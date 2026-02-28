@@ -1,0 +1,21 @@
+import "std/gui.vix"
+
+fn main() -> i32
+{
+    // 创建主窗口
+    window = gui::CreateMainWindow("VixWin32App", "我的第一个Windows GUI应用", 400, 300)
+    
+    // 添加标签
+    label = gui::CreateTextLabel(window.handle, "欢迎使用Vix Windows GUI!", 50, 50, 200, 30)
+    
+    // 添加按钮
+    button = gui::CreateButtonControl(window.handle, "点击我", 50, 100, 100, 30, 1001)
+    
+    // 显示窗口
+    gui::Show(window)
+    
+    // 启动消息循环
+    gui::MessageLoop()
+    
+    return 0
+}
