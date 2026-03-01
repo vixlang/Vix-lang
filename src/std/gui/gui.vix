@@ -1,0 +1,587 @@
+// vixgui.vix - Vix GUI 标准库
+// 基于 SDL2 实现，提供跨平台图形界面功能
+
+extern "C" {
+    // SDL2 核心函数
+    fn SDL_Init(flags: u32) -> i32
+    fn SDL_Quit()
+    fn SDL_CreateWindow(title: ptr, x: i32, y: i32, w: i32, h: i32, flags: u32) -> ptr
+    fn SDL_DestroyWindow(window: ptr)
+    fn SDL_CreateRenderer(window: ptr, index: i32, flags: u32) -> ptr
+    fn SDL_DestroyRenderer(renderer: ptr)
+    fn SDL_SetRenderDrawColor(renderer: ptr, r: u8, g: u8, b: u8, a: u8) -> i32
+    fn SDL_RenderClear(renderer: ptr) -> i32
+    fn SDL_RenderPresent(renderer: ptr)
+    fn SDL_RenderFillRect(renderer: ptr, rect: ptr) -> i32
+    fn SDL_RenderDrawRect(renderer: ptr, rect: ptr) -> i32
+    fn SDL_RenderDrawLine(renderer: ptr, x1: i32, y1: i32, x2: i32, y2: i32) -> i32
+    fn SDL_RenderDrawPoint(renderer: ptr, x: i32, y: i32) -> i32
+    fn SDL_PollEvent(event: ptr) -> i32
+    fn SDL_Delay(ms: u32)
+    fn SDL_GetTicks() -> u32
+    
+    // SDL_ttf 字体
+    fn TTF_Init() -> i32
+    fn TTF_Quit()
+    fn TTF_OpenFont(file: ptr, ptsize: i32) -> ptr
+    fn TTF_CloseFont(font: ptr)
+    fn TTF_RenderText_Solid(font: ptr, text: ptr, color: Color) -> ptr
+    fn TTF_RenderText_Blended(font: ptr, text: ptr, color: Color) -> ptr
+    fn TTF_SizeText(font: ptr, text: ptr, w: ptr, h: ptr) -> i32
+    
+    // SDL_image 图像
+    fn IMG_Init(flags: i32) -> i32
+    fn IMG_Quit()
+    fn IMG_Load(path: ptr) -> ptr
+    fn IMG_LoadTexture(renderer: ptr, path: ptr) -> ptr
+    
+    // SDL 纹理和表面操作
+    fn SDL_FreeSurface(surface: ptr)
+    fn SDL_CreateTextureFromSurface(renderer: ptr, surface: ptr) -> ptr
+    fn SDL_DestroyTexture(texture: ptr)
+    fn SDL_QueryTexture(texture: ptr, format: ptr, access: ptr, w: ptr, h: ptr) -> i32
+    fn SDL_RenderCopy(renderer: ptr, texture: ptr, srcrect: ptr, dstrect: ptr) -> i32
+    
+    // 数学函数
+    fn cos(x: f64) -> f64
+    fn sin(x: f64) -> f64
+}
+
+// SDL 常量
+global SDL_INIT_VIDEO: u32 = 0x00000020
+global SDL_INIT_EVENTS: u32 = 0x00000040
+global SDL_INIT_TIMER: u32 = 0x00000001
+global SDL_WINDOW_SHOWN: u32 = 0x00000004
+global SDL_WINDOW_OPENGL: u32 = 0x00000002
+global SDL_RENDERER_ACCELERATED: u32 = 0x00000002
+global SDL_RENDERER_PRESENTVSYNC: u32 = 0x00000004
+
+// SDL_image 初始化标志
+global IMG_INIT_PNG: i32 = 0x00000002
+global IMG_INIT_JPG: i32 = 0x00000001
+
+// SDL 事件类型
+global SDL_QUIT: u32 = 0x100
+global SDL_KEYDOWN: u32 = 0x300
+global SDL_KEYUP: u32 = 0x301
+global SDL_MOUSEMOTION: u32 = 0x400
+global SDL_MOUSEBUTTONDOWN: u32 = 0x401
+global SDL_MOUSEBUTTONUP: u32 = 0x402
+
+// SDL 键盘键值
+global SDLK_ESCAPE: u32 = 27
+global SDLK_SPACE: u32 = 32
+global SDLK_RETURN: u32 = 13
+global SDLK_BACKSPACE: u32 = 8
+global SDLK_UP: u32 = 273
+global SDLK_DOWN: u32 = 274
+global SDLK_LEFT: u32 = 276
+global SDLK_RIGHT: u32 = 275
+global SDLK_a: u32 = 97
+global SDLK_d: u32 = 100
+global SDLK_w: u32 = 119
+global SDLK_s: u32 = 115
+
+// SDL 鼠标按钮
+global SDL_BUTTON_LEFT: u32 = 1
+global SDL_BUTTON_MIDDLE: u32 = 2
+global SDL_BUTTON_RIGHT: u32 = 3
+
+// 基础结构体
+struct Color {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8
+}
+
+struct Rect {
+    x: i32,
+    y: i32,
+    w: i32,
+    h: i32
+}
+
+struct Point {
+    x: i32,
+    y: i32
+}
+
+struct Size {
+    width: i32,
+    height: i32
+}
+
+// 窗口结构体
+struct Window {
+    sdl_window: ptr,
+    renderer: ptr,
+    width: i32,
+    height: i32,
+    running: bool,
+    bg_color: Color
+}
+
+// 纹理结构体
+struct Texture {
+    sdl_texture: ptr,
+    width: i32,
+    height: i32
+}
+
+// 字体结构体
+struct Font {
+    sdl_font: ptr,
+    size: i32
+}
+
+// ========== 颜色函数 ==========
+
+// 创建 RGB 颜色
+fn color_rgb(r: u8, g: u8, b: u8) -> Color {
+    let color = Color { r: r, g: g, b: b, a: 255 }
+    return color
+}
+
+// 创建 RGBA 颜色
+fn color_rgba(r: u8, g: u8, b: u8, a: u8) -> Color {
+    let color = Color { r: r, g: g, b: b, a: a }
+    return color
+}
+
+// 颜色常量
+global COLOR_BLACK = color_rgb(0, 0, 0)
+global COLOR_WHITE = color_rgb(255, 255, 255)
+global COLOR_RED = color_rgb(255, 0, 0)
+global COLOR_GREEN = color_rgb(0, 255, 0)
+global COLOR_BLUE = color_rgb(0, 0, 255)
+global COLOR_YELLOW = color_rgb(255, 255, 0)
+global COLOR_CYAN = color_rgb(0, 255, 255)
+global COLOR_MAGENTA = color_rgb(255, 0, 255)
+global COLOR_GRAY = color_rgb(128, 128, 128)
+global COLOR_DARK_GRAY = color_rgb(64, 64, 64)
+global COLOR_LIGHT_GRAY = color_rgb(192, 192, 192)
+
+// ========== 窗口函数 ==========
+
+// 创建窗口
+fn window_create(title: string, width: i32, height: i32) -> Window {
+    let window = Window {
+        sdl_window: nil,
+        renderer: nil,
+        width: width,
+        height: height,
+        running: false,
+        bg_color: COLOR_WHITE
+    }
+    
+    // 初始化 SDL
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
+        return window
+    }
+    
+    // 初始化 TTF
+    if (TTF_Init() != 0) {
+        SDL_Quit()
+        return window
+    }
+    
+    // 初始化 IMG
+    if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) == 0) {
+        TTF_Quit()
+        SDL_Quit()
+        return window
+    }
+    
+    // 创建窗口
+    window.sdl_window = SDL_CreateWindow(title, 100, 100, width, height, SDL_WINDOW_SHOWN)
+    if (window.sdl_window == nil) {
+        IMG_Quit()
+        TTF_Quit()
+        SDL_Quit()
+        return window
+    }
+    
+    // 创建渲染器
+    window.renderer = SDL_CreateRenderer(window.sdl_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)
+    if (window.renderer == nil) {
+        SDL_DestroyWindow(window.sdl_window)
+        IMG_Quit()
+        TTF_Quit()
+        SDL_Quit()
+        return window
+    }
+    
+    window.running = true
+    return window
+}
+
+// 设置窗口背景颜色
+fn window_set_background(mut window: &Window, color: Color) {
+    @window.bg_color = color
+}
+
+// 获取窗口是否正在运行
+fn window_is_running(window: &Window) -> bool {
+    return window.running
+}
+
+// 设置窗口运行状态
+fn window_set_running(mut window: &Window, running: bool) {
+    @window.running = running
+}
+
+// 获取窗口尺寸
+fn window_get_size(window: &Window) -> Size {
+    let size = Size { width: window.width, height: window.height }
+    return size
+}
+
+// 清除窗口
+fn window_clear(window: &Window) {
+    SDL_SetRenderDrawColor(window.renderer, window.bg_color.r, window.bg_color.g, window.bg_color.b, window.bg_color.a)
+    SDL_RenderClear(window.renderer)
+}
+
+// 显示渲染结果
+fn window_present(window: &Window) {
+    SDL_RenderPresent(window.renderer)
+}
+
+// 窗口延迟
+fn window_delay(ms: u32) {
+    SDL_Delay(ms)
+}
+
+// 获取当前时间（毫秒）
+fn get_ticks() -> u32 {
+    return SDL_GetTicks()
+}
+
+// 轮询事件
+fn window_poll_event(event: ptr) -> bool {
+    return SDL_PollEvent(event) == 1
+}
+
+// 销毁窗口
+fn window_destroy(mut window: &Window) {
+    if (@window.renderer != nil) {
+        SDL_DestroyRenderer(@window.renderer)
+        @window.renderer = nil
+    }
+    if (@window.sdl_window != nil) {
+        SDL_DestroyWindow(@window.sdl_window)
+        @window.sdl_window = nil
+    }
+    IMG_Quit()
+    TTF_Quit()
+    SDL_Quit()
+    @window.running = false
+}
+
+// ========== 绘制函数 ==========
+
+// 设置绘制颜色
+fn set_draw_color(window: &Window, color: Color) {
+    SDL_SetRenderDrawColor(window.renderer, color.r, color.g, color.b, color.a)
+}
+
+// 绘制矩形（填充）
+fn draw_rect_filled(window: &Window, rect: &Rect, color: Color) {
+    SDL_SetRenderDrawColor(window.renderer, color.r, color.g, color.b, color.a)
+    SDL_RenderFillRect(window.renderer, rect)
+}
+
+// 绘制矩形（边框）
+fn draw_rect_outline(window: &Window, rect: &Rect, color: Color) {
+    SDL_SetRenderDrawColor(window.renderer, color.r, color.g, color.b, color.a)
+    SDL_RenderDrawRect(window.renderer, rect)
+}
+
+// 绘制直线
+fn draw_line(window: &Window, x1: i32, y1: i32, x2: i32, y2: i32, color: Color) {
+    SDL_SetRenderDrawColor(window.renderer, color.r, color.g, color.b, color.a)
+    SDL_RenderDrawLine(window.renderer, x1, y1, x2, y2)
+}
+
+// 绘制点
+fn draw_point(window: &Window, x: i32, y: i32, color: Color) {
+    SDL_SetRenderDrawColor(window.renderer, color.r, color.g, color.b, color.a)
+    SDL_RenderDrawPoint(window.renderer, x, y)
+}
+
+// 绘制圆形（填充）
+fn draw_circle_filled(window: &Window, center_x: i32, center_y: i32, radius: i32, color: Color) {
+    SDL_SetRenderDrawColor(window.renderer, color.r, color.g, color.b, color.a)
+    
+    for (dy in -radius .. radius + 1) {
+        for (dx in -radius .. radius + 1) {
+            if (dx * dx + dy * dy <= radius * radius) {
+                SDL_RenderDrawPoint(window.renderer, center_x + dx, center_y + dy)
+            }
+        }
+    }
+}
+
+// 绘制圆形（边框）
+fn draw_circle_outline(window: &Window, center_x: i32, center_y: i32, radius: i32, color: Color) {
+    SDL_SetRenderDrawColor(window.renderer, color.r, color.g, color.b, color.a)
+    
+    let segments = 36
+    for (i in 0 .. segments) {
+        let angle1 = 6.28318530718 * i / segments  // 2 * PI * i / segments
+        let angle2 = 6.28318530718 * (i + 1) / segments
+        
+        let x1 = center_x + radius * cos(angle1)
+        let y1 = center_y + radius * sin(angle1)
+        let x2 = center_x + radius * cos(angle2)
+        let y2 = center_y + radius * sin(angle2)
+        
+        SDL_RenderDrawLine(window.renderer, x1, y1, x2, y2)
+    }
+}
+
+// ========== 纹理函数 ==========
+
+// 从文件加载纹理
+fn texture_load(window: &Window, path: string) -> Texture {
+    let sdl_texture = IMG_LoadTexture(window.renderer, path)
+    if (sdl_texture == nil) {
+        let texture = Texture { sdl_texture: nil, width: 0, height: 0 }
+        return texture
+    }
+    
+    let width: i32 = 0
+    let height: i32 = 0
+    SDL_QueryTexture(sdl_texture, nil, nil, &width, &height)
+    
+    let texture = Texture { sdl_texture: sdl_texture, width: width, height: height }
+    return texture
+}
+
+// 获取纹理尺寸
+fn texture_get_size(texture: &Texture) -> Size {
+    let size = Size { width: texture.width, height: texture.height }
+    return size
+}
+
+// 绘制纹理
+fn texture_draw(window: &Window, texture: &Texture, src_rect: &Rect, dst_rect: &Rect) {
+    SDL_RenderCopy(window.renderer, texture.sdl_texture, src_rect, dst_rect)
+}
+
+// 绘制完整纹理
+fn texture_draw_full(window: &Window, texture: &Texture, x: i32, y: i32) {
+    let dst_rect = Rect { x: x, y: y, w: texture.width, h: texture.height }
+    SDL_RenderCopy(window.renderer, texture.sdl_texture, nil, &dst_rect)
+}
+
+// 销毁纹理
+fn texture_destroy(mut texture: &Texture) {
+    if (@texture.sdl_texture != nil) {
+        SDL_DestroyTexture(@texture.sdl_texture)
+        @texture.sdl_texture = nil
+    }
+    @texture.width = 0
+    @texture.height = 0
+}
+
+// ========== 字体和文本函数 ==========
+
+// 加载字体
+fn font_load(path: string, size: i32) -> Font {
+    let sdl_font = TTF_OpenFont(path, size)
+    let font = Font { sdl_font: sdl_font, size: size }
+    return font
+}
+
+// 创建文本纹理
+fn font_create_text(window: &Window, font: &Font, text: string, color: Color) -> Texture {
+    let surface = TTF_RenderText_Blended(font.sdl_font, text, color)
+    if (surface == nil) {
+        let texture = Texture { sdl_texture: nil, width: 0, height: 0 }
+        return texture
+    }
+    
+    let sdl_texture = SDL_CreateTextureFromSurface(window.renderer, surface)
+    SDL_FreeSurface(surface)
+    
+    if (sdl_texture == nil) {
+        let texture = Texture { sdl_texture: nil, width: 0, height: 0 }
+        return texture
+    }
+    
+    let width: i32 = 0
+    let height: i32 = 0
+    SDL_QueryTexture(sdl_texture, nil, nil, &width, &height)
+    
+    let texture = Texture { sdl_texture: sdl_texture, width: width, height: height }
+    return texture
+}
+
+// 测量文本尺寸
+fn font_measure_text(font: &Font, text: string) -> Size {
+    let width: i32 = 0
+    let height: i32 = 0
+    TTF_SizeText(font.sdl_font, text, &width, &height)
+    let size = Size { width: width, height: height }
+    return size
+}
+
+// 绘制文本
+fn draw_text(window: &Window, font: &Font, text: string, x: i32, y: i32, color: Color) {
+    let texture = font_create_text(window, font, text, color)
+    if (texture.sdl_texture == nil) {
+        return
+    }
+    
+    texture_draw_full(window, &texture, x, y)
+    texture_destroy(&texture)
+}
+
+// 销毁字体
+fn font_destroy(mut font: &Font) {
+    if (@font.sdl_font != nil) {
+        TTF_CloseFont(@font.sdl_font)
+        @font.sdl_font = nil
+    }
+    @font.size = 0
+}
+
+// ========== 事件处理函数 ==========
+
+// 检查是否退出事件
+fn event_is_quit(event_type: u32) -> bool {
+    return event_type == SDL_QUIT
+}
+
+// 检查是否按键按下
+fn event_is_key_down(event_type: u32) -> bool {
+    return event_type == SDL_KEYDOWN
+}
+
+// 检查是否按键释放
+fn event_is_key_up(event_type: u32) -> bool {
+    return event_type == SDL_KEYUP
+}
+
+// 检查是否鼠标移动
+fn event_is_mouse_motion(event_type: u32) -> bool {
+    return event_type == SDL_MOUSEMOTION
+}
+
+// 检查是否鼠标按下
+fn event_is_mouse_down(event_type: u32) -> bool {
+    return event_type == SDL_MOUSEBUTTONDOWN
+}
+
+// 检查是否鼠标释放
+fn event_is_mouse_up(event_type: u32) -> bool {
+    return event_type == SDL_MOUSEBUTTONUP
+}
+
+// ========== 辅助函数 ==========
+
+// 创建矩形
+fn rect_create(x: i32, y: i32, w: i32, h: i32) -> Rect {
+    let rect = Rect { x: x, y: y, w: w, h: h }
+    return rect
+}
+
+// 创建点
+fn point_create(x: i32, y: i32) -> Point {
+    let point = Point { x: x, y: y }
+    return point
+}
+
+// 创建尺寸
+fn size_create(width: i32, height: i32) -> Size {
+    let size = Size { width: width, height: height }
+    return size
+}
+
+// 检查点是否在矩形内
+fn point_in_rect(point: Point, rect: Rect) -> bool {
+    return point.x >= rect.x and point.x <= rect.x + rect.w and
+           point.y >= rect.y and point.y <= rect.y + rect.h
+}
+
+// 矩形交集
+fn rect_intersect(a: Rect, b: Rect) -> bool {
+    return a.x < b.x + b.w and a.x + a.w > b.x and
+           a.y < b.y + b.h and a.y + a.h > b.y
+}
+
+// ========== 使用方法示例 ==========
+
+/*
+// 手动编写主循环示例：
+fn main() -> i32 {
+    // 1. 创建窗口
+    let window = window_create("Vix GUI Example", 800, 600)
+    
+    // 2. 检查窗口创建是否成功
+    if (window.sdl_window == nil) {
+        return 1
+    }
+    
+    // 3. 加载字体
+    let font = font_load("arial.ttf", 24)
+    
+    // 4. 初始化变量
+    let x = 100
+    let y = 100
+    
+    // 5. 主循环
+    while (window_is_running(&window)) {
+        // 处理事件
+        let event_type: u32 = 0
+        while (window_poll_event(&event_type)) {
+            if (event_is_quit(event_type)) {
+                window_set_running(&window, false)
+            }
+            elif (event_is_key_down(event_type)) {
+                // 处理键盘事件
+                // 需要根据实际事件结构获取按键
+            }
+            elif (event_is_mouse_down(event_type)) {
+                // 处理鼠标事件
+            }
+        }
+        
+        // 更新逻辑
+        x = x + 1
+        if (x > 700) {
+            x = 100
+        }
+        
+        // 绘制
+        window_clear(&window)
+        
+        // 绘制背景
+        draw_rect_filled(&window, &rect_create(0, 0, 800, 600), COLOR_BLUE)
+        
+        // 绘制移动的方块
+        draw_rect_filled(&window, &rect_create(x, y, 100, 100), COLOR_RED)
+        draw_rect_outline(&window, &rect_create(x, y, 100, 100), COLOR_WHITE)
+        
+        // 绘制文本
+        if (font.sdl_font != nil) {
+            draw_text(&window, &font, "Hello Vix GUI!", 300, 300, COLOR_WHITE)
+        }
+        
+        // 显示结果
+        window_present(&window)
+        
+        // 控制帧率
+        window_delay(16)
+    }
+    
+    // 6. 清理资源
+    font_destroy(&font)
+    window_destroy(&window)
+    
+    return 0
+}
+
+*/

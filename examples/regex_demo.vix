@@ -1,0 +1,33 @@
+
+import "std/regex.vix"
+
+fn main() -> i32 {
+    // 1. 创建和编译正则表达式
+    let regex = regex_new()
+    regex_compile(&regex, "\\d+", REG_EXTENDED)  // 匹配数字
+    
+    // 2. 测试匹配
+    let text = "我有123个苹果和456个橘子"
+    if (regex_match(&regex, text, 0)) {
+        print("文本包含数字")
+    }
+    
+    // 3. 搜索第一个数字
+    let match = regex_search(&regex, text, 0)
+    if (match.start != -1) {
+        let num = text[match.start .. match.end]
+        print("找到数字：", num)
+    }
+    
+    // 4. 查找所有数字
+    let all_matches = regex_find_all(&regex, text, 0)
+    print("共找到", all_matches.length, "个数字")
+    
+    // 5. 替换数字为"X"
+    let new_text = regex_replace_all(&regex, text, "X", 0)
+    print("替换后：", new_text)
+    
+    // 清理
+    regex_free(&regex)
+    return 0
+}

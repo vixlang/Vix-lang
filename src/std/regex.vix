@@ -1,0 +1,324 @@
+// std/regex.vix - Vix 正则表达式标准库
+// 基于 POSIX regex 实现
+
+extern "C" {
+    // POSIX regex 函数
+    fn regcomp(preg: ptr, pattern: ptr, cflags: i32) -> i32
+    fn regexec(preg: ptr, string: ptr, nmatch: i32, pmatch: ptr, eflags: i32) -> i32
+    fn regfree(preg: ptr)
+    fn regerror(errcode: i32, preg: ptr, errbuf: ptr, errbuf_size: i32) -> i32
+}
+
+// 匹配位置结构体
+struct Match {
+    start: i32,
+    end: i32
+}
+
+// 正则表达式结构体
+struct Regex {
+    ptr: ptr,          // 编译后的正则表达式
+    pattern: string,   // 原始模式字符串
+    compiled: bool     // 是否已编译
+}
+
+// 编译标志常量
+global REG_EXTENDED: i32 = 1      // 使用扩展正则表达式
+global REG_ICASE: i32 = 2         // 忽略大小写
+global REG_NEWLINE: i32 = 4       // 使 ^ 和 $ 匹配换行符
+global REG_NOSUB: i32 = 8         // 不报告匹配位置
+
+// 执行标志常量
+global REG_NOTBOL: i32 = 1        // ^ 不匹配行首
+global REG_NOTEOL: i32 = 2        // $ 不匹配行尾
+
+// 错误码常量
+global REG_NOMATCH: i32 = 1       // 没有匹配
+global REG_BADPAT: i32 = 2        // 无效的正则表达式
+global REG_ECOLLATE: i32 = 3      // 无效的排序元素
+global REG_ECTYPE: i32 = 4        // 无效的字符类
+global REG_EESCAPE: i32 = 5       // 尾随反斜杠
+global REG_ESUBREG: i32 = 6       // 无效的反向引用
+global REG_EBRACK: i32 = 7        // 不匹配的方括号
+global REG_EPAREN: i32 = 8        // 不匹配的括号
+global REG_EBRACE: i32 = 9        // 不匹配的大括号
+global REG_BADBR: i32 = 10        // 大括号中的内容无效
+global REG_ERANGE: i32 = 11       // 无效的范围
+global REG_ESPACE: i32 = 12       // 内存不足
+global REG_BADRPT: i32 = 13       // 无效的重复运算符
+
+// 获取错误信息
+fn regex_error(errcode: i32) -> string {
+    let buffer: [i8 * 256] = [0]
+    let size = regerror(errcode, nil, &buffer[0], 256)
+    if (size == 0) {
+        return ""
+    }
+    return &buffer[0]
+}
+
+// 创建正则表达式对象
+fn regex_new() -> Regex {
+    let regex = Regex {
+        ptr: nil,
+        pattern: "",
+        compiled: false
+    }
+    return regex
+}
+
+// 编译正则表达式
+fn regex_compile(mut regex: &Regex, pattern: string, flags: i32) -> bool {
+    if (@regex.ptr != nil) {
+        regfree(@regex.ptr)
+        @regex.ptr = nil
+    }
+    
+    @regex.pattern = pattern
+    let preg: [i8 * 128] = [0]  // regmatch_t 缓冲区
+    
+    let result = regcomp(&preg[0], pattern, flags)
+    if (result != 0) {
+        @regex.compiled = false
+        return false
+    }
+    
+    @regex.ptr = &preg[0]
+    @regex.compiled = true
+    return true
+}
+
+// 销毁正则表达式
+fn regex_free(mut regex: &Regex) {
+    if (@regex.ptr != nil) {
+        regfree(@regex.ptr)
+        @regex.ptr = nil
+    }
+    @regex.pattern = ""
+    @regex.compiled = false
+}
+
+// 检查字符串是否匹配正则表达式
+fn regex_match(regex: &Regex, text: string, flags: i32) -> bool {
+    if (not regex.compiled or regex.ptr == nil) {
+        return false
+    }
+    
+    let result = regexec(regex.ptr, text, 0, nil, flags)
+    return result == 0
+}
+
+// 查找第一个匹配
+fn regex_search(regex: &Regex, text: string, flags: i32) -> Match {
+    let match_result = Match { start: -1, end: -1 }
+    
+    if (not regex.compiled or regex.ptr == nil) {
+        return match_result
+    }
+    
+    let pmatch: [i32 * 2] = [0]  // regmatch_t 结构，存储开始和结束位置
+    
+    let result = regexec(regex.ptr, text, 1, &pmatch[0], flags)
+    if (result != 0) {
+        return match_result
+    }
+    
+    match_result.start = pmatch[0]
+    match_result.end = pmatch[1]
+    return match_result
+}
+
+// 查找所有匹配
+fn regex_find_all(regex: &Regex, text: string, flags: i32) -> [Match] {
+    let matches: [Match] = []
+    
+    if (not regex.compiled or regex.ptr == nil) {
+        return matches
+    }
+    
+    let offset = 0
+    let text_length = text.length
+    let pmatch: [i32 * 2] = [0]
+    
+    while (offset < text_length) {
+        let remaining_text = text[offset .. text_length]
+        let eflags = flags
+        if (offset > 0) {
+            // 不是从字符串开始处搜索
+        }
+        
+        let result = regexec(regex.ptr, remaining_text, 1, &pmatch[0], eflags)
+        if (result != 0) {
+            break
+        }
+        
+        let start = pmatch[0]
+        let end = pmatch[1]
+        
+        if (start == -1 or end == -1) {
+            break
+        }
+        
+        let global_start = offset + start
+        let global_end = offset + end
+        
+        let match_result = Match { start: global_start, end: global_end }
+        matches.push(match_result)
+        
+        if (start == end) {
+            // 零长度匹配，向前移动一个字符
+            offset = offset + 1
+        } else {
+            offset = offset + end
+        }
+    }
+    
+    return matches
+}
+
+// 替换第一个匹配
+fn regex_replace_first(regex: &Regex, text: string, replacement: string, flags: i32) -> string {
+    let match_result = regex_search(regex, text, flags)
+    if (match_result.start == -1) {
+        return text
+    }
+    
+    let prefix = text[0 .. match_result.start]
+    let suffix = text[match_result.end .. text.length]
+    
+    return prefix + replacement + suffix
+}
+
+// 替换所有匹配
+fn regex_replace_all(regex: &Regex, text: string, replacement: string, flags: i32) -> string {
+    let matches = regex_find_all(regex, text, flags)
+    if (matches.length == 0) {
+        return text
+    }
+    
+    let result = ""
+    let last_end = 0
+    
+    for (i in 0 .. matches.length) {
+        let match_item = matches[i]
+        
+        // 添加不匹配的部分
+        if (match_item.start > last_end) {
+            let unmatched = text[last_end .. match_item.start]
+            result = result + unmatched
+        }
+        
+        // 添加替换文本
+        result = result + replacement
+        last_end = match_item.end
+    }
+    
+    // 添加剩余部分
+    if (last_end < text.length) {
+        let remaining = text[last_end .. text.length]
+        result = result + remaining
+    }
+    
+    return result
+}
+
+// 分割字符串
+fn regex_split(regex: &Regex, text: string, flags: i32) -> [string] {
+    let parts: [string] = []
+    
+    if (not regex.compiled or regex.ptr == nil) {
+        parts.push(text)
+        return parts
+    }
+    
+    let matches = regex_find_all(regex, text, flags)
+    if (matches.length == 0) {
+        parts.push(text)
+        return parts
+    }
+    
+    let last_end = 0
+    
+    for (i in 0 .. matches.length) {
+        let match_item = matches[i]
+        
+        // 添加分隔符之前的部分
+        if (match_item.start > last_end) {
+            let part = text[last_end .. match_item.start]
+            if (part != "") {
+                parts.push(part)
+            }
+        }
+        
+        last_end = match_item.end
+    }
+    
+    // 添加最后一个分隔符之后的部分
+    if (last_end < text.length) {
+        let last_part = text[last_end .. text.length]
+        if (last_part != "") {
+            parts.push(last_part)
+        }
+    }
+    
+    return parts
+}
+
+// 获取匹配的文本
+fn regex_get_match(regex: &Regex, text: string, index: i32, flags: i32) -> string {
+    let match_result = regex_search(regex, text, flags)
+    if (match_result.start == -1 or match_result.end == -1) {
+        return ""
+    }
+    
+    return text[match_result.start .. match_result.end]
+}
+
+// 检查正则表达式是否已编译
+fn regex_is_compiled(regex: &Regex) -> bool {
+    return regex.compiled
+}
+
+// 获取正则表达式模式
+fn regex_get_pattern(regex: &Regex) -> string {
+    return regex.pattern
+}
+
+// 简单匹配函数（快速使用）
+fn regex_simple_match(pattern: string, text: string, flags: i32) -> bool {
+    let regex = regex_new()
+    if (not regex_compile(&regex, pattern, flags)) {
+        regex_free(&regex)
+        return false
+    }
+    
+    let result = regex_match(&regex, text, 0)
+    regex_free(&regex)
+    return result
+}
+
+// 简单搜索函数（快速使用）
+fn regex_simple_search(pattern: string, text: string, flags: i32) -> Match {
+    let regex = regex_new()
+    if (not regex_compile(&regex, pattern, flags)) {
+        regex_free(&regex)
+        return Match { start: -1, end: -1 }
+    }
+    
+    let result = regex_search(&regex, text, 0)
+    regex_free(&regex)
+    return result
+}
+
+// 简单替换函数（快速使用）
+fn regex_simple_replace(pattern: string, text: string, replacement: string, flags: i32) -> string {
+    let regex = regex_new()
+    if (not regex_compile(&regex, pattern, flags)) {
+        regex_free(&regex)
+        return text
+    }
+    
+    let result = regex_replace_all(&regex, text, replacement, 0)
+    regex_free(&regex)
+    return result
+}
