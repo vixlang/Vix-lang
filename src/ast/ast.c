@@ -2,8 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
+#ifdef _WIN32
+#   include <windows.h>
+#   include <direct.h>
+#   include <io.h>
+#   define access _access
+#   define F_OK 0
+#   define R_OK 4
+#   define sleep(x) Sleep(x*1000)
+#   define setenv(name,val,over) SetEnvironmentVariableA(name,val)
+#else
+#   include <unistd.h>
+#endif
 extern char* realpath(const char* path, char* resolved_path);
 
 #ifdef HAVE_PARSER_TAB_H//tips : 别删，用来取消警告

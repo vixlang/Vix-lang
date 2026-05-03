@@ -32,7 +32,35 @@ semantic_errors -> errs
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+#   include <windows.h>
+#   include <direct.h>
+#   include <io.h>
+#   define access _access
+#   define F_O K 0
+#   define R_OK 4
+#   define sleep(x) Sleep(x*1000)
+#   define setenv(name,val,over) SetEnvironmentVariableA(name,val)
+#   include <pathcch.h>
+#   pragma comment(lib, "pathcch.lib")
+
+    char* realpath(const char* path, char* resolved) {
+        static char buffer[MAX_PATH];
+        if (!resolved) resolved = buffer;
+
+        wchar_t wpath[MAX_PATH];
+        wchar_t wfull[MAX_PATH];
+        MultiByteToWideChar(CP_UTF8, 0, path, -1, wpath, MAX_PATH);
+        if (PathCchCanonicalize(wfull, MAX_PATH, wpath) != S_OK) return NULL;
+
+        WideCharToMultiByte(CP_UTF8, 0, wfull, -1, resolved, MAX_PATH, NULL, NULL);
+        return resolved;
+    }
+#else
+#   include <unistd.h>
+#endif
+
 #include "../include/ast.h"
 #include "../include/parser.h"
 #include "../include/compiler.h"
@@ -389,11 +417,25 @@ int main(int argc, char **argv) {
                              "clang -O2 %s -o %s -target %s -ffreestanding -fno-builtin -fno-pic -fno-pie -no-pie -nostdlib -nostartfiles -nodefaultlibs -static -Wl,--build-id=none -Wl,--no-dynamic-linker -Wl,-z,max-page-size=0x1000 -Wl,-e,_start -Wl,-T,%s",
                              llvm_f, out_f, f_t, ls);
                 } else if (eff_t) {
+#ifdef _WIN32
+                    snprintf(ccmd, ccmd_sz,
+                             "clang -O2 %s -o %s -target %s -static -lpsapi -lntdll -ladvapi32 -lshell32 -lole32 -luser32",
+                             llvm_f, out_f, eff_t);
+#else
                     snprintf(ccmd, ccmd_sz,
                              "clang -O2 %s -o %s -target %s $(llvm-config --ldflags --libs all) -lm -lstdc++",
                              llvm_f, out_f, eff_t);
+#endif
                 } else {
-                    snprintf(ccmd, ccmd_sz, "clang -O2 %s -o %s $(llvm-config --ldflags --libs all) -lm -lstdc++", llvm_f, out_f);
+#ifdef _WIN32
+                    snprintf(ccmd, ccmd_sz,
+                             "clang -O2 %s -o %s -static -lpsapi -lntdll -ladvapi32 -lshell32 -lole32 -luser32",
+                             llvm_f, out_f);
+#else
+                    snprintf(ccmd, ccmd_sz,
+                             "clang -O2 %s -o %s $(llvm-config --ldflags --libs all) -lm -lstdc++",
+                             llvm_f, out_f);
+#endif
                 }
                 
                 int cres = system(ccmd);

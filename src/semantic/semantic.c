@@ -3,7 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#ifdef _WIN32
+#   include <windows.h>
+#   include <direct.h>
+#   include <io.h>
+#   define access _access
+#   define F_OK 0
+#   define R_OK 4
+#   define sleep(x) Sleep(x*1000)
+#   define setenv(name,val,over) SetEnvironmentVariableA(name,val)
+#else
+#   include <unistd.h>
+#endif
 #include <ctype.h>
 extern const char* current_input_filename;
 static int extract_public_functions_from_module(const char* module_path, SymbolTable* table);
