@@ -37,8 +37,8 @@ jobs:
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
-          chmod +x ./src/install.sh
-          ./src/install.sh
+          sudo apt-get update
+          sudo apt-get install -y clang llvm flex bison make git
           clang --version
           llvm-config --version || true
 
