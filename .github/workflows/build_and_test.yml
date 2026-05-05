@@ -76,8 +76,8 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: |
-          pacman -S --noconfirm mingw-w64-x86_64-flex
-          pacman -S --noconfirm mingw-w64-x86_64-bison
+          pacman -S --noconfirm flex
+          pacman -S --noconfirm bison
 
       - name: Build vixc (Windows)
         if: runner.os == 'Windows'

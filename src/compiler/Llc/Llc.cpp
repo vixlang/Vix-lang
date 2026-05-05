@@ -99,7 +99,7 @@ bool Llc::compile(const std::string &llvm_ir_path,
 
 	std::string effectiveTripleStr = triple;
 	if (effectiveTripleStr.empty()) {
- 		effectiveTripleStr = module->getTargetTriple().str();
+ 		effectiveTripleStr = module->getTargetTriple();
 	}
 	if (effectiveTripleStr.empty()) {
  		effectiveTripleStr = sys::getDefaultTargetTriple();
