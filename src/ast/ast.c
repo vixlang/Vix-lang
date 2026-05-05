@@ -2,9 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
+#ifdef _WIN32
+static char* realpath(const char* path, char* resolved_path) {
+    char* result = _fullpath(resolved_path, path, _MAX_PATH);
+    return result;
+}
+#else
 extern char* realpath(const char* path, char* resolved_path);
+#endif
 
 #ifdef HAVE_PARSER_TAB_H//tips : 别删，用来取消警告
 #include "../parser/parser.tab.h"//tips : 这个头文件按编译顺序编译

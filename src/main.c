@@ -12,7 +12,11 @@ vix 语言 0.0.1版本完工
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
+#include "../include/vix_wincompat.h"
+#else
 #include <unistd.h>
+#endif
 #include "../include/ast.h"
 #include "../include/parser.h"
 #include "../include/compiler.h"
@@ -137,7 +141,13 @@ int main(int argc, char **argv) {
             is_vic = strlen(argv[i]) > 4 && strcmp(argv[i] + strlen(argv[i]) - 4, ".vic") == 0;
         }
     }
-    setenv("VIX_DEBUG", dbg ? "1" : "0", 1);//通过环境变量控制调试输出
+#ifdef _WIN32
+    char env_buf[32];
+    snprintf(env_buf, sizeof(env_buf), "VIX_DEBUG=%s", dbg ? "1" : "0");
+    _putenv(env_buf);
+#else
+    setenv("VIX_DEBUG", dbg ? "1" : "0", 1);
+#endif
     vix_set_opt_level(opt_level);
     if (!in_f) {
         in_f = argv[1];

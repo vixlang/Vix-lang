@@ -13,3 +13,5 @@ build
 dist
 !lib
 .VSCodeCounter
+*.o
+*.exe
