@@ -48,7 +48,7 @@ extern "C" void vix_optimize_module(void* llvm_module, int level) {
     if (!TM) return;
 
     M->setDataLayout(TM->createDataLayout());
-    M->setTargetTriple(TM->getTargetTriple());
+    M->setTargetTriple(TM->getTargetTriple().str());
 
     PassBuilder PB(TM.get());
 

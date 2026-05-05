@@ -62,7 +62,7 @@ parser/lex.yy.c: parser/lexer.l
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(LLVM_CXXFLAGS) $(CPPFLAGS) -fexceptions -c $< -o $@
 
 main.o: main.c ../include/ast.h ../include/parser.h ../include/compiler.h ../include/semantic.h ../include/typeck.h compiler/Llc/Llc.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
