@@ -69,10 +69,15 @@ jobs:
           install: >-
             mingw-w64-x86_64-clang
             mingw-w64-x86_64-llvm
-            mingw-w64-x86_64-flex
-            mingw-w64-x86_64-bison
             mingw-w64-x86_64-make
             git
+
+      - name: Install flex and bison (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: |
+          pacman -S --noconfirm mingw-w64-x86_64-flex
+          pacman -S --noconfirm mingw-w64-x86_64-bison
 
       - name: Build vixc (Windows)
         if: runner.os == 'Windows'
@@ -154,7 +159,7 @@ jobs:
           cd test
           python3 run.py
         continue-on-error: true
-
+ 
       - name: Run tests (Windows)
         if: runner.os == 'Windows'
         shell: bash
@@ -163,33 +168,3 @@ jobs:
           cd test
           python3 run.py
         continue-on-error: true
-
-  # ═══════════════════════════════════════════════════════════════
-  #  Release (only on tag push)
-  # ═══════════════════════════════════════════════════════════════
-  release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build, test]
-    runs-on: ubuntu-latest
-    name: Create Release
-    permissions:
-      contents: write
-
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Package release
-        run: |
-          mkdir -p release_pkg
-          cp artifacts/vixc-linux-x64/vixc release_pkg/ 2>/dev/null || true
-          cp artifacts/vixc-windows-x64/vixc.exe release_pkg/ 2>/dev/null || true
-          ls -lhR release_pkg/
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: release_pkg/*
-          generate_release_notes: true
