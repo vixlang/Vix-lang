@@ -59,36 +59,30 @@ jobs:
           path: src/vixc
           retention-days: 30
 
-      # ── Windows Build (MSYS2) ──
-      - name: Setup MSYS2 (Windows)
+      # ── Windows Build ──
+      - name: Install LLVM 18 (Windows)
         if: runner.os == 'Windows'
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: >-
-            mingw-w64-x86_64-clang
-            mingw-w64-x86_64-llvm
-            mingw-w64-x86_64-make
-            git
-
-      - name: Install flex and bison (Windows)
-        if: runner.os == 'Windows'
-        shell: msys2 {0}
+        shell: powershell
         run: |
-          pacman -S --noconfirm flex
-          pacman -S --noconfirm bison
+          $url = "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/LLVM-18.1.8-win64.exe"
+          Invoke-WebRequest -Uri $url -OutFile "LLVM-18.1.8-win64.exe"
+          Start-Process -FilePath "LLVM-18.1.8-win64.exe" -ArgumentList "/S" -Wait
+          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "LLVM_HOME=C:\Program Files\LLVM" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install Win flex-bison (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install winflexbison -y
+          echo "C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build vixc (Windows)
         if: runner.os == 'Windows'
-        shell: msys2 {0}
+        working-directory: ./src
+        shell: cmd
         run: |
-          export LLVM_HOME=/mingw64
-          cd src
-          mingw32-make clean || true
-          mingw32-make -j$(nproc)
-          ls -lh vixc.exe
-          ./vixc.exe -v
+          build_win.bat
 
       - name: Upload vixc artifact (Windows)
         if: runner.os == 'Windows'
