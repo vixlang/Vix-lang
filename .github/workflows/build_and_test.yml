@@ -1,0 +1,195 @@
+name: Vix Compiler CI
+
+on:
+  push:
+    branches: [main, stage0, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, stage0, develop]
+
+env:
+  VIX_DEBUG: "0"
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════
+  #  Build vixc compiler on Linux and Windows
+  # ═══════════════════════════════════════════════════════════════
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Linux x64
+            artifact_name: vixc
+          - os: windows-latest
+            name: Windows x64
+            artifact_name: vixc.exe
+
+    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.name }})
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ── Linux Build ──
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm flex bison make git
+          clang --version
+          llvm-config --version
+
+      - name: Build vixc (Linux)
+        if: runner.os == 'Linux'
+        working-directory: ./src
+        run: |
+          make clean || true
+          make -j$(nproc)
+          ls -lh vixc
+          ./vixc -v
+
+      - name: Upload vixc artifact (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vixc-linux-x64
+          path: src/vixc
+          retention-days: 30
+
+      # ── Windows Build (MSYS2) ──
+      - name: Setup MSYS2 (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-clang
+            mingw-w64-x86_64-llvm
+            mingw-w64-x86_64-flex
+            mingw-w64-x86_64-bison
+            mingw-w64-x86_64-make
+            git
+
+      - name: Build vixc (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: |
+          export LLVM_HOME=/mingw64
+          cd src
+          mingw32-make clean || true
+          mingw32-make -j$(nproc)
+          ls -lh vixc.exe
+          ./vixc.exe -v
+
+      - name: Upload vixc artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vixc-windows-x64
+          path: src/vixc.exe
+          retention-days: 30
+
+  # ═══════════════════════════════════════════════════════════════
+  #  Run tests using the built vixc
+  # ═══════════════════════════════════════════════════════════════
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: vixc-linux-x64
+            compiler_path: vixc
+            bin_dir: .
+          - os: windows-latest
+            artifact: vixc-windows-x64
+            compiler_path: vixc.exe
+            bin_dir: .
+
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.os }})
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download vixc artifact (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: src
+
+      - name: Make vixc executable (Linux)
+        if: runner.os == 'Linux'
+        run: chmod +x src/vixc
+
+      - name: Download vixc artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: src
+
+      - name: Verify vixc works
+        working-directory: ./src
+        run: |
+          ./${{ matrix.compiler_path }} -v
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run tests (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          export PATH="$PWD/src:$PATH"
+          cd test
+          python3 run.py
+        continue-on-error: true
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          export PATH="$PWD/src:$PATH"
+          cd test
+          python3 run.py
+        continue-on-error: true
+
+  # ═══════════════════════════════════════════════════════════════
+  #  Release (only on tag push)
+  # ═══════════════════════════════════════════════════════════════
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    name: Create Release
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Package release
+        run: |
+          mkdir -p release_pkg
+          cp artifacts/vixc-linux-x64/vixc release_pkg/ 2>/dev/null || true
+          cp artifacts/vixc-windows-x64/vixc.exe release_pkg/ 2>/dev/null || true
+          ls -lhR release_pkg/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release_pkg/*
+          generate_release_notes: true

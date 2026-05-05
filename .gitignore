@@ -1,5 +1,5 @@
 .python-version
-.github
+# .github
 .venv
 .kilo
 uv.lock
