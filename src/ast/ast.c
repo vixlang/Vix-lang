@@ -90,6 +90,9 @@ static int canonicalize_existing_path(const char* path, char* out, size_t out_si
 
     char resolved[1024];
     if (vix_realpath(path, resolved, sizeof(resolved)) != NULL) {
+        for (char* p = resolved; *p; p++) {
+            if (*p == '\\') *p = '/';
+        }
         strncpy(out, resolved, out_size - 1);
         out[out_size - 1] = '\0';
         return 1;
