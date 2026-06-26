@@ -100,6 +100,58 @@ static int canonicalize_existing_path(const char* path, char* out, size_t out_si
     return 1;
 }
 
+static int vix_expand_package_name(const char* module_path, char* out, size_t out_size) {
+    if (!module_path || !out || out_size == 0) return 0;
+    if (strchr(module_path, '/') != NULL) return 0;
+
+    char registry[256] = "github.com";
+    char user[256] = "";
+    char repo[256] = "";
+    const char* p = module_path;
+
+    if (p[0] == '@') {
+        strncpy(registry, "gitee.com", sizeof(registry) - 1);
+        registry[sizeof(registry) - 1] = '\0';
+        p++;
+    } else {
+        const char* colon = strchr(p, ':');
+        if (colon) {
+            size_t reg_len = colon - p;
+            if (reg_len > 0 && reg_len < sizeof(registry)) {
+                strncpy(registry, p, reg_len);
+                registry[reg_len] = '\0';
+                if (strchr(registry, '.') == NULL) {
+                    size_t avail = sizeof(registry) - strlen(registry) - 1;
+                    strncat(registry, ".com", avail);
+                }
+            }
+            p = colon + 1;
+        }
+    }
+
+    const char* dot = strchr(p, '.');
+    if (dot) {
+        size_t user_len = dot - p;
+        if (user_len > 0 && user_len < sizeof(user)) {
+            strncpy(user, p, user_len);
+            user[user_len] = '\0';
+            strncpy(repo, dot + 1, sizeof(repo) - 1);
+            repo[sizeof(repo) - 1] = '\0';
+        } else {
+            return 0;
+        }
+    } else {
+        strncpy(user, "vixlang", sizeof(user) - 1);
+        user[sizeof(user) - 1] = '\0';
+        int n = snprintf(repo, sizeof(repo), "vlib-%s", p);
+        if (n < 0 || (size_t)n >= sizeof(repo)) return 0;
+    }
+
+    int n = snprintf(out, out_size, "%s/%s/%s", registry, user, repo);
+    if (n < 0 || (size_t)n >= out_size) return 0;
+    return 1;
+}
+
 static int try_resolve_import_path(const char* base_dir, const char* module_path, char* out, size_t out_size) {
     char candidate[1024];
     snprintf(candidate, sizeof(candidate), "%s/%s", base_dir, module_path);
@@ -134,22 +186,45 @@ int vix_resolve_import_path(const char* current_file, const char* module_path, c
         }
     }
 
-    // Priority 2: $VIX_HOME/std/
-    const char* vix_home = vix_getenv("VIX_HOME");
-    if (vix_home && vix_home[0] != '\0') {
-        char base[1024];
-        snprintf(base, sizeof(base), "%s/std", vix_home);
-        if (try_resolve_import_path(base, module_path, out, out_size)) return 1;
-    }
+    // Priority 2: package name expansion (for bare names without '/')
+    if (strchr(module_path, '/') == NULL) {
+        char expanded[1024];
+        if (vix_expand_package_name(module_path, expanded, sizeof(expanded))) {
+            const char* vix_home = vix_getenv("VIX_HOME");
+            char lib_path[1024];
 
-    // Priority 3: .vix/libs/ (project-local packages)
-    if (try_resolve_import_path(".vix/libs", module_path, out, out_size)) return 1;
+            snprintf(lib_path, sizeof(lib_path), ".vix/libs/%s/main.vix", expanded);
+            if (vix_file_exists(lib_path)) {
+                return canonicalize_existing_path(lib_path, out, out_size);
+            }
 
-    // Priority 4: $VIX_HOME/libs/
-    if (vix_home && vix_home[0] != '\0') {
-        char base[1024];
-        snprintf(base, sizeof(base), "%s/libs", vix_home);
-        if (try_resolve_import_path(base, module_path, out, out_size)) return 1;
+            if (vix_home && vix_home[0] != '\0') {
+                snprintf(lib_path, sizeof(lib_path), "%s/libs/%s/main.vix", vix_home, expanded);
+                if (vix_file_exists(lib_path)) {
+                    return canonicalize_existing_path(lib_path, out, out_size);
+                }
+
+                // Bare name standard library fallback
+                snprintf(lib_path, sizeof(lib_path), "%s/std/%s", vix_home, module_path);
+                if (vix_file_exists(lib_path)) {
+                    return canonicalize_existing_path(lib_path, out, out_size);
+                }
+            }
+        }
+    } else {
+        // Priority 3: path-style import (contains '/'), backward-compatible direct search
+        const char* vix_home = vix_getenv("VIX_HOME");
+        if (vix_home && vix_home[0] != '\0') {
+            char base[1024];
+            snprintf(base, sizeof(base), "%s/std", vix_home);
+            if (try_resolve_import_path(base, module_path, out, out_size)) return 1;
+        }
+        if (try_resolve_import_path(".vix/libs", module_path, out, out_size)) return 1;
+        if (vix_home && vix_home[0] != '\0') {
+            char base[1024];
+            snprintf(base, sizeof(base), "%s/libs", vix_home);
+            if (try_resolve_import_path(base, module_path, out, out_size)) return 1;
+        }
     }
 
     return 0;
