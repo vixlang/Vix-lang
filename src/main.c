@@ -30,20 +30,19 @@
 
 #ifdef _WIN32
 #include <windows.h>
-struct timespec {
-  time_t tv_sec;
-  long tv_nsec;
-};
+#include <time.h>
 
-static int clock_gettime(int unused, struct timespec *ts) {
-  LARGE_INTEGER freq, counter;
-  QueryPerformanceFrequency(&freq);
-  QueryPerformanceCounter(&counter);
-  ts->tv_sec = counter.QuadPart / freq.QuadPart;
-  ts->tv_nsec = (counter.QuadPart % freq.QuadPart) * 1000000000 / freq.QuadPart;
-  return 0;
+static int vix_clock_gettime(int unused, struct timespec *ts) {
+    (void)unused;
+    LARGE_INTEGER freq, counter;
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&counter);
+    ts->tv_sec = (long)(counter.QuadPart / freq.QuadPart);
+    ts->tv_nsec = (long)((counter.QuadPart % freq.QuadPart) * 1000000000 / freq.QuadPart);
+    return 0;
 }
 #define CLOCK_MONOTONIC 1
+#define clock_gettime vix_clock_gettime
 #else
 #include <libgen.h>
 #include <limits.h>
@@ -363,16 +362,36 @@ int main(int argc, char **argv) {
     char *dot = strrchr(in_f, '.');
     if (dot) {
       size_t len = dot - in_f;
+#ifdef _WIN32
+      char *def_out = malloc(len + 5);
+#else
       char *def_out = malloc(len + 1);
+#endif
       if (def_out) {
         strncpy(def_out, in_f, len);
         def_out[len] = '\0';
+#ifdef _WIN32
+        strcat(def_out, ".exe");
+#endif
         out_f = def_out;
         save_c = 1;
       }
     } else {
+#ifdef _WIN32
+      char *def_out = malloc(strlen(in_f) + 5);
+      if (def_out) {
+        strcpy(def_out, in_f);
+        strcat(def_out, ".exe");
+        out_f = def_out;
+        save_c = 1;
+      } else {
+        out_f = in_f;
+        save_c = 1;
+      }
+#else
       out_f = in_f;
       save_c = 1;
+#endif
     }
   }
 

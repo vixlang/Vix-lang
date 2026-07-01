@@ -4,9 +4,16 @@ import subprocess
 import sys
 from pathlib import Path
 
+import platform
+
 ROOT = Path(__file__).resolve().parent
-VENV_PYTHON = ROOT / ".venv" / "bin" / "python3"
+if platform.system() == "Windows":
+    VENV_PYTHON = ROOT / ".venv" / "Scripts" / "python.exe"
+else:
+    VENV_PYTHON = ROOT / ".venv" / "bin" / "python3"
 COMPILER = ROOT / "build" / "vixc"
+if platform.system() == "Windows" and not str(COMPILER).endswith(".exe"):
+    COMPILER = Path(str(COMPILER) + ".exe")
 
 GREEN = "\033[32m"
 RED = "\033[31m"

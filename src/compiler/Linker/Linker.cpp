@@ -167,14 +167,16 @@ static std::vector<std::string> probeWindowsSDKPaths() {
         "C:/Program Files/Windows Kits/10/Lib",
         NULL
     };
-    for (auto *root : sdkRoots) {
-        if (!sys::fs::is_directory(root)) continue;
+    for (size_t i = 0; sdkRoots[i]; i++) {
+        auto *root = sdkRoots[i];
+        bool is_dir;
+        std::error_code ec = sys::fs::is_directory(root, is_dir);
+        if (!is_dir) continue;
         std::string bestVer;
-        std::error_code ec;
         for (sys::fs::directory_iterator it(root, ec), end; it != end;
              it.increment(ec)) {
-            StringRef name = sys::path::filename(it->path());
-            if (name > bestVer) bestVer = name.str();
+            std::string name = sys::path::filename(it->path()).str();
+            if (name > bestVer) bestVer = name;
         }
         if (bestVer.empty()) continue;
         std::string base = std::string(root) + "/" + bestVer;
@@ -184,9 +186,11 @@ static std::vector<std::string> probeWindowsSDKPaths() {
             "/ucrt/arm64", "/um/arm64",
             NULL
         };
-        for (auto *sub : subdirs) {
-            std::string p = base + sub;
-            if (sys::fs::is_directory(p))
+        for (size_t i2 = 0; subdirs[i2]; i2++) {
+            std::string p = base + subdirs[i2];
+            bool exists;
+            std::error_code ec2 = sys::fs::is_directory(p, exists);
+            if (exists)
                 paths.push_back(p);
         }
     }
@@ -203,10 +207,15 @@ static std::vector<std::string> probeWindowsSDKPaths() {
         "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC",
         "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC",
         "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC",
+        "C:/Program Files/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC",
+        "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Tools/MSVC",
         NULL
     };
-    for (auto *toolsDir : standaloneTools) {
-        if (!sys::fs::is_directory(toolsDir)) continue;
+    for (size_t i = 0; standaloneTools[i]; i++) {
+        auto *toolsDir = standaloneTools[i];
+        bool exists;
+        std::error_code ec2 = sys::fs::is_directory(toolsDir, exists);
+        if (!exists) continue;
         std::string bestVer;
         std::error_code ec;
         for (sys::fs::directory_iterator it(toolsDir, ec), end; it != end;
@@ -376,12 +385,24 @@ void buildCoffArgs(std::vector<std::string> &args, bool bare,
         args.push_back("/SUBSYSTEM:CONSOLE");
         addBareArgs(args, entry, script);
     } else {
+        args.push_back("/ENTRY:mainCRTStartup");
+        args.push_back("/SUBSYSTEM:CONSOLE");
         // Prefer bundled libc if available
         if (libc_dir && libc_dir[0]) {
             args.push_back("/LIBPATH:" + std::string(libc_dir));
         }
+        // Add Windows SDK and MSVC library paths
+        auto sdkPaths = probeWindowsSDKPaths();
+        for (auto &p : sdkPaths)
+            args.push_back("/LIBPATH:" + p);
+        args.push_back("legacy_stdio_definitions.lib");
+        args.push_back("vcruntime.lib");
+        args.push_back("ucrt.lib");
         args.push_back("msvcrt.lib");
         args.push_back("kernel32.lib");
+        args.push_back("advapi32.lib");
+        args.push_back("user32.lib");
+        args.push_back("shell32.lib");
     }
 }
 
@@ -511,7 +532,6 @@ extern "C" int vix_link(const char *obj_file, const char *output_file,
     }
     args.push_back(progName);
 
-    // ── Flavor-specific flags ──────────────────────────────────
     const char *entry = options ? options->entry_point : nullptr;
     const char *script = options ? options->linker_script : nullptr;
     const char *libc_dir = options ? options->libc_dir : nullptr;
@@ -568,19 +588,26 @@ extern "C" int vix_link(const char *obj_file, const char *output_file,
         args.push_back("-L/usr/lib");
     }
 
-    // ── User-specified library paths (-L) ──────────────────────
+    // ── User-specified library paths (-L /LIBPATH:) ───────────
     if (options && options->lib_paths && options->lib_path_count > 0) {
         for (int i = 0; i < options->lib_path_count; i++) {
             if (options->lib_paths[i] && options->lib_paths[i][0]) {
-                args.push_back("-L" + std::string(options->lib_paths[i]));
+                if (flavor == LinkFlavor::COFF)
+                    args.push_back("/LIBPATH:" + std::string(options->lib_paths[i]));
+                else
+                    args.push_back("-L" + std::string(options->lib_paths[i]));
             }
         }
     }
 
     // ── Input / output ────────────────────────────────────────
     args.push_back(obj_file);
-    args.push_back("-o");
-    args.push_back(output_file);
+    if (flavor == LinkFlavor::COFF) {
+        args.push_back("/out:" + std::string(output_file));
+    } else {
+        args.push_back("-o");
+        args.push_back(output_file);
+    }
 
     // ── System libraries (ELF non-bare only, others handled above) ─
     if (!bare && flavor == LinkFlavor::ELF) {
@@ -615,6 +642,8 @@ extern "C" int vix_link(const char *obj_file, const char *output_file,
     rawArgs.reserve(args.size());
     for (auto &s : args)
         rawArgs.push_back(s.c_str());
+
+
 
     std::string outStr, errStr;
     raw_string_ostream outOS(outStr);
@@ -742,11 +771,14 @@ extern "C" int vix_link_multi(const char **obj_files, int obj_count,
         args.push_back("-L/usr/lib");
     }
 
-    // ── User-specified library paths (-L) ──────────────────────
+    // ── User-specified library paths (-L /LIBPATH:) ───────────
     if (options && options->lib_paths && options->lib_path_count > 0) {
         for (int i = 0; i < options->lib_path_count; i++) {
             if (options->lib_paths[i] && options->lib_paths[i][0]) {
-                args.push_back("-L" + std::string(options->lib_paths[i]));
+                if (flavor == LinkFlavor::COFF)
+                    args.push_back("/LIBPATH:" + std::string(options->lib_paths[i]));
+                else
+                    args.push_back("-L" + std::string(options->lib_paths[i]));
             }
         }
     }
@@ -754,8 +786,12 @@ extern "C" int vix_link_multi(const char **obj_files, int obj_count,
     for (int i = 0; i < obj_count; i++) {
         args.push_back(obj_files[i]);
     }
-    args.push_back("-o");
-    args.push_back(output_file);
+    if (flavor == LinkFlavor::COFF) {
+        args.push_back("/out:" + std::string(output_file));
+    } else {
+        args.push_back("-o");
+        args.push_back(output_file);
+    }
 
     if (!bare && flavor == LinkFlavor::ELF) {
         if (wantStatic) {

@@ -74,15 +74,20 @@ set(_lld_found OFF)
 foreach(_lld_dir IN LISTS _lld_cmake_candidates)
     get_filename_component(_lld_dir "${_lld_dir}" ABSOLUTE)
     if(EXISTS "${_lld_dir}/LLDConfig.cmake")
-        find_package(LLD REQUIRED CONFIG PATHS "${_lld_dir}" NO_DEFAULT_PATH)
-        set(_lld_found ON)
-        message(STATUS "Found LLD at ${_lld_dir}")
-        break()
+        find_package(LLD CONFIG PATHS "${_lld_dir}" NO_DEFAULT_PATH)
+        if(LLD_FOUND)
+            set(_lld_found ON)
+            message(STATUS "Found LLD at ${_lld_dir}")
+            break()
+        endif()
     endif()
 endforeach()
 
 if(NOT _lld_found)
-    find_package(LLD REQUIRED CONFIG)
+    find_package(LLD CONFIG)
+    if(NOT LLD_FOUND)
+        message(FATAL_ERROR "LLD not found. Please install LLVM/LLD or set LLD_DIR to the LLD cmake directory.")
+    endif()
 endif()
 
 include_directories(${LLVM_INCLUDE_DIRS} ${LLD_INCLUDE_DIRS})
@@ -127,6 +132,12 @@ set(CXX_SOURCES
     src/Typeck/LayOut.cpp
     src/Ownership/Ownership.cpp
 )
+
+if(WIN32)
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/parser/lex.yy.c
+        PROPERTIES COMPILE_DEFINITIONS "YY_NO_UNISTD_H")
+endif()
+
 add_executable(vixc ${C_SOURCES} ${CXX_SOURCES})
 
 target_include_directories(vixc PRIVATE
@@ -146,6 +157,48 @@ if(NOT WIN32)
         _POSIX_C_SOURCE=200809L
         _XOPEN_SOURCE=700
     )
+endif()
+if(WIN32)
+    # 移除 LLVMWindowsManifest 对动态 LibXml2::LibXml2 的依赖
+    if(TARGET LLVMWindowsManifest)
+        get_target_property(_iface_libs LLVMWindowsManifest INTERFACE_LINK_LIBRARIES)
+        if(_iface_libs)
+            list(REMOVE_ITEM _iface_libs LibXml2::LibXml2)
+            set_target_properties(LLVMWindowsManifest PROPERTIES
+                INTERFACE_LINK_LIBRARIES "${_iface_libs}")
+        endif()
+    endif()
+
+    # 探测 vcpkg 静态 triplet 路径
+    set(_vcpkg_static "$ENV{VCPKG_ROOT}/installed/x64-windows-static")
+    if(NOT EXISTS "${_vcpkg_static}")
+        set(_vcpkg_static "E:/spj/vcpkg/installed/x64-windows-static")
+    endif()
+
+    # 静态库路径
+    set(_libxml2_static "${_vcpkg_static}/lib/libxml2.lib")
+    set(_zlib_static    "${_vcpkg_static}/lib/zlib.lib")
+    set(_iconv_static   "${_vcpkg_static}/lib/iconv.lib")
+
+    if(NOT EXISTS "${_libxml2_static}")
+        message(FATAL_ERROR "Static libxml2 not found. Run: vcpkg install libxml2:x64-windows-static")
+    endif()
+
+    target_link_libraries(vixc PRIVATE
+        "${_libxml2_static}"
+        "${_zlib_static}"
+        "${_iconv_static}"
+    )
+    target_include_directories(vixc PRIVATE
+        "${_vcpkg_static}/include/libxml2"
+    )
+
+    # libxml2 的 dict.c 需要 BCryptGenRandom
+    target_link_libraries(vixc PRIVATE bcrypt.lib)
+
+    message(STATUS "Linked static libxml2: ${_libxml2_static}")
+    message(STATUS "Linked static zlib:    ${_zlib_static}")
+    message(STATUS "Linked static iconv:   ${_iconv_static}")
 endif()
 if(TARGET LLVM)
     target_link_libraries(vixc PRIVATE LLVM)
@@ -170,6 +223,7 @@ endforeach()
 foreach(lib IN LISTS LLVM_SYSTEM_LIBS)
     target_link_libraries(vixc PRIVATE ${lib})
 endforeach()
+
 install(TARGETS vixc RUNTIME DESTINATION bin)
 
 # ── Binaryen (for WASM codegen) ──────────────────────────────────

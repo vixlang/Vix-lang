@@ -32,7 +32,7 @@
 #include "../../include/type.h"
 #include "../../include/unify.h"
 
-extern const char* current_input_filename;
+extern "C" const char* current_input_filename;
 
 namespace {
 

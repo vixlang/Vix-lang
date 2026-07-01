@@ -23,3 +23,20 @@ RELEASE.md
 *.egg-info
 .cache
 venv
+
+# Windows specific
+*.exe
+# LLVM IR
+*.ll
+!tests/vixc0/*.ll
+# Target specific
+*.a
+# Object files
+*.o
+*.obj
+# Debug symbols
+*.d
+*.pdb
+
+# Rubbish Vix File
+./*.vix

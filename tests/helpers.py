@@ -1,9 +1,12 @@
 import os
+import platform
 import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 COMPILER = ROOT / "build" / "vixc"
+if platform.system() == "Windows" and not str(COMPILER).endswith(".exe"):
+    COMPILER = Path(str(COMPILER) + ".exe")
 TEST_DIR = ROOT / "tests" / "regression"
 EXAMPLES_DIR = ROOT / "examples"
 STD_DIR = ROOT / "src" / "std"
@@ -17,6 +20,8 @@ def compile_vix(compiler: Path, source: Path, output: Path, extra_args=None):
 
 
 def run_binary(binary: Path, timeout=5):
+    if platform.system() == "Windows" and not str(binary).endswith(".exe"):
+        binary = Path(str(binary) + ".exe")
     return subprocess.run([str(binary)], capture_output=True, text=True, timeout=timeout)
 
 
