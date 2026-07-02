@@ -67,6 +67,8 @@ private:
     uintptr_t compile_struct_literal(ASTNode *node);
     uintptr_t compile_member_assign(ASTNode *assign_node);
 
+    uintptr_t compile_scaled_pointer_expr(ASTNode *inner);
+
     void add_imports();
     void register_function(ASTNode *node);
     void compile_function_body(ASTNode *node);

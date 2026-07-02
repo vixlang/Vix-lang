@@ -406,6 +406,27 @@ uintptr_t WasmCodegen::compile_member_assign(ASTNode *assign_node) {
     return emit_i32_store(addr, val);
 }
 
+uintptr_t WasmCodegen::compile_scaled_pointer_expr(ASTNode *inner) {
+    if (inner->type == AST_BINOP) {
+        BinaryenOp op = 0;
+        if (inner->data.binop.op == OP_ADD) op = BinaryenAddInt32();
+        else if (inner->data.binop.op == OP_SUB) op = BinaryenSubInt32();
+        if (op) {
+            uintptr_t lhs = compile_node(inner->data.binop.left);
+            uintptr_t rhs = compile_node(inner->data.binop.right);
+            uintptr_t scaled = (uintptr_t)BinaryenBinary(
+                m_module, BinaryenMulInt32(),
+                (BinaryenExpressionRef)rhs,
+                BinaryenConst(m_module, BinaryenLiteralInt32(4)));
+            return (uintptr_t)BinaryenBinary(
+                m_module, op,
+                (BinaryenExpressionRef)lhs,
+                (BinaryenExpressionRef)scaled);
+        }
+    }
+    return compile_node(inner);
+}
+
 uintptr_t WasmCodegen::compile_node(ASTNode *node) {
     if (!node || m_has_error) return (uintptr_t)BinaryenNop(m_module);
 
@@ -467,8 +488,10 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
                     }
                     return expr;
                 }
-                case OP_DEREF:
-                    return emit_i32_load(expr);
+                case OP_DEREF: {
+                    uintptr_t addr = compile_scaled_pointer_expr(node->data.unaryop.expr);
+                    return emit_i32_load(addr);
+                }
                 case OP_MINUS:
                     return (uintptr_t)BinaryenBinary(m_module, BinaryenSubInt32(),
                         BinaryenConst(m_module, BinaryenLiteralInt32(0)),
@@ -833,7 +856,7 @@ uintptr_t WasmCodegen::compile_assign(ASTNode *assign_node) {
         return compile_member_assign(assign_node);
     }
     if (target && target->type == AST_UNARYOP && target->data.unaryop.op == OP_DEREF) {
-        uintptr_t addr = compile_node(target->data.unaryop.expr);
+        uintptr_t addr = compile_scaled_pointer_expr(target->data.unaryop.expr);
         uintptr_t val = compile_node(assign_node->data.assign.right);
         return emit_i32_store(addr, val);
     }
