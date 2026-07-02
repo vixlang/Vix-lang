@@ -67,6 +67,80 @@ void WasmCodegen::register_function(ASTNode *node) {
     m_functions[name] = info;
 }
 
+void WasmCodegen::scan_address_taken(ASTNode *node) {
+    if (!node) return;
+    if (node->type == AST_UNARYOP && node->data.unaryop.op == OP_ADDRESS) {
+        ASTNode *inner = node->data.unaryop.expr;
+        if (inner && inner->type == AST_IDENTIFIER && inner->data.identifier.name) {
+            m_address_taken_vars.insert(inner->data.identifier.name);
+            return;
+        }
+    }
+    switch (node->type) {
+        case AST_PROGRAM:
+            for (int i = 0; i < node->data.program.statement_count; i++)
+                scan_address_taken(node->data.program.statements[i]);
+            break;
+        case AST_FUNCTION:
+            scan_address_taken(node->data.function.body);
+            break;
+        case AST_BINOP:
+            scan_address_taken(node->data.binop.left);
+            scan_address_taken(node->data.binop.right);
+            break;
+        case AST_UNARYOP:
+            scan_address_taken(node->data.unaryop.expr);
+            break;
+        case AST_ASSIGN:
+            scan_address_taken(node->data.assign.left);
+            scan_address_taken(node->data.assign.right);
+            break;
+        case AST_CALL:
+            scan_address_taken(node->data.call.func);
+            scan_address_taken(node->data.call.args);
+            break;
+        case AST_IF:
+            scan_address_taken(node->data.if_stmt.condition);
+            scan_address_taken(node->data.if_stmt.then_body);
+            scan_address_taken(node->data.if_stmt.else_body);
+            break;
+        case AST_WHILE:
+            scan_address_taken(node->data.while_stmt.condition);
+            scan_address_taken(node->data.while_stmt.body);
+            break;
+        case AST_FOR:
+            scan_address_taken(node->data.for_stmt.var);
+            scan_address_taken(node->data.for_stmt.start);
+            scan_address_taken(node->data.for_stmt.end);
+            scan_address_taken(node->data.for_stmt.body);
+            break;
+        case AST_RETURN:
+            scan_address_taken(node->data.return_stmt.expr);
+            break;
+        case AST_PRINT:
+            scan_address_taken(node->data.print.expr);
+            break;
+        case AST_EXPRESSION_LIST:
+            for (int i = 0; i < node->data.expression_list.expression_count; i++)
+                scan_address_taken(node->data.expression_list.expressions[i]);
+            break;
+        case AST_INDEX:
+            scan_address_taken(node->data.index.target);
+            scan_address_taken(node->data.index.index);
+            break;
+        case AST_MEMBER_ACCESS:
+            scan_address_taken(node->data.member_access.object);
+            scan_address_taken(node->data.member_access.field);
+            break;
+        case AST_STRUCT_LITERAL:
+            scan_address_taken(node->data.struct_literal.type_name);
+            scan_address_taken(node->data.struct_literal.fields);
+            break;
+        default:
+            break;
+    }
+}
+
 uint32_t WasmCodegen::get_or_create_local(const char *name, uintptr_t wasm_type) {
     if (!m_current_func) return 0;
     auto it = m_current_func->local_indices.find(name);
@@ -364,6 +438,37 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
         case AST_UNARYOP: {
             uintptr_t expr = compile_node(node->data.unaryop.expr);
             switch (node->data.unaryop.op) {
+                case OP_ADDRESS: {
+                    ASTNode *inner = node->data.unaryop.expr;
+                    if (inner->type == AST_IDENTIFIER && inner->data.identifier.name) {
+                        std::string aname(inner->data.identifier.name);
+                        auto ait = m_var_mem_addrs.find(aname);
+                        if (ait != m_var_mem_addrs.end()) {
+                            return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)ait->second));
+                        }
+                        set_error("cannot take address of local variable");
+                        return (uintptr_t)BinaryenUnreachable(m_module);
+                    }
+                    if (inner->type == AST_INDEX) {
+                        uintptr_t ibase = compile_node(inner->data.index.target);
+                        uintptr_t iidx = compile_node(inner->data.index.index);
+                        uintptr_t idataAddr = (uintptr_t)BinaryenBinary(
+                            m_module, BinaryenAddInt32(),
+                            (BinaryenExpressionRef)ibase,
+                            BinaryenConst(m_module, BinaryenLiteralInt32(8)));
+                        uintptr_t ibyteOffset = (uintptr_t)BinaryenBinary(
+                            m_module, BinaryenShlInt32(),
+                            (BinaryenExpressionRef)iidx,
+                            BinaryenConst(m_module, BinaryenLiteralInt32(2)));
+                        return (uintptr_t)BinaryenBinary(
+                            m_module, BinaryenAddInt32(),
+                            (BinaryenExpressionRef)idataAddr,
+                            (BinaryenExpressionRef)ibyteOffset);
+                    }
+                    return expr;
+                }
+                case OP_DEREF:
+                    return emit_i32_load(expr);
                 case OP_MINUS:
                     return (uintptr_t)BinaryenBinary(m_module, BinaryenSubInt32(),
                         BinaryenConst(m_module, BinaryenLiteralInt32(0)),
@@ -671,6 +776,12 @@ uintptr_t WasmCodegen::compile_ident(ASTNode *ident_node) {
     if (!ident_node->data.identifier.name) {
         return (uintptr_t)BinaryenNop(m_module);
     }
+    std::string iname(ident_node->data.identifier.name);
+    auto iit = m_var_mem_addrs.find(iname);
+    if (iit != m_var_mem_addrs.end()) {
+        return emit_i32_load(
+            (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)iit->second)));
+    }
     uint32_t idx = get_or_create_local(ident_node->data.identifier.name, BinaryenTypeInt32());
     return (uintptr_t)BinaryenLocalGet(m_module, idx, BinaryenTypeInt32());
 }
@@ -721,9 +832,21 @@ uintptr_t WasmCodegen::compile_assign(ASTNode *assign_node) {
     if (target && target->type == AST_MEMBER_ACCESS) {
         return compile_member_assign(assign_node);
     }
+    if (target && target->type == AST_UNARYOP && target->data.unaryop.op == OP_DEREF) {
+        uintptr_t addr = compile_node(target->data.unaryop.expr);
+        uintptr_t val = compile_node(assign_node->data.assign.right);
+        return emit_i32_store(addr, val);
+    }
 
     uintptr_t val = compile_node(assign_node->data.assign.right);
     if (target && target->type == AST_IDENTIFIER && target->data.identifier.name) {
+        std::string tname(target->data.identifier.name);
+        auto tit = m_var_mem_addrs.find(tname);
+        if (tit != m_var_mem_addrs.end()) {
+            return emit_i32_store(
+                (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)tit->second)),
+                val);
+        }
         uint32_t idx = get_or_create_local(target->data.identifier.name, BinaryenTypeInt32());
         return (uintptr_t)BinaryenLocalSet(m_module, idx, (BinaryenExpressionRef)val);
     }
@@ -735,6 +858,20 @@ uintptr_t WasmCodegen::compile_var_decl(ASTNode *decl_node, ASTNode *init_expr) 
     if (decl_node->type != AST_ASSIGN) return (uintptr_t)BinaryenNop(m_module);
     ASTNode *target = decl_node->data.assign.left;
     if (target && target->type == AST_IDENTIFIER && target->data.identifier.name) {
+        std::string vname(target->data.identifier.name);
+        if (m_address_taken_vars.count(vname)) {
+            uint32_t addr = alloc_bytes(4, 4);
+            m_var_mem_addrs[vname] = addr;
+            uintptr_t val;
+            if (init_expr) {
+                val = compile_node(init_expr);
+            } else {
+                val = (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(0));
+            }
+            return emit_i32_store(
+                (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)addr)),
+                val);
+        }
         uintptr_t val;
         if (init_expr) {
             val = compile_node(init_expr);
@@ -764,8 +901,12 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
     m_heap_offset = 4096;
     m_break_labels.clear();
     m_continue_labels.clear();
+    m_address_taken_vars.clear();
+    m_var_mem_addrs.clear();
 
     add_imports();
+
+    scan_address_taken(root);
 
     if (root->type == AST_PROGRAM) {
         for (int i = 0; i < root->data.program.statement_count; i++) {

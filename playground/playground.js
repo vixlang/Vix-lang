@@ -52,6 +52,16 @@
             + '    print(binary_search(arr, 100))\n'
             + '    return 0\n'
             + '}',
+        pointer: 'fn main(): i32 {\n'
+            + '    let x = 10\n'
+            + '    let mut ptr = ref x\n'
+            + '    @ptr = 20\n'
+            + '    let arr = [1, 2, 3, 4, 5]\n'
+            + '    let p = ref arr[0]\n'
+            + '    let second = @(p + 1)\n'
+            + '    print(second)\n'
+            + '    return 0\n'
+            + '}',
     };
 
     var saved = localStorage.getItem('vix-playground-code');

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 class WasmCodegen {
 public:
@@ -49,6 +50,10 @@ private:
 
     std::unordered_map<std::string, WasmStructLayout> m_struct_layouts;
 
+    std::unordered_set<std::string> m_address_taken_vars;
+    std::unordered_map<std::string, uint32_t> m_var_mem_addrs;
+
+    void scan_address_taken(ASTNode *node);
     void register_struct_layout(ASTNode *node);
     const WasmFieldLayout *find_field_layout(const std::string &struct_name, const std::string &field_name) const;
 
