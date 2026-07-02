@@ -40,6 +40,9 @@ private:
     std::vector<StringEntry> m_strings;
     uint32_t m_string_offset;
 
+    std::vector<std::string> m_break_labels;
+    std::vector<std::string> m_continue_labels;
+
     void add_imports();
     void register_function(ASTNode *node);
     void compile_function_body(ASTNode *node);
@@ -49,6 +52,9 @@ private:
     uintptr_t compile_block(ASTNode *stmt_list);
     uintptr_t compile_if(ASTNode *if_node);
     uintptr_t compile_while(ASTNode *while_node);
+    uintptr_t compile_for(ASTNode *for_node);
+    uintptr_t compile_break(ASTNode *node);
+    uintptr_t compile_continue(ASTNode *node);
     uintptr_t compile_binary_op(ASTNode *op_node);
     uintptr_t compile_call(ASTNode *call_node);
     uintptr_t compile_print(ASTNode *print_node);

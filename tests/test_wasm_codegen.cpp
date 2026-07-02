@@ -193,6 +193,12 @@ void test_fixture_hello() {
     tests_passed++;
 }
 
+void test_fixture_control_flow() {
+    expect_emit_success("tests/fixtures/wasm_core/control_flow.vix");
+    fprintf(stderr, "PASS: test_fixture_control_flow\n"); fflush(stderr);
+    tests_passed++;
+}
+
 void test_compile_function_params_and_locals() {
     const char *source =
         "fn add(a: i32, b: i32): i32 {\n"
@@ -227,6 +233,7 @@ int main() {
     test_parse_error_reports_message();
     test_fixture_hello();
     test_compile_function_params_and_locals();
+    test_fixture_control_flow();
     fprintf(stderr, "\n%d passed, %d failed\n", tests_passed, tests_failed);
 
     return tests_failed > 0 ? 1 : 0;

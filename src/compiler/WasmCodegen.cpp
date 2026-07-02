@@ -171,6 +171,12 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
             m_string_offset = (m_string_offset + 3) & ~3;
             return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)entry.offset));
         }
+        case AST_FOR:
+            return compile_for(node);
+        case AST_BREAK:
+            return compile_break(node);
+        case AST_CONTINUE:
+            return compile_continue(node);
         case AST_RETURN:
             return compile_return(node);
         case AST_ASSIGN:
@@ -221,8 +227,107 @@ uintptr_t WasmCodegen::compile_if(ASTNode *if_node) {
 }
 
 uintptr_t WasmCodegen::compile_while(ASTNode *while_node) {
-    (void)while_node;
-    return (uintptr_t)BinaryenNop(m_module);
+    std::string breakLabel = "while_break_" + std::to_string(m_break_labels.size());
+    std::string continueLabel = "while_continue_" + std::to_string(m_continue_labels.size());
+    m_break_labels.push_back(breakLabel);
+    m_continue_labels.push_back(continueLabel);
+
+    BinaryenExpressionRef cond = (BinaryenExpressionRef)compile_node(while_node->data.while_stmt.condition);
+    BinaryenExpressionRef body = (BinaryenExpressionRef)compile_node(while_node->data.while_stmt.body);
+    BinaryenExpressionRef notCond = BinaryenUnary(m_module, BinaryenEqZInt32(), cond);
+    BinaryenExpressionRef breakIf = BinaryenBreak(m_module, breakLabel.c_str(), notCond, nullptr);
+
+    BinaryenExpressionRef loopExprs[] = {
+        breakIf,
+        body,
+        BinaryenBreak(m_module, continueLabel.c_str(), nullptr, nullptr)
+    };
+
+    BinaryenExpressionRef loopBody = BinaryenBlock(
+        m_module, continueLabel.c_str(), loopExprs, 3, BinaryenTypeNone());
+    BinaryenExpressionRef loop = BinaryenLoop(m_module, continueLabel.c_str(), loopBody);
+    BinaryenExpressionRef outer[] = { loop };
+
+    m_break_labels.pop_back();
+    m_continue_labels.pop_back();
+    return (uintptr_t)BinaryenBlock(m_module, breakLabel.c_str(), outer, 1, BinaryenTypeNone());
+}
+
+uintptr_t WasmCodegen::compile_for(ASTNode *for_node) {
+    ASTNode *var = for_node->data.for_stmt.var;
+    ASTNode *start = for_node->data.for_stmt.start;
+    ASTNode *end = for_node->data.for_stmt.end;
+    ASTNode *body = for_node->data.for_stmt.body;
+
+    if (!var || var->type != AST_IDENTIFIER || !var->data.identifier.name) {
+        return (uintptr_t)BinaryenNop(m_module);
+    }
+    const char *varName = var->data.identifier.name;
+
+    ASTNode fakeDecl = {};
+    fakeDecl.type = AST_ASSIGN;
+    fakeDecl.data.assign.left = var;
+    fakeDecl.data.assign.right = start;
+    fakeDecl.data.assign.is_declaration = 1;
+
+    uintptr_t init = compile_var_decl(&fakeDecl, start);
+    uint32_t idx = get_or_create_local(varName, BinaryenTypeInt32());
+
+    uintptr_t condVal = compile_node(end);
+    BinaryenExpressionRef cond = BinaryenBinary(
+        m_module,
+        BinaryenLtSInt32(),
+        BinaryenLocalGet(m_module, idx, BinaryenTypeInt32()),
+        (BinaryenExpressionRef)condVal);
+
+    BinaryenExpressionRef inc = BinaryenLocalSet(
+        m_module,
+        idx,
+        BinaryenBinary(
+            m_module,
+            BinaryenAddInt32(),
+            BinaryenLocalGet(m_module, idx, BinaryenTypeInt32()),
+            BinaryenConst(m_module, BinaryenLiteralInt32(1))));
+
+    std::string breakLabel = "for_break_" + std::to_string(m_break_labels.size());
+    std::string continueLabel = "for_continue_" + std::to_string(m_continue_labels.size());
+    m_break_labels.push_back(breakLabel);
+    m_continue_labels.push_back(continueLabel);
+
+    BinaryenExpressionRef notCond = BinaryenUnary(m_module, BinaryenEqZInt32(), cond);
+    BinaryenExpressionRef breakIf = BinaryenBreak(m_module, breakLabel.c_str(), notCond, nullptr);
+
+    BinaryenExpressionRef bodyExpr = (BinaryenExpressionRef)compile_node(body);
+    BinaryenExpressionRef loopExprs[] = {
+        breakIf,
+        bodyExpr,
+        inc,
+        BinaryenBreak(m_module, continueLabel.c_str(), nullptr, nullptr)
+    };
+
+    BinaryenExpressionRef loopBody = BinaryenBlock(
+        m_module, continueLabel.c_str(), loopExprs, 4, BinaryenTypeNone());
+    BinaryenExpressionRef loop = BinaryenLoop(m_module, continueLabel.c_str(), loopBody);
+    BinaryenExpressionRef outer[] = { loop };
+
+    m_break_labels.pop_back();
+    m_continue_labels.pop_back();
+
+    BinaryenExpressionRef blockExprs[] = {
+        (BinaryenExpressionRef)init,
+        BinaryenBlock(m_module, breakLabel.c_str(), outer, 1, BinaryenTypeNone())
+    };
+    return (uintptr_t)BinaryenBlock(m_module, nullptr, blockExprs, 2, BinaryenTypeNone());
+}
+
+uintptr_t WasmCodegen::compile_break(ASTNode *) {
+    if (m_break_labels.empty()) return (uintptr_t)BinaryenNop(m_module);
+    return (uintptr_t)BinaryenBreak(m_module, m_break_labels.back().c_str(), nullptr, nullptr);
+}
+
+uintptr_t WasmCodegen::compile_continue(ASTNode *) {
+    if (m_continue_labels.empty()) return (uintptr_t)BinaryenNop(m_module);
+    return (uintptr_t)BinaryenBreak(m_module, m_continue_labels.back().c_str(), nullptr, nullptr);
 }
 
 uintptr_t WasmCodegen::compile_binary_op(ASTNode *op_node) {
