@@ -51,6 +51,7 @@ void report_redefinition_error(const char* identifier);
 void report_mismatched_parentheses();
 int get_error_count();
 int get_warning_count();
+const char* get_last_error_message();
 void print_error_summary();
 void cleanup_error_handler();
 void report_simple_error(ErrorLevel level, ErrorType error_type, const char* msg);

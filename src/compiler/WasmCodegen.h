@@ -15,6 +15,7 @@ public:
     ~WasmCodegen();
 
     bool emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::string &error_msg);
+    bool validate();
 
 private:
     BinaryenModuleRef m_module;

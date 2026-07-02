@@ -25,6 +25,7 @@ static int current_line = 1;
 static int current_column = 1;
 static int error_count = 0;
 static int warning_count = 0;
+static char last_error_message[1024] = {0};
 static char* source_content = NULL;
 
 static void vreport_error(ErrorLevel level, ErrorType error_type, const char* format, va_list args);
@@ -507,7 +508,20 @@ int get_warning_count() {
     return warning_count;
 }
 
+const char* get_last_error_message() {
+    return last_error_message;
+}
+
 static void emit_diagnostic(ErrorLevel level, ErrorType error_type, const char* message, int length, const char* suggestion_override) {
+    if (level != ERROR_LEVEL_WARNING) {
+        if (message) {
+            strncpy(last_error_message, message, sizeof(last_error_message) - 1);
+            last_error_message[sizeof(last_error_message) - 1] = '\0';
+        } else {
+            last_error_message[0] = '\0';
+        }
+    }
+
     if (level == ERROR_LEVEL_WARNING) {
         warning_count++;
     } else {

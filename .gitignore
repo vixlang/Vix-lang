@@ -23,3 +23,11 @@ RELEASE.md
 *.egg-info
 .cache
 venv
+nul
+emsdk/
+third_party/binaryen
+playground/build_wasm/
+examples/.vfmt_tmp
+examples/hello.s
+binary_search_out.wasm
+D*msys64tmplink_test.sh
