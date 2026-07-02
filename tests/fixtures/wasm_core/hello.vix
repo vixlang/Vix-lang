@@ -1,0 +1,4 @@
+fn main(): i32 {
+    print("Hello, Vix Playground!")
+    return 0
+}
