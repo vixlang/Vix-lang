@@ -249,6 +249,52 @@ void test_compile_function_params_and_locals() {
     tests_passed++;
 }
 
+void test_pointer_example() {
+    const char *source =
+        "fn main(): i32 {\n"
+        "    let x = 10\n"
+        "    let mut ptr = ref x\n"
+        "    @ptr = 20\n"
+        "    let arr = [1, 2, 3, 4, 5]\n"
+        "    let p = ref arr[0]\n"
+        "    let second = @(p + 1)\n"
+        "    print(second)\n"
+        "    return 0\n"
+        "}\n";
+
+    fprintf(stderr, "test_pointer_example: compiling...\n"); fflush(stderr);
+    CompileResult cr = vixc_compile_string(source);
+    fprintf(stderr, "  error_count=%d root=%p\n", cr.error_count, cr.root); fflush(stderr);
+    if (cr.error_count != 0 || !cr.root) {
+        fprintf(stderr, "FAIL: frontend compilation failed\n"); fflush(stderr);
+        tests_failed++;
+        return;
+    }
+
+    WasmCodegen cg;
+    std::vector<uint8_t> wasm_bytes;
+    std::string error;
+    fprintf(stderr, "test_pointer_example: emitting...\n"); fflush(stderr);
+    bool ok = cg.emit(cr.root, wasm_bytes, error);
+    fprintf(stderr, "  ok=%d bytes=%zu error=[%s]\n", ok, wasm_bytes.size(), error.c_str()); fflush(stderr);
+
+    if (!ok) {
+        fprintf(stderr, "FAIL: emit() returned false\n"); fflush(stderr);
+        tests_failed++;
+        vixc_free_result(&cr);
+        return;
+    }
+    assert(!wasm_bytes.empty());
+    assert(wasm_bytes[0] == 0x00);
+    assert(wasm_bytes[1] == 0x61);
+    assert(wasm_bytes[2] == 0x73);
+    assert(wasm_bytes[3] == 0x6d);
+
+    vixc_free_result(&cr);
+    fprintf(stderr, "PASS: test_pointer_example (%zu bytes)\n", wasm_bytes.size()); fflush(stderr);
+    tests_passed++;
+}
+
 int main() {
     fprintf(stderr, "=== WASM Codegen Test ===\n");
     test_binaryen_basic();
@@ -262,6 +308,7 @@ int main() {
     test_fixture_bubble_sort();
     test_fixture_structs();
     test_fixture_binary_search();
+    test_pointer_example();
     fprintf(stderr, "\n%d passed, %d failed\n", tests_passed, tests_failed);
 
     return tests_failed > 0 ? 1 : 0;

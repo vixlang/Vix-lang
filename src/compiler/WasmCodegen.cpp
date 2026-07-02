@@ -408,10 +408,8 @@ uintptr_t WasmCodegen::compile_member_assign(ASTNode *assign_node) {
 
 uintptr_t WasmCodegen::compile_scaled_pointer_expr(ASTNode *inner) {
     if (inner->type == AST_BINOP) {
-        BinaryenOp op = 0;
-        if (inner->data.binop.op == OP_ADD) op = BinaryenAddInt32();
-        else if (inner->data.binop.op == OP_SUB) op = BinaryenSubInt32();
-        if (op) {
+        if (inner->data.binop.op == OP_ADD || inner->data.binop.op == OP_SUB) {
+            BinaryenOp op = (inner->data.binop.op == OP_ADD) ? BinaryenAddInt32() : BinaryenSubInt32();
             uintptr_t lhs = compile_node(inner->data.binop.left);
             uintptr_t rhs = compile_node(inner->data.binop.right);
             uintptr_t scaled = (uintptr_t)BinaryenBinary(
