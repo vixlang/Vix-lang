@@ -78,6 +78,14 @@ uint32_t WasmCodegen::get_or_create_local(const char *name, uintptr_t wasm_type)
     return idx;
 }
 
+static uintptr_t drop_if_value(BinaryenModuleRef m, uintptr_t expr) {
+    BinaryenType t = BinaryenExpressionGetType((BinaryenExpressionRef)expr);
+    if (t != BinaryenTypeNone() && t != BinaryenTypeAuto()) {
+        return (uintptr_t)BinaryenDrop(m, (BinaryenExpressionRef)expr);
+    }
+    return expr;
+}
+
 void WasmCodegen::bind_param_locals(ASTNode *params) {
     if (!m_current_func || !params || params->type != AST_EXPRESSION_LIST) return;
     for (int i = 0; i < params->data.expression_list.expression_count; i++) {
@@ -107,7 +115,12 @@ void WasmCodegen::compile_function_body(ASTNode *node) {
             ASTNode *stmt = body->data.program.statements[i];
             if (stmt) {
                 uintptr_t expr = compile_node(stmt);
-                if (expr) exprs.push_back(expr);
+                if (expr) {
+                    if (i + 1 < body->data.program.statement_count) {
+                        expr = drop_if_value(m_module, expr);
+                    }
+                    exprs.push_back(expr);
+                }
             }
         }
     } else if (body) {
@@ -122,8 +135,8 @@ void WasmCodegen::compile_function_body(ASTNode *node) {
         block_expr = exprs[0];
     } else {
         block_expr = (uintptr_t)BinaryenBlock(m_module, nullptr,
-                                              (BinaryenExpressionRef*)exprs.data(),
-                                              exprs.size(), BinaryenTypeAuto());
+                                               (BinaryenExpressionRef*)exprs.data(),
+                                               exprs.size(), BinaryenTypeAuto());
     }
 
     uint32_t local_count = m_current_func->next_local - m_current_func->param_count;
@@ -342,6 +355,21 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
             return compile_index(node);
         case AST_IDENTIFIER:
             return compile_ident(node);
+        case AST_UNARYOP: {
+            uintptr_t expr = compile_node(node->data.unaryop.expr);
+            switch (node->data.unaryop.op) {
+                case OP_MINUS:
+                    return (uintptr_t)BinaryenBinary(m_module, BinaryenSubInt32(),
+                        BinaryenConst(m_module, BinaryenLiteralInt32(0)),
+                        (BinaryenExpressionRef)expr);
+                case OP_PLUS:
+                    return expr;
+                case OP_NOT:
+                    return (uintptr_t)BinaryenUnary(m_module, BinaryenEqZInt32(), (BinaryenExpressionRef)expr);
+                default:
+                    return (uintptr_t)BinaryenNop(m_module);
+            }
+        }
         case AST_NUM_INT:
             return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)node->data.num_int.value));
         case AST_NUM_FLOAT:
@@ -386,7 +414,12 @@ uintptr_t WasmCodegen::compile_block(ASTNode *node) {
             ASTNode *stmt = node->data.program.statements[i];
             if (stmt) {
                 uintptr_t expr = compile_node(stmt);
-                if (expr) exprs.push_back(expr);
+                if (expr) {
+                    if (i + 1 < node->data.program.statement_count) {
+                        expr = drop_if_value(m_module, expr);
+                    }
+                    exprs.push_back(expr);
+                }
             }
         }
     } else {
@@ -431,7 +464,7 @@ uintptr_t WasmCodegen::compile_while(ASTNode *while_node) {
     };
 
     BinaryenExpressionRef loopBody = BinaryenBlock(
-        m_module, continueLabel.c_str(), loopExprs, 3, BinaryenTypeNone());
+        m_module, nullptr, loopExprs, 3, BinaryenTypeNone());
     BinaryenExpressionRef loop = BinaryenLoop(m_module, continueLabel.c_str(), loopBody);
     BinaryenExpressionRef outer[] = { loop };
 
@@ -493,7 +526,7 @@ uintptr_t WasmCodegen::compile_for(ASTNode *for_node) {
     };
 
     BinaryenExpressionRef loopBody = BinaryenBlock(
-        m_module, continueLabel.c_str(), loopExprs, 4, BinaryenTypeNone());
+        m_module, nullptr, loopExprs, 4, BinaryenTypeNone());
     BinaryenExpressionRef loop = BinaryenLoop(m_module, continueLabel.c_str(), loopBody);
     BinaryenExpressionRef outer[] = { loop };
 
@@ -777,6 +810,13 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
         BinaryenModuleDispose(m_module);
         m_module = nullptr;
         error_msg = m_error;
+        return false;
+    }
+
+    if (!BinaryenModuleValidate(m_module)) {
+        BinaryenModuleDispose(m_module);
+        m_module = nullptr;
+        error_msg = "wasm validation failed";
         return false;
     }
 
