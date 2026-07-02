@@ -52,6 +52,7 @@ private:
 
     std::unordered_set<std::string> m_address_taken_vars;
     std::unordered_map<std::string, uint32_t> m_var_mem_addrs;
+    std::unordered_set<std::string> m_ref_params;
 
     void scan_address_taken(ASTNode *node);
     void register_struct_layout(ASTNode *node);
@@ -69,6 +70,7 @@ private:
 
     uintptr_t compile_scaled_pointer_expr(ASTNode *inner);
     uintptr_t compile_adt_constructor(const std::string &name, ASTNode *args);
+    uintptr_t resolve_ref_base(ASTNode *base_node);
 
     void add_imports();
     void register_function(ASTNode *node);

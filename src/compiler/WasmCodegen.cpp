@@ -180,6 +180,19 @@ void WasmCodegen::compile_function_body(ASTNode *node) {
     if (fit == m_functions.end()) return;
 
     m_current_func = &fit->second;
+    m_ref_params.clear();
+    if (node->data.function.params && node->data.function.params->type == AST_EXPRESSION_LIST) {
+        for (int i = 0; i < node->data.function.params->data.expression_list.expression_count; i++) {
+            ASTNode *p = node->data.function.params->data.expression_list.expressions[i];
+            if (p && p->type == AST_ASSIGN && p->data.assign.left &&
+                p->data.assign.left->type == AST_IDENTIFIER && p->data.assign.left->data.identifier.name) {
+                ASTNode *ty = p->data.assign.right;
+                if (ty && ty->type == AST_TYPE_POINTER) {
+                    m_ref_params.insert(p->data.assign.left->data.identifier.name);
+                }
+            }
+        }
+    }
     bind_param_locals(node->data.function.params);
 
     ASTNode *body = node->data.function.body;
@@ -272,7 +285,7 @@ uintptr_t WasmCodegen::compile_array_literal(ASTNode *node) {
 }
 
 uintptr_t WasmCodegen::compile_index(ASTNode *node) {
-    uintptr_t base = compile_node(node->data.index.target);
+    uintptr_t base = resolve_ref_base(node->data.index.target);
     uintptr_t idx = compile_node(node->data.index.index);
     uintptr_t dataAddr = (uintptr_t)BinaryenBinary(
         m_module,
@@ -295,7 +308,7 @@ uintptr_t WasmCodegen::compile_index(ASTNode *node) {
 uintptr_t WasmCodegen::compile_index_assign(ASTNode *assign_node) {
     ASTNode *target = assign_node->data.assign.left;
     uintptr_t val = compile_node(assign_node->data.assign.right);
-    uintptr_t base = compile_node(target->data.index.target);
+    uintptr_t base = resolve_ref_base(target->data.index.target);
     uintptr_t idx = compile_node(target->data.index.index);
     uintptr_t dataAddr = (uintptr_t)BinaryenBinary(
         m_module,
@@ -474,6 +487,17 @@ uintptr_t WasmCodegen::compile_adt_constructor(const std::string &name, ASTNode 
     return (uintptr_t)BinaryenBlock(m_module, nullptr, exprs.data(), exprs.size(), BinaryenTypeInt32());
 }
 
+uintptr_t WasmCodegen::resolve_ref_base(ASTNode *base_node) {
+    if (base_node && base_node->type == AST_IDENTIFIER && base_node->data.identifier.name) {
+        std::string bname(base_node->data.identifier.name);
+        if (m_ref_params.count(bname)) {
+            uint32_t idx = get_or_create_local(base_node->data.identifier.name, BinaryenTypeInt32());
+            return emit_i32_load((uintptr_t)BinaryenLocalGet(m_module, idx, BinaryenTypeInt32()));
+        }
+    }
+    return compile_node(base_node);
+}
+
 uintptr_t WasmCodegen::compile_node(ASTNode *node) {
     if (!node || m_has_error) return (uintptr_t)BinaryenNop(m_module);
 
@@ -518,7 +542,7 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
                         return (uintptr_t)BinaryenUnreachable(m_module);
                     }
                     if (inner->type == AST_INDEX) {
-                        uintptr_t ibase = compile_node(inner->data.index.target);
+                        uintptr_t ibase = resolve_ref_base(inner->data.index.target);
                         uintptr_t iidx = compile_node(inner->data.index.index);
                         uintptr_t idataAddr = (uintptr_t)BinaryenBinary(
                             m_module, BinaryenAddInt32(),
