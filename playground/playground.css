@@ -5,23 +5,41 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Sego
     position: fixed; inset: 0; z-index: 9999;
     background: #1e1e2e; display: flex;
     align-items: center; justify-content: center;
+    transition: opacity 0.4s;
 }
+#loading-overlay.hidden { opacity: 0; pointer-events: none; }
 #loading-bar-container { width: 300px; text-align: center; }
+#loading-icon { width: 48px; height: 48px; margin-bottom: 16px; }
+#loading-bar-track {
+    width: 100%; height: 4px; background: #313244; border-radius: 2px; overflow: hidden;
+}
 #loading-bar {
-    height: 4px; background: #89b4fa; border-radius: 2px;
+    height: 100%; background: #89b4fa; border-radius: 2px;
     width: 0%; transition: width 0.3s;
 }
 #loading-text { margin-top: 12px; color: #a6adc8; font-size: 14px; }
 
 #app { display: flex; flex-direction: column; height: 100vh; }
+#app:not(.ready) #editor-container,
+#app:not(.ready) #output-container { opacity: 0.4; pointer-events: none; }
 
 header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 16px; background: #1e1e2e; color: #cdd6f4;
+    padding: 8px 16px; background: #1e1e2e; color: #cdd6f4; gap: 16px;
 }
-header h1 { font-size: 16px; font-weight: 600; }
-#status-bar { display: flex; align-items: center; gap: 12px; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.brand-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #cdd6f4; }
+.brand-link img { width: 24px; height: 24px; }
+.brand-link span { font-size: 16px; font-weight: 700; }
+.divider { width: 1px; height: 20px; background: #45475a; }
+.page-title { font-size: 14px; color: #a6adc8; }
+
+#status-indicator { display: flex; align-items: center; gap: 6px; }
+#status-dot { width: 8px; height: 8px; border-radius: 50%; background: #f38ba8; }
+#status-dot.ready { background: #a6e3a1; }
 #status-text { font-size: 12px; color: #a6adc8; }
+
 #example-selector {
     padding: 4px 8px; border: 1px solid #45475a; border-radius: 4px;
     background: #313244; color: #cdd6f4; font-size: 12px; cursor: pointer;
@@ -29,8 +47,10 @@ header h1 { font-size: 16px; font-weight: 600; }
 #btn-run {
     padding: 6px 20px; border: none; border-radius: 6px;
     background: #a6e3a1; color: #1e1e2e; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
 }
 #btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+.key-hint { font-size: 10px; opacity: 0.6; font-weight: 400; }
 
 main { display: flex; flex: 1; overflow: hidden; }
 #editor-container { flex: 1; overflow: auto; }
@@ -46,6 +66,18 @@ main { display: flex; flex: 1; overflow: hidden; }
     color: #6c7086; cursor: pointer; font-size: 12px;
 }
 #output-tabs .tab.active { color: #cdd6f4; border-bottom: 2px solid #89b4fa; }
+
+#output-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 12px; border-bottom: 1px solid #313244;
+}
+.output-label { font-size: 11px; color: #6c7086; text-transform: uppercase; letter-spacing: 0.5px; }
+#btn-clear-output {
+    padding: 2px 8px; border: 1px solid #45475a; border-radius: 4px;
+    background: transparent; color: #a6adc8; font-size: 11px; cursor: pointer;
+}
+#btn-clear-output:hover { background: #313244; }
+
 #output-content, #wasm-content {
     flex: 1; padding: 12px; font-family: 'Fira Code', 'Cascadia Code', monospace;
     font-size: 13px; color: #cdd6f4; overflow: auto; white-space: pre-wrap;

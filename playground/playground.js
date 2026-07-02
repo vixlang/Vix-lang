@@ -59,8 +59,8 @@
 
     var editor = CodeMirror(document.getElementById('editor-container'), {
         value: initialCode,
-        mode: 'text/x-vix',
-        theme: 'default',
+        mode: 'text/x-rustsrc',
+        theme: 'vix-dark',
         lineNumbers: true,
         indentUnit: 4,
         tabSize: 4,
@@ -76,9 +76,21 @@
     });
 
     var statusText = document.getElementById('status-text');
+    var statusDot = document.getElementById('status-dot');
     var runBtn = document.getElementById('btn-run');
     var exampleSel = document.getElementById('example-selector');
     var loadingOverlay = document.getElementById('loading-overlay');
+    var appEl = document.getElementById('app');
+    var clearBtn = document.getElementById('btn-clear-output');
+
+    function setStatus(text, ready) {
+        statusText.textContent = text;
+        if (ready) {
+            statusDot.classList.add('ready');
+        } else {
+            statusDot.classList.remove('ready');
+        }
+    }
 
     exampleSel.addEventListener('change', function() {
         var code = EXAMPLES[this.value];
@@ -148,13 +160,11 @@
         console.log('[playground] runCode starting, source len:', source.length);
 
         try {
-            // 分配输出参数指针的内存 (32-bit wasm: 每个指针 4 字节)
             var ptrOut = Module._malloc(4);
             var lenOut = Module._malloc(4);
             var errOut = Module._malloc(4);
             console.log('[playground] allocated ptrOut lenOut errOut');
 
-            // 初始化为 0
             Module.setValue(ptrOut, 0, 'i32');
             Module.setValue(lenOut, 0, 'i32');
             Module.setValue(errOut, 0, 'i32');
@@ -212,23 +222,33 @@
     }
 
     runBtn.disabled = true;
-    statusText.textContent = '正在加载编译器 (5-10 MB)...';
+    setStatus('正在加载编译器 (5-10 MB)...', false);
 
     window.onVixcWasmReady = function() {
         console.log('[playground] onVixcWasmReady fired');
-        statusText.textContent = '编译器就绪';
+        setStatus('编译器就绪', true);
         runBtn.disabled = false;
-        if (loadingOverlay) loadingOverlay.style.display = 'none';
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+        }
+        appEl.classList.add('ready');
     };
 
-    // 安全 fallback: 10 秒后如果还没就绪，强制隐藏加载覆盖层
     setTimeout(function() {
-        if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+        if (loadingOverlay && !loadingOverlay.classList.contains('hidden')) {
             console.log('[playground] fallback: forcing loading overlay hidden');
-            loadingOverlay.style.display = 'none';
-            statusText.textContent = '编译器加载超时, 可能不可用';
+            loadingOverlay.classList.add('hidden');
+            appEl.classList.add('ready');
+            setStatus('编译器加载超时', false);
         }
     }, 15000);
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            outputText = '';
+            document.getElementById('output-content').textContent = '';
+        });
+    }
 
     document.querySelectorAll('[data-tab]').forEach(function(btn) {
         btn.addEventListener('click', function() {
