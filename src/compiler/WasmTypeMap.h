@@ -11,6 +11,17 @@ struct WasmTypeInfo {
     bool is_pointer_like;
 };
 
+struct WasmFieldLayout {
+    std::string name;
+    uint32_t offset;
+    uint32_t size;
+};
+
+struct WasmStructLayout {
+    uint32_t size;
+    std::vector<WasmFieldLayout> fields;
+};
+
 WasmTypeInfo map_vix_type_to_wasm(const Type *type);
 
 #endif

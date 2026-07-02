@@ -3,6 +3,7 @@
 
 #include "ast.h"
 #include "binaryen-c.h"
+#include "WasmTypeMap.h"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -45,6 +46,11 @@ private:
 
     uint32_t m_heap_offset;
 
+    std::unordered_map<std::string, WasmStructLayout> m_struct_layouts;
+
+    void register_struct_layout(ASTNode *node);
+    const WasmFieldLayout *find_field_layout(const std::string &struct_name, const std::string &field_name) const;
+
     uint32_t alloc_bytes(uint32_t size, uint32_t align);
     uintptr_t emit_i32_load(uintptr_t addr);
     uintptr_t emit_i32_store(uintptr_t addr, uintptr_t value);
@@ -52,6 +58,8 @@ private:
     uintptr_t compile_index(ASTNode *node);
     uintptr_t compile_index_assign(ASTNode *assign_node);
     uintptr_t emit_array_length(uintptr_t array_ptr);
+    uintptr_t compile_struct_literal(ASTNode *node);
+    uintptr_t compile_member_assign(ASTNode *assign_node);
 
     void add_imports();
     void register_function(ASTNode *node);

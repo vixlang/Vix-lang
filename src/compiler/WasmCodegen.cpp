@@ -227,6 +227,92 @@ uintptr_t WasmCodegen::compile_index_assign(ASTNode *assign_node) {
     return emit_i32_store(addr, val);
 }
 
+void WasmCodegen::register_struct_layout(ASTNode *node) {
+    if (!node || node->type != AST_STRUCT_DEF || !node->data.struct_def.name) return;
+    WasmStructLayout layout = {};
+    uint32_t offset = 0;
+    ASTNode *fields = node->data.struct_def.fields;
+    if (fields && fields->type == AST_EXPRESSION_LIST) {
+        for (int i = 0; i < fields->data.expression_list.expression_count; i++) {
+            ASTNode *f = fields->data.expression_list.expressions[i];
+            if (!f || f->type != AST_ASSIGN || !f->data.assign.left) continue;
+            ASTNode *left = f->data.assign.left;
+            if (left->type != AST_IDENTIFIER || !left->data.identifier.name) continue;
+            layout.fields.push_back({left->data.identifier.name, offset, 4});
+            offset += 4;
+        }
+    }
+    layout.size = offset;
+    m_struct_layouts[node->data.struct_def.name] = layout;
+}
+
+const WasmFieldLayout *WasmCodegen::find_field_layout(const std::string &struct_name, const std::string &field_name) const {
+    auto it = m_struct_layouts.find(struct_name);
+    if (it == m_struct_layouts.end()) return nullptr;
+    for (const auto &f : it->second.fields) {
+        if (f.name == field_name) return &f;
+    }
+    return nullptr;
+}
+
+uintptr_t WasmCodegen::compile_struct_literal(ASTNode *node) {
+    ASTNode *type_name = node->data.struct_literal.type_name;
+    if (!type_name || type_name->type != AST_IDENTIFIER || !type_name->data.identifier.name) {
+        return (uintptr_t)BinaryenNop(m_module);
+    }
+    std::string structName(type_name->data.identifier.name);
+    auto it = m_struct_layouts.find(structName);
+    if (it == m_struct_layouts.end()) return (uintptr_t)BinaryenNop(m_module);
+
+    uint32_t base = alloc_bytes(it->second.size, 4);
+    std::vector<BinaryenExpressionRef> exprs;
+    ASTNode *fields = node->data.struct_literal.fields;
+    if (fields && fields->type == AST_EXPRESSION_LIST) {
+        for (int i = 0; i < fields->data.expression_list.expression_count; i++) {
+            ASTNode *f = fields->data.expression_list.expressions[i];
+            if (!f || f->type != AST_ASSIGN || !f->data.assign.left || !f->data.assign.right) continue;
+            ASTNode *left = f->data.assign.left;
+            if (left->type != AST_IDENTIFIER || !left->data.identifier.name) continue;
+            const WasmFieldLayout *layout = find_field_layout(structName, left->data.identifier.name);
+            if (!layout) continue;
+            exprs.push_back((BinaryenExpressionRef)emit_i32_store(
+                (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)(base + layout->offset))),
+                compile_node(f->data.assign.right)));
+        }
+    }
+    exprs.push_back(BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)base)));
+    return (uintptr_t)BinaryenBlock(m_module, nullptr, exprs.data(), exprs.size(), BinaryenTypeInt32());
+}
+
+uintptr_t WasmCodegen::compile_member_assign(ASTNode *assign_node) {
+    ASTNode *target = assign_node->data.assign.left;
+    if (!target || target->type != AST_MEMBER_ACCESS) return (uintptr_t)BinaryenNop(m_module);
+
+    uintptr_t val = compile_node(assign_node->data.assign.right);
+    uintptr_t base = compile_node(target->data.member_access.object);
+    ASTNode *field = target->data.member_access.field;
+
+    if (!field || field->type != AST_IDENTIFIER || !field->data.identifier.name) {
+        return (uintptr_t)BinaryenNop(m_module);
+    }
+    std::string fname(field->data.identifier.name);
+    if (fname == "length") return (uintptr_t)BinaryenNop(m_module);
+
+    ASTNode *object = target->data.member_access.object;
+    uint32_t fieldOffset = 0;
+    if (object && object->inferred_type && object->inferred_type->name) {
+        std::string sname(object->inferred_type->name);
+        const WasmFieldLayout *layout = find_field_layout(sname, fname);
+        if (layout) fieldOffset = layout->offset;
+    }
+
+    uintptr_t addr = (uintptr_t)BinaryenBinary(
+        m_module, BinaryenAddInt32(),
+        (BinaryenExpressionRef)base,
+        BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)fieldOffset)));
+    return emit_i32_store(addr, val);
+}
+
 uintptr_t WasmCodegen::compile_node(ASTNode *node) {
     if (!node || m_has_error) return (uintptr_t)BinaryenNop(m_module);
 
@@ -248,6 +334,8 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
                 return compile_array_literal(node);
             }
             return compile_block(node);
+        case AST_STRUCT_LITERAL:
+            return compile_struct_literal(node);
         case AST_MEMBER_ACCESS:
             return compile_member_access(node);
         case AST_INDEX:
@@ -563,17 +651,30 @@ uintptr_t WasmCodegen::compile_member_access(ASTNode *node) {
         return (uintptr_t)BinaryenNop(m_module);
     }
     std::string fname(field->data.identifier.name);
+    uintptr_t base = compile_node(object);
     if (fname == "length") {
-        uintptr_t base = compile_node(object);
         return emit_array_length(base);
     }
-    return (uintptr_t)BinaryenNop(m_module);
+    uint32_t fieldOffset = 0;
+    if (object && object->inferred_type && object->inferred_type->name) {
+        std::string sname(object->inferred_type->name);
+        const WasmFieldLayout *layout = find_field_layout(sname, fname);
+        if (layout) fieldOffset = layout->offset;
+    }
+    uintptr_t addr = (uintptr_t)BinaryenBinary(
+        m_module, BinaryenAddInt32(),
+        (BinaryenExpressionRef)base,
+        BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)fieldOffset)));
+    return emit_i32_load(addr);
 }
 
 uintptr_t WasmCodegen::compile_assign(ASTNode *assign_node) {
     ASTNode *target = assign_node->data.assign.left;
     if (target && target->type == AST_INDEX) {
         return compile_index_assign(assign_node);
+    }
+    if (target && target->type == AST_MEMBER_ACCESS) {
+        return compile_member_assign(assign_node);
     }
 
     uintptr_t val = compile_node(assign_node->data.assign.right);
@@ -624,6 +725,9 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
     if (root->type == AST_PROGRAM) {
         for (int i = 0; i < root->data.program.statement_count; i++) {
             ASTNode *stmt = root->data.program.statements[i];
+            if (stmt && stmt->type == AST_STRUCT_DEF) {
+                register_struct_layout(stmt);
+            }
             if (stmt && stmt->type == AST_FUNCTION) {
                 register_function(stmt);
             }
