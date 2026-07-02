@@ -54,10 +54,11 @@ if(EMSCRIPTEN)
     )
 
     target_compile_definitions(vixc-wasm PRIVATE VIXC_FRONTEND_ONLY)
+    target_compile_options(vixc-wasm PRIVATE -frtti -fexceptions)
 
     target_link_libraries(vixc-wasm PRIVATE binaryen)
 
     set_target_properties(vixc-wasm PROPERTIES
-        LINK_FLAGS "-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s \"EXPORTED_FUNCTIONS=['_compile_vix', '_free_wasm_result']\" -s \"EXPORTED_RUNTIME_METHODS=['ccall', 'getValue', 'setValue', 'UTF8ToString', 'stringToUTF8']\" -O2 --pre-js ${CMAKE_CURRENT_SOURCE_DIR}/pre.js"
+        LINK_FLAGS "-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=0 -s \"EXPORTED_FUNCTIONS=['_compile_vix', '_free_wasm_result', '_malloc', '_free']\" -s \"EXPORTED_RUNTIME_METHODS=['ccall', 'getValue', 'setValue', 'UTF8ToString', 'stringToUTF8']\" -O2 --pre-js ${CMAKE_CURRENT_SOURCE_DIR}/pre.js"
     )
 endif()
