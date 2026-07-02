@@ -3,7 +3,7 @@
 #include "binaryen-c.h"
 #include <cstring>
 
-WasmCodegen::WasmCodegen() : m_module(nullptr), m_current_func(nullptr), m_has_error(false) {}
+WasmCodegen::WasmCodegen() : m_module(nullptr), m_current_func(nullptr), m_has_error(false), m_string_offset(16) {}
 
 WasmCodegen::~WasmCodegen() {
     if (m_module) BinaryenModuleDispose(m_module);
@@ -24,6 +24,8 @@ void WasmCodegen::add_imports() {
                               BinaryenTypeCreate(one_i32, 1), void_t);
     BinaryenAddFunctionImport(m_module, "vix_puts", "env", "vix_puts",
                               BinaryenTypeCreate(one_i32, 1), void_t);
+    BinaryenAddFunctionImport(m_module, "vix_print_i32", "env", "vix_print_i32",
+                              BinaryenTypeCreate(one_i32, 1), void_t);
     BinaryenAddFunctionImport(m_module, "vix_exit", "env", "vix_exit",
                               BinaryenTypeCreate(one_i32, 1), void_t);
 }
@@ -38,7 +40,6 @@ void WasmCodegen::register_function(ASTNode *node) {
         for (int i = 0; i < params->data.expression_list.expression_count; i++) {
             ASTNode *p = params->data.expression_list.expressions[i];
             if (p && p->type == AST_ASSIGN && p->data.assign.left) {
-                // param has a declared type, use i32 default
                 param_types.push_back(BinaryenTypeInt32());
             } else {
                 param_types.push_back(BinaryenTypeInt32());
@@ -55,13 +56,11 @@ void WasmCodegen::register_function(ASTNode *node) {
     }
 
     FuncInfo info;
-    info.func_ref = BinaryenAddFunction(
-        m_module, name.c_str(),
-        BinaryenTypeCreate(param_types.data(), param_types.size()),
-        ret_type,
-        nullptr, 0, // no var types initially
-        BinaryenNop(m_module));
+    info.func_ref = 0;
     info.next_local = param_types.size();
+    info.param_count = param_types.size();
+    info.param_types = param_types;
+    info.return_type = ret_type;
 
     m_functions[name] = info;
 }
@@ -77,6 +76,17 @@ uint32_t WasmCodegen::get_or_create_local(const char *name, uintptr_t wasm_type)
     return idx;
 }
 
+void WasmCodegen::bind_param_locals(ASTNode *params) {
+    if (!m_current_func || !params || params->type != AST_EXPRESSION_LIST) return;
+    for (int i = 0; i < params->data.expression_list.expression_count; i++) {
+        ASTNode *p = params->data.expression_list.expressions[i];
+        if (!p || p->type != AST_ASSIGN || !p->data.assign.left) continue;
+        ASTNode *left = p->data.assign.left;
+        if (left->type != AST_IDENTIFIER || !left->data.identifier.name) continue;
+        m_current_func->local_indices[left->data.identifier.name] = (uint32_t)i;
+    }
+}
+
 void WasmCodegen::compile_function_body(ASTNode *node) {
     if (!node || node->type != AST_FUNCTION || !node->data.function.name) return;
 
@@ -85,11 +95,44 @@ void WasmCodegen::compile_function_body(ASTNode *node) {
     if (fit == m_functions.end()) return;
 
     m_current_func = &fit->second;
+    bind_param_locals(node->data.function.params);
 
     ASTNode *body = node->data.function.body;
-    (void)body;
-    // TODO: compile function body into Binaryen expression
-    // Binaryen C API requires recreating the function to set body
+    std::vector<uintptr_t> exprs;
+
+    if (body && body->type == AST_PROGRAM) {
+        for (int i = 0; i < body->data.program.statement_count; i++) {
+            ASTNode *stmt = body->data.program.statements[i];
+            if (stmt) {
+                uintptr_t expr = compile_node(stmt);
+                if (expr) exprs.push_back(expr);
+            }
+        }
+    } else if (body) {
+        uintptr_t expr = compile_node(body);
+        if (expr) exprs.push_back(expr);
+    }
+
+    uintptr_t block_expr;
+    if (exprs.empty()) {
+        block_expr = (uintptr_t)BinaryenNop(m_module);
+    } else if (exprs.size() == 1) {
+        block_expr = exprs[0];
+    } else {
+        block_expr = (uintptr_t)BinaryenBlock(m_module, nullptr,
+                                              (BinaryenExpressionRef*)exprs.data(),
+                                              exprs.size(), BinaryenTypeAuto());
+    }
+
+    uint32_t local_count = m_current_func->next_local - m_current_func->param_count;
+    std::vector<BinaryenType> local_types(local_count, BinaryenTypeInt32());
+
+    m_current_func->func_ref = BinaryenAddFunction(
+        m_module, name.c_str(),
+        BinaryenTypeCreate(m_current_func->param_types.data(), m_current_func->param_types.size()),
+        m_current_func->return_type,
+        local_types.data(), local_count,
+        (BinaryenExpressionRef)block_expr);
 
     m_current_func = nullptr;
 }
@@ -108,18 +151,32 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
             return compile_binary_op(node);
         case AST_CALL:
             return compile_call(node);
+        case AST_PRINT:
+            return compile_print(node);
         case AST_IDENTIFIER:
             return compile_ident(node);
         case AST_NUM_INT:
             return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)node->data.num_int.value));
         case AST_NUM_FLOAT:
             return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralFloat64(node->data.num_float.value));
-        case AST_STRING:
-            // Strings are stored in memory; return pointer for now
-            return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(0));
+        case AST_STRING: {
+            const char *s = node->data.string.value;
+            if (!s) return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(0));
+            uint32_t len = strlen(s);
+            StringEntry entry;
+            entry.offset = m_string_offset;
+            entry.data.assign(s, s + len + 1);
+            m_strings.push_back(entry);
+            m_string_offset += len + 1;
+            m_string_offset = (m_string_offset + 3) & ~3;
+            return (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)entry.offset));
+        }
         case AST_RETURN:
             return compile_return(node);
         case AST_ASSIGN:
+            if (node->data.assign.is_declaration) {
+                return compile_var_decl(node, node->data.assign.right);
+            }
             return compile_assign(node);
         default:
             return (uintptr_t)BinaryenNop(m_module);
@@ -140,7 +197,6 @@ uintptr_t WasmCodegen::compile_block(ASTNode *node) {
             }
         }
     } else {
-        // Not a block-like node, compile directly
         uintptr_t expr = compile_node(node);
         if (expr) exprs.push_back(expr);
     }
@@ -166,7 +222,6 @@ uintptr_t WasmCodegen::compile_if(ASTNode *if_node) {
 
 uintptr_t WasmCodegen::compile_while(ASTNode *while_node) {
     (void)while_node;
-    // TODO: implement while loop
     return (uintptr_t)BinaryenNop(m_module);
 }
 
@@ -208,8 +263,16 @@ uintptr_t WasmCodegen::compile_call(ASTNode *call_node) {
     }
 
     std::string name(func->data.identifier.name);
+    std::string wasm_name = name;
 
-    // Check if it's an import function
+    if (name == "print" || name == "puts") {
+        wasm_name = "vix_puts";
+    } else if (name == "putchar") {
+        wasm_name = "vix_putchar";
+    } else if (name == "exit") {
+        wasm_name = "vix_exit";
+    }
+
     bool is_import = (name == "putchar" || name == "puts" || name == "print" || name == "exit");
 
     std::vector<uintptr_t> arg_exprs;
@@ -225,9 +288,52 @@ uintptr_t WasmCodegen::compile_call(ASTNode *call_node) {
         ret_type = BinaryenTypeNone();
     }
 
-    return (uintptr_t)BinaryenCall(m_module, name.c_str(),
+    return (uintptr_t)BinaryenCall(m_module, wasm_name.c_str(),
                                    (BinaryenExpressionRef*)arg_exprs.data(),
                                    arg_exprs.size(), ret_type);
+}
+
+uintptr_t WasmCodegen::compile_print(ASTNode *print_node) {
+    ASTNode *expr = print_node ? print_node->data.print.expr : nullptr;
+    if (!expr) return (uintptr_t)BinaryenNop(m_module);
+
+    std::vector<uintptr_t> exprs;
+    auto append_print = [&](ASTNode *item) {
+        if (!item) return;
+
+        uintptr_t value = compile_node(item);
+        const char *import_name = "vix_print_i32";
+
+        if (item->type == AST_STRING ||
+            (item->inferred_type && item->inferred_type->kind == TYPEINFO_STRING)) {
+            import_name = "vix_puts";
+        } else if (item->type == AST_CHAR) {
+            import_name = "vix_putchar";
+        }
+
+        BinaryenExpressionRef arg = (BinaryenExpressionRef)value;
+        exprs.push_back((uintptr_t)BinaryenCall(
+            m_module,
+            import_name,
+            &arg,
+            1,
+            BinaryenTypeNone()));
+    };
+
+    if (expr->type == AST_EXPRESSION_LIST) {
+        for (int i = 0; i < expr->data.expression_list.expression_count; i++) {
+            append_print(expr->data.expression_list.expressions[i]);
+        }
+    } else {
+        append_print(expr);
+    }
+
+    if (exprs.empty()) return (uintptr_t)BinaryenNop(m_module);
+    if (exprs.size() == 1) return exprs[0];
+
+    return (uintptr_t)BinaryenBlock(m_module, nullptr,
+                                    (BinaryenExpressionRef*)exprs.data(),
+                                    exprs.size(), BinaryenTypeNone());
 }
 
 uintptr_t WasmCodegen::compile_ident(ASTNode *ident_node) {
@@ -247,7 +353,6 @@ uintptr_t WasmCodegen::compile_return(ASTNode *ret_node) {
 }
 
 uintptr_t WasmCodegen::compile_assign(ASTNode *assign_node) {
-    // Assignment: left = right
     uintptr_t val = compile_node(assign_node->data.assign.right);
     ASTNode *target = assign_node->data.assign.left;
 
@@ -269,7 +374,6 @@ uintptr_t WasmCodegen::compile_var_decl(ASTNode *decl_node, ASTNode *init_expr) 
         } else {
             val = (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(0));
         }
-        // local already created in register_function, just set it
         return (uintptr_t)BinaryenLocalSet(m_module,
             get_or_create_local(target->data.identifier.name, BinaryenTypeInt32()),
             (BinaryenExpressionRef)val);
@@ -286,12 +390,13 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
     m_module = BinaryenModuleCreate();
     m_has_error = false;
     m_error.clear();
+    m_functions.clear();
+    m_strings.clear();
+    m_current_func = nullptr;
+    m_string_offset = 16;
 
     add_imports();
 
-    BinaryenSetMemory(m_module, 1, -1, "memory", nullptr, nullptr, nullptr, nullptr, nullptr, 0, false, false, nullptr);
-
-    // First pass: register all functions
     if (root->type == AST_PROGRAM) {
         for (int i = 0; i < root->data.program.statement_count; i++) {
             ASTNode *stmt = root->data.program.statements[i];
@@ -301,7 +406,6 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
         }
     }
 
-    // Second pass: compile function bodies
     if (root->type == AST_PROGRAM) {
         for (int i = 0; i < root->data.program.statement_count; i++) {
             ASTNode *stmt = root->data.program.statements[i];
@@ -311,7 +415,27 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
         }
     }
 
-    // Export main
+    size_t num_seg = m_strings.size();
+    if (num_seg == 0) {
+        BinaryenSetMemory(m_module, 1, -1, "memory", nullptr, nullptr, nullptr, nullptr, nullptr, 0, false, false, nullptr);
+    } else {
+        std::vector<const char*> seg_names(num_seg, nullptr);
+        std::vector<const char*> seg_datas(num_seg);
+        std::vector<uint8_t> seg_passives(num_seg, 0);
+        std::vector<BinaryenExpressionRef> seg_offsets(num_seg);
+        std::vector<BinaryenIndex> seg_sizes(num_seg);
+        for (size_t i = 0; i < num_seg; i++) {
+            seg_datas[i] = m_strings[i].data.data();
+            seg_sizes[i] = m_strings[i].data.size();
+            seg_offsets[i] = BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)m_strings[i].offset));
+        }
+        BinaryenSetMemory(m_module, m_string_offset / 65536 + 1, -1, "memory",
+                           seg_names.data(), seg_datas.data(),
+                           (bool*)seg_passives.data(), seg_offsets.data(),
+                           seg_sizes.data(), (BinaryenIndex)num_seg,
+                           false, false, nullptr);
+    }
+
     if (m_functions.count("main")) {
         BinaryenAddFunctionExport(m_module, "main", "main");
     }

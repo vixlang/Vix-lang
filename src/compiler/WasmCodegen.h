@@ -19,19 +19,31 @@ private:
     BinaryenModuleRef m_module;
     std::string m_error;
 
+    struct StringEntry {
+        std::vector<char> data;
+        uint32_t offset;
+    };
+
     struct FuncInfo {
         BinaryenFunctionRef func_ref;
         std::unordered_map<std::string, uint32_t> local_indices;
         uint32_t next_local;
+        uint32_t param_count;
+        std::vector<uintptr_t> param_types;
+        uintptr_t return_type;
     };
 
     std::unordered_map<std::string, FuncInfo> m_functions;
     FuncInfo *m_current_func;
     bool m_has_error;
 
+    std::vector<StringEntry> m_strings;
+    uint32_t m_string_offset;
+
     void add_imports();
     void register_function(ASTNode *node);
     void compile_function_body(ASTNode *node);
+    void bind_param_locals(ASTNode *params);
 
     uintptr_t compile_node(ASTNode *node);
     uintptr_t compile_block(ASTNode *stmt_list);
@@ -39,6 +51,7 @@ private:
     uintptr_t compile_while(ASTNode *while_node);
     uintptr_t compile_binary_op(ASTNode *op_node);
     uintptr_t compile_call(ASTNode *call_node);
+    uintptr_t compile_print(ASTNode *print_node);
     uintptr_t compile_ident(ASTNode *ident_node);
     uintptr_t compile_return(ASTNode *ret_node);
     uintptr_t compile_assign(ASTNode *assign_node);

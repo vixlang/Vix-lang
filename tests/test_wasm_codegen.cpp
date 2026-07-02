@@ -193,6 +193,32 @@ void test_fixture_hello() {
     tests_passed++;
 }
 
+void test_compile_function_params_and_locals() {
+    const char *source =
+        "fn add(a: i32, b: i32): i32 {\n"
+        "    let c = a + b\n"
+        "    return c\n"
+        "}\n"
+        "fn main(): i32 {\n"
+        "    print(add(4, 5))\n"
+        "    return 0\n"
+        "}\n";
+
+    CompileResult cr = vixc_compile_string(source);
+    assert(cr.error_count == 0);
+    assert(cr.root != nullptr);
+
+    WasmCodegen cg;
+    std::vector<uint8_t> wasm_bytes;
+    std::string error;
+    bool ok = cg.emit(cr.root, wasm_bytes, error);
+    assert(ok);
+    assert(!wasm_bytes.empty());
+    vixc_free_result(&cr);
+    fprintf(stderr, "PASS: test_compile_function_params_and_locals\n"); fflush(stderr);
+    tests_passed++;
+}
+
 int main() {
     fprintf(stderr, "=== WASM Codegen Test ===\n");
     test_binaryen_basic();
@@ -200,6 +226,7 @@ int main() {
     test_string_literal_embedded_in_wasm();
     test_parse_error_reports_message();
     test_fixture_hello();
+    test_compile_function_params_and_locals();
     fprintf(stderr, "\n%d passed, %d failed\n", tests_passed, tests_failed);
 
     return tests_failed > 0 ? 1 : 0;
