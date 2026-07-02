@@ -313,10 +313,16 @@ uintptr_t WasmCodegen::compile_member_assign(ASTNode *assign_node) {
 
     ASTNode *object = target->data.member_access.object;
     uint32_t fieldOffset = 0;
-    if (object && object->inferred_type && object->inferred_type->name) {
-        std::string sname(object->inferred_type->name);
-        const WasmFieldLayout *layout = find_field_layout(sname, fname);
-        if (layout) fieldOffset = layout->offset;
+    if (object && object->inferred_type) {
+        const char *structName = object->inferred_type->name;
+        if (!structName && object->inferred_type->kind == TYPEINFO_APP
+            && object->inferred_type->app_ctor) {
+            structName = object->inferred_type->app_ctor->name;
+        }
+        if (structName) {
+            const WasmFieldLayout *layout = find_field_layout(structName, fname);
+            if (layout) fieldOffset = layout->offset;
+        }
     }
 
     uintptr_t addr = (uintptr_t)BinaryenBinary(
@@ -689,10 +695,16 @@ uintptr_t WasmCodegen::compile_member_access(ASTNode *node) {
         return emit_array_length(base);
     }
     uint32_t fieldOffset = 0;
-    if (object && object->inferred_type && object->inferred_type->name) {
-        std::string sname(object->inferred_type->name);
-        const WasmFieldLayout *layout = find_field_layout(sname, fname);
-        if (layout) fieldOffset = layout->offset;
+    if (object && object->inferred_type) {
+        const char *structName = object->inferred_type->name;
+        if (!structName && object->inferred_type->kind == TYPEINFO_APP
+            && object->inferred_type->app_ctor) {
+            structName = object->inferred_type->app_ctor->name;
+        }
+        if (structName) {
+            const WasmFieldLayout *layout = find_field_layout(structName, fname);
+            if (layout) fieldOffset = layout->offset;
+        }
     }
     uintptr_t addr = (uintptr_t)BinaryenBinary(
         m_module, BinaryenAddInt32(),
