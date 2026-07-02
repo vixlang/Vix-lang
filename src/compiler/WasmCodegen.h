@@ -43,6 +43,16 @@ private:
     std::vector<std::string> m_break_labels;
     std::vector<std::string> m_continue_labels;
 
+    uint32_t m_heap_offset;
+
+    uint32_t alloc_bytes(uint32_t size, uint32_t align);
+    uintptr_t emit_i32_load(uintptr_t addr);
+    uintptr_t emit_i32_store(uintptr_t addr, uintptr_t value);
+    uintptr_t compile_array_literal(ASTNode *node);
+    uintptr_t compile_index(ASTNode *node);
+    uintptr_t compile_index_assign(ASTNode *assign_node);
+    uintptr_t emit_array_length(uintptr_t array_ptr);
+
     void add_imports();
     void register_function(ASTNode *node);
     void compile_function_body(ASTNode *node);
@@ -60,6 +70,7 @@ private:
     uintptr_t compile_print(ASTNode *print_node);
     uintptr_t compile_ident(ASTNode *ident_node);
     uintptr_t compile_return(ASTNode *ret_node);
+    uintptr_t compile_member_access(ASTNode *node);
     uintptr_t compile_assign(ASTNode *assign_node);
     uintptr_t compile_var_decl(ASTNode *decl_node, ASTNode *init_expr);
 

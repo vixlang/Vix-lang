@@ -3,7 +3,9 @@
 #include "binaryen-c.h"
 #include <cstring>
 
-WasmCodegen::WasmCodegen() : m_module(nullptr), m_current_func(nullptr), m_has_error(false), m_string_offset(16) {}
+WasmCodegen::WasmCodegen()
+    : m_module(nullptr), m_current_func(nullptr), m_has_error(false),
+      m_string_offset(16), m_heap_offset(4096) {}
 
 WasmCodegen::~WasmCodegen() {
     if (m_module) BinaryenModuleDispose(m_module);
@@ -137,6 +139,94 @@ void WasmCodegen::compile_function_body(ASTNode *node) {
     m_current_func = nullptr;
 }
 
+uint32_t WasmCodegen::alloc_bytes(uint32_t size, uint32_t align) {
+    uint32_t base = (m_heap_offset + align - 1) & ~(align - 1);
+    m_heap_offset = base + size;
+    return base;
+}
+
+uintptr_t WasmCodegen::emit_i32_load(uintptr_t addr) {
+    return (uintptr_t)BinaryenLoad(m_module, 4, true, 0, 4, BinaryenTypeInt32(),
+                                    (BinaryenExpressionRef)addr, "0");
+}
+
+uintptr_t WasmCodegen::emit_i32_store(uintptr_t addr, uintptr_t value) {
+    return (uintptr_t)BinaryenStore(m_module, 4, 0, 4, (BinaryenExpressionRef)addr,
+                                     (BinaryenExpressionRef)value, BinaryenTypeInt32(), "0");
+}
+
+uintptr_t WasmCodegen::emit_array_length(uintptr_t array_ptr) {
+    return emit_i32_load(array_ptr);
+}
+
+uintptr_t WasmCodegen::compile_array_literal(ASTNode *node) {
+    int count = node->data.expression_list.expression_count;
+    uint32_t total = 8 + (uint32_t)count * 4;
+    uint32_t base = alloc_bytes(total, 4);
+
+    std::vector<BinaryenExpressionRef> exprs;
+    exprs.push_back((BinaryenExpressionRef)emit_i32_store(
+        (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)base)),
+        (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(count))));
+    exprs.push_back((BinaryenExpressionRef)emit_i32_store(
+        (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)(base + 4))),
+        (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(4))));
+
+    for (int i = 0; i < count; i++) {
+        uintptr_t value = compile_node(node->data.expression_list.expressions[i]);
+        exprs.push_back((BinaryenExpressionRef)emit_i32_store(
+            (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)(base + 8 + i * 4))),
+            value));
+    }
+
+    exprs.push_back(BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)base)));
+    return (uintptr_t)BinaryenBlock(m_module, nullptr, exprs.data(), exprs.size(), BinaryenTypeInt32());
+}
+
+uintptr_t WasmCodegen::compile_index(ASTNode *node) {
+    uintptr_t base = compile_node(node->data.index.target);
+    uintptr_t idx = compile_node(node->data.index.index);
+    uintptr_t dataAddr = (uintptr_t)BinaryenBinary(
+        m_module,
+        BinaryenAddInt32(),
+        (BinaryenExpressionRef)base,
+        BinaryenConst(m_module, BinaryenLiteralInt32(8)));
+    uintptr_t byteOffset = (uintptr_t)BinaryenBinary(
+        m_module,
+        BinaryenShlInt32(),
+        (BinaryenExpressionRef)idx,
+        BinaryenConst(m_module, BinaryenLiteralInt32(2)));
+    uintptr_t addr = (uintptr_t)BinaryenBinary(
+        m_module,
+        BinaryenAddInt32(),
+        (BinaryenExpressionRef)dataAddr,
+        (BinaryenExpressionRef)byteOffset);
+    return emit_i32_load(addr);
+}
+
+uintptr_t WasmCodegen::compile_index_assign(ASTNode *assign_node) {
+    ASTNode *target = assign_node->data.assign.left;
+    uintptr_t val = compile_node(assign_node->data.assign.right);
+    uintptr_t base = compile_node(target->data.index.target);
+    uintptr_t idx = compile_node(target->data.index.index);
+    uintptr_t dataAddr = (uintptr_t)BinaryenBinary(
+        m_module,
+        BinaryenAddInt32(),
+        (BinaryenExpressionRef)base,
+        BinaryenConst(m_module, BinaryenLiteralInt32(8)));
+    uintptr_t byteOffset = (uintptr_t)BinaryenBinary(
+        m_module,
+        BinaryenShlInt32(),
+        (BinaryenExpressionRef)idx,
+        BinaryenConst(m_module, BinaryenLiteralInt32(2)));
+    uintptr_t addr = (uintptr_t)BinaryenBinary(
+        m_module,
+        BinaryenAddInt32(),
+        (BinaryenExpressionRef)dataAddr,
+        (BinaryenExpressionRef)byteOffset);
+    return emit_i32_store(addr, val);
+}
+
 uintptr_t WasmCodegen::compile_node(ASTNode *node) {
     if (!node || m_has_error) return (uintptr_t)BinaryenNop(m_module);
 
@@ -153,6 +243,15 @@ uintptr_t WasmCodegen::compile_node(ASTNode *node) {
             return compile_call(node);
         case AST_PRINT:
             return compile_print(node);
+        case AST_EXPRESSION_LIST:
+            if (node->inferred_type && node->inferred_type->kind == TYPEINFO_ARRAY) {
+                return compile_array_literal(node);
+            }
+            return compile_block(node);
+        case AST_MEMBER_ACCESS:
+            return compile_member_access(node);
+        case AST_INDEX:
+            return compile_index(node);
         case AST_IDENTIFIER:
             return compile_ident(node);
         case AST_NUM_INT:
@@ -457,10 +556,27 @@ uintptr_t WasmCodegen::compile_return(ASTNode *ret_node) {
     return (uintptr_t)BinaryenReturn(m_module, (BinaryenExpressionRef)val);
 }
 
-uintptr_t WasmCodegen::compile_assign(ASTNode *assign_node) {
-    uintptr_t val = compile_node(assign_node->data.assign.right);
-    ASTNode *target = assign_node->data.assign.left;
+uintptr_t WasmCodegen::compile_member_access(ASTNode *node) {
+    ASTNode *object = node->data.member_access.object;
+    ASTNode *field = node->data.member_access.field;
+    if (!object || !field || field->type != AST_IDENTIFIER || !field->data.identifier.name) {
+        return (uintptr_t)BinaryenNop(m_module);
+    }
+    std::string fname(field->data.identifier.name);
+    if (fname == "length") {
+        uintptr_t base = compile_node(object);
+        return emit_array_length(base);
+    }
+    return (uintptr_t)BinaryenNop(m_module);
+}
 
+uintptr_t WasmCodegen::compile_assign(ASTNode *assign_node) {
+    ASTNode *target = assign_node->data.assign.left;
+    if (target && target->type == AST_INDEX) {
+        return compile_index_assign(assign_node);
+    }
+
+    uintptr_t val = compile_node(assign_node->data.assign.right);
     if (target && target->type == AST_IDENTIFIER && target->data.identifier.name) {
         uint32_t idx = get_or_create_local(target->data.identifier.name, BinaryenTypeInt32());
         return (uintptr_t)BinaryenLocalSet(m_module, idx, (BinaryenExpressionRef)val);
@@ -499,6 +615,9 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
     m_strings.clear();
     m_current_func = nullptr;
     m_string_offset = 16;
+    m_heap_offset = 4096;
+    m_break_labels.clear();
+    m_continue_labels.clear();
 
     add_imports();
 
@@ -534,7 +653,12 @@ bool WasmCodegen::emit(ASTNode *root, std::vector<uint8_t> &out_bytes, std::stri
             seg_sizes[i] = m_strings[i].data.size();
             seg_offsets[i] = BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)m_strings[i].offset));
         }
-        BinaryenSetMemory(m_module, m_string_offset / 65536 + 1, -1, "memory",
+        if (m_heap_offset < m_string_offset + 16) {
+            m_heap_offset = (m_string_offset + 31) & ~31;
+        }
+        uint32_t mem_pages = (m_heap_offset + 65535) / 65536;
+        if (mem_pages < 1) mem_pages = 1;
+        BinaryenSetMemory(m_module, mem_pages, -1, "memory",
                            seg_names.data(), seg_datas.data(),
                            (bool*)seg_passives.data(), seg_offsets.data(),
                            seg_sizes.data(), (BinaryenIndex)num_seg,

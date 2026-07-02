@@ -199,6 +199,18 @@ void test_fixture_control_flow() {
     tests_passed++;
 }
 
+void test_fixture_arrays() {
+    expect_emit_success("tests/fixtures/wasm_core/arrays.vix");
+    fprintf(stderr, "PASS: test_fixture_arrays\n"); fflush(stderr);
+    tests_passed++;
+}
+
+void test_fixture_bubble_sort() {
+    expect_emit_success("tests/fixtures/wasm_core/bubble_sort.vix");
+    fprintf(stderr, "PASS: test_fixture_bubble_sort\n"); fflush(stderr);
+    tests_passed++;
+}
+
 void test_compile_function_params_and_locals() {
     const char *source =
         "fn add(a: i32, b: i32): i32 {\n"
@@ -234,6 +246,8 @@ int main() {
     test_fixture_hello();
     test_compile_function_params_and_locals();
     test_fixture_control_flow();
+    test_fixture_arrays();
+    test_fixture_bubble_sort();
     fprintf(stderr, "\n%d passed, %d failed\n", tests_passed, tests_failed);
 
     return tests_failed > 0 ? 1 : 0;
