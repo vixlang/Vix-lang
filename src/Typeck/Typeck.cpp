@@ -1169,6 +1169,20 @@ struct TypeChecker {
 			case AST_EXPRESSION_LIST:
 				result = check_expression_list(node);
 				break;
+			case AST_PRINT: {
+				result = builtin_void;
+				ASTNode *expr = node->data.print.expr;
+				if (expr) {
+					if (expr->type == AST_EXPRESSION_LIST) {
+						for (int i = 0; i < expr->data.expression_list.expression_count; i++) {
+							check_expr(expr->data.expression_list.expressions[i]);
+						}
+					} else {
+						check_expr(expr);
+					}
+				}
+				break;
+			}
 			default:
 				result = builtin_void;
 				break;
