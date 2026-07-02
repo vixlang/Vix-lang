@@ -68,6 +68,7 @@ private:
     uintptr_t compile_member_assign(ASTNode *assign_node);
 
     uintptr_t compile_scaled_pointer_expr(ASTNode *inner);
+    uintptr_t compile_adt_constructor(const std::string &name, ASTNode *args);
 
     void add_imports();
     void register_function(ASTNode *node);

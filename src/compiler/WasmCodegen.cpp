@@ -1,6 +1,7 @@
 #include "WasmCodegen.h"
 #include "WasmTypeMap.h"
 #include "binaryen-c.h"
+#include "parser.h"
 #include <cstring>
 
 WasmCodegen::WasmCodegen()
@@ -385,6 +386,17 @@ uintptr_t WasmCodegen::compile_member_assign(ASTNode *assign_node) {
     std::string fname(field->data.identifier.name);
     if (fname == "length") return (uintptr_t)BinaryenNop(m_module);
 
+    bool isNumeric = !fname.empty();
+    for (char c : fname) if (c < '0' || c > '9') { isNumeric = false; break; }
+    if (isNumeric) {
+        uint32_t fieldOffset = std::stoul(fname) * 4;
+        uintptr_t addr = (uintptr_t)BinaryenBinary(
+            m_module, BinaryenAddInt32(),
+            (BinaryenExpressionRef)base,
+            BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)fieldOffset)));
+        return emit_i32_store(addr, val);
+    }
+
     ASTNode *object = target->data.member_access.object;
     uint32_t fieldOffset = 0;
     if (object && object->inferred_type) {
@@ -423,6 +435,43 @@ uintptr_t WasmCodegen::compile_scaled_pointer_expr(ASTNode *inner) {
         }
     }
     return compile_node(inner);
+}
+
+static int builtin_adt_tag(const std::string &name) {
+    if (name == "None" || name == "Err") return 1;
+    return 0;
+}
+
+static bool is_adt_constructor_name(const std::string &name) {
+    if (name == "Some" || name == "None" || name == "Ok" || name == "Err") return true;
+    return vix_adt_ctor_index(name.c_str()) >= 0;
+}
+
+uintptr_t WasmCodegen::compile_adt_constructor(const std::string &name, ASTNode *args) {
+    int ctor_idx = vix_adt_ctor_index(name.c_str());
+    int tag = (ctor_idx >= 0) ? ctor_idx : builtin_adt_tag(name);
+
+    uint32_t base = alloc_bytes(8, 4);
+
+    std::vector<BinaryenExpressionRef> exprs;
+    exprs.push_back((BinaryenExpressionRef)emit_i32_store(
+        (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)base)),
+        (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(tag))));
+
+    int pc = (ctor_idx >= 0) ? vix_adt_ctor_payload_count(name.c_str()) : 1;
+    if (pc > 0 && args && args->type == AST_EXPRESSION_LIST && args->data.expression_list.expression_count > 0) {
+        uintptr_t pval = compile_node(args->data.expression_list.expressions[0]);
+        exprs.push_back((BinaryenExpressionRef)emit_i32_store(
+            (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)(base + 4))),
+            pval));
+    } else {
+        exprs.push_back((BinaryenExpressionRef)emit_i32_store(
+            (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)(base + 4))),
+            (uintptr_t)BinaryenConst(m_module, BinaryenLiteralInt32(0))));
+    }
+
+    exprs.push_back(BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)base)));
+    return (uintptr_t)BinaryenBlock(m_module, nullptr, exprs.data(), exprs.size(), BinaryenTypeInt32());
 }
 
 uintptr_t WasmCodegen::compile_node(ASTNode *node) {
@@ -720,6 +769,11 @@ uintptr_t WasmCodegen::compile_call(ASTNode *call_node) {
     }
 
     std::string name(func->data.identifier.name);
+
+    if (is_adt_constructor_name(name)) {
+        return compile_adt_constructor(name, args);
+    }
+
     std::string wasm_name = name;
 
     if (name == "print" || name == "puts") {
@@ -743,6 +797,11 @@ uintptr_t WasmCodegen::compile_call(ASTNode *call_node) {
     uintptr_t ret_type = BinaryenTypeInt32();
     if (is_import) {
         ret_type = BinaryenTypeNone();
+    } else {
+        auto fit = m_functions.find(wasm_name);
+        if (fit != m_functions.end()) {
+            ret_type = fit->second.return_type;
+        }
     }
 
     return (uintptr_t)BinaryenCall(m_module, wasm_name.c_str(),
@@ -798,6 +857,12 @@ uintptr_t WasmCodegen::compile_ident(ASTNode *ident_node) {
         return (uintptr_t)BinaryenNop(m_module);
     }
     std::string iname(ident_node->data.identifier.name);
+
+    if (iname == "None" || (vix_adt_ctor_index(iname.c_str()) >= 0 &&
+        vix_adt_ctor_payload_count(iname.c_str()) <= 0)) {
+        return compile_adt_constructor(iname, nullptr);
+    }
+
     auto iit = m_var_mem_addrs.find(iname);
     if (iit != m_var_mem_addrs.end()) {
         return emit_i32_load(
@@ -826,6 +891,18 @@ uintptr_t WasmCodegen::compile_member_access(ASTNode *node) {
     if (fname == "length") {
         return emit_array_length(base);
     }
+
+    bool isNumeric = !fname.empty();
+    for (char c : fname) if (c < '0' || c > '9') { isNumeric = false; break; }
+    if (isNumeric) {
+        uint32_t fieldOffset = std::stoul(fname) * 4;
+        uintptr_t addr = (uintptr_t)BinaryenBinary(
+            m_module, BinaryenAddInt32(),
+            (BinaryenExpressionRef)base,
+            BinaryenConst(m_module, BinaryenLiteralInt32((int32_t)fieldOffset)));
+        return emit_i32_load(addr);
+    }
+
     uint32_t fieldOffset = 0;
     if (object && object->inferred_type) {
         const char *structName = object->inferred_type->name;
