@@ -87,7 +87,7 @@ LLVMCodeGenerator::VisitResult LLVMCodeGenerator::visitIf(ASTNode* node) {
     VisitResult thenResult = visit(node->data.if_stmt.then_body);
     scopeManager.exitScope();
     BasicBlock* thenEndBB = builder.GetInsertBlock();
-    bool thenTerminated = thenEndBB->getTerminator();
+    bool thenTerminated = !thenEndBB || thenEndBB->getTerminator();
     if (!thenTerminated) {
         builder.CreateBr(mergeBB);
     }
@@ -103,7 +103,7 @@ LLVMCodeGenerator::VisitResult LLVMCodeGenerator::visitIf(ASTNode* node) {
         scopeManager.exitScope();
     }
     BasicBlock* elseEndBB = builder.GetInsertBlock();
-    bool elseTerminated = elseEndBB->getTerminator();
+    bool elseTerminated = !elseEndBB || elseEndBB->getTerminator();
     if (!elseTerminated) {
         builder.CreateBr(mergeBB);
     }
@@ -177,7 +177,7 @@ LLVMCodeGenerator::VisitResult LLVMCodeGenerator::visitWhile(ASTNode* node) {
     loopContinueTargets.pop_back();
     loopBreakTargets.pop_back();
     loopBB = builder.GetInsertBlock();
-    if (!loopBB->getTerminator()) {
+    if (loopBB && !loopBB->getTerminator()) {
         builder.CreateBr(condBB);
     }
     
@@ -334,7 +334,7 @@ LLVMCodeGenerator::VisitResult LLVMCodeGenerator::visitFor(ASTNode* node) {
         loopContinueTargets.pop_back();
         loopBreakTargets.pop_back();
 
-        if (!builder.GetInsertBlock()->getTerminator()) {
+        if (builder.GetInsertBlock() && !builder.GetInsertBlock()->getTerminator()) {
             builder.CreateBr(incBB);
         }
 
@@ -396,7 +396,7 @@ LLVMCodeGenerator::VisitResult LLVMCodeGenerator::visitFor(ASTNode* node) {
     scopeManager.exitScope();
     loopContinueTargets.pop_back();
     loopBreakTargets.pop_back();
-    if (!builder.GetInsertBlock()->getTerminator()) {
+    if (builder.GetInsertBlock() && !builder.GetInsertBlock()->getTerminator()) {
         builder.CreateBr(incBB);
     }
     builder.SetInsertPoint(incBB);

@@ -1376,7 +1376,7 @@ int check_unused_variables_with_usage(ASTNode* node, SymbolTable* table, struct 
 
         case AST_INDEX: {
             if (node->data.index.target) warnings_found += check_unused_variables_with_usage(node->data.index.target, table, usage_list);
-            if (node->data.index.index && node->data.index.index->type != AST_IDENTIFIER) {
+            if (node->data.index.index) {
                 if (node->data.index.index) warnings_found += check_unused_variables_with_usage(node->data.index.index, table, usage_list);
             }
             break;
