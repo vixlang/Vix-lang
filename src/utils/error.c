@@ -85,14 +85,19 @@ void load_source_file(const char* filename) {
     long file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
+    if (file_size <= 0) {
+        fclose(file);
+        return;
+    }
+
     if (source_content) {
         free(source_content);
         source_content = NULL;
     }
 
-    source_content = (char*)malloc(file_size + 1);
+    source_content = (char*)malloc((size_t)(file_size + 1));
     if (source_content) {
-        fread(source_content, 1, file_size, file);
+        fread(source_content, 1, (size_t)file_size, file);
         source_content[file_size] = '\0';
     }
 
