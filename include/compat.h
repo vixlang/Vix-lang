@@ -5,6 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef STRINGIFY
+#define STRINGIFY_(x) #x
+#define STRINGIFY(x) STRINGIFY_(x)
+#endif
+
+#define VIX_VERSION_MAJOR 0
+#define VIX_VERSION_MINOR 2
+#define VIX_VERSION_PATCH 0
+#define VIX_VERSION_STRING "Vix v" STRINGIFY(VIX_VERSION_MAJOR) "." STRINGIFY(VIX_VERSION_MINOR) "." STRINGIFY(VIX_VERSION_PATCH)
+
 #ifdef _WIN32
 #include <io.h>
 #include <direct.h>

@@ -1,4 +1,5 @@
 #include "Codegen.h"
+#include "../../include/compat.h"
 
 using namespace llvm;
 
@@ -28,7 +29,7 @@ std::unique_ptr<Module> LLVMCodeGenerator::generate(ASTNode* ast_root) {
 
     if (!hasMain && !mainFunctionCreated && !sourceAttrs.noMain) {
         report_semantic_error_with_location(
-            "No 'fn main()' defined. Vix v0.2.0 requires an explicit main function.",
+            "No 'fn main()' defined. " VIX_VERSION_STRING " requires an explicit main function.",
             current_input_filename ? current_input_filename : "unknown", 1);
     }
     Function* mainFunc = module->getFunction("main");
