@@ -212,8 +212,7 @@ fn main(): i32 {
 }'''
         _, run = compile_and_run(compiler, src, tmp_path)
         assert run is not None
-        assert "20" in run.stdout
-        assert "10" in run.stdout
+        assert run.stdout.strip() == "20\n10", f"Expected '20\\n10', got '{run.stdout.strip()}'"
 
     def test_ptr_type_annotation(self, compiler, tmp_path):
         src = '''fn main(): i32 {
@@ -1037,7 +1036,7 @@ class TestNotInContext:
 }'''
         _, run = compile_and_run(compiler, src, tmp_path)
         assert run is not None
-        assert "0" in run.stdout
+        assert run.stdout.strip() == "3\n2\n1\n0", f"Expected '3\\n2\\n1\\n0', got '{run.stdout.strip()}'"
 
     def test_not_with_and_or(self, compiler, tmp_path):
         src = '''fn main(): i32 {
