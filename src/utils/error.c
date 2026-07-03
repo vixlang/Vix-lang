@@ -395,8 +395,6 @@ static void sanitize_message(const char* message, char* buffer, size_t buffer_si
 }
 
 static void print_suggestion_block(const char* suggestion) {
-    (void)suggestion;
-    return;
     if (!suggestion || !*suggestion) return;
     fprintf(stderr, "%s   = %s%shelp%s: %s\n",
             colorize(ANSI_DIM),
