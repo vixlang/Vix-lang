@@ -137,6 +137,6 @@ class TestEdgeCaseErrors:
         assert res.returncode != 0
 
     def test_missing_return_type(self, compiler, tmp_path):
-        src = 'fn main() { return 0 }'
+        src = 'fn foo(): i32 { let x = 1 }'
         res, _ = compile_and_run(compiler, src, tmp_path)
         assert res.returncode != 0
