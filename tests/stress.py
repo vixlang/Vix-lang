@@ -180,7 +180,7 @@ class TestLoopStress:
         _, run = compile_and_run(compiler, src, tmp_path)
         assert run is not None
         # Just check it compiles and runs without crashing
-        assert run.stdout.strip() is not None
+        assert run.stdout.strip() != ""
 
     @pytest.mark.parametrize("count", [10, 50, 100])
     def test_for_loop_accumulation(self, compiler, tmp_path, count):
@@ -275,7 +275,7 @@ class TestTypeStress:
         res, run = compile_and_run(compiler, src, tmp_path)
         # Float operations may not always compile correctly
         if run is not None:
-            assert run.stdout.strip() is not None
+            assert run.stdout.strip() != ""
 
     @pytest.mark.parametrize("count", [5, 10])
     def test_many_mutable_reassignments(self, compiler, tmp_path, count):

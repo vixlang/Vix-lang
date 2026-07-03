@@ -1877,7 +1877,7 @@ fn main(): i32 {{ print(classify({n})) return 0 }}'''
         _, run = compile_and_run(compiler, src, tmp_path)
         assert run is not None
         # This test just verifies compilation and basic execution
-        assert run.stdout.strip() is not None
+        assert run.stdout.strip() != ""
 
     @pytest.mark.parametrize("n", range(50))
     def test_for_accumulator(self, compiler, tmp_path, n):
@@ -2126,7 +2126,7 @@ fn main(): i32 {{
 }}'''
         _, run = compile_and_run(compiler, src, tmp_path)
         assert run is not None
-        assert run.stdout.strip() is not None
+        assert run.stdout.strip() != ""
 
     @pytest.mark.parametrize("n", range(50))
     def test_bucket_index(self, compiler, tmp_path, n):
@@ -2149,7 +2149,7 @@ fn main(): i32 {{
 }}'''
         _, run = compile_and_run(compiler, src, tmp_path)
         assert run is not None
-        assert run.stdout.strip() is not None
+        assert run.stdout.strip() != ""
 
     @pytest.mark.parametrize("n", range(50))
     def test_option_match(self, compiler, tmp_path, n):
