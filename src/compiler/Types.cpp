@@ -24,9 +24,6 @@ bool TypeHelper::isStringVariable(const std::string& name) {
 
 void TypeHelper::registerArrayType(const std::string& name, Type* elementType, int elementCount) {
     arrayTypes[name] = {elementType, elementCount};
-    if (elementType->isIntegerTy(8)) {
-        stringVariables[name] = true;
-    }
 }
 
 std::pair<Type*, int>* TypeHelper::getArrayTypeInfo(const std::string& name) {
