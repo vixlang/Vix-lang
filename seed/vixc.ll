@@ -3376,594 +3376,704 @@ target triple = "x86_64-pc-linux-gnu"
 @.strlit41177 = internal constant [5 x i8] c"ptr:\00"
 @.strlit41185 = internal constant [15 x i8] c"    mov qword \00"
 @.strlit41189 = internal constant [6 x i8] c", rdi\00"
-@.strlit41268 = internal constant [4 x i8] c"ptr\00"
-@.strlit41362 = internal constant [14 x i8] c"    sub rsp, \00"
-@.strlit41372 = internal constant [2 x i8] c":\00"
-@.strlit41375 = internal constant [17 x i8] c"    mov rsp, rbp\00"
-@.strlit41377 = internal constant [12 x i8] c"    pop rbp\00"
-@.strlit41379 = internal constant [8 x i8] c"    ret\00"
-@.strlit41384 = internal constant [24 x i8] c"    ; unsupported MIR: \00"
-@.strlit41388 = internal constant [57 x i8] c"    %error \22unsupported MIR instruction in self backend\22\00"
-@.strlit41390 = internal constant [4 x i8] c"f64\00"
-@.strlit41396 = internal constant [16 x i8] c"    movq qword \00"
-@.strlit41399 = internal constant [3 x i8] c", \00"
-@.strlit41404 = internal constant [4 x i8] c"f32\00"
-@.strlit41410 = internal constant [16 x i8] c"    movd dword \00"
-@.strlit41413 = internal constant [3 x i8] c", \00"
-@.strlit41418 = internal constant [9 x i8] c"    mov \00"
-@.strlit41422 = internal constant [2 x i8] c" \00"
-@.strlit41426 = internal constant [3 x i8] c", \00"
-@.strlit41433 = internal constant [2 x i8] c"0\00"
-@.strlit41439 = internal constant [4 x i8] c"0.0\00"
-@.strlit41447 = internal constant [9 x i8] c"0.000000\00"
-@.strlit41455 = internal constant [10 x i8] c"    pxor \00"
-@.strlit41458 = internal constant [3 x i8] c", \00"
-@.strlit41470 = internal constant [4 x i8] c"f64\00"
-@.strlit41476 = internal constant [10 x i8] c"    movq \00"
-@.strlit41479 = internal constant [9 x i8] c", qword \00"
-@.strlit41491 = internal constant [10 x i8] c"    movd \00"
-@.strlit41494 = internal constant [9 x i8] c", dword \00"
-@.strlit41506 = internal constant [10 x i8] c"    pxor \00"
-@.strlit41509 = internal constant [3 x i8] c", \00"
-@.strlit41541 = internal constant [11 x i8] c"    movzx \00"
-@.strlit41544 = internal constant [8 x i8] c", byte \00"
-@.strlit41556 = internal constant [9 x i8] c"    mov \00"
-@.strlit41559 = internal constant [3 x i8] c", \00"
-@.strlit41594 = internal constant [11 x i8] c"    movzx \00"
-@.strlit41597 = internal constant [8 x i8] c", byte \00"
-@.strlit41689 = internal constant [1 x i8] zeroinitializer
-@.strlit41785 = internal constant [15 x i8] c"    mov qword \00"
-@.strlit41790 = internal constant [4 x i8] c", 0\00"
-@.strlit41799 = internal constant [15 x i8] c"    mov dword \00"
-@.strlit41804 = internal constant [4 x i8] c", 0\00"
-@.strlit41809 = internal constant [14 x i8] c"    mov byte \00"
-@.strlit41814 = internal constant [4 x i8] c", 0\00"
-@.strlit41831 = internal constant [20 x i8] c"    mov rax, qword \00"
-@.strlit41837 = internal constant [15 x i8] c"    mov qword \00"
-@.strlit41842 = internal constant [6 x i8] c", rax\00"
-@.strlit41851 = internal constant [20 x i8] c"    mov eax, dword \00"
-@.strlit41857 = internal constant [15 x i8] c"    mov dword \00"
-@.strlit41862 = internal constant [6 x i8] c", eax\00"
-@.strlit41867 = internal constant [18 x i8] c"    mov al, byte \00"
-@.strlit41873 = internal constant [14 x i8] c"    mov byte \00"
-@.strlit41878 = internal constant [5 x i8] c", al\00"
-@.strlit41883 = internal constant [14 x i8] c"    mov r11, \00"
-@.strlit41886 = internal constant [4 x i8] c"ptr\00"
-@.strlit41902 = internal constant [25 x i8] c"    mov rax, qword [r11+\00"
-@.strlit41906 = internal constant [2 x i8] c"]\00"
-@.strlit41909 = internal constant [15 x i8] c"    mov qword \00"
-@.strlit41914 = internal constant [6 x i8] c", rax\00"
-@.strlit41923 = internal constant [25 x i8] c"    mov eax, dword [r11+\00"
-@.strlit41927 = internal constant [2 x i8] c"]\00"
-@.strlit41930 = internal constant [15 x i8] c"    mov dword \00"
-@.strlit41935 = internal constant [6 x i8] c", eax\00"
-@.strlit41940 = internal constant [23 x i8] c"    mov al, byte [r11+\00"
-@.strlit41944 = internal constant [2 x i8] c"]\00"
-@.strlit41947 = internal constant [14 x i8] c"    mov byte \00"
-@.strlit41952 = internal constant [5 x i8] c", al\00"
-@.strlit41957 = internal constant [14 x i8] c"    mov r11, \00"
-@.strlit41960 = internal constant [4 x i8] c"ptr\00"
-@.strlit41968 = internal constant [14 x i8] c"    add r11, \00"
-@.strlit41985 = internal constant [25 x i8] c"    mov rax, qword [r11+\00"
-@.strlit41989 = internal constant [2 x i8] c"]\00"
-@.strlit41992 = internal constant [15 x i8] c"    mov qword \00"
-@.strlit41997 = internal constant [6 x i8] c", rax\00"
-@.strlit42006 = internal constant [25 x i8] c"    mov eax, dword [r11+\00"
-@.strlit42010 = internal constant [2 x i8] c"]\00"
-@.strlit42013 = internal constant [15 x i8] c"    mov dword \00"
-@.strlit42018 = internal constant [6 x i8] c", eax\00"
-@.strlit42023 = internal constant [23 x i8] c"    mov al, byte [r11+\00"
-@.strlit42027 = internal constant [2 x i8] c"]\00"
-@.strlit42030 = internal constant [14 x i8] c"    mov byte \00"
-@.strlit42035 = internal constant [5 x i8] c", al\00"
-@.strlit42040 = internal constant [14 x i8] c"    mov r11, \00"
-@.strlit42056 = internal constant [25 x i8] c"    mov rax, qword [r11+\00"
-@.strlit42060 = internal constant [2 x i8] c"]\00"
-@.strlit42063 = internal constant [15 x i8] c"    mov qword \00"
-@.strlit42068 = internal constant [6 x i8] c", rax\00"
-@.strlit42077 = internal constant [25 x i8] c"    mov eax, dword [r11+\00"
-@.strlit42081 = internal constant [2 x i8] c"]\00"
-@.strlit42084 = internal constant [15 x i8] c"    mov dword \00"
-@.strlit42089 = internal constant [6 x i8] c", eax\00"
-@.strlit42094 = internal constant [23 x i8] c"    mov al, byte [r11+\00"
-@.strlit42098 = internal constant [2 x i8] c"]\00"
-@.strlit42101 = internal constant [14 x i8] c"    mov byte \00"
-@.strlit42106 = internal constant [5 x i8] c", al\00"
-@.strlit42111 = internal constant [14 x i8] c"    mov r11, \00"
-@.strlit42114 = internal constant [4 x i8] c"ptr\00"
-@.strlit42130 = internal constant [20 x i8] c"    mov rax, qword \00"
-@.strlit42136 = internal constant [20 x i8] c"    mov qword [r11+\00"
-@.strlit42140 = internal constant [7 x i8] c"], rax\00"
-@.strlit42149 = internal constant [20 x i8] c"    mov eax, dword \00"
-@.strlit42155 = internal constant [20 x i8] c"    mov dword [r11+\00"
-@.strlit42159 = internal constant [7 x i8] c"], eax\00"
-@.strlit42164 = internal constant [18 x i8] c"    mov al, byte \00"
-@.strlit42170 = internal constant [19 x i8] c"    mov byte [r11+\00"
-@.strlit42174 = internal constant [6 x i8] c"], al\00"
-@.strlit42262 = internal constant [4 x i8] c"i32\00"
-@.strlit42389 = internal constant [9 x i8] c"    mov \00"
-@.strlit42393 = internal constant [3 x i8] c", \00"
-@.strlit42401 = internal constant [9 x i8] c"    mov \00"
-@.strlit42405 = internal constant [2 x i8] c" \00"
-@.strlit42411 = internal constant [3 x i8] c", \00"
-@.strlit42468 = internal constant [5 x i8] c"ptr:\00"
-@.strlit42509 = internal constant [14 x i8] c"    mov r11, \00"
-@.strlit42512 = internal constant [4 x i8] c"ptr\00"
-@.strlit42520 = internal constant [14 x i8] c"    add r11, \00"
-@.strlit42525 = internal constant [9 x i8] c"    mov \00"
-@.strlit42529 = internal constant [3 x i8] c", \00"
-@.strlit42534 = internal constant [7 x i8] c" [r11]\00"
-@.strlit42537 = internal constant [9 x i8] c"    mov \00"
-@.strlit42541 = internal constant [3 x i8] c", \00"
-@.strlit42591 = internal constant [9 x i8] c"    mov \00"
-@.strlit42595 = internal constant [3 x i8] c", \00"
-@.strlit42600 = internal constant [2 x i8] c" \00"
-@.strlit42613 = internal constant [9 x i8] c"    mov \00"
-@.strlit42617 = internal constant [3 x i8] c", \00"
-@.strlit42668 = internal constant [5 x i8] c"sdiv\00"
-@.strlit42674 = internal constant [5 x i8] c"srem\00"
-@.strlit42687 = internal constant [8 x i8] c"    cqo\00"
-@.strlit42689 = internal constant [8 x i8] c"    cdq\00"
-@.strlit42696 = internal constant [10 x i8] c"    idiv \00"
-@.strlit42701 = internal constant [5 x i8] c"srem\00"
-@.strlit42707 = internal constant [9 x i8] c"    mov \00"
-@.strlit42710 = internal constant [3 x i8] c", \00"
-@.strlit42716 = internal constant [4 x i8] c"shl\00"
-@.strlit42722 = internal constant [5 x i8] c"ashr\00"
-@.strlit42730 = internal constant [14 x i8] c"    mov ecx, \00"
-@.strlit42733 = internal constant [4 x i8] c"i32\00"
-@.strlit42737 = internal constant [5 x i8] c"    \00"
-@.strlit42740 = internal constant [2 x i8] c" \00"
-@.strlit42744 = internal constant [5 x i8] c", cl\00"
-@.strlit42753 = internal constant [5 x i8] c"    \00"
-@.strlit42756 = internal constant [2 x i8] c" \00"
-@.strlit42760 = internal constant [3 x i8] c", \00"
-@.strlit42765 = internal constant [9 x i8] c"    mov \00"
-@.strlit42777 = internal constant [3 x i8] c", \00"
-@.strlit42808 = internal constant [9 x i8] c"    mov \00"
-@.strlit42811 = internal constant [3 x i8] c", \00"
-@.strlit42819 = internal constant [5 x i8] c"    \00"
-@.strlit42822 = internal constant [2 x i8] c" \00"
-@.strlit42827 = internal constant [9 x i8] c"    mov \00"
-@.strlit42839 = internal constant [3 x i8] c", \00"
-@.strlit42894 = internal constant [5 x i8] c"zext\00"
-@.strlit42900 = internal constant [3 x i8] c"i8\00"
-@.strlit42906 = internal constant [3 x i8] c"u8\00"
-@.strlit42914 = internal constant [5 x i8] c"char\00"
-@.strlit42922 = internal constant [16 x i8] c"    movzx eax, \00"
-@.strlit42929 = internal constant [14 x i8] c"    mov eax, \00"
-@.strlit42941 = internal constant [9 x i8] c"    mov \00"
-@.strlit42953 = internal constant [6 x i8] c", rax\00"
-@.strlit42956 = internal constant [9 x i8] c"    mov \00"
-@.strlit42968 = internal constant [6 x i8] c", eax\00"
-@.strlit42971 = internal constant [6 x i8] c"trunc\00"
-@.strlit42991 = internal constant [14 x i8] c"    mov rax, \00"
-@.strlit42998 = internal constant [9 x i8] c"    mov \00"
-@.strlit43010 = internal constant [3 x i8] c", \00"
-@.strlit43016 = internal constant [7 x i8] c"sitofp\00"
-@.strlit43022 = internal constant [14 x i8] c"    mov eax, \00"
-@.strlit43029 = internal constant [23 x i8] c"    cvtsi2sd xmm0, eax\00"
-@.strlit43031 = internal constant [10 x i8] c"    movq \00"
-@.strlit43043 = internal constant [7 x i8] c", xmm0\00"
-@.strlit43046 = internal constant [9 x i8] c"    mov \00"
-@.strlit43050 = internal constant [3 x i8] c", \00"
-@.strlit43058 = internal constant [9 x i8] c"    mov \00"
-@.strlit43070 = internal constant [3 x i8] c", \00"
-@.strlit43164 = internal constant [5 x i8] c"ptr:\00"
-@.strlit43202 = internal constant [14 x i8] c"    lea rax, \00"
-@.strlit43213 = internal constant [14 x i8] c"    mov rax, \00"
-@.strlit43216 = internal constant [4 x i8] c"ptr\00"
-@.strlit43224 = internal constant [14 x i8] c"    add rax, \00"
-@.strlit43229 = internal constant [9 x i8] c"    mov \00"
-@.strlit43241 = internal constant [6 x i8] c", rax\00"
-@.strlit43248 = internal constant [7 x i8] c"string\00"
-@.strlit43254 = internal constant [4 x i8] c"i32\00"
-@.strlit43261 = internal constant [3 x i8] c"i8\00"
-@.strlit43269 = internal constant [5 x i8] c"ptr:\00"
-@.strlit43274 = internal constant [14 x i8] c"    mov rax, \00"
-@.strlit43277 = internal constant [4 x i8] c"ptr\00"
-@.strlit43281 = internal constant [14 x i8] c"    mov ecx, \00"
-@.strlit43284 = internal constant [4 x i8] c"i32\00"
-@.strlit43292 = internal constant [15 x i8] c"    imul rcx, \00"
-@.strlit43297 = internal constant [17 x i8] c"    add rax, rcx\00"
-@.strlit43299 = internal constant [9 x i8] c"    mov \00"
-@.strlit43311 = internal constant [6 x i8] c", rax\00"
-@.strlit43371 = internal constant [4 x i8] c"i32\00"
-@.strlit43385 = internal constant [9 x i8] c"    cmp \00"
-@.strlit43389 = internal constant [3 x i8] c", \00"
-@.strlit43394 = internal constant [5 x i8] c"    \00"
-@.strlit43398 = internal constant [4 x i8] c" al\00"
-@.strlit43401 = internal constant [18 x i8] c"    movzx eax, al\00"
-@.strlit43403 = internal constant [9 x i8] c"    mov \00"
-@.strlit43415 = internal constant [6 x i8] c", eax\00"
-@.strlit43484 = internal constant [9 x i8] c"    mov \00"
-@.strlit43488 = internal constant [3 x i8] c", \00"
-@.strlit43500 = internal constant [12 x i8] c"    syscall\00"
-@.strlit43502 = internal constant [1 x i8] zeroinitializer
-@.strlit43510 = internal constant [9 x i8] c"    mov \00"
-@.strlit43513 = internal constant [4 x i8] c"i64\00"
-@.strlit43517 = internal constant [6 x i8] c", rax\00"
-@.strlit43540 = internal constant [8 x i8] c"syscall\00"
-@.strlit43564 = internal constant [4 x i8] c"i32\00"
-@.strlit43570 = internal constant [1 x i8] zeroinitializer
-@.strlit43588 = internal constant [14 x i8] c"    lea rdi, \00"
-@.strlit43657 = internal constant [4 x i8] c"ptr\00"
-@.strlit43663 = internal constant [5 x i8] c"ptr:\00"
-@.strlit43683 = internal constant [4 x i8] c"ptr\00"
-@.strlit43703 = internal constant [5 x i8] c"ptr:\00"
-@.strlit43756 = internal constant [9 x i8] c"    lea \00"
-@.strlit43758 = internal constant [4 x i8] c"ptr\00"
-@.strlit43761 = internal constant [3 x i8] c", \00"
-@.strlit43785 = internal constant [9 x i8] c"    lea \00"
-@.strlit43790 = internal constant [3 x i8] c", \00"
-@.strlit43808 = internal constant [9 x i8] c"    mov \00"
-@.strlit43813 = internal constant [3 x i8] c", \00"
-@.strlit43825 = internal constant [13 x i8] c"    mov al, \00"
-@.strlit43830 = internal constant [10 x i8] c"    call \00"
-@.strlit43834 = internal constant [1 x i8] zeroinitializer
-@.strlit43852 = internal constant [4 x i8] c"f64\00"
-@.strlit43858 = internal constant [16 x i8] c"    movq qword \00"
-@.strlit43862 = internal constant [7 x i8] c", xmm0\00"
-@.strlit43865 = internal constant [4 x i8] c"f32\00"
-@.strlit43871 = internal constant [16 x i8] c"    movd dword \00"
-@.strlit43875 = internal constant [7 x i8] c", xmm0\00"
-@.strlit43878 = internal constant [9 x i8] c"    mov \00"
-@.strlit43882 = internal constant [3 x i8] c", \00"
-@.strlit43888 = internal constant [1 x i8] zeroinitializer
-@.strlit43894 = internal constant [11 x i8] c"mir_module\00"
-@.strlit43902 = internal constant [2 x i8] c"{\00"
-@.strlit43910 = internal constant [7 x i8] c"type @\00"
-@.strlit43918 = internal constant [7 x i8] c"extern\00"
-@.strlit43945 = internal constant [1 x i8] zeroinitializer
-@.strlit43948 = internal constant [1 x i8] zeroinitializer
-@.strlit43956 = internal constant [8 x i8] c"syscall\00"
-@.strlit43966 = internal constant [8 x i8] c"extern \00"
-@.strlit43970 = internal constant [5 x i8] c"fn @\00"
-@.strlit43978 = internal constant [2 x i8] c"}\00"
-@.strlit43992 = internal constant [7 x i8] c"block \00"
-@.strlit44004 = internal constant [7 x i8] c"%entry\00"
-@.strlit44015 = internal constant [2 x i8] c":\00"
-@.strlit44018 = internal constant [9 x i8] c"ret void\00"
-@.strlit44024 = internal constant [9 x i8] c"    jmp \00"
-@.strlit44031 = internal constant [5 x i8] c"ret \00"
-@.strlit44050 = internal constant [4 x i8] c"i32\00"
-@.strlit44062 = internal constant [2 x i8] c"0\00"
-@.strlit44074 = internal constant [7 x i8] c"__sret\00"
-@.strlit44087 = internal constant [7 x i8] c"__sret\00"
-@.strlit44099 = internal constant [20 x i8] c"    mov rax, qword \00"
-@.strlit44110 = internal constant [9 x i8] c"    jmp \00"
-@.strlit44117 = internal constant [4 x i8] c"f64\00"
-@.strlit44123 = internal constant [16 x i8] c"    movq xmm0, \00"
-@.strlit44130 = internal constant [4 x i8] c"f32\00"
-@.strlit44136 = internal constant [16 x i8] c"    movd xmm0, \00"
-@.strlit44143 = internal constant [9 x i8] c"    mov \00"
-@.strlit44147 = internal constant [3 x i8] c", \00"
-@.strlit44155 = internal constant [9 x i8] c"    jmp \00"
-@.strlit44162 = internal constant [10 x i8] c"br label \00"
-@.strlit44168 = internal constant [9 x i8] c"    jmp \00"
-@.strlit44176 = internal constant [9 x i8] c"br_cond \00"
-@.strlit44218 = internal constant [9 x i8] c"    cmp \00"
-@.strlit44221 = internal constant [4 x i8] c"i32\00"
-@.strlit44224 = internal constant [4 x i8] c", 0\00"
-@.strlit44227 = internal constant [8 x i8] c"    je \00"
-@.strlit44233 = internal constant [9 x i8] c"    jmp \00"
-@.strlit44239 = internal constant [7 x i8] c"store \00"
-@.strlit44347 = internal constant [5 x i8] c"xmm0\00"
-@.strlit44351 = internal constant [3 x i8] c"i8\00"
-@.strlit44357 = internal constant [3 x i8] c"u8\00"
-@.strlit44365 = internal constant [5 x i8] c"char\00"
-@.strlit44373 = internal constant [13 x i8] c"    mov al, \00"
-@.strlit44380 = internal constant [9 x i8] c"    mov \00"
-@.strlit44384 = internal constant [3 x i8] c", \00"
-@.strlit44418 = internal constant [4 x i8] c"f64\00"
-@.strlit44424 = internal constant [16 x i8] c"    movq qword \00"
-@.strlit44434 = internal constant [7 x i8] c", xmm0\00"
-@.strlit44437 = internal constant [4 x i8] c"f32\00"
-@.strlit44443 = internal constant [16 x i8] c"    movd dword \00"
-@.strlit44453 = internal constant [7 x i8] c", xmm0\00"
-@.strlit44456 = internal constant [9 x i8] c"    mov \00"
-@.strlit44460 = internal constant [2 x i8] c" \00"
-@.strlit44471 = internal constant [3 x i8] c", \00"
-@.strlit44477 = internal constant [4 x i8] c"ptr\00"
-@.strlit44485 = internal constant [7 x i8] c"string\00"
-@.strlit44497 = internal constant [7 x i8] c"string\00"
-@.strlit44500 = internal constant [14 x i8] c"    mov r11, \00"
-@.strlit44503 = internal constant [4 x i8] c"ptr\00"
-@.strlit44507 = internal constant [4 x i8] c"f64\00"
-@.strlit44513 = internal constant [27 x i8] c"    movq qword [r11], xmm0\00"
-@.strlit44515 = internal constant [4 x i8] c"f32\00"
-@.strlit44521 = internal constant [27 x i8] c"    movd dword [r11], xmm0\00"
-@.strlit44523 = internal constant [9 x i8] c"    mov \00"
-@.strlit44527 = internal constant [9 x i8] c" [r11], \00"
-@.strlit44533 = internal constant [6 x i8] c"call \00"
-@.strlit44539 = internal constant [1 x i8] zeroinitializer
-@.strlit44546 = internal constant [1 x i8] zeroinitializer
-@.strlit44554 = internal constant [8 x i8] c"alloca \00"
-@.strlit44566 = internal constant [6 x i8] c"load \00"
-@.strlit44648 = internal constant [1 x i8] zeroinitializer
-@.strlit44652 = internal constant [7 x i8] c"ptr:i8\00"
-@.strlit44658 = internal constant [4 x i8] c"i32\00"
-@.strlit44665 = internal constant [3 x i8] c"i8\00"
-@.strlit44684 = internal constant [4 x i8] c"ptr\00"
-@.strlit44690 = internal constant [7 x i8] c"string\00"
-@.strlit44700 = internal constant [4 x i8] c"i32\00"
-@.strlit44713 = internal constant [3 x i8] c"i8\00"
-@.strlit44719 = internal constant [4 x i8] c"i32\00"
-@.strlit44726 = internal constant [4 x i8] c"i32\00"
-@.strlit44746 = internal constant [3 x i8] c"i8\00"
-@.strlit44752 = internal constant [3 x i8] c"u8\00"
-@.strlit44760 = internal constant [5 x i8] c"char\00"
-@.strlit44768 = internal constant [21 x i8] c"    movzx eax, byte \00"
-@.strlit44779 = internal constant [9 x i8] c"    mov \00"
-@.strlit44783 = internal constant [3 x i8] c", \00"
-@.strlit44788 = internal constant [2 x i8] c" \00"
-@.strlit44800 = internal constant [14 x i8] c"    mov rax, \00"
-@.strlit44803 = internal constant [4 x i8] c"ptr\00"
-@.strlit44807 = internal constant [3 x i8] c"i8\00"
-@.strlit44813 = internal constant [3 x i8] c"u8\00"
-@.strlit44821 = internal constant [5 x i8] c"char\00"
-@.strlit44829 = internal constant [26 x i8] c"    movzx eax, byte [rax]\00"
-@.strlit44831 = internal constant [9 x i8] c"    mov \00"
-@.strlit44835 = internal constant [3 x i8] c", \00"
-@.strlit44840 = internal constant [7 x i8] c" [rax]\00"
-@.strlit44843 = internal constant [9 x i8] c"    mov \00"
-@.strlit44850 = internal constant [3 x i8] c", \00"
-@.strlit44856 = internal constant [5 x i8] c"add \00"
-@.strlit44864 = internal constant [4 x i8] c"add\00"
-@.strlit44865 = internal constant [4 x i8] c"add\00"
-@.strlit44867 = internal constant [5 x i8] c"sub \00"
-@.strlit44875 = internal constant [4 x i8] c"sub\00"
-@.strlit44876 = internal constant [4 x i8] c"sub\00"
-@.strlit44878 = internal constant [5 x i8] c"mul \00"
-@.strlit44886 = internal constant [4 x i8] c"mul\00"
-@.strlit44887 = internal constant [5 x i8] c"imul\00"
-@.strlit44889 = internal constant [6 x i8] c"sdiv \00"
-@.strlit44897 = internal constant [5 x i8] c"sdiv\00"
-@.strlit44898 = internal constant [5 x i8] c"idiv\00"
-@.strlit44900 = internal constant [6 x i8] c"srem \00"
-@.strlit44908 = internal constant [5 x i8] c"srem\00"
-@.strlit44909 = internal constant [5 x i8] c"idiv\00"
-@.strlit44911 = internal constant [5 x i8] c"and \00"
-@.strlit44919 = internal constant [4 x i8] c"and\00"
-@.strlit44920 = internal constant [4 x i8] c"and\00"
-@.strlit44922 = internal constant [4 x i8] c"or \00"
-@.strlit44930 = internal constant [3 x i8] c"or\00"
-@.strlit44931 = internal constant [3 x i8] c"or\00"
-@.strlit44933 = internal constant [5 x i8] c"xor \00"
-@.strlit44941 = internal constant [4 x i8] c"xor\00"
-@.strlit44942 = internal constant [4 x i8] c"xor\00"
-@.strlit44944 = internal constant [5 x i8] c"shl \00"
-@.strlit44952 = internal constant [4 x i8] c"shl\00"
-@.strlit44953 = internal constant [4 x i8] c"shl\00"
-@.strlit44955 = internal constant [6 x i8] c"ashr \00"
-@.strlit44963 = internal constant [5 x i8] c"ashr\00"
-@.strlit44964 = internal constant [4 x i8] c"sar\00"
-@.strlit44966 = internal constant [5 x i8] c"neg \00"
-@.strlit44974 = internal constant [4 x i8] c"neg\00"
-@.strlit44975 = internal constant [4 x i8] c"neg\00"
-@.strlit44977 = internal constant [6 x i8] c"icmp \00"
-@.strlit44986 = internal constant [6 x i8] c"zext \00"
-@.strlit44992 = internal constant [7 x i8] c"trunc \00"
-@.strlit45000 = internal constant [8 x i8] c"sitofp \00"
-@.strlit45011 = internal constant [5 x i8] c"gep \00"
-@.strlit45020 = internal constant [6 x i8] c"call \00"
-@.strlit45029 = internal constant [13 x i8] c"insertvalue \00"
-@.strlit45038 = internal constant [14 x i8] c"extractvalue \00"
-@.strlit45047 = internal constant [12 x i8] c"const ptr \22\00"
-@.strlit45076 = internal constant [1 x i8] zeroinitializer
-@.strlit45082 = internal constant [15 x i8] c"    lea rax, [\00"
-@.strlit45085 = internal constant [2 x i8] c"]\00"
-@.strlit45088 = internal constant [9 x i8] c"    mov \00"
-@.strlit45091 = internal constant [7 x i8] c"string\00"
-@.strlit45095 = internal constant [6 x i8] c", rax\00"
-@.strlit45098 = internal constant [8 x i8] c"const @\00"
-@.strlit45107 = internal constant [7 x i8] c"const \00"
-@.strlit45123 = internal constant [4 x i8] c"i32\00"
-@.strlit45135 = internal constant [2 x i8] c"0\00"
-@.strlit45147 = internal constant [5 x i8] c"xmm0\00"
-@.strlit45151 = internal constant [4 x i8] c"f64\00"
-@.strlit45157 = internal constant [16 x i8] c"    movq qword \00"
-@.strlit45161 = internal constant [7 x i8] c", xmm0\00"
-@.strlit45164 = internal constant [16 x i8] c"    movd dword \00"
-@.strlit45168 = internal constant [7 x i8] c", xmm0\00"
-@.strlit45171 = internal constant [9 x i8] c"    mov \00"
-@.strlit45175 = internal constant [3 x i8] c", \00"
-@.strlit45183 = internal constant [9 x i8] c"    mov \00"
-@.strlit45187 = internal constant [3 x i8] c", \00"
-@.strlit45295 = internal constant [15 x i8] c"section .data\0A\00"
-@.strlit45343 = internal constant [3 x i8] c"-h\00"
-@.strlit45349 = internal constant [7 x i8] c"--help\00"
-@.strlit45356 = internal constant [7 x i8] c"--help\00"
-@.strlit45358 = internal constant [3 x i8] c"-v\00"
-@.strlit45364 = internal constant [10 x i8] c"--version\00"
-@.strlit45371 = internal constant [10 x i8] c"--version\00"
-@.strlit45373 = internal constant [6 x i8] c"--lex\00"
-@.strlit45379 = internal constant [14 x i8] c"--parse-stats\00"
-@.strlit45387 = internal constant [9 x i8] c"--parser\00"
-@.strlit45395 = internal constant [6 x i8] c"--ast\00"
-@.strlit45403 = internal constant [5 x i8] c"-ast\00"
-@.strlit45411 = internal constant [12 x i8] c"--typeinfer\00"
-@.strlit45419 = internal constant [10 x i8] c"--tyinfer\00"
-@.strlit45427 = internal constant [11 x i8] c"--semantic\00"
-@.strlit45435 = internal constant [8 x i8] c"--check\00"
-@.strlit45443 = internal constant [4 x i8] c"-ll\00"
-@.strlit45451 = internal constant [5 x i8] c"-obj\00"
-@.strlit45459 = internal constant [3 x i8] c"-S\00"
-@.strlit45468 = internal constant [5 x i8] c".vix\00"
-@.strlit45473 = internal constant [1 x i8] zeroinitializer
-@.strlit45517 = internal constant [1 x i8] zeroinitializer
-@.strlit45542 = internal constant [2 x i8] c".\00"
-@.strlit45547 = internal constant [2 x i8] c"/\00"
+@.strlit41251 = internal constant [1 x i8] zeroinitializer
+@.strlit41284 = internal constant [4 x i8] c"ptr\00"
+@.strlit41321 = internal constant [1 x i8] zeroinitializer
+@.strlit41336 = internal constant [20 x i8] c"    mov r11, qword \00"
+@.strlit41341 = internal constant [4 x i8] c"r11\00"
+@.strlit41406 = internal constant [14 x i8] c"    sub rsp, \00"
+@.strlit41416 = internal constant [2 x i8] c":\00"
+@.strlit41419 = internal constant [17 x i8] c"    mov rsp, rbp\00"
+@.strlit41421 = internal constant [12 x i8] c"    pop rbp\00"
+@.strlit41423 = internal constant [8 x i8] c"    ret\00"
+@.strlit41428 = internal constant [24 x i8] c"    ; unsupported MIR: \00"
+@.strlit41432 = internal constant [57 x i8] c"    %error \22unsupported MIR instruction in self backend\22\00"
+@.strlit41434 = internal constant [4 x i8] c"f64\00"
+@.strlit41440 = internal constant [16 x i8] c"    movq qword \00"
+@.strlit41443 = internal constant [3 x i8] c", \00"
+@.strlit41448 = internal constant [4 x i8] c"f32\00"
+@.strlit41454 = internal constant [16 x i8] c"    movd dword \00"
+@.strlit41457 = internal constant [3 x i8] c", \00"
+@.strlit41462 = internal constant [9 x i8] c"    mov \00"
+@.strlit41466 = internal constant [2 x i8] c" \00"
+@.strlit41470 = internal constant [3 x i8] c", \00"
+@.strlit41490 = internal constant [6 x i8] c"[rbp+\00"
+@.strlit41498 = internal constant [2 x i8] c"]\00"
+@.strlit41501 = internal constant [4 x i8] c"f64\00"
+@.strlit41507 = internal constant [22 x i8] c"    movq xmm0, qword \00"
+@.strlit41511 = internal constant [16 x i8] c"    movq qword \00"
+@.strlit41514 = internal constant [7 x i8] c", xmm0\00"
+@.strlit41517 = internal constant [4 x i8] c"f32\00"
+@.strlit41523 = internal constant [22 x i8] c"    movd xmm0, dword \00"
+@.strlit41527 = internal constant [16 x i8] c"    movd dword \00"
+@.strlit41530 = internal constant [7 x i8] c", xmm0\00"
+@.strlit41533 = internal constant [9 x i8] c"    mov \00"
+@.strlit41537 = internal constant [3 x i8] c", \00"
+@.strlit41542 = internal constant [2 x i8] c" \00"
+@.strlit41547 = internal constant [9 x i8] c"    mov \00"
+@.strlit41551 = internal constant [2 x i8] c" \00"
+@.strlit41555 = internal constant [3 x i8] c", \00"
+@.strlit41560 = internal constant [7 x i8] c"Lfloat\00"
+@.strlit41578 = internal constant [4 x i8] c"f32\00"
+@.strlit41585 = internal constant [6 x i8] c": dd \00"
+@.strlit41591 = internal constant [6 x i8] c": dq \00"
+@.strlit41635 = internal constant [3 x i8] c".0\00"
+@.strlit41640 = internal constant [2 x i8] c"0\00"
+@.strlit41646 = internal constant [4 x i8] c"0.0\00"
+@.strlit41654 = internal constant [9 x i8] c"0.000000\00"
+@.strlit41662 = internal constant [10 x i8] c"    pxor \00"
+@.strlit41665 = internal constant [3 x i8] c", \00"
+@.strlit41677 = internal constant [4 x i8] c"f64\00"
+@.strlit41683 = internal constant [10 x i8] c"    movq \00"
+@.strlit41686 = internal constant [9 x i8] c", qword \00"
+@.strlit41698 = internal constant [10 x i8] c"    movd \00"
+@.strlit41701 = internal constant [9 x i8] c", dword \00"
+@.strlit41742 = internal constant [4 x i8] c"f64\00"
+@.strlit41748 = internal constant [11 x i8] c"    movsd \00"
+@.strlit41751 = internal constant [14 x i8] c", qword [rel \00"
+@.strlit41755 = internal constant [2 x i8] c"]\00"
+@.strlit41758 = internal constant [11 x i8] c"    movss \00"
+@.strlit41761 = internal constant [14 x i8] c", dword [rel \00"
+@.strlit41765 = internal constant [2 x i8] c"]\00"
+@.strlit41768 = internal constant [10 x i8] c"    pxor \00"
+@.strlit41771 = internal constant [3 x i8] c", \00"
+@.strlit41803 = internal constant [11 x i8] c"    movzx \00"
+@.strlit41806 = internal constant [8 x i8] c", byte \00"
+@.strlit41818 = internal constant [9 x i8] c"    mov \00"
+@.strlit41821 = internal constant [3 x i8] c", \00"
+@.strlit41856 = internal constant [11 x i8] c"    movzx \00"
+@.strlit41859 = internal constant [8 x i8] c", byte \00"
+@.strlit41951 = internal constant [1 x i8] zeroinitializer
+@.strlit42047 = internal constant [15 x i8] c"    mov qword \00"
+@.strlit42052 = internal constant [4 x i8] c", 0\00"
+@.strlit42061 = internal constant [15 x i8] c"    mov dword \00"
+@.strlit42066 = internal constant [4 x i8] c", 0\00"
+@.strlit42071 = internal constant [14 x i8] c"    mov byte \00"
+@.strlit42076 = internal constant [4 x i8] c", 0\00"
+@.strlit42093 = internal constant [20 x i8] c"    mov rax, qword \00"
+@.strlit42099 = internal constant [15 x i8] c"    mov qword \00"
+@.strlit42104 = internal constant [6 x i8] c", rax\00"
+@.strlit42113 = internal constant [20 x i8] c"    mov eax, dword \00"
+@.strlit42119 = internal constant [15 x i8] c"    mov dword \00"
+@.strlit42124 = internal constant [6 x i8] c", eax\00"
+@.strlit42129 = internal constant [18 x i8] c"    mov al, byte \00"
+@.strlit42135 = internal constant [14 x i8] c"    mov byte \00"
+@.strlit42140 = internal constant [5 x i8] c", al\00"
+@.strlit42145 = internal constant [14 x i8] c"    mov r11, \00"
+@.strlit42148 = internal constant [4 x i8] c"ptr\00"
+@.strlit42164 = internal constant [25 x i8] c"    mov rax, qword [r11+\00"
+@.strlit42168 = internal constant [2 x i8] c"]\00"
+@.strlit42171 = internal constant [15 x i8] c"    mov qword \00"
+@.strlit42176 = internal constant [6 x i8] c", rax\00"
+@.strlit42185 = internal constant [25 x i8] c"    mov eax, dword [r11+\00"
+@.strlit42189 = internal constant [2 x i8] c"]\00"
+@.strlit42192 = internal constant [15 x i8] c"    mov dword \00"
+@.strlit42197 = internal constant [6 x i8] c", eax\00"
+@.strlit42202 = internal constant [23 x i8] c"    mov al, byte [r11+\00"
+@.strlit42206 = internal constant [2 x i8] c"]\00"
+@.strlit42209 = internal constant [14 x i8] c"    mov byte \00"
+@.strlit42214 = internal constant [5 x i8] c", al\00"
+@.strlit42219 = internal constant [14 x i8] c"    mov r11, \00"
+@.strlit42222 = internal constant [4 x i8] c"ptr\00"
+@.strlit42230 = internal constant [14 x i8] c"    add r11, \00"
+@.strlit42247 = internal constant [25 x i8] c"    mov rax, qword [r11+\00"
+@.strlit42251 = internal constant [2 x i8] c"]\00"
+@.strlit42254 = internal constant [15 x i8] c"    mov qword \00"
+@.strlit42259 = internal constant [6 x i8] c", rax\00"
+@.strlit42268 = internal constant [25 x i8] c"    mov eax, dword [r11+\00"
+@.strlit42272 = internal constant [2 x i8] c"]\00"
+@.strlit42275 = internal constant [15 x i8] c"    mov dword \00"
+@.strlit42280 = internal constant [6 x i8] c", eax\00"
+@.strlit42285 = internal constant [23 x i8] c"    mov al, byte [r11+\00"
+@.strlit42289 = internal constant [2 x i8] c"]\00"
+@.strlit42292 = internal constant [14 x i8] c"    mov byte \00"
+@.strlit42297 = internal constant [5 x i8] c", al\00"
+@.strlit42302 = internal constant [14 x i8] c"    mov r11, \00"
+@.strlit42318 = internal constant [25 x i8] c"    mov rax, qword [r11+\00"
+@.strlit42322 = internal constant [2 x i8] c"]\00"
+@.strlit42325 = internal constant [15 x i8] c"    mov qword \00"
+@.strlit42330 = internal constant [6 x i8] c", rax\00"
+@.strlit42339 = internal constant [25 x i8] c"    mov eax, dword [r11+\00"
+@.strlit42343 = internal constant [2 x i8] c"]\00"
+@.strlit42346 = internal constant [15 x i8] c"    mov dword \00"
+@.strlit42351 = internal constant [6 x i8] c", eax\00"
+@.strlit42356 = internal constant [23 x i8] c"    mov al, byte [r11+\00"
+@.strlit42360 = internal constant [2 x i8] c"]\00"
+@.strlit42363 = internal constant [14 x i8] c"    mov byte \00"
+@.strlit42368 = internal constant [5 x i8] c", al\00"
+@.strlit42373 = internal constant [14 x i8] c"    mov r11, \00"
+@.strlit42376 = internal constant [4 x i8] c"ptr\00"
+@.strlit42392 = internal constant [20 x i8] c"    mov rax, qword \00"
+@.strlit42398 = internal constant [20 x i8] c"    mov qword [r11+\00"
+@.strlit42402 = internal constant [7 x i8] c"], rax\00"
+@.strlit42411 = internal constant [20 x i8] c"    mov eax, dword \00"
+@.strlit42417 = internal constant [20 x i8] c"    mov dword [r11+\00"
+@.strlit42421 = internal constant [7 x i8] c"], eax\00"
+@.strlit42426 = internal constant [18 x i8] c"    mov al, byte \00"
+@.strlit42432 = internal constant [19 x i8] c"    mov byte [r11+\00"
+@.strlit42436 = internal constant [6 x i8] c"], al\00"
+@.strlit42524 = internal constant [4 x i8] c"i32\00"
+@.strlit42651 = internal constant [9 x i8] c"    mov \00"
+@.strlit42655 = internal constant [3 x i8] c", \00"
+@.strlit42663 = internal constant [9 x i8] c"    mov \00"
+@.strlit42667 = internal constant [2 x i8] c" \00"
+@.strlit42673 = internal constant [3 x i8] c", \00"
+@.strlit42730 = internal constant [5 x i8] c"ptr:\00"
+@.strlit42771 = internal constant [14 x i8] c"    mov r11, \00"
+@.strlit42774 = internal constant [4 x i8] c"ptr\00"
+@.strlit42782 = internal constant [14 x i8] c"    add r11, \00"
+@.strlit42787 = internal constant [9 x i8] c"    mov \00"
+@.strlit42791 = internal constant [3 x i8] c", \00"
+@.strlit42796 = internal constant [7 x i8] c" [r11]\00"
+@.strlit42799 = internal constant [9 x i8] c"    mov \00"
+@.strlit42803 = internal constant [3 x i8] c", \00"
+@.strlit42853 = internal constant [9 x i8] c"    mov \00"
+@.strlit42857 = internal constant [3 x i8] c", \00"
+@.strlit42862 = internal constant [2 x i8] c" \00"
+@.strlit42875 = internal constant [9 x i8] c"    mov \00"
+@.strlit42879 = internal constant [3 x i8] c", \00"
+@.strlit42930 = internal constant [5 x i8] c"sdiv\00"
+@.strlit42936 = internal constant [5 x i8] c"srem\00"
+@.strlit42949 = internal constant [8 x i8] c"    cqo\00"
+@.strlit42951 = internal constant [8 x i8] c"    cdq\00"
+@.strlit42958 = internal constant [10 x i8] c"    idiv \00"
+@.strlit42963 = internal constant [5 x i8] c"srem\00"
+@.strlit42969 = internal constant [9 x i8] c"    mov \00"
+@.strlit42972 = internal constant [3 x i8] c", \00"
+@.strlit42978 = internal constant [4 x i8] c"shl\00"
+@.strlit42984 = internal constant [5 x i8] c"ashr\00"
+@.strlit42992 = internal constant [14 x i8] c"    mov ecx, \00"
+@.strlit42995 = internal constant [4 x i8] c"i32\00"
+@.strlit42999 = internal constant [5 x i8] c"    \00"
+@.strlit43002 = internal constant [2 x i8] c" \00"
+@.strlit43006 = internal constant [5 x i8] c", cl\00"
+@.strlit43015 = internal constant [5 x i8] c"    \00"
+@.strlit43018 = internal constant [2 x i8] c" \00"
+@.strlit43022 = internal constant [3 x i8] c", \00"
+@.strlit43027 = internal constant [9 x i8] c"    mov \00"
+@.strlit43039 = internal constant [3 x i8] c", \00"
+@.strlit43070 = internal constant [9 x i8] c"    mov \00"
+@.strlit43073 = internal constant [3 x i8] c", \00"
+@.strlit43081 = internal constant [5 x i8] c"    \00"
+@.strlit43084 = internal constant [2 x i8] c" \00"
+@.strlit43089 = internal constant [9 x i8] c"    mov \00"
+@.strlit43101 = internal constant [3 x i8] c", \00"
+@.strlit43106 = internal constant [5 x i8] c"fadd\00"
+@.strlit43112 = internal constant [4 x i8] c"f32\00"
+@.strlit43117 = internal constant [6 x i8] c"addss\00"
+@.strlit43118 = internal constant [6 x i8] c"addsd\00"
+@.strlit43120 = internal constant [5 x i8] c"fsub\00"
+@.strlit43126 = internal constant [4 x i8] c"f32\00"
+@.strlit43131 = internal constant [6 x i8] c"subss\00"
+@.strlit43132 = internal constant [6 x i8] c"subsd\00"
+@.strlit43134 = internal constant [5 x i8] c"fmul\00"
+@.strlit43140 = internal constant [4 x i8] c"f32\00"
+@.strlit43145 = internal constant [6 x i8] c"mulss\00"
+@.strlit43146 = internal constant [6 x i8] c"mulsd\00"
+@.strlit43148 = internal constant [4 x i8] c"f32\00"
+@.strlit43153 = internal constant [6 x i8] c"divss\00"
+@.strlit43154 = internal constant [6 x i8] c"divsd\00"
+@.strlit43195 = internal constant [5 x i8] c"xmm0\00"
+@.strlit43199 = internal constant [5 x i8] c"xmm1\00"
+@.strlit43203 = internal constant [5 x i8] c"    \00"
+@.strlit43208 = internal constant [12 x i8] c" xmm0, xmm1\00"
+@.strlit43211 = internal constant [4 x i8] c"f64\00"
+@.strlit43217 = internal constant [16 x i8] c"    movq qword \00"
+@.strlit43221 = internal constant [7 x i8] c", xmm0\00"
+@.strlit43224 = internal constant [16 x i8] c"    movd dword \00"
+@.strlit43228 = internal constant [7 x i8] c", xmm0\00"
+@.strlit43281 = internal constant [5 x i8] c"zext\00"
+@.strlit43287 = internal constant [3 x i8] c"i8\00"
+@.strlit43293 = internal constant [3 x i8] c"u8\00"
+@.strlit43301 = internal constant [5 x i8] c"char\00"
+@.strlit43309 = internal constant [16 x i8] c"    movzx eax, \00"
+@.strlit43316 = internal constant [14 x i8] c"    mov eax, \00"
+@.strlit43328 = internal constant [9 x i8] c"    mov \00"
+@.strlit43340 = internal constant [6 x i8] c", rax\00"
+@.strlit43343 = internal constant [9 x i8] c"    mov \00"
+@.strlit43355 = internal constant [6 x i8] c", eax\00"
+@.strlit43358 = internal constant [6 x i8] c"trunc\00"
+@.strlit43378 = internal constant [14 x i8] c"    mov rax, \00"
+@.strlit43385 = internal constant [9 x i8] c"    mov \00"
+@.strlit43397 = internal constant [3 x i8] c", \00"
+@.strlit43403 = internal constant [7 x i8] c"sitofp\00"
+@.strlit43409 = internal constant [14 x i8] c"    mov eax, \00"
+@.strlit43416 = internal constant [23 x i8] c"    cvtsi2sd xmm0, eax\00"
+@.strlit43418 = internal constant [10 x i8] c"    movq \00"
+@.strlit43430 = internal constant [7 x i8] c", xmm0\00"
+@.strlit43433 = internal constant [9 x i8] c"    mov \00"
+@.strlit43437 = internal constant [3 x i8] c", \00"
+@.strlit43445 = internal constant [9 x i8] c"    mov \00"
+@.strlit43457 = internal constant [3 x i8] c", \00"
+@.strlit43551 = internal constant [5 x i8] c"ptr:\00"
+@.strlit43589 = internal constant [14 x i8] c"    lea rax, \00"
+@.strlit43600 = internal constant [14 x i8] c"    mov rax, \00"
+@.strlit43603 = internal constant [4 x i8] c"ptr\00"
+@.strlit43611 = internal constant [14 x i8] c"    add rax, \00"
+@.strlit43616 = internal constant [9 x i8] c"    mov \00"
+@.strlit43628 = internal constant [6 x i8] c", rax\00"
+@.strlit43635 = internal constant [7 x i8] c"string\00"
+@.strlit43641 = internal constant [4 x i8] c"i32\00"
+@.strlit43648 = internal constant [3 x i8] c"i8\00"
+@.strlit43656 = internal constant [5 x i8] c"ptr:\00"
+@.strlit43661 = internal constant [14 x i8] c"    mov rax, \00"
+@.strlit43664 = internal constant [4 x i8] c"ptr\00"
+@.strlit43668 = internal constant [14 x i8] c"    mov ecx, \00"
+@.strlit43671 = internal constant [4 x i8] c"i32\00"
+@.strlit43679 = internal constant [15 x i8] c"    imul rcx, \00"
+@.strlit43684 = internal constant [17 x i8] c"    add rax, rcx\00"
+@.strlit43686 = internal constant [9 x i8] c"    mov \00"
+@.strlit43698 = internal constant [6 x i8] c", rax\00"
+@.strlit43758 = internal constant [4 x i8] c"i32\00"
+@.strlit43772 = internal constant [9 x i8] c"    cmp \00"
+@.strlit43776 = internal constant [3 x i8] c", \00"
+@.strlit43781 = internal constant [5 x i8] c"    \00"
+@.strlit43785 = internal constant [4 x i8] c" al\00"
+@.strlit43788 = internal constant [18 x i8] c"    movzx eax, al\00"
+@.strlit43790 = internal constant [9 x i8] c"    mov \00"
+@.strlit43802 = internal constant [6 x i8] c", eax\00"
+@.strlit43805 = internal constant [4 x i8] c"oeq\00"
+@.strlit43811 = internal constant [3 x i8] c"eq\00"
+@.strlit43818 = internal constant [5 x i8] c"sete\00"
+@.strlit43820 = internal constant [4 x i8] c"one\00"
+@.strlit43826 = internal constant [3 x i8] c"ne\00"
+@.strlit43833 = internal constant [6 x i8] c"setne\00"
+@.strlit43835 = internal constant [4 x i8] c"olt\00"
+@.strlit43840 = internal constant [5 x i8] c"setb\00"
+@.strlit43842 = internal constant [4 x i8] c"ole\00"
+@.strlit43847 = internal constant [6 x i8] c"setbe\00"
+@.strlit43849 = internal constant [4 x i8] c"ogt\00"
+@.strlit43854 = internal constant [5 x i8] c"seta\00"
+@.strlit43855 = internal constant [6 x i8] c"setae\00"
+@.strlit43914 = internal constant [4 x i8] c"i32\00"
+@.strlit43917 = internal constant [5 x i8] c"xmm0\00"
+@.strlit43921 = internal constant [5 x i8] c"xmm1\00"
+@.strlit43925 = internal constant [4 x i8] c"f32\00"
+@.strlit43931 = internal constant [23 x i8] c"    ucomiss xmm0, xmm1\00"
+@.strlit43933 = internal constant [23 x i8] c"    ucomisd xmm0, xmm1\00"
+@.strlit43935 = internal constant [13 x i8] c"    setnp dl\00"
+@.strlit43937 = internal constant [5 x i8] c"    \00"
+@.strlit43941 = internal constant [4 x i8] c" al\00"
+@.strlit43944 = internal constant [15 x i8] c"    and al, dl\00"
+@.strlit43946 = internal constant [18 x i8] c"    movzx eax, al\00"
+@.strlit43948 = internal constant [9 x i8] c"    mov \00"
+@.strlit43952 = internal constant [6 x i8] c", eax\00"
+@.strlit44099 = internal constant [9 x i8] c"    mov \00"
+@.strlit44103 = internal constant [3 x i8] c", \00"
+@.strlit44115 = internal constant [12 x i8] c"    syscall\00"
+@.strlit44117 = internal constant [1 x i8] zeroinitializer
+@.strlit44125 = internal constant [9 x i8] c"    mov \00"
+@.strlit44128 = internal constant [4 x i8] c"i64\00"
+@.strlit44132 = internal constant [6 x i8] c", rax\00"
+@.strlit44155 = internal constant [8 x i8] c"syscall\00"
+@.strlit44179 = internal constant [4 x i8] c"i32\00"
+@.strlit44194 = internal constant [14 x i8] c"    sub rsp, \00"
+@.strlit44199 = internal constant [1 x i8] zeroinitializer
+@.strlit44217 = internal constant [14 x i8] c"    lea rdi, \00"
+@.strlit44286 = internal constant [4 x i8] c"ptr\00"
+@.strlit44292 = internal constant [5 x i8] c"ptr:\00"
+@.strlit44312 = internal constant [4 x i8] c"ptr\00"
+@.strlit44332 = internal constant [5 x i8] c"ptr:\00"
+@.strlit44367 = internal constant [5 x i8] c"xmm8\00"
+@.strlit44371 = internal constant [4 x i8] c"f64\00"
+@.strlit44377 = internal constant [21 x i8] c"    movq qword [rsp+\00"
+@.strlit44382 = internal constant [8 x i8] c"], xmm8\00"
+@.strlit44385 = internal constant [21 x i8] c"    movd dword [rsp+\00"
+@.strlit44390 = internal constant [8 x i8] c"], xmm8\00"
+@.strlit44413 = internal constant [9 x i8] c"    lea \00"
+@.strlit44415 = internal constant [4 x i8] c"ptr\00"
+@.strlit44418 = internal constant [3 x i8] c", \00"
+@.strlit44434 = internal constant [14 x i8] c"    lea r11, \00"
+@.strlit44445 = internal constant [20 x i8] c"    mov qword [rsp+\00"
+@.strlit44450 = internal constant [7 x i8] c"], r11\00"
+@.strlit44467 = internal constant [9 x i8] c"    lea \00"
+@.strlit44472 = internal constant [3 x i8] c", \00"
+@.strlit44490 = internal constant [9 x i8] c"    mov \00"
+@.strlit44495 = internal constant [3 x i8] c", \00"
+@.strlit44509 = internal constant [14 x i8] c"    lea r11, \00"
+@.strlit44520 = internal constant [20 x i8] c"    mov qword [rsp+\00"
+@.strlit44525 = internal constant [7 x i8] c"], r11\00"
+@.strlit44528 = internal constant [9 x i8] c"    mov \00"
+@.strlit44532 = internal constant [3 x i8] c", \00"
+@.strlit44540 = internal constant [9 x i8] c"    mov \00"
+@.strlit44544 = internal constant [7 x i8] c" [rsp+\00"
+@.strlit44550 = internal constant [4 x i8] c"], \00"
+@.strlit44562 = internal constant [13 x i8] c"    mov al, \00"
+@.strlit44567 = internal constant [10 x i8] c"    call \00"
+@.strlit44575 = internal constant [14 x i8] c"    add rsp, \00"
+@.strlit44580 = internal constant [1 x i8] zeroinitializer
+@.strlit44598 = internal constant [4 x i8] c"f64\00"
+@.strlit44604 = internal constant [16 x i8] c"    movq qword \00"
+@.strlit44608 = internal constant [7 x i8] c", xmm0\00"
+@.strlit44611 = internal constant [4 x i8] c"f32\00"
+@.strlit44617 = internal constant [16 x i8] c"    movd dword \00"
+@.strlit44621 = internal constant [7 x i8] c", xmm0\00"
+@.strlit44624 = internal constant [9 x i8] c"    mov \00"
+@.strlit44628 = internal constant [3 x i8] c", \00"
+@.strlit44634 = internal constant [1 x i8] zeroinitializer
+@.strlit44640 = internal constant [11 x i8] c"mir_module\00"
+@.strlit44648 = internal constant [2 x i8] c"{\00"
+@.strlit44656 = internal constant [7 x i8] c"type @\00"
+@.strlit44664 = internal constant [7 x i8] c"extern\00"
+@.strlit44691 = internal constant [1 x i8] zeroinitializer
+@.strlit44694 = internal constant [1 x i8] zeroinitializer
+@.strlit44702 = internal constant [8 x i8] c"syscall\00"
+@.strlit44712 = internal constant [8 x i8] c"extern \00"
+@.strlit44716 = internal constant [5 x i8] c"fn @\00"
+@.strlit44724 = internal constant [2 x i8] c"}\00"
+@.strlit44738 = internal constant [7 x i8] c"block \00"
+@.strlit44750 = internal constant [7 x i8] c"%entry\00"
+@.strlit44761 = internal constant [2 x i8] c":\00"
+@.strlit44764 = internal constant [9 x i8] c"ret void\00"
+@.strlit44770 = internal constant [9 x i8] c"    jmp \00"
+@.strlit44777 = internal constant [5 x i8] c"ret \00"
+@.strlit44796 = internal constant [4 x i8] c"i32\00"
+@.strlit44808 = internal constant [2 x i8] c"0\00"
+@.strlit44820 = internal constant [7 x i8] c"__sret\00"
+@.strlit44833 = internal constant [7 x i8] c"__sret\00"
+@.strlit44845 = internal constant [20 x i8] c"    mov rax, qword \00"
+@.strlit44856 = internal constant [9 x i8] c"    jmp \00"
+@.strlit44863 = internal constant [4 x i8] c"f64\00"
+@.strlit44869 = internal constant [16 x i8] c"    movq xmm0, \00"
+@.strlit44876 = internal constant [4 x i8] c"f32\00"
+@.strlit44882 = internal constant [16 x i8] c"    movd xmm0, \00"
+@.strlit44889 = internal constant [9 x i8] c"    mov \00"
+@.strlit44893 = internal constant [3 x i8] c", \00"
+@.strlit44901 = internal constant [9 x i8] c"    jmp \00"
+@.strlit44908 = internal constant [10 x i8] c"br label \00"
+@.strlit44914 = internal constant [9 x i8] c"    jmp \00"
+@.strlit44922 = internal constant [9 x i8] c"br_cond \00"
+@.strlit44964 = internal constant [9 x i8] c"    cmp \00"
+@.strlit44967 = internal constant [4 x i8] c"i32\00"
+@.strlit44970 = internal constant [4 x i8] c", 0\00"
+@.strlit44973 = internal constant [8 x i8] c"    je \00"
+@.strlit44979 = internal constant [9 x i8] c"    jmp \00"
+@.strlit44985 = internal constant [7 x i8] c"store \00"
+@.strlit45093 = internal constant [5 x i8] c"xmm0\00"
+@.strlit45097 = internal constant [3 x i8] c"i8\00"
+@.strlit45103 = internal constant [3 x i8] c"u8\00"
+@.strlit45111 = internal constant [5 x i8] c"char\00"
+@.strlit45119 = internal constant [13 x i8] c"    mov al, \00"
+@.strlit45126 = internal constant [9 x i8] c"    mov \00"
+@.strlit45130 = internal constant [3 x i8] c", \00"
+@.strlit45164 = internal constant [4 x i8] c"f64\00"
+@.strlit45170 = internal constant [16 x i8] c"    movq qword \00"
+@.strlit45180 = internal constant [7 x i8] c", xmm0\00"
+@.strlit45183 = internal constant [4 x i8] c"f32\00"
+@.strlit45189 = internal constant [16 x i8] c"    movd dword \00"
+@.strlit45199 = internal constant [7 x i8] c", xmm0\00"
+@.strlit45202 = internal constant [9 x i8] c"    mov \00"
+@.strlit45206 = internal constant [2 x i8] c" \00"
+@.strlit45217 = internal constant [3 x i8] c", \00"
+@.strlit45223 = internal constant [4 x i8] c"ptr\00"
+@.strlit45231 = internal constant [7 x i8] c"string\00"
+@.strlit45243 = internal constant [7 x i8] c"string\00"
+@.strlit45246 = internal constant [14 x i8] c"    mov r11, \00"
+@.strlit45249 = internal constant [4 x i8] c"ptr\00"
+@.strlit45253 = internal constant [4 x i8] c"f64\00"
+@.strlit45259 = internal constant [27 x i8] c"    movq qword [r11], xmm0\00"
+@.strlit45261 = internal constant [4 x i8] c"f32\00"
+@.strlit45267 = internal constant [27 x i8] c"    movd dword [r11], xmm0\00"
+@.strlit45269 = internal constant [9 x i8] c"    mov \00"
+@.strlit45273 = internal constant [9 x i8] c" [r11], \00"
+@.strlit45279 = internal constant [6 x i8] c"call \00"
+@.strlit45285 = internal constant [1 x i8] zeroinitializer
+@.strlit45292 = internal constant [1 x i8] zeroinitializer
+@.strlit45300 = internal constant [8 x i8] c"alloca \00"
+@.strlit45312 = internal constant [6 x i8] c"load \00"
+@.strlit45394 = internal constant [1 x i8] zeroinitializer
+@.strlit45398 = internal constant [7 x i8] c"ptr:i8\00"
+@.strlit45404 = internal constant [4 x i8] c"i32\00"
+@.strlit45411 = internal constant [3 x i8] c"i8\00"
+@.strlit45430 = internal constant [4 x i8] c"ptr\00"
+@.strlit45436 = internal constant [7 x i8] c"string\00"
+@.strlit45446 = internal constant [4 x i8] c"i32\00"
+@.strlit45459 = internal constant [3 x i8] c"i8\00"
+@.strlit45465 = internal constant [4 x i8] c"i32\00"
+@.strlit45472 = internal constant [4 x i8] c"i32\00"
+@.strlit45492 = internal constant [3 x i8] c"i8\00"
+@.strlit45498 = internal constant [3 x i8] c"u8\00"
+@.strlit45506 = internal constant [5 x i8] c"char\00"
+@.strlit45514 = internal constant [21 x i8] c"    movzx eax, byte \00"
+@.strlit45525 = internal constant [9 x i8] c"    mov \00"
+@.strlit45529 = internal constant [3 x i8] c", \00"
+@.strlit45534 = internal constant [2 x i8] c" \00"
+@.strlit45546 = internal constant [14 x i8] c"    mov rax, \00"
+@.strlit45549 = internal constant [4 x i8] c"ptr\00"
+@.strlit45553 = internal constant [3 x i8] c"i8\00"
+@.strlit45559 = internal constant [3 x i8] c"u8\00"
+@.strlit45567 = internal constant [5 x i8] c"char\00"
+@.strlit45575 = internal constant [26 x i8] c"    movzx eax, byte [rax]\00"
+@.strlit45577 = internal constant [9 x i8] c"    mov \00"
+@.strlit45581 = internal constant [3 x i8] c", \00"
+@.strlit45586 = internal constant [7 x i8] c" [rax]\00"
+@.strlit45589 = internal constant [9 x i8] c"    mov \00"
+@.strlit45596 = internal constant [3 x i8] c", \00"
+@.strlit45602 = internal constant [5 x i8] c"add \00"
+@.strlit45610 = internal constant [4 x i8] c"add\00"
+@.strlit45611 = internal constant [4 x i8] c"add\00"
+@.strlit45613 = internal constant [5 x i8] c"sub \00"
+@.strlit45621 = internal constant [4 x i8] c"sub\00"
+@.strlit45622 = internal constant [4 x i8] c"sub\00"
+@.strlit45624 = internal constant [5 x i8] c"mul \00"
+@.strlit45632 = internal constant [4 x i8] c"mul\00"
+@.strlit45633 = internal constant [5 x i8] c"imul\00"
+@.strlit45635 = internal constant [6 x i8] c"sdiv \00"
+@.strlit45643 = internal constant [5 x i8] c"sdiv\00"
+@.strlit45644 = internal constant [5 x i8] c"idiv\00"
+@.strlit45646 = internal constant [6 x i8] c"srem \00"
+@.strlit45654 = internal constant [5 x i8] c"srem\00"
+@.strlit45655 = internal constant [5 x i8] c"idiv\00"
+@.strlit45657 = internal constant [6 x i8] c"fadd \00"
+@.strlit45665 = internal constant [5 x i8] c"fadd\00"
+@.strlit45667 = internal constant [6 x i8] c"fsub \00"
+@.strlit45675 = internal constant [5 x i8] c"fsub\00"
+@.strlit45677 = internal constant [6 x i8] c"fmul \00"
+@.strlit45685 = internal constant [5 x i8] c"fmul\00"
+@.strlit45687 = internal constant [6 x i8] c"fdiv \00"
+@.strlit45695 = internal constant [5 x i8] c"fdiv\00"
+@.strlit45697 = internal constant [5 x i8] c"and \00"
+@.strlit45705 = internal constant [4 x i8] c"and\00"
+@.strlit45706 = internal constant [4 x i8] c"and\00"
+@.strlit45708 = internal constant [4 x i8] c"or \00"
+@.strlit45716 = internal constant [3 x i8] c"or\00"
+@.strlit45717 = internal constant [3 x i8] c"or\00"
+@.strlit45719 = internal constant [5 x i8] c"xor \00"
+@.strlit45727 = internal constant [4 x i8] c"xor\00"
+@.strlit45728 = internal constant [4 x i8] c"xor\00"
+@.strlit45730 = internal constant [5 x i8] c"shl \00"
+@.strlit45738 = internal constant [4 x i8] c"shl\00"
+@.strlit45739 = internal constant [4 x i8] c"shl\00"
+@.strlit45741 = internal constant [6 x i8] c"ashr \00"
+@.strlit45749 = internal constant [5 x i8] c"ashr\00"
+@.strlit45750 = internal constant [4 x i8] c"sar\00"
+@.strlit45752 = internal constant [5 x i8] c"neg \00"
+@.strlit45760 = internal constant [4 x i8] c"neg\00"
+@.strlit45761 = internal constant [4 x i8] c"neg\00"
+@.strlit45763 = internal constant [6 x i8] c"icmp \00"
+@.strlit45772 = internal constant [6 x i8] c"fcmp \00"
+@.strlit45781 = internal constant [6 x i8] c"zext \00"
+@.strlit45787 = internal constant [7 x i8] c"trunc \00"
+@.strlit45795 = internal constant [8 x i8] c"sitofp \00"
+@.strlit45806 = internal constant [5 x i8] c"gep \00"
+@.strlit45815 = internal constant [6 x i8] c"call \00"
+@.strlit45824 = internal constant [13 x i8] c"insertvalue \00"
+@.strlit45833 = internal constant [14 x i8] c"extractvalue \00"
+@.strlit45842 = internal constant [12 x i8] c"const ptr \22\00"
+@.strlit45871 = internal constant [1 x i8] zeroinitializer
+@.strlit45877 = internal constant [15 x i8] c"    lea rax, [\00"
+@.strlit45880 = internal constant [2 x i8] c"]\00"
+@.strlit45883 = internal constant [9 x i8] c"    mov \00"
+@.strlit45886 = internal constant [7 x i8] c"string\00"
+@.strlit45890 = internal constant [6 x i8] c", rax\00"
+@.strlit45893 = internal constant [8 x i8] c"const @\00"
+@.strlit45902 = internal constant [7 x i8] c"const \00"
+@.strlit45918 = internal constant [4 x i8] c"i32\00"
+@.strlit45930 = internal constant [2 x i8] c"0\00"
+@.strlit45942 = internal constant [5 x i8] c"xmm0\00"
+@.strlit45946 = internal constant [4 x i8] c"f64\00"
+@.strlit45952 = internal constant [16 x i8] c"    movq qword \00"
+@.strlit45956 = internal constant [7 x i8] c", xmm0\00"
+@.strlit45959 = internal constant [16 x i8] c"    movd dword \00"
+@.strlit45963 = internal constant [7 x i8] c", xmm0\00"
+@.strlit45966 = internal constant [9 x i8] c"    mov \00"
+@.strlit45970 = internal constant [3 x i8] c", \00"
+@.strlit45978 = internal constant [9 x i8] c"    mov \00"
+@.strlit45982 = internal constant [3 x i8] c", \00"
+@.strlit46090 = internal constant [15 x i8] c"section .data\0A\00"
+@.strlit46138 = internal constant [3 x i8] c"-h\00"
+@.strlit46144 = internal constant [7 x i8] c"--help\00"
+@.strlit46151 = internal constant [7 x i8] c"--help\00"
+@.strlit46153 = internal constant [3 x i8] c"-v\00"
+@.strlit46159 = internal constant [10 x i8] c"--version\00"
+@.strlit46166 = internal constant [10 x i8] c"--version\00"
+@.strlit46168 = internal constant [6 x i8] c"--lex\00"
+@.strlit46174 = internal constant [14 x i8] c"--parse-stats\00"
+@.strlit46182 = internal constant [9 x i8] c"--parser\00"
+@.strlit46190 = internal constant [6 x i8] c"--ast\00"
+@.strlit46198 = internal constant [5 x i8] c"-ast\00"
+@.strlit46206 = internal constant [12 x i8] c"--typeinfer\00"
+@.strlit46214 = internal constant [10 x i8] c"--tyinfer\00"
+@.strlit46222 = internal constant [11 x i8] c"--semantic\00"
+@.strlit46230 = internal constant [8 x i8] c"--check\00"
+@.strlit46238 = internal constant [4 x i8] c"-ll\00"
+@.strlit46246 = internal constant [5 x i8] c"-obj\00"
+@.strlit46254 = internal constant [3 x i8] c"-S\00"
+@.strlit46263 = internal constant [5 x i8] c".vix\00"
+@.strlit46268 = internal constant [1 x i8] zeroinitializer
+@.strlit46312 = internal constant [1 x i8] zeroinitializer
+@.strlit46337 = internal constant [2 x i8] c".\00"
+@.strlit46342 = internal constant [2 x i8] c"/\00"
 @.fmt.string = internal constant [4 x i8] c"%s\0A\00"
-@.strlit45560 = internal constant [1 x i8] zeroinitializer
-@.strlit45570 = internal constant [4 x i8] c".ll\00"
-@.strlit45573 = internal constant [1 x i8] zeroinitializer
-@.strlit45584 = internal constant [4 x i8] c"exe\00"
-@.strlit45591 = internal constant [4 x i8] c"asm\00"
-@.strlit45597 = internal constant [3 x i8] c".s\00"
-@.strlit45600 = internal constant [3 x i8] c".o\00"
-@.strlit45602 = internal constant [38 x i8] c"OVERVIEW: Vix Compiler LLVM Bootstrap\00"
-@.strlit45603 = internal constant [1 x i8] zeroinitializer
-@.strlit45604 = internal constant [34 x i8] c"USAGE: vixc [options] <input.vix>\00"
-@.strlit45605 = internal constant [1 x i8] zeroinitializer
-@.strlit45606 = internal constant [9 x i8] c"OPTIONS:\00"
-@.strlit45607 = internal constant [48 x i8] c"  -o <file>              Write output to <file>\00"
-@.strlit45608 = internal constant [70 x i8] c"  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)\00"
-@.strlit45609 = internal constant [70 x i8] c"  -S                     Emit assembly to <file> (default: <input>.s)\00"
-@.strlit45610 = internal constant [63 x i8] c"  -obj                   Emit object file (default: <input>.o)\00"
-@.strlit45611 = internal constant [91 x i8] c"  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)\00"
-@.strlit45612 = internal constant [64 x i8] c"  --backend <llvm|self>  Select codegen backend (default: llvm)\00"
-@.strlit45613 = internal constant [63 x i8] c"  -l<lib>, -l <lib>      Link executable with a system library\00"
-@.strlit45614 = internal constant [58 x i8] c"  -L<dir>, -L <dir>      Add a system library search path\00"
-@.strlit45615 = internal constant [50 x i8] c"  --check                Syntax & type check only\00"
-@.strlit45616 = internal constant [48 x i8] c"  --lex                  Print tokens to stdout\00"
-@.strlit45617 = internal constant [67 x i8] c"  --parse-stats          Print lightweight parser input statistics\00"
-@.strlit45618 = internal constant [52 x i8] c"  --parser               Print parse tree to stdout\00"
-@.strlit45619 = internal constant [51 x i8] c"  --ast / -ast                 Print AST to stdout\00"
-@.strlit45620 = internal constant [63 x i8] c"  --typeinfer            Print type inference result to stdout\00"
-@.strlit45621 = internal constant [59 x i8] c"  --semantic             Print semantic analysis to stdout\00"
-@.strlit45622 = internal constant [70 x i8] c"  --debug=<mir|asm|llvm> Print selected intermediate output to stdout\00"
-@.strlit45623 = internal constant [62 x i8] c"  -v, --version          Display compiler version information\00"
-@.strlit45624 = internal constant [51 x i8] c"  -h, --help             Display this help message\00"
-@.strlit45625 = internal constant [23 x i8] c"vixc 0.4.4 (bootstrap)\00"
-@.strlit45627 = internal constant [5 x i8] c".vix\00"
-@.strlit45645 = internal constant [1 x i8] zeroinitializer
-@.strlit45652 = internal constant [1 x i8] zeroinitializer
-@.strlit45655 = internal constant [1 x i8] zeroinitializer
-@.strlit45660 = internal constant [1 x i8] zeroinitializer
-@.strlit45661 = internal constant [11 x i8] c" --target=\00"
-@.strlit45665 = internal constant [1 x i8] zeroinitializer
-@.strlit45671 = internal constant [7 x i8] c"x86_64\00"
-@.strlit45677 = internal constant [6 x i8] c"--lex\00"
-@.strlit45685 = internal constant [14 x i8] c"--parse-stats\00"
-@.strlit45698 = internal constant [9 x i8] c"--parser\00"
-@.strlit45713 = internal constant [6 x i8] c"--ast\00"
-@.strlit45728 = internal constant [5 x i8] c"-ast\00"
-@.strlit45758 = internal constant [11 x i8] c"--semantic\00"
-@.strlit45772 = internal constant [12 x i8] c"--typeinfer\00"
-@.strlit45788 = internal constant [10 x i8] c"--tyinfer\00"
-@.strlit45817 = internal constant [12 x i8] c"--typeinfer\00"
-@.strlit45827 = internal constant [10 x i8] c"--tyinfer\00"
-@.strlit45848 = internal constant [11 x i8] c"debug_llvm\00"
-@.strlit45859 = internal constant [10 x i8] c"debug_mir\00"
-@.strlit45867 = internal constant [10 x i8] c"debug_asm\00"
-@.strlit45879 = internal constant [8 x i8] c"--check\00"
-@.strlit45886 = internal constant [5 x i8] c"self\00"
-@.strlit45892 = internal constant [3 x i8] c"ir\00"
-@.strlit45902 = internal constant [7 x i8] c"stdout\00"
-@.strlit45920 = internal constant [4 x i8] c"asm\00"
-@.strlit45935 = internal constant [9 x i8] c".tmp.asm\00"
-@.strlit45939 = internal constant [5 x i8] c"-obj\00"
-@.strlit45946 = internal constant [7 x i8] c".tmp.o\00"
-@.strlit45952 = internal constant [15 x i8] c"nasm -f elf64 \00"
-@.strlit45955 = internal constant [5 x i8] c" -o \00"
-@.strlit45966 = internal constant [34 x i8] c"vixc: error: failed to assemble '\00"
-@.strlit45969 = internal constant [2 x i8] c"'\00"
-@.strlit45973 = internal constant [5 x i8] c"-obj\00"
-@.strlit45980 = internal constant [15 x i8] c"clang -no-pie \00"
-@.strlit45983 = internal constant [2 x i8] c" \00"
-@.strlit45987 = internal constant [5 x i8] c" -o \00"
-@.strlit45991 = internal constant [2 x i8] c" \00"
-@.strlit46002 = internal constant [30 x i8] c"vixc: error: failed to link '\00"
-@.strlit46005 = internal constant [2 x i8] c"'\00"
-@.strlit46014 = internal constant [7 x i8] c"stdout\00"
-@.strlit46021 = internal constant [1 x i8] zeroinitializer
-@.strlit46022 = internal constant [1 x i8] zeroinitializer
-@.strlit46024 = internal constant [3 x i8] c"ir\00"
-@.strlit46037 = internal constant [8 x i8] c".tmp.ll\00"
-@.strlit46043 = internal constant [3 x i8] c"ir\00"
-@.strlit46051 = internal constant [1 x i8] zeroinitializer
-@.strlit46062 = internal constant [1 x i8] zeroinitializer
-@.strlit46064 = internal constant [4 x i8] c"asm\00"
-@.strlit46069 = internal constant [6 x i8] c"clang\00"
-@.strlit46072 = internal constant [5 x i8] c" -S \00"
-@.strlit46076 = internal constant [5 x i8] c" -o \00"
-@.strlit46081 = internal constant [5 x i8] c"-obj\00"
-@.strlit46086 = internal constant [6 x i8] c"clang\00"
-@.strlit46089 = internal constant [5 x i8] c" -c \00"
-@.strlit46093 = internal constant [5 x i8] c" -o \00"
-@.strlit46097 = internal constant [6 x i8] c"clang\00"
-@.strlit46100 = internal constant [2 x i8] c" \00"
-@.strlit46104 = internal constant [2 x i8] c" \00"
-@.strlit46108 = internal constant [5 x i8] c" -o \00"
-@.strlit46112 = internal constant [2 x i8] c" \00"
-@.strlit46119 = internal constant [3 x i8] c"ir\00"
-@.strlit46132 = internal constant [31 x i8] c"vixc: error: failed to build '\00"
-@.strlit46135 = internal constant [2 x i8] c"'\00"
-@.strlit46141 = internal constant [2 x i8] c"w\00"
-@.strlit46147 = internal constant [33 x i8] c"vixc: error: cannot write file '\00"
-@.strlit46150 = internal constant [2 x i8] c"'\00"
-@.strlit46158 = internal constant [2 x i8] c"r\00"
-@.strlit46164 = internal constant [1 x i8] zeroinitializer
-@.strlit46185 = internal constant [1 x i8] zeroinitializer
-@.strlit46186 = internal constant [8 x i8] c"codegen\00"
-@.strlit46187 = internal constant [1 x i8] zeroinitializer
-@.strlit46188 = internal constant [4 x i8] c"exe\00"
-@.strlit46189 = internal constant [1 x i8] zeroinitializer
-@.strlit46190 = internal constant [1 x i8] zeroinitializer
-@.strlit46192 = internal constant [5 x i8] c"llvm\00"
-@.strlit46203 = internal constant [3 x i8] c"-h\00"
-@.strlit46209 = internal constant [7 x i8] c"--help\00"
-@.strlit46217 = internal constant [3 x i8] c"-v\00"
-@.strlit46223 = internal constant [10 x i8] c"--version\00"
-@.strlit46231 = internal constant [3 x i8] c"-o\00"
-@.strlit46248 = internal constant [39 x i8] c"vixc: error: '-o' requires an argument\00"
-@.strlit46250 = internal constant [4 x i8] c"-ll\00"
-@.strlit46255 = internal constant [3 x i8] c"ir\00"
-@.strlit46268 = internal constant [5 x i8] c".vix\00"
-@.strlit46274 = internal constant [4 x i8] c".ll\00"
-@.strlit46285 = internal constant [5 x i8] c"-obj\00"
-@.strlit46290 = internal constant [5 x i8] c"-obj\00"
-@.strlit46292 = internal constant [3 x i8] c"-S\00"
-@.strlit46297 = internal constant [4 x i8] c"asm\00"
-@.strlit46299 = internal constant [9 x i8] c"--debug=\00"
-@.strlit46309 = internal constant [4 x i8] c"mir\00"
-@.strlit46314 = internal constant [10 x i8] c"debug_mir\00"
-@.strlit46316 = internal constant [4 x i8] c"asm\00"
-@.strlit46321 = internal constant [10 x i8] c"debug_asm\00"
-@.strlit46323 = internal constant [5 x i8] c"llvm\00"
-@.strlit46328 = internal constant [11 x i8] c"debug_llvm\00"
-@.strlit46329 = internal constant [36 x i8] c"vixc: error: unknown debug output '\00"
-@.strlit46332 = internal constant [2 x i8] c"'\00"
-@.strlit46335 = internal constant [9 x i8] c"--target\00"
-@.strlit46352 = internal constant [45 x i8] c"vixc: error: '--target' requires an argument\00"
-@.strlit46354 = internal constant [10 x i8] c"--backend\00"
-@.strlit46371 = internal constant [46 x i8] c"vixc: error: '--backend' requires an argument\00"
-@.strlit46373 = internal constant [15 x i8] c"--backend=self\00"
-@.strlit46378 = internal constant [5 x i8] c"self\00"
-@.strlit46380 = internal constant [15 x i8] c"--backend=llvm\00"
-@.strlit46385 = internal constant [5 x i8] c"llvm\00"
-@.strlit46387 = internal constant [3 x i8] c"-l\00"
-@.strlit46393 = internal constant [3 x i8] c"-L\00"
-@.strlit46409 = internal constant [2 x i8] c" \00"
-@.strlit46418 = internal constant [15 x i8] c"vixc: error: '\00"
-@.strlit46421 = internal constant [23 x i8] c"' requires an argument\00"
-@.strlit46424 = internal constant [3 x i8] c"-l\00"
-@.strlit46430 = internal constant [3 x i8] c"-L\00"
-@.strlit46438 = internal constant [2 x i8] c" \00"
-@.strlit46448 = internal constant [7 x i8] c"--help\00"
-@.strlit46454 = internal constant [10 x i8] c"--version\00"
-@.strlit46460 = internal constant [4 x i8] c"-ll\00"
-@.strlit46465 = internal constant [3 x i8] c"ir\00"
-@.strlit46467 = internal constant [5 x i8] c"-obj\00"
-@.strlit46472 = internal constant [5 x i8] c"-obj\00"
-@.strlit46474 = internal constant [3 x i8] c"-S\00"
-@.strlit46479 = internal constant [4 x i8] c"asm\00"
-@.strlit46493 = internal constant [48 x i8] c"vixc: error: multiple input files not supported\00"
-@.strlit46500 = internal constant [48 x i8] c"vixc: error: unrecognized command-line option '\00"
-@.strlit46503 = internal constant [3 x i8] c"'\0A\00"
-@.strlit46521 = internal constant [34 x i8] c"vixc: fatal error: no input files\00"
-@.strlit46522 = internal constant [24 x i8] c"compilation terminated.\00"
-@.strlit46524 = internal constant [1 x i8] zeroinitializer
-@.strlit46529 = internal constant [32 x i8] c"vixc: error: cannot read file '\00"
-@.strlit46532 = internal constant [2 x i8] c"'\00"
-@.strlit46535 = internal constant [5 x i8] c"llvm\00"
-@.strlit46543 = internal constant [5 x i8] c"self\00"
-@.strlit46552 = internal constant [31 x i8] c"vixc: error: unknown backend '\00"
-@.strlit46555 = internal constant [2 x i8] c"'\00"
-@.strlit46558 = internal constant [5 x i8] c"self\00"
-@.strlit46570 = internal constant [62 x i8] c"vixc: error: self backend only supports x86_64 targets, got '\00"
-@.strlit46573 = internal constant [2 x i8] c"'\00"
+@.strlit46355 = internal constant [1 x i8] zeroinitializer
+@.strlit46365 = internal constant [4 x i8] c".ll\00"
+@.strlit46368 = internal constant [1 x i8] zeroinitializer
+@.strlit46379 = internal constant [4 x i8] c"exe\00"
+@.strlit46386 = internal constant [4 x i8] c"asm\00"
+@.strlit46392 = internal constant [3 x i8] c".s\00"
+@.strlit46395 = internal constant [3 x i8] c".o\00"
+@.strlit46397 = internal constant [38 x i8] c"OVERVIEW: Vix Compiler LLVM Bootstrap\00"
+@.strlit46398 = internal constant [1 x i8] zeroinitializer
+@.strlit46399 = internal constant [34 x i8] c"USAGE: vixc [options] <input.vix>\00"
+@.strlit46400 = internal constant [1 x i8] zeroinitializer
+@.strlit46401 = internal constant [9 x i8] c"OPTIONS:\00"
+@.strlit46402 = internal constant [48 x i8] c"  -o <file>              Write output to <file>\00"
+@.strlit46403 = internal constant [70 x i8] c"  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)\00"
+@.strlit46404 = internal constant [70 x i8] c"  -S                     Emit assembly to <file> (default: <input>.s)\00"
+@.strlit46405 = internal constant [63 x i8] c"  -obj                   Emit object file (default: <input>.o)\00"
+@.strlit46406 = internal constant [91 x i8] c"  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)\00"
+@.strlit46407 = internal constant [64 x i8] c"  --backend <llvm|self>  Select codegen backend (default: llvm)\00"
+@.strlit46408 = internal constant [63 x i8] c"  -l<lib>, -l <lib>      Link executable with a system library\00"
+@.strlit46409 = internal constant [58 x i8] c"  -L<dir>, -L <dir>      Add a system library search path\00"
+@.strlit46410 = internal constant [50 x i8] c"  --check                Syntax & type check only\00"
+@.strlit46411 = internal constant [48 x i8] c"  --lex                  Print tokens to stdout\00"
+@.strlit46412 = internal constant [67 x i8] c"  --parse-stats          Print lightweight parser input statistics\00"
+@.strlit46413 = internal constant [52 x i8] c"  --parser               Print parse tree to stdout\00"
+@.strlit46414 = internal constant [51 x i8] c"  --ast / -ast                 Print AST to stdout\00"
+@.strlit46415 = internal constant [63 x i8] c"  --typeinfer            Print type inference result to stdout\00"
+@.strlit46416 = internal constant [59 x i8] c"  --semantic             Print semantic analysis to stdout\00"
+@.strlit46417 = internal constant [70 x i8] c"  --debug=<mir|asm|llvm> Print selected intermediate output to stdout\00"
+@.strlit46418 = internal constant [62 x i8] c"  -v, --version          Display compiler version information\00"
+@.strlit46419 = internal constant [51 x i8] c"  -h, --help             Display this help message\00"
+@.strlit46420 = internal constant [23 x i8] c"vixc 0.4.4 (bootstrap)\00"
+@.strlit46422 = internal constant [5 x i8] c".vix\00"
+@.strlit46440 = internal constant [1 x i8] zeroinitializer
+@.strlit46447 = internal constant [1 x i8] zeroinitializer
+@.strlit46450 = internal constant [1 x i8] zeroinitializer
+@.strlit46455 = internal constant [1 x i8] zeroinitializer
+@.strlit46456 = internal constant [11 x i8] c" --target=\00"
+@.strlit46460 = internal constant [1 x i8] zeroinitializer
+@.strlit46466 = internal constant [7 x i8] c"x86_64\00"
+@.strlit46472 = internal constant [6 x i8] c"--lex\00"
+@.strlit46480 = internal constant [14 x i8] c"--parse-stats\00"
+@.strlit46493 = internal constant [9 x i8] c"--parser\00"
+@.strlit46508 = internal constant [6 x i8] c"--ast\00"
+@.strlit46523 = internal constant [5 x i8] c"-ast\00"
+@.strlit46553 = internal constant [11 x i8] c"--semantic\00"
+@.strlit46567 = internal constant [12 x i8] c"--typeinfer\00"
+@.strlit46583 = internal constant [10 x i8] c"--tyinfer\00"
+@.strlit46612 = internal constant [12 x i8] c"--typeinfer\00"
+@.strlit46622 = internal constant [10 x i8] c"--tyinfer\00"
+@.strlit46643 = internal constant [11 x i8] c"debug_llvm\00"
+@.strlit46654 = internal constant [10 x i8] c"debug_mir\00"
+@.strlit46662 = internal constant [10 x i8] c"debug_asm\00"
+@.strlit46674 = internal constant [8 x i8] c"--check\00"
+@.strlit46681 = internal constant [5 x i8] c"self\00"
+@.strlit46687 = internal constant [3 x i8] c"ir\00"
+@.strlit46697 = internal constant [7 x i8] c"stdout\00"
+@.strlit46715 = internal constant [4 x i8] c"asm\00"
+@.strlit46730 = internal constant [9 x i8] c".tmp.asm\00"
+@.strlit46734 = internal constant [5 x i8] c"-obj\00"
+@.strlit46741 = internal constant [7 x i8] c".tmp.o\00"
+@.strlit46747 = internal constant [15 x i8] c"nasm -f elf64 \00"
+@.strlit46750 = internal constant [5 x i8] c" -o \00"
+@.strlit46761 = internal constant [34 x i8] c"vixc: error: failed to assemble '\00"
+@.strlit46764 = internal constant [2 x i8] c"'\00"
+@.strlit46768 = internal constant [5 x i8] c"-obj\00"
+@.strlit46775 = internal constant [28 x i8] c"clang -fuse-ld=lld -no-pie \00"
+@.strlit46778 = internal constant [2 x i8] c" \00"
+@.strlit46782 = internal constant [5 x i8] c" -o \00"
+@.strlit46786 = internal constant [2 x i8] c" \00"
+@.strlit46797 = internal constant [30 x i8] c"vixc: error: failed to link '\00"
+@.strlit46800 = internal constant [2 x i8] c"'\00"
+@.strlit46809 = internal constant [7 x i8] c"stdout\00"
+@.strlit46816 = internal constant [1 x i8] zeroinitializer
+@.strlit46817 = internal constant [1 x i8] zeroinitializer
+@.strlit46819 = internal constant [3 x i8] c"ir\00"
+@.strlit46832 = internal constant [8 x i8] c".tmp.ll\00"
+@.strlit46838 = internal constant [3 x i8] c"ir\00"
+@.strlit46846 = internal constant [1 x i8] zeroinitializer
+@.strlit46857 = internal constant [1 x i8] zeroinitializer
+@.strlit46859 = internal constant [4 x i8] c"asm\00"
+@.strlit46864 = internal constant [6 x i8] c"clang\00"
+@.strlit46867 = internal constant [5 x i8] c" -S \00"
+@.strlit46871 = internal constant [5 x i8] c" -o \00"
+@.strlit46876 = internal constant [5 x i8] c"-obj\00"
+@.strlit46881 = internal constant [6 x i8] c"clang\00"
+@.strlit46884 = internal constant [5 x i8] c" -c \00"
+@.strlit46888 = internal constant [5 x i8] c" -o \00"
+@.strlit46892 = internal constant [6 x i8] c"clang\00"
+@.strlit46895 = internal constant [15 x i8] c" -fuse-ld=lld \00"
+@.strlit46899 = internal constant [2 x i8] c" \00"
+@.strlit46903 = internal constant [5 x i8] c" -o \00"
+@.strlit46907 = internal constant [2 x i8] c" \00"
+@.strlit46914 = internal constant [3 x i8] c"ir\00"
+@.strlit46927 = internal constant [31 x i8] c"vixc: error: failed to build '\00"
+@.strlit46930 = internal constant [2 x i8] c"'\00"
+@.strlit46936 = internal constant [2 x i8] c"w\00"
+@.strlit46942 = internal constant [33 x i8] c"vixc: error: cannot write file '\00"
+@.strlit46945 = internal constant [2 x i8] c"'\00"
+@.strlit46953 = internal constant [2 x i8] c"r\00"
+@.strlit46959 = internal constant [1 x i8] zeroinitializer
+@.strlit46980 = internal constant [1 x i8] zeroinitializer
+@.strlit46981 = internal constant [8 x i8] c"codegen\00"
+@.strlit46982 = internal constant [1 x i8] zeroinitializer
+@.strlit46983 = internal constant [4 x i8] c"exe\00"
+@.strlit46984 = internal constant [1 x i8] zeroinitializer
+@.strlit46985 = internal constant [1 x i8] zeroinitializer
+@.strlit46987 = internal constant [5 x i8] c"llvm\00"
+@.strlit46998 = internal constant [3 x i8] c"-h\00"
+@.strlit47004 = internal constant [7 x i8] c"--help\00"
+@.strlit47012 = internal constant [3 x i8] c"-v\00"
+@.strlit47018 = internal constant [10 x i8] c"--version\00"
+@.strlit47026 = internal constant [3 x i8] c"-o\00"
+@.strlit47043 = internal constant [39 x i8] c"vixc: error: '-o' requires an argument\00"
+@.strlit47045 = internal constant [4 x i8] c"-ll\00"
+@.strlit47050 = internal constant [3 x i8] c"ir\00"
+@.strlit47063 = internal constant [5 x i8] c".vix\00"
+@.strlit47069 = internal constant [4 x i8] c".ll\00"
+@.strlit47080 = internal constant [5 x i8] c"-obj\00"
+@.strlit47085 = internal constant [5 x i8] c"-obj\00"
+@.strlit47087 = internal constant [3 x i8] c"-S\00"
+@.strlit47092 = internal constant [4 x i8] c"asm\00"
+@.strlit47094 = internal constant [9 x i8] c"--debug=\00"
+@.strlit47104 = internal constant [4 x i8] c"mir\00"
+@.strlit47109 = internal constant [10 x i8] c"debug_mir\00"
+@.strlit47111 = internal constant [4 x i8] c"asm\00"
+@.strlit47116 = internal constant [10 x i8] c"debug_asm\00"
+@.strlit47118 = internal constant [5 x i8] c"llvm\00"
+@.strlit47123 = internal constant [11 x i8] c"debug_llvm\00"
+@.strlit47124 = internal constant [36 x i8] c"vixc: error: unknown debug output '\00"
+@.strlit47127 = internal constant [2 x i8] c"'\00"
+@.strlit47130 = internal constant [9 x i8] c"--target\00"
+@.strlit47147 = internal constant [45 x i8] c"vixc: error: '--target' requires an argument\00"
+@.strlit47149 = internal constant [10 x i8] c"--backend\00"
+@.strlit47166 = internal constant [46 x i8] c"vixc: error: '--backend' requires an argument\00"
+@.strlit47168 = internal constant [15 x i8] c"--backend=self\00"
+@.strlit47173 = internal constant [5 x i8] c"self\00"
+@.strlit47175 = internal constant [15 x i8] c"--backend=llvm\00"
+@.strlit47180 = internal constant [5 x i8] c"llvm\00"
+@.strlit47182 = internal constant [3 x i8] c"-l\00"
+@.strlit47188 = internal constant [3 x i8] c"-L\00"
+@.strlit47204 = internal constant [2 x i8] c" \00"
+@.strlit47213 = internal constant [15 x i8] c"vixc: error: '\00"
+@.strlit47216 = internal constant [23 x i8] c"' requires an argument\00"
+@.strlit47219 = internal constant [3 x i8] c"-l\00"
+@.strlit47225 = internal constant [3 x i8] c"-L\00"
+@.strlit47233 = internal constant [2 x i8] c" \00"
+@.strlit47243 = internal constant [7 x i8] c"--help\00"
+@.strlit47249 = internal constant [10 x i8] c"--version\00"
+@.strlit47255 = internal constant [4 x i8] c"-ll\00"
+@.strlit47260 = internal constant [3 x i8] c"ir\00"
+@.strlit47262 = internal constant [5 x i8] c"-obj\00"
+@.strlit47267 = internal constant [5 x i8] c"-obj\00"
+@.strlit47269 = internal constant [3 x i8] c"-S\00"
+@.strlit47274 = internal constant [4 x i8] c"asm\00"
+@.strlit47288 = internal constant [48 x i8] c"vixc: error: multiple input files not supported\00"
+@.strlit47295 = internal constant [48 x i8] c"vixc: error: unrecognized command-line option '\00"
+@.strlit47298 = internal constant [3 x i8] c"'\0A\00"
+@.strlit47316 = internal constant [34 x i8] c"vixc: fatal error: no input files\00"
+@.strlit47317 = internal constant [24 x i8] c"compilation terminated.\00"
+@.strlit47319 = internal constant [1 x i8] zeroinitializer
+@.strlit47324 = internal constant [32 x i8] c"vixc: error: cannot read file '\00"
+@.strlit47327 = internal constant [2 x i8] c"'\00"
+@.strlit47330 = internal constant [5 x i8] c"llvm\00"
+@.strlit47338 = internal constant [5 x i8] c"self\00"
+@.strlit47347 = internal constant [31 x i8] c"vixc: error: unknown backend '\00"
+@.strlit47350 = internal constant [2 x i8] c"'\00"
+@.strlit47353 = internal constant [5 x i8] c"self\00"
+@.strlit47365 = internal constant [62 x i8] c"vixc: error: self backend only supports x86_64 targets, got '\00"
+@.strlit47368 = internal constant [2 x i8] c"'\00"
 
 declare i32 @printf(ptr, ...)
 
@@ -78859,9 +78969,9 @@ if.else6702:                                      ; preds = %while.body6699
   br label %if.end6703
 
 if.end6703:                                       ; preds = %if.else6702, %if.end6706
-  %load41333 = load i32, ptr %pos, align 4
-  %add41334 = add i32 %load41333, 1
-  store i32 %add41334, ptr %pos, align 4
+  %load41377 = load i32, ptr %pos, align 4
+  %add41378 = add i32 %load41377, 1
+  store i32 %add41378, ptr %pos, align 4
   br label %while.cond6698
 
 if.then6704:                                      ; preds = %and.merge3
@@ -78879,7 +78989,7 @@ if.then6704:                                      ; preds = %and.merge3
 if.else6705:                                      ; preds = %and.merge3
   br label %if.end6706
 
-if.end6706:                                       ; preds = %if.else6705, %if.end6721
+if.end6706:                                       ; preds = %if.else6705, %if.end6730
   br label %if.end6703
 
 and.rhs1:                                         ; preds = %if.then6701
@@ -78922,13 +79032,14 @@ if.end6709:                                       ; preds = %if.else6708, %if.th
   %call41250 = call ptr @mir2asm_clean_name(ptr %call41249)
   %param_name = alloca ptr, align 8
   store ptr %call41250, ptr %param_name, align 8
-  %ifexpr41251 = alloca ptr, align 8
+  %param_reg = alloca ptr, align 8
+  store ptr @.strlit41251, ptr %param_reg, align 8
   %load41252 = load ptr, ptr %param_ty, align 8
   %call41253 = call i32 @mir2asm_type_is_float(ptr %load41252)
   %cmp41254 = icmp eq i32 %call41253, 1
   %bool41255 = zext i1 %cmp41254 to i32
   %cond41256 = icmp ne i32 %bool41255, 0
-  br i1 %cond41256, label %ifexpr.then6710, label %ifexpr.else6711
+  br i1 %cond41256, label %and.rhs7, label %and.false8
 
 or.true4:                                         ; preds = %or.rhs5, %if.then6704
   br label %or.merge6
@@ -78946,126 +79057,273 @@ or.merge6:                                        ; preds = %or.true4, %or.rhs5
   %cond41238 = icmp ne i32 %orval41237, 0
   br i1 %cond41238, label %if.then6707, label %if.else6708
 
-ifexpr.then6710:                                  ; preds = %if.end6709
-  %load41257 = load i32, ptr %float_arg, align 4
-  %load41258 = load ptr, ptr %param_ty, align 8
-  %call41259 = call ptr @mir2asm_arg_reg_typed(i32 %load41257, ptr %load41258)
-  store ptr %call41259, ptr %ifexpr41251, align 8
-  br label %ifexpr.end6712
+if.then6710:                                      ; preds = %and.merge9
+  %load41263 = load i32, ptr %float_arg, align 4
+  %load41264 = load ptr, ptr %param_ty, align 8
+  %call41265 = call ptr @mir2asm_arg_reg_typed(i32 %load41263, ptr %load41264)
+  store ptr %call41265, ptr %param_reg, align 8
+  br label %if.end6712
 
-ifexpr.else6711:                                  ; preds = %if.end6709
-  %ifexpr41260 = alloca ptr, align 8
-  %load41261 = load ptr, ptr %b, align 8
-  %load41262 = load ptr, ptr %param_ty, align 8
-  %call41263 = call i32 @mir2asm_type_is_struct_value(ptr %load41261, ptr %load41262)
-  %cmp41264 = icmp eq i32 %call41263, 1
-  %bool41265 = zext i1 %cmp41264 to i32
-  %cond41266 = icmp ne i32 %bool41265, 0
-  br i1 %cond41266, label %ifexpr.then6713, label %ifexpr.else6714
+if.else6711:                                      ; preds = %and.merge9
+  %load41266 = load ptr, ptr %param_ty, align 8
+  %call41267 = call i32 @mir2asm_type_is_float(ptr %load41266)
+  %cmp41268 = icmp eq i32 %call41267, 0
+  %bool41269 = zext i1 %cmp41268 to i32
+  %cond41270 = icmp ne i32 %bool41269, 0
+  br i1 %cond41270, label %and.rhs10, label %and.false11
 
-ifexpr.end6712:                                   ; preds = %ifexpr.end6715, %ifexpr.then6710
-  %ifexprval41274 = load ptr, ptr %ifexpr41251, align 8
-  %param_reg = alloca ptr, align 8
-  store ptr %ifexprval41274, ptr %param_reg, align 8
-  %load41275 = load ptr, ptr %b, align 8
-  %field41277 = getelementptr %MirAsm, ptr %load41275, i32 0, i32 16
-  %fieldval41278 = load ptr, ptr %field41277, align 8
-  %load41279 = load ptr, ptr %param_name, align 8
-  %call41280 = call ptr @vix_array_push_ptr(ptr %fieldval41278, ptr %load41279)
-  %load41281 = load ptr, ptr %b, align 8
-  %fieldptr41283 = getelementptr %MirAsm, ptr %load41281, i32 0, i32 16
-  store ptr %call41280, ptr %fieldptr41283, align 8
-  %load41284 = load ptr, ptr %b, align 8
-  %field41286 = getelementptr %MirAsm, ptr %load41284, i32 0, i32 17
-  %fieldval41287 = load ptr, ptr %field41286, align 8
-  %load41288 = load ptr, ptr %param_ty, align 8
-  %call41289 = call ptr @vix_array_push_ptr(ptr %fieldval41287, ptr %load41288)
-  %load41290 = load ptr, ptr %b, align 8
-  %fieldptr41292 = getelementptr %MirAsm, ptr %load41290, i32 0, i32 17
-  store ptr %call41289, ptr %fieldptr41292, align 8
-  %load41293 = load ptr, ptr %b, align 8
-  %field41295 = getelementptr %MirAsm, ptr %load41293, i32 0, i32 18
-  %fieldval41296 = load ptr, ptr %field41295, align 8
-  %load41297 = load ptr, ptr %param_reg, align 8
-  %call41298 = call ptr @vix_array_push_ptr(ptr %fieldval41296, ptr %load41297)
-  %load41299 = load ptr, ptr %b, align 8
-  %fieldptr41301 = getelementptr %MirAsm, ptr %load41299, i32 0, i32 18
-  store ptr %call41298, ptr %fieldptr41301, align 8
-  %load41302 = load ptr, ptr %b, align 8
-  %load41303 = load ptr, ptr %param_name, align 8
-  %load41304 = load ptr, ptr %param_ty, align 8
-  %call41305 = call i32 @mir2asm_alloc_slot_typed(ptr %load41302, ptr %load41303, i32 0, ptr %load41304)
+if.end6712:                                       ; preds = %if.end6715, %if.then6710
+  %load41289 = load ptr, ptr %b, align 8
+  %field41291 = getelementptr %MirAsm, ptr %load41289, i32 0, i32 16
+  %fieldval41292 = load ptr, ptr %field41291, align 8
+  %load41293 = load ptr, ptr %param_name, align 8
+  %call41294 = call ptr @vix_array_push_ptr(ptr %fieldval41292, ptr %load41293)
+  %load41295 = load ptr, ptr %b, align 8
+  %fieldptr41297 = getelementptr %MirAsm, ptr %load41295, i32 0, i32 16
+  store ptr %call41294, ptr %fieldptr41297, align 8
+  %load41298 = load ptr, ptr %b, align 8
+  %field41300 = getelementptr %MirAsm, ptr %load41298, i32 0, i32 17
+  %fieldval41301 = load ptr, ptr %field41300, align 8
+  %load41302 = load ptr, ptr %param_ty, align 8
+  %call41303 = call ptr @vix_array_push_ptr(ptr %fieldval41301, ptr %load41302)
+  %load41304 = load ptr, ptr %b, align 8
+  %fieldptr41306 = getelementptr %MirAsm, ptr %load41304, i32 0, i32 17
+  store ptr %call41303, ptr %fieldptr41306, align 8
+  %load41307 = load ptr, ptr %b, align 8
+  %field41309 = getelementptr %MirAsm, ptr %load41307, i32 0, i32 18
+  %fieldval41310 = load ptr, ptr %field41309, align 8
+  %load41311 = load ptr, ptr %param_reg, align 8
+  %call41312 = call ptr @vix_array_push_ptr(ptr %fieldval41310, ptr %load41311)
+  %load41313 = load ptr, ptr %b, align 8
+  %fieldptr41315 = getelementptr %MirAsm, ptr %load41313, i32 0, i32 18
+  store ptr %call41312, ptr %fieldptr41315, align 8
+  %load41316 = load ptr, ptr %b, align 8
+  %load41317 = load ptr, ptr %param_name, align 8
+  %load41318 = load ptr, ptr %param_ty, align 8
+  %call41319 = call i32 @mir2asm_alloc_slot_typed(ptr %load41316, ptr %load41317, i32 0, ptr %load41318)
   %param_off = alloca i32, align 4
-  store i32 %call41305, ptr %param_off, align 4
-  %load41306 = load ptr, ptr %b, align 8
-  %load41307 = load ptr, ptr %param_ty, align 8
-  %call41308 = call i32 @mir2asm_type_is_struct_value(ptr %load41306, ptr %load41307)
-  %cmp41309 = icmp eq i32 %call41308, 1
-  %bool41310 = zext i1 %cmp41309 to i32
-  %cond41311 = icmp ne i32 %bool41310, 0
-  br i1 %cond41311, label %if.then6716, label %if.else6717
+  store i32 %call41319, ptr %param_off, align 4
+  %load41320 = load ptr, ptr %param_reg, align 8
+  %strcmp41322 = call i32 @strcmp(ptr %load41320, ptr @.strlit41321)
+  %cmp41323 = icmp eq i32 %strcmp41322, 0
+  %bool41324 = zext i1 %cmp41323 to i32
+  %cond41325 = icmp ne i32 %bool41324, 0
+  br i1 %cond41325, label %if.then6719, label %if.else6720
 
-ifexpr.then6713:                                  ; preds = %ifexpr.else6711
-  %load41267 = load i32, ptr %arg, align 4
-  %call41269 = call ptr @mir2asm_arg_reg_typed(i32 %load41267, ptr @.strlit41268)
-  store ptr %call41269, ptr %ifexpr41260, align 8
-  br label %ifexpr.end6715
+and.rhs7:                                         ; preds = %if.end6709
+  %load41257 = load i32, ptr %float_arg, align 4
+  %cmp41258 = icmp slt i32 %load41257, 8
+  %bool41259 = zext i1 %cmp41258 to i32
+  %cond41260 = icmp ne i32 %bool41259, 0
+  br i1 %cond41260, label %and.merge9, label %and.false8
 
-ifexpr.else6714:                                  ; preds = %ifexpr.else6711
-  %load41270 = load i32, ptr %arg, align 4
-  %load41271 = load ptr, ptr %param_ty, align 8
-  %call41272 = call ptr @mir2asm_arg_reg_typed(i32 %load41270, ptr %load41271)
-  store ptr %call41272, ptr %ifexpr41260, align 8
-  br label %ifexpr.end6715
+and.false8:                                       ; preds = %and.rhs7, %if.end6709
+  br label %and.merge9
 
-ifexpr.end6715:                                   ; preds = %ifexpr.else6714, %ifexpr.then6713
-  %ifexprval41273 = load ptr, ptr %ifexpr41260, align 8
-  store ptr %ifexprval41273, ptr %ifexpr41251, align 8
-  br label %ifexpr.end6712
+and.merge9:                                       ; preds = %and.false8, %and.rhs7
+  %andval41261 = phi i32 [ 1, %and.rhs7 ], [ 0, %and.false8 ]
+  %cond41262 = icmp ne i32 %andval41261, 0
+  br i1 %cond41262, label %if.then6710, label %if.else6711
 
-if.then6716:                                      ; preds = %ifexpr.end6712
-  %load41312 = load ptr, ptr %b, align 8
-  %load41313 = load i32, ptr %param_off, align 4
-  %load41314 = load ptr, ptr %param_reg, align 8
-  %load41315 = load ptr, ptr %b, align 8
-  %load41316 = load ptr, ptr %param_ty, align 8
-  %call41317 = call i32 @mir2asm_type_size_for(ptr %load41315, ptr %load41316)
-  call void @mir2asm_emit_copy_reg_to_stack(ptr %load41312, i32 %load41313, ptr %load41314, i32 %call41317)
+if.then6713:                                      ; preds = %and.merge12
+  %load41277 = load ptr, ptr %b, align 8
+  %load41278 = load ptr, ptr %param_ty, align 8
+  %call41279 = call i32 @mir2asm_type_is_struct_value(ptr %load41277, ptr %load41278)
+  %cmp41280 = icmp eq i32 %call41279, 1
+  %bool41281 = zext i1 %cmp41280 to i32
+  %cond41282 = icmp ne i32 %bool41281, 0
+  br i1 %cond41282, label %if.then6716, label %if.else6717
+
+if.else6714:                                      ; preds = %and.merge12
+  br label %if.end6715
+
+if.end6715:                                       ; preds = %if.else6714, %if.end6718
+  br label %if.end6712
+
+and.rhs10:                                        ; preds = %if.else6711
+  %load41271 = load i32, ptr %arg, align 4
+  %cmp41272 = icmp slt i32 %load41271, 6
+  %bool41273 = zext i1 %cmp41272 to i32
+  %cond41274 = icmp ne i32 %bool41273, 0
+  br i1 %cond41274, label %and.merge12, label %and.false11
+
+and.false11:                                      ; preds = %and.rhs10, %if.else6711
+  br label %and.merge12
+
+and.merge12:                                      ; preds = %and.false11, %and.rhs10
+  %andval41275 = phi i32 [ 1, %and.rhs10 ], [ 0, %and.false11 ]
+  %cond41276 = icmp ne i32 %andval41275, 0
+  br i1 %cond41276, label %if.then6713, label %if.else6714
+
+if.then6716:                                      ; preds = %if.then6713
+  %load41283 = load i32, ptr %arg, align 4
+  %call41285 = call ptr @mir2asm_arg_reg_typed(i32 %load41283, ptr @.strlit41284)
+  store ptr %call41285, ptr %param_reg, align 8
   br label %if.end6718
 
-if.else6717:                                      ; preds = %ifexpr.end6712
-  %load41318 = load ptr, ptr %b, align 8
-  %load41319 = load ptr, ptr %param_ty, align 8
-  %load41320 = load i32, ptr %param_off, align 4
-  %call41321 = call ptr @mir2asm_mem(i32 %load41320)
-  %load41322 = load ptr, ptr %param_reg, align 8
-  call void @mir2asm_emit_save_arg(ptr %load41318, ptr %load41319, ptr %call41321, ptr %load41322)
+if.else6717:                                      ; preds = %if.then6713
+  %load41286 = load i32, ptr %arg, align 4
+  %load41287 = load ptr, ptr %param_ty, align 8
+  %call41288 = call ptr @mir2asm_arg_reg_typed(i32 %load41286, ptr %load41287)
+  store ptr %call41288, ptr %param_reg, align 8
   br label %if.end6718
 
 if.end6718:                                       ; preds = %if.else6717, %if.then6716
-  %load41323 = load ptr, ptr %param_ty, align 8
-  %call41324 = call i32 @mir2asm_type_is_float(ptr %load41323)
-  %cmp41325 = icmp eq i32 %call41324, 1
-  %bool41326 = zext i1 %cmp41325 to i32
-  %cond41327 = icmp ne i32 %bool41326, 0
-  br i1 %cond41327, label %if.then6719, label %if.else6720
+  br label %if.end6715
 
-if.then6719:                                      ; preds = %if.end6718
-  %load41328 = load i32, ptr %float_arg, align 4
-  %add41329 = add i32 %load41328, 1
-  store i32 %add41329, ptr %float_arg, align 4
+if.then6719:                                      ; preds = %if.end6712
+  %load41326 = load i32, ptr %float_arg, align 4
+  %load41327 = load i32, ptr %arg, align 4
+  %call41328 = call ptr @mir2asm_incoming_stack_arg(i32 %load41326, i32 %load41327)
+  %stack_src = alloca ptr, align 8
+  store ptr %call41328, ptr %stack_src, align 8
+  %load41329 = load ptr, ptr %b, align 8
+  %load41330 = load ptr, ptr %param_ty, align 8
+  %call41331 = call i32 @mir2asm_type_is_struct_value(ptr %load41329, ptr %load41330)
+  %cmp41332 = icmp eq i32 %call41331, 1
+  %bool41333 = zext i1 %cmp41332 to i32
+  %cond41334 = icmp ne i32 %bool41333, 0
+  br i1 %cond41334, label %if.then6722, label %if.else6723
+
+if.else6720:                                      ; preds = %if.end6712
+  %load41350 = load ptr, ptr %b, align 8
+  %load41351 = load ptr, ptr %param_ty, align 8
+  %call41352 = call i32 @mir2asm_type_is_struct_value(ptr %load41350, ptr %load41351)
+  %cmp41353 = icmp eq i32 %call41352, 1
+  %bool41354 = zext i1 %cmp41353 to i32
+  %cond41355 = icmp ne i32 %bool41354, 0
+  br i1 %cond41355, label %if.then6725, label %if.else6726
+
+if.end6721:                                       ; preds = %if.end6727, %if.end6724
+  %load41367 = load ptr, ptr %param_ty, align 8
+  %call41368 = call i32 @mir2asm_type_is_float(ptr %load41367)
+  %cmp41369 = icmp eq i32 %call41368, 1
+  %bool41370 = zext i1 %cmp41369 to i32
+  %cond41371 = icmp ne i32 %bool41370, 0
+  br i1 %cond41371, label %if.then6728, label %if.else6729
+
+if.then6722:                                      ; preds = %if.then6719
+  %load41335 = load ptr, ptr %b, align 8
+  %load41337 = load ptr, ptr %stack_src, align 8
+  %call41338 = call ptr @vix_string_concat(ptr @.strlit41336, ptr %load41337)
+  call void @mir2asm_line(ptr %load41335, ptr %call41338)
+  %load41339 = load ptr, ptr %b, align 8
+  %load41340 = load i32, ptr %param_off, align 4
+  %load41342 = load ptr, ptr %b, align 8
+  %load41343 = load ptr, ptr %param_ty, align 8
+  %call41344 = call i32 @mir2asm_type_size_for(ptr %load41342, ptr %load41343)
+  call void @mir2asm_emit_copy_reg_to_stack(ptr %load41339, i32 %load41340, ptr @.strlit41341, i32 %call41344)
+  br label %if.end6724
+
+if.else6723:                                      ; preds = %if.then6719
+  %load41345 = load ptr, ptr %b, align 8
+  %load41346 = load ptr, ptr %param_ty, align 8
+  %load41347 = load i32, ptr %param_off, align 4
+  %call41348 = call ptr @mir2asm_mem(i32 %load41347)
+  %load41349 = load ptr, ptr %stack_src, align 8
+  call void @mir2asm_emit_save_stack_arg(ptr %load41345, ptr %load41346, ptr %call41348, ptr %load41349)
+  br label %if.end6724
+
+if.end6724:                                       ; preds = %if.else6723, %if.then6722
   br label %if.end6721
 
-if.else6720:                                      ; preds = %if.end6718
-  %load41330 = load i32, ptr %arg, align 4
-  %add41331 = add i32 %load41330, 1
-  store i32 %add41331, ptr %arg, align 4
+if.then6725:                                      ; preds = %if.else6720
+  %load41356 = load ptr, ptr %b, align 8
+  %load41357 = load i32, ptr %param_off, align 4
+  %load41358 = load ptr, ptr %param_reg, align 8
+  %load41359 = load ptr, ptr %b, align 8
+  %load41360 = load ptr, ptr %param_ty, align 8
+  %call41361 = call i32 @mir2asm_type_size_for(ptr %load41359, ptr %load41360)
+  call void @mir2asm_emit_copy_reg_to_stack(ptr %load41356, i32 %load41357, ptr %load41358, i32 %call41361)
+  br label %if.end6727
+
+if.else6726:                                      ; preds = %if.else6720
+  %load41362 = load ptr, ptr %b, align 8
+  %load41363 = load ptr, ptr %param_ty, align 8
+  %load41364 = load i32, ptr %param_off, align 4
+  %call41365 = call ptr @mir2asm_mem(i32 %load41364)
+  %load41366 = load ptr, ptr %param_reg, align 8
+  call void @mir2asm_emit_save_arg(ptr %load41362, ptr %load41363, ptr %call41365, ptr %load41366)
+  br label %if.end6727
+
+if.end6727:                                       ; preds = %if.else6726, %if.then6725
   br label %if.end6721
 
-if.end6721:                                       ; preds = %if.else6720, %if.then6719
-  %load41332 = load i32, ptr %ty_end, align 4
-  store i32 %load41332, ptr %pos, align 4
+if.then6728:                                      ; preds = %if.end6721
+  %load41372 = load i32, ptr %float_arg, align 4
+  %add41373 = add i32 %load41372, 1
+  store i32 %add41373, ptr %float_arg, align 4
+  br label %if.end6730
+
+if.else6729:                                      ; preds = %if.end6721
+  %load41374 = load i32, ptr %arg, align 4
+  %add41375 = add i32 %load41374, 1
+  store i32 %add41375, ptr %arg, align 4
+  br label %if.end6730
+
+if.end6730:                                       ; preds = %if.else6729, %if.then6728
+  %load41376 = load i32, ptr %ty_end, align 4
+  store i32 %load41376, ptr %pos, align 4
   br label %if.end6706
+}
+
+define ptr @mir2asm_incoming_stack_arg(i32 %0, i32 %1) {
+entry:
+  %float_arg = alloca i32, align 4
+  store i32 %0, ptr %float_arg, align 4
+  %arg = alloca i32, align 4
+  store i32 %1, ptr %arg, align 4
+  %ifexpr41474 = alloca i32, align 4
+  %load41475 = load i32, ptr %float_arg, align 4
+  %cmp41476 = icmp sgt i32 %load41475, 8
+  %bool41477 = zext i1 %cmp41476 to i32
+  %cond41478 = icmp ne i32 %bool41477, 0
+  br i1 %cond41478, label %ifexpr.then6743, label %ifexpr.else6744
+
+ifexpr.then6743:                                  ; preds = %entry
+  %load41479 = load i32, ptr %float_arg, align 4
+  %sub41480 = sub i32 %load41479, 8
+  store i32 %sub41480, ptr %ifexpr41474, align 4
+  br label %ifexpr.end6745
+
+ifexpr.else6744:                                  ; preds = %entry
+  store i32 0, ptr %ifexpr41474, align 4
+  br label %ifexpr.end6745
+
+ifexpr.end6745:                                   ; preds = %ifexpr.else6744, %ifexpr.then6743
+  %ifexprval41481 = load i32, ptr %ifexpr41474, align 4
+  %overflow_float = alloca i32, align 4
+  store i32 %ifexprval41481, ptr %overflow_float, align 4
+  %ifexpr41482 = alloca i32, align 4
+  %load41483 = load i32, ptr %arg, align 4
+  %cmp41484 = icmp sgt i32 %load41483, 6
+  %bool41485 = zext i1 %cmp41484 to i32
+  %cond41486 = icmp ne i32 %bool41485, 0
+  br i1 %cond41486, label %ifexpr.then6746, label %ifexpr.else6747
+
+ifexpr.then6746:                                  ; preds = %ifexpr.end6745
+  %load41487 = load i32, ptr %arg, align 4
+  %sub41488 = sub i32 %load41487, 6
+  store i32 %sub41488, ptr %ifexpr41482, align 4
+  br label %ifexpr.end6748
+
+ifexpr.else6747:                                  ; preds = %ifexpr.end6745
+  store i32 0, ptr %ifexpr41482, align 4
+  br label %ifexpr.end6748
+
+ifexpr.end6748:                                   ; preds = %ifexpr.else6747, %ifexpr.then6746
+  %ifexprval41489 = load i32, ptr %ifexpr41482, align 4
+  %overflow_arg = alloca i32, align 4
+  store i32 %ifexprval41489, ptr %overflow_arg, align 4
+  %load41491 = load i32, ptr %overflow_float, align 4
+  %load41492 = load i32, ptr %overflow_arg, align 4
+  %add41493 = add i32 %load41491, %load41492
+  %mul41494 = mul i32 %add41493, 8
+  %add41495 = add i32 16, %mul41494
+  %call41496 = call ptr @i32_to_str(i32 %add41495)
+  %call41497 = call ptr @vix_string_concat(ptr @.strlit41490, ptr %call41496)
+  %call41499 = call ptr @vix_string_concat(ptr %call41497, ptr @.strlit41498)
+  ret ptr %call41499
 }
 
 define void @mir2asm_emit_copy_reg_to_stack(ptr %0, i32 %1, ptr %2, i32 %3) {
@@ -79078,106 +79336,189 @@ entry:
   store ptr %2, ptr %reg, align 8
   %size = alloca i32, align 4
   store i32 %3, ptr %size, align 4
-  %load42039 = load ptr, ptr %b, align 8
-  %load42041 = load ptr, ptr %reg, align 8
-  %call42042 = call ptr @vix_string_concat(ptr @.strlit42040, ptr %load42041)
-  call void @mir2asm_line(ptr %load42039, ptr %call42042)
+  %load42301 = load ptr, ptr %b, align 8
+  %load42303 = load ptr, ptr %reg, align 8
+  %call42304 = call ptr @vix_string_concat(ptr @.strlit42302, ptr %load42303)
+  call void @mir2asm_line(ptr %load42301, ptr %call42304)
   %copied = alloca i32, align 4
   store i32 0, ptr %copied, align 4
-  br label %while.cond6812
+  br label %while.cond6850
 
-while.cond6812:                                   ; preds = %if.end6817, %entry
-  %load42043 = load i32, ptr %copied, align 4
-  %load42044 = load i32, ptr %size, align 4
-  %cmp42045 = icmp slt i32 %load42043, %load42044
-  %bool42046 = zext i1 %cmp42045 to i32
-  %cond42047 = icmp ne i32 %bool42046, 0
-  br i1 %cond42047, label %while.body6813, label %while.end6814
+while.cond6850:                                   ; preds = %if.end6855, %entry
+  %load42305 = load i32, ptr %copied, align 4
+  %load42306 = load i32, ptr %size, align 4
+  %cmp42307 = icmp slt i32 %load42305, %load42306
+  %bool42308 = zext i1 %cmp42307 to i32
+  %cond42309 = icmp ne i32 %bool42308, 0
+  br i1 %cond42309, label %while.body6851, label %while.end6852
 
-while.body6813:                                   ; preds = %while.cond6812
-  %load42048 = load i32, ptr %size, align 4
-  %load42049 = load i32, ptr %copied, align 4
-  %sub42050 = sub i32 %load42048, %load42049
+while.body6851:                                   ; preds = %while.cond6850
+  %load42310 = load i32, ptr %size, align 4
+  %load42311 = load i32, ptr %copied, align 4
+  %sub42312 = sub i32 %load42310, %load42311
   %remain = alloca i32, align 4
-  store i32 %sub42050, ptr %remain, align 4
-  %load42051 = load i32, ptr %remain, align 4
-  %cmp42052 = icmp sge i32 %load42051, 8
-  %bool42053 = zext i1 %cmp42052 to i32
-  %cond42054 = icmp ne i32 %bool42053, 0
-  br i1 %cond42054, label %if.then6815, label %if.else6816
+  store i32 %sub42312, ptr %remain, align 4
+  %load42313 = load i32, ptr %remain, align 4
+  %cmp42314 = icmp sge i32 %load42313, 8
+  %bool42315 = zext i1 %cmp42314 to i32
+  %cond42316 = icmp ne i32 %bool42315, 0
+  br i1 %cond42316, label %if.then6853, label %if.else6854
 
-while.end6814:                                    ; preds = %while.cond6812
+while.end6852:                                    ; preds = %while.cond6850
   ret void
 
-if.then6815:                                      ; preds = %while.body6813
-  %load42055 = load ptr, ptr %b, align 8
-  %load42057 = load i32, ptr %copied, align 4
-  %call42058 = call ptr @i32_to_str(i32 %load42057)
-  %call42059 = call ptr @vix_string_concat(ptr @.strlit42056, ptr %call42058)
-  %call42061 = call ptr @vix_string_concat(ptr %call42059, ptr @.strlit42060)
-  call void @mir2asm_line(ptr %load42055, ptr %call42061)
-  %load42062 = load ptr, ptr %b, align 8
-  %load42064 = load i32, ptr %dest_offset, align 4
-  %load42065 = load i32, ptr %copied, align 4
-  %call42066 = call ptr @mir2asm_mem_at(i32 %load42064, i32 %load42065)
-  %call42067 = call ptr @vix_string_concat(ptr @.strlit42063, ptr %call42066)
-  %call42069 = call ptr @vix_string_concat(ptr %call42067, ptr @.strlit42068)
-  call void @mir2asm_line(ptr %load42062, ptr %call42069)
-  %load42070 = load i32, ptr %copied, align 4
-  %add42071 = add i32 %load42070, 8
-  store i32 %add42071, ptr %copied, align 4
-  br label %if.end6817
+if.then6853:                                      ; preds = %while.body6851
+  %load42317 = load ptr, ptr %b, align 8
+  %load42319 = load i32, ptr %copied, align 4
+  %call42320 = call ptr @i32_to_str(i32 %load42319)
+  %call42321 = call ptr @vix_string_concat(ptr @.strlit42318, ptr %call42320)
+  %call42323 = call ptr @vix_string_concat(ptr %call42321, ptr @.strlit42322)
+  call void @mir2asm_line(ptr %load42317, ptr %call42323)
+  %load42324 = load ptr, ptr %b, align 8
+  %load42326 = load i32, ptr %dest_offset, align 4
+  %load42327 = load i32, ptr %copied, align 4
+  %call42328 = call ptr @mir2asm_mem_at(i32 %load42326, i32 %load42327)
+  %call42329 = call ptr @vix_string_concat(ptr @.strlit42325, ptr %call42328)
+  %call42331 = call ptr @vix_string_concat(ptr %call42329, ptr @.strlit42330)
+  call void @mir2asm_line(ptr %load42324, ptr %call42331)
+  %load42332 = load i32, ptr %copied, align 4
+  %add42333 = add i32 %load42332, 8
+  store i32 %add42333, ptr %copied, align 4
+  br label %if.end6855
 
-if.else6816:                                      ; preds = %while.body6813
-  %load42072 = load i32, ptr %remain, align 4
-  %cmp42073 = icmp sge i32 %load42072, 4
-  %bool42074 = zext i1 %cmp42073 to i32
-  %cond42075 = icmp ne i32 %bool42074, 0
-  br i1 %cond42075, label %if.then6818, label %if.else6819
+if.else6854:                                      ; preds = %while.body6851
+  %load42334 = load i32, ptr %remain, align 4
+  %cmp42335 = icmp sge i32 %load42334, 4
+  %bool42336 = zext i1 %cmp42335 to i32
+  %cond42337 = icmp ne i32 %bool42336, 0
+  br i1 %cond42337, label %if.then6856, label %if.else6857
 
-if.end6817:                                       ; preds = %if.end6820, %if.then6815
-  br label %while.cond6812
+if.end6855:                                       ; preds = %if.end6858, %if.then6853
+  br label %while.cond6850
 
-if.then6818:                                      ; preds = %if.else6816
-  %load42076 = load ptr, ptr %b, align 8
-  %load42078 = load i32, ptr %copied, align 4
-  %call42079 = call ptr @i32_to_str(i32 %load42078)
-  %call42080 = call ptr @vix_string_concat(ptr @.strlit42077, ptr %call42079)
-  %call42082 = call ptr @vix_string_concat(ptr %call42080, ptr @.strlit42081)
-  call void @mir2asm_line(ptr %load42076, ptr %call42082)
-  %load42083 = load ptr, ptr %b, align 8
-  %load42085 = load i32, ptr %dest_offset, align 4
-  %load42086 = load i32, ptr %copied, align 4
-  %call42087 = call ptr @mir2asm_mem_at(i32 %load42085, i32 %load42086)
-  %call42088 = call ptr @vix_string_concat(ptr @.strlit42084, ptr %call42087)
-  %call42090 = call ptr @vix_string_concat(ptr %call42088, ptr @.strlit42089)
-  call void @mir2asm_line(ptr %load42083, ptr %call42090)
-  %load42091 = load i32, ptr %copied, align 4
-  %add42092 = add i32 %load42091, 4
-  store i32 %add42092, ptr %copied, align 4
-  br label %if.end6820
+if.then6856:                                      ; preds = %if.else6854
+  %load42338 = load ptr, ptr %b, align 8
+  %load42340 = load i32, ptr %copied, align 4
+  %call42341 = call ptr @i32_to_str(i32 %load42340)
+  %call42342 = call ptr @vix_string_concat(ptr @.strlit42339, ptr %call42341)
+  %call42344 = call ptr @vix_string_concat(ptr %call42342, ptr @.strlit42343)
+  call void @mir2asm_line(ptr %load42338, ptr %call42344)
+  %load42345 = load ptr, ptr %b, align 8
+  %load42347 = load i32, ptr %dest_offset, align 4
+  %load42348 = load i32, ptr %copied, align 4
+  %call42349 = call ptr @mir2asm_mem_at(i32 %load42347, i32 %load42348)
+  %call42350 = call ptr @vix_string_concat(ptr @.strlit42346, ptr %call42349)
+  %call42352 = call ptr @vix_string_concat(ptr %call42350, ptr @.strlit42351)
+  call void @mir2asm_line(ptr %load42345, ptr %call42352)
+  %load42353 = load i32, ptr %copied, align 4
+  %add42354 = add i32 %load42353, 4
+  store i32 %add42354, ptr %copied, align 4
+  br label %if.end6858
 
-if.else6819:                                      ; preds = %if.else6816
-  %load42093 = load ptr, ptr %b, align 8
-  %load42095 = load i32, ptr %copied, align 4
-  %call42096 = call ptr @i32_to_str(i32 %load42095)
-  %call42097 = call ptr @vix_string_concat(ptr @.strlit42094, ptr %call42096)
-  %call42099 = call ptr @vix_string_concat(ptr %call42097, ptr @.strlit42098)
-  call void @mir2asm_line(ptr %load42093, ptr %call42099)
-  %load42100 = load ptr, ptr %b, align 8
-  %load42102 = load i32, ptr %dest_offset, align 4
-  %load42103 = load i32, ptr %copied, align 4
-  %call42104 = call ptr @mir2asm_mem_at(i32 %load42102, i32 %load42103)
-  %call42105 = call ptr @vix_string_concat(ptr @.strlit42101, ptr %call42104)
-  %call42107 = call ptr @vix_string_concat(ptr %call42105, ptr @.strlit42106)
-  call void @mir2asm_line(ptr %load42100, ptr %call42107)
-  %load42108 = load i32, ptr %copied, align 4
-  %add42109 = add i32 %load42108, 1
-  store i32 %add42109, ptr %copied, align 4
-  br label %if.end6820
+if.else6857:                                      ; preds = %if.else6854
+  %load42355 = load ptr, ptr %b, align 8
+  %load42357 = load i32, ptr %copied, align 4
+  %call42358 = call ptr @i32_to_str(i32 %load42357)
+  %call42359 = call ptr @vix_string_concat(ptr @.strlit42356, ptr %call42358)
+  %call42361 = call ptr @vix_string_concat(ptr %call42359, ptr @.strlit42360)
+  call void @mir2asm_line(ptr %load42355, ptr %call42361)
+  %load42362 = load ptr, ptr %b, align 8
+  %load42364 = load i32, ptr %dest_offset, align 4
+  %load42365 = load i32, ptr %copied, align 4
+  %call42366 = call ptr @mir2asm_mem_at(i32 %load42364, i32 %load42365)
+  %call42367 = call ptr @vix_string_concat(ptr @.strlit42363, ptr %call42366)
+  %call42369 = call ptr @vix_string_concat(ptr %call42367, ptr @.strlit42368)
+  call void @mir2asm_line(ptr %load42362, ptr %call42369)
+  %load42370 = load i32, ptr %copied, align 4
+  %add42371 = add i32 %load42370, 1
+  store i32 %add42371, ptr %copied, align 4
+  br label %if.end6858
 
-if.end6820:                                       ; preds = %if.else6819, %if.then6818
-  br label %if.end6817
+if.end6858:                                       ; preds = %if.else6857, %if.then6856
+  br label %if.end6855
+}
+
+define void @mir2asm_emit_save_stack_arg(ptr %0, ptr %1, ptr %2, ptr %3) {
+entry:
+  %b = alloca ptr, align 8
+  store ptr %0, ptr %b, align 8
+  %ty = alloca ptr, align 8
+  store ptr %1, ptr %ty, align 8
+  %dest = alloca ptr, align 8
+  store ptr %2, ptr %dest, align 8
+  %src = alloca ptr, align 8
+  store ptr %3, ptr %src, align 8
+  %load41500 = load ptr, ptr %ty, align 8
+  %strcmp41502 = call i32 @strcmp(ptr %load41500, ptr @.strlit41501)
+  %cmp41503 = icmp eq i32 %strcmp41502, 0
+  %bool41504 = zext i1 %cmp41503 to i32
+  %cond41505 = icmp ne i32 %bool41504, 0
+  br i1 %cond41505, label %if.then6749, label %if.else6750
+
+if.then6749:                                      ; preds = %entry
+  %load41506 = load ptr, ptr %b, align 8
+  %load41508 = load ptr, ptr %src, align 8
+  %call41509 = call ptr @vix_string_concat(ptr @.strlit41507, ptr %load41508)
+  call void @mir2asm_line(ptr %load41506, ptr %call41509)
+  %load41510 = load ptr, ptr %b, align 8
+  %load41512 = load ptr, ptr %dest, align 8
+  %call41513 = call ptr @vix_string_concat(ptr @.strlit41511, ptr %load41512)
+  %call41515 = call ptr @vix_string_concat(ptr %call41513, ptr @.strlit41514)
+  call void @mir2asm_line(ptr %load41510, ptr %call41515)
+  ret void
+
+if.else6750:                                      ; preds = %entry
+  br label %if.end6751
+
+if.end6751:                                       ; preds = %if.else6750
+  %load41516 = load ptr, ptr %ty, align 8
+  %strcmp41518 = call i32 @strcmp(ptr %load41516, ptr @.strlit41517)
+  %cmp41519 = icmp eq i32 %strcmp41518, 0
+  %bool41520 = zext i1 %cmp41519 to i32
+  %cond41521 = icmp ne i32 %bool41520, 0
+  br i1 %cond41521, label %if.then6752, label %if.else6753
+
+if.then6752:                                      ; preds = %if.end6751
+  %load41522 = load ptr, ptr %b, align 8
+  %load41524 = load ptr, ptr %src, align 8
+  %call41525 = call ptr @vix_string_concat(ptr @.strlit41523, ptr %load41524)
+  call void @mir2asm_line(ptr %load41522, ptr %call41525)
+  %load41526 = load ptr, ptr %b, align 8
+  %load41528 = load ptr, ptr %dest, align 8
+  %call41529 = call ptr @vix_string_concat(ptr @.strlit41527, ptr %load41528)
+  %call41531 = call ptr @vix_string_concat(ptr %call41529, ptr @.strlit41530)
+  call void @mir2asm_line(ptr %load41526, ptr %call41531)
+  ret void
+
+if.else6753:                                      ; preds = %if.end6751
+  br label %if.end6754
+
+if.end6754:                                       ; preds = %if.else6753
+  %load41532 = load ptr, ptr %b, align 8
+  %load41534 = load ptr, ptr %ty, align 8
+  %call41535 = call ptr @mir2asm_acc(ptr %load41534)
+  %call41536 = call ptr @vix_string_concat(ptr @.strlit41533, ptr %call41535)
+  %call41538 = call ptr @vix_string_concat(ptr %call41536, ptr @.strlit41537)
+  %load41539 = load ptr, ptr %ty, align 8
+  %call41540 = call ptr @mir2asm_mem_word(ptr %load41539)
+  %call41541 = call ptr @vix_string_concat(ptr %call41538, ptr %call41540)
+  %call41543 = call ptr @vix_string_concat(ptr %call41541, ptr @.strlit41542)
+  %load41544 = load ptr, ptr %src, align 8
+  %call41545 = call ptr @vix_string_concat(ptr %call41543, ptr %load41544)
+  call void @mir2asm_line(ptr %load41532, ptr %call41545)
+  %load41546 = load ptr, ptr %b, align 8
+  %load41548 = load ptr, ptr %ty, align 8
+  %call41549 = call ptr @mir2asm_mem_word(ptr %load41548)
+  %call41550 = call ptr @vix_string_concat(ptr @.strlit41547, ptr %call41549)
+  %call41552 = call ptr @vix_string_concat(ptr %call41550, ptr @.strlit41551)
+  %load41553 = load ptr, ptr %dest, align 8
+  %call41554 = call ptr @vix_string_concat(ptr %call41552, ptr %load41553)
+  %call41556 = call ptr @vix_string_concat(ptr %call41554, ptr @.strlit41555)
+  %load41557 = load ptr, ptr %ty, align 8
+  %call41558 = call ptr @mir2asm_acc(ptr %load41557)
+  %call41559 = call ptr @vix_string_concat(ptr %call41556, ptr %call41558)
+  call void @mir2asm_line(ptr %load41546, ptr %call41559)
+  ret void
 }
 
 define void @mir2asm_emit_save_arg(ptr %0, ptr %1, ptr %2, ptr %3) {
@@ -79190,59 +79531,59 @@ entry:
   store ptr %2, ptr %dest, align 8
   %reg = alloca ptr, align 8
   store ptr %3, ptr %reg, align 8
-  %load41389 = load ptr, ptr %ty, align 8
-  %strcmp41391 = call i32 @strcmp(ptr %load41389, ptr @.strlit41390)
-  %cmp41392 = icmp eq i32 %strcmp41391, 0
-  %bool41393 = zext i1 %cmp41392 to i32
-  %cond41394 = icmp ne i32 %bool41393, 0
-  br i1 %cond41394, label %if.then6728, label %if.else6729
+  %load41433 = load ptr, ptr %ty, align 8
+  %strcmp41435 = call i32 @strcmp(ptr %load41433, ptr @.strlit41434)
+  %cmp41436 = icmp eq i32 %strcmp41435, 0
+  %bool41437 = zext i1 %cmp41436 to i32
+  %cond41438 = icmp ne i32 %bool41437, 0
+  br i1 %cond41438, label %if.then6737, label %if.else6738
 
-if.then6728:                                      ; preds = %entry
-  %load41395 = load ptr, ptr %b, align 8
-  %load41397 = load ptr, ptr %dest, align 8
-  %call41398 = call ptr @vix_string_concat(ptr @.strlit41396, ptr %load41397)
-  %call41400 = call ptr @vix_string_concat(ptr %call41398, ptr @.strlit41399)
-  %load41401 = load ptr, ptr %reg, align 8
-  %call41402 = call ptr @vix_string_concat(ptr %call41400, ptr %load41401)
-  call void @mir2asm_line(ptr %load41395, ptr %call41402)
+if.then6737:                                      ; preds = %entry
+  %load41439 = load ptr, ptr %b, align 8
+  %load41441 = load ptr, ptr %dest, align 8
+  %call41442 = call ptr @vix_string_concat(ptr @.strlit41440, ptr %load41441)
+  %call41444 = call ptr @vix_string_concat(ptr %call41442, ptr @.strlit41443)
+  %load41445 = load ptr, ptr %reg, align 8
+  %call41446 = call ptr @vix_string_concat(ptr %call41444, ptr %load41445)
+  call void @mir2asm_line(ptr %load41439, ptr %call41446)
   ret void
 
-if.else6729:                                      ; preds = %entry
-  br label %if.end6730
+if.else6738:                                      ; preds = %entry
+  br label %if.end6739
 
-if.end6730:                                       ; preds = %if.else6729
-  %load41403 = load ptr, ptr %ty, align 8
-  %strcmp41405 = call i32 @strcmp(ptr %load41403, ptr @.strlit41404)
-  %cmp41406 = icmp eq i32 %strcmp41405, 0
-  %bool41407 = zext i1 %cmp41406 to i32
-  %cond41408 = icmp ne i32 %bool41407, 0
-  br i1 %cond41408, label %if.then6731, label %if.else6732
+if.end6739:                                       ; preds = %if.else6738
+  %load41447 = load ptr, ptr %ty, align 8
+  %strcmp41449 = call i32 @strcmp(ptr %load41447, ptr @.strlit41448)
+  %cmp41450 = icmp eq i32 %strcmp41449, 0
+  %bool41451 = zext i1 %cmp41450 to i32
+  %cond41452 = icmp ne i32 %bool41451, 0
+  br i1 %cond41452, label %if.then6740, label %if.else6741
 
-if.then6731:                                      ; preds = %if.end6730
-  %load41409 = load ptr, ptr %b, align 8
-  %load41411 = load ptr, ptr %dest, align 8
-  %call41412 = call ptr @vix_string_concat(ptr @.strlit41410, ptr %load41411)
-  %call41414 = call ptr @vix_string_concat(ptr %call41412, ptr @.strlit41413)
-  %load41415 = load ptr, ptr %reg, align 8
-  %call41416 = call ptr @vix_string_concat(ptr %call41414, ptr %load41415)
-  call void @mir2asm_line(ptr %load41409, ptr %call41416)
+if.then6740:                                      ; preds = %if.end6739
+  %load41453 = load ptr, ptr %b, align 8
+  %load41455 = load ptr, ptr %dest, align 8
+  %call41456 = call ptr @vix_string_concat(ptr @.strlit41454, ptr %load41455)
+  %call41458 = call ptr @vix_string_concat(ptr %call41456, ptr @.strlit41457)
+  %load41459 = load ptr, ptr %reg, align 8
+  %call41460 = call ptr @vix_string_concat(ptr %call41458, ptr %load41459)
+  call void @mir2asm_line(ptr %load41453, ptr %call41460)
   ret void
 
-if.else6732:                                      ; preds = %if.end6730
-  br label %if.end6733
+if.else6741:                                      ; preds = %if.end6739
+  br label %if.end6742
 
-if.end6733:                                       ; preds = %if.else6732
-  %load41417 = load ptr, ptr %b, align 8
-  %load41419 = load ptr, ptr %ty, align 8
-  %call41420 = call ptr @mir2asm_mem_word(ptr %load41419)
-  %call41421 = call ptr @vix_string_concat(ptr @.strlit41418, ptr %call41420)
-  %call41423 = call ptr @vix_string_concat(ptr %call41421, ptr @.strlit41422)
-  %load41424 = load ptr, ptr %dest, align 8
-  %call41425 = call ptr @vix_string_concat(ptr %call41423, ptr %load41424)
-  %call41427 = call ptr @vix_string_concat(ptr %call41425, ptr @.strlit41426)
-  %load41428 = load ptr, ptr %reg, align 8
-  %call41429 = call ptr @vix_string_concat(ptr %call41427, ptr %load41428)
-  call void @mir2asm_line(ptr %load41417, ptr %call41429)
+if.end6742:                                       ; preds = %if.else6741
+  %load41461 = load ptr, ptr %b, align 8
+  %load41463 = load ptr, ptr %ty, align 8
+  %call41464 = call ptr @mir2asm_mem_word(ptr %load41463)
+  %call41465 = call ptr @vix_string_concat(ptr @.strlit41462, ptr %call41464)
+  %call41467 = call ptr @vix_string_concat(ptr %call41465, ptr @.strlit41466)
+  %load41468 = load ptr, ptr %dest, align 8
+  %call41469 = call ptr @vix_string_concat(ptr %call41467, ptr %load41468)
+  %call41471 = call ptr @vix_string_concat(ptr %call41469, ptr @.strlit41470)
+  %load41472 = load ptr, ptr %reg, align 8
+  %call41473 = call ptr @vix_string_concat(ptr %call41471, ptr %load41472)
+  call void @mir2asm_line(ptr %load41461, ptr %call41473)
   ret void
 }
 
@@ -79250,68 +79591,68 @@ define void @mir2asm_end_function(ptr %0) {
 entry:
   %b = alloca ptr, align 8
   store ptr %0, ptr %b, align 8
-  %load41335 = load ptr, ptr %b, align 8
-  %field41337 = getelementptr %MirAsm, ptr %load41335, i32 0, i32 10
-  %fieldval41338 = load i32, ptr %field41337, align 4
-  %cmp41339 = icmp eq i32 %fieldval41338, 0
-  %bool41340 = zext i1 %cmp41339 to i32
-  %cond41341 = icmp ne i32 %bool41340, 0
-  br i1 %cond41341, label %if.then6722, label %if.else6723
+  %load41379 = load ptr, ptr %b, align 8
+  %field41381 = getelementptr %MirAsm, ptr %load41379, i32 0, i32 10
+  %fieldval41382 = load i32, ptr %field41381, align 4
+  %cmp41383 = icmp eq i32 %fieldval41382, 0
+  %bool41384 = zext i1 %cmp41383 to i32
+  %cond41385 = icmp ne i32 %bool41384, 0
+  br i1 %cond41385, label %if.then6731, label %if.else6732
 
-if.then6722:                                      ; preds = %entry
+if.then6731:                                      ; preds = %entry
   ret void
 
-if.else6723:                                      ; preds = %entry
-  br label %if.end6724
+if.else6732:                                      ; preds = %entry
+  br label %if.end6733
 
-if.end6724:                                       ; preds = %if.else6723
-  %load41342 = load ptr, ptr %b, align 8
-  %field41344 = getelementptr %MirAsm, ptr %load41342, i32 0, i32 15
-  %fieldval41345 = load i32, ptr %field41344, align 4
-  %cmp41346 = icmp sge i32 %fieldval41345, 0
-  %bool41347 = zext i1 %cmp41346 to i32
-  %cond41348 = icmp ne i32 %bool41347, 0
-  br i1 %cond41348, label %if.then6725, label %if.else6726
+if.end6733:                                       ; preds = %if.else6732
+  %load41386 = load ptr, ptr %b, align 8
+  %field41388 = getelementptr %MirAsm, ptr %load41386, i32 0, i32 15
+  %fieldval41389 = load i32, ptr %field41388, align 4
+  %cmp41390 = icmp sge i32 %fieldval41389, 0
+  %bool41391 = zext i1 %cmp41390 to i32
+  %cond41392 = icmp ne i32 %bool41391, 0
+  br i1 %cond41392, label %if.then6734, label %if.else6735
 
-if.then6725:                                      ; preds = %if.end6724
-  %load41349 = load ptr, ptr %b, align 8
-  %field41351 = getelementptr %MirAsm, ptr %load41349, i32 0, i32 9
-  %fieldval41352 = load i32, ptr %field41351, align 4
-  %call41353 = call i32 @mir2asm_align_to(i32 %fieldval41352, i32 16)
+if.then6734:                                      ; preds = %if.end6733
+  %load41393 = load ptr, ptr %b, align 8
+  %field41395 = getelementptr %MirAsm, ptr %load41393, i32 0, i32 9
+  %fieldval41396 = load i32, ptr %field41395, align 4
+  %call41397 = call i32 @mir2asm_align_to(i32 %fieldval41396, i32 16)
   %frame_size = alloca i32, align 4
-  store i32 %call41353, ptr %frame_size, align 4
-  %load41354 = load ptr, ptr %b, align 8
-  %field41356 = getelementptr %MirAsm, ptr %load41354, i32 0, i32 0
-  %fieldval41357 = load ptr, ptr %field41356, align 8
-  %load41358 = load ptr, ptr %b, align 8
-  %field41360 = getelementptr %MirAsm, ptr %load41358, i32 0, i32 15
-  %fieldval41361 = load i32, ptr %field41360, align 4
-  %load41363 = load i32, ptr %frame_size, align 4
-  %call41364 = call ptr @i32_to_str(i32 %load41363)
-  %call41365 = call ptr @vix_string_concat(ptr @.strlit41362, ptr %call41364)
-  %storeidx41366 = getelementptr ptr, ptr %fieldval41357, i32 %fieldval41361
-  store ptr %call41365, ptr %storeidx41366, align 8
-  br label %if.end6727
+  store i32 %call41397, ptr %frame_size, align 4
+  %load41398 = load ptr, ptr %b, align 8
+  %field41400 = getelementptr %MirAsm, ptr %load41398, i32 0, i32 0
+  %fieldval41401 = load ptr, ptr %field41400, align 8
+  %load41402 = load ptr, ptr %b, align 8
+  %field41404 = getelementptr %MirAsm, ptr %load41402, i32 0, i32 15
+  %fieldval41405 = load i32, ptr %field41404, align 4
+  %load41407 = load i32, ptr %frame_size, align 4
+  %call41408 = call ptr @i32_to_str(i32 %load41407)
+  %call41409 = call ptr @vix_string_concat(ptr @.strlit41406, ptr %call41408)
+  %storeidx41410 = getelementptr ptr, ptr %fieldval41401, i32 %fieldval41405
+  store ptr %call41409, ptr %storeidx41410, align 8
+  br label %if.end6736
 
-if.else6726:                                      ; preds = %if.end6724
-  br label %if.end6727
+if.else6735:                                      ; preds = %if.end6733
+  br label %if.end6736
 
-if.end6727:                                       ; preds = %if.else6726, %if.then6725
-  %load41367 = load ptr, ptr %b, align 8
-  %load41368 = load ptr, ptr %b, align 8
-  %field41370 = getelementptr %MirAsm, ptr %load41368, i32 0, i32 14
-  %fieldval41371 = load ptr, ptr %field41370, align 8
-  %call41373 = call ptr @vix_string_concat(ptr %fieldval41371, ptr @.strlit41372)
-  call void @mir2asm_line(ptr %load41367, ptr %call41373)
-  %load41374 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load41374, ptr @.strlit41375)
-  %load41376 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load41376, ptr @.strlit41377)
-  %load41378 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load41378, ptr @.strlit41379)
-  %load41380 = load ptr, ptr %b, align 8
-  %fieldptr41382 = getelementptr %MirAsm, ptr %load41380, i32 0, i32 10
-  store i32 0, ptr %fieldptr41382, align 4
+if.end6736:                                       ; preds = %if.else6735, %if.then6734
+  %load41411 = load ptr, ptr %b, align 8
+  %load41412 = load ptr, ptr %b, align 8
+  %field41414 = getelementptr %MirAsm, ptr %load41412, i32 0, i32 14
+  %fieldval41415 = load ptr, ptr %field41414, align 8
+  %call41417 = call ptr @vix_string_concat(ptr %fieldval41415, ptr @.strlit41416)
+  call void @mir2asm_line(ptr %load41411, ptr %call41417)
+  %load41418 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load41418, ptr @.strlit41419)
+  %load41420 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load41420, ptr @.strlit41421)
+  %load41422 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load41422, ptr @.strlit41423)
+  %load41424 = load ptr, ptr %b, align 8
+  %fieldptr41426 = getelementptr %MirAsm, ptr %load41424, i32 0, i32 10
+  store i32 0, ptr %fieldptr41426, align 4
   ret void
 }
 
@@ -79321,13 +79662,160 @@ entry:
   store ptr %0, ptr %b, align 8
   %line = alloca ptr, align 8
   store ptr %1, ptr %line, align 8
-  %load41383 = load ptr, ptr %b, align 8
-  %load41385 = load ptr, ptr %line, align 8
-  %call41386 = call ptr @vix_string_concat(ptr @.strlit41384, ptr %load41385)
-  call void @mir2asm_line(ptr %load41383, ptr %call41386)
-  %load41387 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load41387, ptr @.strlit41388)
+  %load41427 = load ptr, ptr %b, align 8
+  %load41429 = load ptr, ptr %line, align 8
+  %call41430 = call ptr @vix_string_concat(ptr @.strlit41428, ptr %load41429)
+  call void @mir2asm_line(ptr %load41427, ptr %call41430)
+  %load41431 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load41431, ptr @.strlit41432)
   ret void
+}
+
+define ptr @mir2asm_float_label(ptr %0, ptr %1, ptr %2) {
+entry:
+  %b = alloca ptr, align 8
+  store ptr %0, ptr %b, align 8
+  %val = alloca ptr, align 8
+  store ptr %1, ptr %val, align 8
+  %ty = alloca ptr, align 8
+  store ptr %2, ptr %ty, align 8
+  %load41561 = load ptr, ptr %b, align 8
+  %field41563 = getelementptr %MirAsm, ptr %load41561, i32 0, i32 4
+  %fieldval41564 = load i32, ptr %field41563, align 4
+  %call41565 = call ptr @i32_to_str(i32 %fieldval41564)
+  %call41566 = call ptr @vix_string_concat(ptr @.strlit41560, ptr %call41565)
+  %label = alloca ptr, align 8
+  store ptr %call41566, ptr %label, align 8
+  %load41567 = load ptr, ptr %b, align 8
+  %fieldptr41569 = getelementptr %MirAsm, ptr %load41567, i32 0, i32 4
+  %load41570 = load ptr, ptr %b, align 8
+  %field41572 = getelementptr %MirAsm, ptr %load41570, i32 0, i32 4
+  %fieldval41573 = load i32, ptr %field41572, align 4
+  %add41574 = add i32 %fieldval41573, 1
+  store i32 %add41574, ptr %fieldptr41569, align 4
+  %load41575 = load ptr, ptr %val, align 8
+  %call41576 = call ptr @mir2asm_float_literal(ptr %load41575)
+  %literal = alloca ptr, align 8
+  store ptr %call41576, ptr %literal, align 8
+  %load41577 = load ptr, ptr %ty, align 8
+  %strcmp41579 = call i32 @strcmp(ptr %load41577, ptr @.strlit41578)
+  %cmp41580 = icmp eq i32 %strcmp41579, 0
+  %bool41581 = zext i1 %cmp41580 to i32
+  %cond41582 = icmp ne i32 %bool41581, 0
+  br i1 %cond41582, label %if.then6755, label %if.else6756
+
+if.then6755:                                      ; preds = %entry
+  %load41583 = load ptr, ptr %b, align 8
+  %load41584 = load ptr, ptr %label, align 8
+  %call41586 = call ptr @vix_string_concat(ptr %load41584, ptr @.strlit41585)
+  %load41587 = load ptr, ptr %literal, align 8
+  %call41588 = call ptr @vix_string_concat(ptr %call41586, ptr %load41587)
+  call void @mir2asm_data_line(ptr %load41583, ptr %call41588)
+  br label %if.end6757
+
+if.else6756:                                      ; preds = %entry
+  %load41589 = load ptr, ptr %b, align 8
+  %load41590 = load ptr, ptr %label, align 8
+  %call41592 = call ptr @vix_string_concat(ptr %load41590, ptr @.strlit41591)
+  %load41593 = load ptr, ptr %literal, align 8
+  %call41594 = call ptr @vix_string_concat(ptr %call41592, ptr %load41593)
+  call void @mir2asm_data_line(ptr %load41589, ptr %call41594)
+  br label %if.end6757
+
+if.end6757:                                       ; preds = %if.else6756, %if.then6755
+  %load41595 = load ptr, ptr %label, align 8
+  ret ptr %load41595
+}
+
+define ptr @mir2asm_float_literal(ptr %0) {
+entry:
+  %val = alloca ptr, align 8
+  store ptr %0, ptr %val, align 8
+  %load41596 = load ptr, ptr %val, align 8
+  %strlen41597 = call i32 @strlen(ptr %load41596)
+  %i = alloca i32, align 4
+  store i32 0, ptr %i, align 4
+  %__for_end_i6762 = alloca i32, align 4
+  store i32 %strlen41597, ptr %__for_end_i6762, align 4
+  br label %for.cond6758
+
+for.cond6758:                                     ; preds = %for.step6760, %entry
+  %load41598 = load i32, ptr %i, align 4
+  %load41599 = load i32, ptr %__for_end_i6762, align 4
+  %cmp41600 = icmp slt i32 %load41598, %load41599
+  %bool41601 = zext i1 %cmp41600 to i32
+  %cond41602 = icmp ne i32 %bool41601, 0
+  br i1 %cond41602, label %for.body6759, label %for.end6761
+
+for.body6759:                                     ; preds = %for.cond6758
+  %load41603 = load ptr, ptr %val, align 8
+  %load41604 = load i32, ptr %i, align 4
+  %sidx41605 = getelementptr i8, ptr %load41603, i32 %load41604
+  %sbyte41606 = load i8, ptr %sidx41605, align 1
+  %schar41607 = zext i8 %sbyte41606 to i32
+  %cmp41608 = icmp eq i32 %schar41607, 46
+  %bool41609 = zext i1 %cmp41608 to i32
+  %cond41610 = icmp ne i32 %bool41609, 0
+  br i1 %cond41610, label %or.true, label %or.rhs
+
+for.step6760:                                     ; preds = %if.end6765
+  %load41632 = load i32, ptr %i, align 4
+  %add41633 = add i32 %load41632, 1
+  store i32 %add41633, ptr %i, align 4
+  br label %for.cond6758
+
+for.end6761:                                      ; preds = %for.cond6758
+  %load41634 = load ptr, ptr %val, align 8
+  %call41636 = call ptr @vix_string_concat(ptr %load41634, ptr @.strlit41635)
+  ret ptr %call41636
+
+if.then6763:                                      ; preds = %or.merge3
+  %load41631 = load ptr, ptr %val, align 8
+  ret ptr %load41631
+
+if.else6764:                                      ; preds = %or.merge3
+  br label %if.end6765
+
+if.end6765:                                       ; preds = %if.else6764
+  br label %for.step6760
+
+or.true:                                          ; preds = %or.rhs, %for.body6759
+  br label %or.merge
+
+or.rhs:                                           ; preds = %for.body6759
+  %load41611 = load ptr, ptr %val, align 8
+  %load41612 = load i32, ptr %i, align 4
+  %sidx41613 = getelementptr i8, ptr %load41611, i32 %load41612
+  %sbyte41614 = load i8, ptr %sidx41613, align 1
+  %schar41615 = zext i8 %sbyte41614 to i32
+  %cmp41616 = icmp eq i32 %schar41615, 101
+  %bool41617 = zext i1 %cmp41616 to i32
+  %cond41618 = icmp ne i32 %bool41617, 0
+  br i1 %cond41618, label %or.true, label %or.merge
+
+or.merge:                                         ; preds = %or.true, %or.rhs
+  %orval41619 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond41620 = icmp ne i32 %orval41619, 0
+  br i1 %cond41620, label %or.true1, label %or.rhs2
+
+or.true1:                                         ; preds = %or.rhs2, %or.merge
+  br label %or.merge3
+
+or.rhs2:                                          ; preds = %or.merge
+  %load41621 = load ptr, ptr %val, align 8
+  %load41622 = load i32, ptr %i, align 4
+  %sidx41623 = getelementptr i8, ptr %load41621, i32 %load41622
+  %sbyte41624 = load i8, ptr %sidx41623, align 1
+  %schar41625 = zext i8 %sbyte41624 to i32
+  %cmp41626 = icmp eq i32 %schar41625, 69
+  %bool41627 = zext i1 %cmp41626 to i32
+  %cond41628 = icmp ne i32 %bool41627, 0
+  br i1 %cond41628, label %or.true1, label %or.merge3
+
+or.merge3:                                        ; preds = %or.true1, %or.rhs2
+  %orval41629 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond41630 = icmp ne i32 %orval41629, 0
+  br i1 %cond41630, label %if.then6763, label %if.else6764
 }
 
 define void @mir2asm_emit_load_float_arg(ptr %0, ptr %1, ptr %2, ptr %3) {
@@ -79340,128 +79828,216 @@ entry:
   store ptr %2, ptr %val, align 8
   %ty = alloca ptr, align 8
   store ptr %3, ptr %ty, align 8
-  %load41430 = load ptr, ptr %val, align 8
-  %call41431 = call ptr @mir2asm_trim(ptr %load41430)
+  %load41637 = load ptr, ptr %val, align 8
+  %call41638 = call ptr @mir2asm_trim(ptr %load41637)
   %v = alloca ptr, align 8
-  store ptr %call41431, ptr %v, align 8
-  %load41432 = load ptr, ptr %v, align 8
-  %strcmp41434 = call i32 @strcmp(ptr %load41432, ptr @.strlit41433)
-  %cmp41435 = icmp eq i32 %strcmp41434, 0
-  %bool41436 = zext i1 %cmp41435 to i32
-  %cond41437 = icmp ne i32 %bool41436, 0
-  br i1 %cond41437, label %or.true, label %or.rhs
+  store ptr %call41638, ptr %v, align 8
+  %load41639 = load ptr, ptr %v, align 8
+  %strcmp41641 = call i32 @strcmp(ptr %load41639, ptr @.strlit41640)
+  %cmp41642 = icmp eq i32 %strcmp41641, 0
+  %bool41643 = zext i1 %cmp41642 to i32
+  %cond41644 = icmp ne i32 %bool41643, 0
+  br i1 %cond41644, label %or.true, label %or.rhs
 
-if.then6734:                                      ; preds = %or.merge3
-  %load41454 = load ptr, ptr %b, align 8
-  %load41456 = load ptr, ptr %reg, align 8
-  %call41457 = call ptr @vix_string_concat(ptr @.strlit41455, ptr %load41456)
-  %call41459 = call ptr @vix_string_concat(ptr %call41457, ptr @.strlit41458)
-  %load41460 = load ptr, ptr %reg, align 8
-  %call41461 = call ptr @vix_string_concat(ptr %call41459, ptr %load41460)
-  call void @mir2asm_line(ptr %load41454, ptr %call41461)
+if.then6766:                                      ; preds = %or.merge3
+  %load41661 = load ptr, ptr %b, align 8
+  %load41663 = load ptr, ptr %reg, align 8
+  %call41664 = call ptr @vix_string_concat(ptr @.strlit41662, ptr %load41663)
+  %call41666 = call ptr @vix_string_concat(ptr %call41664, ptr @.strlit41665)
+  %load41667 = load ptr, ptr %reg, align 8
+  %call41668 = call ptr @vix_string_concat(ptr %call41666, ptr %load41667)
+  call void @mir2asm_line(ptr %load41661, ptr %call41668)
   ret void
 
-if.else6735:                                      ; preds = %or.merge3
-  br label %if.end6736
+if.else6767:                                      ; preds = %or.merge3
+  br label %if.end6768
 
-if.end6736:                                       ; preds = %if.else6735
-  %load41462 = load ptr, ptr %b, align 8
-  %load41463 = load ptr, ptr %v, align 8
-  %call41464 = call i32 @mir2asm_find_name(ptr %load41462, ptr %load41463)
+if.end6768:                                       ; preds = %if.else6767
+  %load41669 = load ptr, ptr %b, align 8
+  %load41670 = load ptr, ptr %v, align 8
+  %call41671 = call i32 @mir2asm_find_name(ptr %load41669, ptr %load41670)
   %val_idx = alloca i32, align 4
-  store i32 %call41464, ptr %val_idx, align 4
-  %load41465 = load i32, ptr %val_idx, align 4
-  %cmp41466 = icmp sge i32 %load41465, 0
-  %bool41467 = zext i1 %cmp41466 to i32
-  %cond41468 = icmp ne i32 %bool41467, 0
-  br i1 %cond41468, label %if.then6737, label %if.else6738
+  store i32 %call41671, ptr %val_idx, align 4
+  %load41672 = load i32, ptr %val_idx, align 4
+  %cmp41673 = icmp sge i32 %load41672, 0
+  %bool41674 = zext i1 %cmp41673 to i32
+  %cond41675 = icmp ne i32 %bool41674, 0
+  br i1 %cond41675, label %if.then6769, label %if.else6770
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load41438 = load ptr, ptr %v, align 8
-  %strcmp41440 = call i32 @strcmp(ptr %load41438, ptr @.strlit41439)
-  %cmp41441 = icmp eq i32 %strcmp41440, 0
-  %bool41442 = zext i1 %cmp41441 to i32
-  %cond41443 = icmp ne i32 %bool41442, 0
-  br i1 %cond41443, label %or.true, label %or.merge
+  %load41645 = load ptr, ptr %v, align 8
+  %strcmp41647 = call i32 @strcmp(ptr %load41645, ptr @.strlit41646)
+  %cmp41648 = icmp eq i32 %strcmp41647, 0
+  %bool41649 = zext i1 %cmp41648 to i32
+  %cond41650 = icmp ne i32 %bool41649, 0
+  br i1 %cond41650, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval41444 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond41445 = icmp ne i32 %orval41444, 0
-  br i1 %cond41445, label %or.true1, label %or.rhs2
+  %orval41651 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond41652 = icmp ne i32 %orval41651, 0
+  br i1 %cond41652, label %or.true1, label %or.rhs2
 
 or.true1:                                         ; preds = %or.rhs2, %or.merge
   br label %or.merge3
 
 or.rhs2:                                          ; preds = %or.merge
-  %load41446 = load ptr, ptr %v, align 8
-  %strcmp41448 = call i32 @strcmp(ptr %load41446, ptr @.strlit41447)
-  %cmp41449 = icmp eq i32 %strcmp41448, 0
-  %bool41450 = zext i1 %cmp41449 to i32
-  %cond41451 = icmp ne i32 %bool41450, 0
-  br i1 %cond41451, label %or.true1, label %or.merge3
+  %load41653 = load ptr, ptr %v, align 8
+  %strcmp41655 = call i32 @strcmp(ptr %load41653, ptr @.strlit41654)
+  %cmp41656 = icmp eq i32 %strcmp41655, 0
+  %bool41657 = zext i1 %cmp41656 to i32
+  %cond41658 = icmp ne i32 %bool41657, 0
+  br i1 %cond41658, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval41452 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond41453 = icmp ne i32 %orval41452, 0
-  br i1 %cond41453, label %if.then6734, label %if.else6735
+  %orval41659 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond41660 = icmp ne i32 %orval41659, 0
+  br i1 %cond41660, label %if.then6766, label %if.else6767
 
-if.then6737:                                      ; preds = %if.end6736
-  %load41469 = load ptr, ptr %ty, align 8
-  %strcmp41471 = call i32 @strcmp(ptr %load41469, ptr @.strlit41470)
-  %cmp41472 = icmp eq i32 %strcmp41471, 0
-  %bool41473 = zext i1 %cmp41472 to i32
-  %cond41474 = icmp ne i32 %bool41473, 0
-  br i1 %cond41474, label %if.then6740, label %if.else6741
+if.then6769:                                      ; preds = %if.end6768
+  %load41676 = load ptr, ptr %ty, align 8
+  %strcmp41678 = call i32 @strcmp(ptr %load41676, ptr @.strlit41677)
+  %cmp41679 = icmp eq i32 %strcmp41678, 0
+  %bool41680 = zext i1 %cmp41679 to i32
+  %cond41681 = icmp ne i32 %bool41680, 0
+  br i1 %cond41681, label %if.then6772, label %if.else6773
 
-if.else6738:                                      ; preds = %if.end6736
-  br label %if.end6739
+if.else6770:                                      ; preds = %if.end6768
+  br label %if.end6771
 
-if.end6739:                                       ; preds = %if.else6738
-  %load41505 = load ptr, ptr %b, align 8
-  %load41507 = load ptr, ptr %reg, align 8
-  %call41508 = call ptr @vix_string_concat(ptr @.strlit41506, ptr %load41507)
-  %call41510 = call ptr @vix_string_concat(ptr %call41508, ptr @.strlit41509)
-  %load41511 = load ptr, ptr %reg, align 8
-  %call41512 = call ptr @vix_string_concat(ptr %call41510, ptr %load41511)
-  call void @mir2asm_line(ptr %load41505, ptr %call41512)
+if.end6771:                                       ; preds = %if.else6770
+  %load41712 = load ptr, ptr %v, align 8
+  %sidx41713 = getelementptr i8, ptr %load41712, i32 0
+  %sbyte41714 = load i8, ptr %sidx41713, align 1
+  %schar41715 = zext i8 %sbyte41714 to i32
+  %cmp41716 = icmp sge i32 %schar41715, 48
+  %bool41717 = zext i1 %cmp41716 to i32
+  %cond41718 = icmp ne i32 %bool41717, 0
+  br i1 %cond41718, label %and.rhs, label %and.false
+
+if.then6772:                                      ; preds = %if.then6769
+  %load41682 = load ptr, ptr %b, align 8
+  %load41684 = load ptr, ptr %reg, align 8
+  %call41685 = call ptr @vix_string_concat(ptr @.strlit41683, ptr %load41684)
+  %call41687 = call ptr @vix_string_concat(ptr %call41685, ptr @.strlit41686)
+  %load41688 = load ptr, ptr %b, align 8
+  %field41690 = getelementptr %MirAsm, ptr %load41688, i32 0, i32 6
+  %fieldval41691 = load ptr, ptr %field41690, align 8
+  %load41692 = load i32, ptr %val_idx, align 4
+  %idx41693 = getelementptr i32, ptr %fieldval41691, i32 %load41692
+  %loadidx41694 = load i32, ptr %idx41693, align 4
+  %call41695 = call ptr @mir2asm_mem(i32 %loadidx41694)
+  %call41696 = call ptr @vix_string_concat(ptr %call41687, ptr %call41695)
+  call void @mir2asm_line(ptr %load41682, ptr %call41696)
+  br label %if.end6774
+
+if.else6773:                                      ; preds = %if.then6769
+  %load41697 = load ptr, ptr %b, align 8
+  %load41699 = load ptr, ptr %reg, align 8
+  %call41700 = call ptr @vix_string_concat(ptr @.strlit41698, ptr %load41699)
+  %call41702 = call ptr @vix_string_concat(ptr %call41700, ptr @.strlit41701)
+  %load41703 = load ptr, ptr %b, align 8
+  %field41705 = getelementptr %MirAsm, ptr %load41703, i32 0, i32 6
+  %fieldval41706 = load ptr, ptr %field41705, align 8
+  %load41707 = load i32, ptr %val_idx, align 4
+  %idx41708 = getelementptr i32, ptr %fieldval41706, i32 %load41707
+  %loadidx41709 = load i32, ptr %idx41708, align 4
+  %call41710 = call ptr @mir2asm_mem(i32 %loadidx41709)
+  %call41711 = call ptr @vix_string_concat(ptr %call41702, ptr %call41710)
+  call void @mir2asm_line(ptr %load41697, ptr %call41711)
+  br label %if.end6774
+
+if.end6774:                                       ; preds = %if.else6773, %if.then6772
   ret void
 
-if.then6740:                                      ; preds = %if.then6737
-  %load41475 = load ptr, ptr %b, align 8
-  %load41477 = load ptr, ptr %reg, align 8
-  %call41478 = call ptr @vix_string_concat(ptr @.strlit41476, ptr %load41477)
-  %call41480 = call ptr @vix_string_concat(ptr %call41478, ptr @.strlit41479)
-  %load41481 = load ptr, ptr %b, align 8
-  %field41483 = getelementptr %MirAsm, ptr %load41481, i32 0, i32 6
-  %fieldval41484 = load ptr, ptr %field41483, align 8
-  %load41485 = load i32, ptr %val_idx, align 4
-  %idx41486 = getelementptr i32, ptr %fieldval41484, i32 %load41485
-  %loadidx41487 = load i32, ptr %idx41486, align 4
-  %call41488 = call ptr @mir2asm_mem(i32 %loadidx41487)
-  %call41489 = call ptr @vix_string_concat(ptr %call41480, ptr %call41488)
-  call void @mir2asm_line(ptr %load41475, ptr %call41489)
-  br label %if.end6742
+if.then6775:                                      ; preds = %or.merge6
+  %load41737 = load ptr, ptr %b, align 8
+  %load41738 = load ptr, ptr %v, align 8
+  %load41739 = load ptr, ptr %ty, align 8
+  %call41740 = call ptr @mir2asm_float_label(ptr %load41737, ptr %load41738, ptr %load41739)
+  %label = alloca ptr, align 8
+  store ptr %call41740, ptr %label, align 8
+  %load41741 = load ptr, ptr %ty, align 8
+  %strcmp41743 = call i32 @strcmp(ptr %load41741, ptr @.strlit41742)
+  %cmp41744 = icmp eq i32 %strcmp41743, 0
+  %bool41745 = zext i1 %cmp41744 to i32
+  %cond41746 = icmp ne i32 %bool41745, 0
+  br i1 %cond41746, label %if.then6778, label %if.else6779
 
-if.else6741:                                      ; preds = %if.then6737
-  %load41490 = load ptr, ptr %b, align 8
-  %load41492 = load ptr, ptr %reg, align 8
-  %call41493 = call ptr @vix_string_concat(ptr @.strlit41491, ptr %load41492)
-  %call41495 = call ptr @vix_string_concat(ptr %call41493, ptr @.strlit41494)
-  %load41496 = load ptr, ptr %b, align 8
-  %field41498 = getelementptr %MirAsm, ptr %load41496, i32 0, i32 6
-  %fieldval41499 = load ptr, ptr %field41498, align 8
-  %load41500 = load i32, ptr %val_idx, align 4
-  %idx41501 = getelementptr i32, ptr %fieldval41499, i32 %load41500
-  %loadidx41502 = load i32, ptr %idx41501, align 4
-  %call41503 = call ptr @mir2asm_mem(i32 %loadidx41502)
-  %call41504 = call ptr @vix_string_concat(ptr %call41495, ptr %call41503)
-  call void @mir2asm_line(ptr %load41490, ptr %call41504)
-  br label %if.end6742
+if.else6776:                                      ; preds = %or.merge6
+  br label %if.end6777
 
-if.end6742:                                       ; preds = %if.else6741, %if.then6740
+if.end6777:                                       ; preds = %if.else6776
+  %load41767 = load ptr, ptr %b, align 8
+  %load41769 = load ptr, ptr %reg, align 8
+  %call41770 = call ptr @vix_string_concat(ptr @.strlit41768, ptr %load41769)
+  %call41772 = call ptr @vix_string_concat(ptr %call41770, ptr @.strlit41771)
+  %load41773 = load ptr, ptr %reg, align 8
+  %call41774 = call ptr @vix_string_concat(ptr %call41772, ptr %load41773)
+  call void @mir2asm_line(ptr %load41767, ptr %call41774)
+  ret void
+
+and.rhs:                                          ; preds = %if.end6771
+  %load41719 = load ptr, ptr %v, align 8
+  %sidx41720 = getelementptr i8, ptr %load41719, i32 0
+  %sbyte41721 = load i8, ptr %sidx41720, align 1
+  %schar41722 = zext i8 %sbyte41721 to i32
+  %cmp41723 = icmp sle i32 %schar41722, 57
+  %bool41724 = zext i1 %cmp41723 to i32
+  %cond41725 = icmp ne i32 %bool41724, 0
+  br i1 %cond41725, label %and.merge, label %and.false
+
+and.false:                                        ; preds = %and.rhs, %if.end6771
+  br label %and.merge
+
+and.merge:                                        ; preds = %and.false, %and.rhs
+  %andval41726 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond41727 = icmp ne i32 %andval41726, 0
+  br i1 %cond41727, label %or.true4, label %or.rhs5
+
+or.true4:                                         ; preds = %or.rhs5, %and.merge
+  br label %or.merge6
+
+or.rhs5:                                          ; preds = %and.merge
+  %load41728 = load ptr, ptr %v, align 8
+  %sidx41729 = getelementptr i8, ptr %load41728, i32 0
+  %sbyte41730 = load i8, ptr %sidx41729, align 1
+  %schar41731 = zext i8 %sbyte41730 to i32
+  %cmp41732 = icmp eq i32 %schar41731, 45
+  %bool41733 = zext i1 %cmp41732 to i32
+  %cond41734 = icmp ne i32 %bool41733, 0
+  br i1 %cond41734, label %or.true4, label %or.merge6
+
+or.merge6:                                        ; preds = %or.true4, %or.rhs5
+  %orval41735 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond41736 = icmp ne i32 %orval41735, 0
+  br i1 %cond41736, label %if.then6775, label %if.else6776
+
+if.then6778:                                      ; preds = %if.then6775
+  %load41747 = load ptr, ptr %b, align 8
+  %load41749 = load ptr, ptr %reg, align 8
+  %call41750 = call ptr @vix_string_concat(ptr @.strlit41748, ptr %load41749)
+  %call41752 = call ptr @vix_string_concat(ptr %call41750, ptr @.strlit41751)
+  %load41753 = load ptr, ptr %label, align 8
+  %call41754 = call ptr @vix_string_concat(ptr %call41752, ptr %load41753)
+  %call41756 = call ptr @vix_string_concat(ptr %call41754, ptr @.strlit41755)
+  call void @mir2asm_line(ptr %load41747, ptr %call41756)
+  br label %if.end6780
+
+if.else6779:                                      ; preds = %if.then6775
+  %load41757 = load ptr, ptr %b, align 8
+  %load41759 = load ptr, ptr %reg, align 8
+  %call41760 = call ptr @vix_string_concat(ptr @.strlit41758, ptr %load41759)
+  %call41762 = call ptr @vix_string_concat(ptr %call41760, ptr @.strlit41761)
+  %load41763 = load ptr, ptr %label, align 8
+  %call41764 = call ptr @vix_string_concat(ptr %call41762, ptr %load41763)
+  %call41766 = call ptr @vix_string_concat(ptr %call41764, ptr @.strlit41765)
+  call void @mir2asm_line(ptr %load41757, ptr %call41766)
+  br label %if.end6780
+
+if.end6780:                                       ; preds = %if.else6779, %if.then6778
   ret void
 }
 
@@ -79475,85 +80051,85 @@ entry:
   store ptr %2, ptr %val, align 8
   %ty = alloca ptr, align 8
   store ptr %3, ptr %ty, align 8
-  %load41513 = load ptr, ptr %b, align 8
-  %load41514 = load ptr, ptr %val, align 8
-  %call41515 = call i32 @mir2asm_find_name(ptr %load41513, ptr %load41514)
+  %load41775 = load ptr, ptr %b, align 8
+  %load41776 = load ptr, ptr %val, align 8
+  %call41777 = call i32 @mir2asm_find_name(ptr %load41775, ptr %load41776)
   %idx = alloca i32, align 4
-  store i32 %call41515, ptr %idx, align 4
-  %load41516 = load i32, ptr %idx, align 4
-  %cmp41517 = icmp sge i32 %load41516, 0
-  %bool41518 = zext i1 %cmp41517 to i32
-  %cond41519 = icmp ne i32 %bool41518, 0
-  br i1 %cond41519, label %and.rhs, label %and.false
+  store i32 %call41777, ptr %idx, align 4
+  %load41778 = load i32, ptr %idx, align 4
+  %cmp41779 = icmp sge i32 %load41778, 0
+  %bool41780 = zext i1 %cmp41779 to i32
+  %cond41781 = icmp ne i32 %bool41780, 0
+  br i1 %cond41781, label %and.rhs, label %and.false
 
-if.then6743:                                      ; preds = %and.merge3
-  %load41540 = load ptr, ptr %b, align 8
-  %load41542 = load ptr, ptr %reg, align 8
-  %call41543 = call ptr @vix_string_concat(ptr @.strlit41541, ptr %load41542)
-  %call41545 = call ptr @vix_string_concat(ptr %call41543, ptr @.strlit41544)
-  %load41546 = load ptr, ptr %b, align 8
-  %field41548 = getelementptr %MirAsm, ptr %load41546, i32 0, i32 6
-  %fieldval41549 = load ptr, ptr %field41548, align 8
-  %load41550 = load i32, ptr %idx, align 4
-  %idx41551 = getelementptr i32, ptr %fieldval41549, i32 %load41550
-  %loadidx41552 = load i32, ptr %idx41551, align 4
-  %call41553 = call ptr @mir2asm_mem(i32 %loadidx41552)
-  %call41554 = call ptr @vix_string_concat(ptr %call41545, ptr %call41553)
-  call void @mir2asm_line(ptr %load41540, ptr %call41554)
+if.then6781:                                      ; preds = %and.merge3
+  %load41802 = load ptr, ptr %b, align 8
+  %load41804 = load ptr, ptr %reg, align 8
+  %call41805 = call ptr @vix_string_concat(ptr @.strlit41803, ptr %load41804)
+  %call41807 = call ptr @vix_string_concat(ptr %call41805, ptr @.strlit41806)
+  %load41808 = load ptr, ptr %b, align 8
+  %field41810 = getelementptr %MirAsm, ptr %load41808, i32 0, i32 6
+  %fieldval41811 = load ptr, ptr %field41810, align 8
+  %load41812 = load i32, ptr %idx, align 4
+  %idx41813 = getelementptr i32, ptr %fieldval41811, i32 %load41812
+  %loadidx41814 = load i32, ptr %idx41813, align 4
+  %call41815 = call ptr @mir2asm_mem(i32 %loadidx41814)
+  %call41816 = call ptr @vix_string_concat(ptr %call41807, ptr %call41815)
+  call void @mir2asm_line(ptr %load41802, ptr %call41816)
   ret void
 
-if.else6744:                                      ; preds = %and.merge3
-  br label %if.end6745
+if.else6782:                                      ; preds = %and.merge3
+  br label %if.end6783
 
-if.end6745:                                       ; preds = %if.else6744
-  %load41555 = load ptr, ptr %b, align 8
-  %load41557 = load ptr, ptr %reg, align 8
-  %call41558 = call ptr @vix_string_concat(ptr @.strlit41556, ptr %load41557)
-  %call41560 = call ptr @vix_string_concat(ptr %call41558, ptr @.strlit41559)
-  %load41561 = load ptr, ptr %b, align 8
-  %load41562 = load ptr, ptr %val, align 8
-  %load41563 = load ptr, ptr %ty, align 8
-  %call41564 = call ptr @mir2asm_operand_typed(ptr %load41561, ptr %load41562, ptr %load41563)
-  %call41565 = call ptr @vix_string_concat(ptr %call41560, ptr %call41564)
-  call void @mir2asm_line(ptr %load41555, ptr %call41565)
+if.end6783:                                       ; preds = %if.else6782
+  %load41817 = load ptr, ptr %b, align 8
+  %load41819 = load ptr, ptr %reg, align 8
+  %call41820 = call ptr @vix_string_concat(ptr @.strlit41818, ptr %load41819)
+  %call41822 = call ptr @vix_string_concat(ptr %call41820, ptr @.strlit41821)
+  %load41823 = load ptr, ptr %b, align 8
+  %load41824 = load ptr, ptr %val, align 8
+  %load41825 = load ptr, ptr %ty, align 8
+  %call41826 = call ptr @mir2asm_operand_typed(ptr %load41823, ptr %load41824, ptr %load41825)
+  %call41827 = call ptr @vix_string_concat(ptr %call41822, ptr %call41826)
+  call void @mir2asm_line(ptr %load41817, ptr %call41827)
   ret void
 
 and.rhs:                                          ; preds = %entry
-  %load41520 = load ptr, ptr %b, align 8
-  %field41522 = getelementptr %MirAsm, ptr %load41520, i32 0, i32 8
-  %fieldval41523 = load ptr, ptr %field41522, align 8
-  %load41524 = load i32, ptr %idx, align 4
-  %idx41525 = getelementptr ptr, ptr %fieldval41523, i32 %load41524
-  %loadidx41526 = load ptr, ptr %idx41525, align 8
-  %call41527 = call i32 @mir2asm_type_is_byte(ptr %loadidx41526)
-  %cmp41528 = icmp eq i32 %call41527, 1
-  %bool41529 = zext i1 %cmp41528 to i32
-  %cond41530 = icmp ne i32 %bool41529, 0
-  br i1 %cond41530, label %and.merge, label %and.false
+  %load41782 = load ptr, ptr %b, align 8
+  %field41784 = getelementptr %MirAsm, ptr %load41782, i32 0, i32 8
+  %fieldval41785 = load ptr, ptr %field41784, align 8
+  %load41786 = load i32, ptr %idx, align 4
+  %idx41787 = getelementptr ptr, ptr %fieldval41785, i32 %load41786
+  %loadidx41788 = load ptr, ptr %idx41787, align 8
+  %call41789 = call i32 @mir2asm_type_is_byte(ptr %loadidx41788)
+  %cmp41790 = icmp eq i32 %call41789, 1
+  %bool41791 = zext i1 %cmp41790 to i32
+  %cond41792 = icmp ne i32 %bool41791, 0
+  br i1 %cond41792, label %and.merge, label %and.false
 
 and.false:                                        ; preds = %and.rhs, %entry
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval41531 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond41532 = icmp ne i32 %andval41531, 0
-  br i1 %cond41532, label %and.rhs1, label %and.false2
+  %andval41793 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond41794 = icmp ne i32 %andval41793, 0
+  br i1 %cond41794, label %and.rhs1, label %and.false2
 
 and.rhs1:                                         ; preds = %and.merge
-  %load41533 = load ptr, ptr %ty, align 8
-  %call41534 = call i32 @mir2asm_type_is_byte(ptr %load41533)
-  %cmp41535 = icmp eq i32 %call41534, 0
-  %bool41536 = zext i1 %cmp41535 to i32
-  %cond41537 = icmp ne i32 %bool41536, 0
-  br i1 %cond41537, label %and.merge3, label %and.false2
+  %load41795 = load ptr, ptr %ty, align 8
+  %call41796 = call i32 @mir2asm_type_is_byte(ptr %load41795)
+  %cmp41797 = icmp eq i32 %call41796, 0
+  %bool41798 = zext i1 %cmp41797 to i32
+  %cond41799 = icmp ne i32 %bool41798, 0
+  br i1 %cond41799, label %and.merge3, label %and.false2
 
 and.false2:                                       ; preds = %and.rhs1, %and.merge
   br label %and.merge3
 
 and.merge3:                                       ; preds = %and.false2, %and.rhs1
-  %andval41538 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
-  %cond41539 = icmp ne i32 %andval41538, 0
-  br i1 %cond41539, label %if.then6743, label %if.else6744
+  %andval41800 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
+  %cond41801 = icmp ne i32 %andval41800, 0
+  br i1 %cond41801, label %if.then6781, label %if.else6782
 }
 
 define ptr @mir2asm_emit_prepare_int_operand(ptr %0, ptr %1, ptr %2, ptr %3) {
@@ -79566,80 +80142,80 @@ entry:
   store ptr %2, ptr %val, align 8
   %ty = alloca ptr, align 8
   store ptr %3, ptr %ty, align 8
-  %load41566 = load ptr, ptr %b, align 8
-  %load41567 = load ptr, ptr %val, align 8
-  %call41568 = call i32 @mir2asm_find_name(ptr %load41566, ptr %load41567)
+  %load41828 = load ptr, ptr %b, align 8
+  %load41829 = load ptr, ptr %val, align 8
+  %call41830 = call i32 @mir2asm_find_name(ptr %load41828, ptr %load41829)
   %idx = alloca i32, align 4
-  store i32 %call41568, ptr %idx, align 4
-  %load41569 = load i32, ptr %idx, align 4
-  %cmp41570 = icmp sge i32 %load41569, 0
-  %bool41571 = zext i1 %cmp41570 to i32
-  %cond41572 = icmp ne i32 %bool41571, 0
-  br i1 %cond41572, label %and.rhs, label %and.false
+  store i32 %call41830, ptr %idx, align 4
+  %load41831 = load i32, ptr %idx, align 4
+  %cmp41832 = icmp sge i32 %load41831, 0
+  %bool41833 = zext i1 %cmp41832 to i32
+  %cond41834 = icmp ne i32 %bool41833, 0
+  br i1 %cond41834, label %and.rhs, label %and.false
 
-if.then6746:                                      ; preds = %and.merge3
-  %load41593 = load ptr, ptr %b, align 8
-  %load41595 = load ptr, ptr %reg, align 8
-  %call41596 = call ptr @vix_string_concat(ptr @.strlit41594, ptr %load41595)
-  %call41598 = call ptr @vix_string_concat(ptr %call41596, ptr @.strlit41597)
-  %load41599 = load ptr, ptr %b, align 8
-  %field41601 = getelementptr %MirAsm, ptr %load41599, i32 0, i32 6
-  %fieldval41602 = load ptr, ptr %field41601, align 8
-  %load41603 = load i32, ptr %idx, align 4
-  %idx41604 = getelementptr i32, ptr %fieldval41602, i32 %load41603
-  %loadidx41605 = load i32, ptr %idx41604, align 4
-  %call41606 = call ptr @mir2asm_mem(i32 %loadidx41605)
-  %call41607 = call ptr @vix_string_concat(ptr %call41598, ptr %call41606)
-  call void @mir2asm_line(ptr %load41593, ptr %call41607)
-  %load41608 = load ptr, ptr %reg, align 8
-  ret ptr %load41608
+if.then6784:                                      ; preds = %and.merge3
+  %load41855 = load ptr, ptr %b, align 8
+  %load41857 = load ptr, ptr %reg, align 8
+  %call41858 = call ptr @vix_string_concat(ptr @.strlit41856, ptr %load41857)
+  %call41860 = call ptr @vix_string_concat(ptr %call41858, ptr @.strlit41859)
+  %load41861 = load ptr, ptr %b, align 8
+  %field41863 = getelementptr %MirAsm, ptr %load41861, i32 0, i32 6
+  %fieldval41864 = load ptr, ptr %field41863, align 8
+  %load41865 = load i32, ptr %idx, align 4
+  %idx41866 = getelementptr i32, ptr %fieldval41864, i32 %load41865
+  %loadidx41867 = load i32, ptr %idx41866, align 4
+  %call41868 = call ptr @mir2asm_mem(i32 %loadidx41867)
+  %call41869 = call ptr @vix_string_concat(ptr %call41860, ptr %call41868)
+  call void @mir2asm_line(ptr %load41855, ptr %call41869)
+  %load41870 = load ptr, ptr %reg, align 8
+  ret ptr %load41870
 
-if.else6747:                                      ; preds = %and.merge3
-  br label %if.end6748
+if.else6785:                                      ; preds = %and.merge3
+  br label %if.end6786
 
-if.end6748:                                       ; preds = %if.else6747
-  %load41609 = load ptr, ptr %b, align 8
-  %load41610 = load ptr, ptr %val, align 8
-  %load41611 = load ptr, ptr %ty, align 8
-  %call41612 = call ptr @mir2asm_operand_typed(ptr %load41609, ptr %load41610, ptr %load41611)
-  ret ptr %call41612
+if.end6786:                                       ; preds = %if.else6785
+  %load41871 = load ptr, ptr %b, align 8
+  %load41872 = load ptr, ptr %val, align 8
+  %load41873 = load ptr, ptr %ty, align 8
+  %call41874 = call ptr @mir2asm_operand_typed(ptr %load41871, ptr %load41872, ptr %load41873)
+  ret ptr %call41874
 
 and.rhs:                                          ; preds = %entry
-  %load41573 = load ptr, ptr %b, align 8
-  %field41575 = getelementptr %MirAsm, ptr %load41573, i32 0, i32 8
-  %fieldval41576 = load ptr, ptr %field41575, align 8
-  %load41577 = load i32, ptr %idx, align 4
-  %idx41578 = getelementptr ptr, ptr %fieldval41576, i32 %load41577
-  %loadidx41579 = load ptr, ptr %idx41578, align 8
-  %call41580 = call i32 @mir2asm_type_is_byte(ptr %loadidx41579)
-  %cmp41581 = icmp eq i32 %call41580, 1
-  %bool41582 = zext i1 %cmp41581 to i32
-  %cond41583 = icmp ne i32 %bool41582, 0
-  br i1 %cond41583, label %and.merge, label %and.false
+  %load41835 = load ptr, ptr %b, align 8
+  %field41837 = getelementptr %MirAsm, ptr %load41835, i32 0, i32 8
+  %fieldval41838 = load ptr, ptr %field41837, align 8
+  %load41839 = load i32, ptr %idx, align 4
+  %idx41840 = getelementptr ptr, ptr %fieldval41838, i32 %load41839
+  %loadidx41841 = load ptr, ptr %idx41840, align 8
+  %call41842 = call i32 @mir2asm_type_is_byte(ptr %loadidx41841)
+  %cmp41843 = icmp eq i32 %call41842, 1
+  %bool41844 = zext i1 %cmp41843 to i32
+  %cond41845 = icmp ne i32 %bool41844, 0
+  br i1 %cond41845, label %and.merge, label %and.false
 
 and.false:                                        ; preds = %and.rhs, %entry
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval41584 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond41585 = icmp ne i32 %andval41584, 0
-  br i1 %cond41585, label %and.rhs1, label %and.false2
+  %andval41846 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond41847 = icmp ne i32 %andval41846, 0
+  br i1 %cond41847, label %and.rhs1, label %and.false2
 
 and.rhs1:                                         ; preds = %and.merge
-  %load41586 = load ptr, ptr %ty, align 8
-  %call41587 = call i32 @mir2asm_type_is_byte(ptr %load41586)
-  %cmp41588 = icmp eq i32 %call41587, 0
-  %bool41589 = zext i1 %cmp41588 to i32
-  %cond41590 = icmp ne i32 %bool41589, 0
-  br i1 %cond41590, label %and.merge3, label %and.false2
+  %load41848 = load ptr, ptr %ty, align 8
+  %call41849 = call i32 @mir2asm_type_is_byte(ptr %load41848)
+  %cmp41850 = icmp eq i32 %call41849, 0
+  %bool41851 = zext i1 %cmp41850 to i32
+  %cond41852 = icmp ne i32 %bool41851, 0
+  br i1 %cond41852, label %and.merge3, label %and.false2
 
 and.false2:                                       ; preds = %and.rhs1, %and.merge
   br label %and.merge3
 
 and.merge3:                                       ; preds = %and.false2, %and.rhs1
-  %andval41591 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
-  %cond41592 = icmp ne i32 %andval41591, 0
-  br i1 %cond41592, label %if.then6746, label %if.else6747
+  %andval41853 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
+  %cond41854 = icmp ne i32 %andval41853, 0
+  br i1 %cond41854, label %if.then6784, label %if.else6785
 }
 
 define void @mir2asm_parse_type_decl(ptr %0, ptr %1) {
@@ -79648,303 +80224,303 @@ entry:
   store ptr %0, ptr %b, align 8
   %line = alloca ptr, align 8
   store ptr %1, ptr %line, align 8
-  %load41613 = load ptr, ptr %line, align 8
-  %call41614 = call i32 @mir2asm_find(ptr %load41613, i8 64, i32 0)
+  %load41875 = load ptr, ptr %line, align 8
+  %call41876 = call i32 @mir2asm_find(ptr %load41875, i8 64, i32 0)
   %at = alloca i32, align 4
-  store i32 %call41614, ptr %at, align 4
-  %load41615 = load ptr, ptr %line, align 8
-  %load41616 = load i32, ptr %at, align 4
-  %call41617 = call i32 @mir2asm_find(ptr %load41615, i8 61, i32 %load41616)
+  store i32 %call41876, ptr %at, align 4
+  %load41877 = load ptr, ptr %line, align 8
+  %load41878 = load i32, ptr %at, align 4
+  %call41879 = call i32 @mir2asm_find(ptr %load41877, i8 61, i32 %load41878)
   %eq = alloca i32, align 4
-  store i32 %call41617, ptr %eq, align 4
-  %load41618 = load ptr, ptr %line, align 8
-  %load41619 = load i32, ptr %eq, align 4
-  %call41620 = call i32 @mir2asm_find(ptr %load41618, i8 123, i32 %load41619)
+  store i32 %call41879, ptr %eq, align 4
+  %load41880 = load ptr, ptr %line, align 8
+  %load41881 = load i32, ptr %eq, align 4
+  %call41882 = call i32 @mir2asm_find(ptr %load41880, i8 123, i32 %load41881)
   %lb = alloca i32, align 4
-  store i32 %call41620, ptr %lb, align 4
-  %load41621 = load ptr, ptr %line, align 8
-  %load41622 = load i32, ptr %lb, align 4
-  %call41623 = call i32 @mir2asm_find(ptr %load41621, i8 125, i32 %load41622)
+  store i32 %call41882, ptr %lb, align 4
+  %load41883 = load ptr, ptr %line, align 8
+  %load41884 = load i32, ptr %lb, align 4
+  %call41885 = call i32 @mir2asm_find(ptr %load41883, i8 125, i32 %load41884)
   %rb = alloca i32, align 4
-  store i32 %call41623, ptr %rb, align 4
-  %load41624 = load i32, ptr %at, align 4
-  %cmp41625 = icmp slt i32 %load41624, 0
-  %bool41626 = zext i1 %cmp41625 to i32
-  %cond41627 = icmp ne i32 %bool41626, 0
-  br i1 %cond41627, label %or.true, label %or.rhs
+  store i32 %call41885, ptr %rb, align 4
+  %load41886 = load i32, ptr %at, align 4
+  %cmp41887 = icmp slt i32 %load41886, 0
+  %bool41888 = zext i1 %cmp41887 to i32
+  %cond41889 = icmp ne i32 %bool41888, 0
+  br i1 %cond41889, label %or.true, label %or.rhs
 
-if.then6749:                                      ; preds = %or.merge6
+if.then6787:                                      ; preds = %or.merge6
   ret void
 
-if.else6750:                                      ; preds = %or.merge6
-  br label %if.end6751
+if.else6788:                                      ; preds = %or.merge6
+  br label %if.end6789
 
-if.end6751:                                       ; preds = %if.else6750
-  %load41646 = load ptr, ptr %line, align 8
-  %load41647 = load i32, ptr %at, align 4
-  %load41648 = load i32, ptr %eq, align 4
-  %call41649 = call ptr @mir2asm_slice(ptr %load41646, i32 %load41647, i32 %load41648)
-  %call41650 = call ptr @mir2asm_trim(ptr %call41649)
-  %call41651 = call ptr @mir2asm_clean_name(ptr %call41650)
+if.end6789:                                       ; preds = %if.else6788
+  %load41908 = load ptr, ptr %line, align 8
+  %load41909 = load i32, ptr %at, align 4
+  %load41910 = load i32, ptr %eq, align 4
+  %call41911 = call ptr @mir2asm_slice(ptr %load41908, i32 %load41909, i32 %load41910)
+  %call41912 = call ptr @mir2asm_trim(ptr %call41911)
+  %call41913 = call ptr @mir2asm_clean_name(ptr %call41912)
   %name = alloca ptr, align 8
-  store ptr %call41651, ptr %name, align 8
-  %load41652 = load ptr, ptr %b, align 8
-  %load41653 = load ptr, ptr %name, align 8
-  %call41654 = call i32 @mir2asm_struct_index(ptr %load41652, ptr %load41653)
-  %cmp41655 = icmp sge i32 %call41654, 0
-  %bool41656 = zext i1 %cmp41655 to i32
-  %cond41657 = icmp ne i32 %bool41656, 0
-  br i1 %cond41657, label %if.then6752, label %if.else6753
+  store ptr %call41913, ptr %name, align 8
+  %load41914 = load ptr, ptr %b, align 8
+  %load41915 = load ptr, ptr %name, align 8
+  %call41916 = call i32 @mir2asm_struct_index(ptr %load41914, ptr %load41915)
+  %cmp41917 = icmp sge i32 %call41916, 0
+  %bool41918 = zext i1 %cmp41917 to i32
+  %cond41919 = icmp ne i32 %bool41918, 0
+  br i1 %cond41919, label %if.then6790, label %if.else6791
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load41628 = load i32, ptr %eq, align 4
-  %cmp41629 = icmp slt i32 %load41628, 0
-  %bool41630 = zext i1 %cmp41629 to i32
-  %cond41631 = icmp ne i32 %bool41630, 0
-  br i1 %cond41631, label %or.true, label %or.merge
+  %load41890 = load i32, ptr %eq, align 4
+  %cmp41891 = icmp slt i32 %load41890, 0
+  %bool41892 = zext i1 %cmp41891 to i32
+  %cond41893 = icmp ne i32 %bool41892, 0
+  br i1 %cond41893, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval41632 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond41633 = icmp ne i32 %orval41632, 0
-  br i1 %cond41633, label %or.true1, label %or.rhs2
+  %orval41894 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond41895 = icmp ne i32 %orval41894, 0
+  br i1 %cond41895, label %or.true1, label %or.rhs2
 
 or.true1:                                         ; preds = %or.rhs2, %or.merge
   br label %or.merge3
 
 or.rhs2:                                          ; preds = %or.merge
-  %load41634 = load i32, ptr %lb, align 4
-  %cmp41635 = icmp slt i32 %load41634, 0
-  %bool41636 = zext i1 %cmp41635 to i32
-  %cond41637 = icmp ne i32 %bool41636, 0
-  br i1 %cond41637, label %or.true1, label %or.merge3
+  %load41896 = load i32, ptr %lb, align 4
+  %cmp41897 = icmp slt i32 %load41896, 0
+  %bool41898 = zext i1 %cmp41897 to i32
+  %cond41899 = icmp ne i32 %bool41898, 0
+  br i1 %cond41899, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval41638 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond41639 = icmp ne i32 %orval41638, 0
-  br i1 %cond41639, label %or.true4, label %or.rhs5
+  %orval41900 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond41901 = icmp ne i32 %orval41900, 0
+  br i1 %cond41901, label %or.true4, label %or.rhs5
 
 or.true4:                                         ; preds = %or.rhs5, %or.merge3
   br label %or.merge6
 
 or.rhs5:                                          ; preds = %or.merge3
-  %load41640 = load i32, ptr %rb, align 4
-  %cmp41641 = icmp slt i32 %load41640, 0
-  %bool41642 = zext i1 %cmp41641 to i32
-  %cond41643 = icmp ne i32 %bool41642, 0
-  br i1 %cond41643, label %or.true4, label %or.merge6
+  %load41902 = load i32, ptr %rb, align 4
+  %cmp41903 = icmp slt i32 %load41902, 0
+  %bool41904 = zext i1 %cmp41903 to i32
+  %cond41905 = icmp ne i32 %bool41904, 0
+  br i1 %cond41905, label %or.true4, label %or.merge6
 
 or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval41644 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond41645 = icmp ne i32 %orval41644, 0
-  br i1 %cond41645, label %if.then6749, label %if.else6750
+  %orval41906 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond41907 = icmp ne i32 %orval41906, 0
+  br i1 %cond41907, label %if.then6787, label %if.else6788
 
-if.then6752:                                      ; preds = %if.end6751
+if.then6790:                                      ; preds = %if.end6789
   ret void
 
-if.else6753:                                      ; preds = %if.end6751
-  br label %if.end6754
+if.else6791:                                      ; preds = %if.end6789
+  br label %if.end6792
 
-if.end6754:                                       ; preds = %if.else6753
-  %load41658 = load i32, ptr %lb, align 4
-  %add41659 = add i32 %load41658, 1
+if.end6792:                                       ; preds = %if.else6791
+  %load41920 = load i32, ptr %lb, align 4
+  %add41921 = add i32 %load41920, 1
   %pos = alloca i32, align 4
-  store i32 %add41659, ptr %pos, align 4
+  store i32 %add41921, ptr %pos, align 4
   %count = alloca i32, align 4
   store i32 0, ptr %count, align 4
   %offset = alloca i32, align 4
   store i32 0, ptr %offset, align 4
   %max_align = alloca i32, align 4
   store i32 1, ptr %max_align, align 4
-  br label %while.cond6755
+  br label %while.cond6793
 
-while.cond6755:                                   ; preds = %if.end6763, %if.end6754
-  %load41660 = load i32, ptr %pos, align 4
-  %load41661 = load i32, ptr %rb, align 4
-  %cmp41662 = icmp slt i32 %load41660, %load41661
-  %bool41663 = zext i1 %cmp41662 to i32
-  %cond41664 = icmp ne i32 %bool41663, 0
-  br i1 %cond41664, label %while.body6756, label %while.end6757
+while.cond6793:                                   ; preds = %if.end6801, %if.end6792
+  %load41922 = load i32, ptr %pos, align 4
+  %load41923 = load i32, ptr %rb, align 4
+  %cmp41924 = icmp slt i32 %load41922, %load41923
+  %bool41925 = zext i1 %cmp41924 to i32
+  %cond41926 = icmp ne i32 %bool41925, 0
+  br i1 %cond41926, label %while.body6794, label %while.end6795
 
-while.body6756:                                   ; preds = %while.cond6755
-  %load41665 = load ptr, ptr %line, align 8
-  %load41666 = load i32, ptr %pos, align 4
-  %call41667 = call i32 @mir2asm_find(ptr %load41665, i8 44, i32 %load41666)
+while.body6794:                                   ; preds = %while.cond6793
+  %load41927 = load ptr, ptr %line, align 8
+  %load41928 = load i32, ptr %pos, align 4
+  %call41929 = call i32 @mir2asm_find(ptr %load41927, i8 44, i32 %load41928)
   %comma = alloca i32, align 4
-  store i32 %call41667, ptr %comma, align 4
-  %ifexpr41668 = alloca i32, align 4
-  %load41669 = load i32, ptr %comma, align 4
-  %cmp41670 = icmp slt i32 %load41669, 0
-  %bool41671 = zext i1 %cmp41670 to i32
-  %cond41672 = icmp ne i32 %bool41671, 0
-  br i1 %cond41672, label %or.true7, label %or.rhs8
+  store i32 %call41929, ptr %comma, align 4
+  %ifexpr41930 = alloca i32, align 4
+  %load41931 = load i32, ptr %comma, align 4
+  %cmp41932 = icmp slt i32 %load41931, 0
+  %bool41933 = zext i1 %cmp41932 to i32
+  %cond41934 = icmp ne i32 %bool41933, 0
+  br i1 %cond41934, label %or.true7, label %or.rhs8
 
-while.end6757:                                    ; preds = %while.cond6755
-  %load41743 = load ptr, ptr %b, align 8
-  %field41745 = getelementptr %MirAsm, ptr %load41743, i32 0, i32 19
-  %fieldval41746 = load ptr, ptr %field41745, align 8
-  %load41747 = load ptr, ptr %name, align 8
-  %call41748 = call ptr @vix_array_push_ptr(ptr %fieldval41746, ptr %load41747)
-  %load41749 = load ptr, ptr %b, align 8
-  %fieldptr41751 = getelementptr %MirAsm, ptr %load41749, i32 0, i32 19
-  store ptr %call41748, ptr %fieldptr41751, align 8
-  %load41752 = load ptr, ptr %b, align 8
-  %field41754 = getelementptr %MirAsm, ptr %load41752, i32 0, i32 20
-  %fieldval41755 = load ptr, ptr %field41754, align 8
-  %load41756 = load i32, ptr %count, align 4
-  %call41757 = call ptr @vix_array_push_i32(ptr %fieldval41755, i32 %load41756)
-  %load41758 = load ptr, ptr %b, align 8
-  %fieldptr41760 = getelementptr %MirAsm, ptr %load41758, i32 0, i32 20
-  store ptr %call41757, ptr %fieldptr41760, align 8
-  %load41761 = load ptr, ptr %b, align 8
-  %field41763 = getelementptr %MirAsm, ptr %load41761, i32 0, i32 21
-  %fieldval41764 = load ptr, ptr %field41763, align 8
-  %load41765 = load i32, ptr %offset, align 4
-  %load41766 = load i32, ptr %max_align, align 4
-  %call41767 = call i32 @mir2asm_align_to(i32 %load41765, i32 %load41766)
-  %call41768 = call ptr @vix_array_push_i32(ptr %fieldval41764, i32 %call41767)
-  %load41769 = load ptr, ptr %b, align 8
-  %fieldptr41771 = getelementptr %MirAsm, ptr %load41769, i32 0, i32 21
-  store ptr %call41768, ptr %fieldptr41771, align 8
+while.end6795:                                    ; preds = %while.cond6793
+  %load42005 = load ptr, ptr %b, align 8
+  %field42007 = getelementptr %MirAsm, ptr %load42005, i32 0, i32 19
+  %fieldval42008 = load ptr, ptr %field42007, align 8
+  %load42009 = load ptr, ptr %name, align 8
+  %call42010 = call ptr @vix_array_push_ptr(ptr %fieldval42008, ptr %load42009)
+  %load42011 = load ptr, ptr %b, align 8
+  %fieldptr42013 = getelementptr %MirAsm, ptr %load42011, i32 0, i32 19
+  store ptr %call42010, ptr %fieldptr42013, align 8
+  %load42014 = load ptr, ptr %b, align 8
+  %field42016 = getelementptr %MirAsm, ptr %load42014, i32 0, i32 20
+  %fieldval42017 = load ptr, ptr %field42016, align 8
+  %load42018 = load i32, ptr %count, align 4
+  %call42019 = call ptr @vix_array_push_i32(ptr %fieldval42017, i32 %load42018)
+  %load42020 = load ptr, ptr %b, align 8
+  %fieldptr42022 = getelementptr %MirAsm, ptr %load42020, i32 0, i32 20
+  store ptr %call42019, ptr %fieldptr42022, align 8
+  %load42023 = load ptr, ptr %b, align 8
+  %field42025 = getelementptr %MirAsm, ptr %load42023, i32 0, i32 21
+  %fieldval42026 = load ptr, ptr %field42025, align 8
+  %load42027 = load i32, ptr %offset, align 4
+  %load42028 = load i32, ptr %max_align, align 4
+  %call42029 = call i32 @mir2asm_align_to(i32 %load42027, i32 %load42028)
+  %call42030 = call ptr @vix_array_push_i32(ptr %fieldval42026, i32 %call42029)
+  %load42031 = load ptr, ptr %b, align 8
+  %fieldptr42033 = getelementptr %MirAsm, ptr %load42031, i32 0, i32 21
+  store ptr %call42030, ptr %fieldptr42033, align 8
   ret void
 
-ifexpr.then6758:                                  ; preds = %or.merge9
-  %load41680 = load i32, ptr %rb, align 4
-  store i32 %load41680, ptr %ifexpr41668, align 4
-  br label %ifexpr.end6760
+ifexpr.then6796:                                  ; preds = %or.merge9
+  %load41942 = load i32, ptr %rb, align 4
+  store i32 %load41942, ptr %ifexpr41930, align 4
+  br label %ifexpr.end6798
 
-ifexpr.else6759:                                  ; preds = %or.merge9
-  %load41681 = load i32, ptr %comma, align 4
-  store i32 %load41681, ptr %ifexpr41668, align 4
-  br label %ifexpr.end6760
+ifexpr.else6797:                                  ; preds = %or.merge9
+  %load41943 = load i32, ptr %comma, align 4
+  store i32 %load41943, ptr %ifexpr41930, align 4
+  br label %ifexpr.end6798
 
-ifexpr.end6760:                                   ; preds = %ifexpr.else6759, %ifexpr.then6758
-  %ifexprval41682 = load i32, ptr %ifexpr41668, align 4
+ifexpr.end6798:                                   ; preds = %ifexpr.else6797, %ifexpr.then6796
+  %ifexprval41944 = load i32, ptr %ifexpr41930, align 4
   %end = alloca i32, align 4
-  store i32 %ifexprval41682, ptr %end, align 4
-  %load41683 = load ptr, ptr %line, align 8
-  %load41684 = load i32, ptr %pos, align 4
-  %load41685 = load i32, ptr %end, align 4
-  %call41686 = call ptr @mir2asm_slice(ptr %load41683, i32 %load41684, i32 %load41685)
-  %call41687 = call ptr @mir2asm_trim(ptr %call41686)
+  store i32 %ifexprval41944, ptr %end, align 4
+  %load41945 = load ptr, ptr %line, align 8
+  %load41946 = load i32, ptr %pos, align 4
+  %load41947 = load i32, ptr %end, align 4
+  %call41948 = call ptr @mir2asm_slice(ptr %load41945, i32 %load41946, i32 %load41947)
+  %call41949 = call ptr @mir2asm_trim(ptr %call41948)
   %ty = alloca ptr, align 8
-  store ptr %call41687, ptr %ty, align 8
-  %load41688 = load ptr, ptr %ty, align 8
-  %strcmp41690 = call i32 @strcmp(ptr %load41688, ptr @.strlit41689)
-  %cmp41691 = icmp eq i32 %strcmp41690, 0
-  %bool41692 = zext i1 %cmp41691 to i32
-  %cmp41693 = icmp eq i32 %bool41692, 0
-  %bool41694 = zext i1 %cmp41693 to i32
-  %cond41695 = icmp ne i32 %bool41694, 0
-  br i1 %cond41695, label %if.then6761, label %if.else6762
+  store ptr %call41949, ptr %ty, align 8
+  %load41950 = load ptr, ptr %ty, align 8
+  %strcmp41952 = call i32 @strcmp(ptr %load41950, ptr @.strlit41951)
+  %cmp41953 = icmp eq i32 %strcmp41952, 0
+  %bool41954 = zext i1 %cmp41953 to i32
+  %cmp41955 = icmp eq i32 %bool41954, 0
+  %bool41956 = zext i1 %cmp41955 to i32
+  %cond41957 = icmp ne i32 %bool41956, 0
+  br i1 %cond41957, label %if.then6799, label %if.else6800
 
-or.true7:                                         ; preds = %or.rhs8, %while.body6756
+or.true7:                                         ; preds = %or.rhs8, %while.body6794
   br label %or.merge9
 
-or.rhs8:                                          ; preds = %while.body6756
-  %load41673 = load i32, ptr %comma, align 4
-  %load41674 = load i32, ptr %rb, align 4
-  %cmp41675 = icmp sgt i32 %load41673, %load41674
-  %bool41676 = zext i1 %cmp41675 to i32
-  %cond41677 = icmp ne i32 %bool41676, 0
-  br i1 %cond41677, label %or.true7, label %or.merge9
+or.rhs8:                                          ; preds = %while.body6794
+  %load41935 = load i32, ptr %comma, align 4
+  %load41936 = load i32, ptr %rb, align 4
+  %cmp41937 = icmp sgt i32 %load41935, %load41936
+  %bool41938 = zext i1 %cmp41937 to i32
+  %cond41939 = icmp ne i32 %bool41938, 0
+  br i1 %cond41939, label %or.true7, label %or.merge9
 
 or.merge9:                                        ; preds = %or.true7, %or.rhs8
-  %orval41678 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
-  %cond41679 = icmp ne i32 %orval41678, 0
-  br i1 %cond41679, label %ifexpr.then6758, label %ifexpr.else6759
+  %orval41940 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
+  %cond41941 = icmp ne i32 %orval41940, 0
+  br i1 %cond41941, label %ifexpr.then6796, label %ifexpr.else6797
 
-if.then6761:                                      ; preds = %ifexpr.end6760
-  %load41696 = load ptr, ptr %b, align 8
-  %load41697 = load ptr, ptr %ty, align 8
-  %call41698 = call i32 @mir2asm_type_size_for(ptr %load41696, ptr %load41697)
+if.then6799:                                      ; preds = %ifexpr.end6798
+  %load41958 = load ptr, ptr %b, align 8
+  %load41959 = load ptr, ptr %ty, align 8
+  %call41960 = call i32 @mir2asm_type_size_for(ptr %load41958, ptr %load41959)
   %align = alloca i32, align 4
-  store i32 %call41698, ptr %align, align 4
-  %load41699 = load i32, ptr %align, align 4
-  %cmp41700 = icmp sgt i32 %load41699, 8
-  %bool41701 = zext i1 %cmp41700 to i32
-  %cond41702 = icmp ne i32 %bool41701, 0
-  br i1 %cond41702, label %if.then6764, label %if.else6765
+  store i32 %call41960, ptr %align, align 4
+  %load41961 = load i32, ptr %align, align 4
+  %cmp41962 = icmp sgt i32 %load41961, 8
+  %bool41963 = zext i1 %cmp41962 to i32
+  %cond41964 = icmp ne i32 %bool41963, 0
+  br i1 %cond41964, label %if.then6802, label %if.else6803
 
-if.else6762:                                      ; preds = %ifexpr.end6760
-  br label %if.end6763
+if.else6800:                                      ; preds = %ifexpr.end6798
+  br label %if.end6801
 
-if.end6763:                                       ; preds = %if.else6762, %if.end6772
-  %load41741 = load i32, ptr %end, align 4
-  %add41742 = add i32 %load41741, 1
-  store i32 %add41742, ptr %pos, align 4
-  br label %while.cond6755
+if.end6801:                                       ; preds = %if.else6800, %if.end6810
+  %load42003 = load i32, ptr %end, align 4
+  %add42004 = add i32 %load42003, 1
+  store i32 %add42004, ptr %pos, align 4
+  br label %while.cond6793
 
-if.then6764:                                      ; preds = %if.then6761
+if.then6802:                                      ; preds = %if.then6799
   store i32 8, ptr %align, align 4
-  br label %if.end6766
+  br label %if.end6804
 
-if.else6765:                                      ; preds = %if.then6761
-  br label %if.end6766
+if.else6803:                                      ; preds = %if.then6799
+  br label %if.end6804
 
-if.end6766:                                       ; preds = %if.else6765, %if.then6764
-  %load41703 = load i32, ptr %align, align 4
-  %cmp41704 = icmp slt i32 %load41703, 1
-  %bool41705 = zext i1 %cmp41704 to i32
-  %cond41706 = icmp ne i32 %bool41705, 0
-  br i1 %cond41706, label %if.then6767, label %if.else6768
+if.end6804:                                       ; preds = %if.else6803, %if.then6802
+  %load41965 = load i32, ptr %align, align 4
+  %cmp41966 = icmp slt i32 %load41965, 1
+  %bool41967 = zext i1 %cmp41966 to i32
+  %cond41968 = icmp ne i32 %bool41967, 0
+  br i1 %cond41968, label %if.then6805, label %if.else6806
 
-if.then6767:                                      ; preds = %if.end6766
+if.then6805:                                      ; preds = %if.end6804
   store i32 1, ptr %align, align 4
-  br label %if.end6769
+  br label %if.end6807
 
-if.else6768:                                      ; preds = %if.end6766
-  br label %if.end6769
+if.else6806:                                      ; preds = %if.end6804
+  br label %if.end6807
 
-if.end6769:                                       ; preds = %if.else6768, %if.then6767
-  %load41707 = load i32, ptr %offset, align 4
-  %load41708 = load i32, ptr %align, align 4
-  %call41709 = call i32 @mir2asm_align_to(i32 %load41707, i32 %load41708)
-  store i32 %call41709, ptr %offset, align 4
-  %load41710 = load ptr, ptr %b, align 8
-  %field41712 = getelementptr %MirAsm, ptr %load41710, i32 0, i32 22
-  %fieldval41713 = load ptr, ptr %field41712, align 8
-  %load41714 = load ptr, ptr %ty, align 8
-  %call41715 = call ptr @vix_array_push_ptr(ptr %fieldval41713, ptr %load41714)
-  %load41716 = load ptr, ptr %b, align 8
-  %fieldptr41718 = getelementptr %MirAsm, ptr %load41716, i32 0, i32 22
-  store ptr %call41715, ptr %fieldptr41718, align 8
-  %load41719 = load ptr, ptr %b, align 8
-  %field41721 = getelementptr %MirAsm, ptr %load41719, i32 0, i32 23
-  %fieldval41722 = load ptr, ptr %field41721, align 8
-  %load41723 = load i32, ptr %offset, align 4
-  %call41724 = call ptr @vix_array_push_i32(ptr %fieldval41722, i32 %load41723)
-  %load41725 = load ptr, ptr %b, align 8
-  %fieldptr41727 = getelementptr %MirAsm, ptr %load41725, i32 0, i32 23
-  store ptr %call41724, ptr %fieldptr41727, align 8
-  %load41728 = load i32, ptr %offset, align 4
-  %load41729 = load ptr, ptr %b, align 8
-  %load41730 = load ptr, ptr %ty, align 8
-  %call41731 = call i32 @mir2asm_type_size_for(ptr %load41729, ptr %load41730)
-  %add41732 = add i32 %load41728, %call41731
-  store i32 %add41732, ptr %offset, align 4
-  %load41733 = load i32, ptr %align, align 4
-  %load41734 = load i32, ptr %max_align, align 4
-  %cmp41735 = icmp sgt i32 %load41733, %load41734
-  %bool41736 = zext i1 %cmp41735 to i32
-  %cond41737 = icmp ne i32 %bool41736, 0
-  br i1 %cond41737, label %if.then6770, label %if.else6771
+if.end6807:                                       ; preds = %if.else6806, %if.then6805
+  %load41969 = load i32, ptr %offset, align 4
+  %load41970 = load i32, ptr %align, align 4
+  %call41971 = call i32 @mir2asm_align_to(i32 %load41969, i32 %load41970)
+  store i32 %call41971, ptr %offset, align 4
+  %load41972 = load ptr, ptr %b, align 8
+  %field41974 = getelementptr %MirAsm, ptr %load41972, i32 0, i32 22
+  %fieldval41975 = load ptr, ptr %field41974, align 8
+  %load41976 = load ptr, ptr %ty, align 8
+  %call41977 = call ptr @vix_array_push_ptr(ptr %fieldval41975, ptr %load41976)
+  %load41978 = load ptr, ptr %b, align 8
+  %fieldptr41980 = getelementptr %MirAsm, ptr %load41978, i32 0, i32 22
+  store ptr %call41977, ptr %fieldptr41980, align 8
+  %load41981 = load ptr, ptr %b, align 8
+  %field41983 = getelementptr %MirAsm, ptr %load41981, i32 0, i32 23
+  %fieldval41984 = load ptr, ptr %field41983, align 8
+  %load41985 = load i32, ptr %offset, align 4
+  %call41986 = call ptr @vix_array_push_i32(ptr %fieldval41984, i32 %load41985)
+  %load41987 = load ptr, ptr %b, align 8
+  %fieldptr41989 = getelementptr %MirAsm, ptr %load41987, i32 0, i32 23
+  store ptr %call41986, ptr %fieldptr41989, align 8
+  %load41990 = load i32, ptr %offset, align 4
+  %load41991 = load ptr, ptr %b, align 8
+  %load41992 = load ptr, ptr %ty, align 8
+  %call41993 = call i32 @mir2asm_type_size_for(ptr %load41991, ptr %load41992)
+  %add41994 = add i32 %load41990, %call41993
+  store i32 %add41994, ptr %offset, align 4
+  %load41995 = load i32, ptr %align, align 4
+  %load41996 = load i32, ptr %max_align, align 4
+  %cmp41997 = icmp sgt i32 %load41995, %load41996
+  %bool41998 = zext i1 %cmp41997 to i32
+  %cond41999 = icmp ne i32 %bool41998, 0
+  br i1 %cond41999, label %if.then6808, label %if.else6809
 
-if.then6770:                                      ; preds = %if.end6769
-  %load41738 = load i32, ptr %align, align 4
-  store i32 %load41738, ptr %max_align, align 4
-  br label %if.end6772
+if.then6808:                                      ; preds = %if.end6807
+  %load42000 = load i32, ptr %align, align 4
+  store i32 %load42000, ptr %max_align, align 4
+  br label %if.end6810
 
-if.else6771:                                      ; preds = %if.end6769
-  br label %if.end6772
+if.else6809:                                      ; preds = %if.end6807
+  br label %if.end6810
 
-if.end6772:                                       ; preds = %if.else6771, %if.then6770
-  %load41739 = load i32, ptr %count, align 4
-  %add41740 = add i32 %load41739, 1
-  store i32 %add41740, ptr %count, align 4
-  br label %if.end6763
+if.end6810:                                       ; preds = %if.else6809, %if.then6808
+  %load42001 = load i32, ptr %count, align 4
+  %add42002 = add i32 %load42001, 1
+  store i32 %add42002, ptr %count, align 4
+  br label %if.end6801
 }
 
 define void @mir2asm_emit_zero_bytes(ptr %0, i32 %1, i32 %2) {
@@ -79957,82 +80533,82 @@ entry:
   store i32 %2, ptr %size, align 4
   %copied = alloca i32, align 4
   store i32 0, ptr %copied, align 4
-  br label %while.cond6773
+  br label %while.cond6811
 
-while.cond6773:                                   ; preds = %if.end6778, %entry
-  %load41772 = load i32, ptr %copied, align 4
-  %load41773 = load i32, ptr %size, align 4
-  %cmp41774 = icmp slt i32 %load41772, %load41773
-  %bool41775 = zext i1 %cmp41774 to i32
-  %cond41776 = icmp ne i32 %bool41775, 0
-  br i1 %cond41776, label %while.body6774, label %while.end6775
+while.cond6811:                                   ; preds = %if.end6816, %entry
+  %load42034 = load i32, ptr %copied, align 4
+  %load42035 = load i32, ptr %size, align 4
+  %cmp42036 = icmp slt i32 %load42034, %load42035
+  %bool42037 = zext i1 %cmp42036 to i32
+  %cond42038 = icmp ne i32 %bool42037, 0
+  br i1 %cond42038, label %while.body6812, label %while.end6813
 
-while.body6774:                                   ; preds = %while.cond6773
-  %load41777 = load i32, ptr %size, align 4
-  %load41778 = load i32, ptr %copied, align 4
-  %sub41779 = sub i32 %load41777, %load41778
+while.body6812:                                   ; preds = %while.cond6811
+  %load42039 = load i32, ptr %size, align 4
+  %load42040 = load i32, ptr %copied, align 4
+  %sub42041 = sub i32 %load42039, %load42040
   %remain = alloca i32, align 4
-  store i32 %sub41779, ptr %remain, align 4
-  %load41780 = load i32, ptr %remain, align 4
-  %cmp41781 = icmp sge i32 %load41780, 8
-  %bool41782 = zext i1 %cmp41781 to i32
-  %cond41783 = icmp ne i32 %bool41782, 0
-  br i1 %cond41783, label %if.then6776, label %if.else6777
+  store i32 %sub42041, ptr %remain, align 4
+  %load42042 = load i32, ptr %remain, align 4
+  %cmp42043 = icmp sge i32 %load42042, 8
+  %bool42044 = zext i1 %cmp42043 to i32
+  %cond42045 = icmp ne i32 %bool42044, 0
+  br i1 %cond42045, label %if.then6814, label %if.else6815
 
-while.end6775:                                    ; preds = %while.cond6773
+while.end6813:                                    ; preds = %while.cond6811
   ret void
 
-if.then6776:                                      ; preds = %while.body6774
-  %load41784 = load ptr, ptr %b, align 8
-  %load41786 = load i32, ptr %dest_offset, align 4
-  %load41787 = load i32, ptr %copied, align 4
-  %call41788 = call ptr @mir2asm_mem_at(i32 %load41786, i32 %load41787)
-  %call41789 = call ptr @vix_string_concat(ptr @.strlit41785, ptr %call41788)
-  %call41791 = call ptr @vix_string_concat(ptr %call41789, ptr @.strlit41790)
-  call void @mir2asm_line(ptr %load41784, ptr %call41791)
-  %load41792 = load i32, ptr %copied, align 4
-  %add41793 = add i32 %load41792, 8
-  store i32 %add41793, ptr %copied, align 4
-  br label %if.end6778
+if.then6814:                                      ; preds = %while.body6812
+  %load42046 = load ptr, ptr %b, align 8
+  %load42048 = load i32, ptr %dest_offset, align 4
+  %load42049 = load i32, ptr %copied, align 4
+  %call42050 = call ptr @mir2asm_mem_at(i32 %load42048, i32 %load42049)
+  %call42051 = call ptr @vix_string_concat(ptr @.strlit42047, ptr %call42050)
+  %call42053 = call ptr @vix_string_concat(ptr %call42051, ptr @.strlit42052)
+  call void @mir2asm_line(ptr %load42046, ptr %call42053)
+  %load42054 = load i32, ptr %copied, align 4
+  %add42055 = add i32 %load42054, 8
+  store i32 %add42055, ptr %copied, align 4
+  br label %if.end6816
 
-if.else6777:                                      ; preds = %while.body6774
-  %load41794 = load i32, ptr %remain, align 4
-  %cmp41795 = icmp sge i32 %load41794, 4
-  %bool41796 = zext i1 %cmp41795 to i32
-  %cond41797 = icmp ne i32 %bool41796, 0
-  br i1 %cond41797, label %if.then6779, label %if.else6780
+if.else6815:                                      ; preds = %while.body6812
+  %load42056 = load i32, ptr %remain, align 4
+  %cmp42057 = icmp sge i32 %load42056, 4
+  %bool42058 = zext i1 %cmp42057 to i32
+  %cond42059 = icmp ne i32 %bool42058, 0
+  br i1 %cond42059, label %if.then6817, label %if.else6818
 
-if.end6778:                                       ; preds = %if.end6781, %if.then6776
-  br label %while.cond6773
+if.end6816:                                       ; preds = %if.end6819, %if.then6814
+  br label %while.cond6811
 
-if.then6779:                                      ; preds = %if.else6777
-  %load41798 = load ptr, ptr %b, align 8
-  %load41800 = load i32, ptr %dest_offset, align 4
-  %load41801 = load i32, ptr %copied, align 4
-  %call41802 = call ptr @mir2asm_mem_at(i32 %load41800, i32 %load41801)
-  %call41803 = call ptr @vix_string_concat(ptr @.strlit41799, ptr %call41802)
-  %call41805 = call ptr @vix_string_concat(ptr %call41803, ptr @.strlit41804)
-  call void @mir2asm_line(ptr %load41798, ptr %call41805)
-  %load41806 = load i32, ptr %copied, align 4
-  %add41807 = add i32 %load41806, 4
-  store i32 %add41807, ptr %copied, align 4
-  br label %if.end6781
+if.then6817:                                      ; preds = %if.else6815
+  %load42060 = load ptr, ptr %b, align 8
+  %load42062 = load i32, ptr %dest_offset, align 4
+  %load42063 = load i32, ptr %copied, align 4
+  %call42064 = call ptr @mir2asm_mem_at(i32 %load42062, i32 %load42063)
+  %call42065 = call ptr @vix_string_concat(ptr @.strlit42061, ptr %call42064)
+  %call42067 = call ptr @vix_string_concat(ptr %call42065, ptr @.strlit42066)
+  call void @mir2asm_line(ptr %load42060, ptr %call42067)
+  %load42068 = load i32, ptr %copied, align 4
+  %add42069 = add i32 %load42068, 4
+  store i32 %add42069, ptr %copied, align 4
+  br label %if.end6819
 
-if.else6780:                                      ; preds = %if.else6777
-  %load41808 = load ptr, ptr %b, align 8
-  %load41810 = load i32, ptr %dest_offset, align 4
-  %load41811 = load i32, ptr %copied, align 4
-  %call41812 = call ptr @mir2asm_mem_at(i32 %load41810, i32 %load41811)
-  %call41813 = call ptr @vix_string_concat(ptr @.strlit41809, ptr %call41812)
-  %call41815 = call ptr @vix_string_concat(ptr %call41813, ptr @.strlit41814)
-  call void @mir2asm_line(ptr %load41808, ptr %call41815)
-  %load41816 = load i32, ptr %copied, align 4
-  %add41817 = add i32 %load41816, 1
-  store i32 %add41817, ptr %copied, align 4
-  br label %if.end6781
+if.else6818:                                      ; preds = %if.else6815
+  %load42070 = load ptr, ptr %b, align 8
+  %load42072 = load i32, ptr %dest_offset, align 4
+  %load42073 = load i32, ptr %copied, align 4
+  %call42074 = call ptr @mir2asm_mem_at(i32 %load42072, i32 %load42073)
+  %call42075 = call ptr @vix_string_concat(ptr @.strlit42071, ptr %call42074)
+  %call42077 = call ptr @vix_string_concat(ptr %call42075, ptr @.strlit42076)
+  call void @mir2asm_line(ptr %load42070, ptr %call42077)
+  %load42078 = load i32, ptr %copied, align 4
+  %add42079 = add i32 %load42078, 1
+  store i32 %add42079, ptr %copied, align 4
+  br label %if.end6819
 
-if.end6781:                                       ; preds = %if.else6780, %if.then6779
-  br label %if.end6778
+if.end6819:                                       ; preds = %if.else6818, %if.then6817
+  br label %if.end6816
 }
 
 define void @mir2asm_emit_copy_stack_bytes(ptr %0, i32 %1, i32 %2, i32 %3) {
@@ -80047,100 +80623,100 @@ entry:
   store i32 %3, ptr %size, align 4
   %copied = alloca i32, align 4
   store i32 0, ptr %copied, align 4
-  br label %while.cond6782
+  br label %while.cond6820
 
-while.cond6782:                                   ; preds = %if.end6787, %entry
-  %load41818 = load i32, ptr %copied, align 4
-  %load41819 = load i32, ptr %size, align 4
-  %cmp41820 = icmp slt i32 %load41818, %load41819
-  %bool41821 = zext i1 %cmp41820 to i32
-  %cond41822 = icmp ne i32 %bool41821, 0
-  br i1 %cond41822, label %while.body6783, label %while.end6784
+while.cond6820:                                   ; preds = %if.end6825, %entry
+  %load42080 = load i32, ptr %copied, align 4
+  %load42081 = load i32, ptr %size, align 4
+  %cmp42082 = icmp slt i32 %load42080, %load42081
+  %bool42083 = zext i1 %cmp42082 to i32
+  %cond42084 = icmp ne i32 %bool42083, 0
+  br i1 %cond42084, label %while.body6821, label %while.end6822
 
-while.body6783:                                   ; preds = %while.cond6782
-  %load41823 = load i32, ptr %size, align 4
-  %load41824 = load i32, ptr %copied, align 4
-  %sub41825 = sub i32 %load41823, %load41824
+while.body6821:                                   ; preds = %while.cond6820
+  %load42085 = load i32, ptr %size, align 4
+  %load42086 = load i32, ptr %copied, align 4
+  %sub42087 = sub i32 %load42085, %load42086
   %remain = alloca i32, align 4
-  store i32 %sub41825, ptr %remain, align 4
-  %load41826 = load i32, ptr %remain, align 4
-  %cmp41827 = icmp sge i32 %load41826, 8
-  %bool41828 = zext i1 %cmp41827 to i32
-  %cond41829 = icmp ne i32 %bool41828, 0
-  br i1 %cond41829, label %if.then6785, label %if.else6786
+  store i32 %sub42087, ptr %remain, align 4
+  %load42088 = load i32, ptr %remain, align 4
+  %cmp42089 = icmp sge i32 %load42088, 8
+  %bool42090 = zext i1 %cmp42089 to i32
+  %cond42091 = icmp ne i32 %bool42090, 0
+  br i1 %cond42091, label %if.then6823, label %if.else6824
 
-while.end6784:                                    ; preds = %while.cond6782
+while.end6822:                                    ; preds = %while.cond6820
   ret void
 
-if.then6785:                                      ; preds = %while.body6783
-  %load41830 = load ptr, ptr %b, align 8
-  %load41832 = load i32, ptr %src_offset, align 4
-  %load41833 = load i32, ptr %copied, align 4
-  %call41834 = call ptr @mir2asm_mem_at(i32 %load41832, i32 %load41833)
-  %call41835 = call ptr @vix_string_concat(ptr @.strlit41831, ptr %call41834)
-  call void @mir2asm_line(ptr %load41830, ptr %call41835)
-  %load41836 = load ptr, ptr %b, align 8
-  %load41838 = load i32, ptr %dest_offset, align 4
-  %load41839 = load i32, ptr %copied, align 4
-  %call41840 = call ptr @mir2asm_mem_at(i32 %load41838, i32 %load41839)
-  %call41841 = call ptr @vix_string_concat(ptr @.strlit41837, ptr %call41840)
-  %call41843 = call ptr @vix_string_concat(ptr %call41841, ptr @.strlit41842)
-  call void @mir2asm_line(ptr %load41836, ptr %call41843)
-  %load41844 = load i32, ptr %copied, align 4
-  %add41845 = add i32 %load41844, 8
-  store i32 %add41845, ptr %copied, align 4
-  br label %if.end6787
+if.then6823:                                      ; preds = %while.body6821
+  %load42092 = load ptr, ptr %b, align 8
+  %load42094 = load i32, ptr %src_offset, align 4
+  %load42095 = load i32, ptr %copied, align 4
+  %call42096 = call ptr @mir2asm_mem_at(i32 %load42094, i32 %load42095)
+  %call42097 = call ptr @vix_string_concat(ptr @.strlit42093, ptr %call42096)
+  call void @mir2asm_line(ptr %load42092, ptr %call42097)
+  %load42098 = load ptr, ptr %b, align 8
+  %load42100 = load i32, ptr %dest_offset, align 4
+  %load42101 = load i32, ptr %copied, align 4
+  %call42102 = call ptr @mir2asm_mem_at(i32 %load42100, i32 %load42101)
+  %call42103 = call ptr @vix_string_concat(ptr @.strlit42099, ptr %call42102)
+  %call42105 = call ptr @vix_string_concat(ptr %call42103, ptr @.strlit42104)
+  call void @mir2asm_line(ptr %load42098, ptr %call42105)
+  %load42106 = load i32, ptr %copied, align 4
+  %add42107 = add i32 %load42106, 8
+  store i32 %add42107, ptr %copied, align 4
+  br label %if.end6825
 
-if.else6786:                                      ; preds = %while.body6783
-  %load41846 = load i32, ptr %remain, align 4
-  %cmp41847 = icmp sge i32 %load41846, 4
-  %bool41848 = zext i1 %cmp41847 to i32
-  %cond41849 = icmp ne i32 %bool41848, 0
-  br i1 %cond41849, label %if.then6788, label %if.else6789
+if.else6824:                                      ; preds = %while.body6821
+  %load42108 = load i32, ptr %remain, align 4
+  %cmp42109 = icmp sge i32 %load42108, 4
+  %bool42110 = zext i1 %cmp42109 to i32
+  %cond42111 = icmp ne i32 %bool42110, 0
+  br i1 %cond42111, label %if.then6826, label %if.else6827
 
-if.end6787:                                       ; preds = %if.end6790, %if.then6785
-  br label %while.cond6782
+if.end6825:                                       ; preds = %if.end6828, %if.then6823
+  br label %while.cond6820
 
-if.then6788:                                      ; preds = %if.else6786
-  %load41850 = load ptr, ptr %b, align 8
-  %load41852 = load i32, ptr %src_offset, align 4
-  %load41853 = load i32, ptr %copied, align 4
-  %call41854 = call ptr @mir2asm_mem_at(i32 %load41852, i32 %load41853)
-  %call41855 = call ptr @vix_string_concat(ptr @.strlit41851, ptr %call41854)
-  call void @mir2asm_line(ptr %load41850, ptr %call41855)
-  %load41856 = load ptr, ptr %b, align 8
-  %load41858 = load i32, ptr %dest_offset, align 4
-  %load41859 = load i32, ptr %copied, align 4
-  %call41860 = call ptr @mir2asm_mem_at(i32 %load41858, i32 %load41859)
-  %call41861 = call ptr @vix_string_concat(ptr @.strlit41857, ptr %call41860)
-  %call41863 = call ptr @vix_string_concat(ptr %call41861, ptr @.strlit41862)
-  call void @mir2asm_line(ptr %load41856, ptr %call41863)
-  %load41864 = load i32, ptr %copied, align 4
-  %add41865 = add i32 %load41864, 4
-  store i32 %add41865, ptr %copied, align 4
-  br label %if.end6790
+if.then6826:                                      ; preds = %if.else6824
+  %load42112 = load ptr, ptr %b, align 8
+  %load42114 = load i32, ptr %src_offset, align 4
+  %load42115 = load i32, ptr %copied, align 4
+  %call42116 = call ptr @mir2asm_mem_at(i32 %load42114, i32 %load42115)
+  %call42117 = call ptr @vix_string_concat(ptr @.strlit42113, ptr %call42116)
+  call void @mir2asm_line(ptr %load42112, ptr %call42117)
+  %load42118 = load ptr, ptr %b, align 8
+  %load42120 = load i32, ptr %dest_offset, align 4
+  %load42121 = load i32, ptr %copied, align 4
+  %call42122 = call ptr @mir2asm_mem_at(i32 %load42120, i32 %load42121)
+  %call42123 = call ptr @vix_string_concat(ptr @.strlit42119, ptr %call42122)
+  %call42125 = call ptr @vix_string_concat(ptr %call42123, ptr @.strlit42124)
+  call void @mir2asm_line(ptr %load42118, ptr %call42125)
+  %load42126 = load i32, ptr %copied, align 4
+  %add42127 = add i32 %load42126, 4
+  store i32 %add42127, ptr %copied, align 4
+  br label %if.end6828
 
-if.else6789:                                      ; preds = %if.else6786
-  %load41866 = load ptr, ptr %b, align 8
-  %load41868 = load i32, ptr %src_offset, align 4
-  %load41869 = load i32, ptr %copied, align 4
-  %call41870 = call ptr @mir2asm_mem_at(i32 %load41868, i32 %load41869)
-  %call41871 = call ptr @vix_string_concat(ptr @.strlit41867, ptr %call41870)
-  call void @mir2asm_line(ptr %load41866, ptr %call41871)
-  %load41872 = load ptr, ptr %b, align 8
-  %load41874 = load i32, ptr %dest_offset, align 4
-  %load41875 = load i32, ptr %copied, align 4
-  %call41876 = call ptr @mir2asm_mem_at(i32 %load41874, i32 %load41875)
-  %call41877 = call ptr @vix_string_concat(ptr @.strlit41873, ptr %call41876)
-  %call41879 = call ptr @vix_string_concat(ptr %call41877, ptr @.strlit41878)
-  call void @mir2asm_line(ptr %load41872, ptr %call41879)
-  %load41880 = load i32, ptr %copied, align 4
-  %add41881 = add i32 %load41880, 1
-  store i32 %add41881, ptr %copied, align 4
-  br label %if.end6790
+if.else6827:                                      ; preds = %if.else6824
+  %load42128 = load ptr, ptr %b, align 8
+  %load42130 = load i32, ptr %src_offset, align 4
+  %load42131 = load i32, ptr %copied, align 4
+  %call42132 = call ptr @mir2asm_mem_at(i32 %load42130, i32 %load42131)
+  %call42133 = call ptr @vix_string_concat(ptr @.strlit42129, ptr %call42132)
+  call void @mir2asm_line(ptr %load42128, ptr %call42133)
+  %load42134 = load ptr, ptr %b, align 8
+  %load42136 = load i32, ptr %dest_offset, align 4
+  %load42137 = load i32, ptr %copied, align 4
+  %call42138 = call ptr @mir2asm_mem_at(i32 %load42136, i32 %load42137)
+  %call42139 = call ptr @vix_string_concat(ptr @.strlit42135, ptr %call42138)
+  %call42141 = call ptr @vix_string_concat(ptr %call42139, ptr @.strlit42140)
+  call void @mir2asm_line(ptr %load42134, ptr %call42141)
+  %load42142 = load i32, ptr %copied, align 4
+  %add42143 = add i32 %load42142, 1
+  store i32 %add42143, ptr %copied, align 4
+  br label %if.end6828
 
-if.end6790:                                       ; preds = %if.else6789, %if.then6788
-  br label %if.end6787
+if.end6828:                                       ; preds = %if.else6827, %if.then6826
+  br label %if.end6825
 }
 
 define void @mir2asm_emit_copy_ptr_to_stack(ptr %0, i32 %1, ptr %2, i32 %3) {
@@ -80153,108 +80729,108 @@ entry:
   store ptr %2, ptr %ptr_value, align 8
   %size = alloca i32, align 4
   store i32 %3, ptr %size, align 4
-  %load41882 = load ptr, ptr %b, align 8
-  %load41884 = load ptr, ptr %b, align 8
-  %load41885 = load ptr, ptr %ptr_value, align 8
-  %call41887 = call ptr @mir2asm_operand_typed(ptr %load41884, ptr %load41885, ptr @.strlit41886)
-  %call41888 = call ptr @vix_string_concat(ptr @.strlit41883, ptr %call41887)
-  call void @mir2asm_line(ptr %load41882, ptr %call41888)
+  %load42144 = load ptr, ptr %b, align 8
+  %load42146 = load ptr, ptr %b, align 8
+  %load42147 = load ptr, ptr %ptr_value, align 8
+  %call42149 = call ptr @mir2asm_operand_typed(ptr %load42146, ptr %load42147, ptr @.strlit42148)
+  %call42150 = call ptr @vix_string_concat(ptr @.strlit42145, ptr %call42149)
+  call void @mir2asm_line(ptr %load42144, ptr %call42150)
   %copied = alloca i32, align 4
   store i32 0, ptr %copied, align 4
-  br label %while.cond6791
+  br label %while.cond6829
 
-while.cond6791:                                   ; preds = %if.end6796, %entry
-  %load41889 = load i32, ptr %copied, align 4
-  %load41890 = load i32, ptr %size, align 4
-  %cmp41891 = icmp slt i32 %load41889, %load41890
-  %bool41892 = zext i1 %cmp41891 to i32
-  %cond41893 = icmp ne i32 %bool41892, 0
-  br i1 %cond41893, label %while.body6792, label %while.end6793
+while.cond6829:                                   ; preds = %if.end6834, %entry
+  %load42151 = load i32, ptr %copied, align 4
+  %load42152 = load i32, ptr %size, align 4
+  %cmp42153 = icmp slt i32 %load42151, %load42152
+  %bool42154 = zext i1 %cmp42153 to i32
+  %cond42155 = icmp ne i32 %bool42154, 0
+  br i1 %cond42155, label %while.body6830, label %while.end6831
 
-while.body6792:                                   ; preds = %while.cond6791
-  %load41894 = load i32, ptr %size, align 4
-  %load41895 = load i32, ptr %copied, align 4
-  %sub41896 = sub i32 %load41894, %load41895
+while.body6830:                                   ; preds = %while.cond6829
+  %load42156 = load i32, ptr %size, align 4
+  %load42157 = load i32, ptr %copied, align 4
+  %sub42158 = sub i32 %load42156, %load42157
   %remain = alloca i32, align 4
-  store i32 %sub41896, ptr %remain, align 4
-  %load41897 = load i32, ptr %remain, align 4
-  %cmp41898 = icmp sge i32 %load41897, 8
-  %bool41899 = zext i1 %cmp41898 to i32
-  %cond41900 = icmp ne i32 %bool41899, 0
-  br i1 %cond41900, label %if.then6794, label %if.else6795
+  store i32 %sub42158, ptr %remain, align 4
+  %load42159 = load i32, ptr %remain, align 4
+  %cmp42160 = icmp sge i32 %load42159, 8
+  %bool42161 = zext i1 %cmp42160 to i32
+  %cond42162 = icmp ne i32 %bool42161, 0
+  br i1 %cond42162, label %if.then6832, label %if.else6833
 
-while.end6793:                                    ; preds = %while.cond6791
+while.end6831:                                    ; preds = %while.cond6829
   ret void
 
-if.then6794:                                      ; preds = %while.body6792
-  %load41901 = load ptr, ptr %b, align 8
-  %load41903 = load i32, ptr %copied, align 4
-  %call41904 = call ptr @i32_to_str(i32 %load41903)
-  %call41905 = call ptr @vix_string_concat(ptr @.strlit41902, ptr %call41904)
-  %call41907 = call ptr @vix_string_concat(ptr %call41905, ptr @.strlit41906)
-  call void @mir2asm_line(ptr %load41901, ptr %call41907)
-  %load41908 = load ptr, ptr %b, align 8
-  %load41910 = load i32, ptr %dest_offset, align 4
-  %load41911 = load i32, ptr %copied, align 4
-  %call41912 = call ptr @mir2asm_mem_at(i32 %load41910, i32 %load41911)
-  %call41913 = call ptr @vix_string_concat(ptr @.strlit41909, ptr %call41912)
-  %call41915 = call ptr @vix_string_concat(ptr %call41913, ptr @.strlit41914)
-  call void @mir2asm_line(ptr %load41908, ptr %call41915)
-  %load41916 = load i32, ptr %copied, align 4
-  %add41917 = add i32 %load41916, 8
-  store i32 %add41917, ptr %copied, align 4
-  br label %if.end6796
+if.then6832:                                      ; preds = %while.body6830
+  %load42163 = load ptr, ptr %b, align 8
+  %load42165 = load i32, ptr %copied, align 4
+  %call42166 = call ptr @i32_to_str(i32 %load42165)
+  %call42167 = call ptr @vix_string_concat(ptr @.strlit42164, ptr %call42166)
+  %call42169 = call ptr @vix_string_concat(ptr %call42167, ptr @.strlit42168)
+  call void @mir2asm_line(ptr %load42163, ptr %call42169)
+  %load42170 = load ptr, ptr %b, align 8
+  %load42172 = load i32, ptr %dest_offset, align 4
+  %load42173 = load i32, ptr %copied, align 4
+  %call42174 = call ptr @mir2asm_mem_at(i32 %load42172, i32 %load42173)
+  %call42175 = call ptr @vix_string_concat(ptr @.strlit42171, ptr %call42174)
+  %call42177 = call ptr @vix_string_concat(ptr %call42175, ptr @.strlit42176)
+  call void @mir2asm_line(ptr %load42170, ptr %call42177)
+  %load42178 = load i32, ptr %copied, align 4
+  %add42179 = add i32 %load42178, 8
+  store i32 %add42179, ptr %copied, align 4
+  br label %if.end6834
 
-if.else6795:                                      ; preds = %while.body6792
-  %load41918 = load i32, ptr %remain, align 4
-  %cmp41919 = icmp sge i32 %load41918, 4
-  %bool41920 = zext i1 %cmp41919 to i32
-  %cond41921 = icmp ne i32 %bool41920, 0
-  br i1 %cond41921, label %if.then6797, label %if.else6798
+if.else6833:                                      ; preds = %while.body6830
+  %load42180 = load i32, ptr %remain, align 4
+  %cmp42181 = icmp sge i32 %load42180, 4
+  %bool42182 = zext i1 %cmp42181 to i32
+  %cond42183 = icmp ne i32 %bool42182, 0
+  br i1 %cond42183, label %if.then6835, label %if.else6836
 
-if.end6796:                                       ; preds = %if.end6799, %if.then6794
-  br label %while.cond6791
+if.end6834:                                       ; preds = %if.end6837, %if.then6832
+  br label %while.cond6829
 
-if.then6797:                                      ; preds = %if.else6795
-  %load41922 = load ptr, ptr %b, align 8
-  %load41924 = load i32, ptr %copied, align 4
-  %call41925 = call ptr @i32_to_str(i32 %load41924)
-  %call41926 = call ptr @vix_string_concat(ptr @.strlit41923, ptr %call41925)
-  %call41928 = call ptr @vix_string_concat(ptr %call41926, ptr @.strlit41927)
-  call void @mir2asm_line(ptr %load41922, ptr %call41928)
-  %load41929 = load ptr, ptr %b, align 8
-  %load41931 = load i32, ptr %dest_offset, align 4
-  %load41932 = load i32, ptr %copied, align 4
-  %call41933 = call ptr @mir2asm_mem_at(i32 %load41931, i32 %load41932)
-  %call41934 = call ptr @vix_string_concat(ptr @.strlit41930, ptr %call41933)
-  %call41936 = call ptr @vix_string_concat(ptr %call41934, ptr @.strlit41935)
-  call void @mir2asm_line(ptr %load41929, ptr %call41936)
-  %load41937 = load i32, ptr %copied, align 4
-  %add41938 = add i32 %load41937, 4
-  store i32 %add41938, ptr %copied, align 4
-  br label %if.end6799
+if.then6835:                                      ; preds = %if.else6833
+  %load42184 = load ptr, ptr %b, align 8
+  %load42186 = load i32, ptr %copied, align 4
+  %call42187 = call ptr @i32_to_str(i32 %load42186)
+  %call42188 = call ptr @vix_string_concat(ptr @.strlit42185, ptr %call42187)
+  %call42190 = call ptr @vix_string_concat(ptr %call42188, ptr @.strlit42189)
+  call void @mir2asm_line(ptr %load42184, ptr %call42190)
+  %load42191 = load ptr, ptr %b, align 8
+  %load42193 = load i32, ptr %dest_offset, align 4
+  %load42194 = load i32, ptr %copied, align 4
+  %call42195 = call ptr @mir2asm_mem_at(i32 %load42193, i32 %load42194)
+  %call42196 = call ptr @vix_string_concat(ptr @.strlit42192, ptr %call42195)
+  %call42198 = call ptr @vix_string_concat(ptr %call42196, ptr @.strlit42197)
+  call void @mir2asm_line(ptr %load42191, ptr %call42198)
+  %load42199 = load i32, ptr %copied, align 4
+  %add42200 = add i32 %load42199, 4
+  store i32 %add42200, ptr %copied, align 4
+  br label %if.end6837
 
-if.else6798:                                      ; preds = %if.else6795
-  %load41939 = load ptr, ptr %b, align 8
-  %load41941 = load i32, ptr %copied, align 4
-  %call41942 = call ptr @i32_to_str(i32 %load41941)
-  %call41943 = call ptr @vix_string_concat(ptr @.strlit41940, ptr %call41942)
-  %call41945 = call ptr @vix_string_concat(ptr %call41943, ptr @.strlit41944)
-  call void @mir2asm_line(ptr %load41939, ptr %call41945)
-  %load41946 = load ptr, ptr %b, align 8
-  %load41948 = load i32, ptr %dest_offset, align 4
-  %load41949 = load i32, ptr %copied, align 4
-  %call41950 = call ptr @mir2asm_mem_at(i32 %load41948, i32 %load41949)
-  %call41951 = call ptr @vix_string_concat(ptr @.strlit41947, ptr %call41950)
-  %call41953 = call ptr @vix_string_concat(ptr %call41951, ptr @.strlit41952)
-  call void @mir2asm_line(ptr %load41946, ptr %call41953)
-  %load41954 = load i32, ptr %copied, align 4
-  %add41955 = add i32 %load41954, 1
-  store i32 %add41955, ptr %copied, align 4
-  br label %if.end6799
+if.else6836:                                      ; preds = %if.else6833
+  %load42201 = load ptr, ptr %b, align 8
+  %load42203 = load i32, ptr %copied, align 4
+  %call42204 = call ptr @i32_to_str(i32 %load42203)
+  %call42205 = call ptr @vix_string_concat(ptr @.strlit42202, ptr %call42204)
+  %call42207 = call ptr @vix_string_concat(ptr %call42205, ptr @.strlit42206)
+  call void @mir2asm_line(ptr %load42201, ptr %call42207)
+  %load42208 = load ptr, ptr %b, align 8
+  %load42210 = load i32, ptr %dest_offset, align 4
+  %load42211 = load i32, ptr %copied, align 4
+  %call42212 = call ptr @mir2asm_mem_at(i32 %load42210, i32 %load42211)
+  %call42213 = call ptr @vix_string_concat(ptr @.strlit42209, ptr %call42212)
+  %call42215 = call ptr @vix_string_concat(ptr %call42213, ptr @.strlit42214)
+  call void @mir2asm_line(ptr %load42208, ptr %call42215)
+  %load42216 = load i32, ptr %copied, align 4
+  %add42217 = add i32 %load42216, 1
+  store i32 %add42217, ptr %copied, align 4
+  br label %if.end6837
 
-if.end6799:                                       ; preds = %if.else6798, %if.then6797
-  br label %if.end6796
+if.end6837:                                       ; preds = %if.else6836, %if.then6835
+  br label %if.end6834
 }
 
 define void @mir2asm_emit_copy_ptr_field_to_stack(ptr %0, i32 %1, ptr %2, i32 %3, i32 %4) {
@@ -80269,126 +80845,126 @@ entry:
   store i32 %3, ptr %field_offset, align 4
   %size = alloca i32, align 4
   store i32 %4, ptr %size, align 4
-  %load41956 = load ptr, ptr %b, align 8
-  %load41958 = load ptr, ptr %b, align 8
-  %load41959 = load ptr, ptr %ptr_value, align 8
-  %call41961 = call ptr @mir2asm_operand_typed(ptr %load41958, ptr %load41959, ptr @.strlit41960)
-  %call41962 = call ptr @vix_string_concat(ptr @.strlit41957, ptr %call41961)
-  call void @mir2asm_line(ptr %load41956, ptr %call41962)
-  %load41963 = load i32, ptr %field_offset, align 4
-  %cmp41964 = icmp ne i32 %load41963, 0
-  %bool41965 = zext i1 %cmp41964 to i32
-  %cond41966 = icmp ne i32 %bool41965, 0
-  br i1 %cond41966, label %if.then6800, label %if.else6801
+  %load42218 = load ptr, ptr %b, align 8
+  %load42220 = load ptr, ptr %b, align 8
+  %load42221 = load ptr, ptr %ptr_value, align 8
+  %call42223 = call ptr @mir2asm_operand_typed(ptr %load42220, ptr %load42221, ptr @.strlit42222)
+  %call42224 = call ptr @vix_string_concat(ptr @.strlit42219, ptr %call42223)
+  call void @mir2asm_line(ptr %load42218, ptr %call42224)
+  %load42225 = load i32, ptr %field_offset, align 4
+  %cmp42226 = icmp ne i32 %load42225, 0
+  %bool42227 = zext i1 %cmp42226 to i32
+  %cond42228 = icmp ne i32 %bool42227, 0
+  br i1 %cond42228, label %if.then6838, label %if.else6839
 
-if.then6800:                                      ; preds = %entry
-  %load41967 = load ptr, ptr %b, align 8
-  %load41969 = load i32, ptr %field_offset, align 4
-  %call41970 = call ptr @i32_to_str(i32 %load41969)
-  %call41971 = call ptr @vix_string_concat(ptr @.strlit41968, ptr %call41970)
-  call void @mir2asm_line(ptr %load41967, ptr %call41971)
-  br label %if.end6802
+if.then6838:                                      ; preds = %entry
+  %load42229 = load ptr, ptr %b, align 8
+  %load42231 = load i32, ptr %field_offset, align 4
+  %call42232 = call ptr @i32_to_str(i32 %load42231)
+  %call42233 = call ptr @vix_string_concat(ptr @.strlit42230, ptr %call42232)
+  call void @mir2asm_line(ptr %load42229, ptr %call42233)
+  br label %if.end6840
 
-if.else6801:                                      ; preds = %entry
-  br label %if.end6802
+if.else6839:                                      ; preds = %entry
+  br label %if.end6840
 
-if.end6802:                                       ; preds = %if.else6801, %if.then6800
+if.end6840:                                       ; preds = %if.else6839, %if.then6838
   %copied = alloca i32, align 4
   store i32 0, ptr %copied, align 4
-  br label %while.cond6803
+  br label %while.cond6841
 
-while.cond6803:                                   ; preds = %if.end6808, %if.end6802
-  %load41972 = load i32, ptr %copied, align 4
-  %load41973 = load i32, ptr %size, align 4
-  %cmp41974 = icmp slt i32 %load41972, %load41973
-  %bool41975 = zext i1 %cmp41974 to i32
-  %cond41976 = icmp ne i32 %bool41975, 0
-  br i1 %cond41976, label %while.body6804, label %while.end6805
+while.cond6841:                                   ; preds = %if.end6846, %if.end6840
+  %load42234 = load i32, ptr %copied, align 4
+  %load42235 = load i32, ptr %size, align 4
+  %cmp42236 = icmp slt i32 %load42234, %load42235
+  %bool42237 = zext i1 %cmp42236 to i32
+  %cond42238 = icmp ne i32 %bool42237, 0
+  br i1 %cond42238, label %while.body6842, label %while.end6843
 
-while.body6804:                                   ; preds = %while.cond6803
-  %load41977 = load i32, ptr %size, align 4
-  %load41978 = load i32, ptr %copied, align 4
-  %sub41979 = sub i32 %load41977, %load41978
+while.body6842:                                   ; preds = %while.cond6841
+  %load42239 = load i32, ptr %size, align 4
+  %load42240 = load i32, ptr %copied, align 4
+  %sub42241 = sub i32 %load42239, %load42240
   %remain = alloca i32, align 4
-  store i32 %sub41979, ptr %remain, align 4
-  %load41980 = load i32, ptr %remain, align 4
-  %cmp41981 = icmp sge i32 %load41980, 8
-  %bool41982 = zext i1 %cmp41981 to i32
-  %cond41983 = icmp ne i32 %bool41982, 0
-  br i1 %cond41983, label %if.then6806, label %if.else6807
+  store i32 %sub42241, ptr %remain, align 4
+  %load42242 = load i32, ptr %remain, align 4
+  %cmp42243 = icmp sge i32 %load42242, 8
+  %bool42244 = zext i1 %cmp42243 to i32
+  %cond42245 = icmp ne i32 %bool42244, 0
+  br i1 %cond42245, label %if.then6844, label %if.else6845
 
-while.end6805:                                    ; preds = %while.cond6803
+while.end6843:                                    ; preds = %while.cond6841
   ret void
 
-if.then6806:                                      ; preds = %while.body6804
-  %load41984 = load ptr, ptr %b, align 8
-  %load41986 = load i32, ptr %copied, align 4
-  %call41987 = call ptr @i32_to_str(i32 %load41986)
-  %call41988 = call ptr @vix_string_concat(ptr @.strlit41985, ptr %call41987)
-  %call41990 = call ptr @vix_string_concat(ptr %call41988, ptr @.strlit41989)
-  call void @mir2asm_line(ptr %load41984, ptr %call41990)
-  %load41991 = load ptr, ptr %b, align 8
-  %load41993 = load i32, ptr %dest_offset, align 4
-  %load41994 = load i32, ptr %copied, align 4
-  %call41995 = call ptr @mir2asm_mem_at(i32 %load41993, i32 %load41994)
-  %call41996 = call ptr @vix_string_concat(ptr @.strlit41992, ptr %call41995)
-  %call41998 = call ptr @vix_string_concat(ptr %call41996, ptr @.strlit41997)
-  call void @mir2asm_line(ptr %load41991, ptr %call41998)
-  %load41999 = load i32, ptr %copied, align 4
-  %add42000 = add i32 %load41999, 8
-  store i32 %add42000, ptr %copied, align 4
-  br label %if.end6808
+if.then6844:                                      ; preds = %while.body6842
+  %load42246 = load ptr, ptr %b, align 8
+  %load42248 = load i32, ptr %copied, align 4
+  %call42249 = call ptr @i32_to_str(i32 %load42248)
+  %call42250 = call ptr @vix_string_concat(ptr @.strlit42247, ptr %call42249)
+  %call42252 = call ptr @vix_string_concat(ptr %call42250, ptr @.strlit42251)
+  call void @mir2asm_line(ptr %load42246, ptr %call42252)
+  %load42253 = load ptr, ptr %b, align 8
+  %load42255 = load i32, ptr %dest_offset, align 4
+  %load42256 = load i32, ptr %copied, align 4
+  %call42257 = call ptr @mir2asm_mem_at(i32 %load42255, i32 %load42256)
+  %call42258 = call ptr @vix_string_concat(ptr @.strlit42254, ptr %call42257)
+  %call42260 = call ptr @vix_string_concat(ptr %call42258, ptr @.strlit42259)
+  call void @mir2asm_line(ptr %load42253, ptr %call42260)
+  %load42261 = load i32, ptr %copied, align 4
+  %add42262 = add i32 %load42261, 8
+  store i32 %add42262, ptr %copied, align 4
+  br label %if.end6846
 
-if.else6807:                                      ; preds = %while.body6804
-  %load42001 = load i32, ptr %remain, align 4
-  %cmp42002 = icmp sge i32 %load42001, 4
-  %bool42003 = zext i1 %cmp42002 to i32
-  %cond42004 = icmp ne i32 %bool42003, 0
-  br i1 %cond42004, label %if.then6809, label %if.else6810
+if.else6845:                                      ; preds = %while.body6842
+  %load42263 = load i32, ptr %remain, align 4
+  %cmp42264 = icmp sge i32 %load42263, 4
+  %bool42265 = zext i1 %cmp42264 to i32
+  %cond42266 = icmp ne i32 %bool42265, 0
+  br i1 %cond42266, label %if.then6847, label %if.else6848
 
-if.end6808:                                       ; preds = %if.end6811, %if.then6806
-  br label %while.cond6803
+if.end6846:                                       ; preds = %if.end6849, %if.then6844
+  br label %while.cond6841
 
-if.then6809:                                      ; preds = %if.else6807
-  %load42005 = load ptr, ptr %b, align 8
-  %load42007 = load i32, ptr %copied, align 4
-  %call42008 = call ptr @i32_to_str(i32 %load42007)
-  %call42009 = call ptr @vix_string_concat(ptr @.strlit42006, ptr %call42008)
-  %call42011 = call ptr @vix_string_concat(ptr %call42009, ptr @.strlit42010)
-  call void @mir2asm_line(ptr %load42005, ptr %call42011)
-  %load42012 = load ptr, ptr %b, align 8
-  %load42014 = load i32, ptr %dest_offset, align 4
-  %load42015 = load i32, ptr %copied, align 4
-  %call42016 = call ptr @mir2asm_mem_at(i32 %load42014, i32 %load42015)
-  %call42017 = call ptr @vix_string_concat(ptr @.strlit42013, ptr %call42016)
-  %call42019 = call ptr @vix_string_concat(ptr %call42017, ptr @.strlit42018)
-  call void @mir2asm_line(ptr %load42012, ptr %call42019)
-  %load42020 = load i32, ptr %copied, align 4
-  %add42021 = add i32 %load42020, 4
-  store i32 %add42021, ptr %copied, align 4
-  br label %if.end6811
+if.then6847:                                      ; preds = %if.else6845
+  %load42267 = load ptr, ptr %b, align 8
+  %load42269 = load i32, ptr %copied, align 4
+  %call42270 = call ptr @i32_to_str(i32 %load42269)
+  %call42271 = call ptr @vix_string_concat(ptr @.strlit42268, ptr %call42270)
+  %call42273 = call ptr @vix_string_concat(ptr %call42271, ptr @.strlit42272)
+  call void @mir2asm_line(ptr %load42267, ptr %call42273)
+  %load42274 = load ptr, ptr %b, align 8
+  %load42276 = load i32, ptr %dest_offset, align 4
+  %load42277 = load i32, ptr %copied, align 4
+  %call42278 = call ptr @mir2asm_mem_at(i32 %load42276, i32 %load42277)
+  %call42279 = call ptr @vix_string_concat(ptr @.strlit42275, ptr %call42278)
+  %call42281 = call ptr @vix_string_concat(ptr %call42279, ptr @.strlit42280)
+  call void @mir2asm_line(ptr %load42274, ptr %call42281)
+  %load42282 = load i32, ptr %copied, align 4
+  %add42283 = add i32 %load42282, 4
+  store i32 %add42283, ptr %copied, align 4
+  br label %if.end6849
 
-if.else6810:                                      ; preds = %if.else6807
-  %load42022 = load ptr, ptr %b, align 8
-  %load42024 = load i32, ptr %copied, align 4
-  %call42025 = call ptr @i32_to_str(i32 %load42024)
-  %call42026 = call ptr @vix_string_concat(ptr @.strlit42023, ptr %call42025)
-  %call42028 = call ptr @vix_string_concat(ptr %call42026, ptr @.strlit42027)
-  call void @mir2asm_line(ptr %load42022, ptr %call42028)
-  %load42029 = load ptr, ptr %b, align 8
-  %load42031 = load i32, ptr %dest_offset, align 4
-  %load42032 = load i32, ptr %copied, align 4
-  %call42033 = call ptr @mir2asm_mem_at(i32 %load42031, i32 %load42032)
-  %call42034 = call ptr @vix_string_concat(ptr @.strlit42030, ptr %call42033)
-  %call42036 = call ptr @vix_string_concat(ptr %call42034, ptr @.strlit42035)
-  call void @mir2asm_line(ptr %load42029, ptr %call42036)
-  %load42037 = load i32, ptr %copied, align 4
-  %add42038 = add i32 %load42037, 1
-  store i32 %add42038, ptr %copied, align 4
-  br label %if.end6811
+if.else6848:                                      ; preds = %if.else6845
+  %load42284 = load ptr, ptr %b, align 8
+  %load42286 = load i32, ptr %copied, align 4
+  %call42287 = call ptr @i32_to_str(i32 %load42286)
+  %call42288 = call ptr @vix_string_concat(ptr @.strlit42285, ptr %call42287)
+  %call42290 = call ptr @vix_string_concat(ptr %call42288, ptr @.strlit42289)
+  call void @mir2asm_line(ptr %load42284, ptr %call42290)
+  %load42291 = load ptr, ptr %b, align 8
+  %load42293 = load i32, ptr %dest_offset, align 4
+  %load42294 = load i32, ptr %copied, align 4
+  %call42295 = call ptr @mir2asm_mem_at(i32 %load42293, i32 %load42294)
+  %call42296 = call ptr @vix_string_concat(ptr @.strlit42292, ptr %call42295)
+  %call42298 = call ptr @vix_string_concat(ptr %call42296, ptr @.strlit42297)
+  call void @mir2asm_line(ptr %load42291, ptr %call42298)
+  %load42299 = load i32, ptr %copied, align 4
+  %add42300 = add i32 %load42299, 1
+  store i32 %add42300, ptr %copied, align 4
+  br label %if.end6849
 
-if.end6811:                                       ; preds = %if.else6810, %if.then6809
-  br label %if.end6808
+if.end6849:                                       ; preds = %if.else6848, %if.then6847
+  br label %if.end6846
 }
 
 define void @mir2asm_emit_copy_stack_to_ptr(ptr %0, ptr %1, i32 %2, i32 %3) {
@@ -80401,105 +80977,105 @@ entry:
   store i32 %2, ptr %src_offset, align 4
   %size = alloca i32, align 4
   store i32 %3, ptr %size, align 4
-  %load42110 = load ptr, ptr %b, align 8
-  %load42112 = load ptr, ptr %b, align 8
-  %load42113 = load ptr, ptr %ptr_value, align 8
-  %call42115 = call ptr @mir2asm_operand_typed(ptr %load42112, ptr %load42113, ptr @.strlit42114)
-  %call42116 = call ptr @vix_string_concat(ptr @.strlit42111, ptr %call42115)
-  call void @mir2asm_line(ptr %load42110, ptr %call42116)
+  %load42372 = load ptr, ptr %b, align 8
+  %load42374 = load ptr, ptr %b, align 8
+  %load42375 = load ptr, ptr %ptr_value, align 8
+  %call42377 = call ptr @mir2asm_operand_typed(ptr %load42374, ptr %load42375, ptr @.strlit42376)
+  %call42378 = call ptr @vix_string_concat(ptr @.strlit42373, ptr %call42377)
+  call void @mir2asm_line(ptr %load42372, ptr %call42378)
   %copied = alloca i32, align 4
   store i32 0, ptr %copied, align 4
-  br label %while.cond6821
+  br label %while.cond6859
 
-while.cond6821:                                   ; preds = %if.end6826, %entry
-  %load42117 = load i32, ptr %copied, align 4
-  %load42118 = load i32, ptr %size, align 4
-  %cmp42119 = icmp slt i32 %load42117, %load42118
-  %bool42120 = zext i1 %cmp42119 to i32
-  %cond42121 = icmp ne i32 %bool42120, 0
-  br i1 %cond42121, label %while.body6822, label %while.end6823
+while.cond6859:                                   ; preds = %if.end6864, %entry
+  %load42379 = load i32, ptr %copied, align 4
+  %load42380 = load i32, ptr %size, align 4
+  %cmp42381 = icmp slt i32 %load42379, %load42380
+  %bool42382 = zext i1 %cmp42381 to i32
+  %cond42383 = icmp ne i32 %bool42382, 0
+  br i1 %cond42383, label %while.body6860, label %while.end6861
 
-while.body6822:                                   ; preds = %while.cond6821
-  %load42122 = load i32, ptr %size, align 4
-  %load42123 = load i32, ptr %copied, align 4
-  %sub42124 = sub i32 %load42122, %load42123
+while.body6860:                                   ; preds = %while.cond6859
+  %load42384 = load i32, ptr %size, align 4
+  %load42385 = load i32, ptr %copied, align 4
+  %sub42386 = sub i32 %load42384, %load42385
   %remain = alloca i32, align 4
-  store i32 %sub42124, ptr %remain, align 4
-  %load42125 = load i32, ptr %remain, align 4
-  %cmp42126 = icmp sge i32 %load42125, 8
-  %bool42127 = zext i1 %cmp42126 to i32
-  %cond42128 = icmp ne i32 %bool42127, 0
-  br i1 %cond42128, label %if.then6824, label %if.else6825
+  store i32 %sub42386, ptr %remain, align 4
+  %load42387 = load i32, ptr %remain, align 4
+  %cmp42388 = icmp sge i32 %load42387, 8
+  %bool42389 = zext i1 %cmp42388 to i32
+  %cond42390 = icmp ne i32 %bool42389, 0
+  br i1 %cond42390, label %if.then6862, label %if.else6863
 
-while.end6823:                                    ; preds = %while.cond6821
+while.end6861:                                    ; preds = %while.cond6859
   ret void
 
-if.then6824:                                      ; preds = %while.body6822
-  %load42129 = load ptr, ptr %b, align 8
-  %load42131 = load i32, ptr %src_offset, align 4
-  %load42132 = load i32, ptr %copied, align 4
-  %call42133 = call ptr @mir2asm_mem_at(i32 %load42131, i32 %load42132)
-  %call42134 = call ptr @vix_string_concat(ptr @.strlit42130, ptr %call42133)
-  call void @mir2asm_line(ptr %load42129, ptr %call42134)
-  %load42135 = load ptr, ptr %b, align 8
-  %load42137 = load i32, ptr %copied, align 4
-  %call42138 = call ptr @i32_to_str(i32 %load42137)
-  %call42139 = call ptr @vix_string_concat(ptr @.strlit42136, ptr %call42138)
-  %call42141 = call ptr @vix_string_concat(ptr %call42139, ptr @.strlit42140)
-  call void @mir2asm_line(ptr %load42135, ptr %call42141)
-  %load42142 = load i32, ptr %copied, align 4
-  %add42143 = add i32 %load42142, 8
-  store i32 %add42143, ptr %copied, align 4
-  br label %if.end6826
+if.then6862:                                      ; preds = %while.body6860
+  %load42391 = load ptr, ptr %b, align 8
+  %load42393 = load i32, ptr %src_offset, align 4
+  %load42394 = load i32, ptr %copied, align 4
+  %call42395 = call ptr @mir2asm_mem_at(i32 %load42393, i32 %load42394)
+  %call42396 = call ptr @vix_string_concat(ptr @.strlit42392, ptr %call42395)
+  call void @mir2asm_line(ptr %load42391, ptr %call42396)
+  %load42397 = load ptr, ptr %b, align 8
+  %load42399 = load i32, ptr %copied, align 4
+  %call42400 = call ptr @i32_to_str(i32 %load42399)
+  %call42401 = call ptr @vix_string_concat(ptr @.strlit42398, ptr %call42400)
+  %call42403 = call ptr @vix_string_concat(ptr %call42401, ptr @.strlit42402)
+  call void @mir2asm_line(ptr %load42397, ptr %call42403)
+  %load42404 = load i32, ptr %copied, align 4
+  %add42405 = add i32 %load42404, 8
+  store i32 %add42405, ptr %copied, align 4
+  br label %if.end6864
 
-if.else6825:                                      ; preds = %while.body6822
-  %load42144 = load i32, ptr %remain, align 4
-  %cmp42145 = icmp sge i32 %load42144, 4
-  %bool42146 = zext i1 %cmp42145 to i32
-  %cond42147 = icmp ne i32 %bool42146, 0
-  br i1 %cond42147, label %if.then6827, label %if.else6828
+if.else6863:                                      ; preds = %while.body6860
+  %load42406 = load i32, ptr %remain, align 4
+  %cmp42407 = icmp sge i32 %load42406, 4
+  %bool42408 = zext i1 %cmp42407 to i32
+  %cond42409 = icmp ne i32 %bool42408, 0
+  br i1 %cond42409, label %if.then6865, label %if.else6866
 
-if.end6826:                                       ; preds = %if.end6829, %if.then6824
-  br label %while.cond6821
+if.end6864:                                       ; preds = %if.end6867, %if.then6862
+  br label %while.cond6859
 
-if.then6827:                                      ; preds = %if.else6825
-  %load42148 = load ptr, ptr %b, align 8
-  %load42150 = load i32, ptr %src_offset, align 4
-  %load42151 = load i32, ptr %copied, align 4
-  %call42152 = call ptr @mir2asm_mem_at(i32 %load42150, i32 %load42151)
-  %call42153 = call ptr @vix_string_concat(ptr @.strlit42149, ptr %call42152)
-  call void @mir2asm_line(ptr %load42148, ptr %call42153)
-  %load42154 = load ptr, ptr %b, align 8
-  %load42156 = load i32, ptr %copied, align 4
-  %call42157 = call ptr @i32_to_str(i32 %load42156)
-  %call42158 = call ptr @vix_string_concat(ptr @.strlit42155, ptr %call42157)
-  %call42160 = call ptr @vix_string_concat(ptr %call42158, ptr @.strlit42159)
-  call void @mir2asm_line(ptr %load42154, ptr %call42160)
-  %load42161 = load i32, ptr %copied, align 4
-  %add42162 = add i32 %load42161, 4
-  store i32 %add42162, ptr %copied, align 4
-  br label %if.end6829
+if.then6865:                                      ; preds = %if.else6863
+  %load42410 = load ptr, ptr %b, align 8
+  %load42412 = load i32, ptr %src_offset, align 4
+  %load42413 = load i32, ptr %copied, align 4
+  %call42414 = call ptr @mir2asm_mem_at(i32 %load42412, i32 %load42413)
+  %call42415 = call ptr @vix_string_concat(ptr @.strlit42411, ptr %call42414)
+  call void @mir2asm_line(ptr %load42410, ptr %call42415)
+  %load42416 = load ptr, ptr %b, align 8
+  %load42418 = load i32, ptr %copied, align 4
+  %call42419 = call ptr @i32_to_str(i32 %load42418)
+  %call42420 = call ptr @vix_string_concat(ptr @.strlit42417, ptr %call42419)
+  %call42422 = call ptr @vix_string_concat(ptr %call42420, ptr @.strlit42421)
+  call void @mir2asm_line(ptr %load42416, ptr %call42422)
+  %load42423 = load i32, ptr %copied, align 4
+  %add42424 = add i32 %load42423, 4
+  store i32 %add42424, ptr %copied, align 4
+  br label %if.end6867
 
-if.else6828:                                      ; preds = %if.else6825
-  %load42163 = load ptr, ptr %b, align 8
-  %load42165 = load i32, ptr %src_offset, align 4
-  %load42166 = load i32, ptr %copied, align 4
-  %call42167 = call ptr @mir2asm_mem_at(i32 %load42165, i32 %load42166)
-  %call42168 = call ptr @vix_string_concat(ptr @.strlit42164, ptr %call42167)
-  call void @mir2asm_line(ptr %load42163, ptr %call42168)
-  %load42169 = load ptr, ptr %b, align 8
-  %load42171 = load i32, ptr %copied, align 4
-  %call42172 = call ptr @i32_to_str(i32 %load42171)
-  %call42173 = call ptr @vix_string_concat(ptr @.strlit42170, ptr %call42172)
-  %call42175 = call ptr @vix_string_concat(ptr %call42173, ptr @.strlit42174)
-  call void @mir2asm_line(ptr %load42169, ptr %call42175)
-  %load42176 = load i32, ptr %copied, align 4
-  %add42177 = add i32 %load42176, 1
-  store i32 %add42177, ptr %copied, align 4
-  br label %if.end6829
+if.else6866:                                      ; preds = %if.else6863
+  %load42425 = load ptr, ptr %b, align 8
+  %load42427 = load i32, ptr %src_offset, align 4
+  %load42428 = load i32, ptr %copied, align 4
+  %call42429 = call ptr @mir2asm_mem_at(i32 %load42427, i32 %load42428)
+  %call42430 = call ptr @vix_string_concat(ptr @.strlit42426, ptr %call42429)
+  call void @mir2asm_line(ptr %load42425, ptr %call42430)
+  %load42431 = load ptr, ptr %b, align 8
+  %load42433 = load i32, ptr %copied, align 4
+  %call42434 = call ptr @i32_to_str(i32 %load42433)
+  %call42435 = call ptr @vix_string_concat(ptr @.strlit42432, ptr %call42434)
+  %call42437 = call ptr @vix_string_concat(ptr %call42435, ptr @.strlit42436)
+  call void @mir2asm_line(ptr %load42431, ptr %call42437)
+  %load42438 = load i32, ptr %copied, align 4
+  %add42439 = add i32 %load42438, 1
+  store i32 %add42439, ptr %copied, align 4
+  br label %if.end6867
 
-if.end6829:                                       ; preds = %if.else6828, %if.then6827
-  br label %if.end6826
+if.end6867:                                       ; preds = %if.else6866, %if.then6865
+  br label %if.end6864
 }
 
 define i32 @mir2asm_index_in_brackets(ptr %0, i32 %1) {
@@ -80508,157 +81084,157 @@ entry:
   store ptr %0, ptr %text, align 8
   %start = alloca i32, align 4
   store i32 %1, ptr %start, align 4
-  %load42178 = load ptr, ptr %text, align 8
-  %load42179 = load i32, ptr %start, align 4
-  %call42180 = call i32 @mir2asm_find(ptr %load42178, i8 91, i32 %load42179)
+  %load42440 = load ptr, ptr %text, align 8
+  %load42441 = load i32, ptr %start, align 4
+  %call42442 = call i32 @mir2asm_find(ptr %load42440, i8 91, i32 %load42441)
   %lb = alloca i32, align 4
-  store i32 %call42180, ptr %lb, align 4
-  %load42181 = load ptr, ptr %text, align 8
-  %load42182 = load i32, ptr %lb, align 4
-  %call42183 = call i32 @mir2asm_find(ptr %load42181, i8 93, i32 %load42182)
+  store i32 %call42442, ptr %lb, align 4
+  %load42443 = load ptr, ptr %text, align 8
+  %load42444 = load i32, ptr %lb, align 4
+  %call42445 = call i32 @mir2asm_find(ptr %load42443, i8 93, i32 %load42444)
   %rb = alloca i32, align 4
-  store i32 %call42183, ptr %rb, align 4
-  %load42184 = load i32, ptr %lb, align 4
-  %cmp42185 = icmp slt i32 %load42184, 0
-  %bool42186 = zext i1 %cmp42185 to i32
-  %cond42187 = icmp ne i32 %bool42186, 0
-  br i1 %cond42187, label %or.true, label %or.rhs
+  store i32 %call42445, ptr %rb, align 4
+  %load42446 = load i32, ptr %lb, align 4
+  %cmp42447 = icmp slt i32 %load42446, 0
+  %bool42448 = zext i1 %cmp42447 to i32
+  %cond42449 = icmp ne i32 %bool42448, 0
+  br i1 %cond42449, label %or.true, label %or.rhs
 
-if.then6830:                                      ; preds = %or.merge
+if.then6868:                                      ; preds = %or.merge
   ret i32 0
 
-if.else6831:                                      ; preds = %or.merge
-  br label %if.end6832
+if.else6869:                                      ; preds = %or.merge
+  br label %if.end6870
 
-if.end6832:                                       ; preds = %if.else6831
-  %load42194 = load ptr, ptr %text, align 8
-  %load42195 = load i32, ptr %lb, align 4
-  %add42196 = add i32 %load42195, 1
-  %load42197 = load i32, ptr %rb, align 4
-  %call42198 = call ptr @mir2asm_slice(ptr %load42194, i32 %add42196, i32 %load42197)
-  %call42199 = call ptr @mir2asm_trim(ptr %call42198)
+if.end6870:                                       ; preds = %if.else6869
+  %load42456 = load ptr, ptr %text, align 8
+  %load42457 = load i32, ptr %lb, align 4
+  %add42458 = add i32 %load42457, 1
+  %load42459 = load i32, ptr %rb, align 4
+  %call42460 = call ptr @mir2asm_slice(ptr %load42456, i32 %add42458, i32 %load42459)
+  %call42461 = call ptr @mir2asm_trim(ptr %call42460)
   %raw = alloca ptr, align 8
-  store ptr %call42199, ptr %raw, align 8
-  %load42200 = load ptr, ptr %raw, align 8
-  %call42201 = call i32 @mir2asm_find(ptr %load42200, i8 44, i32 0)
+  store ptr %call42461, ptr %raw, align 8
+  %load42462 = load ptr, ptr %raw, align 8
+  %call42463 = call i32 @mir2asm_find(ptr %load42462, i8 44, i32 0)
   %comma = alloca i32, align 4
-  store i32 %call42201, ptr %comma, align 4
-  %ifexpr42202 = alloca ptr, align 8
-  %load42203 = load i32, ptr %comma, align 4
-  %cmp42204 = icmp sge i32 %load42203, 0
-  %bool42205 = zext i1 %cmp42204 to i32
-  %cond42206 = icmp ne i32 %bool42205, 0
-  br i1 %cond42206, label %ifexpr.then6833, label %ifexpr.else6834
+  store i32 %call42463, ptr %comma, align 4
+  %ifexpr42464 = alloca ptr, align 8
+  %load42465 = load i32, ptr %comma, align 4
+  %cmp42466 = icmp sge i32 %load42465, 0
+  %bool42467 = zext i1 %cmp42466 to i32
+  %cond42468 = icmp ne i32 %bool42467, 0
+  br i1 %cond42468, label %ifexpr.then6871, label %ifexpr.else6872
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load42188 = load i32, ptr %rb, align 4
-  %cmp42189 = icmp slt i32 %load42188, 0
-  %bool42190 = zext i1 %cmp42189 to i32
-  %cond42191 = icmp ne i32 %bool42190, 0
-  br i1 %cond42191, label %or.true, label %or.merge
+  %load42450 = load i32, ptr %rb, align 4
+  %cmp42451 = icmp slt i32 %load42450, 0
+  %bool42452 = zext i1 %cmp42451 to i32
+  %cond42453 = icmp ne i32 %bool42452, 0
+  br i1 %cond42453, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval42192 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond42193 = icmp ne i32 %orval42192, 0
-  br i1 %cond42193, label %if.then6830, label %if.else6831
+  %orval42454 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond42455 = icmp ne i32 %orval42454, 0
+  br i1 %cond42455, label %if.then6868, label %if.else6869
 
-ifexpr.then6833:                                  ; preds = %if.end6832
-  %load42207 = load ptr, ptr %raw, align 8
-  %load42208 = load i32, ptr %comma, align 4
-  %add42209 = add i32 %load42208, 1
-  %call42210 = call ptr @mir2asm_after(ptr %load42207, i32 %add42209)
-  %call42211 = call ptr @mir2asm_trim(ptr %call42210)
-  store ptr %call42211, ptr %ifexpr42202, align 8
-  br label %ifexpr.end6835
+ifexpr.then6871:                                  ; preds = %if.end6870
+  %load42469 = load ptr, ptr %raw, align 8
+  %load42470 = load i32, ptr %comma, align 4
+  %add42471 = add i32 %load42470, 1
+  %call42472 = call ptr @mir2asm_after(ptr %load42469, i32 %add42471)
+  %call42473 = call ptr @mir2asm_trim(ptr %call42472)
+  store ptr %call42473, ptr %ifexpr42464, align 8
+  br label %ifexpr.end6873
 
-ifexpr.else6834:                                  ; preds = %if.end6832
-  %load42212 = load ptr, ptr %raw, align 8
-  store ptr %load42212, ptr %ifexpr42202, align 8
-  br label %ifexpr.end6835
+ifexpr.else6872:                                  ; preds = %if.end6870
+  %load42474 = load ptr, ptr %raw, align 8
+  store ptr %load42474, ptr %ifexpr42464, align 8
+  br label %ifexpr.end6873
 
-ifexpr.end6835:                                   ; preds = %ifexpr.else6834, %ifexpr.then6833
-  %ifexprval42213 = load ptr, ptr %ifexpr42202, align 8
+ifexpr.end6873:                                   ; preds = %ifexpr.else6872, %ifexpr.then6871
+  %ifexprval42475 = load ptr, ptr %ifexpr42464, align 8
   %value = alloca ptr, align 8
-  store ptr %ifexprval42213, ptr %value, align 8
+  store ptr %ifexprval42475, ptr %value, align 8
   %out = alloca i32, align 4
   store i32 0, ptr %out, align 4
-  %load42214 = load ptr, ptr %value, align 8
-  %strlen42215 = call i32 @strlen(ptr %load42214)
+  %load42476 = load ptr, ptr %value, align 8
+  %strlen42477 = call i32 @strlen(ptr %load42476)
   %i = alloca i32, align 4
   store i32 0, ptr %i, align 4
-  %__for_end_i6840 = alloca i32, align 4
-  store i32 %strlen42215, ptr %__for_end_i6840, align 4
-  br label %for.cond6836
+  %__for_end_i6878 = alloca i32, align 4
+  store i32 %strlen42477, ptr %__for_end_i6878, align 4
+  br label %for.cond6874
 
-for.cond6836:                                     ; preds = %for.step6838, %ifexpr.end6835
-  %load42216 = load i32, ptr %i, align 4
-  %load42217 = load i32, ptr %__for_end_i6840, align 4
-  %cmp42218 = icmp slt i32 %load42216, %load42217
-  %bool42219 = zext i1 %cmp42218 to i32
-  %cond42220 = icmp ne i32 %bool42219, 0
-  br i1 %cond42220, label %for.body6837, label %for.end6839
+for.cond6874:                                     ; preds = %for.step6876, %ifexpr.end6873
+  %load42478 = load i32, ptr %i, align 4
+  %load42479 = load i32, ptr %__for_end_i6878, align 4
+  %cmp42480 = icmp slt i32 %load42478, %load42479
+  %bool42481 = zext i1 %cmp42480 to i32
+  %cond42482 = icmp ne i32 %bool42481, 0
+  br i1 %cond42482, label %for.body6875, label %for.end6877
 
-for.body6837:                                     ; preds = %for.cond6836
-  %load42221 = load ptr, ptr %value, align 8
-  %load42222 = load i32, ptr %i, align 4
-  %sidx42223 = getelementptr i8, ptr %load42221, i32 %load42222
-  %sbyte42224 = load i8, ptr %sidx42223, align 1
-  %schar42225 = zext i8 %sbyte42224 to i32
-  %cmp42226 = icmp sge i32 %schar42225, 48
-  %bool42227 = zext i1 %cmp42226 to i32
-  %cond42228 = icmp ne i32 %bool42227, 0
-  br i1 %cond42228, label %and.rhs, label %and.false
+for.body6875:                                     ; preds = %for.cond6874
+  %load42483 = load ptr, ptr %value, align 8
+  %load42484 = load i32, ptr %i, align 4
+  %sidx42485 = getelementptr i8, ptr %load42483, i32 %load42484
+  %sbyte42486 = load i8, ptr %sidx42485, align 1
+  %schar42487 = zext i8 %sbyte42486 to i32
+  %cmp42488 = icmp sge i32 %schar42487, 48
+  %bool42489 = zext i1 %cmp42488 to i32
+  %cond42490 = icmp ne i32 %bool42489, 0
+  br i1 %cond42490, label %and.rhs, label %and.false
 
-for.step6838:                                     ; preds = %if.end6843
-  %load42248 = load i32, ptr %i, align 4
-  %add42249 = add i32 %load42248, 1
-  store i32 %add42249, ptr %i, align 4
-  br label %for.cond6836
+for.step6876:                                     ; preds = %if.end6881
+  %load42510 = load i32, ptr %i, align 4
+  %add42511 = add i32 %load42510, 1
+  store i32 %add42511, ptr %i, align 4
+  br label %for.cond6874
 
-for.end6839:                                      ; preds = %for.cond6836
-  %load42250 = load i32, ptr %out, align 4
-  ret i32 %load42250
+for.end6877:                                      ; preds = %for.cond6874
+  %load42512 = load i32, ptr %out, align 4
+  ret i32 %load42512
 
-if.then6841:                                      ; preds = %and.merge
-  %load42239 = load i32, ptr %out, align 4
-  %mul42240 = mul i32 %load42239, 10
-  %load42241 = load ptr, ptr %value, align 8
-  %load42242 = load i32, ptr %i, align 4
-  %sidx42243 = getelementptr i8, ptr %load42241, i32 %load42242
-  %sbyte42244 = load i8, ptr %sidx42243, align 1
-  %schar42245 = zext i8 %sbyte42244 to i32
-  %sub42246 = sub i32 %schar42245, 48
-  %add42247 = add i32 %mul42240, %sub42246
-  store i32 %add42247, ptr %out, align 4
-  br label %if.end6843
+if.then6879:                                      ; preds = %and.merge
+  %load42501 = load i32, ptr %out, align 4
+  %mul42502 = mul i32 %load42501, 10
+  %load42503 = load ptr, ptr %value, align 8
+  %load42504 = load i32, ptr %i, align 4
+  %sidx42505 = getelementptr i8, ptr %load42503, i32 %load42504
+  %sbyte42506 = load i8, ptr %sidx42505, align 1
+  %schar42507 = zext i8 %sbyte42506 to i32
+  %sub42508 = sub i32 %schar42507, 48
+  %add42509 = add i32 %mul42502, %sub42508
+  store i32 %add42509, ptr %out, align 4
+  br label %if.end6881
 
-if.else6842:                                      ; preds = %and.merge
-  br label %if.end6843
+if.else6880:                                      ; preds = %and.merge
+  br label %if.end6881
 
-if.end6843:                                       ; preds = %if.else6842, %if.then6841
-  br label %for.step6838
+if.end6881:                                       ; preds = %if.else6880, %if.then6879
+  br label %for.step6876
 
-and.rhs:                                          ; preds = %for.body6837
-  %load42229 = load ptr, ptr %value, align 8
-  %load42230 = load i32, ptr %i, align 4
-  %sidx42231 = getelementptr i8, ptr %load42229, i32 %load42230
-  %sbyte42232 = load i8, ptr %sidx42231, align 1
-  %schar42233 = zext i8 %sbyte42232 to i32
-  %cmp42234 = icmp sle i32 %schar42233, 57
-  %bool42235 = zext i1 %cmp42234 to i32
-  %cond42236 = icmp ne i32 %bool42235, 0
-  br i1 %cond42236, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %for.body6875
+  %load42491 = load ptr, ptr %value, align 8
+  %load42492 = load i32, ptr %i, align 4
+  %sidx42493 = getelementptr i8, ptr %load42491, i32 %load42492
+  %sbyte42494 = load i8, ptr %sidx42493, align 1
+  %schar42495 = zext i8 %sbyte42494 to i32
+  %cmp42496 = icmp sle i32 %schar42495, 57
+  %bool42497 = zext i1 %cmp42496 to i32
+  %cond42498 = icmp ne i32 %bool42497, 0
+  br i1 %cond42498, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %for.body6837
+and.false:                                        ; preds = %and.rhs, %for.body6875
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval42237 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond42238 = icmp ne i32 %andval42237, 0
-  br i1 %cond42238, label %if.then6841, label %if.else6842
+  %andval42499 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond42500 = icmp ne i32 %andval42499, 0
+  br i1 %cond42500, label %if.then6879, label %if.else6880
 }
 
 define void @mir2asm_emit_const_struct(ptr %0, ptr %1, ptr %2) {
@@ -80669,45 +81245,45 @@ entry:
   store ptr %1, ptr %dest, align 8
   %rhs = alloca ptr, align 8
   store ptr %2, ptr %rhs, align 8
-  %load42251 = load ptr, ptr %rhs, align 8
-  %call42252 = call i32 @mir2asm_find(ptr %load42251, i8 32, i32 6)
+  %load42513 = load ptr, ptr %rhs, align 8
+  %call42514 = call i32 @mir2asm_find(ptr %load42513, i8 32, i32 6)
   %sp = alloca i32, align 4
-  store i32 %call42252, ptr %sp, align 4
-  %ifexpr42253 = alloca ptr, align 8
-  %load42254 = load i32, ptr %sp, align 4
-  %cmp42255 = icmp sge i32 %load42254, 0
-  %bool42256 = zext i1 %cmp42255 to i32
-  %cond42257 = icmp ne i32 %bool42256, 0
-  br i1 %cond42257, label %ifexpr.then6844, label %ifexpr.else6845
+  store i32 %call42514, ptr %sp, align 4
+  %ifexpr42515 = alloca ptr, align 8
+  %load42516 = load i32, ptr %sp, align 4
+  %cmp42517 = icmp sge i32 %load42516, 0
+  %bool42518 = zext i1 %cmp42517 to i32
+  %cond42519 = icmp ne i32 %bool42518, 0
+  br i1 %cond42519, label %ifexpr.then6882, label %ifexpr.else6883
 
-ifexpr.then6844:                                  ; preds = %entry
-  %load42258 = load ptr, ptr %rhs, align 8
-  %load42259 = load i32, ptr %sp, align 4
-  %call42260 = call ptr @mir2asm_slice(ptr %load42258, i32 6, i32 %load42259)
-  %call42261 = call ptr @mir2asm_trim(ptr %call42260)
-  store ptr %call42261, ptr %ifexpr42253, align 8
-  br label %ifexpr.end6846
+ifexpr.then6882:                                  ; preds = %entry
+  %load42520 = load ptr, ptr %rhs, align 8
+  %load42521 = load i32, ptr %sp, align 4
+  %call42522 = call ptr @mir2asm_slice(ptr %load42520, i32 6, i32 %load42521)
+  %call42523 = call ptr @mir2asm_trim(ptr %call42522)
+  store ptr %call42523, ptr %ifexpr42515, align 8
+  br label %ifexpr.end6884
 
-ifexpr.else6845:                                  ; preds = %entry
-  store ptr @.strlit42262, ptr %ifexpr42253, align 8
-  br label %ifexpr.end6846
+ifexpr.else6883:                                  ; preds = %entry
+  store ptr @.strlit42524, ptr %ifexpr42515, align 8
+  br label %ifexpr.end6884
 
-ifexpr.end6846:                                   ; preds = %ifexpr.else6845, %ifexpr.then6844
-  %ifexprval42263 = load ptr, ptr %ifexpr42253, align 8
+ifexpr.end6884:                                   ; preds = %ifexpr.else6883, %ifexpr.then6882
+  %ifexprval42525 = load ptr, ptr %ifexpr42515, align 8
   %ty = alloca ptr, align 8
-  store ptr %ifexprval42263, ptr %ty, align 8
-  %load42264 = load ptr, ptr %b, align 8
-  %load42265 = load ptr, ptr %dest, align 8
-  %load42266 = load ptr, ptr %ty, align 8
-  %call42267 = call i32 @mir2asm_alloc_slot_typed(ptr %load42264, ptr %load42265, i32 0, ptr %load42266)
+  store ptr %ifexprval42525, ptr %ty, align 8
+  %load42526 = load ptr, ptr %b, align 8
+  %load42527 = load ptr, ptr %dest, align 8
+  %load42528 = load ptr, ptr %ty, align 8
+  %call42529 = call i32 @mir2asm_alloc_slot_typed(ptr %load42526, ptr %load42527, i32 0, ptr %load42528)
   %off = alloca i32, align 4
-  store i32 %call42267, ptr %off, align 4
-  %load42268 = load ptr, ptr %b, align 8
-  %load42269 = load i32, ptr %off, align 4
-  %load42270 = load ptr, ptr %b, align 8
-  %load42271 = load ptr, ptr %ty, align 8
-  %call42272 = call i32 @mir2asm_type_size_for(ptr %load42270, ptr %load42271)
-  call void @mir2asm_emit_zero_bytes(ptr %load42268, i32 %load42269, i32 %call42272)
+  store i32 %call42529, ptr %off, align 4
+  %load42530 = load ptr, ptr %b, align 8
+  %load42531 = load i32, ptr %off, align 4
+  %load42532 = load ptr, ptr %b, align 8
+  %load42533 = load ptr, ptr %ty, align 8
+  %call42534 = call i32 @mir2asm_type_size_for(ptr %load42532, ptr %load42533)
+  call void @mir2asm_emit_zero_bytes(ptr %load42530, i32 %load42531, i32 %call42534)
   ret void
 }
 
@@ -80721,228 +81297,228 @@ entry:
   store ptr %2, ptr %rhs, align 8
   %ty_start = alloca i32, align 4
   store i32 12, ptr %ty_start, align 4
-  %load42273 = load ptr, ptr %rhs, align 8
-  %load42274 = load i32, ptr %ty_start, align 4
-  %call42275 = call i32 @mir2asm_find(ptr %load42273, i8 32, i32 %load42274)
+  %load42535 = load ptr, ptr %rhs, align 8
+  %load42536 = load i32, ptr %ty_start, align 4
+  %call42537 = call i32 @mir2asm_find(ptr %load42535, i8 32, i32 %load42536)
   %ty_end = alloca i32, align 4
-  store i32 %call42275, ptr %ty_end, align 4
-  %load42276 = load ptr, ptr %rhs, align 8
-  %load42277 = load i32, ptr %ty_end, align 4
-  %call42278 = call i32 @mir2asm_find(ptr %load42276, i8 44, i32 %load42277)
+  store i32 %call42537, ptr %ty_end, align 4
+  %load42538 = load ptr, ptr %rhs, align 8
+  %load42539 = load i32, ptr %ty_end, align 4
+  %call42540 = call i32 @mir2asm_find(ptr %load42538, i8 44, i32 %load42539)
   %comma1 = alloca i32, align 4
-  store i32 %call42278, ptr %comma1, align 4
-  %load42279 = load ptr, ptr %rhs, align 8
-  %load42280 = load i32, ptr %comma1, align 4
-  %add42281 = add i32 %load42280, 1
-  %call42282 = call i32 @mir2asm_find(ptr %load42279, i8 44, i32 %add42281)
+  store i32 %call42540, ptr %comma1, align 4
+  %load42541 = load ptr, ptr %rhs, align 8
+  %load42542 = load i32, ptr %comma1, align 4
+  %add42543 = add i32 %load42542, 1
+  %call42544 = call i32 @mir2asm_find(ptr %load42541, i8 44, i32 %add42543)
   %comma2 = alloca i32, align 4
-  store i32 %call42282, ptr %comma2, align 4
-  %load42283 = load i32, ptr %ty_end, align 4
-  %cmp42284 = icmp slt i32 %load42283, 0
-  %bool42285 = zext i1 %cmp42284 to i32
-  %cond42286 = icmp ne i32 %bool42285, 0
-  br i1 %cond42286, label %or.true, label %or.rhs
+  store i32 %call42544, ptr %comma2, align 4
+  %load42545 = load i32, ptr %ty_end, align 4
+  %cmp42546 = icmp slt i32 %load42545, 0
+  %bool42547 = zext i1 %cmp42546 to i32
+  %cond42548 = icmp ne i32 %bool42547, 0
+  br i1 %cond42548, label %or.true, label %or.rhs
 
-if.then6847:                                      ; preds = %or.merge3
+if.then6885:                                      ; preds = %or.merge3
   ret void
 
-if.else6848:                                      ; preds = %or.merge3
-  br label %if.end6849
+if.else6886:                                      ; preds = %or.merge3
+  br label %if.end6887
 
-if.end6849:                                       ; preds = %if.else6848
-  %load42299 = load ptr, ptr %rhs, align 8
-  %load42300 = load i32, ptr %ty_start, align 4
-  %load42301 = load i32, ptr %ty_end, align 4
-  %call42302 = call ptr @mir2asm_slice(ptr %load42299, i32 %load42300, i32 %load42301)
-  %call42303 = call ptr @mir2asm_trim(ptr %call42302)
+if.end6887:                                       ; preds = %if.else6886
+  %load42561 = load ptr, ptr %rhs, align 8
+  %load42562 = load i32, ptr %ty_start, align 4
+  %load42563 = load i32, ptr %ty_end, align 4
+  %call42564 = call ptr @mir2asm_slice(ptr %load42561, i32 %load42562, i32 %load42563)
+  %call42565 = call ptr @mir2asm_trim(ptr %call42564)
   %ty = alloca ptr, align 8
-  store ptr %call42303, ptr %ty, align 8
-  %load42304 = load ptr, ptr %rhs, align 8
-  %load42305 = load i32, ptr %ty_end, align 4
-  %add42306 = add i32 %load42305, 1
-  %load42307 = load i32, ptr %comma1, align 4
-  %call42308 = call ptr @mir2asm_slice(ptr %load42304, i32 %add42306, i32 %load42307)
-  %call42309 = call ptr @mir2asm_trim(ptr %call42308)
+  store ptr %call42565, ptr %ty, align 8
+  %load42566 = load ptr, ptr %rhs, align 8
+  %load42567 = load i32, ptr %ty_end, align 4
+  %add42568 = add i32 %load42567, 1
+  %load42569 = load i32, ptr %comma1, align 4
+  %call42570 = call ptr @mir2asm_slice(ptr %load42566, i32 %add42568, i32 %load42569)
+  %call42571 = call ptr @mir2asm_trim(ptr %call42570)
   %src = alloca ptr, align 8
-  store ptr %call42309, ptr %src, align 8
-  %load42310 = load ptr, ptr %rhs, align 8
-  %load42311 = load i32, ptr %comma1, align 4
-  %add42312 = add i32 %load42311, 1
-  %load42313 = load i32, ptr %comma2, align 4
-  %call42314 = call ptr @mir2asm_slice(ptr %load42310, i32 %add42312, i32 %load42313)
-  %call42315 = call ptr @mir2asm_trim(ptr %call42314)
+  store ptr %call42571, ptr %src, align 8
+  %load42572 = load ptr, ptr %rhs, align 8
+  %load42573 = load i32, ptr %comma1, align 4
+  %add42574 = add i32 %load42573, 1
+  %load42575 = load i32, ptr %comma2, align 4
+  %call42576 = call ptr @mir2asm_slice(ptr %load42572, i32 %add42574, i32 %load42575)
+  %call42577 = call ptr @mir2asm_trim(ptr %call42576)
   %val = alloca ptr, align 8
-  store ptr %call42315, ptr %val, align 8
-  %load42316 = load ptr, ptr %rhs, align 8
-  %load42317 = load i32, ptr %comma2, align 4
-  %call42318 = call i32 @mir2asm_index_in_brackets(ptr %load42316, i32 %load42317)
+  store ptr %call42577, ptr %val, align 8
+  %load42578 = load ptr, ptr %rhs, align 8
+  %load42579 = load i32, ptr %comma2, align 4
+  %call42580 = call i32 @mir2asm_index_in_brackets(ptr %load42578, i32 %load42579)
   %field_index = alloca i32, align 4
-  store i32 %call42318, ptr %field_index, align 4
-  %load42319 = load ptr, ptr %b, align 8
-  %load42320 = load ptr, ptr %dest, align 8
-  %load42321 = load ptr, ptr %ty, align 8
-  %call42322 = call i32 @mir2asm_alloc_slot_typed(ptr %load42319, ptr %load42320, i32 0, ptr %load42321)
+  store i32 %call42580, ptr %field_index, align 4
+  %load42581 = load ptr, ptr %b, align 8
+  %load42582 = load ptr, ptr %dest, align 8
+  %load42583 = load ptr, ptr %ty, align 8
+  %call42584 = call i32 @mir2asm_alloc_slot_typed(ptr %load42581, ptr %load42582, i32 0, ptr %load42583)
   %dest_off = alloca i32, align 4
-  store i32 %call42322, ptr %dest_off, align 4
-  %load42323 = load ptr, ptr %b, align 8
-  %load42324 = load ptr, ptr %ty, align 8
-  %call42325 = call i32 @mir2asm_type_size_for(ptr %load42323, ptr %load42324)
+  store i32 %call42584, ptr %dest_off, align 4
+  %load42585 = load ptr, ptr %b, align 8
+  %load42586 = load ptr, ptr %ty, align 8
+  %call42587 = call i32 @mir2asm_type_size_for(ptr %load42585, ptr %load42586)
   %size = alloca i32, align 4
-  store i32 %call42325, ptr %size, align 4
-  %load42326 = load ptr, ptr %b, align 8
-  %load42327 = load ptr, ptr %src, align 8
-  %call42328 = call i32 @mir2asm_find_name(ptr %load42326, ptr %load42327)
+  store i32 %call42587, ptr %size, align 4
+  %load42588 = load ptr, ptr %b, align 8
+  %load42589 = load ptr, ptr %src, align 8
+  %call42590 = call i32 @mir2asm_find_name(ptr %load42588, ptr %load42589)
   %src_idx = alloca i32, align 4
-  store i32 %call42328, ptr %src_idx, align 4
-  %load42329 = load i32, ptr %src_idx, align 4
-  %cmp42330 = icmp sge i32 %load42329, 0
-  %bool42331 = zext i1 %cmp42330 to i32
-  %cond42332 = icmp ne i32 %bool42331, 0
-  br i1 %cond42332, label %if.then6850, label %if.else6851
+  store i32 %call42590, ptr %src_idx, align 4
+  %load42591 = load i32, ptr %src_idx, align 4
+  %cmp42592 = icmp sge i32 %load42591, 0
+  %bool42593 = zext i1 %cmp42592 to i32
+  %cond42594 = icmp ne i32 %bool42593, 0
+  br i1 %cond42594, label %if.then6888, label %if.else6889
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load42287 = load i32, ptr %comma1, align 4
-  %cmp42288 = icmp slt i32 %load42287, 0
-  %bool42289 = zext i1 %cmp42288 to i32
-  %cond42290 = icmp ne i32 %bool42289, 0
-  br i1 %cond42290, label %or.true, label %or.merge
+  %load42549 = load i32, ptr %comma1, align 4
+  %cmp42550 = icmp slt i32 %load42549, 0
+  %bool42551 = zext i1 %cmp42550 to i32
+  %cond42552 = icmp ne i32 %bool42551, 0
+  br i1 %cond42552, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval42291 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond42292 = icmp ne i32 %orval42291, 0
-  br i1 %cond42292, label %or.true1, label %or.rhs2
+  %orval42553 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond42554 = icmp ne i32 %orval42553, 0
+  br i1 %cond42554, label %or.true1, label %or.rhs2
 
 or.true1:                                         ; preds = %or.rhs2, %or.merge
   br label %or.merge3
 
 or.rhs2:                                          ; preds = %or.merge
-  %load42293 = load i32, ptr %comma2, align 4
-  %cmp42294 = icmp slt i32 %load42293, 0
-  %bool42295 = zext i1 %cmp42294 to i32
-  %cond42296 = icmp ne i32 %bool42295, 0
-  br i1 %cond42296, label %or.true1, label %or.merge3
+  %load42555 = load i32, ptr %comma2, align 4
+  %cmp42556 = icmp slt i32 %load42555, 0
+  %bool42557 = zext i1 %cmp42556 to i32
+  %cond42558 = icmp ne i32 %bool42557, 0
+  br i1 %cond42558, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval42297 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond42298 = icmp ne i32 %orval42297, 0
-  br i1 %cond42298, label %if.then6847, label %if.else6848
+  %orval42559 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond42560 = icmp ne i32 %orval42559, 0
+  br i1 %cond42560, label %if.then6885, label %if.else6886
 
-if.then6850:                                      ; preds = %if.end6849
-  %load42333 = load ptr, ptr %b, align 8
-  %load42334 = load i32, ptr %dest_off, align 4
-  %load42335 = load ptr, ptr %b, align 8
-  %field42337 = getelementptr %MirAsm, ptr %load42335, i32 0, i32 6
-  %fieldval42338 = load ptr, ptr %field42337, align 8
-  %load42339 = load i32, ptr %src_idx, align 4
-  %idx42340 = getelementptr i32, ptr %fieldval42338, i32 %load42339
-  %loadidx42341 = load i32, ptr %idx42340, align 4
-  %load42342 = load i32, ptr %size, align 4
-  call void @mir2asm_emit_copy_stack_bytes(ptr %load42333, i32 %load42334, i32 %loadidx42341, i32 %load42342)
-  br label %if.end6852
+if.then6888:                                      ; preds = %if.end6887
+  %load42595 = load ptr, ptr %b, align 8
+  %load42596 = load i32, ptr %dest_off, align 4
+  %load42597 = load ptr, ptr %b, align 8
+  %field42599 = getelementptr %MirAsm, ptr %load42597, i32 0, i32 6
+  %fieldval42600 = load ptr, ptr %field42599, align 8
+  %load42601 = load i32, ptr %src_idx, align 4
+  %idx42602 = getelementptr i32, ptr %fieldval42600, i32 %load42601
+  %loadidx42603 = load i32, ptr %idx42602, align 4
+  %load42604 = load i32, ptr %size, align 4
+  call void @mir2asm_emit_copy_stack_bytes(ptr %load42595, i32 %load42596, i32 %loadidx42603, i32 %load42604)
+  br label %if.end6890
 
-if.else6851:                                      ; preds = %if.end6849
-  %load42343 = load ptr, ptr %b, align 8
-  %load42344 = load i32, ptr %dest_off, align 4
-  %load42345 = load i32, ptr %size, align 4
-  call void @mir2asm_emit_zero_bytes(ptr %load42343, i32 %load42344, i32 %load42345)
-  br label %if.end6852
+if.else6889:                                      ; preds = %if.end6887
+  %load42605 = load ptr, ptr %b, align 8
+  %load42606 = load i32, ptr %dest_off, align 4
+  %load42607 = load i32, ptr %size, align 4
+  call void @mir2asm_emit_zero_bytes(ptr %load42605, i32 %load42606, i32 %load42607)
+  br label %if.end6890
 
-if.end6852:                                       ; preds = %if.else6851, %if.then6850
-  %load42346 = load ptr, ptr %b, align 8
-  %load42347 = load ptr, ptr %ty, align 8
-  %load42348 = load i32, ptr %field_index, align 4
-  %call42349 = call ptr @mir2asm_struct_field_ty(ptr %load42346, ptr %load42347, i32 %load42348)
+if.end6890:                                       ; preds = %if.else6889, %if.then6888
+  %load42608 = load ptr, ptr %b, align 8
+  %load42609 = load ptr, ptr %ty, align 8
+  %load42610 = load i32, ptr %field_index, align 4
+  %call42611 = call ptr @mir2asm_struct_field_ty(ptr %load42608, ptr %load42609, i32 %load42610)
   %field_ty = alloca ptr, align 8
-  store ptr %call42349, ptr %field_ty, align 8
-  %load42350 = load ptr, ptr %b, align 8
-  %load42351 = load ptr, ptr %ty, align 8
-  %load42352 = load i32, ptr %field_index, align 4
-  %call42353 = call i32 @mir2asm_struct_field_offset(ptr %load42350, ptr %load42351, i32 %load42352)
+  store ptr %call42611, ptr %field_ty, align 8
+  %load42612 = load ptr, ptr %b, align 8
+  %load42613 = load ptr, ptr %ty, align 8
+  %load42614 = load i32, ptr %field_index, align 4
+  %call42615 = call i32 @mir2asm_struct_field_offset(ptr %load42612, ptr %load42613, i32 %load42614)
   %field_off = alloca i32, align 4
-  store i32 %call42353, ptr %field_off, align 4
-  %load42354 = load ptr, ptr %b, align 8
-  %load42355 = load ptr, ptr %field_ty, align 8
-  %call42356 = call i32 @mir2asm_type_is_struct_value(ptr %load42354, ptr %load42355)
-  %cmp42357 = icmp eq i32 %call42356, 1
-  %bool42358 = zext i1 %cmp42357 to i32
-  %cond42359 = icmp ne i32 %bool42358, 0
-  br i1 %cond42359, label %if.then6853, label %if.else6854
+  store i32 %call42615, ptr %field_off, align 4
+  %load42616 = load ptr, ptr %b, align 8
+  %load42617 = load ptr, ptr %field_ty, align 8
+  %call42618 = call i32 @mir2asm_type_is_struct_value(ptr %load42616, ptr %load42617)
+  %cmp42619 = icmp eq i32 %call42618, 1
+  %bool42620 = zext i1 %cmp42619 to i32
+  %cond42621 = icmp ne i32 %bool42620, 0
+  br i1 %cond42621, label %if.then6891, label %if.else6892
 
-if.then6853:                                      ; preds = %if.end6852
-  %load42360 = load ptr, ptr %b, align 8
-  %load42361 = load ptr, ptr %val, align 8
-  %call42362 = call i32 @mir2asm_find_name(ptr %load42360, ptr %load42361)
+if.then6891:                                      ; preds = %if.end6890
+  %load42622 = load ptr, ptr %b, align 8
+  %load42623 = load ptr, ptr %val, align 8
+  %call42624 = call i32 @mir2asm_find_name(ptr %load42622, ptr %load42623)
   %val_idx2 = alloca i32, align 4
-  store i32 %call42362, ptr %val_idx2, align 4
-  %load42363 = load i32, ptr %val_idx2, align 4
-  %cmp42364 = icmp sge i32 %load42363, 0
-  %bool42365 = zext i1 %cmp42364 to i32
-  %cond42366 = icmp ne i32 %bool42365, 0
-  br i1 %cond42366, label %if.then6856, label %if.else6857
+  store i32 %call42624, ptr %val_idx2, align 4
+  %load42625 = load i32, ptr %val_idx2, align 4
+  %cmp42626 = icmp sge i32 %load42625, 0
+  %bool42627 = zext i1 %cmp42626 to i32
+  %cond42628 = icmp ne i32 %bool42627, 0
+  br i1 %cond42628, label %if.then6894, label %if.else6895
 
-if.else6854:                                      ; preds = %if.end6852
-  br label %if.end6855
+if.else6892:                                      ; preds = %if.end6890
+  br label %if.end6893
 
-if.end6855:                                       ; preds = %if.else6854
-  %load42388 = load ptr, ptr %b, align 8
-  %load42390 = load ptr, ptr %field_ty, align 8
-  %call42391 = call ptr @mir2asm_acc(ptr %load42390)
-  %call42392 = call ptr @vix_string_concat(ptr @.strlit42389, ptr %call42391)
-  %call42394 = call ptr @vix_string_concat(ptr %call42392, ptr @.strlit42393)
-  %load42395 = load ptr, ptr %b, align 8
-  %load42396 = load ptr, ptr %val, align 8
-  %load42397 = load ptr, ptr %field_ty, align 8
-  %call42398 = call ptr @mir2asm_operand_typed(ptr %load42395, ptr %load42396, ptr %load42397)
-  %call42399 = call ptr @vix_string_concat(ptr %call42394, ptr %call42398)
-  call void @mir2asm_line(ptr %load42388, ptr %call42399)
-  %load42400 = load ptr, ptr %b, align 8
-  %load42402 = load ptr, ptr %field_ty, align 8
-  %call42403 = call ptr @mir2asm_mem_word(ptr %load42402)
-  %call42404 = call ptr @vix_string_concat(ptr @.strlit42401, ptr %call42403)
-  %call42406 = call ptr @vix_string_concat(ptr %call42404, ptr @.strlit42405)
-  %load42407 = load i32, ptr %dest_off, align 4
-  %load42408 = load i32, ptr %field_off, align 4
-  %call42409 = call ptr @mir2asm_mem_at(i32 %load42407, i32 %load42408)
-  %call42410 = call ptr @vix_string_concat(ptr %call42406, ptr %call42409)
-  %call42412 = call ptr @vix_string_concat(ptr %call42410, ptr @.strlit42411)
-  %load42413 = load ptr, ptr %field_ty, align 8
-  %call42414 = call ptr @mir2asm_acc(ptr %load42413)
-  %call42415 = call ptr @vix_string_concat(ptr %call42412, ptr %call42414)
-  call void @mir2asm_line(ptr %load42400, ptr %call42415)
+if.end6893:                                       ; preds = %if.else6892
+  %load42650 = load ptr, ptr %b, align 8
+  %load42652 = load ptr, ptr %field_ty, align 8
+  %call42653 = call ptr @mir2asm_acc(ptr %load42652)
+  %call42654 = call ptr @vix_string_concat(ptr @.strlit42651, ptr %call42653)
+  %call42656 = call ptr @vix_string_concat(ptr %call42654, ptr @.strlit42655)
+  %load42657 = load ptr, ptr %b, align 8
+  %load42658 = load ptr, ptr %val, align 8
+  %load42659 = load ptr, ptr %field_ty, align 8
+  %call42660 = call ptr @mir2asm_operand_typed(ptr %load42657, ptr %load42658, ptr %load42659)
+  %call42661 = call ptr @vix_string_concat(ptr %call42656, ptr %call42660)
+  call void @mir2asm_line(ptr %load42650, ptr %call42661)
+  %load42662 = load ptr, ptr %b, align 8
+  %load42664 = load ptr, ptr %field_ty, align 8
+  %call42665 = call ptr @mir2asm_mem_word(ptr %load42664)
+  %call42666 = call ptr @vix_string_concat(ptr @.strlit42663, ptr %call42665)
+  %call42668 = call ptr @vix_string_concat(ptr %call42666, ptr @.strlit42667)
+  %load42669 = load i32, ptr %dest_off, align 4
+  %load42670 = load i32, ptr %field_off, align 4
+  %call42671 = call ptr @mir2asm_mem_at(i32 %load42669, i32 %load42670)
+  %call42672 = call ptr @vix_string_concat(ptr %call42668, ptr %call42671)
+  %call42674 = call ptr @vix_string_concat(ptr %call42672, ptr @.strlit42673)
+  %load42675 = load ptr, ptr %field_ty, align 8
+  %call42676 = call ptr @mir2asm_acc(ptr %load42675)
+  %call42677 = call ptr @vix_string_concat(ptr %call42674, ptr %call42676)
+  call void @mir2asm_line(ptr %load42662, ptr %call42677)
   ret void
 
-if.then6856:                                      ; preds = %if.then6853
-  %load42367 = load ptr, ptr %b, align 8
-  %load42368 = load i32, ptr %dest_off, align 4
-  %load42369 = load i32, ptr %field_off, align 4
-  %sub42370 = sub i32 %load42368, %load42369
-  %load42371 = load ptr, ptr %b, align 8
-  %field42373 = getelementptr %MirAsm, ptr %load42371, i32 0, i32 6
-  %fieldval42374 = load ptr, ptr %field42373, align 8
-  %load42375 = load i32, ptr %val_idx2, align 4
-  %idx42376 = getelementptr i32, ptr %fieldval42374, i32 %load42375
-  %loadidx42377 = load i32, ptr %idx42376, align 4
-  %load42378 = load ptr, ptr %b, align 8
-  %load42379 = load ptr, ptr %field_ty, align 8
-  %call42380 = call i32 @mir2asm_type_size_for(ptr %load42378, ptr %load42379)
-  call void @mir2asm_emit_copy_stack_bytes(ptr %load42367, i32 %sub42370, i32 %loadidx42377, i32 %call42380)
-  br label %if.end6858
+if.then6894:                                      ; preds = %if.then6891
+  %load42629 = load ptr, ptr %b, align 8
+  %load42630 = load i32, ptr %dest_off, align 4
+  %load42631 = load i32, ptr %field_off, align 4
+  %sub42632 = sub i32 %load42630, %load42631
+  %load42633 = load ptr, ptr %b, align 8
+  %field42635 = getelementptr %MirAsm, ptr %load42633, i32 0, i32 6
+  %fieldval42636 = load ptr, ptr %field42635, align 8
+  %load42637 = load i32, ptr %val_idx2, align 4
+  %idx42638 = getelementptr i32, ptr %fieldval42636, i32 %load42637
+  %loadidx42639 = load i32, ptr %idx42638, align 4
+  %load42640 = load ptr, ptr %b, align 8
+  %load42641 = load ptr, ptr %field_ty, align 8
+  %call42642 = call i32 @mir2asm_type_size_for(ptr %load42640, ptr %load42641)
+  call void @mir2asm_emit_copy_stack_bytes(ptr %load42629, i32 %sub42632, i32 %loadidx42639, i32 %call42642)
+  br label %if.end6896
 
-if.else6857:                                      ; preds = %if.then6853
-  %load42381 = load ptr, ptr %b, align 8
-  %load42382 = load i32, ptr %dest_off, align 4
-  %load42383 = load i32, ptr %field_off, align 4
-  %sub42384 = sub i32 %load42382, %load42383
-  %load42385 = load ptr, ptr %b, align 8
-  %load42386 = load ptr, ptr %field_ty, align 8
-  %call42387 = call i32 @mir2asm_type_size_for(ptr %load42385, ptr %load42386)
-  call void @mir2asm_emit_zero_bytes(ptr %load42381, i32 %sub42384, i32 %call42387)
-  br label %if.end6858
+if.else6895:                                      ; preds = %if.then6891
+  %load42643 = load ptr, ptr %b, align 8
+  %load42644 = load i32, ptr %dest_off, align 4
+  %load42645 = load i32, ptr %field_off, align 4
+  %sub42646 = sub i32 %load42644, %load42645
+  %load42647 = load ptr, ptr %b, align 8
+  %load42648 = load ptr, ptr %field_ty, align 8
+  %call42649 = call i32 @mir2asm_type_size_for(ptr %load42647, ptr %load42648)
+  call void @mir2asm_emit_zero_bytes(ptr %load42643, i32 %sub42646, i32 %call42649)
+  br label %if.end6896
 
-if.end6858:                                       ; preds = %if.else6857, %if.then6856
+if.end6896:                                       ; preds = %if.else6895, %if.then6894
   ret void
 }
 
@@ -80956,325 +81532,325 @@ entry:
   store ptr %2, ptr %rhs, align 8
   %ty_start = alloca i32, align 4
   store i32 13, ptr %ty_start, align 4
-  %load42416 = load ptr, ptr %rhs, align 8
-  %load42417 = load i32, ptr %ty_start, align 4
-  %call42418 = call i32 @mir2asm_find(ptr %load42416, i8 32, i32 %load42417)
+  %load42678 = load ptr, ptr %rhs, align 8
+  %load42679 = load i32, ptr %ty_start, align 4
+  %call42680 = call i32 @mir2asm_find(ptr %load42678, i8 32, i32 %load42679)
   %ty_end = alloca i32, align 4
-  store i32 %call42418, ptr %ty_end, align 4
-  %load42419 = load ptr, ptr %rhs, align 8
-  %load42420 = load i32, ptr %ty_end, align 4
-  %call42421 = call i32 @mir2asm_find(ptr %load42419, i8 44, i32 %load42420)
+  store i32 %call42680, ptr %ty_end, align 4
+  %load42681 = load ptr, ptr %rhs, align 8
+  %load42682 = load i32, ptr %ty_end, align 4
+  %call42683 = call i32 @mir2asm_find(ptr %load42681, i8 44, i32 %load42682)
   %comma = alloca i32, align 4
-  store i32 %call42421, ptr %comma, align 4
-  %load42422 = load i32, ptr %ty_end, align 4
-  %cmp42423 = icmp slt i32 %load42422, 0
-  %bool42424 = zext i1 %cmp42423 to i32
-  %cond42425 = icmp ne i32 %bool42424, 0
-  br i1 %cond42425, label %or.true, label %or.rhs
+  store i32 %call42683, ptr %comma, align 4
+  %load42684 = load i32, ptr %ty_end, align 4
+  %cmp42685 = icmp slt i32 %load42684, 0
+  %bool42686 = zext i1 %cmp42685 to i32
+  %cond42687 = icmp ne i32 %bool42686, 0
+  br i1 %cond42687, label %or.true, label %or.rhs
 
-if.then6859:                                      ; preds = %or.merge
+if.then6897:                                      ; preds = %or.merge
   ret void
 
-if.else6860:                                      ; preds = %or.merge
-  br label %if.end6861
+if.else6898:                                      ; preds = %or.merge
+  br label %if.end6899
 
-if.end6861:                                       ; preds = %if.else6860
-  %load42432 = load ptr, ptr %rhs, align 8
-  %load42433 = load i32, ptr %ty_start, align 4
-  %load42434 = load i32, ptr %ty_end, align 4
-  %call42435 = call ptr @mir2asm_slice(ptr %load42432, i32 %load42433, i32 %load42434)
-  %call42436 = call ptr @mir2asm_trim(ptr %call42435)
+if.end6899:                                       ; preds = %if.else6898
+  %load42694 = load ptr, ptr %rhs, align 8
+  %load42695 = load i32, ptr %ty_start, align 4
+  %load42696 = load i32, ptr %ty_end, align 4
+  %call42697 = call ptr @mir2asm_slice(ptr %load42694, i32 %load42695, i32 %load42696)
+  %call42698 = call ptr @mir2asm_trim(ptr %call42697)
   %ty = alloca ptr, align 8
-  store ptr %call42436, ptr %ty, align 8
-  %load42437 = load ptr, ptr %rhs, align 8
-  %load42438 = load i32, ptr %ty_end, align 4
-  %add42439 = add i32 %load42438, 1
-  %load42440 = load i32, ptr %comma, align 4
-  %call42441 = call ptr @mir2asm_slice(ptr %load42437, i32 %add42439, i32 %load42440)
-  %call42442 = call ptr @mir2asm_trim(ptr %call42441)
+  store ptr %call42698, ptr %ty, align 8
+  %load42699 = load ptr, ptr %rhs, align 8
+  %load42700 = load i32, ptr %ty_end, align 4
+  %add42701 = add i32 %load42700, 1
+  %load42702 = load i32, ptr %comma, align 4
+  %call42703 = call ptr @mir2asm_slice(ptr %load42699, i32 %add42701, i32 %load42702)
+  %call42704 = call ptr @mir2asm_trim(ptr %call42703)
   %src = alloca ptr, align 8
-  store ptr %call42442, ptr %src, align 8
-  %load42443 = load ptr, ptr %rhs, align 8
-  %load42444 = load i32, ptr %comma, align 4
-  %call42445 = call i32 @mir2asm_index_in_brackets(ptr %load42443, i32 %load42444)
+  store ptr %call42704, ptr %src, align 8
+  %load42705 = load ptr, ptr %rhs, align 8
+  %load42706 = load i32, ptr %comma, align 4
+  %call42707 = call i32 @mir2asm_index_in_brackets(ptr %load42705, i32 %load42706)
   %field_index = alloca i32, align 4
-  store i32 %call42445, ptr %field_index, align 4
-  %load42446 = load ptr, ptr %b, align 8
-  %load42447 = load ptr, ptr %ty, align 8
-  %load42448 = load i32, ptr %field_index, align 4
-  %call42449 = call ptr @mir2asm_struct_field_ty(ptr %load42446, ptr %load42447, i32 %load42448)
+  store i32 %call42707, ptr %field_index, align 4
+  %load42708 = load ptr, ptr %b, align 8
+  %load42709 = load ptr, ptr %ty, align 8
+  %load42710 = load i32, ptr %field_index, align 4
+  %call42711 = call ptr @mir2asm_struct_field_ty(ptr %load42708, ptr %load42709, i32 %load42710)
   %field_ty = alloca ptr, align 8
-  store ptr %call42449, ptr %field_ty, align 8
-  %load42450 = load ptr, ptr %b, align 8
-  %load42451 = load ptr, ptr %ty, align 8
-  %load42452 = load i32, ptr %field_index, align 4
-  %call42453 = call i32 @mir2asm_struct_field_offset(ptr %load42450, ptr %load42451, i32 %load42452)
+  store ptr %call42711, ptr %field_ty, align 8
+  %load42712 = load ptr, ptr %b, align 8
+  %load42713 = load ptr, ptr %ty, align 8
+  %load42714 = load i32, ptr %field_index, align 4
+  %call42715 = call i32 @mir2asm_struct_field_offset(ptr %load42712, ptr %load42713, i32 %load42714)
   %field_off = alloca i32, align 4
-  store i32 %call42453, ptr %field_off, align 4
-  %load42454 = load ptr, ptr %b, align 8
-  %load42455 = load ptr, ptr %src, align 8
-  %call42456 = call i32 @mir2asm_find_name(ptr %load42454, ptr %load42455)
+  store i32 %call42715, ptr %field_off, align 4
+  %load42716 = load ptr, ptr %b, align 8
+  %load42717 = load ptr, ptr %src, align 8
+  %call42718 = call i32 @mir2asm_find_name(ptr %load42716, ptr %load42717)
   %src_idx = alloca i32, align 4
-  store i32 %call42456, ptr %src_idx, align 4
-  %load42457 = load i32, ptr %src_idx, align 4
-  %cmp42458 = icmp slt i32 %load42457, 0
-  %bool42459 = zext i1 %cmp42458 to i32
-  %cond42460 = icmp ne i32 %bool42459, 0
-  br i1 %cond42460, label %if.then6862, label %if.else6863
+  store i32 %call42718, ptr %src_idx, align 4
+  %load42719 = load i32, ptr %src_idx, align 4
+  %cmp42720 = icmp slt i32 %load42719, 0
+  %bool42721 = zext i1 %cmp42720 to i32
+  %cond42722 = icmp ne i32 %bool42721, 0
+  br i1 %cond42722, label %if.then6900, label %if.else6901
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load42426 = load i32, ptr %comma, align 4
-  %cmp42427 = icmp slt i32 %load42426, 0
-  %bool42428 = zext i1 %cmp42427 to i32
-  %cond42429 = icmp ne i32 %bool42428, 0
-  br i1 %cond42429, label %or.true, label %or.merge
+  %load42688 = load i32, ptr %comma, align 4
+  %cmp42689 = icmp slt i32 %load42688, 0
+  %bool42690 = zext i1 %cmp42689 to i32
+  %cond42691 = icmp ne i32 %bool42690, 0
+  br i1 %cond42691, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval42430 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond42431 = icmp ne i32 %orval42430, 0
-  br i1 %cond42431, label %if.then6859, label %if.else6860
+  %orval42692 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond42693 = icmp ne i32 %orval42692, 0
+  br i1 %cond42693, label %if.then6897, label %if.else6898
 
-if.then6862:                                      ; preds = %if.end6861
+if.then6900:                                      ; preds = %if.end6899
   ret void
 
-if.else6863:                                      ; preds = %if.end6861
-  br label %if.end6864
+if.else6901:                                      ; preds = %if.end6899
+  br label %if.end6902
 
-if.end6864:                                       ; preds = %if.else6863
-  %load42461 = load ptr, ptr %b, align 8
-  %field42463 = getelementptr %MirAsm, ptr %load42461, i32 0, i32 8
-  %fieldval42464 = load ptr, ptr %field42463, align 8
-  %load42465 = load i32, ptr %src_idx, align 4
-  %idx42466 = getelementptr ptr, ptr %fieldval42464, i32 %load42465
-  %loadidx42467 = load ptr, ptr %idx42466, align 8
-  %load42469 = load ptr, ptr %ty, align 8
-  %call42470 = call ptr @vix_string_concat(ptr @.strlit42468, ptr %load42469)
-  %strcmp42471 = call i32 @strcmp(ptr %loadidx42467, ptr %call42470)
-  %cmp42472 = icmp eq i32 %strcmp42471, 0
-  %bool42473 = zext i1 %cmp42472 to i32
-  %cond42474 = icmp ne i32 %bool42473, 0
-  br i1 %cond42474, label %if.then6865, label %if.else6866
+if.end6902:                                       ; preds = %if.else6901
+  %load42723 = load ptr, ptr %b, align 8
+  %field42725 = getelementptr %MirAsm, ptr %load42723, i32 0, i32 8
+  %fieldval42726 = load ptr, ptr %field42725, align 8
+  %load42727 = load i32, ptr %src_idx, align 4
+  %idx42728 = getelementptr ptr, ptr %fieldval42726, i32 %load42727
+  %loadidx42729 = load ptr, ptr %idx42728, align 8
+  %load42731 = load ptr, ptr %ty, align 8
+  %call42732 = call ptr @vix_string_concat(ptr @.strlit42730, ptr %load42731)
+  %strcmp42733 = call i32 @strcmp(ptr %loadidx42729, ptr %call42732)
+  %cmp42734 = icmp eq i32 %strcmp42733, 0
+  %bool42735 = zext i1 %cmp42734 to i32
+  %cond42736 = icmp ne i32 %bool42735, 0
+  br i1 %cond42736, label %if.then6903, label %if.else6904
 
-if.then6865:                                      ; preds = %if.end6864
-  %load42475 = load ptr, ptr %b, align 8
-  %load42476 = load ptr, ptr %dest, align 8
-  %load42477 = load ptr, ptr %field_ty, align 8
-  %call42478 = call i32 @mir2asm_alloc_slot_typed(ptr %load42475, ptr %load42476, i32 0, ptr %load42477)
+if.then6903:                                      ; preds = %if.end6902
+  %load42737 = load ptr, ptr %b, align 8
+  %load42738 = load ptr, ptr %dest, align 8
+  %load42739 = load ptr, ptr %field_ty, align 8
+  %call42740 = call i32 @mir2asm_alloc_slot_typed(ptr %load42737, ptr %load42738, i32 0, ptr %load42739)
   %dest_off_ptr = alloca i32, align 4
-  store i32 %call42478, ptr %dest_off_ptr, align 4
-  %load42479 = load ptr, ptr %b, align 8
-  %load42480 = load ptr, ptr %field_ty, align 8
-  %call42481 = call i32 @mir2asm_type_is_struct_value(ptr %load42479, ptr %load42480)
-  %cmp42482 = icmp eq i32 %call42481, 1
-  %bool42483 = zext i1 %cmp42482 to i32
-  %cond42484 = icmp ne i32 %bool42483, 0
-  br i1 %cond42484, label %or.true1, label %or.rhs2
+  store i32 %call42740, ptr %dest_off_ptr, align 4
+  %load42741 = load ptr, ptr %b, align 8
+  %load42742 = load ptr, ptr %field_ty, align 8
+  %call42743 = call i32 @mir2asm_type_is_struct_value(ptr %load42741, ptr %load42742)
+  %cmp42744 = icmp eq i32 %call42743, 1
+  %bool42745 = zext i1 %cmp42744 to i32
+  %cond42746 = icmp ne i32 %bool42745, 0
+  br i1 %cond42746, label %or.true1, label %or.rhs2
 
-if.else6866:                                      ; preds = %if.end6864
-  br label %if.end6867
+if.else6904:                                      ; preds = %if.end6902
+  br label %if.end6905
 
-if.end6867:                                       ; preds = %if.else6866
-  %load42546 = load ptr, ptr %b, align 8
-  %load42547 = load ptr, ptr %field_ty, align 8
-  %call42548 = call i32 @mir2asm_type_is_struct_value(ptr %load42546, ptr %load42547)
-  %cmp42549 = icmp eq i32 %call42548, 1
-  %bool42550 = zext i1 %cmp42549 to i32
-  %cond42551 = icmp ne i32 %bool42550, 0
-  br i1 %cond42551, label %or.true4, label %or.rhs5
+if.end6905:                                       ; preds = %if.else6904
+  %load42808 = load ptr, ptr %b, align 8
+  %load42809 = load ptr, ptr %field_ty, align 8
+  %call42810 = call i32 @mir2asm_type_is_struct_value(ptr %load42808, ptr %load42809)
+  %cmp42811 = icmp eq i32 %call42810, 1
+  %bool42812 = zext i1 %cmp42811 to i32
+  %cond42813 = icmp ne i32 %bool42812, 0
+  br i1 %cond42813, label %or.true4, label %or.rhs5
 
-if.then6868:                                      ; preds = %or.merge3
-  %load42501 = load ptr, ptr %b, align 8
-  %load42502 = load i32, ptr %dest_off_ptr, align 4
-  %load42503 = load ptr, ptr %src, align 8
-  %load42504 = load i32, ptr %field_off, align 4
-  %load42505 = load ptr, ptr %b, align 8
-  %load42506 = load ptr, ptr %field_ty, align 8
-  %call42507 = call i32 @mir2asm_type_size_for(ptr %load42505, ptr %load42506)
-  call void @mir2asm_emit_copy_ptr_field_to_stack(ptr %load42501, i32 %load42502, ptr %load42503, i32 %load42504, i32 %call42507)
+if.then6906:                                      ; preds = %or.merge3
+  %load42763 = load ptr, ptr %b, align 8
+  %load42764 = load i32, ptr %dest_off_ptr, align 4
+  %load42765 = load ptr, ptr %src, align 8
+  %load42766 = load i32, ptr %field_off, align 4
+  %load42767 = load ptr, ptr %b, align 8
+  %load42768 = load ptr, ptr %field_ty, align 8
+  %call42769 = call i32 @mir2asm_type_size_for(ptr %load42767, ptr %load42768)
+  call void @mir2asm_emit_copy_ptr_field_to_stack(ptr %load42763, i32 %load42764, ptr %load42765, i32 %load42766, i32 %call42769)
   ret void
 
-if.else6869:                                      ; preds = %or.merge3
-  br label %if.end6870
+if.else6907:                                      ; preds = %or.merge3
+  br label %if.end6908
 
-if.end6870:                                       ; preds = %if.else6869
-  %load42508 = load ptr, ptr %b, align 8
-  %load42510 = load ptr, ptr %b, align 8
-  %load42511 = load ptr, ptr %src, align 8
-  %call42513 = call ptr @mir2asm_operand_typed(ptr %load42510, ptr %load42511, ptr @.strlit42512)
-  %call42514 = call ptr @vix_string_concat(ptr @.strlit42509, ptr %call42513)
-  call void @mir2asm_line(ptr %load42508, ptr %call42514)
-  %load42515 = load i32, ptr %field_off, align 4
-  %cmp42516 = icmp ne i32 %load42515, 0
-  %bool42517 = zext i1 %cmp42516 to i32
-  %cond42518 = icmp ne i32 %bool42517, 0
-  br i1 %cond42518, label %if.then6871, label %if.else6872
+if.end6908:                                       ; preds = %if.else6907
+  %load42770 = load ptr, ptr %b, align 8
+  %load42772 = load ptr, ptr %b, align 8
+  %load42773 = load ptr, ptr %src, align 8
+  %call42775 = call ptr @mir2asm_operand_typed(ptr %load42772, ptr %load42773, ptr @.strlit42774)
+  %call42776 = call ptr @vix_string_concat(ptr @.strlit42771, ptr %call42775)
+  call void @mir2asm_line(ptr %load42770, ptr %call42776)
+  %load42777 = load i32, ptr %field_off, align 4
+  %cmp42778 = icmp ne i32 %load42777, 0
+  %bool42779 = zext i1 %cmp42778 to i32
+  %cond42780 = icmp ne i32 %bool42779, 0
+  br i1 %cond42780, label %if.then6909, label %if.else6910
 
-or.true1:                                         ; preds = %and.merge, %if.then6865
+or.true1:                                         ; preds = %and.merge, %if.then6903
   br label %or.merge3
 
-or.rhs2:                                          ; preds = %if.then6865
-  %load42485 = load ptr, ptr %field_ty, align 8
-  %strlen42486 = call i32 @strlen(ptr %load42485)
-  %cmp42487 = icmp sgt i32 %strlen42486, 0
-  %bool42488 = zext i1 %cmp42487 to i32
-  %cond42489 = icmp ne i32 %bool42488, 0
-  br i1 %cond42489, label %and.rhs, label %and.false
+or.rhs2:                                          ; preds = %if.then6903
+  %load42747 = load ptr, ptr %field_ty, align 8
+  %strlen42748 = call i32 @strlen(ptr %load42747)
+  %cmp42749 = icmp sgt i32 %strlen42748, 0
+  %bool42750 = zext i1 %cmp42749 to i32
+  %cond42751 = icmp ne i32 %bool42750, 0
+  br i1 %cond42751, label %and.rhs, label %and.false
 
 or.merge3:                                        ; preds = %or.true1, %and.merge
-  %orval42499 = phi i32 [ 1, %or.true1 ], [ 0, %and.merge ]
-  %cond42500 = icmp ne i32 %orval42499, 0
-  br i1 %cond42500, label %if.then6868, label %if.else6869
+  %orval42761 = phi i32 [ 1, %or.true1 ], [ 0, %and.merge ]
+  %cond42762 = icmp ne i32 %orval42761, 0
+  br i1 %cond42762, label %if.then6906, label %if.else6907
 
 and.rhs:                                          ; preds = %or.rhs2
-  %load42490 = load ptr, ptr %field_ty, align 8
-  %sidx42491 = getelementptr i8, ptr %load42490, i32 0
-  %sbyte42492 = load i8, ptr %sidx42491, align 1
-  %schar42493 = zext i8 %sbyte42492 to i32
-  %cmp42494 = icmp eq i32 %schar42493, 64
-  %bool42495 = zext i1 %cmp42494 to i32
-  %cond42496 = icmp ne i32 %bool42495, 0
-  br i1 %cond42496, label %and.merge, label %and.false
+  %load42752 = load ptr, ptr %field_ty, align 8
+  %sidx42753 = getelementptr i8, ptr %load42752, i32 0
+  %sbyte42754 = load i8, ptr %sidx42753, align 1
+  %schar42755 = zext i8 %sbyte42754 to i32
+  %cmp42756 = icmp eq i32 %schar42755, 64
+  %bool42757 = zext i1 %cmp42756 to i32
+  %cond42758 = icmp ne i32 %bool42757, 0
+  br i1 %cond42758, label %and.merge, label %and.false
 
 and.false:                                        ; preds = %and.rhs, %or.rhs2
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval42497 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond42498 = icmp ne i32 %andval42497, 0
-  br i1 %cond42498, label %or.true1, label %or.merge3
+  %andval42759 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond42760 = icmp ne i32 %andval42759, 0
+  br i1 %cond42760, label %or.true1, label %or.merge3
 
-if.then6871:                                      ; preds = %if.end6870
-  %load42519 = load ptr, ptr %b, align 8
-  %load42521 = load i32, ptr %field_off, align 4
-  %call42522 = call ptr @i32_to_str(i32 %load42521)
-  %call42523 = call ptr @vix_string_concat(ptr @.strlit42520, ptr %call42522)
-  call void @mir2asm_line(ptr %load42519, ptr %call42523)
-  br label %if.end6873
+if.then6909:                                      ; preds = %if.end6908
+  %load42781 = load ptr, ptr %b, align 8
+  %load42783 = load i32, ptr %field_off, align 4
+  %call42784 = call ptr @i32_to_str(i32 %load42783)
+  %call42785 = call ptr @vix_string_concat(ptr @.strlit42782, ptr %call42784)
+  call void @mir2asm_line(ptr %load42781, ptr %call42785)
+  br label %if.end6911
 
-if.else6872:                                      ; preds = %if.end6870
-  br label %if.end6873
+if.else6910:                                      ; preds = %if.end6908
+  br label %if.end6911
 
-if.end6873:                                       ; preds = %if.else6872, %if.then6871
-  %load42524 = load ptr, ptr %b, align 8
-  %load42526 = load ptr, ptr %field_ty, align 8
-  %call42527 = call ptr @mir2asm_acc(ptr %load42526)
-  %call42528 = call ptr @vix_string_concat(ptr @.strlit42525, ptr %call42527)
-  %call42530 = call ptr @vix_string_concat(ptr %call42528, ptr @.strlit42529)
-  %load42531 = load ptr, ptr %field_ty, align 8
-  %call42532 = call ptr @mir2asm_mem_word(ptr %load42531)
-  %call42533 = call ptr @vix_string_concat(ptr %call42530, ptr %call42532)
-  %call42535 = call ptr @vix_string_concat(ptr %call42533, ptr @.strlit42534)
-  call void @mir2asm_line(ptr %load42524, ptr %call42535)
-  %load42536 = load ptr, ptr %b, align 8
-  %load42538 = load i32, ptr %dest_off_ptr, align 4
-  %call42539 = call ptr @mir2asm_mem(i32 %load42538)
-  %call42540 = call ptr @vix_string_concat(ptr @.strlit42537, ptr %call42539)
-  %call42542 = call ptr @vix_string_concat(ptr %call42540, ptr @.strlit42541)
-  %load42543 = load ptr, ptr %field_ty, align 8
-  %call42544 = call ptr @mir2asm_acc(ptr %load42543)
-  %call42545 = call ptr @vix_string_concat(ptr %call42542, ptr %call42544)
-  call void @mir2asm_line(ptr %load42536, ptr %call42545)
+if.end6911:                                       ; preds = %if.else6910, %if.then6909
+  %load42786 = load ptr, ptr %b, align 8
+  %load42788 = load ptr, ptr %field_ty, align 8
+  %call42789 = call ptr @mir2asm_acc(ptr %load42788)
+  %call42790 = call ptr @vix_string_concat(ptr @.strlit42787, ptr %call42789)
+  %call42792 = call ptr @vix_string_concat(ptr %call42790, ptr @.strlit42791)
+  %load42793 = load ptr, ptr %field_ty, align 8
+  %call42794 = call ptr @mir2asm_mem_word(ptr %load42793)
+  %call42795 = call ptr @vix_string_concat(ptr %call42792, ptr %call42794)
+  %call42797 = call ptr @vix_string_concat(ptr %call42795, ptr @.strlit42796)
+  call void @mir2asm_line(ptr %load42786, ptr %call42797)
+  %load42798 = load ptr, ptr %b, align 8
+  %load42800 = load i32, ptr %dest_off_ptr, align 4
+  %call42801 = call ptr @mir2asm_mem(i32 %load42800)
+  %call42802 = call ptr @vix_string_concat(ptr @.strlit42799, ptr %call42801)
+  %call42804 = call ptr @vix_string_concat(ptr %call42802, ptr @.strlit42803)
+  %load42805 = load ptr, ptr %field_ty, align 8
+  %call42806 = call ptr @mir2asm_acc(ptr %load42805)
+  %call42807 = call ptr @vix_string_concat(ptr %call42804, ptr %call42806)
+  call void @mir2asm_line(ptr %load42798, ptr %call42807)
   ret void
 
-if.then6874:                                      ; preds = %or.merge6
-  %load42568 = load ptr, ptr %b, align 8
-  %load42569 = load ptr, ptr %dest, align 8
-  %load42570 = load ptr, ptr %field_ty, align 8
-  %call42571 = call i32 @mir2asm_alloc_slot_typed(ptr %load42568, ptr %load42569, i32 0, ptr %load42570)
+if.then6912:                                      ; preds = %or.merge6
+  %load42830 = load ptr, ptr %b, align 8
+  %load42831 = load ptr, ptr %dest, align 8
+  %load42832 = load ptr, ptr %field_ty, align 8
+  %call42833 = call i32 @mir2asm_alloc_slot_typed(ptr %load42830, ptr %load42831, i32 0, ptr %load42832)
   %dest_off = alloca i32, align 4
-  store i32 %call42571, ptr %dest_off, align 4
-  %load42572 = load ptr, ptr %b, align 8
-  %load42573 = load i32, ptr %dest_off, align 4
-  %load42574 = load ptr, ptr %b, align 8
-  %field42576 = getelementptr %MirAsm, ptr %load42574, i32 0, i32 6
-  %fieldval42577 = load ptr, ptr %field42576, align 8
-  %load42578 = load i32, ptr %src_idx, align 4
-  %idx42579 = getelementptr i32, ptr %fieldval42577, i32 %load42578
-  %loadidx42580 = load i32, ptr %idx42579, align 4
-  %load42581 = load i32, ptr %field_off, align 4
-  %sub42582 = sub i32 %loadidx42580, %load42581
-  %load42583 = load ptr, ptr %b, align 8
-  %load42584 = load ptr, ptr %field_ty, align 8
-  %call42585 = call i32 @mir2asm_type_size_for(ptr %load42583, ptr %load42584)
-  call void @mir2asm_emit_copy_stack_bytes(ptr %load42572, i32 %load42573, i32 %sub42582, i32 %call42585)
+  store i32 %call42833, ptr %dest_off, align 4
+  %load42834 = load ptr, ptr %b, align 8
+  %load42835 = load i32, ptr %dest_off, align 4
+  %load42836 = load ptr, ptr %b, align 8
+  %field42838 = getelementptr %MirAsm, ptr %load42836, i32 0, i32 6
+  %fieldval42839 = load ptr, ptr %field42838, align 8
+  %load42840 = load i32, ptr %src_idx, align 4
+  %idx42841 = getelementptr i32, ptr %fieldval42839, i32 %load42840
+  %loadidx42842 = load i32, ptr %idx42841, align 4
+  %load42843 = load i32, ptr %field_off, align 4
+  %sub42844 = sub i32 %loadidx42842, %load42843
+  %load42845 = load ptr, ptr %b, align 8
+  %load42846 = load ptr, ptr %field_ty, align 8
+  %call42847 = call i32 @mir2asm_type_size_for(ptr %load42845, ptr %load42846)
+  call void @mir2asm_emit_copy_stack_bytes(ptr %load42834, i32 %load42835, i32 %sub42844, i32 %call42847)
   ret void
 
-if.else6875:                                      ; preds = %or.merge6
-  br label %if.end6876
+if.else6913:                                      ; preds = %or.merge6
+  br label %if.end6914
 
-if.end6876:                                       ; preds = %if.else6875
-  %load42586 = load ptr, ptr %b, align 8
-  %load42587 = load ptr, ptr %dest, align 8
-  %load42588 = load ptr, ptr %field_ty, align 8
-  %call42589 = call i32 @mir2asm_alloc_slot_typed(ptr %load42586, ptr %load42587, i32 0, ptr %load42588)
+if.end6914:                                       ; preds = %if.else6913
+  %load42848 = load ptr, ptr %b, align 8
+  %load42849 = load ptr, ptr %dest, align 8
+  %load42850 = load ptr, ptr %field_ty, align 8
+  %call42851 = call i32 @mir2asm_alloc_slot_typed(ptr %load42848, ptr %load42849, i32 0, ptr %load42850)
   %dest_off2 = alloca i32, align 4
-  store i32 %call42589, ptr %dest_off2, align 4
-  %load42590 = load ptr, ptr %b, align 8
-  %load42592 = load ptr, ptr %field_ty, align 8
-  %call42593 = call ptr @mir2asm_acc(ptr %load42592)
-  %call42594 = call ptr @vix_string_concat(ptr @.strlit42591, ptr %call42593)
-  %call42596 = call ptr @vix_string_concat(ptr %call42594, ptr @.strlit42595)
-  %load42597 = load ptr, ptr %field_ty, align 8
-  %call42598 = call ptr @mir2asm_mem_word(ptr %load42597)
-  %call42599 = call ptr @vix_string_concat(ptr %call42596, ptr %call42598)
-  %call42601 = call ptr @vix_string_concat(ptr %call42599, ptr @.strlit42600)
-  %load42602 = load ptr, ptr %b, align 8
-  %field42604 = getelementptr %MirAsm, ptr %load42602, i32 0, i32 6
-  %fieldval42605 = load ptr, ptr %field42604, align 8
-  %load42606 = load i32, ptr %src_idx, align 4
-  %idx42607 = getelementptr i32, ptr %fieldval42605, i32 %load42606
-  %loadidx42608 = load i32, ptr %idx42607, align 4
-  %load42609 = load i32, ptr %field_off, align 4
-  %call42610 = call ptr @mir2asm_mem_at(i32 %loadidx42608, i32 %load42609)
-  %call42611 = call ptr @vix_string_concat(ptr %call42601, ptr %call42610)
-  call void @mir2asm_line(ptr %load42590, ptr %call42611)
-  %load42612 = load ptr, ptr %b, align 8
-  %load42614 = load i32, ptr %dest_off2, align 4
-  %call42615 = call ptr @mir2asm_mem(i32 %load42614)
-  %call42616 = call ptr @vix_string_concat(ptr @.strlit42613, ptr %call42615)
-  %call42618 = call ptr @vix_string_concat(ptr %call42616, ptr @.strlit42617)
-  %load42619 = load ptr, ptr %field_ty, align 8
-  %call42620 = call ptr @mir2asm_acc(ptr %load42619)
-  %call42621 = call ptr @vix_string_concat(ptr %call42618, ptr %call42620)
-  call void @mir2asm_line(ptr %load42612, ptr %call42621)
+  store i32 %call42851, ptr %dest_off2, align 4
+  %load42852 = load ptr, ptr %b, align 8
+  %load42854 = load ptr, ptr %field_ty, align 8
+  %call42855 = call ptr @mir2asm_acc(ptr %load42854)
+  %call42856 = call ptr @vix_string_concat(ptr @.strlit42853, ptr %call42855)
+  %call42858 = call ptr @vix_string_concat(ptr %call42856, ptr @.strlit42857)
+  %load42859 = load ptr, ptr %field_ty, align 8
+  %call42860 = call ptr @mir2asm_mem_word(ptr %load42859)
+  %call42861 = call ptr @vix_string_concat(ptr %call42858, ptr %call42860)
+  %call42863 = call ptr @vix_string_concat(ptr %call42861, ptr @.strlit42862)
+  %load42864 = load ptr, ptr %b, align 8
+  %field42866 = getelementptr %MirAsm, ptr %load42864, i32 0, i32 6
+  %fieldval42867 = load ptr, ptr %field42866, align 8
+  %load42868 = load i32, ptr %src_idx, align 4
+  %idx42869 = getelementptr i32, ptr %fieldval42867, i32 %load42868
+  %loadidx42870 = load i32, ptr %idx42869, align 4
+  %load42871 = load i32, ptr %field_off, align 4
+  %call42872 = call ptr @mir2asm_mem_at(i32 %loadidx42870, i32 %load42871)
+  %call42873 = call ptr @vix_string_concat(ptr %call42863, ptr %call42872)
+  call void @mir2asm_line(ptr %load42852, ptr %call42873)
+  %load42874 = load ptr, ptr %b, align 8
+  %load42876 = load i32, ptr %dest_off2, align 4
+  %call42877 = call ptr @mir2asm_mem(i32 %load42876)
+  %call42878 = call ptr @vix_string_concat(ptr @.strlit42875, ptr %call42877)
+  %call42880 = call ptr @vix_string_concat(ptr %call42878, ptr @.strlit42879)
+  %load42881 = load ptr, ptr %field_ty, align 8
+  %call42882 = call ptr @mir2asm_acc(ptr %load42881)
+  %call42883 = call ptr @vix_string_concat(ptr %call42880, ptr %call42882)
+  call void @mir2asm_line(ptr %load42874, ptr %call42883)
   ret void
 
-or.true4:                                         ; preds = %and.merge9, %if.end6867
+or.true4:                                         ; preds = %and.merge9, %if.end6905
   br label %or.merge6
 
-or.rhs5:                                          ; preds = %if.end6867
-  %load42552 = load ptr, ptr %field_ty, align 8
-  %strlen42553 = call i32 @strlen(ptr %load42552)
-  %cmp42554 = icmp sgt i32 %strlen42553, 0
-  %bool42555 = zext i1 %cmp42554 to i32
-  %cond42556 = icmp ne i32 %bool42555, 0
-  br i1 %cond42556, label %and.rhs7, label %and.false8
+or.rhs5:                                          ; preds = %if.end6905
+  %load42814 = load ptr, ptr %field_ty, align 8
+  %strlen42815 = call i32 @strlen(ptr %load42814)
+  %cmp42816 = icmp sgt i32 %strlen42815, 0
+  %bool42817 = zext i1 %cmp42816 to i32
+  %cond42818 = icmp ne i32 %bool42817, 0
+  br i1 %cond42818, label %and.rhs7, label %and.false8
 
 or.merge6:                                        ; preds = %or.true4, %and.merge9
-  %orval42566 = phi i32 [ 1, %or.true4 ], [ 0, %and.merge9 ]
-  %cond42567 = icmp ne i32 %orval42566, 0
-  br i1 %cond42567, label %if.then6874, label %if.else6875
+  %orval42828 = phi i32 [ 1, %or.true4 ], [ 0, %and.merge9 ]
+  %cond42829 = icmp ne i32 %orval42828, 0
+  br i1 %cond42829, label %if.then6912, label %if.else6913
 
 and.rhs7:                                         ; preds = %or.rhs5
-  %load42557 = load ptr, ptr %field_ty, align 8
-  %sidx42558 = getelementptr i8, ptr %load42557, i32 0
-  %sbyte42559 = load i8, ptr %sidx42558, align 1
-  %schar42560 = zext i8 %sbyte42559 to i32
-  %cmp42561 = icmp eq i32 %schar42560, 64
-  %bool42562 = zext i1 %cmp42561 to i32
-  %cond42563 = icmp ne i32 %bool42562, 0
-  br i1 %cond42563, label %and.merge9, label %and.false8
+  %load42819 = load ptr, ptr %field_ty, align 8
+  %sidx42820 = getelementptr i8, ptr %load42819, i32 0
+  %sbyte42821 = load i8, ptr %sidx42820, align 1
+  %schar42822 = zext i8 %sbyte42821 to i32
+  %cmp42823 = icmp eq i32 %schar42822, 64
+  %bool42824 = zext i1 %cmp42823 to i32
+  %cond42825 = icmp ne i32 %bool42824, 0
+  br i1 %cond42825, label %and.merge9, label %and.false8
 
 and.false8:                                       ; preds = %and.rhs7, %or.rhs5
   br label %and.merge9
 
 and.merge9:                                       ; preds = %and.false8, %and.rhs7
-  %andval42564 = phi i32 [ 1, %and.rhs7 ], [ 0, %and.false8 ]
-  %cond42565 = icmp ne i32 %andval42564, 0
-  br i1 %cond42565, label %or.true4, label %or.merge6
+  %andval42826 = phi i32 [ 1, %and.rhs7 ], [ 0, %and.false8 ]
+  %cond42827 = icmp ne i32 %andval42826, 0
+  br i1 %cond42827, label %or.true4, label %or.merge6
 }
 
 define void @mir2asm_emit_binop(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4) {
@@ -81289,243 +81865,243 @@ entry:
   store ptr %3, ptr %op, align 8
   %asm_op = alloca ptr, align 8
   store ptr %4, ptr %asm_op, align 8
-  %load42622 = load ptr, ptr %op, align 8
-  %strlen42623 = call i32 @strlen(ptr %load42622)
-  %add42624 = add i32 %strlen42623, 1
+  %load42884 = load ptr, ptr %op, align 8
+  %strlen42885 = call i32 @strlen(ptr %load42884)
+  %add42886 = add i32 %strlen42885, 1
   %start = alloca i32, align 4
-  store i32 %add42624, ptr %start, align 4
-  %load42625 = load ptr, ptr %rhs, align 8
-  %load42626 = load i32, ptr %start, align 4
-  %call42627 = call i32 @mir2asm_find(ptr %load42625, i8 32, i32 %load42626)
+  store i32 %add42886, ptr %start, align 4
+  %load42887 = load ptr, ptr %rhs, align 8
+  %load42888 = load i32, ptr %start, align 4
+  %call42889 = call i32 @mir2asm_find(ptr %load42887, i8 32, i32 %load42888)
   %sp = alloca i32, align 4
-  store i32 %call42627, ptr %sp, align 4
-  %load42628 = load ptr, ptr %rhs, align 8
-  %load42629 = load i32, ptr %sp, align 4
-  %call42630 = call i32 @mir2asm_find(ptr %load42628, i8 44, i32 %load42629)
+  store i32 %call42889, ptr %sp, align 4
+  %load42890 = load ptr, ptr %rhs, align 8
+  %load42891 = load i32, ptr %sp, align 4
+  %call42892 = call i32 @mir2asm_find(ptr %load42890, i8 44, i32 %load42891)
   %comma = alloca i32, align 4
-  store i32 %call42630, ptr %comma, align 4
-  %load42631 = load i32, ptr %sp, align 4
-  %cmp42632 = icmp slt i32 %load42631, 0
-  %bool42633 = zext i1 %cmp42632 to i32
-  %cond42634 = icmp ne i32 %bool42633, 0
-  br i1 %cond42634, label %or.true, label %or.rhs
+  store i32 %call42892, ptr %comma, align 4
+  %load42893 = load i32, ptr %sp, align 4
+  %cmp42894 = icmp slt i32 %load42893, 0
+  %bool42895 = zext i1 %cmp42894 to i32
+  %cond42896 = icmp ne i32 %bool42895, 0
+  br i1 %cond42896, label %or.true, label %or.rhs
 
-if.then6877:                                      ; preds = %or.merge
+if.then6915:                                      ; preds = %or.merge
   ret void
 
-if.else6878:                                      ; preds = %or.merge
-  br label %if.end6879
+if.else6916:                                      ; preds = %or.merge
+  br label %if.end6917
 
-if.end6879:                                       ; preds = %if.else6878
-  %load42641 = load ptr, ptr %rhs, align 8
-  %load42642 = load i32, ptr %start, align 4
-  %load42643 = load i32, ptr %sp, align 4
-  %call42644 = call ptr @mir2asm_slice(ptr %load42641, i32 %load42642, i32 %load42643)
-  %call42645 = call ptr @mir2asm_trim(ptr %call42644)
+if.end6917:                                       ; preds = %if.else6916
+  %load42903 = load ptr, ptr %rhs, align 8
+  %load42904 = load i32, ptr %start, align 4
+  %load42905 = load i32, ptr %sp, align 4
+  %call42906 = call ptr @mir2asm_slice(ptr %load42903, i32 %load42904, i32 %load42905)
+  %call42907 = call ptr @mir2asm_trim(ptr %call42906)
   %ty = alloca ptr, align 8
-  store ptr %call42645, ptr %ty, align 8
-  %load42646 = load ptr, ptr %rhs, align 8
-  %load42647 = load i32, ptr %sp, align 4
-  %add42648 = add i32 %load42647, 1
-  %load42649 = load i32, ptr %comma, align 4
-  %call42650 = call ptr @mir2asm_slice(ptr %load42646, i32 %add42648, i32 %load42649)
-  %call42651 = call ptr @mir2asm_trim(ptr %call42650)
+  store ptr %call42907, ptr %ty, align 8
+  %load42908 = load ptr, ptr %rhs, align 8
+  %load42909 = load i32, ptr %sp, align 4
+  %add42910 = add i32 %load42909, 1
+  %load42911 = load i32, ptr %comma, align 4
+  %call42912 = call ptr @mir2asm_slice(ptr %load42908, i32 %add42910, i32 %load42911)
+  %call42913 = call ptr @mir2asm_trim(ptr %call42912)
   %left = alloca ptr, align 8
-  store ptr %call42651, ptr %left, align 8
-  %load42652 = load ptr, ptr %rhs, align 8
-  %load42653 = load i32, ptr %comma, align 4
-  %add42654 = add i32 %load42653, 1
-  %call42655 = call ptr @mir2asm_after(ptr %load42652, i32 %add42654)
-  %call42656 = call ptr @mir2asm_trim(ptr %call42655)
+  store ptr %call42913, ptr %left, align 8
+  %load42914 = load ptr, ptr %rhs, align 8
+  %load42915 = load i32, ptr %comma, align 4
+  %add42916 = add i32 %load42915, 1
+  %call42917 = call ptr @mir2asm_after(ptr %load42914, i32 %add42916)
+  %call42918 = call ptr @mir2asm_trim(ptr %call42917)
   %right = alloca ptr, align 8
-  store ptr %call42656, ptr %right, align 8
-  %load42657 = load ptr, ptr %b, align 8
-  %load42658 = load ptr, ptr %dest, align 8
-  %load42659 = load ptr, ptr %ty, align 8
-  %call42660 = call i32 @mir2asm_alloc_slot_typed(ptr %load42657, ptr %load42658, i32 0, ptr %load42659)
-  %load42661 = load ptr, ptr %ty, align 8
-  %call42662 = call ptr @mir2asm_acc(ptr %load42661)
+  store ptr %call42918, ptr %right, align 8
+  %load42919 = load ptr, ptr %b, align 8
+  %load42920 = load ptr, ptr %dest, align 8
+  %load42921 = load ptr, ptr %ty, align 8
+  %call42922 = call i32 @mir2asm_alloc_slot_typed(ptr %load42919, ptr %load42920, i32 0, ptr %load42921)
+  %load42923 = load ptr, ptr %ty, align 8
+  %call42924 = call ptr @mir2asm_acc(ptr %load42923)
   %acc = alloca ptr, align 8
-  store ptr %call42662, ptr %acc, align 8
-  %load42663 = load ptr, ptr %b, align 8
-  %load42664 = load ptr, ptr %acc, align 8
-  %load42665 = load ptr, ptr %left, align 8
-  %load42666 = load ptr, ptr %ty, align 8
-  call void @mir2asm_emit_load_int_reg(ptr %load42663, ptr %load42664, ptr %load42665, ptr %load42666)
-  %load42667 = load ptr, ptr %op, align 8
-  %strcmp42669 = call i32 @strcmp(ptr %load42667, ptr @.strlit42668)
-  %cmp42670 = icmp eq i32 %strcmp42669, 0
-  %bool42671 = zext i1 %cmp42670 to i32
-  %cond42672 = icmp ne i32 %bool42671, 0
-  br i1 %cond42672, label %or.true1, label %or.rhs2
+  store ptr %call42924, ptr %acc, align 8
+  %load42925 = load ptr, ptr %b, align 8
+  %load42926 = load ptr, ptr %acc, align 8
+  %load42927 = load ptr, ptr %left, align 8
+  %load42928 = load ptr, ptr %ty, align 8
+  call void @mir2asm_emit_load_int_reg(ptr %load42925, ptr %load42926, ptr %load42927, ptr %load42928)
+  %load42929 = load ptr, ptr %op, align 8
+  %strcmp42931 = call i32 @strcmp(ptr %load42929, ptr @.strlit42930)
+  %cmp42932 = icmp eq i32 %strcmp42931, 0
+  %bool42933 = zext i1 %cmp42932 to i32
+  %cond42934 = icmp ne i32 %bool42933, 0
+  br i1 %cond42934, label %or.true1, label %or.rhs2
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load42635 = load i32, ptr %comma, align 4
-  %cmp42636 = icmp slt i32 %load42635, 0
-  %bool42637 = zext i1 %cmp42636 to i32
-  %cond42638 = icmp ne i32 %bool42637, 0
-  br i1 %cond42638, label %or.true, label %or.merge
+  %load42897 = load i32, ptr %comma, align 4
+  %cmp42898 = icmp slt i32 %load42897, 0
+  %bool42899 = zext i1 %cmp42898 to i32
+  %cond42900 = icmp ne i32 %bool42899, 0
+  br i1 %cond42900, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval42639 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond42640 = icmp ne i32 %orval42639, 0
-  br i1 %cond42640, label %if.then6877, label %if.else6878
+  %orval42901 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond42902 = icmp ne i32 %orval42901, 0
+  br i1 %cond42902, label %if.then6915, label %if.else6916
 
-if.then6880:                                      ; preds = %or.merge3
-  %load42681 = load ptr, ptr %ty, align 8
-  %call42682 = call i32 @mir2asm_type_is_64(ptr %load42681)
-  %cmp42683 = icmp eq i32 %call42682, 1
-  %bool42684 = zext i1 %cmp42683 to i32
-  %cond42685 = icmp ne i32 %bool42684, 0
-  br i1 %cond42685, label %if.then6883, label %if.else6884
+if.then6918:                                      ; preds = %or.merge3
+  %load42943 = load ptr, ptr %ty, align 8
+  %call42944 = call i32 @mir2asm_type_is_64(ptr %load42943)
+  %cmp42945 = icmp eq i32 %call42944, 1
+  %bool42946 = zext i1 %cmp42945 to i32
+  %cond42947 = icmp ne i32 %bool42946, 0
+  br i1 %cond42947, label %if.then6921, label %if.else6922
 
-if.else6881:                                      ; preds = %or.merge3
-  %load42715 = load ptr, ptr %op, align 8
-  %strcmp42717 = call i32 @strcmp(ptr %load42715, ptr @.strlit42716)
-  %cmp42718 = icmp eq i32 %strcmp42717, 0
-  %bool42719 = zext i1 %cmp42718 to i32
-  %cond42720 = icmp ne i32 %bool42719, 0
-  br i1 %cond42720, label %or.true4, label %or.rhs5
+if.else6919:                                      ; preds = %or.merge3
+  %load42977 = load ptr, ptr %op, align 8
+  %strcmp42979 = call i32 @strcmp(ptr %load42977, ptr @.strlit42978)
+  %cmp42980 = icmp eq i32 %strcmp42979, 0
+  %bool42981 = zext i1 %cmp42980 to i32
+  %cond42982 = icmp ne i32 %bool42981, 0
+  br i1 %cond42982, label %or.true4, label %or.rhs5
 
-if.end6882:                                       ; preds = %if.end6891, %if.end6888
-  %load42764 = load ptr, ptr %b, align 8
-  %load42766 = load ptr, ptr %b, align 8
-  %field42768 = getelementptr %MirAsm, ptr %load42766, i32 0, i32 6
-  %fieldval42769 = load ptr, ptr %field42768, align 8
-  %load42770 = load ptr, ptr %b, align 8
-  %load42771 = load ptr, ptr %dest, align 8
-  %call42772 = call i32 @mir2asm_find_name(ptr %load42770, ptr %load42771)
-  %idx42773 = getelementptr i32, ptr %fieldval42769, i32 %call42772
-  %loadidx42774 = load i32, ptr %idx42773, align 4
-  %call42775 = call ptr @mir2asm_mem(i32 %loadidx42774)
-  %call42776 = call ptr @vix_string_concat(ptr @.strlit42765, ptr %call42775)
-  %call42778 = call ptr @vix_string_concat(ptr %call42776, ptr @.strlit42777)
-  %load42779 = load ptr, ptr %acc, align 8
-  %call42780 = call ptr @vix_string_concat(ptr %call42778, ptr %load42779)
-  call void @mir2asm_line(ptr %load42764, ptr %call42780)
+if.end6920:                                       ; preds = %if.end6929, %if.end6926
+  %load43026 = load ptr, ptr %b, align 8
+  %load43028 = load ptr, ptr %b, align 8
+  %field43030 = getelementptr %MirAsm, ptr %load43028, i32 0, i32 6
+  %fieldval43031 = load ptr, ptr %field43030, align 8
+  %load43032 = load ptr, ptr %b, align 8
+  %load43033 = load ptr, ptr %dest, align 8
+  %call43034 = call i32 @mir2asm_find_name(ptr %load43032, ptr %load43033)
+  %idx43035 = getelementptr i32, ptr %fieldval43031, i32 %call43034
+  %loadidx43036 = load i32, ptr %idx43035, align 4
+  %call43037 = call ptr @mir2asm_mem(i32 %loadidx43036)
+  %call43038 = call ptr @vix_string_concat(ptr @.strlit43027, ptr %call43037)
+  %call43040 = call ptr @vix_string_concat(ptr %call43038, ptr @.strlit43039)
+  %load43041 = load ptr, ptr %acc, align 8
+  %call43042 = call ptr @vix_string_concat(ptr %call43040, ptr %load43041)
+  call void @mir2asm_line(ptr %load43026, ptr %call43042)
   ret void
 
-or.true1:                                         ; preds = %or.rhs2, %if.end6879
+or.true1:                                         ; preds = %or.rhs2, %if.end6917
   br label %or.merge3
 
-or.rhs2:                                          ; preds = %if.end6879
-  %load42673 = load ptr, ptr %op, align 8
-  %strcmp42675 = call i32 @strcmp(ptr %load42673, ptr @.strlit42674)
-  %cmp42676 = icmp eq i32 %strcmp42675, 0
-  %bool42677 = zext i1 %cmp42676 to i32
-  %cond42678 = icmp ne i32 %bool42677, 0
-  br i1 %cond42678, label %or.true1, label %or.merge3
+or.rhs2:                                          ; preds = %if.end6917
+  %load42935 = load ptr, ptr %op, align 8
+  %strcmp42937 = call i32 @strcmp(ptr %load42935, ptr @.strlit42936)
+  %cmp42938 = icmp eq i32 %strcmp42937, 0
+  %bool42939 = zext i1 %cmp42938 to i32
+  %cond42940 = icmp ne i32 %bool42939, 0
+  br i1 %cond42940, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval42679 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond42680 = icmp ne i32 %orval42679, 0
-  br i1 %cond42680, label %if.then6880, label %if.else6881
+  %orval42941 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond42942 = icmp ne i32 %orval42941, 0
+  br i1 %cond42942, label %if.then6918, label %if.else6919
 
-if.then6883:                                      ; preds = %if.then6880
-  %load42686 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load42686, ptr @.strlit42687)
-  br label %if.end6885
+if.then6921:                                      ; preds = %if.then6918
+  %load42948 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load42948, ptr @.strlit42949)
+  br label %if.end6923
 
-if.else6884:                                      ; preds = %if.then6880
-  %load42688 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load42688, ptr @.strlit42689)
-  br label %if.end6885
+if.else6922:                                      ; preds = %if.then6918
+  %load42950 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load42950, ptr @.strlit42951)
+  br label %if.end6923
 
-if.end6885:                                       ; preds = %if.else6884, %if.then6883
-  %load42690 = load ptr, ptr %b, align 8
-  %load42691 = load ptr, ptr %ty, align 8
-  %call42692 = call ptr @mir2asm_cx(ptr %load42691)
-  %load42693 = load ptr, ptr %right, align 8
-  %load42694 = load ptr, ptr %ty, align 8
-  call void @mir2asm_emit_load_int_reg(ptr %load42690, ptr %call42692, ptr %load42693, ptr %load42694)
-  %load42695 = load ptr, ptr %b, align 8
-  %load42697 = load ptr, ptr %ty, align 8
-  %call42698 = call ptr @mir2asm_cx(ptr %load42697)
-  %call42699 = call ptr @vix_string_concat(ptr @.strlit42696, ptr %call42698)
-  call void @mir2asm_line(ptr %load42695, ptr %call42699)
-  %load42700 = load ptr, ptr %op, align 8
-  %strcmp42702 = call i32 @strcmp(ptr %load42700, ptr @.strlit42701)
-  %cmp42703 = icmp eq i32 %strcmp42702, 0
-  %bool42704 = zext i1 %cmp42703 to i32
-  %cond42705 = icmp ne i32 %bool42704, 0
-  br i1 %cond42705, label %if.then6886, label %if.else6887
+if.end6923:                                       ; preds = %if.else6922, %if.then6921
+  %load42952 = load ptr, ptr %b, align 8
+  %load42953 = load ptr, ptr %ty, align 8
+  %call42954 = call ptr @mir2asm_cx(ptr %load42953)
+  %load42955 = load ptr, ptr %right, align 8
+  %load42956 = load ptr, ptr %ty, align 8
+  call void @mir2asm_emit_load_int_reg(ptr %load42952, ptr %call42954, ptr %load42955, ptr %load42956)
+  %load42957 = load ptr, ptr %b, align 8
+  %load42959 = load ptr, ptr %ty, align 8
+  %call42960 = call ptr @mir2asm_cx(ptr %load42959)
+  %call42961 = call ptr @vix_string_concat(ptr @.strlit42958, ptr %call42960)
+  call void @mir2asm_line(ptr %load42957, ptr %call42961)
+  %load42962 = load ptr, ptr %op, align 8
+  %strcmp42964 = call i32 @strcmp(ptr %load42962, ptr @.strlit42963)
+  %cmp42965 = icmp eq i32 %strcmp42964, 0
+  %bool42966 = zext i1 %cmp42965 to i32
+  %cond42967 = icmp ne i32 %bool42966, 0
+  br i1 %cond42967, label %if.then6924, label %if.else6925
 
-if.then6886:                                      ; preds = %if.end6885
-  %load42706 = load ptr, ptr %b, align 8
-  %load42708 = load ptr, ptr %acc, align 8
-  %call42709 = call ptr @vix_string_concat(ptr @.strlit42707, ptr %load42708)
-  %call42711 = call ptr @vix_string_concat(ptr %call42709, ptr @.strlit42710)
-  %load42712 = load ptr, ptr %ty, align 8
-  %call42713 = call ptr @mir2asm_dx(ptr %load42712)
-  %call42714 = call ptr @vix_string_concat(ptr %call42711, ptr %call42713)
-  call void @mir2asm_line(ptr %load42706, ptr %call42714)
-  br label %if.end6888
+if.then6924:                                      ; preds = %if.end6923
+  %load42968 = load ptr, ptr %b, align 8
+  %load42970 = load ptr, ptr %acc, align 8
+  %call42971 = call ptr @vix_string_concat(ptr @.strlit42969, ptr %load42970)
+  %call42973 = call ptr @vix_string_concat(ptr %call42971, ptr @.strlit42972)
+  %load42974 = load ptr, ptr %ty, align 8
+  %call42975 = call ptr @mir2asm_dx(ptr %load42974)
+  %call42976 = call ptr @vix_string_concat(ptr %call42973, ptr %call42975)
+  call void @mir2asm_line(ptr %load42968, ptr %call42976)
+  br label %if.end6926
 
-if.else6887:                                      ; preds = %if.end6885
-  br label %if.end6888
+if.else6925:                                      ; preds = %if.end6923
+  br label %if.end6926
 
-if.end6888:                                       ; preds = %if.else6887, %if.then6886
-  br label %if.end6882
+if.end6926:                                       ; preds = %if.else6925, %if.then6924
+  br label %if.end6920
 
-if.then6889:                                      ; preds = %or.merge6
-  %load42729 = load ptr, ptr %b, align 8
-  %load42731 = load ptr, ptr %b, align 8
-  %load42732 = load ptr, ptr %right, align 8
-  %call42734 = call ptr @mir2asm_operand_typed(ptr %load42731, ptr %load42732, ptr @.strlit42733)
-  %call42735 = call ptr @vix_string_concat(ptr @.strlit42730, ptr %call42734)
-  call void @mir2asm_line(ptr %load42729, ptr %call42735)
-  %load42736 = load ptr, ptr %b, align 8
-  %load42738 = load ptr, ptr %asm_op, align 8
-  %call42739 = call ptr @vix_string_concat(ptr @.strlit42737, ptr %load42738)
-  %call42741 = call ptr @vix_string_concat(ptr %call42739, ptr @.strlit42740)
-  %load42742 = load ptr, ptr %acc, align 8
-  %call42743 = call ptr @vix_string_concat(ptr %call42741, ptr %load42742)
-  %call42745 = call ptr @vix_string_concat(ptr %call42743, ptr @.strlit42744)
-  call void @mir2asm_line(ptr %load42736, ptr %call42745)
-  br label %if.end6891
+if.then6927:                                      ; preds = %or.merge6
+  %load42991 = load ptr, ptr %b, align 8
+  %load42993 = load ptr, ptr %b, align 8
+  %load42994 = load ptr, ptr %right, align 8
+  %call42996 = call ptr @mir2asm_operand_typed(ptr %load42993, ptr %load42994, ptr @.strlit42995)
+  %call42997 = call ptr @vix_string_concat(ptr @.strlit42992, ptr %call42996)
+  call void @mir2asm_line(ptr %load42991, ptr %call42997)
+  %load42998 = load ptr, ptr %b, align 8
+  %load43000 = load ptr, ptr %asm_op, align 8
+  %call43001 = call ptr @vix_string_concat(ptr @.strlit42999, ptr %load43000)
+  %call43003 = call ptr @vix_string_concat(ptr %call43001, ptr @.strlit43002)
+  %load43004 = load ptr, ptr %acc, align 8
+  %call43005 = call ptr @vix_string_concat(ptr %call43003, ptr %load43004)
+  %call43007 = call ptr @vix_string_concat(ptr %call43005, ptr @.strlit43006)
+  call void @mir2asm_line(ptr %load42998, ptr %call43007)
+  br label %if.end6929
 
-if.else6890:                                      ; preds = %or.merge6
-  %load42746 = load ptr, ptr %b, align 8
-  %load42747 = load ptr, ptr %ty, align 8
-  %call42748 = call ptr @mir2asm_cx(ptr %load42747)
-  %load42749 = load ptr, ptr %right, align 8
-  %load42750 = load ptr, ptr %ty, align 8
-  %call42751 = call ptr @mir2asm_emit_prepare_int_operand(ptr %load42746, ptr %call42748, ptr %load42749, ptr %load42750)
+if.else6928:                                      ; preds = %or.merge6
+  %load43008 = load ptr, ptr %b, align 8
+  %load43009 = load ptr, ptr %ty, align 8
+  %call43010 = call ptr @mir2asm_cx(ptr %load43009)
+  %load43011 = load ptr, ptr %right, align 8
+  %load43012 = load ptr, ptr %ty, align 8
+  %call43013 = call ptr @mir2asm_emit_prepare_int_operand(ptr %load43008, ptr %call43010, ptr %load43011, ptr %load43012)
   %right_op = alloca ptr, align 8
-  store ptr %call42751, ptr %right_op, align 8
-  %load42752 = load ptr, ptr %b, align 8
-  %load42754 = load ptr, ptr %asm_op, align 8
-  %call42755 = call ptr @vix_string_concat(ptr @.strlit42753, ptr %load42754)
-  %call42757 = call ptr @vix_string_concat(ptr %call42755, ptr @.strlit42756)
-  %load42758 = load ptr, ptr %acc, align 8
-  %call42759 = call ptr @vix_string_concat(ptr %call42757, ptr %load42758)
-  %call42761 = call ptr @vix_string_concat(ptr %call42759, ptr @.strlit42760)
-  %load42762 = load ptr, ptr %right_op, align 8
-  %call42763 = call ptr @vix_string_concat(ptr %call42761, ptr %load42762)
-  call void @mir2asm_line(ptr %load42752, ptr %call42763)
-  br label %if.end6891
+  store ptr %call43013, ptr %right_op, align 8
+  %load43014 = load ptr, ptr %b, align 8
+  %load43016 = load ptr, ptr %asm_op, align 8
+  %call43017 = call ptr @vix_string_concat(ptr @.strlit43015, ptr %load43016)
+  %call43019 = call ptr @vix_string_concat(ptr %call43017, ptr @.strlit43018)
+  %load43020 = load ptr, ptr %acc, align 8
+  %call43021 = call ptr @vix_string_concat(ptr %call43019, ptr %load43020)
+  %call43023 = call ptr @vix_string_concat(ptr %call43021, ptr @.strlit43022)
+  %load43024 = load ptr, ptr %right_op, align 8
+  %call43025 = call ptr @vix_string_concat(ptr %call43023, ptr %load43024)
+  call void @mir2asm_line(ptr %load43014, ptr %call43025)
+  br label %if.end6929
 
-if.end6891:                                       ; preds = %if.else6890, %if.then6889
-  br label %if.end6882
+if.end6929:                                       ; preds = %if.else6928, %if.then6927
+  br label %if.end6920
 
-or.true4:                                         ; preds = %or.rhs5, %if.else6881
+or.true4:                                         ; preds = %or.rhs5, %if.else6919
   br label %or.merge6
 
-or.rhs5:                                          ; preds = %if.else6881
-  %load42721 = load ptr, ptr %op, align 8
-  %strcmp42723 = call i32 @strcmp(ptr %load42721, ptr @.strlit42722)
-  %cmp42724 = icmp eq i32 %strcmp42723, 0
-  %bool42725 = zext i1 %cmp42724 to i32
-  %cond42726 = icmp ne i32 %bool42725, 0
-  br i1 %cond42726, label %or.true4, label %or.merge6
+or.rhs5:                                          ; preds = %if.else6919
+  %load42983 = load ptr, ptr %op, align 8
+  %strcmp42985 = call i32 @strcmp(ptr %load42983, ptr @.strlit42984)
+  %cmp42986 = icmp eq i32 %strcmp42985, 0
+  %bool42987 = zext i1 %cmp42986 to i32
+  %cond42988 = icmp ne i32 %bool42987, 0
+  br i1 %cond42988, label %or.true4, label %or.merge6
 
 or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval42727 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond42728 = icmp ne i32 %orval42727, 0
-  br i1 %cond42728, label %if.then6889, label %if.else6890
+  %orval42989 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond42990 = icmp ne i32 %orval42989, 0
+  br i1 %cond42990, label %if.then6927, label %if.else6928
 }
 
 define void @mir2asm_emit_unary(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4) {
@@ -81540,83 +82116,315 @@ entry:
   store ptr %3, ptr %op, align 8
   %asm_op = alloca ptr, align 8
   store ptr %4, ptr %asm_op, align 8
-  %load42781 = load ptr, ptr %op, align 8
-  %strlen42782 = call i32 @strlen(ptr %load42781)
-  %add42783 = add i32 %strlen42782, 1
+  %load43043 = load ptr, ptr %op, align 8
+  %strlen43044 = call i32 @strlen(ptr %load43043)
+  %add43045 = add i32 %strlen43044, 1
   %start = alloca i32, align 4
-  store i32 %add42783, ptr %start, align 4
-  %load42784 = load ptr, ptr %rhs, align 8
-  %load42785 = load i32, ptr %start, align 4
-  %call42786 = call i32 @mir2asm_find(ptr %load42784, i8 32, i32 %load42785)
+  store i32 %add43045, ptr %start, align 4
+  %load43046 = load ptr, ptr %rhs, align 8
+  %load43047 = load i32, ptr %start, align 4
+  %call43048 = call i32 @mir2asm_find(ptr %load43046, i8 32, i32 %load43047)
   %sp = alloca i32, align 4
-  store i32 %call42786, ptr %sp, align 4
-  %load42787 = load i32, ptr %sp, align 4
-  %cmp42788 = icmp slt i32 %load42787, 0
-  %bool42789 = zext i1 %cmp42788 to i32
-  %cond42790 = icmp ne i32 %bool42789, 0
-  br i1 %cond42790, label %if.then6892, label %if.else6893
+  store i32 %call43048, ptr %sp, align 4
+  %load43049 = load i32, ptr %sp, align 4
+  %cmp43050 = icmp slt i32 %load43049, 0
+  %bool43051 = zext i1 %cmp43050 to i32
+  %cond43052 = icmp ne i32 %bool43051, 0
+  br i1 %cond43052, label %if.then6930, label %if.else6931
 
-if.then6892:                                      ; preds = %entry
+if.then6930:                                      ; preds = %entry
   ret void
 
-if.else6893:                                      ; preds = %entry
-  br label %if.end6894
+if.else6931:                                      ; preds = %entry
+  br label %if.end6932
 
-if.end6894:                                       ; preds = %if.else6893
-  %load42791 = load ptr, ptr %rhs, align 8
-  %load42792 = load i32, ptr %start, align 4
-  %load42793 = load i32, ptr %sp, align 4
-  %call42794 = call ptr @mir2asm_slice(ptr %load42791, i32 %load42792, i32 %load42793)
-  %call42795 = call ptr @mir2asm_trim(ptr %call42794)
+if.end6932:                                       ; preds = %if.else6931
+  %load43053 = load ptr, ptr %rhs, align 8
+  %load43054 = load i32, ptr %start, align 4
+  %load43055 = load i32, ptr %sp, align 4
+  %call43056 = call ptr @mir2asm_slice(ptr %load43053, i32 %load43054, i32 %load43055)
+  %call43057 = call ptr @mir2asm_trim(ptr %call43056)
   %ty = alloca ptr, align 8
-  store ptr %call42795, ptr %ty, align 8
-  %load42796 = load ptr, ptr %rhs, align 8
-  %load42797 = load i32, ptr %sp, align 4
-  %add42798 = add i32 %load42797, 1
-  %call42799 = call ptr @mir2asm_after(ptr %load42796, i32 %add42798)
-  %call42800 = call ptr @mir2asm_trim(ptr %call42799)
+  store ptr %call43057, ptr %ty, align 8
+  %load43058 = load ptr, ptr %rhs, align 8
+  %load43059 = load i32, ptr %sp, align 4
+  %add43060 = add i32 %load43059, 1
+  %call43061 = call ptr @mir2asm_after(ptr %load43058, i32 %add43060)
+  %call43062 = call ptr @mir2asm_trim(ptr %call43061)
   %val = alloca ptr, align 8
-  store ptr %call42800, ptr %val, align 8
-  %load42801 = load ptr, ptr %b, align 8
-  %load42802 = load ptr, ptr %dest, align 8
-  %load42803 = load ptr, ptr %ty, align 8
-  %call42804 = call i32 @mir2asm_alloc_slot_typed(ptr %load42801, ptr %load42802, i32 0, ptr %load42803)
-  %load42805 = load ptr, ptr %ty, align 8
-  %call42806 = call ptr @mir2asm_acc(ptr %load42805)
+  store ptr %call43062, ptr %val, align 8
+  %load43063 = load ptr, ptr %b, align 8
+  %load43064 = load ptr, ptr %dest, align 8
+  %load43065 = load ptr, ptr %ty, align 8
+  %call43066 = call i32 @mir2asm_alloc_slot_typed(ptr %load43063, ptr %load43064, i32 0, ptr %load43065)
+  %load43067 = load ptr, ptr %ty, align 8
+  %call43068 = call ptr @mir2asm_acc(ptr %load43067)
   %acc = alloca ptr, align 8
-  store ptr %call42806, ptr %acc, align 8
-  %load42807 = load ptr, ptr %b, align 8
-  %load42809 = load ptr, ptr %acc, align 8
-  %call42810 = call ptr @vix_string_concat(ptr @.strlit42808, ptr %load42809)
-  %call42812 = call ptr @vix_string_concat(ptr %call42810, ptr @.strlit42811)
-  %load42813 = load ptr, ptr %b, align 8
-  %load42814 = load ptr, ptr %val, align 8
-  %load42815 = load ptr, ptr %ty, align 8
-  %call42816 = call ptr @mir2asm_operand_typed(ptr %load42813, ptr %load42814, ptr %load42815)
-  %call42817 = call ptr @vix_string_concat(ptr %call42812, ptr %call42816)
-  call void @mir2asm_line(ptr %load42807, ptr %call42817)
-  %load42818 = load ptr, ptr %b, align 8
-  %load42820 = load ptr, ptr %asm_op, align 8
-  %call42821 = call ptr @vix_string_concat(ptr @.strlit42819, ptr %load42820)
-  %call42823 = call ptr @vix_string_concat(ptr %call42821, ptr @.strlit42822)
-  %load42824 = load ptr, ptr %acc, align 8
-  %call42825 = call ptr @vix_string_concat(ptr %call42823, ptr %load42824)
-  call void @mir2asm_line(ptr %load42818, ptr %call42825)
-  %load42826 = load ptr, ptr %b, align 8
-  %load42828 = load ptr, ptr %b, align 8
-  %field42830 = getelementptr %MirAsm, ptr %load42828, i32 0, i32 6
-  %fieldval42831 = load ptr, ptr %field42830, align 8
-  %load42832 = load ptr, ptr %b, align 8
-  %load42833 = load ptr, ptr %dest, align 8
-  %call42834 = call i32 @mir2asm_find_name(ptr %load42832, ptr %load42833)
-  %idx42835 = getelementptr i32, ptr %fieldval42831, i32 %call42834
-  %loadidx42836 = load i32, ptr %idx42835, align 4
-  %call42837 = call ptr @mir2asm_mem(i32 %loadidx42836)
-  %call42838 = call ptr @vix_string_concat(ptr @.strlit42827, ptr %call42837)
-  %call42840 = call ptr @vix_string_concat(ptr %call42838, ptr @.strlit42839)
-  %load42841 = load ptr, ptr %acc, align 8
-  %call42842 = call ptr @vix_string_concat(ptr %call42840, ptr %load42841)
-  call void @mir2asm_line(ptr %load42826, ptr %call42842)
+  store ptr %call43068, ptr %acc, align 8
+  %load43069 = load ptr, ptr %b, align 8
+  %load43071 = load ptr, ptr %acc, align 8
+  %call43072 = call ptr @vix_string_concat(ptr @.strlit43070, ptr %load43071)
+  %call43074 = call ptr @vix_string_concat(ptr %call43072, ptr @.strlit43073)
+  %load43075 = load ptr, ptr %b, align 8
+  %load43076 = load ptr, ptr %val, align 8
+  %load43077 = load ptr, ptr %ty, align 8
+  %call43078 = call ptr @mir2asm_operand_typed(ptr %load43075, ptr %load43076, ptr %load43077)
+  %call43079 = call ptr @vix_string_concat(ptr %call43074, ptr %call43078)
+  call void @mir2asm_line(ptr %load43069, ptr %call43079)
+  %load43080 = load ptr, ptr %b, align 8
+  %load43082 = load ptr, ptr %asm_op, align 8
+  %call43083 = call ptr @vix_string_concat(ptr @.strlit43081, ptr %load43082)
+  %call43085 = call ptr @vix_string_concat(ptr %call43083, ptr @.strlit43084)
+  %load43086 = load ptr, ptr %acc, align 8
+  %call43087 = call ptr @vix_string_concat(ptr %call43085, ptr %load43086)
+  call void @mir2asm_line(ptr %load43080, ptr %call43087)
+  %load43088 = load ptr, ptr %b, align 8
+  %load43090 = load ptr, ptr %b, align 8
+  %field43092 = getelementptr %MirAsm, ptr %load43090, i32 0, i32 6
+  %fieldval43093 = load ptr, ptr %field43092, align 8
+  %load43094 = load ptr, ptr %b, align 8
+  %load43095 = load ptr, ptr %dest, align 8
+  %call43096 = call i32 @mir2asm_find_name(ptr %load43094, ptr %load43095)
+  %idx43097 = getelementptr i32, ptr %fieldval43093, i32 %call43096
+  %loadidx43098 = load i32, ptr %idx43097, align 4
+  %call43099 = call ptr @mir2asm_mem(i32 %loadidx43098)
+  %call43100 = call ptr @vix_string_concat(ptr @.strlit43089, ptr %call43099)
+  %call43102 = call ptr @vix_string_concat(ptr %call43100, ptr @.strlit43101)
+  %load43103 = load ptr, ptr %acc, align 8
+  %call43104 = call ptr @vix_string_concat(ptr %call43102, ptr %load43103)
+  call void @mir2asm_line(ptr %load43088, ptr %call43104)
+  ret void
+}
+
+define ptr @mir2asm_float_op(ptr %0, ptr %1) {
+entry:
+  %ty = alloca ptr, align 8
+  store ptr %0, ptr %ty, align 8
+  %op = alloca ptr, align 8
+  store ptr %1, ptr %op, align 8
+  %load43105 = load ptr, ptr %op, align 8
+  %strcmp43107 = call i32 @strcmp(ptr %load43105, ptr @.strlit43106)
+  %cmp43108 = icmp eq i32 %strcmp43107, 0
+  %bool43109 = zext i1 %cmp43108 to i32
+  %cond43110 = icmp ne i32 %bool43109, 0
+  br i1 %cond43110, label %if.then6933, label %if.else6934
+
+if.then6933:                                      ; preds = %entry
+  %load43111 = load ptr, ptr %ty, align 8
+  %strcmp43113 = call i32 @strcmp(ptr %load43111, ptr @.strlit43112)
+  %cmp43114 = icmp eq i32 %strcmp43113, 0
+  %bool43115 = zext i1 %cmp43114 to i32
+  %cond43116 = icmp ne i32 %bool43115, 0
+  br i1 %cond43116, label %if.then6936, label %if.else6937
+
+if.else6934:                                      ; preds = %entry
+  br label %if.end6935
+
+if.end6935:                                       ; preds = %if.else6934, %if.end6938
+  %load43119 = load ptr, ptr %op, align 8
+  %strcmp43121 = call i32 @strcmp(ptr %load43119, ptr @.strlit43120)
+  %cmp43122 = icmp eq i32 %strcmp43121, 0
+  %bool43123 = zext i1 %cmp43122 to i32
+  %cond43124 = icmp ne i32 %bool43123, 0
+  br i1 %cond43124, label %if.then6939, label %if.else6940
+
+if.then6936:                                      ; preds = %if.then6933
+  ret ptr @.strlit43117
+
+if.else6937:                                      ; preds = %if.then6933
+  ret ptr @.strlit43118
+
+if.end6938:                                       ; No predecessors!
+  br label %if.end6935
+
+if.then6939:                                      ; preds = %if.end6935
+  %load43125 = load ptr, ptr %ty, align 8
+  %strcmp43127 = call i32 @strcmp(ptr %load43125, ptr @.strlit43126)
+  %cmp43128 = icmp eq i32 %strcmp43127, 0
+  %bool43129 = zext i1 %cmp43128 to i32
+  %cond43130 = icmp ne i32 %bool43129, 0
+  br i1 %cond43130, label %if.then6942, label %if.else6943
+
+if.else6940:                                      ; preds = %if.end6935
+  br label %if.end6941
+
+if.end6941:                                       ; preds = %if.else6940, %if.end6944
+  %load43133 = load ptr, ptr %op, align 8
+  %strcmp43135 = call i32 @strcmp(ptr %load43133, ptr @.strlit43134)
+  %cmp43136 = icmp eq i32 %strcmp43135, 0
+  %bool43137 = zext i1 %cmp43136 to i32
+  %cond43138 = icmp ne i32 %bool43137, 0
+  br i1 %cond43138, label %if.then6945, label %if.else6946
+
+if.then6942:                                      ; preds = %if.then6939
+  ret ptr @.strlit43131
+
+if.else6943:                                      ; preds = %if.then6939
+  ret ptr @.strlit43132
+
+if.end6944:                                       ; No predecessors!
+  br label %if.end6941
+
+if.then6945:                                      ; preds = %if.end6941
+  %load43139 = load ptr, ptr %ty, align 8
+  %strcmp43141 = call i32 @strcmp(ptr %load43139, ptr @.strlit43140)
+  %cmp43142 = icmp eq i32 %strcmp43141, 0
+  %bool43143 = zext i1 %cmp43142 to i32
+  %cond43144 = icmp ne i32 %bool43143, 0
+  br i1 %cond43144, label %if.then6948, label %if.else6949
+
+if.else6946:                                      ; preds = %if.end6941
+  br label %if.end6947
+
+if.end6947:                                       ; preds = %if.else6946, %if.end6950
+  %load43147 = load ptr, ptr %ty, align 8
+  %strcmp43149 = call i32 @strcmp(ptr %load43147, ptr @.strlit43148)
+  %cmp43150 = icmp eq i32 %strcmp43149, 0
+  %bool43151 = zext i1 %cmp43150 to i32
+  %cond43152 = icmp ne i32 %bool43151, 0
+  br i1 %cond43152, label %if.then6951, label %if.else6952
+
+if.then6948:                                      ; preds = %if.then6945
+  ret ptr @.strlit43145
+
+if.else6949:                                      ; preds = %if.then6945
+  ret ptr @.strlit43146
+
+if.end6950:                                       ; No predecessors!
+  br label %if.end6947
+
+if.then6951:                                      ; preds = %if.end6947
+  ret ptr @.strlit43153
+
+if.else6952:                                      ; preds = %if.end6947
+  br label %if.end6953
+
+if.end6953:                                       ; preds = %if.else6952
+  ret ptr @.strlit43154
+}
+
+define void @mir2asm_emit_fbinop(ptr %0, ptr %1, ptr %2, ptr %3) {
+entry:
+  %b = alloca ptr, align 8
+  store ptr %0, ptr %b, align 8
+  %dest = alloca ptr, align 8
+  store ptr %1, ptr %dest, align 8
+  %rhs = alloca ptr, align 8
+  store ptr %2, ptr %rhs, align 8
+  %op = alloca ptr, align 8
+  store ptr %3, ptr %op, align 8
+  %load43155 = load ptr, ptr %op, align 8
+  %strlen43156 = call i32 @strlen(ptr %load43155)
+  %add43157 = add i32 %strlen43156, 1
+  %start = alloca i32, align 4
+  store i32 %add43157, ptr %start, align 4
+  %load43158 = load ptr, ptr %rhs, align 8
+  %load43159 = load i32, ptr %start, align 4
+  %call43160 = call i32 @mir2asm_find(ptr %load43158, i8 32, i32 %load43159)
+  %sp = alloca i32, align 4
+  store i32 %call43160, ptr %sp, align 4
+  %load43161 = load ptr, ptr %rhs, align 8
+  %load43162 = load i32, ptr %sp, align 4
+  %call43163 = call i32 @mir2asm_find(ptr %load43161, i8 44, i32 %load43162)
+  %comma = alloca i32, align 4
+  store i32 %call43163, ptr %comma, align 4
+  %load43164 = load i32, ptr %sp, align 4
+  %cmp43165 = icmp slt i32 %load43164, 0
+  %bool43166 = zext i1 %cmp43165 to i32
+  %cond43167 = icmp ne i32 %bool43166, 0
+  br i1 %cond43167, label %or.true, label %or.rhs
+
+if.then6954:                                      ; preds = %or.merge
+  ret void
+
+if.else6955:                                      ; preds = %or.merge
+  br label %if.end6956
+
+if.end6956:                                       ; preds = %if.else6955
+  %load43174 = load ptr, ptr %rhs, align 8
+  %load43175 = load i32, ptr %start, align 4
+  %load43176 = load i32, ptr %sp, align 4
+  %call43177 = call ptr @mir2asm_slice(ptr %load43174, i32 %load43175, i32 %load43176)
+  %call43178 = call ptr @mir2asm_trim(ptr %call43177)
+  %ty = alloca ptr, align 8
+  store ptr %call43178, ptr %ty, align 8
+  %load43179 = load ptr, ptr %rhs, align 8
+  %load43180 = load i32, ptr %sp, align 4
+  %add43181 = add i32 %load43180, 1
+  %load43182 = load i32, ptr %comma, align 4
+  %call43183 = call ptr @mir2asm_slice(ptr %load43179, i32 %add43181, i32 %load43182)
+  %call43184 = call ptr @mir2asm_trim(ptr %call43183)
+  %left = alloca ptr, align 8
+  store ptr %call43184, ptr %left, align 8
+  %load43185 = load ptr, ptr %rhs, align 8
+  %load43186 = load i32, ptr %comma, align 4
+  %add43187 = add i32 %load43186, 1
+  %call43188 = call ptr @mir2asm_after(ptr %load43185, i32 %add43187)
+  %call43189 = call ptr @mir2asm_trim(ptr %call43188)
+  %right = alloca ptr, align 8
+  store ptr %call43189, ptr %right, align 8
+  %load43190 = load ptr, ptr %b, align 8
+  %load43191 = load ptr, ptr %dest, align 8
+  %load43192 = load ptr, ptr %ty, align 8
+  %call43193 = call i32 @mir2asm_alloc_slot_typed(ptr %load43190, ptr %load43191, i32 0, ptr %load43192)
+  %dest_off = alloca i32, align 4
+  store i32 %call43193, ptr %dest_off, align 4
+  %load43194 = load ptr, ptr %b, align 8
+  %load43196 = load ptr, ptr %left, align 8
+  %load43197 = load ptr, ptr %ty, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load43194, ptr @.strlit43195, ptr %load43196, ptr %load43197)
+  %load43198 = load ptr, ptr %b, align 8
+  %load43200 = load ptr, ptr %right, align 8
+  %load43201 = load ptr, ptr %ty, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load43198, ptr @.strlit43199, ptr %load43200, ptr %load43201)
+  %load43202 = load ptr, ptr %b, align 8
+  %load43204 = load ptr, ptr %ty, align 8
+  %load43205 = load ptr, ptr %op, align 8
+  %call43206 = call ptr @mir2asm_float_op(ptr %load43204, ptr %load43205)
+  %call43207 = call ptr @vix_string_concat(ptr @.strlit43203, ptr %call43206)
+  %call43209 = call ptr @vix_string_concat(ptr %call43207, ptr @.strlit43208)
+  call void @mir2asm_line(ptr %load43202, ptr %call43209)
+  %load43210 = load ptr, ptr %ty, align 8
+  %strcmp43212 = call i32 @strcmp(ptr %load43210, ptr @.strlit43211)
+  %cmp43213 = icmp eq i32 %strcmp43212, 0
+  %bool43214 = zext i1 %cmp43213 to i32
+  %cond43215 = icmp ne i32 %bool43214, 0
+  br i1 %cond43215, label %if.then6957, label %if.else6958
+
+or.true:                                          ; preds = %or.rhs, %entry
+  br label %or.merge
+
+or.rhs:                                           ; preds = %entry
+  %load43168 = load i32, ptr %comma, align 4
+  %cmp43169 = icmp slt i32 %load43168, 0
+  %bool43170 = zext i1 %cmp43169 to i32
+  %cond43171 = icmp ne i32 %bool43170, 0
+  br i1 %cond43171, label %or.true, label %or.merge
+
+or.merge:                                         ; preds = %or.true, %or.rhs
+  %orval43172 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond43173 = icmp ne i32 %orval43172, 0
+  br i1 %cond43173, label %if.then6954, label %if.else6955
+
+if.then6957:                                      ; preds = %if.end6956
+  %load43216 = load ptr, ptr %b, align 8
+  %load43218 = load i32, ptr %dest_off, align 4
+  %call43219 = call ptr @mir2asm_mem(i32 %load43218)
+  %call43220 = call ptr @vix_string_concat(ptr @.strlit43217, ptr %call43219)
+  %call43222 = call ptr @vix_string_concat(ptr %call43220, ptr @.strlit43221)
+  call void @mir2asm_line(ptr %load43216, ptr %call43222)
+  br label %if.end6959
+
+if.else6958:                                      ; preds = %if.end6956
+  %load43223 = load ptr, ptr %b, align 8
+  %load43225 = load i32, ptr %dest_off, align 4
+  %call43226 = call ptr @mir2asm_mem(i32 %load43225)
+  %call43227 = call ptr @vix_string_concat(ptr @.strlit43224, ptr %call43226)
+  %call43229 = call ptr @vix_string_concat(ptr %call43227, ptr @.strlit43228)
+  call void @mir2asm_line(ptr %load43223, ptr %call43229)
+  br label %if.end6959
+
+if.end6959:                                       ; preds = %if.else6958, %if.then6957
   ret void
 }
 
@@ -81628,345 +82436,345 @@ entry:
   store ptr %1, ptr %dest, align 8
   %rhs = alloca ptr, align 8
   store ptr %2, ptr %rhs, align 8
-  %load42843 = load ptr, ptr %rhs, align 8
-  %call42844 = call i32 @mir2asm_find(ptr %load42843, i8 32, i32 0)
+  %load43230 = load ptr, ptr %rhs, align 8
+  %call43231 = call i32 @mir2asm_find(ptr %load43230, i8 32, i32 0)
   %p1 = alloca i32, align 4
-  store i32 %call42844, ptr %p1, align 4
-  %load42845 = load i32, ptr %p1, align 4
-  %cmp42846 = icmp slt i32 %load42845, 0
-  %bool42847 = zext i1 %cmp42846 to i32
-  %cond42848 = icmp ne i32 %bool42847, 0
-  br i1 %cond42848, label %if.then6895, label %if.else6896
+  store i32 %call43231, ptr %p1, align 4
+  %load43232 = load i32, ptr %p1, align 4
+  %cmp43233 = icmp slt i32 %load43232, 0
+  %bool43234 = zext i1 %cmp43233 to i32
+  %cond43235 = icmp ne i32 %bool43234, 0
+  br i1 %cond43235, label %if.then6960, label %if.else6961
 
-if.then6895:                                      ; preds = %entry
+if.then6960:                                      ; preds = %entry
   ret void
 
-if.else6896:                                      ; preds = %entry
-  br label %if.end6897
+if.else6961:                                      ; preds = %entry
+  br label %if.end6962
 
-if.end6897:                                       ; preds = %if.else6896
-  %load42849 = load ptr, ptr %rhs, align 8
-  %load42850 = load i32, ptr %p1, align 4
-  %call42851 = call ptr @mir2asm_slice(ptr %load42849, i32 0, i32 %load42850)
-  %call42852 = call ptr @mir2asm_trim(ptr %call42851)
+if.end6962:                                       ; preds = %if.else6961
+  %load43236 = load ptr, ptr %rhs, align 8
+  %load43237 = load i32, ptr %p1, align 4
+  %call43238 = call ptr @mir2asm_slice(ptr %load43236, i32 0, i32 %load43237)
+  %call43239 = call ptr @mir2asm_trim(ptr %call43238)
   %op = alloca ptr, align 8
-  store ptr %call42852, ptr %op, align 8
-  %load42853 = load ptr, ptr %rhs, align 8
-  %load42854 = load i32, ptr %p1, align 4
-  %add42855 = add i32 %load42854, 1
-  %call42856 = call ptr @mir2asm_after(ptr %load42853, i32 %add42855)
-  %call42857 = call ptr @mir2asm_trim(ptr %call42856)
+  store ptr %call43239, ptr %op, align 8
+  %load43240 = load ptr, ptr %rhs, align 8
+  %load43241 = load i32, ptr %p1, align 4
+  %add43242 = add i32 %load43241, 1
+  %call43243 = call ptr @mir2asm_after(ptr %load43240, i32 %add43242)
+  %call43244 = call ptr @mir2asm_trim(ptr %call43243)
   %rest = alloca ptr, align 8
-  store ptr %call42857, ptr %rest, align 8
-  %load42858 = load ptr, ptr %rest, align 8
-  %call42859 = call i32 @mir2asm_find(ptr %load42858, i8 32, i32 0)
+  store ptr %call43244, ptr %rest, align 8
+  %load43245 = load ptr, ptr %rest, align 8
+  %call43246 = call i32 @mir2asm_find(ptr %load43245, i8 32, i32 0)
   %p2 = alloca i32, align 4
-  store i32 %call42859, ptr %p2, align 4
-  %load42860 = load ptr, ptr %rest, align 8
-  %load42861 = load i32, ptr %p2, align 4
-  %add42862 = add i32 %load42861, 1
-  %call42863 = call i32 @mir2asm_find(ptr %load42860, i8 32, i32 %add42862)
+  store i32 %call43246, ptr %p2, align 4
+  %load43247 = load ptr, ptr %rest, align 8
+  %load43248 = load i32, ptr %p2, align 4
+  %add43249 = add i32 %load43248, 1
+  %call43250 = call i32 @mir2asm_find(ptr %load43247, i8 32, i32 %add43249)
   %to_pos = alloca i32, align 4
-  store i32 %call42863, ptr %to_pos, align 4
-  %load42864 = load i32, ptr %p2, align 4
-  %cmp42865 = icmp slt i32 %load42864, 0
-  %bool42866 = zext i1 %cmp42865 to i32
-  %cond42867 = icmp ne i32 %bool42866, 0
-  br i1 %cond42867, label %or.true, label %or.rhs
+  store i32 %call43250, ptr %to_pos, align 4
+  %load43251 = load i32, ptr %p2, align 4
+  %cmp43252 = icmp slt i32 %load43251, 0
+  %bool43253 = zext i1 %cmp43252 to i32
+  %cond43254 = icmp ne i32 %bool43253, 0
+  br i1 %cond43254, label %or.true, label %or.rhs
 
-if.then6898:                                      ; preds = %or.merge
+if.then6963:                                      ; preds = %or.merge
   ret void
 
-if.else6899:                                      ; preds = %or.merge
-  br label %if.end6900
+if.else6964:                                      ; preds = %or.merge
+  br label %if.end6965
 
-if.end6900:                                       ; preds = %if.else6899
-  %load42874 = load ptr, ptr %rest, align 8
-  %load42875 = load i32, ptr %p2, align 4
-  %call42876 = call ptr @mir2asm_slice(ptr %load42874, i32 0, i32 %load42875)
-  %call42877 = call ptr @mir2asm_trim(ptr %call42876)
+if.end6965:                                       ; preds = %if.else6964
+  %load43261 = load ptr, ptr %rest, align 8
+  %load43262 = load i32, ptr %p2, align 4
+  %call43263 = call ptr @mir2asm_slice(ptr %load43261, i32 0, i32 %load43262)
+  %call43264 = call ptr @mir2asm_trim(ptr %call43263)
   %from_ty = alloca ptr, align 8
-  store ptr %call42877, ptr %from_ty, align 8
-  %load42878 = load ptr, ptr %rest, align 8
-  %load42879 = load i32, ptr %p2, align 4
-  %add42880 = add i32 %load42879, 1
-  %load42881 = load i32, ptr %to_pos, align 4
-  %call42882 = call ptr @mir2asm_slice(ptr %load42878, i32 %add42880, i32 %load42881)
-  %call42883 = call ptr @mir2asm_trim(ptr %call42882)
+  store ptr %call43264, ptr %from_ty, align 8
+  %load43265 = load ptr, ptr %rest, align 8
+  %load43266 = load i32, ptr %p2, align 4
+  %add43267 = add i32 %load43266, 1
+  %load43268 = load i32, ptr %to_pos, align 4
+  %call43269 = call ptr @mir2asm_slice(ptr %load43265, i32 %add43267, i32 %load43268)
+  %call43270 = call ptr @mir2asm_trim(ptr %call43269)
   %val = alloca ptr, align 8
-  store ptr %call42883, ptr %val, align 8
-  %load42884 = load ptr, ptr %rest, align 8
-  %load42885 = load i32, ptr %to_pos, align 4
-  %add42886 = add i32 %load42885, 4
-  %call42887 = call ptr @mir2asm_after(ptr %load42884, i32 %add42886)
-  %call42888 = call ptr @mir2asm_trim(ptr %call42887)
+  store ptr %call43270, ptr %val, align 8
+  %load43271 = load ptr, ptr %rest, align 8
+  %load43272 = load i32, ptr %to_pos, align 4
+  %add43273 = add i32 %load43272, 4
+  %call43274 = call ptr @mir2asm_after(ptr %load43271, i32 %add43273)
+  %call43275 = call ptr @mir2asm_trim(ptr %call43274)
   %to_ty = alloca ptr, align 8
-  store ptr %call42888, ptr %to_ty, align 8
-  %load42889 = load ptr, ptr %b, align 8
-  %load42890 = load ptr, ptr %dest, align 8
-  %load42891 = load ptr, ptr %to_ty, align 8
-  %call42892 = call i32 @mir2asm_alloc_slot_typed(ptr %load42889, ptr %load42890, i32 0, ptr %load42891)
-  %load42893 = load ptr, ptr %op, align 8
-  %strcmp42895 = call i32 @strcmp(ptr %load42893, ptr @.strlit42894)
-  %cmp42896 = icmp eq i32 %strcmp42895, 0
-  %bool42897 = zext i1 %cmp42896 to i32
-  %cond42898 = icmp ne i32 %bool42897, 0
-  br i1 %cond42898, label %if.then6901, label %if.else6902
+  store ptr %call43275, ptr %to_ty, align 8
+  %load43276 = load ptr, ptr %b, align 8
+  %load43277 = load ptr, ptr %dest, align 8
+  %load43278 = load ptr, ptr %to_ty, align 8
+  %call43279 = call i32 @mir2asm_alloc_slot_typed(ptr %load43276, ptr %load43277, i32 0, ptr %load43278)
+  %load43280 = load ptr, ptr %op, align 8
+  %strcmp43282 = call i32 @strcmp(ptr %load43280, ptr @.strlit43281)
+  %cmp43283 = icmp eq i32 %strcmp43282, 0
+  %bool43284 = zext i1 %cmp43283 to i32
+  %cond43285 = icmp ne i32 %bool43284, 0
+  br i1 %cond43285, label %if.then6966, label %if.else6967
 
-or.true:                                          ; preds = %or.rhs, %if.end6897
+or.true:                                          ; preds = %or.rhs, %if.end6962
   br label %or.merge
 
-or.rhs:                                           ; preds = %if.end6897
-  %load42868 = load i32, ptr %to_pos, align 4
-  %cmp42869 = icmp slt i32 %load42868, 0
-  %bool42870 = zext i1 %cmp42869 to i32
-  %cond42871 = icmp ne i32 %bool42870, 0
-  br i1 %cond42871, label %or.true, label %or.merge
+or.rhs:                                           ; preds = %if.end6962
+  %load43255 = load i32, ptr %to_pos, align 4
+  %cmp43256 = icmp slt i32 %load43255, 0
+  %bool43257 = zext i1 %cmp43256 to i32
+  %cond43258 = icmp ne i32 %bool43257, 0
+  br i1 %cond43258, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval42872 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond42873 = icmp ne i32 %orval42872, 0
-  br i1 %cond42873, label %if.then6898, label %if.else6899
+  %orval43259 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond43260 = icmp ne i32 %orval43259, 0
+  br i1 %cond43260, label %if.then6963, label %if.else6964
 
-if.then6901:                                      ; preds = %if.end6900
-  %load42899 = load ptr, ptr %from_ty, align 8
-  %strcmp42901 = call i32 @strcmp(ptr %load42899, ptr @.strlit42900)
-  %cmp42902 = icmp eq i32 %strcmp42901, 0
-  %bool42903 = zext i1 %cmp42902 to i32
-  %cond42904 = icmp ne i32 %bool42903, 0
-  br i1 %cond42904, label %or.true1, label %or.rhs2
+if.then6966:                                      ; preds = %if.end6965
+  %load43286 = load ptr, ptr %from_ty, align 8
+  %strcmp43288 = call i32 @strcmp(ptr %load43286, ptr @.strlit43287)
+  %cmp43289 = icmp eq i32 %strcmp43288, 0
+  %bool43290 = zext i1 %cmp43289 to i32
+  %cond43291 = icmp ne i32 %bool43290, 0
+  br i1 %cond43291, label %or.true1, label %or.rhs2
 
-if.else6902:                                      ; preds = %if.end6900
-  br label %if.end6903
+if.else6967:                                      ; preds = %if.end6965
+  br label %if.end6968
 
-if.end6903:                                       ; preds = %if.else6902
-  %load42970 = load ptr, ptr %op, align 8
-  %strcmp42972 = call i32 @strcmp(ptr %load42970, ptr @.strlit42971)
-  %cmp42973 = icmp eq i32 %strcmp42972, 0
-  %bool42974 = zext i1 %cmp42973 to i32
-  %cond42975 = icmp ne i32 %bool42974, 0
-  br i1 %cond42975, label %and.rhs, label %and.false
+if.end6968:                                       ; preds = %if.else6967
+  %load43357 = load ptr, ptr %op, align 8
+  %strcmp43359 = call i32 @strcmp(ptr %load43357, ptr @.strlit43358)
+  %cmp43360 = icmp eq i32 %strcmp43359, 0
+  %bool43361 = zext i1 %cmp43360 to i32
+  %cond43362 = icmp ne i32 %bool43361, 0
+  br i1 %cond43362, label %and.rhs, label %and.false
 
-if.then6904:                                      ; preds = %or.merge6
-  %load42921 = load ptr, ptr %b, align 8
-  %load42923 = load ptr, ptr %b, align 8
-  %load42924 = load ptr, ptr %val, align 8
-  %load42925 = load ptr, ptr %from_ty, align 8
-  %call42926 = call ptr @mir2asm_operand_typed(ptr %load42923, ptr %load42924, ptr %load42925)
-  %call42927 = call ptr @vix_string_concat(ptr @.strlit42922, ptr %call42926)
-  call void @mir2asm_line(ptr %load42921, ptr %call42927)
-  br label %if.end6906
+if.then6969:                                      ; preds = %or.merge6
+  %load43308 = load ptr, ptr %b, align 8
+  %load43310 = load ptr, ptr %b, align 8
+  %load43311 = load ptr, ptr %val, align 8
+  %load43312 = load ptr, ptr %from_ty, align 8
+  %call43313 = call ptr @mir2asm_operand_typed(ptr %load43310, ptr %load43311, ptr %load43312)
+  %call43314 = call ptr @vix_string_concat(ptr @.strlit43309, ptr %call43313)
+  call void @mir2asm_line(ptr %load43308, ptr %call43314)
+  br label %if.end6971
 
-if.else6905:                                      ; preds = %or.merge6
-  %load42928 = load ptr, ptr %b, align 8
-  %load42930 = load ptr, ptr %b, align 8
-  %load42931 = load ptr, ptr %val, align 8
-  %load42932 = load ptr, ptr %from_ty, align 8
-  %call42933 = call ptr @mir2asm_operand_typed(ptr %load42930, ptr %load42931, ptr %load42932)
-  %call42934 = call ptr @vix_string_concat(ptr @.strlit42929, ptr %call42933)
-  call void @mir2asm_line(ptr %load42928, ptr %call42934)
-  br label %if.end6906
+if.else6970:                                      ; preds = %or.merge6
+  %load43315 = load ptr, ptr %b, align 8
+  %load43317 = load ptr, ptr %b, align 8
+  %load43318 = load ptr, ptr %val, align 8
+  %load43319 = load ptr, ptr %from_ty, align 8
+  %call43320 = call ptr @mir2asm_operand_typed(ptr %load43317, ptr %load43318, ptr %load43319)
+  %call43321 = call ptr @vix_string_concat(ptr @.strlit43316, ptr %call43320)
+  call void @mir2asm_line(ptr %load43315, ptr %call43321)
+  br label %if.end6971
 
-if.end6906:                                       ; preds = %if.else6905, %if.then6904
-  %load42935 = load ptr, ptr %to_ty, align 8
-  %call42936 = call i32 @mir2asm_type_is_64(ptr %load42935)
-  %cmp42937 = icmp eq i32 %call42936, 1
-  %bool42938 = zext i1 %cmp42937 to i32
-  %cond42939 = icmp ne i32 %bool42938, 0
-  br i1 %cond42939, label %if.then6907, label %if.else6908
+if.end6971:                                       ; preds = %if.else6970, %if.then6969
+  %load43322 = load ptr, ptr %to_ty, align 8
+  %call43323 = call i32 @mir2asm_type_is_64(ptr %load43322)
+  %cmp43324 = icmp eq i32 %call43323, 1
+  %bool43325 = zext i1 %cmp43324 to i32
+  %cond43326 = icmp ne i32 %bool43325, 0
+  br i1 %cond43326, label %if.then6972, label %if.else6973
 
-or.true1:                                         ; preds = %or.rhs2, %if.then6901
+or.true1:                                         ; preds = %or.rhs2, %if.then6966
   br label %or.merge3
 
-or.rhs2:                                          ; preds = %if.then6901
-  %load42905 = load ptr, ptr %from_ty, align 8
-  %strcmp42907 = call i32 @strcmp(ptr %load42905, ptr @.strlit42906)
-  %cmp42908 = icmp eq i32 %strcmp42907, 0
-  %bool42909 = zext i1 %cmp42908 to i32
-  %cond42910 = icmp ne i32 %bool42909, 0
-  br i1 %cond42910, label %or.true1, label %or.merge3
+or.rhs2:                                          ; preds = %if.then6966
+  %load43292 = load ptr, ptr %from_ty, align 8
+  %strcmp43294 = call i32 @strcmp(ptr %load43292, ptr @.strlit43293)
+  %cmp43295 = icmp eq i32 %strcmp43294, 0
+  %bool43296 = zext i1 %cmp43295 to i32
+  %cond43297 = icmp ne i32 %bool43296, 0
+  br i1 %cond43297, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval42911 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond42912 = icmp ne i32 %orval42911, 0
-  br i1 %cond42912, label %or.true4, label %or.rhs5
+  %orval43298 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond43299 = icmp ne i32 %orval43298, 0
+  br i1 %cond43299, label %or.true4, label %or.rhs5
 
 or.true4:                                         ; preds = %or.rhs5, %or.merge3
   br label %or.merge6
 
 or.rhs5:                                          ; preds = %or.merge3
-  %load42913 = load ptr, ptr %from_ty, align 8
-  %strcmp42915 = call i32 @strcmp(ptr %load42913, ptr @.strlit42914)
-  %cmp42916 = icmp eq i32 %strcmp42915, 0
-  %bool42917 = zext i1 %cmp42916 to i32
-  %cond42918 = icmp ne i32 %bool42917, 0
-  br i1 %cond42918, label %or.true4, label %or.merge6
+  %load43300 = load ptr, ptr %from_ty, align 8
+  %strcmp43302 = call i32 @strcmp(ptr %load43300, ptr @.strlit43301)
+  %cmp43303 = icmp eq i32 %strcmp43302, 0
+  %bool43304 = zext i1 %cmp43303 to i32
+  %cond43305 = icmp ne i32 %bool43304, 0
+  br i1 %cond43305, label %or.true4, label %or.merge6
 
 or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval42919 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond42920 = icmp ne i32 %orval42919, 0
-  br i1 %cond42920, label %if.then6904, label %if.else6905
+  %orval43306 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond43307 = icmp ne i32 %orval43306, 0
+  br i1 %cond43307, label %if.then6969, label %if.else6970
 
-if.then6907:                                      ; preds = %if.end6906
-  %load42940 = load ptr, ptr %b, align 8
-  %load42942 = load ptr, ptr %b, align 8
-  %field42944 = getelementptr %MirAsm, ptr %load42942, i32 0, i32 6
-  %fieldval42945 = load ptr, ptr %field42944, align 8
-  %load42946 = load ptr, ptr %b, align 8
-  %load42947 = load ptr, ptr %dest, align 8
-  %call42948 = call i32 @mir2asm_find_name(ptr %load42946, ptr %load42947)
-  %idx42949 = getelementptr i32, ptr %fieldval42945, i32 %call42948
-  %loadidx42950 = load i32, ptr %idx42949, align 4
-  %call42951 = call ptr @mir2asm_mem(i32 %loadidx42950)
-  %call42952 = call ptr @vix_string_concat(ptr @.strlit42941, ptr %call42951)
-  %call42954 = call ptr @vix_string_concat(ptr %call42952, ptr @.strlit42953)
-  call void @mir2asm_line(ptr %load42940, ptr %call42954)
-  br label %if.end6909
+if.then6972:                                      ; preds = %if.end6971
+  %load43327 = load ptr, ptr %b, align 8
+  %load43329 = load ptr, ptr %b, align 8
+  %field43331 = getelementptr %MirAsm, ptr %load43329, i32 0, i32 6
+  %fieldval43332 = load ptr, ptr %field43331, align 8
+  %load43333 = load ptr, ptr %b, align 8
+  %load43334 = load ptr, ptr %dest, align 8
+  %call43335 = call i32 @mir2asm_find_name(ptr %load43333, ptr %load43334)
+  %idx43336 = getelementptr i32, ptr %fieldval43332, i32 %call43335
+  %loadidx43337 = load i32, ptr %idx43336, align 4
+  %call43338 = call ptr @mir2asm_mem(i32 %loadidx43337)
+  %call43339 = call ptr @vix_string_concat(ptr @.strlit43328, ptr %call43338)
+  %call43341 = call ptr @vix_string_concat(ptr %call43339, ptr @.strlit43340)
+  call void @mir2asm_line(ptr %load43327, ptr %call43341)
+  br label %if.end6974
 
-if.else6908:                                      ; preds = %if.end6906
-  %load42955 = load ptr, ptr %b, align 8
-  %load42957 = load ptr, ptr %b, align 8
-  %field42959 = getelementptr %MirAsm, ptr %load42957, i32 0, i32 6
-  %fieldval42960 = load ptr, ptr %field42959, align 8
-  %load42961 = load ptr, ptr %b, align 8
-  %load42962 = load ptr, ptr %dest, align 8
-  %call42963 = call i32 @mir2asm_find_name(ptr %load42961, ptr %load42962)
-  %idx42964 = getelementptr i32, ptr %fieldval42960, i32 %call42963
-  %loadidx42965 = load i32, ptr %idx42964, align 4
-  %call42966 = call ptr @mir2asm_mem(i32 %loadidx42965)
-  %call42967 = call ptr @vix_string_concat(ptr @.strlit42956, ptr %call42966)
-  %call42969 = call ptr @vix_string_concat(ptr %call42967, ptr @.strlit42968)
-  call void @mir2asm_line(ptr %load42955, ptr %call42969)
-  br label %if.end6909
+if.else6973:                                      ; preds = %if.end6971
+  %load43342 = load ptr, ptr %b, align 8
+  %load43344 = load ptr, ptr %b, align 8
+  %field43346 = getelementptr %MirAsm, ptr %load43344, i32 0, i32 6
+  %fieldval43347 = load ptr, ptr %field43346, align 8
+  %load43348 = load ptr, ptr %b, align 8
+  %load43349 = load ptr, ptr %dest, align 8
+  %call43350 = call i32 @mir2asm_find_name(ptr %load43348, ptr %load43349)
+  %idx43351 = getelementptr i32, ptr %fieldval43347, i32 %call43350
+  %loadidx43352 = load i32, ptr %idx43351, align 4
+  %call43353 = call ptr @mir2asm_mem(i32 %loadidx43352)
+  %call43354 = call ptr @vix_string_concat(ptr @.strlit43343, ptr %call43353)
+  %call43356 = call ptr @vix_string_concat(ptr %call43354, ptr @.strlit43355)
+  call void @mir2asm_line(ptr %load43342, ptr %call43356)
+  br label %if.end6974
 
-if.end6909:                                       ; preds = %if.else6908, %if.then6907
+if.end6974:                                       ; preds = %if.else6973, %if.then6972
   ret void
 
-if.then6910:                                      ; preds = %and.merge9
-  %load42990 = load ptr, ptr %b, align 8
-  %load42992 = load ptr, ptr %b, align 8
-  %load42993 = load ptr, ptr %val, align 8
-  %load42994 = load ptr, ptr %from_ty, align 8
-  %call42995 = call ptr @mir2asm_operand_typed(ptr %load42992, ptr %load42993, ptr %load42994)
-  %call42996 = call ptr @vix_string_concat(ptr @.strlit42991, ptr %call42995)
-  call void @mir2asm_line(ptr %load42990, ptr %call42996)
-  %load42997 = load ptr, ptr %b, align 8
-  %load42999 = load ptr, ptr %b, align 8
-  %field43001 = getelementptr %MirAsm, ptr %load42999, i32 0, i32 6
-  %fieldval43002 = load ptr, ptr %field43001, align 8
-  %load43003 = load ptr, ptr %b, align 8
-  %load43004 = load ptr, ptr %dest, align 8
-  %call43005 = call i32 @mir2asm_find_name(ptr %load43003, ptr %load43004)
-  %idx43006 = getelementptr i32, ptr %fieldval43002, i32 %call43005
-  %loadidx43007 = load i32, ptr %idx43006, align 4
-  %call43008 = call ptr @mir2asm_mem(i32 %loadidx43007)
-  %call43009 = call ptr @vix_string_concat(ptr @.strlit42998, ptr %call43008)
-  %call43011 = call ptr @vix_string_concat(ptr %call43009, ptr @.strlit43010)
-  %load43012 = load ptr, ptr %to_ty, align 8
-  %call43013 = call ptr @mir2asm_acc(ptr %load43012)
-  %call43014 = call ptr @vix_string_concat(ptr %call43011, ptr %call43013)
-  call void @mir2asm_line(ptr %load42997, ptr %call43014)
+if.then6975:                                      ; preds = %and.merge9
+  %load43377 = load ptr, ptr %b, align 8
+  %load43379 = load ptr, ptr %b, align 8
+  %load43380 = load ptr, ptr %val, align 8
+  %load43381 = load ptr, ptr %from_ty, align 8
+  %call43382 = call ptr @mir2asm_operand_typed(ptr %load43379, ptr %load43380, ptr %load43381)
+  %call43383 = call ptr @vix_string_concat(ptr @.strlit43378, ptr %call43382)
+  call void @mir2asm_line(ptr %load43377, ptr %call43383)
+  %load43384 = load ptr, ptr %b, align 8
+  %load43386 = load ptr, ptr %b, align 8
+  %field43388 = getelementptr %MirAsm, ptr %load43386, i32 0, i32 6
+  %fieldval43389 = load ptr, ptr %field43388, align 8
+  %load43390 = load ptr, ptr %b, align 8
+  %load43391 = load ptr, ptr %dest, align 8
+  %call43392 = call i32 @mir2asm_find_name(ptr %load43390, ptr %load43391)
+  %idx43393 = getelementptr i32, ptr %fieldval43389, i32 %call43392
+  %loadidx43394 = load i32, ptr %idx43393, align 4
+  %call43395 = call ptr @mir2asm_mem(i32 %loadidx43394)
+  %call43396 = call ptr @vix_string_concat(ptr @.strlit43385, ptr %call43395)
+  %call43398 = call ptr @vix_string_concat(ptr %call43396, ptr @.strlit43397)
+  %load43399 = load ptr, ptr %to_ty, align 8
+  %call43400 = call ptr @mir2asm_acc(ptr %load43399)
+  %call43401 = call ptr @vix_string_concat(ptr %call43398, ptr %call43400)
+  call void @mir2asm_line(ptr %load43384, ptr %call43401)
   ret void
 
-if.else6911:                                      ; preds = %and.merge9
-  br label %if.end6912
+if.else6976:                                      ; preds = %and.merge9
+  br label %if.end6977
 
-if.end6912:                                       ; preds = %if.else6911
-  %load43015 = load ptr, ptr %op, align 8
-  %strcmp43017 = call i32 @strcmp(ptr %load43015, ptr @.strlit43016)
-  %cmp43018 = icmp eq i32 %strcmp43017, 0
-  %bool43019 = zext i1 %cmp43018 to i32
-  %cond43020 = icmp ne i32 %bool43019, 0
-  br i1 %cond43020, label %if.then6913, label %if.else6914
+if.end6977:                                       ; preds = %if.else6976
+  %load43402 = load ptr, ptr %op, align 8
+  %strcmp43404 = call i32 @strcmp(ptr %load43402, ptr @.strlit43403)
+  %cmp43405 = icmp eq i32 %strcmp43404, 0
+  %bool43406 = zext i1 %cmp43405 to i32
+  %cond43407 = icmp ne i32 %bool43406, 0
+  br i1 %cond43407, label %if.then6978, label %if.else6979
 
-and.rhs:                                          ; preds = %if.end6903
-  %load42976 = load ptr, ptr %from_ty, align 8
-  %call42977 = call i32 @mir2asm_type_is_64(ptr %load42976)
-  %cmp42978 = icmp eq i32 %call42977, 1
-  %bool42979 = zext i1 %cmp42978 to i32
-  %cond42980 = icmp ne i32 %bool42979, 0
-  br i1 %cond42980, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %if.end6968
+  %load43363 = load ptr, ptr %from_ty, align 8
+  %call43364 = call i32 @mir2asm_type_is_64(ptr %load43363)
+  %cmp43365 = icmp eq i32 %call43364, 1
+  %bool43366 = zext i1 %cmp43365 to i32
+  %cond43367 = icmp ne i32 %bool43366, 0
+  br i1 %cond43367, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %if.end6903
+and.false:                                        ; preds = %and.rhs, %if.end6968
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval42981 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond42982 = icmp ne i32 %andval42981, 0
-  br i1 %cond42982, label %and.rhs7, label %and.false8
+  %andval43368 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond43369 = icmp ne i32 %andval43368, 0
+  br i1 %cond43369, label %and.rhs7, label %and.false8
 
 and.rhs7:                                         ; preds = %and.merge
-  %load42983 = load ptr, ptr %to_ty, align 8
-  %call42984 = call i32 @mir2asm_type_is_64(ptr %load42983)
-  %cmp42985 = icmp eq i32 %call42984, 0
-  %bool42986 = zext i1 %cmp42985 to i32
-  %cond42987 = icmp ne i32 %bool42986, 0
-  br i1 %cond42987, label %and.merge9, label %and.false8
+  %load43370 = load ptr, ptr %to_ty, align 8
+  %call43371 = call i32 @mir2asm_type_is_64(ptr %load43370)
+  %cmp43372 = icmp eq i32 %call43371, 0
+  %bool43373 = zext i1 %cmp43372 to i32
+  %cond43374 = icmp ne i32 %bool43373, 0
+  br i1 %cond43374, label %and.merge9, label %and.false8
 
 and.false8:                                       ; preds = %and.rhs7, %and.merge
   br label %and.merge9
 
 and.merge9:                                       ; preds = %and.false8, %and.rhs7
-  %andval42988 = phi i32 [ 1, %and.rhs7 ], [ 0, %and.false8 ]
-  %cond42989 = icmp ne i32 %andval42988, 0
-  br i1 %cond42989, label %if.then6910, label %if.else6911
+  %andval43375 = phi i32 [ 1, %and.rhs7 ], [ 0, %and.false8 ]
+  %cond43376 = icmp ne i32 %andval43375, 0
+  br i1 %cond43376, label %if.then6975, label %if.else6976
 
-if.then6913:                                      ; preds = %if.end6912
-  %load43021 = load ptr, ptr %b, align 8
-  %load43023 = load ptr, ptr %b, align 8
-  %load43024 = load ptr, ptr %val, align 8
-  %load43025 = load ptr, ptr %from_ty, align 8
-  %call43026 = call ptr @mir2asm_operand_typed(ptr %load43023, ptr %load43024, ptr %load43025)
-  %call43027 = call ptr @vix_string_concat(ptr @.strlit43022, ptr %call43026)
-  call void @mir2asm_line(ptr %load43021, ptr %call43027)
-  %load43028 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load43028, ptr @.strlit43029)
-  %load43030 = load ptr, ptr %b, align 8
-  %load43032 = load ptr, ptr %b, align 8
-  %field43034 = getelementptr %MirAsm, ptr %load43032, i32 0, i32 6
-  %fieldval43035 = load ptr, ptr %field43034, align 8
-  %load43036 = load ptr, ptr %b, align 8
-  %load43037 = load ptr, ptr %dest, align 8
-  %call43038 = call i32 @mir2asm_find_name(ptr %load43036, ptr %load43037)
-  %idx43039 = getelementptr i32, ptr %fieldval43035, i32 %call43038
-  %loadidx43040 = load i32, ptr %idx43039, align 4
-  %call43041 = call ptr @mir2asm_mem(i32 %loadidx43040)
-  %call43042 = call ptr @vix_string_concat(ptr @.strlit43031, ptr %call43041)
-  %call43044 = call ptr @vix_string_concat(ptr %call43042, ptr @.strlit43043)
-  call void @mir2asm_line(ptr %load43030, ptr %call43044)
+if.then6978:                                      ; preds = %if.end6977
+  %load43408 = load ptr, ptr %b, align 8
+  %load43410 = load ptr, ptr %b, align 8
+  %load43411 = load ptr, ptr %val, align 8
+  %load43412 = load ptr, ptr %from_ty, align 8
+  %call43413 = call ptr @mir2asm_operand_typed(ptr %load43410, ptr %load43411, ptr %load43412)
+  %call43414 = call ptr @vix_string_concat(ptr @.strlit43409, ptr %call43413)
+  call void @mir2asm_line(ptr %load43408, ptr %call43414)
+  %load43415 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43415, ptr @.strlit43416)
+  %load43417 = load ptr, ptr %b, align 8
+  %load43419 = load ptr, ptr %b, align 8
+  %field43421 = getelementptr %MirAsm, ptr %load43419, i32 0, i32 6
+  %fieldval43422 = load ptr, ptr %field43421, align 8
+  %load43423 = load ptr, ptr %b, align 8
+  %load43424 = load ptr, ptr %dest, align 8
+  %call43425 = call i32 @mir2asm_find_name(ptr %load43423, ptr %load43424)
+  %idx43426 = getelementptr i32, ptr %fieldval43422, i32 %call43425
+  %loadidx43427 = load i32, ptr %idx43426, align 4
+  %call43428 = call ptr @mir2asm_mem(i32 %loadidx43427)
+  %call43429 = call ptr @vix_string_concat(ptr @.strlit43418, ptr %call43428)
+  %call43431 = call ptr @vix_string_concat(ptr %call43429, ptr @.strlit43430)
+  call void @mir2asm_line(ptr %load43417, ptr %call43431)
   ret void
 
-if.else6914:                                      ; preds = %if.end6912
-  br label %if.end6915
+if.else6979:                                      ; preds = %if.end6977
+  br label %if.end6980
 
-if.end6915:                                       ; preds = %if.else6914
-  %load43045 = load ptr, ptr %b, align 8
-  %load43047 = load ptr, ptr %to_ty, align 8
-  %call43048 = call ptr @mir2asm_acc(ptr %load43047)
-  %call43049 = call ptr @vix_string_concat(ptr @.strlit43046, ptr %call43048)
-  %call43051 = call ptr @vix_string_concat(ptr %call43049, ptr @.strlit43050)
-  %load43052 = load ptr, ptr %b, align 8
-  %load43053 = load ptr, ptr %val, align 8
-  %load43054 = load ptr, ptr %from_ty, align 8
-  %call43055 = call ptr @mir2asm_operand_typed(ptr %load43052, ptr %load43053, ptr %load43054)
-  %call43056 = call ptr @vix_string_concat(ptr %call43051, ptr %call43055)
-  call void @mir2asm_line(ptr %load43045, ptr %call43056)
-  %load43057 = load ptr, ptr %b, align 8
-  %load43059 = load ptr, ptr %b, align 8
-  %field43061 = getelementptr %MirAsm, ptr %load43059, i32 0, i32 6
-  %fieldval43062 = load ptr, ptr %field43061, align 8
-  %load43063 = load ptr, ptr %b, align 8
-  %load43064 = load ptr, ptr %dest, align 8
-  %call43065 = call i32 @mir2asm_find_name(ptr %load43063, ptr %load43064)
-  %idx43066 = getelementptr i32, ptr %fieldval43062, i32 %call43065
-  %loadidx43067 = load i32, ptr %idx43066, align 4
-  %call43068 = call ptr @mir2asm_mem(i32 %loadidx43067)
-  %call43069 = call ptr @vix_string_concat(ptr @.strlit43058, ptr %call43068)
-  %call43071 = call ptr @vix_string_concat(ptr %call43069, ptr @.strlit43070)
-  %load43072 = load ptr, ptr %to_ty, align 8
-  %call43073 = call ptr @mir2asm_acc(ptr %load43072)
-  %call43074 = call ptr @vix_string_concat(ptr %call43071, ptr %call43073)
-  call void @mir2asm_line(ptr %load43057, ptr %call43074)
+if.end6980:                                       ; preds = %if.else6979
+  %load43432 = load ptr, ptr %b, align 8
+  %load43434 = load ptr, ptr %to_ty, align 8
+  %call43435 = call ptr @mir2asm_acc(ptr %load43434)
+  %call43436 = call ptr @vix_string_concat(ptr @.strlit43433, ptr %call43435)
+  %call43438 = call ptr @vix_string_concat(ptr %call43436, ptr @.strlit43437)
+  %load43439 = load ptr, ptr %b, align 8
+  %load43440 = load ptr, ptr %val, align 8
+  %load43441 = load ptr, ptr %from_ty, align 8
+  %call43442 = call ptr @mir2asm_operand_typed(ptr %load43439, ptr %load43440, ptr %load43441)
+  %call43443 = call ptr @vix_string_concat(ptr %call43438, ptr %call43442)
+  call void @mir2asm_line(ptr %load43432, ptr %call43443)
+  %load43444 = load ptr, ptr %b, align 8
+  %load43446 = load ptr, ptr %b, align 8
+  %field43448 = getelementptr %MirAsm, ptr %load43446, i32 0, i32 6
+  %fieldval43449 = load ptr, ptr %field43448, align 8
+  %load43450 = load ptr, ptr %b, align 8
+  %load43451 = load ptr, ptr %dest, align 8
+  %call43452 = call i32 @mir2asm_find_name(ptr %load43450, ptr %load43451)
+  %idx43453 = getelementptr i32, ptr %fieldval43449, i32 %call43452
+  %loadidx43454 = load i32, ptr %idx43453, align 4
+  %call43455 = call ptr @mir2asm_mem(i32 %loadidx43454)
+  %call43456 = call ptr @vix_string_concat(ptr @.strlit43445, ptr %call43455)
+  %call43458 = call ptr @vix_string_concat(ptr %call43456, ptr @.strlit43457)
+  %load43459 = load ptr, ptr %to_ty, align 8
+  %call43460 = call ptr @mir2asm_acc(ptr %load43459)
+  %call43461 = call ptr @vix_string_concat(ptr %call43458, ptr %call43460)
+  call void @mir2asm_line(ptr %load43444, ptr %call43461)
   ret void
 }
 
@@ -81978,391 +82786,391 @@ entry:
   store ptr %1, ptr %dest, align 8
   %rhs = alloca ptr, align 8
   store ptr %2, ptr %rhs, align 8
-  %load43075 = load ptr, ptr %rhs, align 8
-  %call43076 = call i32 @mir2asm_find(ptr %load43075, i8 44, i32 0)
+  %load43462 = load ptr, ptr %rhs, align 8
+  %call43463 = call i32 @mir2asm_find(ptr %load43462, i8 44, i32 0)
   %comma1 = alloca i32, align 4
-  store i32 %call43076, ptr %comma1, align 4
-  %load43077 = load ptr, ptr %rhs, align 8
-  %load43078 = load i32, ptr %comma1, align 4
-  %add43079 = add i32 %load43078, 1
-  %call43080 = call i32 @mir2asm_find(ptr %load43077, i8 44, i32 %add43079)
+  store i32 %call43463, ptr %comma1, align 4
+  %load43464 = load ptr, ptr %rhs, align 8
+  %load43465 = load i32, ptr %comma1, align 4
+  %add43466 = add i32 %load43465, 1
+  %call43467 = call i32 @mir2asm_find(ptr %load43464, i8 44, i32 %add43466)
   %comma2 = alloca i32, align 4
-  store i32 %call43080, ptr %comma2, align 4
-  %load43081 = load ptr, ptr %rhs, align 8
-  %load43082 = load i32, ptr %comma2, align 4
-  %call43083 = call i32 @mir2asm_find(ptr %load43081, i8 91, i32 %load43082)
+  store i32 %call43467, ptr %comma2, align 4
+  %load43468 = load ptr, ptr %rhs, align 8
+  %load43469 = load i32, ptr %comma2, align 4
+  %call43470 = call i32 @mir2asm_find(ptr %load43468, i8 91, i32 %load43469)
   %lb = alloca i32, align 4
-  store i32 %call43083, ptr %lb, align 4
-  %load43084 = load ptr, ptr %rhs, align 8
-  %load43085 = load i32, ptr %lb, align 4
-  %call43086 = call i32 @mir2asm_find(ptr %load43084, i8 93, i32 %load43085)
+  store i32 %call43470, ptr %lb, align 4
+  %load43471 = load ptr, ptr %rhs, align 8
+  %load43472 = load i32, ptr %lb, align 4
+  %call43473 = call i32 @mir2asm_find(ptr %load43471, i8 93, i32 %load43472)
   %rb = alloca i32, align 4
-  store i32 %call43086, ptr %rb, align 4
-  %load43087 = load i32, ptr %comma1, align 4
-  %cmp43088 = icmp slt i32 %load43087, 0
-  %bool43089 = zext i1 %cmp43088 to i32
-  %cond43090 = icmp ne i32 %bool43089, 0
-  br i1 %cond43090, label %or.true, label %or.rhs
+  store i32 %call43473, ptr %rb, align 4
+  %load43474 = load i32, ptr %comma1, align 4
+  %cmp43475 = icmp slt i32 %load43474, 0
+  %bool43476 = zext i1 %cmp43475 to i32
+  %cond43477 = icmp ne i32 %bool43476, 0
+  br i1 %cond43477, label %or.true, label %or.rhs
 
-if.then6916:                                      ; preds = %or.merge6
+if.then6981:                                      ; preds = %or.merge6
   ret void
 
-if.else6917:                                      ; preds = %or.merge6
-  br label %if.end6918
+if.else6982:                                      ; preds = %or.merge6
+  br label %if.end6983
 
-if.end6918:                                       ; preds = %if.else6917
-  %load43109 = load ptr, ptr %rhs, align 8
-  %load43110 = load i32, ptr %comma1, align 4
-  %call43111 = call ptr @mir2asm_slice(ptr %load43109, i32 4, i32 %load43110)
-  %call43112 = call ptr @mir2asm_trim(ptr %call43111)
+if.end6983:                                       ; preds = %if.else6982
+  %load43496 = load ptr, ptr %rhs, align 8
+  %load43497 = load i32, ptr %comma1, align 4
+  %call43498 = call ptr @mir2asm_slice(ptr %load43496, i32 4, i32 %load43497)
+  %call43499 = call ptr @mir2asm_trim(ptr %call43498)
   %ty = alloca ptr, align 8
-  store ptr %call43112, ptr %ty, align 8
-  %load43113 = load ptr, ptr %rhs, align 8
-  %load43114 = load i32, ptr %comma1, align 4
-  %add43115 = add i32 %load43114, 1
-  %load43116 = load i32, ptr %comma2, align 4
-  %call43117 = call ptr @mir2asm_slice(ptr %load43113, i32 %add43115, i32 %load43116)
-  %call43118 = call ptr @mir2asm_trim(ptr %call43117)
+  store ptr %call43499, ptr %ty, align 8
+  %load43500 = load ptr, ptr %rhs, align 8
+  %load43501 = load i32, ptr %comma1, align 4
+  %add43502 = add i32 %load43501, 1
+  %load43503 = load i32, ptr %comma2, align 4
+  %call43504 = call ptr @mir2asm_slice(ptr %load43500, i32 %add43502, i32 %load43503)
+  %call43505 = call ptr @mir2asm_trim(ptr %call43504)
   %base = alloca ptr, align 8
-  store ptr %call43118, ptr %base, align 8
-  %load43119 = load ptr, ptr %rhs, align 8
-  %load43120 = load i32, ptr %lb, align 4
-  %add43121 = add i32 %load43120, 1
-  %load43122 = load i32, ptr %rb, align 4
-  %call43123 = call ptr @mir2asm_slice(ptr %load43119, i32 %add43121, i32 %load43122)
-  %call43124 = call ptr @mir2asm_trim(ptr %call43123)
+  store ptr %call43505, ptr %base, align 8
+  %load43506 = load ptr, ptr %rhs, align 8
+  %load43507 = load i32, ptr %lb, align 4
+  %add43508 = add i32 %load43507, 1
+  %load43509 = load i32, ptr %rb, align 4
+  %call43510 = call ptr @mir2asm_slice(ptr %load43506, i32 %add43508, i32 %load43509)
+  %call43511 = call ptr @mir2asm_trim(ptr %call43510)
   %index = alloca ptr, align 8
-  store ptr %call43124, ptr %index, align 8
-  %load43125 = load ptr, ptr %index, align 8
-  %call43126 = call i32 @mir2asm_find(ptr %load43125, i8 44, i32 0)
+  store ptr %call43511, ptr %index, align 8
+  %load43512 = load ptr, ptr %index, align 8
+  %call43513 = call i32 @mir2asm_find(ptr %load43512, i8 44, i32 0)
   %comma_idx = alloca i32, align 4
-  store i32 %call43126, ptr %comma_idx, align 4
-  %ifexpr43127 = alloca ptr, align 8
-  %load43128 = load i32, ptr %comma_idx, align 4
-  %cmp43129 = icmp sge i32 %load43128, 0
-  %bool43130 = zext i1 %cmp43129 to i32
-  %cond43131 = icmp ne i32 %bool43130, 0
-  br i1 %cond43131, label %ifexpr.then6919, label %ifexpr.else6920
+  store i32 %call43513, ptr %comma_idx, align 4
+  %ifexpr43514 = alloca ptr, align 8
+  %load43515 = load i32, ptr %comma_idx, align 4
+  %cmp43516 = icmp sge i32 %load43515, 0
+  %bool43517 = zext i1 %cmp43516 to i32
+  %cond43518 = icmp ne i32 %bool43517, 0
+  br i1 %cond43518, label %ifexpr.then6984, label %ifexpr.else6985
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load43091 = load i32, ptr %comma2, align 4
-  %cmp43092 = icmp slt i32 %load43091, 0
-  %bool43093 = zext i1 %cmp43092 to i32
-  %cond43094 = icmp ne i32 %bool43093, 0
-  br i1 %cond43094, label %or.true, label %or.merge
+  %load43478 = load i32, ptr %comma2, align 4
+  %cmp43479 = icmp slt i32 %load43478, 0
+  %bool43480 = zext i1 %cmp43479 to i32
+  %cond43481 = icmp ne i32 %bool43480, 0
+  br i1 %cond43481, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval43095 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond43096 = icmp ne i32 %orval43095, 0
-  br i1 %cond43096, label %or.true1, label %or.rhs2
+  %orval43482 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond43483 = icmp ne i32 %orval43482, 0
+  br i1 %cond43483, label %or.true1, label %or.rhs2
 
 or.true1:                                         ; preds = %or.rhs2, %or.merge
   br label %or.merge3
 
 or.rhs2:                                          ; preds = %or.merge
-  %load43097 = load i32, ptr %lb, align 4
-  %cmp43098 = icmp slt i32 %load43097, 0
-  %bool43099 = zext i1 %cmp43098 to i32
-  %cond43100 = icmp ne i32 %bool43099, 0
-  br i1 %cond43100, label %or.true1, label %or.merge3
+  %load43484 = load i32, ptr %lb, align 4
+  %cmp43485 = icmp slt i32 %load43484, 0
+  %bool43486 = zext i1 %cmp43485 to i32
+  %cond43487 = icmp ne i32 %bool43486, 0
+  br i1 %cond43487, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval43101 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond43102 = icmp ne i32 %orval43101, 0
-  br i1 %cond43102, label %or.true4, label %or.rhs5
+  %orval43488 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond43489 = icmp ne i32 %orval43488, 0
+  br i1 %cond43489, label %or.true4, label %or.rhs5
 
 or.true4:                                         ; preds = %or.rhs5, %or.merge3
   br label %or.merge6
 
 or.rhs5:                                          ; preds = %or.merge3
-  %load43103 = load i32, ptr %rb, align 4
-  %cmp43104 = icmp slt i32 %load43103, 0
-  %bool43105 = zext i1 %cmp43104 to i32
-  %cond43106 = icmp ne i32 %bool43105, 0
-  br i1 %cond43106, label %or.true4, label %or.merge6
+  %load43490 = load i32, ptr %rb, align 4
+  %cmp43491 = icmp slt i32 %load43490, 0
+  %bool43492 = zext i1 %cmp43491 to i32
+  %cond43493 = icmp ne i32 %bool43492, 0
+  br i1 %cond43493, label %or.true4, label %or.merge6
 
 or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval43107 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond43108 = icmp ne i32 %orval43107, 0
-  br i1 %cond43108, label %if.then6916, label %if.else6917
+  %orval43494 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond43495 = icmp ne i32 %orval43494, 0
+  br i1 %cond43495, label %if.then6981, label %if.else6982
 
-ifexpr.then6919:                                  ; preds = %if.end6918
-  %load43132 = load ptr, ptr %index, align 8
-  %load43133 = load i32, ptr %comma_idx, align 4
-  %add43134 = add i32 %load43133, 1
-  %call43135 = call ptr @mir2asm_after(ptr %load43132, i32 %add43134)
-  %call43136 = call ptr @mir2asm_trim(ptr %call43135)
-  store ptr %call43136, ptr %ifexpr43127, align 8
-  br label %ifexpr.end6921
+ifexpr.then6984:                                  ; preds = %if.end6983
+  %load43519 = load ptr, ptr %index, align 8
+  %load43520 = load i32, ptr %comma_idx, align 4
+  %add43521 = add i32 %load43520, 1
+  %call43522 = call ptr @mir2asm_after(ptr %load43519, i32 %add43521)
+  %call43523 = call ptr @mir2asm_trim(ptr %call43522)
+  store ptr %call43523, ptr %ifexpr43514, align 8
+  br label %ifexpr.end6986
 
-ifexpr.else6920:                                  ; preds = %if.end6918
-  %load43137 = load ptr, ptr %index, align 8
-  store ptr %load43137, ptr %ifexpr43127, align 8
-  br label %ifexpr.end6921
+ifexpr.else6985:                                  ; preds = %if.end6983
+  %load43524 = load ptr, ptr %index, align 8
+  store ptr %load43524, ptr %ifexpr43514, align 8
+  br label %ifexpr.end6986
 
-ifexpr.end6921:                                   ; preds = %ifexpr.else6920, %ifexpr.then6919
-  %ifexprval43138 = load ptr, ptr %ifexpr43127, align 8
+ifexpr.end6986:                                   ; preds = %ifexpr.else6985, %ifexpr.then6984
+  %ifexprval43525 = load ptr, ptr %ifexpr43514, align 8
   %idx_val = alloca ptr, align 8
-  store ptr %ifexprval43138, ptr %idx_val, align 8
-  %load43139 = load ptr, ptr %b, align 8
-  %load43140 = load ptr, ptr %ty, align 8
-  %call43141 = call i32 @mir2asm_type_is_struct_value(ptr %load43139, ptr %load43140)
-  %cmp43142 = icmp eq i32 %call43141, 1
-  %bool43143 = zext i1 %cmp43142 to i32
-  %cond43144 = icmp ne i32 %bool43143, 0
-  br i1 %cond43144, label %and.rhs, label %and.false
+  store ptr %ifexprval43525, ptr %idx_val, align 8
+  %load43526 = load ptr, ptr %b, align 8
+  %load43527 = load ptr, ptr %ty, align 8
+  %call43528 = call i32 @mir2asm_type_is_struct_value(ptr %load43526, ptr %load43527)
+  %cmp43529 = icmp eq i32 %call43528, 1
+  %bool43530 = zext i1 %cmp43529 to i32
+  %cond43531 = icmp ne i32 %bool43530, 0
+  br i1 %cond43531, label %and.rhs, label %and.false
 
-if.then6922:                                      ; preds = %and.merge
-  %load43151 = load ptr, ptr %rhs, align 8
-  %load43152 = load i32, ptr %comma2, align 4
-  %call43153 = call i32 @mir2asm_index_in_brackets(ptr %load43151, i32 %load43152)
+if.then6987:                                      ; preds = %and.merge
+  %load43538 = load ptr, ptr %rhs, align 8
+  %load43539 = load i32, ptr %comma2, align 4
+  %call43540 = call i32 @mir2asm_index_in_brackets(ptr %load43538, i32 %load43539)
   %field_index = alloca i32, align 4
-  store i32 %call43153, ptr %field_index, align 4
-  %load43154 = load ptr, ptr %b, align 8
-  %load43155 = load ptr, ptr %ty, align 8
-  %load43156 = load i32, ptr %field_index, align 4
-  %call43157 = call ptr @mir2asm_struct_field_ty(ptr %load43154, ptr %load43155, i32 %load43156)
+  store i32 %call43540, ptr %field_index, align 4
+  %load43541 = load ptr, ptr %b, align 8
+  %load43542 = load ptr, ptr %ty, align 8
+  %load43543 = load i32, ptr %field_index, align 4
+  %call43544 = call ptr @mir2asm_struct_field_ty(ptr %load43541, ptr %load43542, i32 %load43543)
   %field_ty = alloca ptr, align 8
-  store ptr %call43157, ptr %field_ty, align 8
-  %load43158 = load ptr, ptr %b, align 8
-  %load43159 = load ptr, ptr %ty, align 8
-  %load43160 = load i32, ptr %field_index, align 4
-  %call43161 = call i32 @mir2asm_struct_field_offset(ptr %load43158, ptr %load43159, i32 %load43160)
+  store ptr %call43544, ptr %field_ty, align 8
+  %load43545 = load ptr, ptr %b, align 8
+  %load43546 = load ptr, ptr %ty, align 8
+  %load43547 = load i32, ptr %field_index, align 4
+  %call43548 = call i32 @mir2asm_struct_field_offset(ptr %load43545, ptr %load43546, i32 %load43547)
   %field_off = alloca i32, align 4
-  store i32 %call43161, ptr %field_off, align 4
-  %load43162 = load ptr, ptr %b, align 8
-  %load43163 = load ptr, ptr %dest, align 8
-  %load43165 = load ptr, ptr %field_ty, align 8
-  %call43166 = call ptr @vix_string_concat(ptr @.strlit43164, ptr %load43165)
-  %call43167 = call i32 @mir2asm_alloc_slot_typed(ptr %load43162, ptr %load43163, i32 0, ptr %call43166)
-  %load43168 = load ptr, ptr %b, align 8
-  %load43169 = load ptr, ptr %base, align 8
-  %call43170 = call i32 @mir2asm_find_name(ptr %load43168, ptr %load43169)
+  store i32 %call43548, ptr %field_off, align 4
+  %load43549 = load ptr, ptr %b, align 8
+  %load43550 = load ptr, ptr %dest, align 8
+  %load43552 = load ptr, ptr %field_ty, align 8
+  %call43553 = call ptr @vix_string_concat(ptr @.strlit43551, ptr %load43552)
+  %call43554 = call i32 @mir2asm_alloc_slot_typed(ptr %load43549, ptr %load43550, i32 0, ptr %call43553)
+  %load43555 = load ptr, ptr %b, align 8
+  %load43556 = load ptr, ptr %base, align 8
+  %call43557 = call i32 @mir2asm_find_name(ptr %load43555, ptr %load43556)
   %base_idx = alloca i32, align 4
-  store i32 %call43170, ptr %base_idx, align 4
-  %load43171 = load i32, ptr %base_idx, align 4
-  %cmp43172 = icmp sge i32 %load43171, 0
-  %bool43173 = zext i1 %cmp43172 to i32
-  %cond43174 = icmp ne i32 %bool43173, 0
-  br i1 %cond43174, label %and.rhs7, label %and.false8
+  store i32 %call43557, ptr %base_idx, align 4
+  %load43558 = load i32, ptr %base_idx, align 4
+  %cmp43559 = icmp sge i32 %load43558, 0
+  %bool43560 = zext i1 %cmp43559 to i32
+  %cond43561 = icmp ne i32 %bool43560, 0
+  br i1 %cond43561, label %and.rhs7, label %and.false8
 
-if.else6923:                                      ; preds = %and.merge
-  br label %if.end6924
+if.else6988:                                      ; preds = %and.merge
+  br label %if.end6989
 
-if.end6924:                                       ; preds = %if.else6923
-  %load43243 = load ptr, ptr %b, align 8
-  %load43244 = load ptr, ptr %base, align 8
-  %call43245 = call ptr @mir2asm_slot_ty(ptr %load43243, ptr %load43244)
+if.end6989:                                       ; preds = %if.else6988
+  %load43630 = load ptr, ptr %b, align 8
+  %load43631 = load ptr, ptr %base, align 8
+  %call43632 = call ptr @mir2asm_slot_ty(ptr %load43630, ptr %load43631)
   %base_ty = alloca ptr, align 8
-  store ptr %call43245, ptr %base_ty, align 8
-  %ifexpr43246 = alloca ptr, align 8
-  %load43247 = load ptr, ptr %base_ty, align 8
-  %strcmp43249 = call i32 @strcmp(ptr %load43247, ptr @.strlit43248)
-  %cmp43250 = icmp eq i32 %strcmp43249, 0
-  %bool43251 = zext i1 %cmp43250 to i32
-  %cond43252 = icmp ne i32 %bool43251, 0
-  br i1 %cond43252, label %and.rhs13, label %and.false14
+  store ptr %call43632, ptr %base_ty, align 8
+  %ifexpr43633 = alloca ptr, align 8
+  %load43634 = load ptr, ptr %base_ty, align 8
+  %strcmp43636 = call i32 @strcmp(ptr %load43634, ptr @.strlit43635)
+  %cmp43637 = icmp eq i32 %strcmp43636, 0
+  %bool43638 = zext i1 %cmp43637 to i32
+  %cond43639 = icmp ne i32 %bool43638, 0
+  br i1 %cond43639, label %and.rhs13, label %and.false14
 
-and.rhs:                                          ; preds = %ifexpr.end6921
-  %load43145 = load i32, ptr %comma_idx, align 4
-  %cmp43146 = icmp sge i32 %load43145, 0
-  %bool43147 = zext i1 %cmp43146 to i32
-  %cond43148 = icmp ne i32 %bool43147, 0
-  br i1 %cond43148, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %ifexpr.end6986
+  %load43532 = load i32, ptr %comma_idx, align 4
+  %cmp43533 = icmp sge i32 %load43532, 0
+  %bool43534 = zext i1 %cmp43533 to i32
+  %cond43535 = icmp ne i32 %bool43534, 0
+  br i1 %cond43535, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %ifexpr.end6921
+and.false:                                        ; preds = %and.rhs, %ifexpr.end6986
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval43149 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond43150 = icmp ne i32 %andval43149, 0
-  br i1 %cond43150, label %if.then6922, label %if.else6923
+  %andval43536 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond43537 = icmp ne i32 %andval43536, 0
+  br i1 %cond43537, label %if.then6987, label %if.else6988
 
-if.then6925:                                      ; preds = %and.merge12
-  %load43201 = load ptr, ptr %b, align 8
-  %load43203 = load ptr, ptr %b, align 8
-  %field43205 = getelementptr %MirAsm, ptr %load43203, i32 0, i32 6
-  %fieldval43206 = load ptr, ptr %field43205, align 8
-  %load43207 = load i32, ptr %base_idx, align 4
-  %idx43208 = getelementptr i32, ptr %fieldval43206, i32 %load43207
-  %loadidx43209 = load i32, ptr %idx43208, align 4
-  %call43210 = call ptr @mir2asm_mem(i32 %loadidx43209)
-  %call43211 = call ptr @vix_string_concat(ptr @.strlit43202, ptr %call43210)
-  call void @mir2asm_line(ptr %load43201, ptr %call43211)
-  br label %if.end6927
+if.then6990:                                      ; preds = %and.merge12
+  %load43588 = load ptr, ptr %b, align 8
+  %load43590 = load ptr, ptr %b, align 8
+  %field43592 = getelementptr %MirAsm, ptr %load43590, i32 0, i32 6
+  %fieldval43593 = load ptr, ptr %field43592, align 8
+  %load43594 = load i32, ptr %base_idx, align 4
+  %idx43595 = getelementptr i32, ptr %fieldval43593, i32 %load43594
+  %loadidx43596 = load i32, ptr %idx43595, align 4
+  %call43597 = call ptr @mir2asm_mem(i32 %loadidx43596)
+  %call43598 = call ptr @vix_string_concat(ptr @.strlit43589, ptr %call43597)
+  call void @mir2asm_line(ptr %load43588, ptr %call43598)
+  br label %if.end6992
 
-if.else6926:                                      ; preds = %and.merge12
-  %load43212 = load ptr, ptr %b, align 8
-  %load43214 = load ptr, ptr %b, align 8
-  %load43215 = load ptr, ptr %base, align 8
-  %call43217 = call ptr @mir2asm_operand_typed(ptr %load43214, ptr %load43215, ptr @.strlit43216)
-  %call43218 = call ptr @vix_string_concat(ptr @.strlit43213, ptr %call43217)
-  call void @mir2asm_line(ptr %load43212, ptr %call43218)
-  br label %if.end6927
+if.else6991:                                      ; preds = %and.merge12
+  %load43599 = load ptr, ptr %b, align 8
+  %load43601 = load ptr, ptr %b, align 8
+  %load43602 = load ptr, ptr %base, align 8
+  %call43604 = call ptr @mir2asm_operand_typed(ptr %load43601, ptr %load43602, ptr @.strlit43603)
+  %call43605 = call ptr @vix_string_concat(ptr @.strlit43600, ptr %call43604)
+  call void @mir2asm_line(ptr %load43599, ptr %call43605)
+  br label %if.end6992
 
-if.end6927:                                       ; preds = %if.else6926, %if.then6925
-  %load43219 = load i32, ptr %field_off, align 4
-  %cmp43220 = icmp ne i32 %load43219, 0
-  %bool43221 = zext i1 %cmp43220 to i32
-  %cond43222 = icmp ne i32 %bool43221, 0
-  br i1 %cond43222, label %if.then6928, label %if.else6929
+if.end6992:                                       ; preds = %if.else6991, %if.then6990
+  %load43606 = load i32, ptr %field_off, align 4
+  %cmp43607 = icmp ne i32 %load43606, 0
+  %bool43608 = zext i1 %cmp43607 to i32
+  %cond43609 = icmp ne i32 %bool43608, 0
+  br i1 %cond43609, label %if.then6993, label %if.else6994
 
-and.rhs7:                                         ; preds = %if.then6922
-  %load43175 = load ptr, ptr %b, align 8
-  %field43177 = getelementptr %MirAsm, ptr %load43175, i32 0, i32 7
-  %fieldval43178 = load ptr, ptr %field43177, align 8
-  %load43179 = load i32, ptr %base_idx, align 4
-  %idx43180 = getelementptr i32, ptr %fieldval43178, i32 %load43179
-  %loadidx43181 = load i32, ptr %idx43180, align 4
-  %cmp43182 = icmp eq i32 %loadidx43181, 1
-  %bool43183 = zext i1 %cmp43182 to i32
-  %cond43184 = icmp ne i32 %bool43183, 0
-  br i1 %cond43184, label %and.merge9, label %and.false8
+and.rhs7:                                         ; preds = %if.then6987
+  %load43562 = load ptr, ptr %b, align 8
+  %field43564 = getelementptr %MirAsm, ptr %load43562, i32 0, i32 7
+  %fieldval43565 = load ptr, ptr %field43564, align 8
+  %load43566 = load i32, ptr %base_idx, align 4
+  %idx43567 = getelementptr i32, ptr %fieldval43565, i32 %load43566
+  %loadidx43568 = load i32, ptr %idx43567, align 4
+  %cmp43569 = icmp eq i32 %loadidx43568, 1
+  %bool43570 = zext i1 %cmp43569 to i32
+  %cond43571 = icmp ne i32 %bool43570, 0
+  br i1 %cond43571, label %and.merge9, label %and.false8
 
-and.false8:                                       ; preds = %and.rhs7, %if.then6922
+and.false8:                                       ; preds = %and.rhs7, %if.then6987
   br label %and.merge9
 
 and.merge9:                                       ; preds = %and.false8, %and.rhs7
-  %andval43185 = phi i32 [ 1, %and.rhs7 ], [ 0, %and.false8 ]
-  %cond43186 = icmp ne i32 %andval43185, 0
-  br i1 %cond43186, label %and.rhs10, label %and.false11
+  %andval43572 = phi i32 [ 1, %and.rhs7 ], [ 0, %and.false8 ]
+  %cond43573 = icmp ne i32 %andval43572, 0
+  br i1 %cond43573, label %and.rhs10, label %and.false11
 
 and.rhs10:                                        ; preds = %and.merge9
-  %load43187 = load ptr, ptr %b, align 8
-  %field43189 = getelementptr %MirAsm, ptr %load43187, i32 0, i32 8
-  %fieldval43190 = load ptr, ptr %field43189, align 8
-  %load43191 = load i32, ptr %base_idx, align 4
-  %idx43192 = getelementptr ptr, ptr %fieldval43190, i32 %load43191
-  %loadidx43193 = load ptr, ptr %idx43192, align 8
-  %load43194 = load ptr, ptr %ty, align 8
-  %strcmp43195 = call i32 @strcmp(ptr %loadidx43193, ptr %load43194)
-  %cmp43196 = icmp eq i32 %strcmp43195, 0
-  %bool43197 = zext i1 %cmp43196 to i32
-  %cond43198 = icmp ne i32 %bool43197, 0
-  br i1 %cond43198, label %and.merge12, label %and.false11
+  %load43574 = load ptr, ptr %b, align 8
+  %field43576 = getelementptr %MirAsm, ptr %load43574, i32 0, i32 8
+  %fieldval43577 = load ptr, ptr %field43576, align 8
+  %load43578 = load i32, ptr %base_idx, align 4
+  %idx43579 = getelementptr ptr, ptr %fieldval43577, i32 %load43578
+  %loadidx43580 = load ptr, ptr %idx43579, align 8
+  %load43581 = load ptr, ptr %ty, align 8
+  %strcmp43582 = call i32 @strcmp(ptr %loadidx43580, ptr %load43581)
+  %cmp43583 = icmp eq i32 %strcmp43582, 0
+  %bool43584 = zext i1 %cmp43583 to i32
+  %cond43585 = icmp ne i32 %bool43584, 0
+  br i1 %cond43585, label %and.merge12, label %and.false11
 
 and.false11:                                      ; preds = %and.rhs10, %and.merge9
   br label %and.merge12
 
 and.merge12:                                      ; preds = %and.false11, %and.rhs10
-  %andval43199 = phi i32 [ 1, %and.rhs10 ], [ 0, %and.false11 ]
-  %cond43200 = icmp ne i32 %andval43199, 0
-  br i1 %cond43200, label %if.then6925, label %if.else6926
+  %andval43586 = phi i32 [ 1, %and.rhs10 ], [ 0, %and.false11 ]
+  %cond43587 = icmp ne i32 %andval43586, 0
+  br i1 %cond43587, label %if.then6990, label %if.else6991
 
-if.then6928:                                      ; preds = %if.end6927
-  %load43223 = load ptr, ptr %b, align 8
-  %load43225 = load i32, ptr %field_off, align 4
-  %call43226 = call ptr @i32_to_str(i32 %load43225)
-  %call43227 = call ptr @vix_string_concat(ptr @.strlit43224, ptr %call43226)
-  call void @mir2asm_line(ptr %load43223, ptr %call43227)
-  br label %if.end6930
+if.then6993:                                      ; preds = %if.end6992
+  %load43610 = load ptr, ptr %b, align 8
+  %load43612 = load i32, ptr %field_off, align 4
+  %call43613 = call ptr @i32_to_str(i32 %load43612)
+  %call43614 = call ptr @vix_string_concat(ptr @.strlit43611, ptr %call43613)
+  call void @mir2asm_line(ptr %load43610, ptr %call43614)
+  br label %if.end6995
 
-if.else6929:                                      ; preds = %if.end6927
-  br label %if.end6930
+if.else6994:                                      ; preds = %if.end6992
+  br label %if.end6995
 
-if.end6930:                                       ; preds = %if.else6929, %if.then6928
-  %load43228 = load ptr, ptr %b, align 8
-  %load43230 = load ptr, ptr %b, align 8
-  %field43232 = getelementptr %MirAsm, ptr %load43230, i32 0, i32 6
-  %fieldval43233 = load ptr, ptr %field43232, align 8
-  %load43234 = load ptr, ptr %b, align 8
-  %load43235 = load ptr, ptr %dest, align 8
-  %call43236 = call i32 @mir2asm_find_name(ptr %load43234, ptr %load43235)
-  %idx43237 = getelementptr i32, ptr %fieldval43233, i32 %call43236
-  %loadidx43238 = load i32, ptr %idx43237, align 4
-  %call43239 = call ptr @mir2asm_mem(i32 %loadidx43238)
-  %call43240 = call ptr @vix_string_concat(ptr @.strlit43229, ptr %call43239)
-  %call43242 = call ptr @vix_string_concat(ptr %call43240, ptr @.strlit43241)
-  call void @mir2asm_line(ptr %load43228, ptr %call43242)
+if.end6995:                                       ; preds = %if.else6994, %if.then6993
+  %load43615 = load ptr, ptr %b, align 8
+  %load43617 = load ptr, ptr %b, align 8
+  %field43619 = getelementptr %MirAsm, ptr %load43617, i32 0, i32 6
+  %fieldval43620 = load ptr, ptr %field43619, align 8
+  %load43621 = load ptr, ptr %b, align 8
+  %load43622 = load ptr, ptr %dest, align 8
+  %call43623 = call i32 @mir2asm_find_name(ptr %load43621, ptr %load43622)
+  %idx43624 = getelementptr i32, ptr %fieldval43620, i32 %call43623
+  %loadidx43625 = load i32, ptr %idx43624, align 4
+  %call43626 = call ptr @mir2asm_mem(i32 %loadidx43625)
+  %call43627 = call ptr @vix_string_concat(ptr @.strlit43616, ptr %call43626)
+  %call43629 = call ptr @vix_string_concat(ptr %call43627, ptr @.strlit43628)
+  call void @mir2asm_line(ptr %load43615, ptr %call43629)
   ret void
 
-ifexpr.then6931:                                  ; preds = %and.merge15
-  store ptr @.strlit43261, ptr %ifexpr43246, align 8
-  br label %ifexpr.end6933
+ifexpr.then6996:                                  ; preds = %and.merge15
+  store ptr @.strlit43648, ptr %ifexpr43633, align 8
+  br label %ifexpr.end6998
 
-ifexpr.else6932:                                  ; preds = %and.merge15
-  %load43262 = load ptr, ptr %ty, align 8
-  store ptr %load43262, ptr %ifexpr43246, align 8
-  br label %ifexpr.end6933
+ifexpr.else6997:                                  ; preds = %and.merge15
+  %load43649 = load ptr, ptr %ty, align 8
+  store ptr %load43649, ptr %ifexpr43633, align 8
+  br label %ifexpr.end6998
 
-ifexpr.end6933:                                   ; preds = %ifexpr.else6932, %ifexpr.then6931
-  %ifexprval43263 = load ptr, ptr %ifexpr43246, align 8
+ifexpr.end6998:                                   ; preds = %ifexpr.else6997, %ifexpr.then6996
+  %ifexprval43650 = load ptr, ptr %ifexpr43633, align 8
   %elem_ty = alloca ptr, align 8
-  store ptr %ifexprval43263, ptr %elem_ty, align 8
-  %load43264 = load ptr, ptr %b, align 8
-  %load43265 = load ptr, ptr %elem_ty, align 8
-  %call43266 = call i32 @mir2asm_type_size_for(ptr %load43264, ptr %load43265)
+  store ptr %ifexprval43650, ptr %elem_ty, align 8
+  %load43651 = load ptr, ptr %b, align 8
+  %load43652 = load ptr, ptr %elem_ty, align 8
+  %call43653 = call i32 @mir2asm_type_size_for(ptr %load43651, ptr %load43652)
   %elem_size = alloca i32, align 4
-  store i32 %call43266, ptr %elem_size, align 4
-  %load43267 = load ptr, ptr %b, align 8
-  %load43268 = load ptr, ptr %dest, align 8
-  %load43270 = load ptr, ptr %elem_ty, align 8
-  %call43271 = call ptr @vix_string_concat(ptr @.strlit43269, ptr %load43270)
-  %call43272 = call i32 @mir2asm_alloc_slot_typed(ptr %load43267, ptr %load43268, i32 0, ptr %call43271)
-  %load43273 = load ptr, ptr %b, align 8
-  %load43275 = load ptr, ptr %b, align 8
-  %load43276 = load ptr, ptr %base, align 8
-  %call43278 = call ptr @mir2asm_operand_typed(ptr %load43275, ptr %load43276, ptr @.strlit43277)
-  %call43279 = call ptr @vix_string_concat(ptr @.strlit43274, ptr %call43278)
-  call void @mir2asm_line(ptr %load43273, ptr %call43279)
-  %load43280 = load ptr, ptr %b, align 8
-  %load43282 = load ptr, ptr %b, align 8
-  %load43283 = load ptr, ptr %idx_val, align 8
-  %call43285 = call ptr @mir2asm_operand_typed(ptr %load43282, ptr %load43283, ptr @.strlit43284)
-  %call43286 = call ptr @vix_string_concat(ptr @.strlit43281, ptr %call43285)
-  call void @mir2asm_line(ptr %load43280, ptr %call43286)
-  %load43287 = load i32, ptr %elem_size, align 4
-  %cmp43288 = icmp ne i32 %load43287, 1
-  %bool43289 = zext i1 %cmp43288 to i32
-  %cond43290 = icmp ne i32 %bool43289, 0
-  br i1 %cond43290, label %if.then6934, label %if.else6935
+  store i32 %call43653, ptr %elem_size, align 4
+  %load43654 = load ptr, ptr %b, align 8
+  %load43655 = load ptr, ptr %dest, align 8
+  %load43657 = load ptr, ptr %elem_ty, align 8
+  %call43658 = call ptr @vix_string_concat(ptr @.strlit43656, ptr %load43657)
+  %call43659 = call i32 @mir2asm_alloc_slot_typed(ptr %load43654, ptr %load43655, i32 0, ptr %call43658)
+  %load43660 = load ptr, ptr %b, align 8
+  %load43662 = load ptr, ptr %b, align 8
+  %load43663 = load ptr, ptr %base, align 8
+  %call43665 = call ptr @mir2asm_operand_typed(ptr %load43662, ptr %load43663, ptr @.strlit43664)
+  %call43666 = call ptr @vix_string_concat(ptr @.strlit43661, ptr %call43665)
+  call void @mir2asm_line(ptr %load43660, ptr %call43666)
+  %load43667 = load ptr, ptr %b, align 8
+  %load43669 = load ptr, ptr %b, align 8
+  %load43670 = load ptr, ptr %idx_val, align 8
+  %call43672 = call ptr @mir2asm_operand_typed(ptr %load43669, ptr %load43670, ptr @.strlit43671)
+  %call43673 = call ptr @vix_string_concat(ptr @.strlit43668, ptr %call43672)
+  call void @mir2asm_line(ptr %load43667, ptr %call43673)
+  %load43674 = load i32, ptr %elem_size, align 4
+  %cmp43675 = icmp ne i32 %load43674, 1
+  %bool43676 = zext i1 %cmp43675 to i32
+  %cond43677 = icmp ne i32 %bool43676, 0
+  br i1 %cond43677, label %if.then6999, label %if.else7000
 
-and.rhs13:                                        ; preds = %if.end6924
-  %load43253 = load ptr, ptr %ty, align 8
-  %strcmp43255 = call i32 @strcmp(ptr %load43253, ptr @.strlit43254)
-  %cmp43256 = icmp eq i32 %strcmp43255, 0
-  %bool43257 = zext i1 %cmp43256 to i32
-  %cond43258 = icmp ne i32 %bool43257, 0
-  br i1 %cond43258, label %and.merge15, label %and.false14
+and.rhs13:                                        ; preds = %if.end6989
+  %load43640 = load ptr, ptr %ty, align 8
+  %strcmp43642 = call i32 @strcmp(ptr %load43640, ptr @.strlit43641)
+  %cmp43643 = icmp eq i32 %strcmp43642, 0
+  %bool43644 = zext i1 %cmp43643 to i32
+  %cond43645 = icmp ne i32 %bool43644, 0
+  br i1 %cond43645, label %and.merge15, label %and.false14
 
-and.false14:                                      ; preds = %and.rhs13, %if.end6924
+and.false14:                                      ; preds = %and.rhs13, %if.end6989
   br label %and.merge15
 
 and.merge15:                                      ; preds = %and.false14, %and.rhs13
-  %andval43259 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
-  %cond43260 = icmp ne i32 %andval43259, 0
-  br i1 %cond43260, label %ifexpr.then6931, label %ifexpr.else6932
+  %andval43646 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
+  %cond43647 = icmp ne i32 %andval43646, 0
+  br i1 %cond43647, label %ifexpr.then6996, label %ifexpr.else6997
 
-if.then6934:                                      ; preds = %ifexpr.end6933
-  %load43291 = load ptr, ptr %b, align 8
-  %load43293 = load i32, ptr %elem_size, align 4
-  %call43294 = call ptr @i32_to_str(i32 %load43293)
-  %call43295 = call ptr @vix_string_concat(ptr @.strlit43292, ptr %call43294)
-  call void @mir2asm_line(ptr %load43291, ptr %call43295)
-  br label %if.end6936
+if.then6999:                                      ; preds = %ifexpr.end6998
+  %load43678 = load ptr, ptr %b, align 8
+  %load43680 = load i32, ptr %elem_size, align 4
+  %call43681 = call ptr @i32_to_str(i32 %load43680)
+  %call43682 = call ptr @vix_string_concat(ptr @.strlit43679, ptr %call43681)
+  call void @mir2asm_line(ptr %load43678, ptr %call43682)
+  br label %if.end7001
 
-if.else6935:                                      ; preds = %ifexpr.end6933
-  br label %if.end6936
+if.else7000:                                      ; preds = %ifexpr.end6998
+  br label %if.end7001
 
-if.end6936:                                       ; preds = %if.else6935, %if.then6934
-  %load43296 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load43296, ptr @.strlit43297)
-  %load43298 = load ptr, ptr %b, align 8
-  %load43300 = load ptr, ptr %b, align 8
-  %field43302 = getelementptr %MirAsm, ptr %load43300, i32 0, i32 6
-  %fieldval43303 = load ptr, ptr %field43302, align 8
-  %load43304 = load ptr, ptr %b, align 8
-  %load43305 = load ptr, ptr %dest, align 8
-  %call43306 = call i32 @mir2asm_find_name(ptr %load43304, ptr %load43305)
-  %idx43307 = getelementptr i32, ptr %fieldval43303, i32 %call43306
-  %loadidx43308 = load i32, ptr %idx43307, align 4
-  %call43309 = call ptr @mir2asm_mem(i32 %loadidx43308)
-  %call43310 = call ptr @vix_string_concat(ptr @.strlit43299, ptr %call43309)
-  %call43312 = call ptr @vix_string_concat(ptr %call43310, ptr @.strlit43311)
-  call void @mir2asm_line(ptr %load43298, ptr %call43312)
+if.end7001:                                       ; preds = %if.else7000, %if.then6999
+  %load43683 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43683, ptr @.strlit43684)
+  %load43685 = load ptr, ptr %b, align 8
+  %load43687 = load ptr, ptr %b, align 8
+  %field43689 = getelementptr %MirAsm, ptr %load43687, i32 0, i32 6
+  %fieldval43690 = load ptr, ptr %field43689, align 8
+  %load43691 = load ptr, ptr %b, align 8
+  %load43692 = load ptr, ptr %dest, align 8
+  %call43693 = call i32 @mir2asm_find_name(ptr %load43691, ptr %load43692)
+  %idx43694 = getelementptr i32, ptr %fieldval43690, i32 %call43693
+  %loadidx43695 = load i32, ptr %idx43694, align 4
+  %call43696 = call ptr @mir2asm_mem(i32 %loadidx43695)
+  %call43697 = call ptr @vix_string_concat(ptr @.strlit43686, ptr %call43696)
+  %call43699 = call ptr @vix_string_concat(ptr %call43697, ptr @.strlit43698)
+  call void @mir2asm_line(ptr %load43685, ptr %call43699)
   ret void
 }
 
@@ -82374,163 +83182,641 @@ entry:
   store ptr %1, ptr %dest, align 8
   %rhs = alloca ptr, align 8
   store ptr %2, ptr %rhs, align 8
-  %load43313 = load ptr, ptr %rhs, align 8
-  %call43314 = call i32 @mir2asm_find(ptr %load43313, i8 32, i32 0)
+  %load43700 = load ptr, ptr %rhs, align 8
+  %call43701 = call i32 @mir2asm_find(ptr %load43700, i8 32, i32 0)
   %p = alloca i32, align 4
-  store i32 %call43314, ptr %p, align 4
-  %load43315 = load i32, ptr %p, align 4
-  %cmp43316 = icmp slt i32 %load43315, 0
-  %bool43317 = zext i1 %cmp43316 to i32
-  %cond43318 = icmp ne i32 %bool43317, 0
-  br i1 %cond43318, label %if.then6937, label %if.else6938
+  store i32 %call43701, ptr %p, align 4
+  %load43702 = load i32, ptr %p, align 4
+  %cmp43703 = icmp slt i32 %load43702, 0
+  %bool43704 = zext i1 %cmp43703 to i32
+  %cond43705 = icmp ne i32 %bool43704, 0
+  br i1 %cond43705, label %if.then7002, label %if.else7003
 
-if.then6937:                                      ; preds = %entry
+if.then7002:                                      ; preds = %entry
   ret void
 
-if.else6938:                                      ; preds = %entry
-  br label %if.end6939
+if.else7003:                                      ; preds = %entry
+  br label %if.end7004
 
-if.end6939:                                       ; preds = %if.else6938
-  %load43319 = load ptr, ptr %rhs, align 8
-  %load43320 = load i32, ptr %p, align 4
-  %add43321 = add i32 %load43320, 1
-  %call43322 = call ptr @mir2asm_after(ptr %load43319, i32 %add43321)
-  %call43323 = call ptr @mir2asm_trim(ptr %call43322)
+if.end7004:                                       ; preds = %if.else7003
+  %load43706 = load ptr, ptr %rhs, align 8
+  %load43707 = load i32, ptr %p, align 4
+  %add43708 = add i32 %load43707, 1
+  %call43709 = call ptr @mir2asm_after(ptr %load43706, i32 %add43708)
+  %call43710 = call ptr @mir2asm_trim(ptr %call43709)
   %rest = alloca ptr, align 8
-  store ptr %call43323, ptr %rest, align 8
-  %load43324 = load ptr, ptr %rest, align 8
-  %call43325 = call i32 @mir2asm_find(ptr %load43324, i8 32, i32 0)
-  store i32 %call43325, ptr %p, align 4
-  %load43326 = load i32, ptr %p, align 4
-  %cmp43327 = icmp slt i32 %load43326, 0
-  %bool43328 = zext i1 %cmp43327 to i32
-  %cond43329 = icmp ne i32 %bool43328, 0
-  br i1 %cond43329, label %if.then6940, label %if.else6941
+  store ptr %call43710, ptr %rest, align 8
+  %load43711 = load ptr, ptr %rest, align 8
+  %call43712 = call i32 @mir2asm_find(ptr %load43711, i8 32, i32 0)
+  store i32 %call43712, ptr %p, align 4
+  %load43713 = load i32, ptr %p, align 4
+  %cmp43714 = icmp slt i32 %load43713, 0
+  %bool43715 = zext i1 %cmp43714 to i32
+  %cond43716 = icmp ne i32 %bool43715, 0
+  br i1 %cond43716, label %if.then7005, label %if.else7006
 
-if.then6940:                                      ; preds = %if.end6939
+if.then7005:                                      ; preds = %if.end7004
   ret void
 
-if.else6941:                                      ; preds = %if.end6939
-  br label %if.end6942
+if.else7006:                                      ; preds = %if.end7004
+  br label %if.end7007
 
-if.end6942:                                       ; preds = %if.else6941
-  %load43330 = load ptr, ptr %rest, align 8
-  %load43331 = load i32, ptr %p, align 4
-  %call43332 = call ptr @mir2asm_slice(ptr %load43330, i32 0, i32 %load43331)
-  %call43333 = call ptr @mir2asm_trim(ptr %call43332)
+if.end7007:                                       ; preds = %if.else7006
+  %load43717 = load ptr, ptr %rest, align 8
+  %load43718 = load i32, ptr %p, align 4
+  %call43719 = call ptr @mir2asm_slice(ptr %load43717, i32 0, i32 %load43718)
+  %call43720 = call ptr @mir2asm_trim(ptr %call43719)
   %pred = alloca ptr, align 8
-  store ptr %call43333, ptr %pred, align 8
-  %load43334 = load ptr, ptr %rest, align 8
-  %load43335 = load i32, ptr %p, align 4
-  %add43336 = add i32 %load43335, 1
-  %call43337 = call ptr @mir2asm_after(ptr %load43334, i32 %add43336)
-  %call43338 = call ptr @mir2asm_trim(ptr %call43337)
+  store ptr %call43720, ptr %pred, align 8
+  %load43721 = load ptr, ptr %rest, align 8
+  %load43722 = load i32, ptr %p, align 4
+  %add43723 = add i32 %load43722, 1
+  %call43724 = call ptr @mir2asm_after(ptr %load43721, i32 %add43723)
+  %call43725 = call ptr @mir2asm_trim(ptr %call43724)
   %typed = alloca ptr, align 8
-  store ptr %call43338, ptr %typed, align 8
-  %load43339 = load ptr, ptr %typed, align 8
-  %call43340 = call i32 @mir2asm_find(ptr %load43339, i8 32, i32 0)
-  store i32 %call43340, ptr %p, align 4
-  %load43341 = load ptr, ptr %typed, align 8
-  %load43342 = load i32, ptr %p, align 4
-  %call43343 = call i32 @mir2asm_find(ptr %load43341, i8 44, i32 %load43342)
+  store ptr %call43725, ptr %typed, align 8
+  %load43726 = load ptr, ptr %typed, align 8
+  %call43727 = call i32 @mir2asm_find(ptr %load43726, i8 32, i32 0)
+  store i32 %call43727, ptr %p, align 4
+  %load43728 = load ptr, ptr %typed, align 8
+  %load43729 = load i32, ptr %p, align 4
+  %call43730 = call i32 @mir2asm_find(ptr %load43728, i8 44, i32 %load43729)
   %comma = alloca i32, align 4
-  store i32 %call43343, ptr %comma, align 4
-  %load43344 = load i32, ptr %p, align 4
-  %cmp43345 = icmp slt i32 %load43344, 0
-  %bool43346 = zext i1 %cmp43345 to i32
-  %cond43347 = icmp ne i32 %bool43346, 0
-  br i1 %cond43347, label %or.true, label %or.rhs
+  store i32 %call43730, ptr %comma, align 4
+  %load43731 = load i32, ptr %p, align 4
+  %cmp43732 = icmp slt i32 %load43731, 0
+  %bool43733 = zext i1 %cmp43732 to i32
+  %cond43734 = icmp ne i32 %bool43733, 0
+  br i1 %cond43734, label %or.true, label %or.rhs
 
-if.then6943:                                      ; preds = %or.merge
+if.then7008:                                      ; preds = %or.merge
   ret void
 
-if.else6944:                                      ; preds = %or.merge
-  br label %if.end6945
+if.else7009:                                      ; preds = %or.merge
+  br label %if.end7010
 
-if.end6945:                                       ; preds = %if.else6944
-  %load43354 = load ptr, ptr %typed, align 8
-  %load43355 = load i32, ptr %p, align 4
-  %call43356 = call ptr @mir2asm_slice(ptr %load43354, i32 0, i32 %load43355)
-  %call43357 = call ptr @mir2asm_trim(ptr %call43356)
+if.end7010:                                       ; preds = %if.else7009
+  %load43741 = load ptr, ptr %typed, align 8
+  %load43742 = load i32, ptr %p, align 4
+  %call43743 = call ptr @mir2asm_slice(ptr %load43741, i32 0, i32 %load43742)
+  %call43744 = call ptr @mir2asm_trim(ptr %call43743)
   %ty = alloca ptr, align 8
-  store ptr %call43357, ptr %ty, align 8
-  %load43358 = load ptr, ptr %typed, align 8
-  %load43359 = load i32, ptr %p, align 4
-  %add43360 = add i32 %load43359, 1
-  %load43361 = load i32, ptr %comma, align 4
-  %call43362 = call ptr @mir2asm_slice(ptr %load43358, i32 %add43360, i32 %load43361)
-  %call43363 = call ptr @mir2asm_trim(ptr %call43362)
+  store ptr %call43744, ptr %ty, align 8
+  %load43745 = load ptr, ptr %typed, align 8
+  %load43746 = load i32, ptr %p, align 4
+  %add43747 = add i32 %load43746, 1
+  %load43748 = load i32, ptr %comma, align 4
+  %call43749 = call ptr @mir2asm_slice(ptr %load43745, i32 %add43747, i32 %load43748)
+  %call43750 = call ptr @mir2asm_trim(ptr %call43749)
   %left = alloca ptr, align 8
-  store ptr %call43363, ptr %left, align 8
-  %load43364 = load ptr, ptr %typed, align 8
-  %load43365 = load i32, ptr %comma, align 4
-  %add43366 = add i32 %load43365, 1
-  %call43367 = call ptr @mir2asm_after(ptr %load43364, i32 %add43366)
-  %call43368 = call ptr @mir2asm_trim(ptr %call43367)
+  store ptr %call43750, ptr %left, align 8
+  %load43751 = load ptr, ptr %typed, align 8
+  %load43752 = load i32, ptr %comma, align 4
+  %add43753 = add i32 %load43752, 1
+  %call43754 = call ptr @mir2asm_after(ptr %load43751, i32 %add43753)
+  %call43755 = call ptr @mir2asm_trim(ptr %call43754)
   %right = alloca ptr, align 8
-  store ptr %call43368, ptr %right, align 8
-  %load43369 = load ptr, ptr %b, align 8
-  %load43370 = load ptr, ptr %dest, align 8
-  %call43372 = call i32 @mir2asm_alloc_slot_typed(ptr %load43369, ptr %load43370, i32 0, ptr @.strlit43371)
-  %load43373 = load ptr, ptr %b, align 8
-  %load43374 = load ptr, ptr %ty, align 8
-  %call43375 = call ptr @mir2asm_acc(ptr %load43374)
-  %load43376 = load ptr, ptr %left, align 8
-  %load43377 = load ptr, ptr %ty, align 8
-  call void @mir2asm_emit_load_int_reg(ptr %load43373, ptr %call43375, ptr %load43376, ptr %load43377)
-  %load43378 = load ptr, ptr %b, align 8
-  %load43379 = load ptr, ptr %ty, align 8
-  %call43380 = call ptr @mir2asm_cx(ptr %load43379)
-  %load43381 = load ptr, ptr %right, align 8
-  %load43382 = load ptr, ptr %ty, align 8
-  %call43383 = call ptr @mir2asm_emit_prepare_int_operand(ptr %load43378, ptr %call43380, ptr %load43381, ptr %load43382)
+  store ptr %call43755, ptr %right, align 8
+  %load43756 = load ptr, ptr %b, align 8
+  %load43757 = load ptr, ptr %dest, align 8
+  %call43759 = call i32 @mir2asm_alloc_slot_typed(ptr %load43756, ptr %load43757, i32 0, ptr @.strlit43758)
+  %load43760 = load ptr, ptr %b, align 8
+  %load43761 = load ptr, ptr %ty, align 8
+  %call43762 = call ptr @mir2asm_acc(ptr %load43761)
+  %load43763 = load ptr, ptr %left, align 8
+  %load43764 = load ptr, ptr %ty, align 8
+  call void @mir2asm_emit_load_int_reg(ptr %load43760, ptr %call43762, ptr %load43763, ptr %load43764)
+  %load43765 = load ptr, ptr %b, align 8
+  %load43766 = load ptr, ptr %ty, align 8
+  %call43767 = call ptr @mir2asm_cx(ptr %load43766)
+  %load43768 = load ptr, ptr %right, align 8
+  %load43769 = load ptr, ptr %ty, align 8
+  %call43770 = call ptr @mir2asm_emit_prepare_int_operand(ptr %load43765, ptr %call43767, ptr %load43768, ptr %load43769)
   %right_op = alloca ptr, align 8
-  store ptr %call43383, ptr %right_op, align 8
-  %load43384 = load ptr, ptr %b, align 8
-  %load43386 = load ptr, ptr %ty, align 8
-  %call43387 = call ptr @mir2asm_acc(ptr %load43386)
-  %call43388 = call ptr @vix_string_concat(ptr @.strlit43385, ptr %call43387)
-  %call43390 = call ptr @vix_string_concat(ptr %call43388, ptr @.strlit43389)
-  %load43391 = load ptr, ptr %right_op, align 8
-  %call43392 = call ptr @vix_string_concat(ptr %call43390, ptr %load43391)
-  call void @mir2asm_line(ptr %load43384, ptr %call43392)
-  %load43393 = load ptr, ptr %b, align 8
-  %load43395 = load ptr, ptr %pred, align 8
-  %call43396 = call ptr @mir2asm_icmp_setcc(ptr %load43395)
-  %call43397 = call ptr @vix_string_concat(ptr @.strlit43394, ptr %call43396)
-  %call43399 = call ptr @vix_string_concat(ptr %call43397, ptr @.strlit43398)
-  call void @mir2asm_line(ptr %load43393, ptr %call43399)
-  %load43400 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load43400, ptr @.strlit43401)
-  %load43402 = load ptr, ptr %b, align 8
-  %load43404 = load ptr, ptr %b, align 8
-  %field43406 = getelementptr %MirAsm, ptr %load43404, i32 0, i32 6
-  %fieldval43407 = load ptr, ptr %field43406, align 8
-  %load43408 = load ptr, ptr %b, align 8
-  %load43409 = load ptr, ptr %dest, align 8
-  %call43410 = call i32 @mir2asm_find_name(ptr %load43408, ptr %load43409)
-  %idx43411 = getelementptr i32, ptr %fieldval43407, i32 %call43410
-  %loadidx43412 = load i32, ptr %idx43411, align 4
-  %call43413 = call ptr @mir2asm_mem(i32 %loadidx43412)
-  %call43414 = call ptr @vix_string_concat(ptr @.strlit43403, ptr %call43413)
-  %call43416 = call ptr @vix_string_concat(ptr %call43414, ptr @.strlit43415)
-  call void @mir2asm_line(ptr %load43402, ptr %call43416)
+  store ptr %call43770, ptr %right_op, align 8
+  %load43771 = load ptr, ptr %b, align 8
+  %load43773 = load ptr, ptr %ty, align 8
+  %call43774 = call ptr @mir2asm_acc(ptr %load43773)
+  %call43775 = call ptr @vix_string_concat(ptr @.strlit43772, ptr %call43774)
+  %call43777 = call ptr @vix_string_concat(ptr %call43775, ptr @.strlit43776)
+  %load43778 = load ptr, ptr %right_op, align 8
+  %call43779 = call ptr @vix_string_concat(ptr %call43777, ptr %load43778)
+  call void @mir2asm_line(ptr %load43771, ptr %call43779)
+  %load43780 = load ptr, ptr %b, align 8
+  %load43782 = load ptr, ptr %pred, align 8
+  %call43783 = call ptr @mir2asm_icmp_setcc(ptr %load43782)
+  %call43784 = call ptr @vix_string_concat(ptr @.strlit43781, ptr %call43783)
+  %call43786 = call ptr @vix_string_concat(ptr %call43784, ptr @.strlit43785)
+  call void @mir2asm_line(ptr %load43780, ptr %call43786)
+  %load43787 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43787, ptr @.strlit43788)
+  %load43789 = load ptr, ptr %b, align 8
+  %load43791 = load ptr, ptr %b, align 8
+  %field43793 = getelementptr %MirAsm, ptr %load43791, i32 0, i32 6
+  %fieldval43794 = load ptr, ptr %field43793, align 8
+  %load43795 = load ptr, ptr %b, align 8
+  %load43796 = load ptr, ptr %dest, align 8
+  %call43797 = call i32 @mir2asm_find_name(ptr %load43795, ptr %load43796)
+  %idx43798 = getelementptr i32, ptr %fieldval43794, i32 %call43797
+  %loadidx43799 = load i32, ptr %idx43798, align 4
+  %call43800 = call ptr @mir2asm_mem(i32 %loadidx43799)
+  %call43801 = call ptr @vix_string_concat(ptr @.strlit43790, ptr %call43800)
+  %call43803 = call ptr @vix_string_concat(ptr %call43801, ptr @.strlit43802)
+  call void @mir2asm_line(ptr %load43789, ptr %call43803)
   ret void
 
-or.true:                                          ; preds = %or.rhs, %if.end6942
+or.true:                                          ; preds = %or.rhs, %if.end7007
   br label %or.merge
 
-or.rhs:                                           ; preds = %if.end6942
-  %load43348 = load i32, ptr %comma, align 4
-  %cmp43349 = icmp slt i32 %load43348, 0
-  %bool43350 = zext i1 %cmp43349 to i32
-  %cond43351 = icmp ne i32 %bool43350, 0
-  br i1 %cond43351, label %or.true, label %or.merge
+or.rhs:                                           ; preds = %if.end7007
+  %load43735 = load i32, ptr %comma, align 4
+  %cmp43736 = icmp slt i32 %load43735, 0
+  %bool43737 = zext i1 %cmp43736 to i32
+  %cond43738 = icmp ne i32 %bool43737, 0
+  br i1 %cond43738, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval43352 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond43353 = icmp ne i32 %orval43352, 0
-  br i1 %cond43353, label %if.then6943, label %if.else6944
+  %orval43739 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond43740 = icmp ne i32 %orval43739, 0
+  br i1 %cond43740, label %if.then7008, label %if.else7009
+}
+
+define ptr @mir2asm_fcmp_setcc(ptr %0) {
+entry:
+  %pred = alloca ptr, align 8
+  store ptr %0, ptr %pred, align 8
+  %load43804 = load ptr, ptr %pred, align 8
+  %strcmp43806 = call i32 @strcmp(ptr %load43804, ptr @.strlit43805)
+  %cmp43807 = icmp eq i32 %strcmp43806, 0
+  %bool43808 = zext i1 %cmp43807 to i32
+  %cond43809 = icmp ne i32 %bool43808, 0
+  br i1 %cond43809, label %or.true, label %or.rhs
+
+if.then7011:                                      ; preds = %or.merge
+  ret ptr @.strlit43818
+
+if.else7012:                                      ; preds = %or.merge
+  br label %if.end7013
+
+if.end7013:                                       ; preds = %if.else7012
+  %load43819 = load ptr, ptr %pred, align 8
+  %strcmp43821 = call i32 @strcmp(ptr %load43819, ptr @.strlit43820)
+  %cmp43822 = icmp eq i32 %strcmp43821, 0
+  %bool43823 = zext i1 %cmp43822 to i32
+  %cond43824 = icmp ne i32 %bool43823, 0
+  br i1 %cond43824, label %or.true1, label %or.rhs2
+
+or.true:                                          ; preds = %or.rhs, %entry
+  br label %or.merge
+
+or.rhs:                                           ; preds = %entry
+  %load43810 = load ptr, ptr %pred, align 8
+  %strcmp43812 = call i32 @strcmp(ptr %load43810, ptr @.strlit43811)
+  %cmp43813 = icmp eq i32 %strcmp43812, 0
+  %bool43814 = zext i1 %cmp43813 to i32
+  %cond43815 = icmp ne i32 %bool43814, 0
+  br i1 %cond43815, label %or.true, label %or.merge
+
+or.merge:                                         ; preds = %or.true, %or.rhs
+  %orval43816 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond43817 = icmp ne i32 %orval43816, 0
+  br i1 %cond43817, label %if.then7011, label %if.else7012
+
+if.then7014:                                      ; preds = %or.merge3
+  ret ptr @.strlit43833
+
+if.else7015:                                      ; preds = %or.merge3
+  br label %if.end7016
+
+if.end7016:                                       ; preds = %if.else7015
+  %load43834 = load ptr, ptr %pred, align 8
+  %strcmp43836 = call i32 @strcmp(ptr %load43834, ptr @.strlit43835)
+  %cmp43837 = icmp eq i32 %strcmp43836, 0
+  %bool43838 = zext i1 %cmp43837 to i32
+  %cond43839 = icmp ne i32 %bool43838, 0
+  br i1 %cond43839, label %if.then7017, label %if.else7018
+
+or.true1:                                         ; preds = %or.rhs2, %if.end7013
+  br label %or.merge3
+
+or.rhs2:                                          ; preds = %if.end7013
+  %load43825 = load ptr, ptr %pred, align 8
+  %strcmp43827 = call i32 @strcmp(ptr %load43825, ptr @.strlit43826)
+  %cmp43828 = icmp eq i32 %strcmp43827, 0
+  %bool43829 = zext i1 %cmp43828 to i32
+  %cond43830 = icmp ne i32 %bool43829, 0
+  br i1 %cond43830, label %or.true1, label %or.merge3
+
+or.merge3:                                        ; preds = %or.true1, %or.rhs2
+  %orval43831 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond43832 = icmp ne i32 %orval43831, 0
+  br i1 %cond43832, label %if.then7014, label %if.else7015
+
+if.then7017:                                      ; preds = %if.end7016
+  ret ptr @.strlit43840
+
+if.else7018:                                      ; preds = %if.end7016
+  br label %if.end7019
+
+if.end7019:                                       ; preds = %if.else7018
+  %load43841 = load ptr, ptr %pred, align 8
+  %strcmp43843 = call i32 @strcmp(ptr %load43841, ptr @.strlit43842)
+  %cmp43844 = icmp eq i32 %strcmp43843, 0
+  %bool43845 = zext i1 %cmp43844 to i32
+  %cond43846 = icmp ne i32 %bool43845, 0
+  br i1 %cond43846, label %if.then7020, label %if.else7021
+
+if.then7020:                                      ; preds = %if.end7019
+  ret ptr @.strlit43847
+
+if.else7021:                                      ; preds = %if.end7019
+  br label %if.end7022
+
+if.end7022:                                       ; preds = %if.else7021
+  %load43848 = load ptr, ptr %pred, align 8
+  %strcmp43850 = call i32 @strcmp(ptr %load43848, ptr @.strlit43849)
+  %cmp43851 = icmp eq i32 %strcmp43850, 0
+  %bool43852 = zext i1 %cmp43851 to i32
+  %cond43853 = icmp ne i32 %bool43852, 0
+  br i1 %cond43853, label %if.then7023, label %if.else7024
+
+if.then7023:                                      ; preds = %if.end7022
+  ret ptr @.strlit43854
+
+if.else7024:                                      ; preds = %if.end7022
+  br label %if.end7025
+
+if.end7025:                                       ; preds = %if.else7024
+  ret ptr @.strlit43855
+}
+
+define void @mir2asm_emit_fcmp(ptr %0, ptr %1, ptr %2) {
+entry:
+  %b = alloca ptr, align 8
+  store ptr %0, ptr %b, align 8
+  %dest = alloca ptr, align 8
+  store ptr %1, ptr %dest, align 8
+  %rhs = alloca ptr, align 8
+  store ptr %2, ptr %rhs, align 8
+  %load43856 = load ptr, ptr %rhs, align 8
+  %call43857 = call i32 @mir2asm_find(ptr %load43856, i8 32, i32 0)
+  %p = alloca i32, align 4
+  store i32 %call43857, ptr %p, align 4
+  %load43858 = load i32, ptr %p, align 4
+  %cmp43859 = icmp slt i32 %load43858, 0
+  %bool43860 = zext i1 %cmp43859 to i32
+  %cond43861 = icmp ne i32 %bool43860, 0
+  br i1 %cond43861, label %if.then7026, label %if.else7027
+
+if.then7026:                                      ; preds = %entry
+  ret void
+
+if.else7027:                                      ; preds = %entry
+  br label %if.end7028
+
+if.end7028:                                       ; preds = %if.else7027
+  %load43862 = load ptr, ptr %rhs, align 8
+  %load43863 = load i32, ptr %p, align 4
+  %add43864 = add i32 %load43863, 1
+  %call43865 = call ptr @mir2asm_after(ptr %load43862, i32 %add43864)
+  %call43866 = call ptr @mir2asm_trim(ptr %call43865)
+  %rest = alloca ptr, align 8
+  store ptr %call43866, ptr %rest, align 8
+  %load43867 = load ptr, ptr %rest, align 8
+  %call43868 = call i32 @mir2asm_find(ptr %load43867, i8 32, i32 0)
+  store i32 %call43868, ptr %p, align 4
+  %load43869 = load i32, ptr %p, align 4
+  %cmp43870 = icmp slt i32 %load43869, 0
+  %bool43871 = zext i1 %cmp43870 to i32
+  %cond43872 = icmp ne i32 %bool43871, 0
+  br i1 %cond43872, label %if.then7029, label %if.else7030
+
+if.then7029:                                      ; preds = %if.end7028
+  ret void
+
+if.else7030:                                      ; preds = %if.end7028
+  br label %if.end7031
+
+if.end7031:                                       ; preds = %if.else7030
+  %load43873 = load ptr, ptr %rest, align 8
+  %load43874 = load i32, ptr %p, align 4
+  %call43875 = call ptr @mir2asm_slice(ptr %load43873, i32 0, i32 %load43874)
+  %call43876 = call ptr @mir2asm_trim(ptr %call43875)
+  %pred = alloca ptr, align 8
+  store ptr %call43876, ptr %pred, align 8
+  %load43877 = load ptr, ptr %rest, align 8
+  %load43878 = load i32, ptr %p, align 4
+  %add43879 = add i32 %load43878, 1
+  %call43880 = call ptr @mir2asm_after(ptr %load43877, i32 %add43879)
+  %call43881 = call ptr @mir2asm_trim(ptr %call43880)
+  %typed = alloca ptr, align 8
+  store ptr %call43881, ptr %typed, align 8
+  %load43882 = load ptr, ptr %typed, align 8
+  %call43883 = call i32 @mir2asm_find(ptr %load43882, i8 32, i32 0)
+  store i32 %call43883, ptr %p, align 4
+  %load43884 = load ptr, ptr %typed, align 8
+  %load43885 = load i32, ptr %p, align 4
+  %call43886 = call i32 @mir2asm_find(ptr %load43884, i8 44, i32 %load43885)
+  %comma = alloca i32, align 4
+  store i32 %call43886, ptr %comma, align 4
+  %load43887 = load i32, ptr %p, align 4
+  %cmp43888 = icmp slt i32 %load43887, 0
+  %bool43889 = zext i1 %cmp43888 to i32
+  %cond43890 = icmp ne i32 %bool43889, 0
+  br i1 %cond43890, label %or.true, label %or.rhs
+
+if.then7032:                                      ; preds = %or.merge
+  ret void
+
+if.else7033:                                      ; preds = %or.merge
+  br label %if.end7034
+
+if.end7034:                                       ; preds = %if.else7033
+  %load43897 = load ptr, ptr %typed, align 8
+  %load43898 = load i32, ptr %p, align 4
+  %call43899 = call ptr @mir2asm_slice(ptr %load43897, i32 0, i32 %load43898)
+  %call43900 = call ptr @mir2asm_trim(ptr %call43899)
+  %ty = alloca ptr, align 8
+  store ptr %call43900, ptr %ty, align 8
+  %load43901 = load ptr, ptr %typed, align 8
+  %load43902 = load i32, ptr %p, align 4
+  %add43903 = add i32 %load43902, 1
+  %load43904 = load i32, ptr %comma, align 4
+  %call43905 = call ptr @mir2asm_slice(ptr %load43901, i32 %add43903, i32 %load43904)
+  %call43906 = call ptr @mir2asm_trim(ptr %call43905)
+  %left = alloca ptr, align 8
+  store ptr %call43906, ptr %left, align 8
+  %load43907 = load ptr, ptr %typed, align 8
+  %load43908 = load i32, ptr %comma, align 4
+  %add43909 = add i32 %load43908, 1
+  %call43910 = call ptr @mir2asm_after(ptr %load43907, i32 %add43909)
+  %call43911 = call ptr @mir2asm_trim(ptr %call43910)
+  %right = alloca ptr, align 8
+  store ptr %call43911, ptr %right, align 8
+  %load43912 = load ptr, ptr %b, align 8
+  %load43913 = load ptr, ptr %dest, align 8
+  %call43915 = call i32 @mir2asm_alloc_slot_typed(ptr %load43912, ptr %load43913, i32 0, ptr @.strlit43914)
+  %dest_off = alloca i32, align 4
+  store i32 %call43915, ptr %dest_off, align 4
+  %load43916 = load ptr, ptr %b, align 8
+  %load43918 = load ptr, ptr %left, align 8
+  %load43919 = load ptr, ptr %ty, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load43916, ptr @.strlit43917, ptr %load43918, ptr %load43919)
+  %load43920 = load ptr, ptr %b, align 8
+  %load43922 = load ptr, ptr %right, align 8
+  %load43923 = load ptr, ptr %ty, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load43920, ptr @.strlit43921, ptr %load43922, ptr %load43923)
+  %load43924 = load ptr, ptr %ty, align 8
+  %strcmp43926 = call i32 @strcmp(ptr %load43924, ptr @.strlit43925)
+  %cmp43927 = icmp eq i32 %strcmp43926, 0
+  %bool43928 = zext i1 %cmp43927 to i32
+  %cond43929 = icmp ne i32 %bool43928, 0
+  br i1 %cond43929, label %if.then7035, label %if.else7036
+
+or.true:                                          ; preds = %or.rhs, %if.end7031
+  br label %or.merge
+
+or.rhs:                                           ; preds = %if.end7031
+  %load43891 = load i32, ptr %comma, align 4
+  %cmp43892 = icmp slt i32 %load43891, 0
+  %bool43893 = zext i1 %cmp43892 to i32
+  %cond43894 = icmp ne i32 %bool43893, 0
+  br i1 %cond43894, label %or.true, label %or.merge
+
+or.merge:                                         ; preds = %or.true, %or.rhs
+  %orval43895 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond43896 = icmp ne i32 %orval43895, 0
+  br i1 %cond43896, label %if.then7032, label %if.else7033
+
+if.then7035:                                      ; preds = %if.end7034
+  %load43930 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43930, ptr @.strlit43931)
+  br label %if.end7037
+
+if.else7036:                                      ; preds = %if.end7034
+  %load43932 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43932, ptr @.strlit43933)
+  br label %if.end7037
+
+if.end7037:                                       ; preds = %if.else7036, %if.then7035
+  %load43934 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43934, ptr @.strlit43935)
+  %load43936 = load ptr, ptr %b, align 8
+  %load43938 = load ptr, ptr %pred, align 8
+  %call43939 = call ptr @mir2asm_fcmp_setcc(ptr %load43938)
+  %call43940 = call ptr @vix_string_concat(ptr @.strlit43937, ptr %call43939)
+  %call43942 = call ptr @vix_string_concat(ptr %call43940, ptr @.strlit43941)
+  call void @mir2asm_line(ptr %load43936, ptr %call43942)
+  %load43943 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43943, ptr @.strlit43944)
+  %load43945 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load43945, ptr @.strlit43946)
+  %load43947 = load ptr, ptr %b, align 8
+  %load43949 = load i32, ptr %dest_off, align 4
+  %call43950 = call ptr @mir2asm_mem(i32 %load43949)
+  %call43951 = call ptr @vix_string_concat(ptr @.strlit43948, ptr %call43950)
+  %call43953 = call ptr @vix_string_concat(ptr %call43951, ptr @.strlit43952)
+  call void @mir2asm_line(ptr %load43947, ptr %call43953)
+  ret void
+}
+
+define i32 @mir2asm_call_stack_bytes(ptr %0, i32 %1, i32 %2, i32 %3) {
+entry:
+  %rhs = alloca ptr, align 8
+  store ptr %0, ptr %rhs, align 8
+  %rp = alloca i32, align 4
+  store i32 %1, ptr %rp, align 4
+  %lp = alloca i32, align 4
+  store i32 %2, ptr %lp, align 4
+  %sret = alloca i32, align 4
+  store i32 %3, ptr %sret, align 4
+  %load43954 = load i32, ptr %lp, align 4
+  %add43955 = add i32 %load43954, 1
+  %pos = alloca i32, align 4
+  store i32 %add43955, ptr %pos, align 4
+  %ifexpr43956 = alloca i32, align 4
+  %load43957 = load i32, ptr %sret, align 4
+  %cmp43958 = icmp eq i32 %load43957, 1
+  %bool43959 = zext i1 %cmp43958 to i32
+  %cond43960 = icmp ne i32 %bool43959, 0
+  br i1 %cond43960, label %ifexpr.then7038, label %ifexpr.else7039
+
+ifexpr.then7038:                                  ; preds = %entry
+  store i32 1, ptr %ifexpr43956, align 4
+  br label %ifexpr.end7040
+
+ifexpr.else7039:                                  ; preds = %entry
+  store i32 0, ptr %ifexpr43956, align 4
+  br label %ifexpr.end7040
+
+ifexpr.end7040:                                   ; preds = %ifexpr.else7039, %ifexpr.then7038
+  %ifexprval43961 = load i32, ptr %ifexpr43956, align 4
+  %arg = alloca i32, align 4
+  store i32 %ifexprval43961, ptr %arg, align 4
+  %float_arg = alloca i32, align 4
+  store i32 0, ptr %float_arg, align 4
+  %stack_count = alloca i32, align 4
+  store i32 0, ptr %stack_count, align 4
+  br label %while.cond7041
+
+while.cond7041:                                   ; preds = %if.end7049, %ifexpr.end7040
+  %load43962 = load i32, ptr %rp, align 4
+  %cmp43963 = icmp sgt i32 %load43962, 0
+  %bool43964 = zext i1 %cmp43963 to i32
+  %cond43965 = icmp ne i32 %bool43964, 0
+  br i1 %cond43965, label %and.rhs, label %and.false
+
+while.body7042:                                   ; preds = %and.merge
+  %load43973 = load ptr, ptr %rhs, align 8
+  %load43974 = load i32, ptr %pos, align 4
+  %call43975 = call i32 @mir2asm_find(ptr %load43973, i8 44, i32 %load43974)
+  %comma = alloca i32, align 4
+  store i32 %call43975, ptr %comma, align 4
+  %ifexpr43976 = alloca i32, align 4
+  %load43977 = load i32, ptr %comma, align 4
+  %cmp43978 = icmp slt i32 %load43977, 0
+  %bool43979 = zext i1 %cmp43978 to i32
+  %cond43980 = icmp ne i32 %bool43979, 0
+  br i1 %cond43980, label %or.true, label %or.rhs
+
+while.end7043:                                    ; preds = %and.merge
+  %load44029 = load i32, ptr %stack_count, align 4
+  %mul44030 = mul i32 %load44029, 8
+  %call44031 = call i32 @mir2asm_align_to(i32 %mul44030, i32 16)
+  ret i32 %call44031
+
+and.rhs:                                          ; preds = %while.cond7041
+  %load43966 = load i32, ptr %pos, align 4
+  %load43967 = load i32, ptr %rp, align 4
+  %cmp43968 = icmp slt i32 %load43966, %load43967
+  %bool43969 = zext i1 %cmp43968 to i32
+  %cond43970 = icmp ne i32 %bool43969, 0
+  br i1 %cond43970, label %and.merge, label %and.false
+
+and.false:                                        ; preds = %and.rhs, %while.cond7041
+  br label %and.merge
+
+and.merge:                                        ; preds = %and.false, %and.rhs
+  %andval43971 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond43972 = icmp ne i32 %andval43971, 0
+  br i1 %cond43972, label %while.body7042, label %while.end7043
+
+ifexpr.then7044:                                  ; preds = %or.merge
+  %load43988 = load i32, ptr %rp, align 4
+  store i32 %load43988, ptr %ifexpr43976, align 4
+  br label %ifexpr.end7046
+
+ifexpr.else7045:                                  ; preds = %or.merge
+  %load43989 = load i32, ptr %comma, align 4
+  store i32 %load43989, ptr %ifexpr43976, align 4
+  br label %ifexpr.end7046
+
+ifexpr.end7046:                                   ; preds = %ifexpr.else7045, %ifexpr.then7044
+  %ifexprval43990 = load i32, ptr %ifexpr43976, align 4
+  %end = alloca i32, align 4
+  store i32 %ifexprval43990, ptr %end, align 4
+  %load43991 = load ptr, ptr %rhs, align 8
+  %load43992 = load i32, ptr %pos, align 4
+  %load43993 = load i32, ptr %end, align 4
+  %call43994 = call ptr @mir2asm_slice(ptr %load43991, i32 %load43992, i32 %load43993)
+  %call43995 = call ptr @mir2asm_trim(ptr %call43994)
+  %part = alloca ptr, align 8
+  store ptr %call43995, ptr %part, align 8
+  %load43996 = load ptr, ptr %part, align 8
+  %call43997 = call i32 @mir2asm_find(ptr %load43996, i8 32, i32 0)
+  %sp = alloca i32, align 4
+  store i32 %call43997, ptr %sp, align 4
+  %load43998 = load i32, ptr %sp, align 4
+  %cmp43999 = icmp sge i32 %load43998, 0
+  %bool44000 = zext i1 %cmp43999 to i32
+  %cond44001 = icmp ne i32 %bool44000, 0
+  br i1 %cond44001, label %if.then7047, label %if.else7048
+
+or.true:                                          ; preds = %or.rhs, %while.body7042
+  br label %or.merge
+
+or.rhs:                                           ; preds = %while.body7042
+  %load43981 = load i32, ptr %comma, align 4
+  %load43982 = load i32, ptr %rp, align 4
+  %cmp43983 = icmp sgt i32 %load43981, %load43982
+  %bool43984 = zext i1 %cmp43983 to i32
+  %cond43985 = icmp ne i32 %bool43984, 0
+  br i1 %cond43985, label %or.true, label %or.merge
+
+or.merge:                                         ; preds = %or.true, %or.rhs
+  %orval43986 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond43987 = icmp ne i32 %orval43986, 0
+  br i1 %cond43987, label %ifexpr.then7044, label %ifexpr.else7045
+
+if.then7047:                                      ; preds = %ifexpr.end7046
+  %load44002 = load ptr, ptr %part, align 8
+  %load44003 = load i32, ptr %sp, align 4
+  %call44004 = call ptr @mir2asm_slice(ptr %load44002, i32 0, i32 %load44003)
+  %call44005 = call ptr @mir2asm_trim(ptr %call44004)
+  %arg_ty = alloca ptr, align 8
+  store ptr %call44005, ptr %arg_ty, align 8
+  %load44006 = load ptr, ptr %arg_ty, align 8
+  %call44007 = call i32 @mir2asm_type_is_float(ptr %load44006)
+  %cmp44008 = icmp eq i32 %call44007, 1
+  %bool44009 = zext i1 %cmp44008 to i32
+  %cond44010 = icmp ne i32 %bool44009, 0
+  br i1 %cond44010, label %if.then7050, label %if.else7051
+
+if.else7048:                                      ; preds = %ifexpr.end7046
+  br label %if.end7049
+
+if.end7049:                                       ; preds = %if.else7048, %if.end7052
+  %load44027 = load i32, ptr %end, align 4
+  %add44028 = add i32 %load44027, 1
+  store i32 %add44028, ptr %pos, align 4
+  br label %while.cond7041
+
+if.then7050:                                      ; preds = %if.then7047
+  %load44011 = load i32, ptr %float_arg, align 4
+  %cmp44012 = icmp sge i32 %load44011, 8
+  %bool44013 = zext i1 %cmp44012 to i32
+  %cond44014 = icmp ne i32 %bool44013, 0
+  br i1 %cond44014, label %if.then7053, label %if.else7054
+
+if.else7051:                                      ; preds = %if.then7047
+  %load44019 = load i32, ptr %arg, align 4
+  %cmp44020 = icmp sge i32 %load44019, 6
+  %bool44021 = zext i1 %cmp44020 to i32
+  %cond44022 = icmp ne i32 %bool44021, 0
+  br i1 %cond44022, label %if.then7056, label %if.else7057
+
+if.end7052:                                       ; preds = %if.end7058, %if.end7055
+  br label %if.end7049
+
+if.then7053:                                      ; preds = %if.then7050
+  %load44015 = load i32, ptr %stack_count, align 4
+  %add44016 = add i32 %load44015, 1
+  store i32 %add44016, ptr %stack_count, align 4
+  br label %if.end7055
+
+if.else7054:                                      ; preds = %if.then7050
+  br label %if.end7055
+
+if.end7055:                                       ; preds = %if.else7054, %if.then7053
+  %load44017 = load i32, ptr %float_arg, align 4
+  %add44018 = add i32 %load44017, 1
+  store i32 %add44018, ptr %float_arg, align 4
+  br label %if.end7052
+
+if.then7056:                                      ; preds = %if.else7051
+  %load44023 = load i32, ptr %stack_count, align 4
+  %add44024 = add i32 %load44023, 1
+  store i32 %add44024, ptr %stack_count, align 4
+  br label %if.end7058
+
+if.else7057:                                      ; preds = %if.else7051
+  br label %if.end7058
+
+if.end7058:                                       ; preds = %if.else7057, %if.then7056
+  %load44025 = load i32, ptr %arg, align 4
+  %add44026 = add i32 %load44025, 1
+  store i32 %add44026, ptr %arg, align 4
+  br label %if.end7052
 }
 
 define void @mir2asm_emit_syscall(ptr %0, ptr %1, ptr %2) {
@@ -82541,200 +83827,200 @@ entry:
   store ptr %1, ptr %dest, align 8
   %rhs = alloca ptr, align 8
   store ptr %2, ptr %rhs, align 8
-  %load43417 = load ptr, ptr %rhs, align 8
-  %call43418 = call i32 @mir2asm_find(ptr %load43417, i8 40, i32 0)
+  %load44032 = load ptr, ptr %rhs, align 8
+  %call44033 = call i32 @mir2asm_find(ptr %load44032, i8 40, i32 0)
   %lp = alloca i32, align 4
-  store i32 %call43418, ptr %lp, align 4
-  %load43419 = load ptr, ptr %rhs, align 8
-  %load43420 = load i32, ptr %lp, align 4
-  %call43421 = call i32 @mir2asm_find_matching_paren(ptr %load43419, i32 %load43420)
+  store i32 %call44033, ptr %lp, align 4
+  %load44034 = load ptr, ptr %rhs, align 8
+  %load44035 = load i32, ptr %lp, align 4
+  %call44036 = call i32 @mir2asm_find_matching_paren(ptr %load44034, i32 %load44035)
   %rp = alloca i32, align 4
-  store i32 %call43421, ptr %rp, align 4
-  %load43422 = load i32, ptr %lp, align 4
-  %cmp43423 = icmp slt i32 %load43422, 0
-  %bool43424 = zext i1 %cmp43423 to i32
-  %cond43425 = icmp ne i32 %bool43424, 0
-  br i1 %cond43425, label %or.true, label %or.rhs
+  store i32 %call44036, ptr %rp, align 4
+  %load44037 = load i32, ptr %lp, align 4
+  %cmp44038 = icmp slt i32 %load44037, 0
+  %bool44039 = zext i1 %cmp44038 to i32
+  %cond44040 = icmp ne i32 %bool44039, 0
+  br i1 %cond44040, label %or.true, label %or.rhs
 
-if.then6946:                                      ; preds = %or.merge
+if.then7059:                                      ; preds = %or.merge
   ret void
 
-if.else6947:                                      ; preds = %or.merge
-  br label %if.end6948
+if.else7060:                                      ; preds = %or.merge
+  br label %if.end7061
 
-if.end6948:                                       ; preds = %if.else6947
-  %load43432 = load i32, ptr %lp, align 4
-  %add43433 = add i32 %load43432, 1
+if.end7061:                                       ; preds = %if.else7060
+  %load44047 = load i32, ptr %lp, align 4
+  %add44048 = add i32 %load44047, 1
   %pos = alloca i32, align 4
-  store i32 %add43433, ptr %pos, align 4
+  store i32 %add44048, ptr %pos, align 4
   %arg = alloca i32, align 4
   store i32 0, ptr %arg, align 4
-  br label %while.cond6949
+  br label %while.cond7062
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load43426 = load i32, ptr %rp, align 4
-  %cmp43427 = icmp slt i32 %load43426, 0
-  %bool43428 = zext i1 %cmp43427 to i32
-  %cond43429 = icmp ne i32 %bool43428, 0
-  br i1 %cond43429, label %or.true, label %or.merge
+  %load44041 = load i32, ptr %rp, align 4
+  %cmp44042 = icmp slt i32 %load44041, 0
+  %bool44043 = zext i1 %cmp44042 to i32
+  %cond44044 = icmp ne i32 %bool44043, 0
+  br i1 %cond44044, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval43430 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond43431 = icmp ne i32 %orval43430, 0
-  br i1 %cond43431, label %if.then6946, label %if.else6947
+  %orval44045 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond44046 = icmp ne i32 %orval44045, 0
+  br i1 %cond44046, label %if.then7059, label %if.else7060
 
-while.cond6949:                                   ; preds = %if.end6957, %if.end6948
-  %load43434 = load i32, ptr %pos, align 4
-  %load43435 = load i32, ptr %rp, align 4
-  %cmp43436 = icmp slt i32 %load43434, %load43435
-  %bool43437 = zext i1 %cmp43436 to i32
-  %cond43438 = icmp ne i32 %bool43437, 0
-  br i1 %cond43438, label %and.rhs, label %and.false
+while.cond7062:                                   ; preds = %if.end7070, %if.end7061
+  %load44049 = load i32, ptr %pos, align 4
+  %load44050 = load i32, ptr %rp, align 4
+  %cmp44051 = icmp slt i32 %load44049, %load44050
+  %bool44052 = zext i1 %cmp44051 to i32
+  %cond44053 = icmp ne i32 %bool44052, 0
+  br i1 %cond44053, label %and.rhs, label %and.false
 
-while.body6950:                                   ; preds = %and.merge
-  %load43445 = load ptr, ptr %rhs, align 8
-  %load43446 = load i32, ptr %pos, align 4
-  %call43447 = call i32 @mir2asm_find(ptr %load43445, i8 44, i32 %load43446)
+while.body7063:                                   ; preds = %and.merge
+  %load44060 = load ptr, ptr %rhs, align 8
+  %load44061 = load i32, ptr %pos, align 4
+  %call44062 = call i32 @mir2asm_find(ptr %load44060, i8 44, i32 %load44061)
   %comma = alloca i32, align 4
-  store i32 %call43447, ptr %comma, align 4
-  %ifexpr43448 = alloca i32, align 4
-  %load43449 = load i32, ptr %comma, align 4
-  %cmp43450 = icmp slt i32 %load43449, 0
-  %bool43451 = zext i1 %cmp43450 to i32
-  %cond43452 = icmp ne i32 %bool43451, 0
-  br i1 %cond43452, label %or.true1, label %or.rhs2
+  store i32 %call44062, ptr %comma, align 4
+  %ifexpr44063 = alloca i32, align 4
+  %load44064 = load i32, ptr %comma, align 4
+  %cmp44065 = icmp slt i32 %load44064, 0
+  %bool44066 = zext i1 %cmp44065 to i32
+  %cond44067 = icmp ne i32 %bool44066, 0
+  br i1 %cond44067, label %or.true1, label %or.rhs2
 
-while.end6951:                                    ; preds = %and.merge
-  %load43499 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load43499, ptr @.strlit43500)
-  %load43501 = load ptr, ptr %dest, align 8
-  %strcmp43503 = call i32 @strcmp(ptr %load43501, ptr @.strlit43502)
-  %cmp43504 = icmp eq i32 %strcmp43503, 0
-  %bool43505 = zext i1 %cmp43504 to i32
-  %cmp43506 = icmp eq i32 %bool43505, 0
-  %bool43507 = zext i1 %cmp43506 to i32
-  %cond43508 = icmp ne i32 %bool43507, 0
-  br i1 %cond43508, label %if.then6958, label %if.else6959
+while.end7064:                                    ; preds = %and.merge
+  %load44114 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load44114, ptr @.strlit44115)
+  %load44116 = load ptr, ptr %dest, align 8
+  %strcmp44118 = call i32 @strcmp(ptr %load44116, ptr @.strlit44117)
+  %cmp44119 = icmp eq i32 %strcmp44118, 0
+  %bool44120 = zext i1 %cmp44119 to i32
+  %cmp44121 = icmp eq i32 %bool44120, 0
+  %bool44122 = zext i1 %cmp44121 to i32
+  %cond44123 = icmp ne i32 %bool44122, 0
+  br i1 %cond44123, label %if.then7071, label %if.else7072
 
-and.rhs:                                          ; preds = %while.cond6949
-  %load43439 = load i32, ptr %arg, align 4
-  %cmp43440 = icmp slt i32 %load43439, 7
-  %bool43441 = zext i1 %cmp43440 to i32
-  %cond43442 = icmp ne i32 %bool43441, 0
-  br i1 %cond43442, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %while.cond7062
+  %load44054 = load i32, ptr %arg, align 4
+  %cmp44055 = icmp slt i32 %load44054, 7
+  %bool44056 = zext i1 %cmp44055 to i32
+  %cond44057 = icmp ne i32 %bool44056, 0
+  br i1 %cond44057, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %while.cond6949
+and.false:                                        ; preds = %and.rhs, %while.cond7062
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval43443 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond43444 = icmp ne i32 %andval43443, 0
-  br i1 %cond43444, label %while.body6950, label %while.end6951
+  %andval44058 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond44059 = icmp ne i32 %andval44058, 0
+  br i1 %cond44059, label %while.body7063, label %while.end7064
 
-ifexpr.then6952:                                  ; preds = %or.merge3
-  %load43460 = load i32, ptr %rp, align 4
-  store i32 %load43460, ptr %ifexpr43448, align 4
-  br label %ifexpr.end6954
+ifexpr.then7065:                                  ; preds = %or.merge3
+  %load44075 = load i32, ptr %rp, align 4
+  store i32 %load44075, ptr %ifexpr44063, align 4
+  br label %ifexpr.end7067
 
-ifexpr.else6953:                                  ; preds = %or.merge3
-  %load43461 = load i32, ptr %comma, align 4
-  store i32 %load43461, ptr %ifexpr43448, align 4
-  br label %ifexpr.end6954
+ifexpr.else7066:                                  ; preds = %or.merge3
+  %load44076 = load i32, ptr %comma, align 4
+  store i32 %load44076, ptr %ifexpr44063, align 4
+  br label %ifexpr.end7067
 
-ifexpr.end6954:                                   ; preds = %ifexpr.else6953, %ifexpr.then6952
-  %ifexprval43462 = load i32, ptr %ifexpr43448, align 4
+ifexpr.end7067:                                   ; preds = %ifexpr.else7066, %ifexpr.then7065
+  %ifexprval44077 = load i32, ptr %ifexpr44063, align 4
   %end = alloca i32, align 4
-  store i32 %ifexprval43462, ptr %end, align 4
-  %load43463 = load ptr, ptr %rhs, align 8
-  %load43464 = load i32, ptr %pos, align 4
-  %load43465 = load i32, ptr %end, align 4
-  %call43466 = call ptr @mir2asm_slice(ptr %load43463, i32 %load43464, i32 %load43465)
-  %call43467 = call ptr @mir2asm_trim(ptr %call43466)
+  store i32 %ifexprval44077, ptr %end, align 4
+  %load44078 = load ptr, ptr %rhs, align 8
+  %load44079 = load i32, ptr %pos, align 4
+  %load44080 = load i32, ptr %end, align 4
+  %call44081 = call ptr @mir2asm_slice(ptr %load44078, i32 %load44079, i32 %load44080)
+  %call44082 = call ptr @mir2asm_trim(ptr %call44081)
   %part = alloca ptr, align 8
-  store ptr %call43467, ptr %part, align 8
-  %load43468 = load ptr, ptr %part, align 8
-  %call43469 = call i32 @mir2asm_find(ptr %load43468, i8 32, i32 0)
+  store ptr %call44082, ptr %part, align 8
+  %load44083 = load ptr, ptr %part, align 8
+  %call44084 = call i32 @mir2asm_find(ptr %load44083, i8 32, i32 0)
   %sp = alloca i32, align 4
-  store i32 %call43469, ptr %sp, align 4
-  %load43470 = load i32, ptr %sp, align 4
-  %cmp43471 = icmp sge i32 %load43470, 0
-  %bool43472 = zext i1 %cmp43471 to i32
-  %cond43473 = icmp ne i32 %bool43472, 0
-  br i1 %cond43473, label %if.then6955, label %if.else6956
+  store i32 %call44084, ptr %sp, align 4
+  %load44085 = load i32, ptr %sp, align 4
+  %cmp44086 = icmp sge i32 %load44085, 0
+  %bool44087 = zext i1 %cmp44086 to i32
+  %cond44088 = icmp ne i32 %bool44087, 0
+  br i1 %cond44088, label %if.then7068, label %if.else7069
 
-or.true1:                                         ; preds = %or.rhs2, %while.body6950
+or.true1:                                         ; preds = %or.rhs2, %while.body7063
   br label %or.merge3
 
-or.rhs2:                                          ; preds = %while.body6950
-  %load43453 = load i32, ptr %comma, align 4
-  %load43454 = load i32, ptr %rp, align 4
-  %cmp43455 = icmp sgt i32 %load43453, %load43454
-  %bool43456 = zext i1 %cmp43455 to i32
-  %cond43457 = icmp ne i32 %bool43456, 0
-  br i1 %cond43457, label %or.true1, label %or.merge3
+or.rhs2:                                          ; preds = %while.body7063
+  %load44068 = load i32, ptr %comma, align 4
+  %load44069 = load i32, ptr %rp, align 4
+  %cmp44070 = icmp sgt i32 %load44068, %load44069
+  %bool44071 = zext i1 %cmp44070 to i32
+  %cond44072 = icmp ne i32 %bool44071, 0
+  br i1 %cond44072, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval43458 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond43459 = icmp ne i32 %orval43458, 0
-  br i1 %cond43459, label %ifexpr.then6952, label %ifexpr.else6953
+  %orval44073 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond44074 = icmp ne i32 %orval44073, 0
+  br i1 %cond44074, label %ifexpr.then7065, label %ifexpr.else7066
 
-if.then6955:                                      ; preds = %ifexpr.end6954
-  %load43474 = load ptr, ptr %part, align 8
-  %load43475 = load i32, ptr %sp, align 4
-  %call43476 = call ptr @mir2asm_slice(ptr %load43474, i32 0, i32 %load43475)
-  %call43477 = call ptr @mir2asm_trim(ptr %call43476)
+if.then7068:                                      ; preds = %ifexpr.end7067
+  %load44089 = load ptr, ptr %part, align 8
+  %load44090 = load i32, ptr %sp, align 4
+  %call44091 = call ptr @mir2asm_slice(ptr %load44089, i32 0, i32 %load44090)
+  %call44092 = call ptr @mir2asm_trim(ptr %call44091)
   %arg_ty = alloca ptr, align 8
-  store ptr %call43477, ptr %arg_ty, align 8
-  %load43478 = load ptr, ptr %part, align 8
-  %load43479 = load i32, ptr %sp, align 4
-  %add43480 = add i32 %load43479, 1
-  %call43481 = call ptr @mir2asm_after(ptr %load43478, i32 %add43480)
-  %call43482 = call ptr @mir2asm_trim(ptr %call43481)
+  store ptr %call44092, ptr %arg_ty, align 8
+  %load44093 = load ptr, ptr %part, align 8
+  %load44094 = load i32, ptr %sp, align 4
+  %add44095 = add i32 %load44094, 1
+  %call44096 = call ptr @mir2asm_after(ptr %load44093, i32 %add44095)
+  %call44097 = call ptr @mir2asm_trim(ptr %call44096)
   %val = alloca ptr, align 8
-  store ptr %call43482, ptr %val, align 8
-  %load43483 = load ptr, ptr %b, align 8
-  %load43485 = load i32, ptr %arg, align 4
-  %call43486 = call ptr @mir2asm_syscall_reg(i32 %load43485)
-  %call43487 = call ptr @vix_string_concat(ptr @.strlit43484, ptr %call43486)
-  %call43489 = call ptr @vix_string_concat(ptr %call43487, ptr @.strlit43488)
-  %load43490 = load ptr, ptr %b, align 8
-  %load43491 = load ptr, ptr %val, align 8
-  %load43492 = load ptr, ptr %arg_ty, align 8
-  %call43493 = call ptr @mir2asm_operand_typed(ptr %load43490, ptr %load43491, ptr %load43492)
-  %call43494 = call ptr @vix_string_concat(ptr %call43489, ptr %call43493)
-  call void @mir2asm_line(ptr %load43483, ptr %call43494)
-  %load43495 = load i32, ptr %arg, align 4
-  %add43496 = add i32 %load43495, 1
-  store i32 %add43496, ptr %arg, align 4
-  br label %if.end6957
+  store ptr %call44097, ptr %val, align 8
+  %load44098 = load ptr, ptr %b, align 8
+  %load44100 = load i32, ptr %arg, align 4
+  %call44101 = call ptr @mir2asm_syscall_reg(i32 %load44100)
+  %call44102 = call ptr @vix_string_concat(ptr @.strlit44099, ptr %call44101)
+  %call44104 = call ptr @vix_string_concat(ptr %call44102, ptr @.strlit44103)
+  %load44105 = load ptr, ptr %b, align 8
+  %load44106 = load ptr, ptr %val, align 8
+  %load44107 = load ptr, ptr %arg_ty, align 8
+  %call44108 = call ptr @mir2asm_operand_typed(ptr %load44105, ptr %load44106, ptr %load44107)
+  %call44109 = call ptr @vix_string_concat(ptr %call44104, ptr %call44108)
+  call void @mir2asm_line(ptr %load44098, ptr %call44109)
+  %load44110 = load i32, ptr %arg, align 4
+  %add44111 = add i32 %load44110, 1
+  store i32 %add44111, ptr %arg, align 4
+  br label %if.end7070
 
-if.else6956:                                      ; preds = %ifexpr.end6954
-  br label %if.end6957
+if.else7069:                                      ; preds = %ifexpr.end7067
+  br label %if.end7070
 
-if.end6957:                                       ; preds = %if.else6956, %if.then6955
-  %load43497 = load i32, ptr %end, align 4
-  %add43498 = add i32 %load43497, 1
-  store i32 %add43498, ptr %pos, align 4
-  br label %while.cond6949
+if.end7070:                                       ; preds = %if.else7069, %if.then7068
+  %load44112 = load i32, ptr %end, align 4
+  %add44113 = add i32 %load44112, 1
+  store i32 %add44113, ptr %pos, align 4
+  br label %while.cond7062
 
-if.then6958:                                      ; preds = %while.end6951
-  %load43509 = load ptr, ptr %b, align 8
-  %load43511 = load ptr, ptr %b, align 8
-  %load43512 = load ptr, ptr %dest, align 8
-  %call43514 = call i32 @mir2asm_alloc_slot_typed(ptr %load43511, ptr %load43512, i32 0, ptr @.strlit43513)
-  %call43515 = call ptr @mir2asm_mem(i32 %call43514)
-  %call43516 = call ptr @vix_string_concat(ptr @.strlit43510, ptr %call43515)
-  %call43518 = call ptr @vix_string_concat(ptr %call43516, ptr @.strlit43517)
-  call void @mir2asm_line(ptr %load43509, ptr %call43518)
-  br label %if.end6960
+if.then7071:                                      ; preds = %while.end7064
+  %load44124 = load ptr, ptr %b, align 8
+  %load44126 = load ptr, ptr %b, align 8
+  %load44127 = load ptr, ptr %dest, align 8
+  %call44129 = call i32 @mir2asm_alloc_slot_typed(ptr %load44126, ptr %load44127, i32 0, ptr @.strlit44128)
+  %call44130 = call ptr @mir2asm_mem(i32 %call44129)
+  %call44131 = call ptr @vix_string_concat(ptr @.strlit44125, ptr %call44130)
+  %call44133 = call ptr @vix_string_concat(ptr %call44131, ptr @.strlit44132)
+  call void @mir2asm_line(ptr %load44124, ptr %call44133)
+  br label %if.end7073
 
-if.else6959:                                      ; preds = %while.end6951
-  br label %if.end6960
+if.else7072:                                      ; preds = %while.end7064
+  br label %if.end7073
 
-if.end6960:                                       ; preds = %if.else6959, %if.then6958
+if.end7073:                                       ; preds = %if.else7072, %if.then7071
   ret void
 }
 
@@ -82746,697 +84032,871 @@ entry:
   store ptr %1, ptr %dest, align 8
   %rhs = alloca ptr, align 8
   store ptr %2, ptr %rhs, align 8
-  %load43519 = load ptr, ptr %rhs, align 8
-  %call43520 = call i32 @mir2asm_find(ptr %load43519, i8 64, i32 0)
+  %load44134 = load ptr, ptr %rhs, align 8
+  %call44135 = call i32 @mir2asm_find(ptr %load44134, i8 64, i32 0)
   %at = alloca i32, align 4
-  store i32 %call43520, ptr %at, align 4
-  %load43521 = load ptr, ptr %rhs, align 8
-  %load43522 = load i32, ptr %at, align 4
-  %call43523 = call i32 @mir2asm_find(ptr %load43521, i8 40, i32 %load43522)
+  store i32 %call44135, ptr %at, align 4
+  %load44136 = load ptr, ptr %rhs, align 8
+  %load44137 = load i32, ptr %at, align 4
+  %call44138 = call i32 @mir2asm_find(ptr %load44136, i8 40, i32 %load44137)
   %lp = alloca i32, align 4
-  store i32 %call43523, ptr %lp, align 4
-  %load43524 = load i32, ptr %at, align 4
-  %cmp43525 = icmp slt i32 %load43524, 0
-  %bool43526 = zext i1 %cmp43525 to i32
-  %cond43527 = icmp ne i32 %bool43526, 0
-  br i1 %cond43527, label %or.true, label %or.rhs
+  store i32 %call44138, ptr %lp, align 4
+  %load44139 = load i32, ptr %at, align 4
+  %cmp44140 = icmp slt i32 %load44139, 0
+  %bool44141 = zext i1 %cmp44140 to i32
+  %cond44142 = icmp ne i32 %bool44141, 0
+  br i1 %cond44142, label %or.true, label %or.rhs
 
-if.then6961:                                      ; preds = %or.merge
+if.then7074:                                      ; preds = %or.merge
   ret void
 
-if.else6962:                                      ; preds = %or.merge
-  br label %if.end6963
+if.else7075:                                      ; preds = %or.merge
+  br label %if.end7076
 
-if.end6963:                                       ; preds = %if.else6962
-  %load43534 = load ptr, ptr %rhs, align 8
-  %load43535 = load i32, ptr %at, align 4
-  %load43536 = load i32, ptr %lp, align 4
-  %call43537 = call ptr @mir2asm_slice(ptr %load43534, i32 %load43535, i32 %load43536)
-  %call43538 = call ptr @mir2asm_clean_name(ptr %call43537)
+if.end7076:                                       ; preds = %if.else7075
+  %load44149 = load ptr, ptr %rhs, align 8
+  %load44150 = load i32, ptr %at, align 4
+  %load44151 = load i32, ptr %lp, align 4
+  %call44152 = call ptr @mir2asm_slice(ptr %load44149, i32 %load44150, i32 %load44151)
+  %call44153 = call ptr @mir2asm_clean_name(ptr %call44152)
   %func = alloca ptr, align 8
-  store ptr %call43538, ptr %func, align 8
-  %load43539 = load ptr, ptr %func, align 8
-  %strcmp43541 = call i32 @strcmp(ptr %load43539, ptr @.strlit43540)
-  %cmp43542 = icmp eq i32 %strcmp43541, 0
-  %bool43543 = zext i1 %cmp43542 to i32
-  %cond43544 = icmp ne i32 %bool43543, 0
-  br i1 %cond43544, label %if.then6964, label %if.else6965
+  store ptr %call44153, ptr %func, align 8
+  %load44154 = load ptr, ptr %func, align 8
+  %strcmp44156 = call i32 @strcmp(ptr %load44154, ptr @.strlit44155)
+  %cmp44157 = icmp eq i32 %strcmp44156, 0
+  %bool44158 = zext i1 %cmp44157 to i32
+  %cond44159 = icmp ne i32 %bool44158, 0
+  br i1 %cond44159, label %if.then7077, label %if.else7078
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load43528 = load i32, ptr %lp, align 4
-  %cmp43529 = icmp slt i32 %load43528, 0
-  %bool43530 = zext i1 %cmp43529 to i32
-  %cond43531 = icmp ne i32 %bool43530, 0
-  br i1 %cond43531, label %or.true, label %or.merge
+  %load44143 = load i32, ptr %lp, align 4
+  %cmp44144 = icmp slt i32 %load44143, 0
+  %bool44145 = zext i1 %cmp44144 to i32
+  %cond44146 = icmp ne i32 %bool44145, 0
+  br i1 %cond44146, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval43532 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond43533 = icmp ne i32 %orval43532, 0
-  br i1 %cond43533, label %if.then6961, label %if.else6962
+  %orval44147 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond44148 = icmp ne i32 %orval44147, 0
+  br i1 %cond44148, label %if.then7074, label %if.else7075
 
-if.then6964:                                      ; preds = %if.end6963
-  %load43545 = load ptr, ptr %b, align 8
-  %load43546 = load ptr, ptr %dest, align 8
-  %load43547 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_syscall(ptr %load43545, ptr %load43546, ptr %load43547)
+if.then7077:                                      ; preds = %if.end7076
+  %load44160 = load ptr, ptr %b, align 8
+  %load44161 = load ptr, ptr %dest, align 8
+  %load44162 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_syscall(ptr %load44160, ptr %load44161, ptr %load44162)
   ret void
 
-if.else6965:                                      ; preds = %if.end6963
-  br label %if.end6966
+if.else7078:                                      ; preds = %if.end7076
+  br label %if.end7079
 
-if.end6966:                                       ; preds = %if.else6965
-  %load43548 = load ptr, ptr %rhs, align 8
-  %load43549 = load i32, ptr %lp, align 4
-  %call43550 = call i32 @mir2asm_find_matching_paren(ptr %load43548, i32 %load43549)
+if.end7079:                                       ; preds = %if.else7078
+  %load44163 = load ptr, ptr %rhs, align 8
+  %load44164 = load i32, ptr %lp, align 4
+  %call44165 = call i32 @mir2asm_find_matching_paren(ptr %load44163, i32 %load44164)
   %rp = alloca i32, align 4
-  store i32 %call43550, ptr %rp, align 4
-  %load43551 = load ptr, ptr %rhs, align 8
-  %load43552 = load i32, ptr %rp, align 4
-  %call43553 = call i32 @mir2asm_find(ptr %load43551, i8 58, i32 %load43552)
+  store i32 %call44165, ptr %rp, align 4
+  %load44166 = load ptr, ptr %rhs, align 8
+  %load44167 = load i32, ptr %rp, align 4
+  %call44168 = call i32 @mir2asm_find(ptr %load44166, i8 58, i32 %load44167)
   %colon = alloca i32, align 4
-  store i32 %call43553, ptr %colon, align 4
-  %ifexpr43554 = alloca ptr, align 8
-  %load43555 = load i32, ptr %colon, align 4
-  %cmp43556 = icmp sge i32 %load43555, 0
-  %bool43557 = zext i1 %cmp43556 to i32
-  %cond43558 = icmp ne i32 %bool43557, 0
-  br i1 %cond43558, label %ifexpr.then6967, label %ifexpr.else6968
+  store i32 %call44168, ptr %colon, align 4
+  %ifexpr44169 = alloca ptr, align 8
+  %load44170 = load i32, ptr %colon, align 4
+  %cmp44171 = icmp sge i32 %load44170, 0
+  %bool44172 = zext i1 %cmp44171 to i32
+  %cond44173 = icmp ne i32 %bool44172, 0
+  br i1 %cond44173, label %ifexpr.then7080, label %ifexpr.else7081
 
-ifexpr.then6967:                                  ; preds = %if.end6966
-  %load43559 = load ptr, ptr %rhs, align 8
-  %load43560 = load i32, ptr %colon, align 4
-  %add43561 = add i32 %load43560, 1
-  %call43562 = call ptr @mir2asm_after(ptr %load43559, i32 %add43561)
-  %call43563 = call ptr @mir2asm_trim(ptr %call43562)
-  store ptr %call43563, ptr %ifexpr43554, align 8
-  br label %ifexpr.end6969
+ifexpr.then7080:                                  ; preds = %if.end7079
+  %load44174 = load ptr, ptr %rhs, align 8
+  %load44175 = load i32, ptr %colon, align 4
+  %add44176 = add i32 %load44175, 1
+  %call44177 = call ptr @mir2asm_after(ptr %load44174, i32 %add44176)
+  %call44178 = call ptr @mir2asm_trim(ptr %call44177)
+  store ptr %call44178, ptr %ifexpr44169, align 8
+  br label %ifexpr.end7082
 
-ifexpr.else6968:                                  ; preds = %if.end6966
-  store ptr @.strlit43564, ptr %ifexpr43554, align 8
-  br label %ifexpr.end6969
+ifexpr.else7081:                                  ; preds = %if.end7079
+  store ptr @.strlit44179, ptr %ifexpr44169, align 8
+  br label %ifexpr.end7082
 
-ifexpr.end6969:                                   ; preds = %ifexpr.else6968, %ifexpr.then6967
-  %ifexprval43565 = load ptr, ptr %ifexpr43554, align 8
+ifexpr.end7082:                                   ; preds = %ifexpr.else7081, %ifexpr.then7080
+  %ifexprval44180 = load ptr, ptr %ifexpr44169, align 8
   %ret_ty = alloca ptr, align 8
-  store ptr %ifexprval43565, ptr %ret_ty, align 8
-  %load43566 = load ptr, ptr %b, align 8
-  %load43567 = load ptr, ptr %ret_ty, align 8
-  %call43568 = call i32 @mir2asm_type_is_struct_value(ptr %load43566, ptr %load43567)
+  store ptr %ifexprval44180, ptr %ret_ty, align 8
+  %load44181 = load ptr, ptr %b, align 8
+  %load44182 = load ptr, ptr %ret_ty, align 8
+  %call44183 = call i32 @mir2asm_type_is_struct_value(ptr %load44181, ptr %load44182)
   %sret = alloca i32, align 4
-  store i32 %call43568, ptr %sret, align 4
-  %load43569 = load ptr, ptr %dest, align 8
-  %strcmp43571 = call i32 @strcmp(ptr %load43569, ptr @.strlit43570)
-  %cmp43572 = icmp eq i32 %strcmp43571, 0
-  %bool43573 = zext i1 %cmp43572 to i32
-  %cmp43574 = icmp eq i32 %bool43573, 0
-  %bool43575 = zext i1 %cmp43574 to i32
-  %cond43576 = icmp ne i32 %bool43575, 0
-  br i1 %cond43576, label %and.rhs, label %and.false
+  store i32 %call44183, ptr %sret, align 4
+  %load44184 = load ptr, ptr %rhs, align 8
+  %load44185 = load i32, ptr %rp, align 4
+  %load44186 = load i32, ptr %lp, align 4
+  %load44187 = load i32, ptr %sret, align 4
+  %call44188 = call i32 @mir2asm_call_stack_bytes(ptr %load44184, i32 %load44185, i32 %load44186, i32 %load44187)
+  %stack_bytes = alloca i32, align 4
+  store i32 %call44188, ptr %stack_bytes, align 4
+  %load44189 = load i32, ptr %stack_bytes, align 4
+  %cmp44190 = icmp sgt i32 %load44189, 0
+  %bool44191 = zext i1 %cmp44190 to i32
+  %cond44192 = icmp ne i32 %bool44191, 0
+  br i1 %cond44192, label %if.then7083, label %if.else7084
 
-if.then6970:                                      ; preds = %and.merge
-  %load43583 = load ptr, ptr %b, align 8
-  %load43584 = load ptr, ptr %dest, align 8
-  %load43585 = load ptr, ptr %ret_ty, align 8
-  %call43586 = call i32 @mir2asm_alloc_slot_typed(ptr %load43583, ptr %load43584, i32 0, ptr %load43585)
+if.then7083:                                      ; preds = %ifexpr.end7082
+  %load44193 = load ptr, ptr %b, align 8
+  %load44195 = load i32, ptr %stack_bytes, align 4
+  %call44196 = call ptr @i32_to_str(i32 %load44195)
+  %call44197 = call ptr @vix_string_concat(ptr @.strlit44194, ptr %call44196)
+  call void @mir2asm_line(ptr %load44193, ptr %call44197)
+  br label %if.end7085
+
+if.else7084:                                      ; preds = %ifexpr.end7082
+  br label %if.end7085
+
+if.end7085:                                       ; preds = %if.else7084, %if.then7083
+  %load44198 = load ptr, ptr %dest, align 8
+  %strcmp44200 = call i32 @strcmp(ptr %load44198, ptr @.strlit44199)
+  %cmp44201 = icmp eq i32 %strcmp44200, 0
+  %bool44202 = zext i1 %cmp44201 to i32
+  %cmp44203 = icmp eq i32 %bool44202, 0
+  %bool44204 = zext i1 %cmp44203 to i32
+  %cond44205 = icmp ne i32 %bool44204, 0
+  br i1 %cond44205, label %and.rhs, label %and.false
+
+if.then7086:                                      ; preds = %and.merge
+  %load44212 = load ptr, ptr %b, align 8
+  %load44213 = load ptr, ptr %dest, align 8
+  %load44214 = load ptr, ptr %ret_ty, align 8
+  %call44215 = call i32 @mir2asm_alloc_slot_typed(ptr %load44212, ptr %load44213, i32 0, ptr %load44214)
   %dest_off = alloca i32, align 4
-  store i32 %call43586, ptr %dest_off, align 4
-  %load43587 = load ptr, ptr %b, align 8
-  %load43589 = load i32, ptr %dest_off, align 4
-  %call43590 = call ptr @mir2asm_mem(i32 %load43589)
-  %call43591 = call ptr @vix_string_concat(ptr @.strlit43588, ptr %call43590)
-  call void @mir2asm_line(ptr %load43587, ptr %call43591)
-  br label %if.end6972
+  store i32 %call44215, ptr %dest_off, align 4
+  %load44216 = load ptr, ptr %b, align 8
+  %load44218 = load i32, ptr %dest_off, align 4
+  %call44219 = call ptr @mir2asm_mem(i32 %load44218)
+  %call44220 = call ptr @vix_string_concat(ptr @.strlit44217, ptr %call44219)
+  call void @mir2asm_line(ptr %load44216, ptr %call44220)
+  br label %if.end7088
 
-if.else6971:                                      ; preds = %and.merge
-  br label %if.end6972
+if.else7087:                                      ; preds = %and.merge
+  br label %if.end7088
 
-if.end6972:                                       ; preds = %if.else6971, %if.then6970
-  %load43592 = load i32, ptr %lp, align 4
-  %add43593 = add i32 %load43592, 1
+if.end7088:                                       ; preds = %if.else7087, %if.then7086
+  %load44221 = load i32, ptr %lp, align 4
+  %add44222 = add i32 %load44221, 1
   %pos = alloca i32, align 4
-  store i32 %add43593, ptr %pos, align 4
-  %ifexpr43594 = alloca i32, align 4
-  %load43595 = load i32, ptr %sret, align 4
-  %cmp43596 = icmp eq i32 %load43595, 1
-  %bool43597 = zext i1 %cmp43596 to i32
-  %cond43598 = icmp ne i32 %bool43597, 0
-  br i1 %cond43598, label %ifexpr.then6973, label %ifexpr.else6974
+  store i32 %add44222, ptr %pos, align 4
+  %ifexpr44223 = alloca i32, align 4
+  %load44224 = load i32, ptr %sret, align 4
+  %cmp44225 = icmp eq i32 %load44224, 1
+  %bool44226 = zext i1 %cmp44225 to i32
+  %cond44227 = icmp ne i32 %bool44226, 0
+  br i1 %cond44227, label %ifexpr.then7089, label %ifexpr.else7090
 
-and.rhs:                                          ; preds = %ifexpr.end6969
-  %load43577 = load i32, ptr %sret, align 4
-  %cmp43578 = icmp eq i32 %load43577, 1
-  %bool43579 = zext i1 %cmp43578 to i32
-  %cond43580 = icmp ne i32 %bool43579, 0
-  br i1 %cond43580, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %if.end7085
+  %load44206 = load i32, ptr %sret, align 4
+  %cmp44207 = icmp eq i32 %load44206, 1
+  %bool44208 = zext i1 %cmp44207 to i32
+  %cond44209 = icmp ne i32 %bool44208, 0
+  br i1 %cond44209, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %ifexpr.end6969
+and.false:                                        ; preds = %and.rhs, %if.end7085
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval43581 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond43582 = icmp ne i32 %andval43581, 0
-  br i1 %cond43582, label %if.then6970, label %if.else6971
+  %andval44210 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond44211 = icmp ne i32 %andval44210, 0
+  br i1 %cond44211, label %if.then7086, label %if.else7087
 
-ifexpr.then6973:                                  ; preds = %if.end6972
-  store i32 1, ptr %ifexpr43594, align 4
-  br label %ifexpr.end6975
+ifexpr.then7089:                                  ; preds = %if.end7088
+  store i32 1, ptr %ifexpr44223, align 4
+  br label %ifexpr.end7091
 
-ifexpr.else6974:                                  ; preds = %if.end6972
-  store i32 0, ptr %ifexpr43594, align 4
-  br label %ifexpr.end6975
+ifexpr.else7090:                                  ; preds = %if.end7088
+  store i32 0, ptr %ifexpr44223, align 4
+  br label %ifexpr.end7091
 
-ifexpr.end6975:                                   ; preds = %ifexpr.else6974, %ifexpr.then6973
-  %ifexprval43599 = load i32, ptr %ifexpr43594, align 4
+ifexpr.end7091:                                   ; preds = %ifexpr.else7090, %ifexpr.then7089
+  %ifexprval44228 = load i32, ptr %ifexpr44223, align 4
   %arg = alloca i32, align 4
-  store i32 %ifexprval43599, ptr %arg, align 4
+  store i32 %ifexprval44228, ptr %arg, align 4
   %float_arg = alloca i32, align 4
   store i32 0, ptr %float_arg, align 4
-  br label %while.cond6976
+  %stack_arg = alloca i32, align 4
+  store i32 0, ptr %stack_arg, align 4
+  br label %while.cond7092
 
-while.cond6976:                                   ; preds = %if.end6984, %ifexpr.end6975
-  %load43600 = load i32, ptr %rp, align 4
-  %cmp43601 = icmp sgt i32 %load43600, 0
-  %bool43602 = zext i1 %cmp43601 to i32
-  %cond43603 = icmp ne i32 %bool43602, 0
-  br i1 %cond43603, label %and.rhs1, label %and.false2
+while.cond7092:                                   ; preds = %if.end7100, %ifexpr.end7091
+  %load44229 = load i32, ptr %rp, align 4
+  %cmp44230 = icmp sgt i32 %load44229, 0
+  %bool44231 = zext i1 %cmp44230 to i32
+  %cond44232 = icmp ne i32 %bool44231, 0
+  br i1 %cond44232, label %and.rhs1, label %and.false2
 
-while.body6977:                                   ; preds = %and.merge3
-  %load43611 = load ptr, ptr %rhs, align 8
-  %load43612 = load i32, ptr %pos, align 4
-  %call43613 = call i32 @mir2asm_find(ptr %load43611, i8 44, i32 %load43612)
+while.body7093:                                   ; preds = %and.merge3
+  %load44240 = load ptr, ptr %rhs, align 8
+  %load44241 = load i32, ptr %pos, align 4
+  %call44242 = call i32 @mir2asm_find(ptr %load44240, i8 44, i32 %load44241)
   %comma = alloca i32, align 4
-  store i32 %call43613, ptr %comma, align 4
-  %ifexpr43614 = alloca i32, align 4
-  %load43615 = load i32, ptr %comma, align 4
-  %cmp43616 = icmp slt i32 %load43615, 0
-  %bool43617 = zext i1 %cmp43616 to i32
-  %cond43618 = icmp ne i32 %bool43617, 0
-  br i1 %cond43618, label %or.true4, label %or.rhs5
+  store i32 %call44242, ptr %comma, align 4
+  %ifexpr44243 = alloca i32, align 4
+  %load44244 = load i32, ptr %comma, align 4
+  %cmp44245 = icmp slt i32 %load44244, 0
+  %bool44246 = zext i1 %cmp44245 to i32
+  %cond44247 = icmp ne i32 %bool44246, 0
+  br i1 %cond44247, label %or.true4, label %or.rhs5
 
-while.end6978:                                    ; preds = %and.merge3
-  %load43824 = load ptr, ptr %b, align 8
-  %load43826 = load i32, ptr %float_arg, align 4
-  %call43827 = call ptr @i32_to_str(i32 %load43826)
-  %call43828 = call ptr @vix_string_concat(ptr @.strlit43825, ptr %call43827)
-  call void @mir2asm_line(ptr %load43824, ptr %call43828)
-  %load43829 = load ptr, ptr %b, align 8
-  %load43831 = load ptr, ptr %func, align 8
-  %call43832 = call ptr @vix_string_concat(ptr @.strlit43830, ptr %load43831)
-  call void @mir2asm_line(ptr %load43829, ptr %call43832)
-  %load43833 = load ptr, ptr %dest, align 8
-  %strcmp43835 = call i32 @strcmp(ptr %load43833, ptr @.strlit43834)
-  %cmp43836 = icmp eq i32 %strcmp43835, 0
-  %bool43837 = zext i1 %cmp43836 to i32
-  %cmp43838 = icmp eq i32 %bool43837, 0
-  %bool43839 = zext i1 %cmp43838 to i32
-  %cond43840 = icmp ne i32 %bool43839, 0
-  br i1 %cond43840, label %and.rhs25, label %and.false26
+while.end7094:                                    ; preds = %and.merge3
+  %load44561 = load ptr, ptr %b, align 8
+  %load44563 = load i32, ptr %float_arg, align 4
+  %call44564 = call ptr @i32_to_str(i32 %load44563)
+  %call44565 = call ptr @vix_string_concat(ptr @.strlit44562, ptr %call44564)
+  call void @mir2asm_line(ptr %load44561, ptr %call44565)
+  %load44566 = load ptr, ptr %b, align 8
+  %load44568 = load ptr, ptr %func, align 8
+  %call44569 = call ptr @vix_string_concat(ptr @.strlit44567, ptr %load44568)
+  call void @mir2asm_line(ptr %load44566, ptr %call44569)
+  %load44570 = load i32, ptr %stack_bytes, align 4
+  %cmp44571 = icmp sgt i32 %load44570, 0
+  %bool44572 = zext i1 %cmp44571 to i32
+  %cond44573 = icmp ne i32 %bool44572, 0
+  br i1 %cond44573, label %if.then7140, label %if.else7141
 
-and.rhs1:                                         ; preds = %while.cond6976
-  %load43604 = load i32, ptr %pos, align 4
-  %load43605 = load i32, ptr %rp, align 4
-  %cmp43606 = icmp slt i32 %load43604, %load43605
-  %bool43607 = zext i1 %cmp43606 to i32
-  %cond43608 = icmp ne i32 %bool43607, 0
-  br i1 %cond43608, label %and.merge3, label %and.false2
+and.rhs1:                                         ; preds = %while.cond7092
+  %load44233 = load i32, ptr %pos, align 4
+  %load44234 = load i32, ptr %rp, align 4
+  %cmp44235 = icmp slt i32 %load44233, %load44234
+  %bool44236 = zext i1 %cmp44235 to i32
+  %cond44237 = icmp ne i32 %bool44236, 0
+  br i1 %cond44237, label %and.merge3, label %and.false2
 
-and.false2:                                       ; preds = %and.rhs1, %while.cond6976
+and.false2:                                       ; preds = %and.rhs1, %while.cond7092
   br label %and.merge3
 
 and.merge3:                                       ; preds = %and.false2, %and.rhs1
-  %andval43609 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
-  %cond43610 = icmp ne i32 %andval43609, 0
-  br i1 %cond43610, label %while.body6977, label %while.end6978
+  %andval44238 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
+  %cond44239 = icmp ne i32 %andval44238, 0
+  br i1 %cond44239, label %while.body7093, label %while.end7094
 
-ifexpr.then6979:                                  ; preds = %or.merge6
-  %load43626 = load i32, ptr %rp, align 4
-  store i32 %load43626, ptr %ifexpr43614, align 4
-  br label %ifexpr.end6981
+ifexpr.then7095:                                  ; preds = %or.merge6
+  %load44255 = load i32, ptr %rp, align 4
+  store i32 %load44255, ptr %ifexpr44243, align 4
+  br label %ifexpr.end7097
 
-ifexpr.else6980:                                  ; preds = %or.merge6
-  %load43627 = load i32, ptr %comma, align 4
-  store i32 %load43627, ptr %ifexpr43614, align 4
-  br label %ifexpr.end6981
+ifexpr.else7096:                                  ; preds = %or.merge6
+  %load44256 = load i32, ptr %comma, align 4
+  store i32 %load44256, ptr %ifexpr44243, align 4
+  br label %ifexpr.end7097
 
-ifexpr.end6981:                                   ; preds = %ifexpr.else6980, %ifexpr.then6979
-  %ifexprval43628 = load i32, ptr %ifexpr43614, align 4
+ifexpr.end7097:                                   ; preds = %ifexpr.else7096, %ifexpr.then7095
+  %ifexprval44257 = load i32, ptr %ifexpr44243, align 4
   %end = alloca i32, align 4
-  store i32 %ifexprval43628, ptr %end, align 4
-  %load43629 = load ptr, ptr %rhs, align 8
-  %load43630 = load i32, ptr %pos, align 4
-  %load43631 = load i32, ptr %end, align 4
-  %call43632 = call ptr @mir2asm_slice(ptr %load43629, i32 %load43630, i32 %load43631)
-  %call43633 = call ptr @mir2asm_trim(ptr %call43632)
+  store i32 %ifexprval44257, ptr %end, align 4
+  %load44258 = load ptr, ptr %rhs, align 8
+  %load44259 = load i32, ptr %pos, align 4
+  %load44260 = load i32, ptr %end, align 4
+  %call44261 = call ptr @mir2asm_slice(ptr %load44258, i32 %load44259, i32 %load44260)
+  %call44262 = call ptr @mir2asm_trim(ptr %call44261)
   %part = alloca ptr, align 8
-  store ptr %call43633, ptr %part, align 8
-  %load43634 = load ptr, ptr %part, align 8
-  %call43635 = call i32 @mir2asm_find(ptr %load43634, i8 32, i32 0)
+  store ptr %call44262, ptr %part, align 8
+  %load44263 = load ptr, ptr %part, align 8
+  %call44264 = call i32 @mir2asm_find(ptr %load44263, i8 32, i32 0)
   %sp = alloca i32, align 4
-  store i32 %call43635, ptr %sp, align 4
-  %load43636 = load i32, ptr %sp, align 4
-  %cmp43637 = icmp sge i32 %load43636, 0
-  %bool43638 = zext i1 %cmp43637 to i32
-  %cond43639 = icmp ne i32 %bool43638, 0
-  br i1 %cond43639, label %if.then6982, label %if.else6983
+  store i32 %call44264, ptr %sp, align 4
+  %load44265 = load i32, ptr %sp, align 4
+  %cmp44266 = icmp sge i32 %load44265, 0
+  %bool44267 = zext i1 %cmp44266 to i32
+  %cond44268 = icmp ne i32 %bool44267, 0
+  br i1 %cond44268, label %if.then7098, label %if.else7099
 
-or.true4:                                         ; preds = %or.rhs5, %while.body6977
+or.true4:                                         ; preds = %or.rhs5, %while.body7093
   br label %or.merge6
 
-or.rhs5:                                          ; preds = %while.body6977
-  %load43619 = load i32, ptr %comma, align 4
-  %load43620 = load i32, ptr %rp, align 4
-  %cmp43621 = icmp sgt i32 %load43619, %load43620
-  %bool43622 = zext i1 %cmp43621 to i32
-  %cond43623 = icmp ne i32 %bool43622, 0
-  br i1 %cond43623, label %or.true4, label %or.merge6
+or.rhs5:                                          ; preds = %while.body7093
+  %load44248 = load i32, ptr %comma, align 4
+  %load44249 = load i32, ptr %rp, align 4
+  %cmp44250 = icmp sgt i32 %load44248, %load44249
+  %bool44251 = zext i1 %cmp44250 to i32
+  %cond44252 = icmp ne i32 %bool44251, 0
+  br i1 %cond44252, label %or.true4, label %or.merge6
 
 or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval43624 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond43625 = icmp ne i32 %orval43624, 0
-  br i1 %cond43625, label %ifexpr.then6979, label %ifexpr.else6980
+  %orval44253 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond44254 = icmp ne i32 %orval44253, 0
+  br i1 %cond44254, label %ifexpr.then7095, label %ifexpr.else7096
 
-if.then6982:                                      ; preds = %ifexpr.end6981
-  %load43640 = load ptr, ptr %part, align 8
-  %load43641 = load i32, ptr %sp, align 4
-  %call43642 = call ptr @mir2asm_slice(ptr %load43640, i32 0, i32 %load43641)
-  %call43643 = call ptr @mir2asm_trim(ptr %call43642)
+if.then7098:                                      ; preds = %ifexpr.end7097
+  %load44269 = load ptr, ptr %part, align 8
+  %load44270 = load i32, ptr %sp, align 4
+  %call44271 = call ptr @mir2asm_slice(ptr %load44269, i32 0, i32 %load44270)
+  %call44272 = call ptr @mir2asm_trim(ptr %call44271)
   %arg_ty = alloca ptr, align 8
-  store ptr %call43643, ptr %arg_ty, align 8
-  %load43644 = load ptr, ptr %part, align 8
-  %load43645 = load i32, ptr %sp, align 4
-  %add43646 = add i32 %load43645, 1
-  %call43647 = call ptr @mir2asm_after(ptr %load43644, i32 %add43646)
-  %call43648 = call ptr @mir2asm_trim(ptr %call43647)
+  store ptr %call44272, ptr %arg_ty, align 8
+  %load44273 = load ptr, ptr %part, align 8
+  %load44274 = load i32, ptr %sp, align 4
+  %add44275 = add i32 %load44274, 1
+  %call44276 = call ptr @mir2asm_after(ptr %load44273, i32 %add44275)
+  %call44277 = call ptr @mir2asm_trim(ptr %call44276)
   %val = alloca ptr, align 8
-  store ptr %call43648, ptr %val, align 8
-  %load43649 = load ptr, ptr %b, align 8
-  %load43650 = load ptr, ptr %val, align 8
-  %call43651 = call i32 @mir2asm_find_name(ptr %load43649, ptr %load43650)
+  store ptr %call44277, ptr %val, align 8
+  %load44278 = load ptr, ptr %b, align 8
+  %load44279 = load ptr, ptr %val, align 8
+  %call44280 = call i32 @mir2asm_find_name(ptr %load44278, ptr %load44279)
   %val_idx = alloca i32, align 4
-  store i32 %call43651, ptr %val_idx, align 4
+  store i32 %call44280, ptr %val_idx, align 4
   %pass_stack_addr = alloca i32, align 4
   store i32 0, ptr %pass_stack_addr, align 4
-  %load43652 = load i32, ptr %val_idx, align 4
-  %cmp43653 = icmp sge i32 %load43652, 0
-  %bool43654 = zext i1 %cmp43653 to i32
-  %cond43655 = icmp ne i32 %bool43654, 0
-  br i1 %cond43655, label %and.rhs7, label %and.false8
+  %load44281 = load i32, ptr %val_idx, align 4
+  %cmp44282 = icmp sge i32 %load44281, 0
+  %bool44283 = zext i1 %cmp44282 to i32
+  %cond44284 = icmp ne i32 %bool44283, 0
+  br i1 %cond44284, label %and.rhs7, label %and.false8
 
-if.else6983:                                      ; preds = %ifexpr.end6981
-  br label %if.end6984
+if.else7099:                                      ; preds = %ifexpr.end7097
+  br label %if.end7100
 
-if.end6984:                                       ; preds = %if.else6983, %if.end6999
-  %load43822 = load i32, ptr %end, align 4
-  %add43823 = add i32 %load43822, 1
-  store i32 %add43823, ptr %pos, align 4
-  br label %while.cond6976
+if.end7100:                                       ; preds = %if.else7099, %if.end7115
+  %load44559 = load i32, ptr %end, align 4
+  %add44560 = add i32 %load44559, 1
+  store i32 %add44560, ptr %pos, align 4
+  br label %while.cond7092
 
-if.then6985:                                      ; preds = %and.merge9
-  %load43672 = load ptr, ptr %b, align 8
-  %field43674 = getelementptr %MirAsm, ptr %load43672, i32 0, i32 7
-  %fieldval43675 = load ptr, ptr %field43674, align 8
-  %load43676 = load i32, ptr %val_idx, align 4
-  %idx43677 = getelementptr i32, ptr %fieldval43675, i32 %load43676
-  %loadidx43678 = load i32, ptr %idx43677, align 4
-  %cmp43679 = icmp eq i32 %loadidx43678, 1
-  %bool43680 = zext i1 %cmp43679 to i32
-  %cond43681 = icmp ne i32 %bool43680, 0
-  br i1 %cond43681, label %if.then6988, label %if.else6989
+if.then7101:                                      ; preds = %and.merge9
+  %load44301 = load ptr, ptr %b, align 8
+  %field44303 = getelementptr %MirAsm, ptr %load44301, i32 0, i32 7
+  %fieldval44304 = load ptr, ptr %field44303, align 8
+  %load44305 = load i32, ptr %val_idx, align 4
+  %idx44306 = getelementptr i32, ptr %fieldval44304, i32 %load44305
+  %loadidx44307 = load i32, ptr %idx44306, align 4
+  %cmp44308 = icmp eq i32 %loadidx44307, 1
+  %bool44309 = zext i1 %cmp44308 to i32
+  %cond44310 = icmp ne i32 %bool44309, 0
+  br i1 %cond44310, label %if.then7104, label %if.else7105
 
-if.else6986:                                      ; preds = %and.merge9
-  br label %if.end6987
+if.else7102:                                      ; preds = %and.merge9
+  br label %if.end7103
 
-if.end6987:                                       ; preds = %if.else6986, %if.end6990
-  %load43722 = load ptr, ptr %arg_ty, align 8
-  %call43723 = call i32 @mir2asm_type_is_float(ptr %load43722)
-  %cmp43724 = icmp eq i32 %call43723, 1
-  %bool43725 = zext i1 %cmp43724 to i32
-  %cond43726 = icmp ne i32 %bool43725, 0
-  br i1 %cond43726, label %if.then6997, label %if.else6998
+if.end7103:                                       ; preds = %if.else7102, %if.end7106
+  %load44351 = load ptr, ptr %arg_ty, align 8
+  %call44352 = call i32 @mir2asm_type_is_float(ptr %load44351)
+  %cmp44353 = icmp eq i32 %call44352, 1
+  %bool44354 = zext i1 %cmp44353 to i32
+  %cond44355 = icmp ne i32 %bool44354, 0
+  br i1 %cond44355, label %if.then7113, label %if.else7114
 
-and.rhs7:                                         ; preds = %if.then6982
-  %load43656 = load ptr, ptr %arg_ty, align 8
-  %strcmp43658 = call i32 @strcmp(ptr %load43656, ptr @.strlit43657)
-  %cmp43659 = icmp eq i32 %strcmp43658, 0
-  %bool43660 = zext i1 %cmp43659 to i32
-  %cond43661 = icmp ne i32 %bool43660, 0
-  br i1 %cond43661, label %or.true10, label %or.rhs11
+and.rhs7:                                         ; preds = %if.then7098
+  %load44285 = load ptr, ptr %arg_ty, align 8
+  %strcmp44287 = call i32 @strcmp(ptr %load44285, ptr @.strlit44286)
+  %cmp44288 = icmp eq i32 %strcmp44287, 0
+  %bool44289 = zext i1 %cmp44288 to i32
+  %cond44290 = icmp ne i32 %bool44289, 0
+  br i1 %cond44290, label %or.true10, label %or.rhs11
 
-and.false8:                                       ; preds = %or.merge12, %if.then6982
+and.false8:                                       ; preds = %or.merge12, %if.then7098
   br label %and.merge9
 
 and.merge9:                                       ; preds = %and.false8, %or.merge12
-  %andval43670 = phi i32 [ 1, %or.merge12 ], [ 0, %and.false8 ]
-  %cond43671 = icmp ne i32 %andval43670, 0
-  br i1 %cond43671, label %if.then6985, label %if.else6986
+  %andval44299 = phi i32 [ 1, %or.merge12 ], [ 0, %and.false8 ]
+  %cond44300 = icmp ne i32 %andval44299, 0
+  br i1 %cond44300, label %if.then7101, label %if.else7102
 
 or.true10:                                        ; preds = %or.rhs11, %and.rhs7
   br label %or.merge12
 
 or.rhs11:                                         ; preds = %and.rhs7
-  %load43662 = load ptr, ptr %arg_ty, align 8
-  %call43664 = call i32 @mir2asm_starts_with(ptr %load43662, ptr @.strlit43663)
-  %cmp43665 = icmp eq i32 %call43664, 1
-  %bool43666 = zext i1 %cmp43665 to i32
-  %cond43667 = icmp ne i32 %bool43666, 0
-  br i1 %cond43667, label %or.true10, label %or.merge12
+  %load44291 = load ptr, ptr %arg_ty, align 8
+  %call44293 = call i32 @mir2asm_starts_with(ptr %load44291, ptr @.strlit44292)
+  %cmp44294 = icmp eq i32 %call44293, 1
+  %bool44295 = zext i1 %cmp44294 to i32
+  %cond44296 = icmp ne i32 %bool44295, 0
+  br i1 %cond44296, label %or.true10, label %or.merge12
 
 or.merge12:                                       ; preds = %or.true10, %or.rhs11
-  %orval43668 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
-  %cond43669 = icmp ne i32 %orval43668, 0
-  br i1 %cond43669, label %and.merge9, label %and.false8
+  %orval44297 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
+  %cond44298 = icmp ne i32 %orval44297, 0
+  br i1 %cond44298, label %and.merge9, label %and.false8
 
-if.then6988:                                      ; preds = %if.then6985
+if.then7104:                                      ; preds = %if.then7101
   store i32 1, ptr %pass_stack_addr, align 4
-  br label %if.end6990
+  br label %if.end7106
 
-if.else6989:                                      ; preds = %if.then6985
-  %load43682 = load ptr, ptr %arg_ty, align 8
-  %strcmp43684 = call i32 @strcmp(ptr %load43682, ptr @.strlit43683)
-  %cmp43685 = icmp eq i32 %strcmp43684, 0
-  %bool43686 = zext i1 %cmp43685 to i32
-  %cond43687 = icmp ne i32 %bool43686, 0
-  br i1 %cond43687, label %and.rhs13, label %and.false14
+if.else7105:                                      ; preds = %if.then7101
+  %load44311 = load ptr, ptr %arg_ty, align 8
+  %strcmp44313 = call i32 @strcmp(ptr %load44311, ptr @.strlit44312)
+  %cmp44314 = icmp eq i32 %strcmp44313, 0
+  %bool44315 = zext i1 %cmp44314 to i32
+  %cond44316 = icmp ne i32 %bool44315, 0
+  br i1 %cond44316, label %and.rhs13, label %and.false14
 
-if.end6990:                                       ; preds = %if.end6993, %if.then6988
-  br label %if.end6987
+if.end7106:                                       ; preds = %if.end7109, %if.then7104
+  br label %if.end7103
 
-if.then6991:                                      ; preds = %and.merge15
+if.then7107:                                      ; preds = %and.merge15
   store i32 1, ptr %pass_stack_addr, align 4
-  br label %if.end6993
+  br label %if.end7109
 
-if.else6992:                                      ; preds = %and.merge15
-  %load43702 = load ptr, ptr %arg_ty, align 8
-  %call43704 = call i32 @mir2asm_starts_with(ptr %load43702, ptr @.strlit43703)
-  %cmp43705 = icmp eq i32 %call43704, 1
-  %bool43706 = zext i1 %cmp43705 to i32
-  %cond43707 = icmp ne i32 %bool43706, 0
-  br i1 %cond43707, label %and.rhs16, label %and.false17
+if.else7108:                                      ; preds = %and.merge15
+  %load44331 = load ptr, ptr %arg_ty, align 8
+  %call44333 = call i32 @mir2asm_starts_with(ptr %load44331, ptr @.strlit44332)
+  %cmp44334 = icmp eq i32 %call44333, 1
+  %bool44335 = zext i1 %cmp44334 to i32
+  %cond44336 = icmp ne i32 %bool44335, 0
+  br i1 %cond44336, label %and.rhs16, label %and.false17
 
-if.end6993:                                       ; preds = %if.end6996, %if.then6991
-  br label %if.end6990
+if.end7109:                                       ; preds = %if.end7112, %if.then7107
+  br label %if.end7106
 
-and.rhs13:                                        ; preds = %if.else6989
-  %load43688 = load ptr, ptr %b, align 8
-  %load43689 = load ptr, ptr %b, align 8
-  %field43691 = getelementptr %MirAsm, ptr %load43689, i32 0, i32 8
-  %fieldval43692 = load ptr, ptr %field43691, align 8
-  %load43693 = load i32, ptr %val_idx, align 4
-  %idx43694 = getelementptr ptr, ptr %fieldval43692, i32 %load43693
-  %loadidx43695 = load ptr, ptr %idx43694, align 8
-  %call43696 = call i32 @mir2asm_type_is_struct_value(ptr %load43688, ptr %loadidx43695)
-  %cmp43697 = icmp eq i32 %call43696, 1
-  %bool43698 = zext i1 %cmp43697 to i32
-  %cond43699 = icmp ne i32 %bool43698, 0
-  br i1 %cond43699, label %and.merge15, label %and.false14
+and.rhs13:                                        ; preds = %if.else7105
+  %load44317 = load ptr, ptr %b, align 8
+  %load44318 = load ptr, ptr %b, align 8
+  %field44320 = getelementptr %MirAsm, ptr %load44318, i32 0, i32 8
+  %fieldval44321 = load ptr, ptr %field44320, align 8
+  %load44322 = load i32, ptr %val_idx, align 4
+  %idx44323 = getelementptr ptr, ptr %fieldval44321, i32 %load44322
+  %loadidx44324 = load ptr, ptr %idx44323, align 8
+  %call44325 = call i32 @mir2asm_type_is_struct_value(ptr %load44317, ptr %loadidx44324)
+  %cmp44326 = icmp eq i32 %call44325, 1
+  %bool44327 = zext i1 %cmp44326 to i32
+  %cond44328 = icmp ne i32 %bool44327, 0
+  br i1 %cond44328, label %and.merge15, label %and.false14
 
-and.false14:                                      ; preds = %and.rhs13, %if.else6989
+and.false14:                                      ; preds = %and.rhs13, %if.else7105
   br label %and.merge15
 
 and.merge15:                                      ; preds = %and.false14, %and.rhs13
-  %andval43700 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
-  %cond43701 = icmp ne i32 %andval43700, 0
-  br i1 %cond43701, label %if.then6991, label %if.else6992
+  %andval44329 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
+  %cond44330 = icmp ne i32 %andval44329, 0
+  br i1 %cond44330, label %if.then7107, label %if.else7108
 
-if.then6994:                                      ; preds = %and.merge18
+if.then7110:                                      ; preds = %and.merge18
   store i32 1, ptr %pass_stack_addr, align 4
-  br label %if.end6996
+  br label %if.end7112
 
-if.else6995:                                      ; preds = %and.merge18
-  br label %if.end6996
+if.else7111:                                      ; preds = %and.merge18
+  br label %if.end7112
 
-if.end6996:                                       ; preds = %if.else6995, %if.then6994
-  br label %if.end6993
+if.end7112:                                       ; preds = %if.else7111, %if.then7110
+  br label %if.end7109
 
-and.rhs16:                                        ; preds = %if.else6992
-  %load43708 = load ptr, ptr %b, align 8
-  %load43709 = load ptr, ptr %b, align 8
-  %field43711 = getelementptr %MirAsm, ptr %load43709, i32 0, i32 8
-  %fieldval43712 = load ptr, ptr %field43711, align 8
-  %load43713 = load i32, ptr %val_idx, align 4
-  %idx43714 = getelementptr ptr, ptr %fieldval43712, i32 %load43713
-  %loadidx43715 = load ptr, ptr %idx43714, align 8
-  %call43716 = call i32 @mir2asm_type_is_struct_value(ptr %load43708, ptr %loadidx43715)
-  %cmp43717 = icmp eq i32 %call43716, 1
-  %bool43718 = zext i1 %cmp43717 to i32
-  %cond43719 = icmp ne i32 %bool43718, 0
-  br i1 %cond43719, label %and.merge18, label %and.false17
+and.rhs16:                                        ; preds = %if.else7108
+  %load44337 = load ptr, ptr %b, align 8
+  %load44338 = load ptr, ptr %b, align 8
+  %field44340 = getelementptr %MirAsm, ptr %load44338, i32 0, i32 8
+  %fieldval44341 = load ptr, ptr %field44340, align 8
+  %load44342 = load i32, ptr %val_idx, align 4
+  %idx44343 = getelementptr ptr, ptr %fieldval44341, i32 %load44342
+  %loadidx44344 = load ptr, ptr %idx44343, align 8
+  %call44345 = call i32 @mir2asm_type_is_struct_value(ptr %load44337, ptr %loadidx44344)
+  %cmp44346 = icmp eq i32 %call44345, 1
+  %bool44347 = zext i1 %cmp44346 to i32
+  %cond44348 = icmp ne i32 %bool44347, 0
+  br i1 %cond44348, label %and.merge18, label %and.false17
 
-and.false17:                                      ; preds = %and.rhs16, %if.else6992
+and.false17:                                      ; preds = %and.rhs16, %if.else7108
   br label %and.merge18
 
 and.merge18:                                      ; preds = %and.false17, %and.rhs16
-  %andval43720 = phi i32 [ 1, %and.rhs16 ], [ 0, %and.false17 ]
-  %cond43721 = icmp ne i32 %andval43720, 0
-  br i1 %cond43721, label %if.then6994, label %if.else6995
+  %andval44349 = phi i32 [ 1, %and.rhs16 ], [ 0, %and.false17 ]
+  %cond44350 = icmp ne i32 %andval44349, 0
+  br i1 %cond44350, label %if.then7110, label %if.else7111
 
-if.then6997:                                      ; preds = %if.end6987
-  %load43727 = load i32, ptr %float_arg, align 4
-  %cmp43728 = icmp slt i32 %load43727, 8
-  %bool43729 = zext i1 %cmp43728 to i32
-  %cond43730 = icmp ne i32 %bool43729, 0
-  br i1 %cond43730, label %if.then7000, label %if.else7001
+if.then7113:                                      ; preds = %if.end7103
+  %load44356 = load i32, ptr %float_arg, align 4
+  %cmp44357 = icmp slt i32 %load44356, 8
+  %bool44358 = zext i1 %cmp44357 to i32
+  %cond44359 = icmp ne i32 %bool44358, 0
+  br i1 %cond44359, label %if.then7116, label %if.else7117
 
-if.else6998:                                      ; preds = %if.end6987
-  %load43739 = load ptr, ptr %b, align 8
-  %load43740 = load ptr, ptr %arg_ty, align 8
-  %call43741 = call i32 @mir2asm_type_is_struct_value(ptr %load43739, ptr %load43740)
-  %cmp43742 = icmp eq i32 %call43741, 1
-  %bool43743 = zext i1 %cmp43742 to i32
-  %cond43744 = icmp ne i32 %bool43743, 0
-  br i1 %cond43744, label %if.then7003, label %if.else7004
+if.else7114:                                      ; preds = %if.end7103
+  %load44396 = load ptr, ptr %b, align 8
+  %load44397 = load ptr, ptr %arg_ty, align 8
+  %call44398 = call i32 @mir2asm_type_is_struct_value(ptr %load44396, ptr %load44397)
+  %cmp44399 = icmp eq i32 %call44398, 1
+  %bool44400 = zext i1 %cmp44399 to i32
+  %cond44401 = icmp ne i32 %bool44400, 0
+  br i1 %cond44401, label %if.then7122, label %if.else7123
 
-if.end6999:                                       ; preds = %if.end7005, %if.end7002
-  br label %if.end6984
+if.end7115:                                       ; preds = %if.end7124, %if.end7118
+  br label %if.end7100
 
-if.then7000:                                      ; preds = %if.then6997
-  %load43731 = load ptr, ptr %b, align 8
-  %load43732 = load i32, ptr %float_arg, align 4
-  %load43733 = load ptr, ptr %arg_ty, align 8
-  %call43734 = call ptr @mir2asm_arg_reg_typed(i32 %load43732, ptr %load43733)
-  %load43735 = load ptr, ptr %val, align 8
-  %load43736 = load ptr, ptr %arg_ty, align 8
-  call void @mir2asm_emit_load_float_arg(ptr %load43731, ptr %call43734, ptr %load43735, ptr %load43736)
-  br label %if.end7002
+if.then7116:                                      ; preds = %if.then7113
+  %load44360 = load ptr, ptr %b, align 8
+  %load44361 = load i32, ptr %float_arg, align 4
+  %load44362 = load ptr, ptr %arg_ty, align 8
+  %call44363 = call ptr @mir2asm_arg_reg_typed(i32 %load44361, ptr %load44362)
+  %load44364 = load ptr, ptr %val, align 8
+  %load44365 = load ptr, ptr %arg_ty, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load44360, ptr %call44363, ptr %load44364, ptr %load44365)
+  br label %if.end7118
 
-if.else7001:                                      ; preds = %if.then6997
-  br label %if.end7002
+if.else7117:                                      ; preds = %if.then7113
+  %load44366 = load ptr, ptr %b, align 8
+  %load44368 = load ptr, ptr %val, align 8
+  %load44369 = load ptr, ptr %arg_ty, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load44366, ptr @.strlit44367, ptr %load44368, ptr %load44369)
+  %load44370 = load ptr, ptr %arg_ty, align 8
+  %strcmp44372 = call i32 @strcmp(ptr %load44370, ptr @.strlit44371)
+  %cmp44373 = icmp eq i32 %strcmp44372, 0
+  %bool44374 = zext i1 %cmp44373 to i32
+  %cond44375 = icmp ne i32 %bool44374, 0
+  br i1 %cond44375, label %if.then7119, label %if.else7120
 
-if.end7002:                                       ; preds = %if.else7001, %if.then7000
-  %load43737 = load i32, ptr %float_arg, align 4
-  %add43738 = add i32 %load43737, 1
-  store i32 %add43738, ptr %float_arg, align 4
-  br label %if.end6999
+if.end7118:                                       ; preds = %if.end7121, %if.then7116
+  %load44394 = load i32, ptr %float_arg, align 4
+  %add44395 = add i32 %load44394, 1
+  store i32 %add44395, ptr %float_arg, align 4
+  br label %if.end7115
 
-if.then7003:                                      ; preds = %if.else6998
-  %load43745 = load i32, ptr %arg, align 4
-  %cmp43746 = icmp slt i32 %load43745, 6
-  %bool43747 = zext i1 %cmp43746 to i32
-  %cond43748 = icmp ne i32 %bool43747, 0
-  br i1 %cond43748, label %and.rhs19, label %and.false20
+if.then7119:                                      ; preds = %if.else7117
+  %load44376 = load ptr, ptr %b, align 8
+  %load44378 = load i32, ptr %stack_arg, align 4
+  %mul44379 = mul i32 %load44378, 8
+  %call44380 = call ptr @i32_to_str(i32 %mul44379)
+  %call44381 = call ptr @vix_string_concat(ptr @.strlit44377, ptr %call44380)
+  %call44383 = call ptr @vix_string_concat(ptr %call44381, ptr @.strlit44382)
+  call void @mir2asm_line(ptr %load44376, ptr %call44383)
+  br label %if.end7121
 
-if.else7004:                                      ; preds = %if.else6998
-  %load43774 = load i32, ptr %arg, align 4
-  %cmp43775 = icmp slt i32 %load43774, 6
-  %bool43776 = zext i1 %cmp43775 to i32
-  %cond43777 = icmp ne i32 %bool43776, 0
-  br i1 %cond43777, label %and.rhs22, label %and.false23
+if.else7120:                                      ; preds = %if.else7117
+  %load44384 = load ptr, ptr %b, align 8
+  %load44386 = load i32, ptr %stack_arg, align 4
+  %mul44387 = mul i32 %load44386, 8
+  %call44388 = call ptr @i32_to_str(i32 %mul44387)
+  %call44389 = call ptr @vix_string_concat(ptr @.strlit44385, ptr %call44388)
+  %call44391 = call ptr @vix_string_concat(ptr %call44389, ptr @.strlit44390)
+  call void @mir2asm_line(ptr %load44384, ptr %call44391)
+  br label %if.end7121
 
-if.end7005:                                       ; preds = %if.end7011, %if.end7008
-  br label %if.end6999
+if.end7121:                                       ; preds = %if.else7120, %if.then7119
+  %load44392 = load i32, ptr %stack_arg, align 4
+  %add44393 = add i32 %load44392, 1
+  store i32 %add44393, ptr %stack_arg, align 4
+  br label %if.end7118
 
-if.then7006:                                      ; preds = %and.merge21
-  %load43755 = load ptr, ptr %b, align 8
-  %load43757 = load i32, ptr %arg, align 4
-  %call43759 = call ptr @mir2asm_arg_reg_typed(i32 %load43757, ptr @.strlit43758)
-  %call43760 = call ptr @vix_string_concat(ptr @.strlit43756, ptr %call43759)
-  %call43762 = call ptr @vix_string_concat(ptr %call43760, ptr @.strlit43761)
-  %load43763 = load ptr, ptr %b, align 8
-  %field43765 = getelementptr %MirAsm, ptr %load43763, i32 0, i32 6
-  %fieldval43766 = load ptr, ptr %field43765, align 8
-  %load43767 = load i32, ptr %val_idx, align 4
-  %idx43768 = getelementptr i32, ptr %fieldval43766, i32 %load43767
-  %loadidx43769 = load i32, ptr %idx43768, align 4
-  %call43770 = call ptr @mir2asm_mem(i32 %loadidx43769)
-  %call43771 = call ptr @vix_string_concat(ptr %call43762, ptr %call43770)
-  call void @mir2asm_line(ptr %load43755, ptr %call43771)
-  br label %if.end7008
+if.then7122:                                      ; preds = %if.else7114
+  %load44402 = load i32, ptr %arg, align 4
+  %cmp44403 = icmp slt i32 %load44402, 6
+  %bool44404 = zext i1 %cmp44403 to i32
+  %cond44405 = icmp ne i32 %bool44404, 0
+  br i1 %cond44405, label %and.rhs19, label %and.false20
 
-if.else7007:                                      ; preds = %and.merge21
-  br label %if.end7008
+if.else7123:                                      ; preds = %if.else7114
+  %load44456 = load i32, ptr %arg, align 4
+  %cmp44457 = icmp slt i32 %load44456, 6
+  %bool44458 = zext i1 %cmp44457 to i32
+  %cond44459 = icmp ne i32 %bool44458, 0
+  br i1 %cond44459, label %and.rhs22, label %and.false23
 
-if.end7008:                                       ; preds = %if.else7007, %if.then7006
-  %load43772 = load i32, ptr %arg, align 4
-  %add43773 = add i32 %load43772, 1
-  store i32 %add43773, ptr %arg, align 4
-  br label %if.end7005
+if.end7124:                                       ; preds = %if.end7133, %if.end7127
+  br label %if.end7115
 
-and.rhs19:                                        ; preds = %if.then7003
-  %load43749 = load i32, ptr %val_idx, align 4
-  %cmp43750 = icmp sge i32 %load43749, 0
-  %bool43751 = zext i1 %cmp43750 to i32
-  %cond43752 = icmp ne i32 %bool43751, 0
-  br i1 %cond43752, label %and.merge21, label %and.false20
+if.then7125:                                      ; preds = %and.merge21
+  %load44412 = load ptr, ptr %b, align 8
+  %load44414 = load i32, ptr %arg, align 4
+  %call44416 = call ptr @mir2asm_arg_reg_typed(i32 %load44414, ptr @.strlit44415)
+  %call44417 = call ptr @vix_string_concat(ptr @.strlit44413, ptr %call44416)
+  %call44419 = call ptr @vix_string_concat(ptr %call44417, ptr @.strlit44418)
+  %load44420 = load ptr, ptr %b, align 8
+  %field44422 = getelementptr %MirAsm, ptr %load44420, i32 0, i32 6
+  %fieldval44423 = load ptr, ptr %field44422, align 8
+  %load44424 = load i32, ptr %val_idx, align 4
+  %idx44425 = getelementptr i32, ptr %fieldval44423, i32 %load44424
+  %loadidx44426 = load i32, ptr %idx44425, align 4
+  %call44427 = call ptr @mir2asm_mem(i32 %loadidx44426)
+  %call44428 = call ptr @vix_string_concat(ptr %call44419, ptr %call44427)
+  call void @mir2asm_line(ptr %load44412, ptr %call44428)
+  br label %if.end7127
 
-and.false20:                                      ; preds = %and.rhs19, %if.then7003
+if.else7126:                                      ; preds = %and.merge21
+  %load44429 = load i32, ptr %val_idx, align 4
+  %cmp44430 = icmp sge i32 %load44429, 0
+  %bool44431 = zext i1 %cmp44430 to i32
+  %cond44432 = icmp ne i32 %bool44431, 0
+  br i1 %cond44432, label %if.then7128, label %if.else7129
+
+if.end7127:                                       ; preds = %if.end7130, %if.then7125
+  %load44454 = load i32, ptr %arg, align 4
+  %add44455 = add i32 %load44454, 1
+  store i32 %add44455, ptr %arg, align 4
+  br label %if.end7124
+
+and.rhs19:                                        ; preds = %if.then7122
+  %load44406 = load i32, ptr %val_idx, align 4
+  %cmp44407 = icmp sge i32 %load44406, 0
+  %bool44408 = zext i1 %cmp44407 to i32
+  %cond44409 = icmp ne i32 %bool44408, 0
+  br i1 %cond44409, label %and.merge21, label %and.false20
+
+and.false20:                                      ; preds = %and.rhs19, %if.then7122
   br label %and.merge21
 
 and.merge21:                                      ; preds = %and.false20, %and.rhs19
-  %andval43753 = phi i32 [ 1, %and.rhs19 ], [ 0, %and.false20 ]
-  %cond43754 = icmp ne i32 %andval43753, 0
-  br i1 %cond43754, label %if.then7006, label %if.else7007
+  %andval44410 = phi i32 [ 1, %and.rhs19 ], [ 0, %and.false20 ]
+  %cond44411 = icmp ne i32 %andval44410, 0
+  br i1 %cond44411, label %if.then7125, label %if.else7126
 
-if.then7009:                                      ; preds = %and.merge24
-  %load43784 = load ptr, ptr %b, align 8
-  %load43786 = load i32, ptr %arg, align 4
-  %load43787 = load ptr, ptr %arg_ty, align 8
-  %call43788 = call ptr @mir2asm_arg_reg_typed(i32 %load43786, ptr %load43787)
-  %call43789 = call ptr @vix_string_concat(ptr @.strlit43785, ptr %call43788)
-  %call43791 = call ptr @vix_string_concat(ptr %call43789, ptr @.strlit43790)
-  %load43792 = load ptr, ptr %b, align 8
-  %field43794 = getelementptr %MirAsm, ptr %load43792, i32 0, i32 6
-  %fieldval43795 = load ptr, ptr %field43794, align 8
-  %load43796 = load i32, ptr %val_idx, align 4
-  %idx43797 = getelementptr i32, ptr %fieldval43795, i32 %load43796
-  %loadidx43798 = load i32, ptr %idx43797, align 4
-  %call43799 = call ptr @mir2asm_mem(i32 %loadidx43798)
-  %call43800 = call ptr @vix_string_concat(ptr %call43791, ptr %call43799)
-  call void @mir2asm_line(ptr %load43784, ptr %call43800)
-  %load43801 = load i32, ptr %arg, align 4
-  %add43802 = add i32 %load43801, 1
-  store i32 %add43802, ptr %arg, align 4
-  br label %if.end7011
+if.then7128:                                      ; preds = %if.else7126
+  %load44433 = load ptr, ptr %b, align 8
+  %load44435 = load ptr, ptr %b, align 8
+  %field44437 = getelementptr %MirAsm, ptr %load44435, i32 0, i32 6
+  %fieldval44438 = load ptr, ptr %field44437, align 8
+  %load44439 = load i32, ptr %val_idx, align 4
+  %idx44440 = getelementptr i32, ptr %fieldval44438, i32 %load44439
+  %loadidx44441 = load i32, ptr %idx44440, align 4
+  %call44442 = call ptr @mir2asm_mem(i32 %loadidx44441)
+  %call44443 = call ptr @vix_string_concat(ptr @.strlit44434, ptr %call44442)
+  call void @mir2asm_line(ptr %load44433, ptr %call44443)
+  %load44444 = load ptr, ptr %b, align 8
+  %load44446 = load i32, ptr %stack_arg, align 4
+  %mul44447 = mul i32 %load44446, 8
+  %call44448 = call ptr @i32_to_str(i32 %mul44447)
+  %call44449 = call ptr @vix_string_concat(ptr @.strlit44445, ptr %call44448)
+  %call44451 = call ptr @vix_string_concat(ptr %call44449, ptr @.strlit44450)
+  call void @mir2asm_line(ptr %load44444, ptr %call44451)
+  %load44452 = load i32, ptr %stack_arg, align 4
+  %add44453 = add i32 %load44452, 1
+  store i32 %add44453, ptr %stack_arg, align 4
+  br label %if.end7130
 
-if.else7010:                                      ; preds = %and.merge24
-  %load43803 = load i32, ptr %arg, align 4
-  %cmp43804 = icmp slt i32 %load43803, 6
-  %bool43805 = zext i1 %cmp43804 to i32
-  %cond43806 = icmp ne i32 %bool43805, 0
-  br i1 %cond43806, label %if.then7012, label %if.else7013
+if.else7129:                                      ; preds = %if.else7126
+  br label %if.end7130
 
-if.end7011:                                       ; preds = %if.end7014, %if.then7009
-  br label %if.end7005
+if.end7130:                                       ; preds = %if.else7129, %if.then7128
+  br label %if.end7127
 
-and.rhs22:                                        ; preds = %if.else7004
-  %load43778 = load i32, ptr %pass_stack_addr, align 4
-  %cmp43779 = icmp eq i32 %load43778, 1
-  %bool43780 = zext i1 %cmp43779 to i32
-  %cond43781 = icmp ne i32 %bool43780, 0
-  br i1 %cond43781, label %and.merge24, label %and.false23
+if.then7131:                                      ; preds = %and.merge24
+  %load44466 = load ptr, ptr %b, align 8
+  %load44468 = load i32, ptr %arg, align 4
+  %load44469 = load ptr, ptr %arg_ty, align 8
+  %call44470 = call ptr @mir2asm_arg_reg_typed(i32 %load44468, ptr %load44469)
+  %call44471 = call ptr @vix_string_concat(ptr @.strlit44467, ptr %call44470)
+  %call44473 = call ptr @vix_string_concat(ptr %call44471, ptr @.strlit44472)
+  %load44474 = load ptr, ptr %b, align 8
+  %field44476 = getelementptr %MirAsm, ptr %load44474, i32 0, i32 6
+  %fieldval44477 = load ptr, ptr %field44476, align 8
+  %load44478 = load i32, ptr %val_idx, align 4
+  %idx44479 = getelementptr i32, ptr %fieldval44477, i32 %load44478
+  %loadidx44480 = load i32, ptr %idx44479, align 4
+  %call44481 = call ptr @mir2asm_mem(i32 %loadidx44480)
+  %call44482 = call ptr @vix_string_concat(ptr %call44473, ptr %call44481)
+  call void @mir2asm_line(ptr %load44466, ptr %call44482)
+  %load44483 = load i32, ptr %arg, align 4
+  %add44484 = add i32 %load44483, 1
+  store i32 %add44484, ptr %arg, align 4
+  br label %if.end7133
 
-and.false23:                                      ; preds = %and.rhs22, %if.else7004
+if.else7132:                                      ; preds = %and.merge24
+  %load44485 = load i32, ptr %arg, align 4
+  %cmp44486 = icmp slt i32 %load44485, 6
+  %bool44487 = zext i1 %cmp44486 to i32
+  %cond44488 = icmp ne i32 %bool44487, 0
+  br i1 %cond44488, label %if.then7134, label %if.else7135
+
+if.end7133:                                       ; preds = %if.end7136, %if.then7131
+  br label %if.end7124
+
+and.rhs22:                                        ; preds = %if.else7123
+  %load44460 = load i32, ptr %pass_stack_addr, align 4
+  %cmp44461 = icmp eq i32 %load44460, 1
+  %bool44462 = zext i1 %cmp44461 to i32
+  %cond44463 = icmp ne i32 %bool44462, 0
+  br i1 %cond44463, label %and.merge24, label %and.false23
+
+and.false23:                                      ; preds = %and.rhs22, %if.else7123
   br label %and.merge24
 
 and.merge24:                                      ; preds = %and.false23, %and.rhs22
-  %andval43782 = phi i32 [ 1, %and.rhs22 ], [ 0, %and.false23 ]
-  %cond43783 = icmp ne i32 %andval43782, 0
-  br i1 %cond43783, label %if.then7009, label %if.else7010
+  %andval44464 = phi i32 [ 1, %and.rhs22 ], [ 0, %and.false23 ]
+  %cond44465 = icmp ne i32 %andval44464, 0
+  br i1 %cond44465, label %if.then7131, label %if.else7132
 
-if.then7012:                                      ; preds = %if.else7010
-  %load43807 = load ptr, ptr %b, align 8
-  %load43809 = load i32, ptr %arg, align 4
-  %load43810 = load ptr, ptr %arg_ty, align 8
-  %call43811 = call ptr @mir2asm_arg_reg_typed(i32 %load43809, ptr %load43810)
-  %call43812 = call ptr @vix_string_concat(ptr @.strlit43808, ptr %call43811)
-  %call43814 = call ptr @vix_string_concat(ptr %call43812, ptr @.strlit43813)
-  %load43815 = load ptr, ptr %b, align 8
-  %load43816 = load ptr, ptr %val, align 8
-  %load43817 = load ptr, ptr %arg_ty, align 8
-  %call43818 = call ptr @mir2asm_operand_typed(ptr %load43815, ptr %load43816, ptr %load43817)
-  %call43819 = call ptr @vix_string_concat(ptr %call43814, ptr %call43818)
-  call void @mir2asm_line(ptr %load43807, ptr %call43819)
-  %load43820 = load i32, ptr %arg, align 4
-  %add43821 = add i32 %load43820, 1
-  store i32 %add43821, ptr %arg, align 4
-  br label %if.end7014
+if.then7134:                                      ; preds = %if.else7132
+  %load44489 = load ptr, ptr %b, align 8
+  %load44491 = load i32, ptr %arg, align 4
+  %load44492 = load ptr, ptr %arg_ty, align 8
+  %call44493 = call ptr @mir2asm_arg_reg_typed(i32 %load44491, ptr %load44492)
+  %call44494 = call ptr @vix_string_concat(ptr @.strlit44490, ptr %call44493)
+  %call44496 = call ptr @vix_string_concat(ptr %call44494, ptr @.strlit44495)
+  %load44497 = load ptr, ptr %b, align 8
+  %load44498 = load ptr, ptr %val, align 8
+  %load44499 = load ptr, ptr %arg_ty, align 8
+  %call44500 = call ptr @mir2asm_operand_typed(ptr %load44497, ptr %load44498, ptr %load44499)
+  %call44501 = call ptr @vix_string_concat(ptr %call44496, ptr %call44500)
+  call void @mir2asm_line(ptr %load44489, ptr %call44501)
+  %load44502 = load i32, ptr %arg, align 4
+  %add44503 = add i32 %load44502, 1
+  store i32 %add44503, ptr %arg, align 4
+  br label %if.end7136
 
-if.else7013:                                      ; preds = %if.else7010
-  br label %if.end7014
+if.else7135:                                      ; preds = %if.else7132
+  %load44504 = load i32, ptr %pass_stack_addr, align 4
+  %cmp44505 = icmp eq i32 %load44504, 1
+  %bool44506 = zext i1 %cmp44505 to i32
+  %cond44507 = icmp ne i32 %bool44506, 0
+  br i1 %cond44507, label %if.then7137, label %if.else7138
 
-if.end7014:                                       ; preds = %if.else7013, %if.then7012
-  br label %if.end7011
+if.end7136:                                       ; preds = %if.end7139, %if.then7134
+  br label %if.end7133
 
-if.then7015:                                      ; preds = %and.merge27
-  %load43847 = load ptr, ptr %b, align 8
-  %load43848 = load ptr, ptr %dest, align 8
-  %load43849 = load ptr, ptr %ret_ty, align 8
-  %call43850 = call i32 @mir2asm_alloc_slot_typed(ptr %load43847, ptr %load43848, i32 0, ptr %load43849)
+if.then7137:                                      ; preds = %if.else7135
+  %load44508 = load ptr, ptr %b, align 8
+  %load44510 = load ptr, ptr %b, align 8
+  %field44512 = getelementptr %MirAsm, ptr %load44510, i32 0, i32 6
+  %fieldval44513 = load ptr, ptr %field44512, align 8
+  %load44514 = load i32, ptr %val_idx, align 4
+  %idx44515 = getelementptr i32, ptr %fieldval44513, i32 %load44514
+  %loadidx44516 = load i32, ptr %idx44515, align 4
+  %call44517 = call ptr @mir2asm_mem(i32 %loadidx44516)
+  %call44518 = call ptr @vix_string_concat(ptr @.strlit44509, ptr %call44517)
+  call void @mir2asm_line(ptr %load44508, ptr %call44518)
+  %load44519 = load ptr, ptr %b, align 8
+  %load44521 = load i32, ptr %stack_arg, align 4
+  %mul44522 = mul i32 %load44521, 8
+  %call44523 = call ptr @i32_to_str(i32 %mul44522)
+  %call44524 = call ptr @vix_string_concat(ptr @.strlit44520, ptr %call44523)
+  %call44526 = call ptr @vix_string_concat(ptr %call44524, ptr @.strlit44525)
+  call void @mir2asm_line(ptr %load44519, ptr %call44526)
+  br label %if.end7139
+
+if.else7138:                                      ; preds = %if.else7135
+  %load44527 = load ptr, ptr %b, align 8
+  %load44529 = load ptr, ptr %arg_ty, align 8
+  %call44530 = call ptr @mir2asm_acc(ptr %load44529)
+  %call44531 = call ptr @vix_string_concat(ptr @.strlit44528, ptr %call44530)
+  %call44533 = call ptr @vix_string_concat(ptr %call44531, ptr @.strlit44532)
+  %load44534 = load ptr, ptr %b, align 8
+  %load44535 = load ptr, ptr %val, align 8
+  %load44536 = load ptr, ptr %arg_ty, align 8
+  %call44537 = call ptr @mir2asm_operand_typed(ptr %load44534, ptr %load44535, ptr %load44536)
+  %call44538 = call ptr @vix_string_concat(ptr %call44533, ptr %call44537)
+  call void @mir2asm_line(ptr %load44527, ptr %call44538)
+  %load44539 = load ptr, ptr %b, align 8
+  %load44541 = load ptr, ptr %arg_ty, align 8
+  %call44542 = call ptr @mir2asm_mem_word(ptr %load44541)
+  %call44543 = call ptr @vix_string_concat(ptr @.strlit44540, ptr %call44542)
+  %call44545 = call ptr @vix_string_concat(ptr %call44543, ptr @.strlit44544)
+  %load44546 = load i32, ptr %stack_arg, align 4
+  %mul44547 = mul i32 %load44546, 8
+  %call44548 = call ptr @i32_to_str(i32 %mul44547)
+  %call44549 = call ptr @vix_string_concat(ptr %call44545, ptr %call44548)
+  %call44551 = call ptr @vix_string_concat(ptr %call44549, ptr @.strlit44550)
+  %load44552 = load ptr, ptr %arg_ty, align 8
+  %call44553 = call ptr @mir2asm_acc(ptr %load44552)
+  %call44554 = call ptr @vix_string_concat(ptr %call44551, ptr %call44553)
+  call void @mir2asm_line(ptr %load44539, ptr %call44554)
+  br label %if.end7139
+
+if.end7139:                                       ; preds = %if.else7138, %if.then7137
+  %load44555 = load i32, ptr %stack_arg, align 4
+  %add44556 = add i32 %load44555, 1
+  store i32 %add44556, ptr %stack_arg, align 4
+  %load44557 = load i32, ptr %arg, align 4
+  %add44558 = add i32 %load44557, 1
+  store i32 %add44558, ptr %arg, align 4
+  br label %if.end7136
+
+if.then7140:                                      ; preds = %while.end7094
+  %load44574 = load ptr, ptr %b, align 8
+  %load44576 = load i32, ptr %stack_bytes, align 4
+  %call44577 = call ptr @i32_to_str(i32 %load44576)
+  %call44578 = call ptr @vix_string_concat(ptr @.strlit44575, ptr %call44577)
+  call void @mir2asm_line(ptr %load44574, ptr %call44578)
+  br label %if.end7142
+
+if.else7141:                                      ; preds = %while.end7094
+  br label %if.end7142
+
+if.end7142:                                       ; preds = %if.else7141, %if.then7140
+  %load44579 = load ptr, ptr %dest, align 8
+  %strcmp44581 = call i32 @strcmp(ptr %load44579, ptr @.strlit44580)
+  %cmp44582 = icmp eq i32 %strcmp44581, 0
+  %bool44583 = zext i1 %cmp44582 to i32
+  %cmp44584 = icmp eq i32 %bool44583, 0
+  %bool44585 = zext i1 %cmp44584 to i32
+  %cond44586 = icmp ne i32 %bool44585, 0
+  br i1 %cond44586, label %and.rhs25, label %and.false26
+
+if.then7143:                                      ; preds = %and.merge27
+  %load44593 = load ptr, ptr %b, align 8
+  %load44594 = load ptr, ptr %dest, align 8
+  %load44595 = load ptr, ptr %ret_ty, align 8
+  %call44596 = call i32 @mir2asm_alloc_slot_typed(ptr %load44593, ptr %load44594, i32 0, ptr %load44595)
   %dest_off28 = alloca i32, align 4
-  store i32 %call43850, ptr %dest_off28, align 4
-  %load43851 = load ptr, ptr %ret_ty, align 8
-  %strcmp43853 = call i32 @strcmp(ptr %load43851, ptr @.strlit43852)
-  %cmp43854 = icmp eq i32 %strcmp43853, 0
-  %bool43855 = zext i1 %cmp43854 to i32
-  %cond43856 = icmp ne i32 %bool43855, 0
-  br i1 %cond43856, label %if.then7018, label %if.else7019
+  store i32 %call44596, ptr %dest_off28, align 4
+  %load44597 = load ptr, ptr %ret_ty, align 8
+  %strcmp44599 = call i32 @strcmp(ptr %load44597, ptr @.strlit44598)
+  %cmp44600 = icmp eq i32 %strcmp44599, 0
+  %bool44601 = zext i1 %cmp44600 to i32
+  %cond44602 = icmp ne i32 %bool44601, 0
+  br i1 %cond44602, label %if.then7146, label %if.else7147
 
-if.else7016:                                      ; preds = %and.merge27
-  br label %if.end7017
+if.else7144:                                      ; preds = %and.merge27
+  br label %if.end7145
 
-if.end7017:                                       ; preds = %if.else7016, %if.end7020
+if.end7145:                                       ; preds = %if.else7144, %if.end7148
   ret void
 
-and.rhs25:                                        ; preds = %while.end6978
-  %load43841 = load i32, ptr %sret, align 4
-  %cmp43842 = icmp eq i32 %load43841, 0
-  %bool43843 = zext i1 %cmp43842 to i32
-  %cond43844 = icmp ne i32 %bool43843, 0
-  br i1 %cond43844, label %and.merge27, label %and.false26
+and.rhs25:                                        ; preds = %if.end7142
+  %load44587 = load i32, ptr %sret, align 4
+  %cmp44588 = icmp eq i32 %load44587, 0
+  %bool44589 = zext i1 %cmp44588 to i32
+  %cond44590 = icmp ne i32 %bool44589, 0
+  br i1 %cond44590, label %and.merge27, label %and.false26
 
-and.false26:                                      ; preds = %and.rhs25, %while.end6978
+and.false26:                                      ; preds = %and.rhs25, %if.end7142
   br label %and.merge27
 
 and.merge27:                                      ; preds = %and.false26, %and.rhs25
-  %andval43845 = phi i32 [ 1, %and.rhs25 ], [ 0, %and.false26 ]
-  %cond43846 = icmp ne i32 %andval43845, 0
-  br i1 %cond43846, label %if.then7015, label %if.else7016
+  %andval44591 = phi i32 [ 1, %and.rhs25 ], [ 0, %and.false26 ]
+  %cond44592 = icmp ne i32 %andval44591, 0
+  br i1 %cond44592, label %if.then7143, label %if.else7144
 
-if.then7018:                                      ; preds = %if.then7015
-  %load43857 = load ptr, ptr %b, align 8
-  %load43859 = load i32, ptr %dest_off28, align 4
-  %call43860 = call ptr @mir2asm_mem(i32 %load43859)
-  %call43861 = call ptr @vix_string_concat(ptr @.strlit43858, ptr %call43860)
-  %call43863 = call ptr @vix_string_concat(ptr %call43861, ptr @.strlit43862)
-  call void @mir2asm_line(ptr %load43857, ptr %call43863)
-  br label %if.end7020
+if.then7146:                                      ; preds = %if.then7143
+  %load44603 = load ptr, ptr %b, align 8
+  %load44605 = load i32, ptr %dest_off28, align 4
+  %call44606 = call ptr @mir2asm_mem(i32 %load44605)
+  %call44607 = call ptr @vix_string_concat(ptr @.strlit44604, ptr %call44606)
+  %call44609 = call ptr @vix_string_concat(ptr %call44607, ptr @.strlit44608)
+  call void @mir2asm_line(ptr %load44603, ptr %call44609)
+  br label %if.end7148
 
-if.else7019:                                      ; preds = %if.then7015
-  %load43864 = load ptr, ptr %ret_ty, align 8
-  %strcmp43866 = call i32 @strcmp(ptr %load43864, ptr @.strlit43865)
-  %cmp43867 = icmp eq i32 %strcmp43866, 0
-  %bool43868 = zext i1 %cmp43867 to i32
-  %cond43869 = icmp ne i32 %bool43868, 0
-  br i1 %cond43869, label %if.then7021, label %if.else7022
+if.else7147:                                      ; preds = %if.then7143
+  %load44610 = load ptr, ptr %ret_ty, align 8
+  %strcmp44612 = call i32 @strcmp(ptr %load44610, ptr @.strlit44611)
+  %cmp44613 = icmp eq i32 %strcmp44612, 0
+  %bool44614 = zext i1 %cmp44613 to i32
+  %cond44615 = icmp ne i32 %bool44614, 0
+  br i1 %cond44615, label %if.then7149, label %if.else7150
 
-if.end7020:                                       ; preds = %if.end7023, %if.then7018
-  br label %if.end7017
+if.end7148:                                       ; preds = %if.end7151, %if.then7146
+  br label %if.end7145
 
-if.then7021:                                      ; preds = %if.else7019
-  %load43870 = load ptr, ptr %b, align 8
-  %load43872 = load i32, ptr %dest_off28, align 4
-  %call43873 = call ptr @mir2asm_mem(i32 %load43872)
-  %call43874 = call ptr @vix_string_concat(ptr @.strlit43871, ptr %call43873)
-  %call43876 = call ptr @vix_string_concat(ptr %call43874, ptr @.strlit43875)
-  call void @mir2asm_line(ptr %load43870, ptr %call43876)
-  br label %if.end7023
+if.then7149:                                      ; preds = %if.else7147
+  %load44616 = load ptr, ptr %b, align 8
+  %load44618 = load i32, ptr %dest_off28, align 4
+  %call44619 = call ptr @mir2asm_mem(i32 %load44618)
+  %call44620 = call ptr @vix_string_concat(ptr @.strlit44617, ptr %call44619)
+  %call44622 = call ptr @vix_string_concat(ptr %call44620, ptr @.strlit44621)
+  call void @mir2asm_line(ptr %load44616, ptr %call44622)
+  br label %if.end7151
 
-if.else7022:                                      ; preds = %if.else7019
-  %load43877 = load ptr, ptr %b, align 8
-  %load43879 = load i32, ptr %dest_off28, align 4
-  %call43880 = call ptr @mir2asm_mem(i32 %load43879)
-  %call43881 = call ptr @vix_string_concat(ptr @.strlit43878, ptr %call43880)
-  %call43883 = call ptr @vix_string_concat(ptr %call43881, ptr @.strlit43882)
-  %load43884 = load ptr, ptr %ret_ty, align 8
-  %call43885 = call ptr @mir2asm_acc(ptr %load43884)
-  %call43886 = call ptr @vix_string_concat(ptr %call43883, ptr %call43885)
-  call void @mir2asm_line(ptr %load43877, ptr %call43886)
-  br label %if.end7023
+if.else7150:                                      ; preds = %if.else7147
+  %load44623 = load ptr, ptr %b, align 8
+  %load44625 = load i32, ptr %dest_off28, align 4
+  %call44626 = call ptr @mir2asm_mem(i32 %load44625)
+  %call44627 = call ptr @vix_string_concat(ptr @.strlit44624, ptr %call44626)
+  %call44629 = call ptr @vix_string_concat(ptr %call44627, ptr @.strlit44628)
+  %load44630 = load ptr, ptr %ret_ty, align 8
+  %call44631 = call ptr @mir2asm_acc(ptr %load44630)
+  %call44632 = call ptr @vix_string_concat(ptr %call44629, ptr %call44631)
+  call void @mir2asm_line(ptr %load44623, ptr %call44632)
+  br label %if.end7151
 
-if.end7023:                                       ; preds = %if.else7022, %if.then7021
-  br label %if.end7020
+if.end7151:                                       ; preds = %if.else7150, %if.then7149
+  br label %if.end7148
 }
 
 define void @mir2asm_emit_instruction(ptr %0, ptr %1) {
@@ -83445,2219 +84905,2309 @@ entry:
   store ptr %0, ptr %b, align 8
   %line = alloca ptr, align 8
   store ptr %1, ptr %line, align 8
-  %load43887 = load ptr, ptr %line, align 8
-  %strcmp43889 = call i32 @strcmp(ptr %load43887, ptr @.strlit43888)
-  %cmp43890 = icmp eq i32 %strcmp43889, 0
-  %bool43891 = zext i1 %cmp43890 to i32
-  %cond43892 = icmp ne i32 %bool43891, 0
-  br i1 %cond43892, label %or.true, label %or.rhs
+  %load44633 = load ptr, ptr %line, align 8
+  %strcmp44635 = call i32 @strcmp(ptr %load44633, ptr @.strlit44634)
+  %cmp44636 = icmp eq i32 %strcmp44635, 0
+  %bool44637 = zext i1 %cmp44636 to i32
+  %cond44638 = icmp ne i32 %bool44637, 0
+  br i1 %cond44638, label %or.true, label %or.rhs
 
-if.then7024:                                      ; preds = %or.merge3
+if.then7152:                                      ; preds = %or.merge3
   ret void
 
-if.else7025:                                      ; preds = %or.merge3
-  br label %if.end7026
+if.else7153:                                      ; preds = %or.merge3
+  br label %if.end7154
 
-if.end7026:                                       ; preds = %if.else7025
-  %load43909 = load ptr, ptr %line, align 8
-  %call43911 = call i32 @mir2asm_starts_with(ptr %load43909, ptr @.strlit43910)
-  %cmp43912 = icmp eq i32 %call43911, 1
-  %bool43913 = zext i1 %cmp43912 to i32
-  %cond43914 = icmp ne i32 %bool43913, 0
-  br i1 %cond43914, label %if.then7027, label %if.else7028
+if.end7154:                                       ; preds = %if.else7153
+  %load44655 = load ptr, ptr %line, align 8
+  %call44657 = call i32 @mir2asm_starts_with(ptr %load44655, ptr @.strlit44656)
+  %cmp44658 = icmp eq i32 %call44657, 1
+  %bool44659 = zext i1 %cmp44658 to i32
+  %cond44660 = icmp ne i32 %bool44659, 0
+  br i1 %cond44660, label %if.then7155, label %if.else7156
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load43893 = load ptr, ptr %line, align 8
-  %call43895 = call i32 @mir2asm_starts_with(ptr %load43893, ptr @.strlit43894)
-  %cmp43896 = icmp eq i32 %call43895, 1
-  %bool43897 = zext i1 %cmp43896 to i32
-  %cond43898 = icmp ne i32 %bool43897, 0
-  br i1 %cond43898, label %or.true, label %or.merge
+  %load44639 = load ptr, ptr %line, align 8
+  %call44641 = call i32 @mir2asm_starts_with(ptr %load44639, ptr @.strlit44640)
+  %cmp44642 = icmp eq i32 %call44641, 1
+  %bool44643 = zext i1 %cmp44642 to i32
+  %cond44644 = icmp ne i32 %bool44643, 0
+  br i1 %cond44644, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval43899 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond43900 = icmp ne i32 %orval43899, 0
-  br i1 %cond43900, label %or.true1, label %or.rhs2
+  %orval44645 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond44646 = icmp ne i32 %orval44645, 0
+  br i1 %cond44646, label %or.true1, label %or.rhs2
 
 or.true1:                                         ; preds = %or.rhs2, %or.merge
   br label %or.merge3
 
 or.rhs2:                                          ; preds = %or.merge
-  %load43901 = load ptr, ptr %line, align 8
-  %strcmp43903 = call i32 @strcmp(ptr %load43901, ptr @.strlit43902)
-  %cmp43904 = icmp eq i32 %strcmp43903, 0
-  %bool43905 = zext i1 %cmp43904 to i32
-  %cond43906 = icmp ne i32 %bool43905, 0
-  br i1 %cond43906, label %or.true1, label %or.merge3
+  %load44647 = load ptr, ptr %line, align 8
+  %strcmp44649 = call i32 @strcmp(ptr %load44647, ptr @.strlit44648)
+  %cmp44650 = icmp eq i32 %strcmp44649, 0
+  %bool44651 = zext i1 %cmp44650 to i32
+  %cond44652 = icmp ne i32 %bool44651, 0
+  br i1 %cond44652, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval43907 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond43908 = icmp ne i32 %orval43907, 0
-  br i1 %cond43908, label %if.then7024, label %if.else7025
+  %orval44653 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond44654 = icmp ne i32 %orval44653, 0
+  br i1 %cond44654, label %if.then7152, label %if.else7153
 
-if.then7027:                                      ; preds = %if.end7026
-  %load43915 = load ptr, ptr %b, align 8
-  %load43916 = load ptr, ptr %line, align 8
-  call void @mir2asm_parse_type_decl(ptr %load43915, ptr %load43916)
+if.then7155:                                      ; preds = %if.end7154
+  %load44661 = load ptr, ptr %b, align 8
+  %load44662 = load ptr, ptr %line, align 8
+  call void @mir2asm_parse_type_decl(ptr %load44661, ptr %load44662)
   ret void
 
-if.else7028:                                      ; preds = %if.end7026
-  br label %if.end7029
+if.else7156:                                      ; preds = %if.end7154
+  br label %if.end7157
 
-if.end7029:                                       ; preds = %if.else7028
-  %load43917 = load ptr, ptr %line, align 8
-  %call43919 = call i32 @mir2asm_starts_with(ptr %load43917, ptr @.strlit43918)
-  %cmp43920 = icmp eq i32 %call43919, 1
-  %bool43921 = zext i1 %cmp43920 to i32
-  %cond43922 = icmp ne i32 %bool43921, 0
-  br i1 %cond43922, label %if.then7030, label %if.else7031
+if.end7157:                                       ; preds = %if.else7156
+  %load44663 = load ptr, ptr %line, align 8
+  %call44665 = call i32 @mir2asm_starts_with(ptr %load44663, ptr @.strlit44664)
+  %cmp44666 = icmp eq i32 %call44665, 1
+  %bool44667 = zext i1 %cmp44666 to i32
+  %cond44668 = icmp ne i32 %bool44667, 0
+  br i1 %cond44668, label %if.then7158, label %if.else7159
 
-if.then7030:                                      ; preds = %if.end7029
-  %load43923 = load ptr, ptr %line, align 8
-  %call43924 = call i32 @mir2asm_find(ptr %load43923, i8 64, i32 0)
+if.then7158:                                      ; preds = %if.end7157
+  %load44669 = load ptr, ptr %line, align 8
+  %call44670 = call i32 @mir2asm_find(ptr %load44669, i8 64, i32 0)
   %at = alloca i32, align 4
-  store i32 %call43924, ptr %at, align 4
-  %load43925 = load ptr, ptr %line, align 8
-  %load43926 = load i32, ptr %at, align 4
-  %call43927 = call i32 @mir2asm_find(ptr %load43925, i8 40, i32 %load43926)
+  store i32 %call44670, ptr %at, align 4
+  %load44671 = load ptr, ptr %line, align 8
+  %load44672 = load i32, ptr %at, align 4
+  %call44673 = call i32 @mir2asm_find(ptr %load44671, i8 40, i32 %load44672)
   %lp = alloca i32, align 4
-  store i32 %call43927, ptr %lp, align 4
-  %ifexpr43928 = alloca ptr, align 8
-  %load43929 = load i32, ptr %at, align 4
-  %cmp43930 = icmp sge i32 %load43929, 0
-  %bool43931 = zext i1 %cmp43930 to i32
-  %cond43932 = icmp ne i32 %bool43931, 0
-  br i1 %cond43932, label %and.rhs, label %and.false
+  store i32 %call44673, ptr %lp, align 4
+  %ifexpr44674 = alloca ptr, align 8
+  %load44675 = load i32, ptr %at, align 4
+  %cmp44676 = icmp sge i32 %load44675, 0
+  %bool44677 = zext i1 %cmp44676 to i32
+  %cond44678 = icmp ne i32 %bool44677, 0
+  br i1 %cond44678, label %and.rhs, label %and.false
 
-if.else7031:                                      ; preds = %if.end7029
-  br label %if.end7032
+if.else7159:                                      ; preds = %if.end7157
+  br label %if.end7160
 
-if.end7032:                                       ; preds = %if.else7031
-  %load43969 = load ptr, ptr %line, align 8
-  %call43971 = call i32 @mir2asm_starts_with(ptr %load43969, ptr @.strlit43970)
-  %cmp43972 = icmp eq i32 %call43971, 1
-  %bool43973 = zext i1 %cmp43972 to i32
-  %cond43974 = icmp ne i32 %bool43973, 0
-  br i1 %cond43974, label %if.then7039, label %if.else7040
+if.end7160:                                       ; preds = %if.else7159
+  %load44715 = load ptr, ptr %line, align 8
+  %call44717 = call i32 @mir2asm_starts_with(ptr %load44715, ptr @.strlit44716)
+  %cmp44718 = icmp eq i32 %call44717, 1
+  %bool44719 = zext i1 %cmp44718 to i32
+  %cond44720 = icmp ne i32 %bool44719, 0
+  br i1 %cond44720, label %if.then7167, label %if.else7168
 
-ifexpr.then7033:                                  ; preds = %and.merge
-  %load43940 = load ptr, ptr %line, align 8
-  %load43941 = load i32, ptr %at, align 4
-  %load43942 = load i32, ptr %lp, align 4
-  %call43943 = call ptr @mir2asm_slice(ptr %load43940, i32 %load43941, i32 %load43942)
-  %call43944 = call ptr @mir2asm_clean_name(ptr %call43943)
-  store ptr %call43944, ptr %ifexpr43928, align 8
-  br label %ifexpr.end7035
+ifexpr.then7161:                                  ; preds = %and.merge
+  %load44686 = load ptr, ptr %line, align 8
+  %load44687 = load i32, ptr %at, align 4
+  %load44688 = load i32, ptr %lp, align 4
+  %call44689 = call ptr @mir2asm_slice(ptr %load44686, i32 %load44687, i32 %load44688)
+  %call44690 = call ptr @mir2asm_clean_name(ptr %call44689)
+  store ptr %call44690, ptr %ifexpr44674, align 8
+  br label %ifexpr.end7163
 
-ifexpr.else7034:                                  ; preds = %and.merge
-  store ptr @.strlit43945, ptr %ifexpr43928, align 8
-  br label %ifexpr.end7035
+ifexpr.else7162:                                  ; preds = %and.merge
+  store ptr @.strlit44691, ptr %ifexpr44674, align 8
+  br label %ifexpr.end7163
 
-ifexpr.end7035:                                   ; preds = %ifexpr.else7034, %ifexpr.then7033
-  %ifexprval43946 = load ptr, ptr %ifexpr43928, align 8
+ifexpr.end7163:                                   ; preds = %ifexpr.else7162, %ifexpr.then7161
+  %ifexprval44692 = load ptr, ptr %ifexpr44674, align 8
   %name = alloca ptr, align 8
-  store ptr %ifexprval43946, ptr %name, align 8
-  %load43947 = load ptr, ptr %name, align 8
-  %strcmp43949 = call i32 @strcmp(ptr %load43947, ptr @.strlit43948)
-  %cmp43950 = icmp eq i32 %strcmp43949, 0
-  %bool43951 = zext i1 %cmp43950 to i32
-  %cmp43952 = icmp eq i32 %bool43951, 0
-  %bool43953 = zext i1 %cmp43952 to i32
-  %cond43954 = icmp ne i32 %bool43953, 0
-  br i1 %cond43954, label %and.rhs4, label %and.false5
+  store ptr %ifexprval44692, ptr %name, align 8
+  %load44693 = load ptr, ptr %name, align 8
+  %strcmp44695 = call i32 @strcmp(ptr %load44693, ptr @.strlit44694)
+  %cmp44696 = icmp eq i32 %strcmp44695, 0
+  %bool44697 = zext i1 %cmp44696 to i32
+  %cmp44698 = icmp eq i32 %bool44697, 0
+  %bool44699 = zext i1 %cmp44698 to i32
+  %cond44700 = icmp ne i32 %bool44699, 0
+  br i1 %cond44700, label %and.rhs4, label %and.false5
 
-and.rhs:                                          ; preds = %if.then7030
-  %load43933 = load i32, ptr %lp, align 4
-  %load43934 = load i32, ptr %at, align 4
-  %cmp43935 = icmp sgt i32 %load43933, %load43934
-  %bool43936 = zext i1 %cmp43935 to i32
-  %cond43937 = icmp ne i32 %bool43936, 0
-  br i1 %cond43937, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %if.then7158
+  %load44679 = load i32, ptr %lp, align 4
+  %load44680 = load i32, ptr %at, align 4
+  %cmp44681 = icmp sgt i32 %load44679, %load44680
+  %bool44682 = zext i1 %cmp44681 to i32
+  %cond44683 = icmp ne i32 %bool44682, 0
+  br i1 %cond44683, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %if.then7030
+and.false:                                        ; preds = %and.rhs, %if.then7158
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval43938 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond43939 = icmp ne i32 %andval43938, 0
-  br i1 %cond43939, label %ifexpr.then7033, label %ifexpr.else7034
+  %andval44684 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond44685 = icmp ne i32 %andval44684, 0
+  br i1 %cond44685, label %ifexpr.then7161, label %ifexpr.else7162
 
-if.then7036:                                      ; preds = %and.merge6
-  %load43965 = load ptr, ptr %b, align 8
-  %load43967 = load ptr, ptr %name, align 8
-  %call43968 = call ptr @vix_string_concat(ptr @.strlit43966, ptr %load43967)
-  call void @mir2asm_line(ptr %load43965, ptr %call43968)
-  br label %if.end7038
+if.then7164:                                      ; preds = %and.merge6
+  %load44711 = load ptr, ptr %b, align 8
+  %load44713 = load ptr, ptr %name, align 8
+  %call44714 = call ptr @vix_string_concat(ptr @.strlit44712, ptr %load44713)
+  call void @mir2asm_line(ptr %load44711, ptr %call44714)
+  br label %if.end7166
 
-if.else7037:                                      ; preds = %and.merge6
-  br label %if.end7038
+if.else7165:                                      ; preds = %and.merge6
+  br label %if.end7166
 
-if.end7038:                                       ; preds = %if.else7037, %if.then7036
+if.end7166:                                       ; preds = %if.else7165, %if.then7164
   ret void
 
-and.rhs4:                                         ; preds = %ifexpr.end7035
-  %load43955 = load ptr, ptr %name, align 8
-  %strcmp43957 = call i32 @strcmp(ptr %load43955, ptr @.strlit43956)
-  %cmp43958 = icmp eq i32 %strcmp43957, 0
-  %bool43959 = zext i1 %cmp43958 to i32
-  %cmp43960 = icmp eq i32 %bool43959, 0
-  %bool43961 = zext i1 %cmp43960 to i32
-  %cond43962 = icmp ne i32 %bool43961, 0
-  br i1 %cond43962, label %and.merge6, label %and.false5
+and.rhs4:                                         ; preds = %ifexpr.end7163
+  %load44701 = load ptr, ptr %name, align 8
+  %strcmp44703 = call i32 @strcmp(ptr %load44701, ptr @.strlit44702)
+  %cmp44704 = icmp eq i32 %strcmp44703, 0
+  %bool44705 = zext i1 %cmp44704 to i32
+  %cmp44706 = icmp eq i32 %bool44705, 0
+  %bool44707 = zext i1 %cmp44706 to i32
+  %cond44708 = icmp ne i32 %bool44707, 0
+  br i1 %cond44708, label %and.merge6, label %and.false5
 
-and.false5:                                       ; preds = %and.rhs4, %ifexpr.end7035
+and.false5:                                       ; preds = %and.rhs4, %ifexpr.end7163
   br label %and.merge6
 
 and.merge6:                                       ; preds = %and.false5, %and.rhs4
-  %andval43963 = phi i32 [ 1, %and.rhs4 ], [ 0, %and.false5 ]
-  %cond43964 = icmp ne i32 %andval43963, 0
-  br i1 %cond43964, label %if.then7036, label %if.else7037
+  %andval44709 = phi i32 [ 1, %and.rhs4 ], [ 0, %and.false5 ]
+  %cond44710 = icmp ne i32 %andval44709, 0
+  br i1 %cond44710, label %if.then7164, label %if.else7165
 
-if.then7039:                                      ; preds = %if.end7032
-  %load43975 = load ptr, ptr %b, align 8
-  %load43976 = load ptr, ptr %line, align 8
-  call void @mir2asm_begin_function(ptr %load43975, ptr %load43976)
+if.then7167:                                      ; preds = %if.end7160
+  %load44721 = load ptr, ptr %b, align 8
+  %load44722 = load ptr, ptr %line, align 8
+  call void @mir2asm_begin_function(ptr %load44721, ptr %load44722)
   ret void
 
-if.else7040:                                      ; preds = %if.end7032
-  br label %if.end7041
+if.else7168:                                      ; preds = %if.end7160
+  br label %if.end7169
 
-if.end7041:                                       ; preds = %if.else7040
-  %load43977 = load ptr, ptr %line, align 8
-  %strcmp43979 = call i32 @strcmp(ptr %load43977, ptr @.strlit43978)
-  %cmp43980 = icmp eq i32 %strcmp43979, 0
-  %bool43981 = zext i1 %cmp43980 to i32
-  %cond43982 = icmp ne i32 %bool43981, 0
-  br i1 %cond43982, label %if.then7042, label %if.else7043
+if.end7169:                                       ; preds = %if.else7168
+  %load44723 = load ptr, ptr %line, align 8
+  %strcmp44725 = call i32 @strcmp(ptr %load44723, ptr @.strlit44724)
+  %cmp44726 = icmp eq i32 %strcmp44725, 0
+  %bool44727 = zext i1 %cmp44726 to i32
+  %cond44728 = icmp ne i32 %bool44727, 0
+  br i1 %cond44728, label %if.then7170, label %if.else7171
 
-if.then7042:                                      ; preds = %if.end7041
-  %load43983 = load ptr, ptr %b, align 8
-  call void @mir2asm_end_function(ptr %load43983)
+if.then7170:                                      ; preds = %if.end7169
+  %load44729 = load ptr, ptr %b, align 8
+  call void @mir2asm_end_function(ptr %load44729)
   ret void
 
-if.else7043:                                      ; preds = %if.end7041
-  br label %if.end7044
+if.else7171:                                      ; preds = %if.end7169
+  br label %if.end7172
 
-if.end7044:                                       ; preds = %if.else7043
-  %load43984 = load ptr, ptr %b, align 8
-  %field43986 = getelementptr %MirAsm, ptr %load43984, i32 0, i32 10
-  %fieldval43987 = load i32, ptr %field43986, align 4
-  %cmp43988 = icmp eq i32 %fieldval43987, 0
-  %bool43989 = zext i1 %cmp43988 to i32
-  %cond43990 = icmp ne i32 %bool43989, 0
-  br i1 %cond43990, label %if.then7045, label %if.else7046
+if.end7172:                                       ; preds = %if.else7171
+  %load44730 = load ptr, ptr %b, align 8
+  %field44732 = getelementptr %MirAsm, ptr %load44730, i32 0, i32 10
+  %fieldval44733 = load i32, ptr %field44732, align 4
+  %cmp44734 = icmp eq i32 %fieldval44733, 0
+  %bool44735 = zext i1 %cmp44734 to i32
+  %cond44736 = icmp ne i32 %bool44735, 0
+  br i1 %cond44736, label %if.then7173, label %if.else7174
 
-if.then7045:                                      ; preds = %if.end7044
+if.then7173:                                      ; preds = %if.end7172
   ret void
 
-if.else7046:                                      ; preds = %if.end7044
-  br label %if.end7047
+if.else7174:                                      ; preds = %if.end7172
+  br label %if.end7175
 
-if.end7047:                                       ; preds = %if.else7046
-  %load43991 = load ptr, ptr %line, align 8
-  %call43993 = call i32 @mir2asm_starts_with(ptr %load43991, ptr @.strlit43992)
-  %cmp43994 = icmp eq i32 %call43993, 1
-  %bool43995 = zext i1 %cmp43994 to i32
-  %cond43996 = icmp ne i32 %bool43995, 0
-  br i1 %cond43996, label %if.then7048, label %if.else7049
+if.end7175:                                       ; preds = %if.else7174
+  %load44737 = load ptr, ptr %line, align 8
+  %call44739 = call i32 @mir2asm_starts_with(ptr %load44737, ptr @.strlit44738)
+  %cmp44740 = icmp eq i32 %call44739, 1
+  %bool44741 = zext i1 %cmp44740 to i32
+  %cond44742 = icmp ne i32 %bool44741, 0
+  br i1 %cond44742, label %if.then7176, label %if.else7177
 
-if.then7048:                                      ; preds = %if.end7047
-  %load43997 = load ptr, ptr %line, align 8
-  %load43998 = load ptr, ptr %line, align 8
-  %strlen43999 = call i32 @strlen(ptr %load43998)
-  %sub44000 = sub i32 %strlen43999, 1
-  %call44001 = call ptr @mir2asm_slice(ptr %load43997, i32 6, i32 %sub44000)
-  %call44002 = call ptr @mir2asm_trim(ptr %call44001)
+if.then7176:                                      ; preds = %if.end7175
+  %load44743 = load ptr, ptr %line, align 8
+  %load44744 = load ptr, ptr %line, align 8
+  %strlen44745 = call i32 @strlen(ptr %load44744)
+  %sub44746 = sub i32 %strlen44745, 1
+  %call44747 = call ptr @mir2asm_slice(ptr %load44743, i32 6, i32 %sub44746)
+  %call44748 = call ptr @mir2asm_trim(ptr %call44747)
   %name7 = alloca ptr, align 8
-  store ptr %call44002, ptr %name7, align 8
-  %load44003 = load ptr, ptr %name7, align 8
-  %strcmp44005 = call i32 @strcmp(ptr %load44003, ptr @.strlit44004)
-  %cmp44006 = icmp eq i32 %strcmp44005, 0
-  %bool44007 = zext i1 %cmp44006 to i32
-  %cmp44008 = icmp eq i32 %bool44007, 0
-  %bool44009 = zext i1 %cmp44008 to i32
-  %cond44010 = icmp ne i32 %bool44009, 0
-  br i1 %cond44010, label %if.then7051, label %if.else7052
+  store ptr %call44748, ptr %name7, align 8
+  %load44749 = load ptr, ptr %name7, align 8
+  %strcmp44751 = call i32 @strcmp(ptr %load44749, ptr @.strlit44750)
+  %cmp44752 = icmp eq i32 %strcmp44751, 0
+  %bool44753 = zext i1 %cmp44752 to i32
+  %cmp44754 = icmp eq i32 %bool44753, 0
+  %bool44755 = zext i1 %cmp44754 to i32
+  %cond44756 = icmp ne i32 %bool44755, 0
+  br i1 %cond44756, label %if.then7179, label %if.else7180
 
-if.else7049:                                      ; preds = %if.end7047
-  br label %if.end7050
+if.else7177:                                      ; preds = %if.end7175
+  br label %if.end7178
 
-if.end7050:                                       ; preds = %if.else7049
-  %load44017 = load ptr, ptr %line, align 8
-  %call44019 = call i32 @mir2asm_starts_with(ptr %load44017, ptr @.strlit44018)
-  %cmp44020 = icmp eq i32 %call44019, 1
-  %bool44021 = zext i1 %cmp44020 to i32
-  %cond44022 = icmp ne i32 %bool44021, 0
-  br i1 %cond44022, label %if.then7054, label %if.else7055
+if.end7178:                                       ; preds = %if.else7177
+  %load44763 = load ptr, ptr %line, align 8
+  %call44765 = call i32 @mir2asm_starts_with(ptr %load44763, ptr @.strlit44764)
+  %cmp44766 = icmp eq i32 %call44765, 1
+  %bool44767 = zext i1 %cmp44766 to i32
+  %cond44768 = icmp ne i32 %bool44767, 0
+  br i1 %cond44768, label %if.then7182, label %if.else7183
 
-if.then7051:                                      ; preds = %if.then7048
-  %load44011 = load ptr, ptr %b, align 8
-  %load44012 = load ptr, ptr %b, align 8
-  %load44013 = load ptr, ptr %name7, align 8
-  %call44014 = call ptr @mir2asm_label(ptr %load44012, ptr %load44013)
-  %call44016 = call ptr @vix_string_concat(ptr %call44014, ptr @.strlit44015)
-  call void @mir2asm_line(ptr %load44011, ptr %call44016)
-  br label %if.end7053
+if.then7179:                                      ; preds = %if.then7176
+  %load44757 = load ptr, ptr %b, align 8
+  %load44758 = load ptr, ptr %b, align 8
+  %load44759 = load ptr, ptr %name7, align 8
+  %call44760 = call ptr @mir2asm_label(ptr %load44758, ptr %load44759)
+  %call44762 = call ptr @vix_string_concat(ptr %call44760, ptr @.strlit44761)
+  call void @mir2asm_line(ptr %load44757, ptr %call44762)
+  br label %if.end7181
 
-if.else7052:                                      ; preds = %if.then7048
-  br label %if.end7053
+if.else7180:                                      ; preds = %if.then7176
+  br label %if.end7181
 
-if.end7053:                                       ; preds = %if.else7052, %if.then7051
+if.end7181:                                       ; preds = %if.else7180, %if.then7179
   ret void
 
-if.then7054:                                      ; preds = %if.end7050
-  %load44023 = load ptr, ptr %b, align 8
-  %load44025 = load ptr, ptr %b, align 8
-  %field44027 = getelementptr %MirAsm, ptr %load44025, i32 0, i32 14
-  %fieldval44028 = load ptr, ptr %field44027, align 8
-  %call44029 = call ptr @vix_string_concat(ptr @.strlit44024, ptr %fieldval44028)
-  call void @mir2asm_line(ptr %load44023, ptr %call44029)
+if.then7182:                                      ; preds = %if.end7178
+  %load44769 = load ptr, ptr %b, align 8
+  %load44771 = load ptr, ptr %b, align 8
+  %field44773 = getelementptr %MirAsm, ptr %load44771, i32 0, i32 14
+  %fieldval44774 = load ptr, ptr %field44773, align 8
+  %call44775 = call ptr @vix_string_concat(ptr @.strlit44770, ptr %fieldval44774)
+  call void @mir2asm_line(ptr %load44769, ptr %call44775)
   ret void
 
-if.else7055:                                      ; preds = %if.end7050
-  br label %if.end7056
+if.else7183:                                      ; preds = %if.end7178
+  br label %if.end7184
 
-if.end7056:                                       ; preds = %if.else7055
-  %load44030 = load ptr, ptr %line, align 8
-  %call44032 = call i32 @mir2asm_starts_with(ptr %load44030, ptr @.strlit44031)
-  %cmp44033 = icmp eq i32 %call44032, 1
-  %bool44034 = zext i1 %cmp44033 to i32
-  %cond44035 = icmp ne i32 %bool44034, 0
-  br i1 %cond44035, label %if.then7057, label %if.else7058
+if.end7184:                                       ; preds = %if.else7183
+  %load44776 = load ptr, ptr %line, align 8
+  %call44778 = call i32 @mir2asm_starts_with(ptr %load44776, ptr @.strlit44777)
+  %cmp44779 = icmp eq i32 %call44778, 1
+  %bool44780 = zext i1 %cmp44779 to i32
+  %cond44781 = icmp ne i32 %bool44780, 0
+  br i1 %cond44781, label %if.then7185, label %if.else7186
 
-if.then7057:                                      ; preds = %if.end7056
-  %load44036 = load ptr, ptr %line, align 8
-  %call44037 = call ptr @mir2asm_after(ptr %load44036, i32 4)
-  %call44038 = call ptr @mir2asm_trim(ptr %call44037)
+if.then7185:                                      ; preds = %if.end7184
+  %load44782 = load ptr, ptr %line, align 8
+  %call44783 = call ptr @mir2asm_after(ptr %load44782, i32 4)
+  %call44784 = call ptr @mir2asm_trim(ptr %call44783)
   %rest = alloca ptr, align 8
-  store ptr %call44038, ptr %rest, align 8
-  %load44039 = load ptr, ptr %rest, align 8
-  %call44040 = call i32 @mir2asm_find(ptr %load44039, i8 32, i32 0)
+  store ptr %call44784, ptr %rest, align 8
+  %load44785 = load ptr, ptr %rest, align 8
+  %call44786 = call i32 @mir2asm_find(ptr %load44785, i8 32, i32 0)
   %sp = alloca i32, align 4
-  store i32 %call44040, ptr %sp, align 4
-  %ifexpr44041 = alloca ptr, align 8
-  %load44042 = load i32, ptr %sp, align 4
-  %cmp44043 = icmp sge i32 %load44042, 0
-  %bool44044 = zext i1 %cmp44043 to i32
-  %cond44045 = icmp ne i32 %bool44044, 0
-  br i1 %cond44045, label %ifexpr.then7060, label %ifexpr.else7061
+  store i32 %call44786, ptr %sp, align 4
+  %ifexpr44787 = alloca ptr, align 8
+  %load44788 = load i32, ptr %sp, align 4
+  %cmp44789 = icmp sge i32 %load44788, 0
+  %bool44790 = zext i1 %cmp44789 to i32
+  %cond44791 = icmp ne i32 %bool44790, 0
+  br i1 %cond44791, label %ifexpr.then7188, label %ifexpr.else7189
 
-if.else7058:                                      ; preds = %if.end7056
-  br label %if.end7059
+if.else7186:                                      ; preds = %if.end7184
+  br label %if.end7187
 
-if.end7059:                                       ; preds = %if.else7058
-  %load44161 = load ptr, ptr %line, align 8
-  %call44163 = call i32 @mir2asm_starts_with(ptr %load44161, ptr @.strlit44162)
-  %cmp44164 = icmp eq i32 %call44163, 1
-  %bool44165 = zext i1 %cmp44164 to i32
-  %cond44166 = icmp ne i32 %bool44165, 0
-  br i1 %cond44166, label %if.then7078, label %if.else7079
+if.end7187:                                       ; preds = %if.else7186
+  %load44907 = load ptr, ptr %line, align 8
+  %call44909 = call i32 @mir2asm_starts_with(ptr %load44907, ptr @.strlit44908)
+  %cmp44910 = icmp eq i32 %call44909, 1
+  %bool44911 = zext i1 %cmp44910 to i32
+  %cond44912 = icmp ne i32 %bool44911, 0
+  br i1 %cond44912, label %if.then7206, label %if.else7207
 
-ifexpr.then7060:                                  ; preds = %if.then7057
-  %load44046 = load ptr, ptr %rest, align 8
-  %load44047 = load i32, ptr %sp, align 4
-  %call44048 = call ptr @mir2asm_slice(ptr %load44046, i32 0, i32 %load44047)
-  %call44049 = call ptr @mir2asm_trim(ptr %call44048)
-  store ptr %call44049, ptr %ifexpr44041, align 8
-  br label %ifexpr.end7062
+ifexpr.then7188:                                  ; preds = %if.then7185
+  %load44792 = load ptr, ptr %rest, align 8
+  %load44793 = load i32, ptr %sp, align 4
+  %call44794 = call ptr @mir2asm_slice(ptr %load44792, i32 0, i32 %load44793)
+  %call44795 = call ptr @mir2asm_trim(ptr %call44794)
+  store ptr %call44795, ptr %ifexpr44787, align 8
+  br label %ifexpr.end7190
 
-ifexpr.else7061:                                  ; preds = %if.then7057
-  store ptr @.strlit44050, ptr %ifexpr44041, align 8
-  br label %ifexpr.end7062
+ifexpr.else7189:                                  ; preds = %if.then7185
+  store ptr @.strlit44796, ptr %ifexpr44787, align 8
+  br label %ifexpr.end7190
 
-ifexpr.end7062:                                   ; preds = %ifexpr.else7061, %ifexpr.then7060
-  %ifexprval44051 = load ptr, ptr %ifexpr44041, align 8
+ifexpr.end7190:                                   ; preds = %ifexpr.else7189, %ifexpr.then7188
+  %ifexprval44797 = load ptr, ptr %ifexpr44787, align 8
   %ty = alloca ptr, align 8
-  store ptr %ifexprval44051, ptr %ty, align 8
-  %ifexpr44052 = alloca ptr, align 8
-  %load44053 = load i32, ptr %sp, align 4
-  %cmp44054 = icmp sge i32 %load44053, 0
-  %bool44055 = zext i1 %cmp44054 to i32
-  %cond44056 = icmp ne i32 %bool44055, 0
-  br i1 %cond44056, label %ifexpr.then7063, label %ifexpr.else7064
+  store ptr %ifexprval44797, ptr %ty, align 8
+  %ifexpr44798 = alloca ptr, align 8
+  %load44799 = load i32, ptr %sp, align 4
+  %cmp44800 = icmp sge i32 %load44799, 0
+  %bool44801 = zext i1 %cmp44800 to i32
+  %cond44802 = icmp ne i32 %bool44801, 0
+  br i1 %cond44802, label %ifexpr.then7191, label %ifexpr.else7192
 
-ifexpr.then7063:                                  ; preds = %ifexpr.end7062
-  %load44057 = load ptr, ptr %rest, align 8
-  %load44058 = load i32, ptr %sp, align 4
-  %add44059 = add i32 %load44058, 1
-  %call44060 = call ptr @mir2asm_after(ptr %load44057, i32 %add44059)
-  %call44061 = call ptr @mir2asm_trim(ptr %call44060)
-  store ptr %call44061, ptr %ifexpr44052, align 8
-  br label %ifexpr.end7065
+ifexpr.then7191:                                  ; preds = %ifexpr.end7190
+  %load44803 = load ptr, ptr %rest, align 8
+  %load44804 = load i32, ptr %sp, align 4
+  %add44805 = add i32 %load44804, 1
+  %call44806 = call ptr @mir2asm_after(ptr %load44803, i32 %add44805)
+  %call44807 = call ptr @mir2asm_trim(ptr %call44806)
+  store ptr %call44807, ptr %ifexpr44798, align 8
+  br label %ifexpr.end7193
 
-ifexpr.else7064:                                  ; preds = %ifexpr.end7062
-  store ptr @.strlit44062, ptr %ifexpr44052, align 8
-  br label %ifexpr.end7065
+ifexpr.else7192:                                  ; preds = %ifexpr.end7190
+  store ptr @.strlit44808, ptr %ifexpr44798, align 8
+  br label %ifexpr.end7193
 
-ifexpr.end7065:                                   ; preds = %ifexpr.else7064, %ifexpr.then7063
-  %ifexprval44063 = load ptr, ptr %ifexpr44052, align 8
+ifexpr.end7193:                                   ; preds = %ifexpr.else7192, %ifexpr.then7191
+  %ifexprval44809 = load ptr, ptr %ifexpr44798, align 8
   %val = alloca ptr, align 8
-  store ptr %ifexprval44063, ptr %val, align 8
-  %load44064 = load ptr, ptr %b, align 8
-  %load44065 = load ptr, ptr %ty, align 8
-  %call44066 = call i32 @mir2asm_type_is_struct_value(ptr %load44064, ptr %load44065)
-  %cmp44067 = icmp eq i32 %call44066, 1
-  %bool44068 = zext i1 %cmp44067 to i32
-  %cond44069 = icmp ne i32 %bool44068, 0
-  br i1 %cond44069, label %if.then7066, label %if.else7067
+  store ptr %ifexprval44809, ptr %val, align 8
+  %load44810 = load ptr, ptr %b, align 8
+  %load44811 = load ptr, ptr %ty, align 8
+  %call44812 = call i32 @mir2asm_type_is_struct_value(ptr %load44810, ptr %load44811)
+  %cmp44813 = icmp eq i32 %call44812, 1
+  %bool44814 = zext i1 %cmp44813 to i32
+  %cond44815 = icmp ne i32 %bool44814, 0
+  br i1 %cond44815, label %if.then7194, label %if.else7195
 
-if.then7066:                                      ; preds = %ifexpr.end7065
-  %load44070 = load ptr, ptr %b, align 8
-  %load44071 = load ptr, ptr %val, align 8
-  %call44072 = call i32 @mir2asm_find_name(ptr %load44070, ptr %load44071)
+if.then7194:                                      ; preds = %ifexpr.end7193
+  %load44816 = load ptr, ptr %b, align 8
+  %load44817 = load ptr, ptr %val, align 8
+  %call44818 = call i32 @mir2asm_find_name(ptr %load44816, ptr %load44817)
   %val_idx = alloca i32, align 4
-  store i32 %call44072, ptr %val_idx, align 4
-  %load44073 = load ptr, ptr %b, align 8
-  %call44075 = call i32 @mir2asm_find_name(ptr %load44073, ptr @.strlit44074)
+  store i32 %call44818, ptr %val_idx, align 4
+  %load44819 = load ptr, ptr %b, align 8
+  %call44821 = call i32 @mir2asm_find_name(ptr %load44819, ptr @.strlit44820)
   %sret_idx = alloca i32, align 4
-  store i32 %call44075, ptr %sret_idx, align 4
-  %load44076 = load i32, ptr %val_idx, align 4
-  %cmp44077 = icmp sge i32 %load44076, 0
-  %bool44078 = zext i1 %cmp44077 to i32
-  %cond44079 = icmp ne i32 %bool44078, 0
-  br i1 %cond44079, label %and.rhs8, label %and.false9
+  store i32 %call44821, ptr %sret_idx, align 4
+  %load44822 = load i32, ptr %val_idx, align 4
+  %cmp44823 = icmp sge i32 %load44822, 0
+  %bool44824 = zext i1 %cmp44823 to i32
+  %cond44825 = icmp ne i32 %bool44824, 0
+  br i1 %cond44825, label %and.rhs8, label %and.false9
 
-if.else7067:                                      ; preds = %ifexpr.end7065
-  br label %if.end7068
+if.else7195:                                      ; preds = %ifexpr.end7193
+  br label %if.end7196
 
-if.end7068:                                       ; preds = %if.else7067
-  %load44116 = load ptr, ptr %ty, align 8
-  %strcmp44118 = call i32 @strcmp(ptr %load44116, ptr @.strlit44117)
-  %cmp44119 = icmp eq i32 %strcmp44118, 0
-  %bool44120 = zext i1 %cmp44119 to i32
-  %cond44121 = icmp ne i32 %bool44120, 0
-  br i1 %cond44121, label %if.then7072, label %if.else7073
+if.end7196:                                       ; preds = %if.else7195
+  %load44862 = load ptr, ptr %ty, align 8
+  %strcmp44864 = call i32 @strcmp(ptr %load44862, ptr @.strlit44863)
+  %cmp44865 = icmp eq i32 %strcmp44864, 0
+  %bool44866 = zext i1 %cmp44865 to i32
+  %cond44867 = icmp ne i32 %bool44866, 0
+  br i1 %cond44867, label %if.then7200, label %if.else7201
 
-if.then7069:                                      ; preds = %and.merge10
-  %load44086 = load ptr, ptr %b, align 8
-  %load44088 = load ptr, ptr %b, align 8
-  %field44090 = getelementptr %MirAsm, ptr %load44088, i32 0, i32 6
-  %fieldval44091 = load ptr, ptr %field44090, align 8
-  %load44092 = load i32, ptr %val_idx, align 4
-  %idx44093 = getelementptr i32, ptr %fieldval44091, i32 %load44092
-  %loadidx44094 = load i32, ptr %idx44093, align 4
-  %load44095 = load ptr, ptr %b, align 8
-  %load44096 = load ptr, ptr %ty, align 8
-  %call44097 = call i32 @mir2asm_type_size_for(ptr %load44095, ptr %load44096)
-  call void @mir2asm_emit_copy_stack_to_ptr(ptr %load44086, ptr @.strlit44087, i32 %loadidx44094, i32 %call44097)
-  %load44098 = load ptr, ptr %b, align 8
-  %load44100 = load ptr, ptr %b, align 8
-  %field44102 = getelementptr %MirAsm, ptr %load44100, i32 0, i32 6
-  %fieldval44103 = load ptr, ptr %field44102, align 8
-  %load44104 = load i32, ptr %sret_idx, align 4
-  %idx44105 = getelementptr i32, ptr %fieldval44103, i32 %load44104
-  %loadidx44106 = load i32, ptr %idx44105, align 4
-  %call44107 = call ptr @mir2asm_mem(i32 %loadidx44106)
-  %call44108 = call ptr @vix_string_concat(ptr @.strlit44099, ptr %call44107)
-  call void @mir2asm_line(ptr %load44098, ptr %call44108)
-  br label %if.end7071
+if.then7197:                                      ; preds = %and.merge10
+  %load44832 = load ptr, ptr %b, align 8
+  %load44834 = load ptr, ptr %b, align 8
+  %field44836 = getelementptr %MirAsm, ptr %load44834, i32 0, i32 6
+  %fieldval44837 = load ptr, ptr %field44836, align 8
+  %load44838 = load i32, ptr %val_idx, align 4
+  %idx44839 = getelementptr i32, ptr %fieldval44837, i32 %load44838
+  %loadidx44840 = load i32, ptr %idx44839, align 4
+  %load44841 = load ptr, ptr %b, align 8
+  %load44842 = load ptr, ptr %ty, align 8
+  %call44843 = call i32 @mir2asm_type_size_for(ptr %load44841, ptr %load44842)
+  call void @mir2asm_emit_copy_stack_to_ptr(ptr %load44832, ptr @.strlit44833, i32 %loadidx44840, i32 %call44843)
+  %load44844 = load ptr, ptr %b, align 8
+  %load44846 = load ptr, ptr %b, align 8
+  %field44848 = getelementptr %MirAsm, ptr %load44846, i32 0, i32 6
+  %fieldval44849 = load ptr, ptr %field44848, align 8
+  %load44850 = load i32, ptr %sret_idx, align 4
+  %idx44851 = getelementptr i32, ptr %fieldval44849, i32 %load44850
+  %loadidx44852 = load i32, ptr %idx44851, align 4
+  %call44853 = call ptr @mir2asm_mem(i32 %loadidx44852)
+  %call44854 = call ptr @vix_string_concat(ptr @.strlit44845, ptr %call44853)
+  call void @mir2asm_line(ptr %load44844, ptr %call44854)
+  br label %if.end7199
 
-if.else7070:                                      ; preds = %and.merge10
-  br label %if.end7071
+if.else7198:                                      ; preds = %and.merge10
+  br label %if.end7199
 
-if.end7071:                                       ; preds = %if.else7070, %if.then7069
-  %load44109 = load ptr, ptr %b, align 8
-  %load44111 = load ptr, ptr %b, align 8
-  %field44113 = getelementptr %MirAsm, ptr %load44111, i32 0, i32 14
-  %fieldval44114 = load ptr, ptr %field44113, align 8
-  %call44115 = call ptr @vix_string_concat(ptr @.strlit44110, ptr %fieldval44114)
-  call void @mir2asm_line(ptr %load44109, ptr %call44115)
+if.end7199:                                       ; preds = %if.else7198, %if.then7197
+  %load44855 = load ptr, ptr %b, align 8
+  %load44857 = load ptr, ptr %b, align 8
+  %field44859 = getelementptr %MirAsm, ptr %load44857, i32 0, i32 14
+  %fieldval44860 = load ptr, ptr %field44859, align 8
+  %call44861 = call ptr @vix_string_concat(ptr @.strlit44856, ptr %fieldval44860)
+  call void @mir2asm_line(ptr %load44855, ptr %call44861)
   ret void
 
-and.rhs8:                                         ; preds = %if.then7066
-  %load44080 = load i32, ptr %sret_idx, align 4
-  %cmp44081 = icmp sge i32 %load44080, 0
-  %bool44082 = zext i1 %cmp44081 to i32
-  %cond44083 = icmp ne i32 %bool44082, 0
-  br i1 %cond44083, label %and.merge10, label %and.false9
+and.rhs8:                                         ; preds = %if.then7194
+  %load44826 = load i32, ptr %sret_idx, align 4
+  %cmp44827 = icmp sge i32 %load44826, 0
+  %bool44828 = zext i1 %cmp44827 to i32
+  %cond44829 = icmp ne i32 %bool44828, 0
+  br i1 %cond44829, label %and.merge10, label %and.false9
 
-and.false9:                                       ; preds = %and.rhs8, %if.then7066
+and.false9:                                       ; preds = %and.rhs8, %if.then7194
   br label %and.merge10
 
 and.merge10:                                      ; preds = %and.false9, %and.rhs8
-  %andval44084 = phi i32 [ 1, %and.rhs8 ], [ 0, %and.false9 ]
-  %cond44085 = icmp ne i32 %andval44084, 0
-  br i1 %cond44085, label %if.then7069, label %if.else7070
+  %andval44830 = phi i32 [ 1, %and.rhs8 ], [ 0, %and.false9 ]
+  %cond44831 = icmp ne i32 %andval44830, 0
+  br i1 %cond44831, label %if.then7197, label %if.else7198
 
-if.then7072:                                      ; preds = %if.end7068
-  %load44122 = load ptr, ptr %b, align 8
-  %load44124 = load ptr, ptr %b, align 8
-  %load44125 = load ptr, ptr %val, align 8
-  %load44126 = load ptr, ptr %ty, align 8
-  %call44127 = call ptr @mir2asm_operand_typed(ptr %load44124, ptr %load44125, ptr %load44126)
-  %call44128 = call ptr @vix_string_concat(ptr @.strlit44123, ptr %call44127)
-  call void @mir2asm_line(ptr %load44122, ptr %call44128)
-  br label %if.end7074
+if.then7200:                                      ; preds = %if.end7196
+  %load44868 = load ptr, ptr %b, align 8
+  %load44870 = load ptr, ptr %b, align 8
+  %load44871 = load ptr, ptr %val, align 8
+  %load44872 = load ptr, ptr %ty, align 8
+  %call44873 = call ptr @mir2asm_operand_typed(ptr %load44870, ptr %load44871, ptr %load44872)
+  %call44874 = call ptr @vix_string_concat(ptr @.strlit44869, ptr %call44873)
+  call void @mir2asm_line(ptr %load44868, ptr %call44874)
+  br label %if.end7202
 
-if.else7073:                                      ; preds = %if.end7068
-  %load44129 = load ptr, ptr %ty, align 8
-  %strcmp44131 = call i32 @strcmp(ptr %load44129, ptr @.strlit44130)
-  %cmp44132 = icmp eq i32 %strcmp44131, 0
-  %bool44133 = zext i1 %cmp44132 to i32
-  %cond44134 = icmp ne i32 %bool44133, 0
-  br i1 %cond44134, label %if.then7075, label %if.else7076
+if.else7201:                                      ; preds = %if.end7196
+  %load44875 = load ptr, ptr %ty, align 8
+  %strcmp44877 = call i32 @strcmp(ptr %load44875, ptr @.strlit44876)
+  %cmp44878 = icmp eq i32 %strcmp44877, 0
+  %bool44879 = zext i1 %cmp44878 to i32
+  %cond44880 = icmp ne i32 %bool44879, 0
+  br i1 %cond44880, label %if.then7203, label %if.else7204
 
-if.end7074:                                       ; preds = %if.end7077, %if.then7072
-  %load44154 = load ptr, ptr %b, align 8
-  %load44156 = load ptr, ptr %b, align 8
-  %field44158 = getelementptr %MirAsm, ptr %load44156, i32 0, i32 14
-  %fieldval44159 = load ptr, ptr %field44158, align 8
-  %call44160 = call ptr @vix_string_concat(ptr @.strlit44155, ptr %fieldval44159)
-  call void @mir2asm_line(ptr %load44154, ptr %call44160)
+if.end7202:                                       ; preds = %if.end7205, %if.then7200
+  %load44900 = load ptr, ptr %b, align 8
+  %load44902 = load ptr, ptr %b, align 8
+  %field44904 = getelementptr %MirAsm, ptr %load44902, i32 0, i32 14
+  %fieldval44905 = load ptr, ptr %field44904, align 8
+  %call44906 = call ptr @vix_string_concat(ptr @.strlit44901, ptr %fieldval44905)
+  call void @mir2asm_line(ptr %load44900, ptr %call44906)
   ret void
 
-if.then7075:                                      ; preds = %if.else7073
-  %load44135 = load ptr, ptr %b, align 8
-  %load44137 = load ptr, ptr %b, align 8
-  %load44138 = load ptr, ptr %val, align 8
-  %load44139 = load ptr, ptr %ty, align 8
-  %call44140 = call ptr @mir2asm_operand_typed(ptr %load44137, ptr %load44138, ptr %load44139)
-  %call44141 = call ptr @vix_string_concat(ptr @.strlit44136, ptr %call44140)
-  call void @mir2asm_line(ptr %load44135, ptr %call44141)
-  br label %if.end7077
+if.then7203:                                      ; preds = %if.else7201
+  %load44881 = load ptr, ptr %b, align 8
+  %load44883 = load ptr, ptr %b, align 8
+  %load44884 = load ptr, ptr %val, align 8
+  %load44885 = load ptr, ptr %ty, align 8
+  %call44886 = call ptr @mir2asm_operand_typed(ptr %load44883, ptr %load44884, ptr %load44885)
+  %call44887 = call ptr @vix_string_concat(ptr @.strlit44882, ptr %call44886)
+  call void @mir2asm_line(ptr %load44881, ptr %call44887)
+  br label %if.end7205
 
-if.else7076:                                      ; preds = %if.else7073
-  %load44142 = load ptr, ptr %b, align 8
-  %load44144 = load ptr, ptr %ty, align 8
-  %call44145 = call ptr @mir2asm_acc(ptr %load44144)
-  %call44146 = call ptr @vix_string_concat(ptr @.strlit44143, ptr %call44145)
-  %call44148 = call ptr @vix_string_concat(ptr %call44146, ptr @.strlit44147)
-  %load44149 = load ptr, ptr %b, align 8
-  %load44150 = load ptr, ptr %val, align 8
-  %load44151 = load ptr, ptr %ty, align 8
-  %call44152 = call ptr @mir2asm_operand_typed(ptr %load44149, ptr %load44150, ptr %load44151)
-  %call44153 = call ptr @vix_string_concat(ptr %call44148, ptr %call44152)
-  call void @mir2asm_line(ptr %load44142, ptr %call44153)
-  br label %if.end7077
+if.else7204:                                      ; preds = %if.else7201
+  %load44888 = load ptr, ptr %b, align 8
+  %load44890 = load ptr, ptr %ty, align 8
+  %call44891 = call ptr @mir2asm_acc(ptr %load44890)
+  %call44892 = call ptr @vix_string_concat(ptr @.strlit44889, ptr %call44891)
+  %call44894 = call ptr @vix_string_concat(ptr %call44892, ptr @.strlit44893)
+  %load44895 = load ptr, ptr %b, align 8
+  %load44896 = load ptr, ptr %val, align 8
+  %load44897 = load ptr, ptr %ty, align 8
+  %call44898 = call ptr @mir2asm_operand_typed(ptr %load44895, ptr %load44896, ptr %load44897)
+  %call44899 = call ptr @vix_string_concat(ptr %call44894, ptr %call44898)
+  call void @mir2asm_line(ptr %load44888, ptr %call44899)
+  br label %if.end7205
 
-if.end7077:                                       ; preds = %if.else7076, %if.then7075
-  br label %if.end7074
+if.end7205:                                       ; preds = %if.else7204, %if.then7203
+  br label %if.end7202
 
-if.then7078:                                      ; preds = %if.end7059
-  %load44167 = load ptr, ptr %b, align 8
-  %load44169 = load ptr, ptr %b, align 8
-  %load44170 = load ptr, ptr %line, align 8
-  %call44171 = call ptr @mir2asm_after(ptr %load44170, i32 9)
-  %call44172 = call ptr @mir2asm_trim(ptr %call44171)
-  %call44173 = call ptr @mir2asm_label(ptr %load44169, ptr %call44172)
-  %call44174 = call ptr @vix_string_concat(ptr @.strlit44168, ptr %call44173)
-  call void @mir2asm_line(ptr %load44167, ptr %call44174)
+if.then7206:                                      ; preds = %if.end7187
+  %load44913 = load ptr, ptr %b, align 8
+  %load44915 = load ptr, ptr %b, align 8
+  %load44916 = load ptr, ptr %line, align 8
+  %call44917 = call ptr @mir2asm_after(ptr %load44916, i32 9)
+  %call44918 = call ptr @mir2asm_trim(ptr %call44917)
+  %call44919 = call ptr @mir2asm_label(ptr %load44915, ptr %call44918)
+  %call44920 = call ptr @vix_string_concat(ptr @.strlit44914, ptr %call44919)
+  call void @mir2asm_line(ptr %load44913, ptr %call44920)
   ret void
 
-if.else7079:                                      ; preds = %if.end7059
-  br label %if.end7080
+if.else7207:                                      ; preds = %if.end7187
+  br label %if.end7208
 
-if.end7080:                                       ; preds = %if.else7079
-  %load44175 = load ptr, ptr %line, align 8
-  %call44177 = call i32 @mir2asm_starts_with(ptr %load44175, ptr @.strlit44176)
-  %cmp44178 = icmp eq i32 %call44177, 1
-  %bool44179 = zext i1 %cmp44178 to i32
-  %cond44180 = icmp ne i32 %bool44179, 0
-  br i1 %cond44180, label %if.then7081, label %if.else7082
+if.end7208:                                       ; preds = %if.else7207
+  %load44921 = load ptr, ptr %line, align 8
+  %call44923 = call i32 @mir2asm_starts_with(ptr %load44921, ptr @.strlit44922)
+  %cmp44924 = icmp eq i32 %call44923, 1
+  %bool44925 = zext i1 %cmp44924 to i32
+  %cond44926 = icmp ne i32 %bool44925, 0
+  br i1 %cond44926, label %if.then7209, label %if.else7210
 
-if.then7081:                                      ; preds = %if.end7080
-  %load44181 = load ptr, ptr %line, align 8
-  %call44182 = call i32 @mir2asm_find(ptr %load44181, i8 44, i32 0)
+if.then7209:                                      ; preds = %if.end7208
+  %load44927 = load ptr, ptr %line, align 8
+  %call44928 = call i32 @mir2asm_find(ptr %load44927, i8 44, i32 0)
   %c1 = alloca i32, align 4
-  store i32 %call44182, ptr %c1, align 4
-  %load44183 = load ptr, ptr %line, align 8
-  %load44184 = load i32, ptr %c1, align 4
-  %add44185 = add i32 %load44184, 1
-  %call44186 = call i32 @mir2asm_find(ptr %load44183, i8 44, i32 %add44185)
+  store i32 %call44928, ptr %c1, align 4
+  %load44929 = load ptr, ptr %line, align 8
+  %load44930 = load i32, ptr %c1, align 4
+  %add44931 = add i32 %load44930, 1
+  %call44932 = call i32 @mir2asm_find(ptr %load44929, i8 44, i32 %add44931)
   %c2 = alloca i32, align 4
-  store i32 %call44186, ptr %c2, align 4
-  %load44187 = load i32, ptr %c1, align 4
-  %cmp44188 = icmp sgt i32 %load44187, 0
-  %bool44189 = zext i1 %cmp44188 to i32
-  %cond44190 = icmp ne i32 %bool44189, 0
-  br i1 %cond44190, label %and.rhs11, label %and.false12
+  store i32 %call44932, ptr %c2, align 4
+  %load44933 = load i32, ptr %c1, align 4
+  %cmp44934 = icmp sgt i32 %load44933, 0
+  %bool44935 = zext i1 %cmp44934 to i32
+  %cond44936 = icmp ne i32 %bool44935, 0
+  br i1 %cond44936, label %and.rhs11, label %and.false12
 
-if.else7082:                                      ; preds = %if.end7080
-  br label %if.end7083
+if.else7210:                                      ; preds = %if.end7208
+  br label %if.end7211
 
-if.end7083:                                       ; preds = %if.else7082
-  %load44238 = load ptr, ptr %line, align 8
-  %call44240 = call i32 @mir2asm_starts_with(ptr %load44238, ptr @.strlit44239)
-  %cmp44241 = icmp eq i32 %call44240, 1
-  %bool44242 = zext i1 %cmp44241 to i32
-  %cond44243 = icmp ne i32 %bool44242, 0
-  br i1 %cond44243, label %if.then7087, label %if.else7088
+if.end7211:                                       ; preds = %if.else7210
+  %load44984 = load ptr, ptr %line, align 8
+  %call44986 = call i32 @mir2asm_starts_with(ptr %load44984, ptr @.strlit44985)
+  %cmp44987 = icmp eq i32 %call44986, 1
+  %bool44988 = zext i1 %cmp44987 to i32
+  %cond44989 = icmp ne i32 %bool44988, 0
+  br i1 %cond44989, label %if.then7215, label %if.else7216
 
-if.then7084:                                      ; preds = %and.merge13
-  %load44198 = load ptr, ptr %line, align 8
-  %load44199 = load i32, ptr %c1, align 4
-  %call44200 = call ptr @mir2asm_slice(ptr %load44198, i32 8, i32 %load44199)
-  %call44201 = call ptr @mir2asm_trim(ptr %call44200)
+if.then7212:                                      ; preds = %and.merge13
+  %load44944 = load ptr, ptr %line, align 8
+  %load44945 = load i32, ptr %c1, align 4
+  %call44946 = call ptr @mir2asm_slice(ptr %load44944, i32 8, i32 %load44945)
+  %call44947 = call ptr @mir2asm_trim(ptr %call44946)
   %cond = alloca ptr, align 8
-  store ptr %call44201, ptr %cond, align 8
-  %load44202 = load ptr, ptr %line, align 8
-  %load44203 = load i32, ptr %c1, align 4
-  %add44204 = add i32 %load44203, 1
-  %load44205 = load i32, ptr %c2, align 4
-  %call44206 = call ptr @mir2asm_slice(ptr %load44202, i32 %add44204, i32 %load44205)
-  %call44207 = call ptr @mir2asm_trim(ptr %call44206)
-  %call44208 = call ptr @mir2asm_after(ptr %call44207, i32 6)
-  %call44209 = call ptr @mir2asm_trim(ptr %call44208)
+  store ptr %call44947, ptr %cond, align 8
+  %load44948 = load ptr, ptr %line, align 8
+  %load44949 = load i32, ptr %c1, align 4
+  %add44950 = add i32 %load44949, 1
+  %load44951 = load i32, ptr %c2, align 4
+  %call44952 = call ptr @mir2asm_slice(ptr %load44948, i32 %add44950, i32 %load44951)
+  %call44953 = call ptr @mir2asm_trim(ptr %call44952)
+  %call44954 = call ptr @mir2asm_after(ptr %call44953, i32 6)
+  %call44955 = call ptr @mir2asm_trim(ptr %call44954)
   %true_label = alloca ptr, align 8
-  store ptr %call44209, ptr %true_label, align 8
-  %load44210 = load ptr, ptr %line, align 8
-  %load44211 = load i32, ptr %c2, align 4
-  %add44212 = add i32 %load44211, 1
-  %call44213 = call ptr @mir2asm_after(ptr %load44210, i32 %add44212)
-  %call44214 = call ptr @mir2asm_trim(ptr %call44213)
-  %call44215 = call ptr @mir2asm_after(ptr %call44214, i32 6)
-  %call44216 = call ptr @mir2asm_trim(ptr %call44215)
+  store ptr %call44955, ptr %true_label, align 8
+  %load44956 = load ptr, ptr %line, align 8
+  %load44957 = load i32, ptr %c2, align 4
+  %add44958 = add i32 %load44957, 1
+  %call44959 = call ptr @mir2asm_after(ptr %load44956, i32 %add44958)
+  %call44960 = call ptr @mir2asm_trim(ptr %call44959)
+  %call44961 = call ptr @mir2asm_after(ptr %call44960, i32 6)
+  %call44962 = call ptr @mir2asm_trim(ptr %call44961)
   %false_label = alloca ptr, align 8
-  store ptr %call44216, ptr %false_label, align 8
-  %load44217 = load ptr, ptr %b, align 8
-  %load44219 = load ptr, ptr %b, align 8
-  %load44220 = load ptr, ptr %cond, align 8
-  %call44222 = call ptr @mir2asm_operand_typed(ptr %load44219, ptr %load44220, ptr @.strlit44221)
-  %call44223 = call ptr @vix_string_concat(ptr @.strlit44218, ptr %call44222)
-  %call44225 = call ptr @vix_string_concat(ptr %call44223, ptr @.strlit44224)
-  call void @mir2asm_line(ptr %load44217, ptr %call44225)
-  %load44226 = load ptr, ptr %b, align 8
-  %load44228 = load ptr, ptr %b, align 8
-  %load44229 = load ptr, ptr %false_label, align 8
-  %call44230 = call ptr @mir2asm_label(ptr %load44228, ptr %load44229)
-  %call44231 = call ptr @vix_string_concat(ptr @.strlit44227, ptr %call44230)
-  call void @mir2asm_line(ptr %load44226, ptr %call44231)
-  %load44232 = load ptr, ptr %b, align 8
-  %load44234 = load ptr, ptr %b, align 8
-  %load44235 = load ptr, ptr %true_label, align 8
-  %call44236 = call ptr @mir2asm_label(ptr %load44234, ptr %load44235)
-  %call44237 = call ptr @vix_string_concat(ptr @.strlit44233, ptr %call44236)
-  call void @mir2asm_line(ptr %load44232, ptr %call44237)
-  br label %if.end7086
+  store ptr %call44962, ptr %false_label, align 8
+  %load44963 = load ptr, ptr %b, align 8
+  %load44965 = load ptr, ptr %b, align 8
+  %load44966 = load ptr, ptr %cond, align 8
+  %call44968 = call ptr @mir2asm_operand_typed(ptr %load44965, ptr %load44966, ptr @.strlit44967)
+  %call44969 = call ptr @vix_string_concat(ptr @.strlit44964, ptr %call44968)
+  %call44971 = call ptr @vix_string_concat(ptr %call44969, ptr @.strlit44970)
+  call void @mir2asm_line(ptr %load44963, ptr %call44971)
+  %load44972 = load ptr, ptr %b, align 8
+  %load44974 = load ptr, ptr %b, align 8
+  %load44975 = load ptr, ptr %false_label, align 8
+  %call44976 = call ptr @mir2asm_label(ptr %load44974, ptr %load44975)
+  %call44977 = call ptr @vix_string_concat(ptr @.strlit44973, ptr %call44976)
+  call void @mir2asm_line(ptr %load44972, ptr %call44977)
+  %load44978 = load ptr, ptr %b, align 8
+  %load44980 = load ptr, ptr %b, align 8
+  %load44981 = load ptr, ptr %true_label, align 8
+  %call44982 = call ptr @mir2asm_label(ptr %load44980, ptr %load44981)
+  %call44983 = call ptr @vix_string_concat(ptr @.strlit44979, ptr %call44982)
+  call void @mir2asm_line(ptr %load44978, ptr %call44983)
+  br label %if.end7214
 
-if.else7085:                                      ; preds = %and.merge13
-  br label %if.end7086
+if.else7213:                                      ; preds = %and.merge13
+  br label %if.end7214
 
-if.end7086:                                       ; preds = %if.else7085, %if.then7084
+if.end7214:                                       ; preds = %if.else7213, %if.then7212
   ret void
 
-and.rhs11:                                        ; preds = %if.then7081
-  %load44191 = load i32, ptr %c2, align 4
-  %load44192 = load i32, ptr %c1, align 4
-  %cmp44193 = icmp sgt i32 %load44191, %load44192
-  %bool44194 = zext i1 %cmp44193 to i32
-  %cond44195 = icmp ne i32 %bool44194, 0
-  br i1 %cond44195, label %and.merge13, label %and.false12
+and.rhs11:                                        ; preds = %if.then7209
+  %load44937 = load i32, ptr %c2, align 4
+  %load44938 = load i32, ptr %c1, align 4
+  %cmp44939 = icmp sgt i32 %load44937, %load44938
+  %bool44940 = zext i1 %cmp44939 to i32
+  %cond44941 = icmp ne i32 %bool44940, 0
+  br i1 %cond44941, label %and.merge13, label %and.false12
 
-and.false12:                                      ; preds = %and.rhs11, %if.then7081
+and.false12:                                      ; preds = %and.rhs11, %if.then7209
   br label %and.merge13
 
 and.merge13:                                      ; preds = %and.false12, %and.rhs11
-  %andval44196 = phi i32 [ 1, %and.rhs11 ], [ 0, %and.false12 ]
-  %cond44197 = icmp ne i32 %andval44196, 0
-  br i1 %cond44197, label %if.then7084, label %if.else7085
+  %andval44942 = phi i32 [ 1, %and.rhs11 ], [ 0, %and.false12 ]
+  %cond44943 = icmp ne i32 %andval44942, 0
+  br i1 %cond44943, label %if.then7212, label %if.else7213
 
-if.then7087:                                      ; preds = %if.end7083
-  %load44244 = load ptr, ptr %line, align 8
-  %call44245 = call i32 @mir2asm_find(ptr %load44244, i8 44, i32 0)
+if.then7215:                                      ; preds = %if.end7211
+  %load44990 = load ptr, ptr %line, align 8
+  %call44991 = call i32 @mir2asm_find(ptr %load44990, i8 44, i32 0)
   %comma = alloca i32, align 4
-  store i32 %call44245, ptr %comma, align 4
-  %load44246 = load ptr, ptr %line, align 8
-  %call44247 = call i32 @mir2asm_find(ptr %load44246, i8 32, i32 6)
+  store i32 %call44991, ptr %comma, align 4
+  %load44992 = load ptr, ptr %line, align 8
+  %call44993 = call i32 @mir2asm_find(ptr %load44992, i8 32, i32 6)
   %sp14 = alloca i32, align 4
-  store i32 %call44247, ptr %sp14, align 4
-  %load44248 = load i32, ptr %comma, align 4
-  %cmp44249 = icmp sgt i32 %load44248, 0
-  %bool44250 = zext i1 %cmp44249 to i32
-  %cond44251 = icmp ne i32 %bool44250, 0
-  br i1 %cond44251, label %and.rhs15, label %and.false16
+  store i32 %call44993, ptr %sp14, align 4
+  %load44994 = load i32, ptr %comma, align 4
+  %cmp44995 = icmp sgt i32 %load44994, 0
+  %bool44996 = zext i1 %cmp44995 to i32
+  %cond44997 = icmp ne i32 %bool44996, 0
+  br i1 %cond44997, label %and.rhs15, label %and.false16
 
-if.else7088:                                      ; preds = %if.end7083
-  br label %if.end7089
+if.else7216:                                      ; preds = %if.end7211
+  br label %if.end7217
 
-if.end7089:                                       ; preds = %if.else7088
-  %load44532 = load ptr, ptr %line, align 8
-  %call44534 = call i32 @mir2asm_starts_with(ptr %load44532, ptr @.strlit44533)
-  %cmp44535 = icmp eq i32 %call44534, 1
-  %bool44536 = zext i1 %cmp44535 to i32
-  %cond44537 = icmp ne i32 %bool44536, 0
-  br i1 %cond44537, label %if.then7126, label %if.else7127
+if.end7217:                                       ; preds = %if.else7216
+  %load45278 = load ptr, ptr %line, align 8
+  %call45280 = call i32 @mir2asm_starts_with(ptr %load45278, ptr @.strlit45279)
+  %cmp45281 = icmp eq i32 %call45280, 1
+  %bool45282 = zext i1 %cmp45281 to i32
+  %cond45283 = icmp ne i32 %bool45282, 0
+  br i1 %cond45283, label %if.then7254, label %if.else7255
 
-if.then7090:                                      ; preds = %and.merge17
-  %load44258 = load ptr, ptr %line, align 8
-  %load44259 = load i32, ptr %sp14, align 4
-  %call44260 = call ptr @mir2asm_slice(ptr %load44258, i32 6, i32 %load44259)
-  %call44261 = call ptr @mir2asm_trim(ptr %call44260)
+if.then7218:                                      ; preds = %and.merge17
+  %load45004 = load ptr, ptr %line, align 8
+  %load45005 = load i32, ptr %sp14, align 4
+  %call45006 = call ptr @mir2asm_slice(ptr %load45004, i32 6, i32 %load45005)
+  %call45007 = call ptr @mir2asm_trim(ptr %call45006)
   %ty18 = alloca ptr, align 8
-  store ptr %call44261, ptr %ty18, align 8
-  %load44262 = load ptr, ptr %line, align 8
-  %load44263 = load i32, ptr %sp14, align 4
-  %add44264 = add i32 %load44263, 1
-  %load44265 = load i32, ptr %comma, align 4
-  %call44266 = call ptr @mir2asm_slice(ptr %load44262, i32 %add44264, i32 %load44265)
-  %call44267 = call ptr @mir2asm_trim(ptr %call44266)
+  store ptr %call45007, ptr %ty18, align 8
+  %load45008 = load ptr, ptr %line, align 8
+  %load45009 = load i32, ptr %sp14, align 4
+  %add45010 = add i32 %load45009, 1
+  %load45011 = load i32, ptr %comma, align 4
+  %call45012 = call ptr @mir2asm_slice(ptr %load45008, i32 %add45010, i32 %load45011)
+  %call45013 = call ptr @mir2asm_trim(ptr %call45012)
   %val19 = alloca ptr, align 8
-  store ptr %call44267, ptr %val19, align 8
-  %load44268 = load ptr, ptr %line, align 8
-  %load44269 = load i32, ptr %comma, align 4
-  %add44270 = add i32 %load44269, 1
-  %call44271 = call ptr @mir2asm_after(ptr %load44268, i32 %add44270)
-  %call44272 = call ptr @mir2asm_trim(ptr %call44271)
+  store ptr %call45013, ptr %val19, align 8
+  %load45014 = load ptr, ptr %line, align 8
+  %load45015 = load i32, ptr %comma, align 4
+  %add45016 = add i32 %load45015, 1
+  %call45017 = call ptr @mir2asm_after(ptr %load45014, i32 %add45016)
+  %call45018 = call ptr @mir2asm_trim(ptr %call45017)
   %addr = alloca ptr, align 8
-  store ptr %call44272, ptr %addr, align 8
-  %load44273 = load ptr, ptr %b, align 8
-  %load44274 = load ptr, ptr %ty18, align 8
-  %call44275 = call i32 @mir2asm_type_is_struct_value(ptr %load44273, ptr %load44274)
-  %cmp44276 = icmp eq i32 %call44275, 1
-  %bool44277 = zext i1 %cmp44276 to i32
-  %cond44278 = icmp ne i32 %bool44277, 0
-  br i1 %cond44278, label %if.then7093, label %if.else7094
+  store ptr %call45018, ptr %addr, align 8
+  %load45019 = load ptr, ptr %b, align 8
+  %load45020 = load ptr, ptr %ty18, align 8
+  %call45021 = call i32 @mir2asm_type_is_struct_value(ptr %load45019, ptr %load45020)
+  %cmp45022 = icmp eq i32 %call45021, 1
+  %bool45023 = zext i1 %cmp45022 to i32
+  %cond45024 = icmp ne i32 %bool45023, 0
+  br i1 %cond45024, label %if.then7221, label %if.else7222
 
-if.else7091:                                      ; preds = %and.merge17
-  br label %if.end7092
+if.else7219:                                      ; preds = %and.merge17
+  br label %if.end7220
 
-if.end7092:                                       ; preds = %if.else7091, %if.end7110
+if.end7220:                                       ; preds = %if.else7219, %if.end7238
   ret void
 
-and.rhs15:                                        ; preds = %if.then7087
-  %load44252 = load i32, ptr %sp14, align 4
-  %cmp44253 = icmp sgt i32 %load44252, 0
-  %bool44254 = zext i1 %cmp44253 to i32
-  %cond44255 = icmp ne i32 %bool44254, 0
-  br i1 %cond44255, label %and.merge17, label %and.false16
+and.rhs15:                                        ; preds = %if.then7215
+  %load44998 = load i32, ptr %sp14, align 4
+  %cmp44999 = icmp sgt i32 %load44998, 0
+  %bool45000 = zext i1 %cmp44999 to i32
+  %cond45001 = icmp ne i32 %bool45000, 0
+  br i1 %cond45001, label %and.merge17, label %and.false16
 
-and.false16:                                      ; preds = %and.rhs15, %if.then7087
+and.false16:                                      ; preds = %and.rhs15, %if.then7215
   br label %and.merge17
 
 and.merge17:                                      ; preds = %and.false16, %and.rhs15
-  %andval44256 = phi i32 [ 1, %and.rhs15 ], [ 0, %and.false16 ]
-  %cond44257 = icmp ne i32 %andval44256, 0
-  br i1 %cond44257, label %if.then7090, label %if.else7091
+  %andval45002 = phi i32 [ 1, %and.rhs15 ], [ 0, %and.false16 ]
+  %cond45003 = icmp ne i32 %andval45002, 0
+  br i1 %cond45003, label %if.then7218, label %if.else7219
 
-if.then7093:                                      ; preds = %if.then7090
-  %load44279 = load ptr, ptr %b, align 8
-  %load44280 = load ptr, ptr %val19, align 8
-  %call44281 = call i32 @mir2asm_find_name(ptr %load44279, ptr %load44280)
+if.then7221:                                      ; preds = %if.then7218
+  %load45025 = load ptr, ptr %b, align 8
+  %load45026 = load ptr, ptr %val19, align 8
+  %call45027 = call i32 @mir2asm_find_name(ptr %load45025, ptr %load45026)
   %val_idx20 = alloca i32, align 4
-  store i32 %call44281, ptr %val_idx20, align 4
-  %load44282 = load ptr, ptr %b, align 8
-  %load44283 = load ptr, ptr %addr, align 8
-  %call44284 = call i32 @mir2asm_find_name(ptr %load44282, ptr %load44283)
+  store i32 %call45027, ptr %val_idx20, align 4
+  %load45028 = load ptr, ptr %b, align 8
+  %load45029 = load ptr, ptr %addr, align 8
+  %call45030 = call i32 @mir2asm_find_name(ptr %load45028, ptr %load45029)
   %addr_idx2 = alloca i32, align 4
-  store i32 %call44284, ptr %addr_idx2, align 4
-  %load44285 = load i32, ptr %val_idx20, align 4
-  %cmp44286 = icmp sge i32 %load44285, 0
-  %bool44287 = zext i1 %cmp44286 to i32
-  %cond44288 = icmp ne i32 %bool44287, 0
-  br i1 %cond44288, label %and.rhs21, label %and.false22
+  store i32 %call45030, ptr %addr_idx2, align 4
+  %load45031 = load i32, ptr %val_idx20, align 4
+  %cmp45032 = icmp sge i32 %load45031, 0
+  %bool45033 = zext i1 %cmp45032 to i32
+  %cond45034 = icmp ne i32 %bool45033, 0
+  br i1 %cond45034, label %and.rhs21, label %and.false22
 
-if.else7094:                                      ; preds = %if.then7090
-  br label %if.end7095
+if.else7222:                                      ; preds = %if.then7218
+  br label %if.end7223
 
-if.end7095:                                       ; preds = %if.else7094
-  %load44341 = load ptr, ptr %ty18, align 8
-  %call44342 = call i32 @mir2asm_type_is_float(ptr %load44341)
-  %cmp44343 = icmp eq i32 %call44342, 1
-  %bool44344 = zext i1 %cmp44343 to i32
-  %cond44345 = icmp ne i32 %bool44344, 0
-  br i1 %cond44345, label %if.then7102, label %if.else7103
+if.end7223:                                       ; preds = %if.else7222
+  %load45087 = load ptr, ptr %ty18, align 8
+  %call45088 = call i32 @mir2asm_type_is_float(ptr %load45087)
+  %cmp45089 = icmp eq i32 %call45088, 1
+  %bool45090 = zext i1 %cmp45089 to i32
+  %cond45091 = icmp ne i32 %bool45090, 0
+  br i1 %cond45091, label %if.then7230, label %if.else7231
 
-if.then7096:                                      ; preds = %and.merge26
-  %load44307 = load ptr, ptr %b, align 8
-  %load44308 = load ptr, ptr %b, align 8
-  %field44310 = getelementptr %MirAsm, ptr %load44308, i32 0, i32 6
-  %fieldval44311 = load ptr, ptr %field44310, align 8
-  %load44312 = load i32, ptr %addr_idx2, align 4
-  %idx44313 = getelementptr i32, ptr %fieldval44311, i32 %load44312
-  %loadidx44314 = load i32, ptr %idx44313, align 4
-  %load44315 = load ptr, ptr %b, align 8
-  %field44317 = getelementptr %MirAsm, ptr %load44315, i32 0, i32 6
-  %fieldval44318 = load ptr, ptr %field44317, align 8
-  %load44319 = load i32, ptr %val_idx20, align 4
-  %idx44320 = getelementptr i32, ptr %fieldval44318, i32 %load44319
-  %loadidx44321 = load i32, ptr %idx44320, align 4
-  %load44322 = load ptr, ptr %b, align 8
-  %load44323 = load ptr, ptr %ty18, align 8
-  %call44324 = call i32 @mir2asm_type_size_for(ptr %load44322, ptr %load44323)
-  call void @mir2asm_emit_copy_stack_bytes(ptr %load44307, i32 %loadidx44314, i32 %loadidx44321, i32 %call44324)
-  br label %if.end7098
+if.then7224:                                      ; preds = %and.merge26
+  %load45053 = load ptr, ptr %b, align 8
+  %load45054 = load ptr, ptr %b, align 8
+  %field45056 = getelementptr %MirAsm, ptr %load45054, i32 0, i32 6
+  %fieldval45057 = load ptr, ptr %field45056, align 8
+  %load45058 = load i32, ptr %addr_idx2, align 4
+  %idx45059 = getelementptr i32, ptr %fieldval45057, i32 %load45058
+  %loadidx45060 = load i32, ptr %idx45059, align 4
+  %load45061 = load ptr, ptr %b, align 8
+  %field45063 = getelementptr %MirAsm, ptr %load45061, i32 0, i32 6
+  %fieldval45064 = load ptr, ptr %field45063, align 8
+  %load45065 = load i32, ptr %val_idx20, align 4
+  %idx45066 = getelementptr i32, ptr %fieldval45064, i32 %load45065
+  %loadidx45067 = load i32, ptr %idx45066, align 4
+  %load45068 = load ptr, ptr %b, align 8
+  %load45069 = load ptr, ptr %ty18, align 8
+  %call45070 = call i32 @mir2asm_type_size_for(ptr %load45068, ptr %load45069)
+  call void @mir2asm_emit_copy_stack_bytes(ptr %load45053, i32 %loadidx45060, i32 %loadidx45067, i32 %call45070)
+  br label %if.end7226
 
-if.else7097:                                      ; preds = %and.merge26
-  %load44325 = load i32, ptr %val_idx20, align 4
-  %cmp44326 = icmp sge i32 %load44325, 0
-  %bool44327 = zext i1 %cmp44326 to i32
-  %cond44328 = icmp ne i32 %bool44327, 0
-  br i1 %cond44328, label %if.then7099, label %if.else7100
+if.else7225:                                      ; preds = %and.merge26
+  %load45071 = load i32, ptr %val_idx20, align 4
+  %cmp45072 = icmp sge i32 %load45071, 0
+  %bool45073 = zext i1 %cmp45072 to i32
+  %cond45074 = icmp ne i32 %bool45073, 0
+  br i1 %cond45074, label %if.then7227, label %if.else7228
 
-if.end7098:                                       ; preds = %if.end7101, %if.then7096
+if.end7226:                                       ; preds = %if.end7229, %if.then7224
   ret void
 
-and.rhs21:                                        ; preds = %if.then7093
-  %load44289 = load i32, ptr %addr_idx2, align 4
-  %cmp44290 = icmp sge i32 %load44289, 0
-  %bool44291 = zext i1 %cmp44290 to i32
-  %cond44292 = icmp ne i32 %bool44291, 0
-  br i1 %cond44292, label %and.merge23, label %and.false22
+and.rhs21:                                        ; preds = %if.then7221
+  %load45035 = load i32, ptr %addr_idx2, align 4
+  %cmp45036 = icmp sge i32 %load45035, 0
+  %bool45037 = zext i1 %cmp45036 to i32
+  %cond45038 = icmp ne i32 %bool45037, 0
+  br i1 %cond45038, label %and.merge23, label %and.false22
 
-and.false22:                                      ; preds = %and.rhs21, %if.then7093
+and.false22:                                      ; preds = %and.rhs21, %if.then7221
   br label %and.merge23
 
 and.merge23:                                      ; preds = %and.false22, %and.rhs21
-  %andval44293 = phi i32 [ 1, %and.rhs21 ], [ 0, %and.false22 ]
-  %cond44294 = icmp ne i32 %andval44293, 0
-  br i1 %cond44294, label %and.rhs24, label %and.false25
+  %andval45039 = phi i32 [ 1, %and.rhs21 ], [ 0, %and.false22 ]
+  %cond45040 = icmp ne i32 %andval45039, 0
+  br i1 %cond45040, label %and.rhs24, label %and.false25
 
 and.rhs24:                                        ; preds = %and.merge23
-  %load44295 = load ptr, ptr %b, align 8
-  %field44297 = getelementptr %MirAsm, ptr %load44295, i32 0, i32 7
-  %fieldval44298 = load ptr, ptr %field44297, align 8
-  %load44299 = load i32, ptr %addr_idx2, align 4
-  %idx44300 = getelementptr i32, ptr %fieldval44298, i32 %load44299
-  %loadidx44301 = load i32, ptr %idx44300, align 4
-  %cmp44302 = icmp eq i32 %loadidx44301, 1
-  %bool44303 = zext i1 %cmp44302 to i32
-  %cond44304 = icmp ne i32 %bool44303, 0
-  br i1 %cond44304, label %and.merge26, label %and.false25
+  %load45041 = load ptr, ptr %b, align 8
+  %field45043 = getelementptr %MirAsm, ptr %load45041, i32 0, i32 7
+  %fieldval45044 = load ptr, ptr %field45043, align 8
+  %load45045 = load i32, ptr %addr_idx2, align 4
+  %idx45046 = getelementptr i32, ptr %fieldval45044, i32 %load45045
+  %loadidx45047 = load i32, ptr %idx45046, align 4
+  %cmp45048 = icmp eq i32 %loadidx45047, 1
+  %bool45049 = zext i1 %cmp45048 to i32
+  %cond45050 = icmp ne i32 %bool45049, 0
+  br i1 %cond45050, label %and.merge26, label %and.false25
 
 and.false25:                                      ; preds = %and.rhs24, %and.merge23
   br label %and.merge26
 
 and.merge26:                                      ; preds = %and.false25, %and.rhs24
-  %andval44305 = phi i32 [ 1, %and.rhs24 ], [ 0, %and.false25 ]
-  %cond44306 = icmp ne i32 %andval44305, 0
-  br i1 %cond44306, label %if.then7096, label %if.else7097
+  %andval45051 = phi i32 [ 1, %and.rhs24 ], [ 0, %and.false25 ]
+  %cond45052 = icmp ne i32 %andval45051, 0
+  br i1 %cond45052, label %if.then7224, label %if.else7225
 
-if.then7099:                                      ; preds = %if.else7097
-  %load44329 = load ptr, ptr %b, align 8
-  %load44330 = load ptr, ptr %addr, align 8
-  %load44331 = load ptr, ptr %b, align 8
-  %field44333 = getelementptr %MirAsm, ptr %load44331, i32 0, i32 6
-  %fieldval44334 = load ptr, ptr %field44333, align 8
-  %load44335 = load i32, ptr %val_idx20, align 4
-  %idx44336 = getelementptr i32, ptr %fieldval44334, i32 %load44335
-  %loadidx44337 = load i32, ptr %idx44336, align 4
-  %load44338 = load ptr, ptr %b, align 8
-  %load44339 = load ptr, ptr %ty18, align 8
-  %call44340 = call i32 @mir2asm_type_size_for(ptr %load44338, ptr %load44339)
-  call void @mir2asm_emit_copy_stack_to_ptr(ptr %load44329, ptr %load44330, i32 %loadidx44337, i32 %call44340)
-  br label %if.end7101
+if.then7227:                                      ; preds = %if.else7225
+  %load45075 = load ptr, ptr %b, align 8
+  %load45076 = load ptr, ptr %addr, align 8
+  %load45077 = load ptr, ptr %b, align 8
+  %field45079 = getelementptr %MirAsm, ptr %load45077, i32 0, i32 6
+  %fieldval45080 = load ptr, ptr %field45079, align 8
+  %load45081 = load i32, ptr %val_idx20, align 4
+  %idx45082 = getelementptr i32, ptr %fieldval45080, i32 %load45081
+  %loadidx45083 = load i32, ptr %idx45082, align 4
+  %load45084 = load ptr, ptr %b, align 8
+  %load45085 = load ptr, ptr %ty18, align 8
+  %call45086 = call i32 @mir2asm_type_size_for(ptr %load45084, ptr %load45085)
+  call void @mir2asm_emit_copy_stack_to_ptr(ptr %load45075, ptr %load45076, i32 %loadidx45083, i32 %call45086)
+  br label %if.end7229
 
-if.else7100:                                      ; preds = %if.else7097
-  br label %if.end7101
+if.else7228:                                      ; preds = %if.else7225
+  br label %if.end7229
 
-if.end7101:                                       ; preds = %if.else7100, %if.then7099
-  br label %if.end7098
+if.end7229:                                       ; preds = %if.else7228, %if.then7227
+  br label %if.end7226
 
-if.then7102:                                      ; preds = %if.end7095
-  %load44346 = load ptr, ptr %b, align 8
-  %load44348 = load ptr, ptr %val19, align 8
-  %load44349 = load ptr, ptr %ty18, align 8
-  call void @mir2asm_emit_load_float_arg(ptr %load44346, ptr @.strlit44347, ptr %load44348, ptr %load44349)
-  br label %if.end7104
+if.then7230:                                      ; preds = %if.end7223
+  %load45092 = load ptr, ptr %b, align 8
+  %load45094 = load ptr, ptr %val19, align 8
+  %load45095 = load ptr, ptr %ty18, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load45092, ptr @.strlit45093, ptr %load45094, ptr %load45095)
+  br label %if.end7232
 
-if.else7103:                                      ; preds = %if.end7095
-  %load44350 = load ptr, ptr %ty18, align 8
-  %strcmp44352 = call i32 @strcmp(ptr %load44350, ptr @.strlit44351)
-  %cmp44353 = icmp eq i32 %strcmp44352, 0
-  %bool44354 = zext i1 %cmp44353 to i32
-  %cond44355 = icmp ne i32 %bool44354, 0
-  br i1 %cond44355, label %or.true27, label %or.rhs28
+if.else7231:                                      ; preds = %if.end7223
+  %load45096 = load ptr, ptr %ty18, align 8
+  %strcmp45098 = call i32 @strcmp(ptr %load45096, ptr @.strlit45097)
+  %cmp45099 = icmp eq i32 %strcmp45098, 0
+  %bool45100 = zext i1 %cmp45099 to i32
+  %cond45101 = icmp ne i32 %bool45100, 0
+  br i1 %cond45101, label %or.true27, label %or.rhs28
 
-if.end7104:                                       ; preds = %if.end7107, %if.then7102
-  %load44391 = load ptr, ptr %b, align 8
-  %load44392 = load ptr, ptr %addr, align 8
-  %call44393 = call i32 @mir2asm_find_name(ptr %load44391, ptr %load44392)
+if.end7232:                                       ; preds = %if.end7235, %if.then7230
+  %load45137 = load ptr, ptr %b, align 8
+  %load45138 = load ptr, ptr %addr, align 8
+  %call45139 = call i32 @mir2asm_find_name(ptr %load45137, ptr %load45138)
   %addr_idx = alloca i32, align 4
-  store i32 %call44393, ptr %addr_idx, align 4
-  %load44394 = load i32, ptr %addr_idx, align 4
-  %cmp44395 = icmp sge i32 %load44394, 0
-  %bool44396 = zext i1 %cmp44395 to i32
-  %cond44397 = icmp ne i32 %bool44396, 0
-  br i1 %cond44397, label %and.rhs33, label %and.false34
+  store i32 %call45139, ptr %addr_idx, align 4
+  %load45140 = load i32, ptr %addr_idx, align 4
+  %cmp45141 = icmp sge i32 %load45140, 0
+  %bool45142 = zext i1 %cmp45141 to i32
+  %cond45143 = icmp ne i32 %bool45142, 0
+  br i1 %cond45143, label %and.rhs33, label %and.false34
 
-if.then7105:                                      ; preds = %or.merge32
-  %load44372 = load ptr, ptr %b, align 8
-  %load44374 = load ptr, ptr %b, align 8
-  %load44375 = load ptr, ptr %val19, align 8
-  %load44376 = load ptr, ptr %ty18, align 8
-  %call44377 = call ptr @mir2asm_operand_typed(ptr %load44374, ptr %load44375, ptr %load44376)
-  %call44378 = call ptr @vix_string_concat(ptr @.strlit44373, ptr %call44377)
-  call void @mir2asm_line(ptr %load44372, ptr %call44378)
-  br label %if.end7107
+if.then7233:                                      ; preds = %or.merge32
+  %load45118 = load ptr, ptr %b, align 8
+  %load45120 = load ptr, ptr %b, align 8
+  %load45121 = load ptr, ptr %val19, align 8
+  %load45122 = load ptr, ptr %ty18, align 8
+  %call45123 = call ptr @mir2asm_operand_typed(ptr %load45120, ptr %load45121, ptr %load45122)
+  %call45124 = call ptr @vix_string_concat(ptr @.strlit45119, ptr %call45123)
+  call void @mir2asm_line(ptr %load45118, ptr %call45124)
+  br label %if.end7235
 
-if.else7106:                                      ; preds = %or.merge32
-  %load44379 = load ptr, ptr %b, align 8
-  %load44381 = load ptr, ptr %ty18, align 8
-  %call44382 = call ptr @mir2asm_acc(ptr %load44381)
-  %call44383 = call ptr @vix_string_concat(ptr @.strlit44380, ptr %call44382)
-  %call44385 = call ptr @vix_string_concat(ptr %call44383, ptr @.strlit44384)
-  %load44386 = load ptr, ptr %b, align 8
-  %load44387 = load ptr, ptr %val19, align 8
-  %load44388 = load ptr, ptr %ty18, align 8
-  %call44389 = call ptr @mir2asm_operand_typed(ptr %load44386, ptr %load44387, ptr %load44388)
-  %call44390 = call ptr @vix_string_concat(ptr %call44385, ptr %call44389)
-  call void @mir2asm_line(ptr %load44379, ptr %call44390)
-  br label %if.end7107
+if.else7234:                                      ; preds = %or.merge32
+  %load45125 = load ptr, ptr %b, align 8
+  %load45127 = load ptr, ptr %ty18, align 8
+  %call45128 = call ptr @mir2asm_acc(ptr %load45127)
+  %call45129 = call ptr @vix_string_concat(ptr @.strlit45126, ptr %call45128)
+  %call45131 = call ptr @vix_string_concat(ptr %call45129, ptr @.strlit45130)
+  %load45132 = load ptr, ptr %b, align 8
+  %load45133 = load ptr, ptr %val19, align 8
+  %load45134 = load ptr, ptr %ty18, align 8
+  %call45135 = call ptr @mir2asm_operand_typed(ptr %load45132, ptr %load45133, ptr %load45134)
+  %call45136 = call ptr @vix_string_concat(ptr %call45131, ptr %call45135)
+  call void @mir2asm_line(ptr %load45125, ptr %call45136)
+  br label %if.end7235
 
-if.end7107:                                       ; preds = %if.else7106, %if.then7105
-  br label %if.end7104
+if.end7235:                                       ; preds = %if.else7234, %if.then7233
+  br label %if.end7232
 
-or.true27:                                        ; preds = %or.rhs28, %if.else7103
+or.true27:                                        ; preds = %or.rhs28, %if.else7231
   br label %or.merge29
 
-or.rhs28:                                         ; preds = %if.else7103
-  %load44356 = load ptr, ptr %ty18, align 8
-  %strcmp44358 = call i32 @strcmp(ptr %load44356, ptr @.strlit44357)
-  %cmp44359 = icmp eq i32 %strcmp44358, 0
-  %bool44360 = zext i1 %cmp44359 to i32
-  %cond44361 = icmp ne i32 %bool44360, 0
-  br i1 %cond44361, label %or.true27, label %or.merge29
+or.rhs28:                                         ; preds = %if.else7231
+  %load45102 = load ptr, ptr %ty18, align 8
+  %strcmp45104 = call i32 @strcmp(ptr %load45102, ptr @.strlit45103)
+  %cmp45105 = icmp eq i32 %strcmp45104, 0
+  %bool45106 = zext i1 %cmp45105 to i32
+  %cond45107 = icmp ne i32 %bool45106, 0
+  br i1 %cond45107, label %or.true27, label %or.merge29
 
 or.merge29:                                       ; preds = %or.true27, %or.rhs28
-  %orval44362 = phi i32 [ 1, %or.true27 ], [ 0, %or.rhs28 ]
-  %cond44363 = icmp ne i32 %orval44362, 0
-  br i1 %cond44363, label %or.true30, label %or.rhs31
+  %orval45108 = phi i32 [ 1, %or.true27 ], [ 0, %or.rhs28 ]
+  %cond45109 = icmp ne i32 %orval45108, 0
+  br i1 %cond45109, label %or.true30, label %or.rhs31
 
 or.true30:                                        ; preds = %or.rhs31, %or.merge29
   br label %or.merge32
 
 or.rhs31:                                         ; preds = %or.merge29
-  %load44364 = load ptr, ptr %ty18, align 8
-  %strcmp44366 = call i32 @strcmp(ptr %load44364, ptr @.strlit44365)
-  %cmp44367 = icmp eq i32 %strcmp44366, 0
-  %bool44368 = zext i1 %cmp44367 to i32
-  %cond44369 = icmp ne i32 %bool44368, 0
-  br i1 %cond44369, label %or.true30, label %or.merge32
+  %load45110 = load ptr, ptr %ty18, align 8
+  %strcmp45112 = call i32 @strcmp(ptr %load45110, ptr @.strlit45111)
+  %cmp45113 = icmp eq i32 %strcmp45112, 0
+  %bool45114 = zext i1 %cmp45113 to i32
+  %cond45115 = icmp ne i32 %bool45114, 0
+  br i1 %cond45115, label %or.true30, label %or.merge32
 
 or.merge32:                                       ; preds = %or.true30, %or.rhs31
-  %orval44370 = phi i32 [ 1, %or.true30 ], [ 0, %or.rhs31 ]
-  %cond44371 = icmp ne i32 %orval44370, 0
-  br i1 %cond44371, label %if.then7105, label %if.else7106
+  %orval45116 = phi i32 [ 1, %or.true30 ], [ 0, %or.rhs31 ]
+  %cond45117 = icmp ne i32 %orval45116, 0
+  br i1 %cond45117, label %if.then7233, label %if.else7234
 
-if.then7108:                                      ; preds = %and.merge35
-  %load44410 = load ptr, ptr %b, align 8
-  %field44412 = getelementptr %MirAsm, ptr %load44410, i32 0, i32 8
-  %fieldval44413 = load ptr, ptr %field44412, align 8
-  %load44414 = load i32, ptr %addr_idx, align 4
-  %load44415 = load ptr, ptr %ty18, align 8
-  %storeidx44416 = getelementptr ptr, ptr %fieldval44413, i32 %load44414
-  store ptr %load44415, ptr %storeidx44416, align 8
-  %load44417 = load ptr, ptr %ty18, align 8
-  %strcmp44419 = call i32 @strcmp(ptr %load44417, ptr @.strlit44418)
-  %cmp44420 = icmp eq i32 %strcmp44419, 0
-  %bool44421 = zext i1 %cmp44420 to i32
-  %cond44422 = icmp ne i32 %bool44421, 0
-  br i1 %cond44422, label %if.then7111, label %if.else7112
+if.then7236:                                      ; preds = %and.merge35
+  %load45156 = load ptr, ptr %b, align 8
+  %field45158 = getelementptr %MirAsm, ptr %load45156, i32 0, i32 8
+  %fieldval45159 = load ptr, ptr %field45158, align 8
+  %load45160 = load i32, ptr %addr_idx, align 4
+  %load45161 = load ptr, ptr %ty18, align 8
+  %storeidx45162 = getelementptr ptr, ptr %fieldval45159, i32 %load45160
+  store ptr %load45161, ptr %storeidx45162, align 8
+  %load45163 = load ptr, ptr %ty18, align 8
+  %strcmp45165 = call i32 @strcmp(ptr %load45163, ptr @.strlit45164)
+  %cmp45166 = icmp eq i32 %strcmp45165, 0
+  %bool45167 = zext i1 %cmp45166 to i32
+  %cond45168 = icmp ne i32 %bool45167, 0
+  br i1 %cond45168, label %if.then7239, label %if.else7240
 
-if.else7109:                                      ; preds = %and.merge35
-  %load44499 = load ptr, ptr %b, align 8
-  %load44501 = load ptr, ptr %b, align 8
-  %load44502 = load ptr, ptr %addr, align 8
-  %call44504 = call ptr @mir2asm_operand_typed(ptr %load44501, ptr %load44502, ptr @.strlit44503)
-  %call44505 = call ptr @vix_string_concat(ptr @.strlit44500, ptr %call44504)
-  call void @mir2asm_line(ptr %load44499, ptr %call44505)
-  %load44506 = load ptr, ptr %ty18, align 8
-  %strcmp44508 = call i32 @strcmp(ptr %load44506, ptr @.strlit44507)
-  %cmp44509 = icmp eq i32 %strcmp44508, 0
-  %bool44510 = zext i1 %cmp44509 to i32
-  %cond44511 = icmp ne i32 %bool44510, 0
-  br i1 %cond44511, label %if.then7120, label %if.else7121
+if.else7237:                                      ; preds = %and.merge35
+  %load45245 = load ptr, ptr %b, align 8
+  %load45247 = load ptr, ptr %b, align 8
+  %load45248 = load ptr, ptr %addr, align 8
+  %call45250 = call ptr @mir2asm_operand_typed(ptr %load45247, ptr %load45248, ptr @.strlit45249)
+  %call45251 = call ptr @vix_string_concat(ptr @.strlit45246, ptr %call45250)
+  call void @mir2asm_line(ptr %load45245, ptr %call45251)
+  %load45252 = load ptr, ptr %ty18, align 8
+  %strcmp45254 = call i32 @strcmp(ptr %load45252, ptr @.strlit45253)
+  %cmp45255 = icmp eq i32 %strcmp45254, 0
+  %bool45256 = zext i1 %cmp45255 to i32
+  %cond45257 = icmp ne i32 %bool45256, 0
+  br i1 %cond45257, label %if.then7248, label %if.else7249
 
-if.end7110:                                       ; preds = %if.end7122, %if.end7119
-  br label %if.end7092
+if.end7238:                                       ; preds = %if.end7250, %if.end7247
+  br label %if.end7220
 
-and.rhs33:                                        ; preds = %if.end7104
-  %load44398 = load ptr, ptr %b, align 8
-  %field44400 = getelementptr %MirAsm, ptr %load44398, i32 0, i32 7
-  %fieldval44401 = load ptr, ptr %field44400, align 8
-  %load44402 = load i32, ptr %addr_idx, align 4
-  %idx44403 = getelementptr i32, ptr %fieldval44401, i32 %load44402
-  %loadidx44404 = load i32, ptr %idx44403, align 4
-  %cmp44405 = icmp eq i32 %loadidx44404, 1
-  %bool44406 = zext i1 %cmp44405 to i32
-  %cond44407 = icmp ne i32 %bool44406, 0
-  br i1 %cond44407, label %and.merge35, label %and.false34
+and.rhs33:                                        ; preds = %if.end7232
+  %load45144 = load ptr, ptr %b, align 8
+  %field45146 = getelementptr %MirAsm, ptr %load45144, i32 0, i32 7
+  %fieldval45147 = load ptr, ptr %field45146, align 8
+  %load45148 = load i32, ptr %addr_idx, align 4
+  %idx45149 = getelementptr i32, ptr %fieldval45147, i32 %load45148
+  %loadidx45150 = load i32, ptr %idx45149, align 4
+  %cmp45151 = icmp eq i32 %loadidx45150, 1
+  %bool45152 = zext i1 %cmp45151 to i32
+  %cond45153 = icmp ne i32 %bool45152, 0
+  br i1 %cond45153, label %and.merge35, label %and.false34
 
-and.false34:                                      ; preds = %and.rhs33, %if.end7104
+and.false34:                                      ; preds = %and.rhs33, %if.end7232
   br label %and.merge35
 
 and.merge35:                                      ; preds = %and.false34, %and.rhs33
-  %andval44408 = phi i32 [ 1, %and.rhs33 ], [ 0, %and.false34 ]
-  %cond44409 = icmp ne i32 %andval44408, 0
-  br i1 %cond44409, label %if.then7108, label %if.else7109
+  %andval45154 = phi i32 [ 1, %and.rhs33 ], [ 0, %and.false34 ]
+  %cond45155 = icmp ne i32 %andval45154, 0
+  br i1 %cond45155, label %if.then7236, label %if.else7237
 
-if.then7111:                                      ; preds = %if.then7108
-  %load44423 = load ptr, ptr %b, align 8
-  %load44425 = load ptr, ptr %b, align 8
-  %field44427 = getelementptr %MirAsm, ptr %load44425, i32 0, i32 6
-  %fieldval44428 = load ptr, ptr %field44427, align 8
-  %load44429 = load i32, ptr %addr_idx, align 4
-  %idx44430 = getelementptr i32, ptr %fieldval44428, i32 %load44429
-  %loadidx44431 = load i32, ptr %idx44430, align 4
-  %call44432 = call ptr @mir2asm_mem(i32 %loadidx44431)
-  %call44433 = call ptr @vix_string_concat(ptr @.strlit44424, ptr %call44432)
-  %call44435 = call ptr @vix_string_concat(ptr %call44433, ptr @.strlit44434)
-  call void @mir2asm_line(ptr %load44423, ptr %call44435)
-  br label %if.end7113
+if.then7239:                                      ; preds = %if.then7236
+  %load45169 = load ptr, ptr %b, align 8
+  %load45171 = load ptr, ptr %b, align 8
+  %field45173 = getelementptr %MirAsm, ptr %load45171, i32 0, i32 6
+  %fieldval45174 = load ptr, ptr %field45173, align 8
+  %load45175 = load i32, ptr %addr_idx, align 4
+  %idx45176 = getelementptr i32, ptr %fieldval45174, i32 %load45175
+  %loadidx45177 = load i32, ptr %idx45176, align 4
+  %call45178 = call ptr @mir2asm_mem(i32 %loadidx45177)
+  %call45179 = call ptr @vix_string_concat(ptr @.strlit45170, ptr %call45178)
+  %call45181 = call ptr @vix_string_concat(ptr %call45179, ptr @.strlit45180)
+  call void @mir2asm_line(ptr %load45169, ptr %call45181)
+  br label %if.end7241
 
-if.else7112:                                      ; preds = %if.then7108
-  %load44436 = load ptr, ptr %ty18, align 8
-  %strcmp44438 = call i32 @strcmp(ptr %load44436, ptr @.strlit44437)
-  %cmp44439 = icmp eq i32 %strcmp44438, 0
-  %bool44440 = zext i1 %cmp44439 to i32
-  %cond44441 = icmp ne i32 %bool44440, 0
-  br i1 %cond44441, label %if.then7114, label %if.else7115
+if.else7240:                                      ; preds = %if.then7236
+  %load45182 = load ptr, ptr %ty18, align 8
+  %strcmp45184 = call i32 @strcmp(ptr %load45182, ptr @.strlit45183)
+  %cmp45185 = icmp eq i32 %strcmp45184, 0
+  %bool45186 = zext i1 %cmp45185 to i32
+  %cond45187 = icmp ne i32 %bool45186, 0
+  br i1 %cond45187, label %if.then7242, label %if.else7243
 
-if.end7113:                                       ; preds = %if.end7116, %if.then7111
-  %load44476 = load ptr, ptr %ty18, align 8
-  %strcmp44478 = call i32 @strcmp(ptr %load44476, ptr @.strlit44477)
-  %cmp44479 = icmp eq i32 %strcmp44478, 0
-  %bool44480 = zext i1 %cmp44479 to i32
-  %cond44481 = icmp ne i32 %bool44480, 0
-  br i1 %cond44481, label %and.rhs36, label %and.false37
+if.end7241:                                       ; preds = %if.end7244, %if.then7239
+  %load45222 = load ptr, ptr %ty18, align 8
+  %strcmp45224 = call i32 @strcmp(ptr %load45222, ptr @.strlit45223)
+  %cmp45225 = icmp eq i32 %strcmp45224, 0
+  %bool45226 = zext i1 %cmp45225 to i32
+  %cond45227 = icmp ne i32 %bool45226, 0
+  br i1 %cond45227, label %and.rhs36, label %and.false37
 
-if.then7114:                                      ; preds = %if.else7112
-  %load44442 = load ptr, ptr %b, align 8
-  %load44444 = load ptr, ptr %b, align 8
-  %field44446 = getelementptr %MirAsm, ptr %load44444, i32 0, i32 6
-  %fieldval44447 = load ptr, ptr %field44446, align 8
-  %load44448 = load i32, ptr %addr_idx, align 4
-  %idx44449 = getelementptr i32, ptr %fieldval44447, i32 %load44448
-  %loadidx44450 = load i32, ptr %idx44449, align 4
-  %call44451 = call ptr @mir2asm_mem(i32 %loadidx44450)
-  %call44452 = call ptr @vix_string_concat(ptr @.strlit44443, ptr %call44451)
-  %call44454 = call ptr @vix_string_concat(ptr %call44452, ptr @.strlit44453)
-  call void @mir2asm_line(ptr %load44442, ptr %call44454)
-  br label %if.end7116
+if.then7242:                                      ; preds = %if.else7240
+  %load45188 = load ptr, ptr %b, align 8
+  %load45190 = load ptr, ptr %b, align 8
+  %field45192 = getelementptr %MirAsm, ptr %load45190, i32 0, i32 6
+  %fieldval45193 = load ptr, ptr %field45192, align 8
+  %load45194 = load i32, ptr %addr_idx, align 4
+  %idx45195 = getelementptr i32, ptr %fieldval45193, i32 %load45194
+  %loadidx45196 = load i32, ptr %idx45195, align 4
+  %call45197 = call ptr @mir2asm_mem(i32 %loadidx45196)
+  %call45198 = call ptr @vix_string_concat(ptr @.strlit45189, ptr %call45197)
+  %call45200 = call ptr @vix_string_concat(ptr %call45198, ptr @.strlit45199)
+  call void @mir2asm_line(ptr %load45188, ptr %call45200)
+  br label %if.end7244
 
-if.else7115:                                      ; preds = %if.else7112
-  %load44455 = load ptr, ptr %b, align 8
-  %load44457 = load ptr, ptr %ty18, align 8
-  %call44458 = call ptr @mir2asm_mem_word(ptr %load44457)
-  %call44459 = call ptr @vix_string_concat(ptr @.strlit44456, ptr %call44458)
-  %call44461 = call ptr @vix_string_concat(ptr %call44459, ptr @.strlit44460)
-  %load44462 = load ptr, ptr %b, align 8
-  %field44464 = getelementptr %MirAsm, ptr %load44462, i32 0, i32 6
-  %fieldval44465 = load ptr, ptr %field44464, align 8
-  %load44466 = load i32, ptr %addr_idx, align 4
-  %idx44467 = getelementptr i32, ptr %fieldval44465, i32 %load44466
-  %loadidx44468 = load i32, ptr %idx44467, align 4
-  %call44469 = call ptr @mir2asm_mem(i32 %loadidx44468)
-  %call44470 = call ptr @vix_string_concat(ptr %call44461, ptr %call44469)
-  %call44472 = call ptr @vix_string_concat(ptr %call44470, ptr @.strlit44471)
-  %load44473 = load ptr, ptr %ty18, align 8
-  %call44474 = call ptr @mir2asm_acc(ptr %load44473)
-  %call44475 = call ptr @vix_string_concat(ptr %call44472, ptr %call44474)
-  call void @mir2asm_line(ptr %load44455, ptr %call44475)
-  br label %if.end7116
+if.else7243:                                      ; preds = %if.else7240
+  %load45201 = load ptr, ptr %b, align 8
+  %load45203 = load ptr, ptr %ty18, align 8
+  %call45204 = call ptr @mir2asm_mem_word(ptr %load45203)
+  %call45205 = call ptr @vix_string_concat(ptr @.strlit45202, ptr %call45204)
+  %call45207 = call ptr @vix_string_concat(ptr %call45205, ptr @.strlit45206)
+  %load45208 = load ptr, ptr %b, align 8
+  %field45210 = getelementptr %MirAsm, ptr %load45208, i32 0, i32 6
+  %fieldval45211 = load ptr, ptr %field45210, align 8
+  %load45212 = load i32, ptr %addr_idx, align 4
+  %idx45213 = getelementptr i32, ptr %fieldval45211, i32 %load45212
+  %loadidx45214 = load i32, ptr %idx45213, align 4
+  %call45215 = call ptr @mir2asm_mem(i32 %loadidx45214)
+  %call45216 = call ptr @vix_string_concat(ptr %call45207, ptr %call45215)
+  %call45218 = call ptr @vix_string_concat(ptr %call45216, ptr @.strlit45217)
+  %load45219 = load ptr, ptr %ty18, align 8
+  %call45220 = call ptr @mir2asm_acc(ptr %load45219)
+  %call45221 = call ptr @vix_string_concat(ptr %call45218, ptr %call45220)
+  call void @mir2asm_line(ptr %load45201, ptr %call45221)
+  br label %if.end7244
 
-if.end7116:                                       ; preds = %if.else7115, %if.then7114
-  br label %if.end7113
+if.end7244:                                       ; preds = %if.else7243, %if.then7242
+  br label %if.end7241
 
-if.then7117:                                      ; preds = %and.merge38
-  %load44492 = load ptr, ptr %b, align 8
-  %field44494 = getelementptr %MirAsm, ptr %load44492, i32 0, i32 8
-  %fieldval44495 = load ptr, ptr %field44494, align 8
-  %load44496 = load i32, ptr %addr_idx, align 4
-  %storeidx44498 = getelementptr ptr, ptr %fieldval44495, i32 %load44496
-  store ptr @.strlit44497, ptr %storeidx44498, align 8
-  br label %if.end7119
+if.then7245:                                      ; preds = %and.merge38
+  %load45238 = load ptr, ptr %b, align 8
+  %field45240 = getelementptr %MirAsm, ptr %load45238, i32 0, i32 8
+  %fieldval45241 = load ptr, ptr %field45240, align 8
+  %load45242 = load i32, ptr %addr_idx, align 4
+  %storeidx45244 = getelementptr ptr, ptr %fieldval45241, i32 %load45242
+  store ptr @.strlit45243, ptr %storeidx45244, align 8
+  br label %if.end7247
 
-if.else7118:                                      ; preds = %and.merge38
-  br label %if.end7119
+if.else7246:                                      ; preds = %and.merge38
+  br label %if.end7247
 
-if.end7119:                                       ; preds = %if.else7118, %if.then7117
-  br label %if.end7110
+if.end7247:                                       ; preds = %if.else7246, %if.then7245
+  br label %if.end7238
 
-and.rhs36:                                        ; preds = %if.end7113
-  %load44482 = load ptr, ptr %b, align 8
-  %load44483 = load ptr, ptr %val19, align 8
-  %call44484 = call ptr @mir2asm_slot_ty(ptr %load44482, ptr %load44483)
-  %strcmp44486 = call i32 @strcmp(ptr %call44484, ptr @.strlit44485)
-  %cmp44487 = icmp eq i32 %strcmp44486, 0
-  %bool44488 = zext i1 %cmp44487 to i32
-  %cond44489 = icmp ne i32 %bool44488, 0
-  br i1 %cond44489, label %and.merge38, label %and.false37
+and.rhs36:                                        ; preds = %if.end7241
+  %load45228 = load ptr, ptr %b, align 8
+  %load45229 = load ptr, ptr %val19, align 8
+  %call45230 = call ptr @mir2asm_slot_ty(ptr %load45228, ptr %load45229)
+  %strcmp45232 = call i32 @strcmp(ptr %call45230, ptr @.strlit45231)
+  %cmp45233 = icmp eq i32 %strcmp45232, 0
+  %bool45234 = zext i1 %cmp45233 to i32
+  %cond45235 = icmp ne i32 %bool45234, 0
+  br i1 %cond45235, label %and.merge38, label %and.false37
 
-and.false37:                                      ; preds = %and.rhs36, %if.end7113
+and.false37:                                      ; preds = %and.rhs36, %if.end7241
   br label %and.merge38
 
 and.merge38:                                      ; preds = %and.false37, %and.rhs36
-  %andval44490 = phi i32 [ 1, %and.rhs36 ], [ 0, %and.false37 ]
-  %cond44491 = icmp ne i32 %andval44490, 0
-  br i1 %cond44491, label %if.then7117, label %if.else7118
+  %andval45236 = phi i32 [ 1, %and.rhs36 ], [ 0, %and.false37 ]
+  %cond45237 = icmp ne i32 %andval45236, 0
+  br i1 %cond45237, label %if.then7245, label %if.else7246
 
-if.then7120:                                      ; preds = %if.else7109
-  %load44512 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load44512, ptr @.strlit44513)
-  br label %if.end7122
+if.then7248:                                      ; preds = %if.else7237
+  %load45258 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load45258, ptr @.strlit45259)
+  br label %if.end7250
 
-if.else7121:                                      ; preds = %if.else7109
-  %load44514 = load ptr, ptr %ty18, align 8
-  %strcmp44516 = call i32 @strcmp(ptr %load44514, ptr @.strlit44515)
-  %cmp44517 = icmp eq i32 %strcmp44516, 0
-  %bool44518 = zext i1 %cmp44517 to i32
-  %cond44519 = icmp ne i32 %bool44518, 0
-  br i1 %cond44519, label %if.then7123, label %if.else7124
+if.else7249:                                      ; preds = %if.else7237
+  %load45260 = load ptr, ptr %ty18, align 8
+  %strcmp45262 = call i32 @strcmp(ptr %load45260, ptr @.strlit45261)
+  %cmp45263 = icmp eq i32 %strcmp45262, 0
+  %bool45264 = zext i1 %cmp45263 to i32
+  %cond45265 = icmp ne i32 %bool45264, 0
+  br i1 %cond45265, label %if.then7251, label %if.else7252
 
-if.end7122:                                       ; preds = %if.end7125, %if.then7120
-  br label %if.end7110
+if.end7250:                                       ; preds = %if.end7253, %if.then7248
+  br label %if.end7238
 
-if.then7123:                                      ; preds = %if.else7121
-  %load44520 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load44520, ptr @.strlit44521)
-  br label %if.end7125
+if.then7251:                                      ; preds = %if.else7249
+  %load45266 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load45266, ptr @.strlit45267)
+  br label %if.end7253
 
-if.else7124:                                      ; preds = %if.else7121
-  %load44522 = load ptr, ptr %b, align 8
-  %load44524 = load ptr, ptr %ty18, align 8
-  %call44525 = call ptr @mir2asm_mem_word(ptr %load44524)
-  %call44526 = call ptr @vix_string_concat(ptr @.strlit44523, ptr %call44525)
-  %call44528 = call ptr @vix_string_concat(ptr %call44526, ptr @.strlit44527)
-  %load44529 = load ptr, ptr %ty18, align 8
-  %call44530 = call ptr @mir2asm_acc(ptr %load44529)
-  %call44531 = call ptr @vix_string_concat(ptr %call44528, ptr %call44530)
-  call void @mir2asm_line(ptr %load44522, ptr %call44531)
-  br label %if.end7125
+if.else7252:                                      ; preds = %if.else7249
+  %load45268 = load ptr, ptr %b, align 8
+  %load45270 = load ptr, ptr %ty18, align 8
+  %call45271 = call ptr @mir2asm_mem_word(ptr %load45270)
+  %call45272 = call ptr @vix_string_concat(ptr @.strlit45269, ptr %call45271)
+  %call45274 = call ptr @vix_string_concat(ptr %call45272, ptr @.strlit45273)
+  %load45275 = load ptr, ptr %ty18, align 8
+  %call45276 = call ptr @mir2asm_acc(ptr %load45275)
+  %call45277 = call ptr @vix_string_concat(ptr %call45274, ptr %call45276)
+  call void @mir2asm_line(ptr %load45268, ptr %call45277)
+  br label %if.end7253
 
-if.end7125:                                       ; preds = %if.else7124, %if.then7123
-  br label %if.end7122
+if.end7253:                                       ; preds = %if.else7252, %if.then7251
+  br label %if.end7250
 
-if.then7126:                                      ; preds = %if.end7089
-  %load44538 = load ptr, ptr %b, align 8
-  %load44540 = load ptr, ptr %line, align 8
-  call void @mir2asm_emit_call(ptr %load44538, ptr @.strlit44539, ptr %load44540)
+if.then7254:                                      ; preds = %if.end7217
+  %load45284 = load ptr, ptr %b, align 8
+  %load45286 = load ptr, ptr %line, align 8
+  call void @mir2asm_emit_call(ptr %load45284, ptr @.strlit45285, ptr %load45286)
   ret void
 
-if.else7127:                                      ; preds = %if.end7089
-  br label %if.end7128
+if.else7255:                                      ; preds = %if.end7217
+  br label %if.end7256
 
-if.end7128:                                       ; preds = %if.else7127
-  %load44541 = load ptr, ptr %line, align 8
-  %call44542 = call ptr @mir2asm_dest(ptr %load44541)
+if.end7256:                                       ; preds = %if.else7255
+  %load45287 = load ptr, ptr %line, align 8
+  %call45288 = call ptr @mir2asm_dest(ptr %load45287)
   %dest = alloca ptr, align 8
-  store ptr %call44542, ptr %dest, align 8
-  %load44543 = load ptr, ptr %line, align 8
-  %call44544 = call ptr @mir2asm_rhs(ptr %load44543)
+  store ptr %call45288, ptr %dest, align 8
+  %load45289 = load ptr, ptr %line, align 8
+  %call45290 = call ptr @mir2asm_rhs(ptr %load45289)
   %rhs = alloca ptr, align 8
-  store ptr %call44544, ptr %rhs, align 8
-  %load44545 = load ptr, ptr %dest, align 8
-  %strcmp44547 = call i32 @strcmp(ptr %load44545, ptr @.strlit44546)
-  %cmp44548 = icmp eq i32 %strcmp44547, 0
-  %bool44549 = zext i1 %cmp44548 to i32
-  %cond44550 = icmp ne i32 %bool44549, 0
-  br i1 %cond44550, label %if.then7129, label %if.else7130
+  store ptr %call45290, ptr %rhs, align 8
+  %load45291 = load ptr, ptr %dest, align 8
+  %strcmp45293 = call i32 @strcmp(ptr %load45291, ptr @.strlit45292)
+  %cmp45294 = icmp eq i32 %strcmp45293, 0
+  %bool45295 = zext i1 %cmp45294 to i32
+  %cond45296 = icmp ne i32 %bool45295, 0
+  br i1 %cond45296, label %if.then7257, label %if.else7258
 
-if.then7129:                                      ; preds = %if.end7128
-  %load44551 = load ptr, ptr %b, align 8
-  %load44552 = load ptr, ptr %line, align 8
-  call void @mir2asm_emit_unsupported(ptr %load44551, ptr %load44552)
+if.then7257:                                      ; preds = %if.end7256
+  %load45297 = load ptr, ptr %b, align 8
+  %load45298 = load ptr, ptr %line, align 8
+  call void @mir2asm_emit_unsupported(ptr %load45297, ptr %load45298)
   ret void
 
-if.else7130:                                      ; preds = %if.end7128
-  br label %if.end7131
+if.else7258:                                      ; preds = %if.end7256
+  br label %if.end7259
 
-if.end7131:                                       ; preds = %if.else7130
-  %load44553 = load ptr, ptr %rhs, align 8
-  %call44555 = call i32 @mir2asm_starts_with(ptr %load44553, ptr @.strlit44554)
-  %cmp44556 = icmp eq i32 %call44555, 1
-  %bool44557 = zext i1 %cmp44556 to i32
-  %cond44558 = icmp ne i32 %bool44557, 0
-  br i1 %cond44558, label %if.then7132, label %if.else7133
+if.end7259:                                       ; preds = %if.else7258
+  %load45299 = load ptr, ptr %rhs, align 8
+  %call45301 = call i32 @mir2asm_starts_with(ptr %load45299, ptr @.strlit45300)
+  %cmp45302 = icmp eq i32 %call45301, 1
+  %bool45303 = zext i1 %cmp45302 to i32
+  %cond45304 = icmp ne i32 %bool45303, 0
+  br i1 %cond45304, label %if.then7260, label %if.else7261
 
-if.then7132:                                      ; preds = %if.end7131
-  %load44559 = load ptr, ptr %b, align 8
-  %load44560 = load ptr, ptr %dest, align 8
-  %load44561 = load ptr, ptr %rhs, align 8
-  %call44562 = call ptr @mir2asm_after(ptr %load44561, i32 7)
-  %call44563 = call ptr @mir2asm_trim(ptr %call44562)
-  %call44564 = call i32 @mir2asm_alloc_slot_typed(ptr %load44559, ptr %load44560, i32 1, ptr %call44563)
+if.then7260:                                      ; preds = %if.end7259
+  %load45305 = load ptr, ptr %b, align 8
+  %load45306 = load ptr, ptr %dest, align 8
+  %load45307 = load ptr, ptr %rhs, align 8
+  %call45308 = call ptr @mir2asm_after(ptr %load45307, i32 7)
+  %call45309 = call ptr @mir2asm_trim(ptr %call45308)
+  %call45310 = call i32 @mir2asm_alloc_slot_typed(ptr %load45305, ptr %load45306, i32 1, ptr %call45309)
   ret void
 
-if.else7133:                                      ; preds = %if.end7131
-  br label %if.end7134
+if.else7261:                                      ; preds = %if.end7259
+  br label %if.end7262
 
-if.end7134:                                       ; preds = %if.else7133
-  %load44565 = load ptr, ptr %rhs, align 8
-  %call44567 = call i32 @mir2asm_starts_with(ptr %load44565, ptr @.strlit44566)
-  %cmp44568 = icmp eq i32 %call44567, 1
-  %bool44569 = zext i1 %cmp44568 to i32
-  %cond44570 = icmp ne i32 %bool44569, 0
-  br i1 %cond44570, label %if.then7135, label %if.else7136
+if.end7262:                                       ; preds = %if.else7261
+  %load45311 = load ptr, ptr %rhs, align 8
+  %call45313 = call i32 @mir2asm_starts_with(ptr %load45311, ptr @.strlit45312)
+  %cmp45314 = icmp eq i32 %call45313, 1
+  %bool45315 = zext i1 %cmp45314 to i32
+  %cond45316 = icmp ne i32 %bool45315, 0
+  br i1 %cond45316, label %if.then7263, label %if.else7264
 
-if.then7135:                                      ; preds = %if.end7134
-  %load44571 = load ptr, ptr %rhs, align 8
-  %call44572 = call i32 @mir2asm_find(ptr %load44571, i8 44, i32 0)
+if.then7263:                                      ; preds = %if.end7262
+  %load45317 = load ptr, ptr %rhs, align 8
+  %call45318 = call i32 @mir2asm_find(ptr %load45317, i8 44, i32 0)
   %comma39 = alloca i32, align 4
-  store i32 %call44572, ptr %comma39, align 4
-  %load44573 = load i32, ptr %comma39, align 4
-  %cmp44574 = icmp sgt i32 %load44573, 0
-  %bool44575 = zext i1 %cmp44574 to i32
-  %cond44576 = icmp ne i32 %bool44575, 0
-  br i1 %cond44576, label %if.then7138, label %if.else7139
+  store i32 %call45318, ptr %comma39, align 4
+  %load45319 = load i32, ptr %comma39, align 4
+  %cmp45320 = icmp sgt i32 %load45319, 0
+  %bool45321 = zext i1 %cmp45320 to i32
+  %cond45322 = icmp ne i32 %bool45321, 0
+  br i1 %cond45322, label %if.then7266, label %if.else7267
 
-if.else7136:                                      ; preds = %if.end7134
-  br label %if.end7137
+if.else7264:                                      ; preds = %if.end7262
+  br label %if.end7265
 
-if.end7137:                                       ; preds = %if.else7136
-  %load44855 = load ptr, ptr %rhs, align 8
-  %call44857 = call i32 @mir2asm_starts_with(ptr %load44855, ptr @.strlit44856)
-  %cmp44858 = icmp eq i32 %call44857, 1
-  %bool44859 = zext i1 %cmp44858 to i32
-  %cond44860 = icmp ne i32 %bool44859, 0
-  br i1 %cond44860, label %if.then7168, label %if.else7169
+if.end7265:                                       ; preds = %if.else7264
+  %load45601 = load ptr, ptr %rhs, align 8
+  %call45603 = call i32 @mir2asm_starts_with(ptr %load45601, ptr @.strlit45602)
+  %cmp45604 = icmp eq i32 %call45603, 1
+  %bool45605 = zext i1 %cmp45604 to i32
+  %cond45606 = icmp ne i32 %bool45605, 0
+  br i1 %cond45606, label %if.then7296, label %if.else7297
 
-if.then7138:                                      ; preds = %if.then7135
-  %load44577 = load ptr, ptr %rhs, align 8
-  %load44578 = load i32, ptr %comma39, align 4
-  %call44579 = call ptr @mir2asm_slice(ptr %load44577, i32 5, i32 %load44578)
-  %call44580 = call ptr @mir2asm_trim(ptr %call44579)
+if.then7266:                                      ; preds = %if.then7263
+  %load45323 = load ptr, ptr %rhs, align 8
+  %load45324 = load i32, ptr %comma39, align 4
+  %call45325 = call ptr @mir2asm_slice(ptr %load45323, i32 5, i32 %load45324)
+  %call45326 = call ptr @mir2asm_trim(ptr %call45325)
   %ty40 = alloca ptr, align 8
-  store ptr %call44580, ptr %ty40, align 8
-  %load44581 = load ptr, ptr %rhs, align 8
-  %load44582 = load i32, ptr %comma39, align 4
-  %add44583 = add i32 %load44582, 1
-  %call44584 = call ptr @mir2asm_after(ptr %load44581, i32 %add44583)
-  %call44585 = call ptr @mir2asm_trim(ptr %call44584)
+  store ptr %call45326, ptr %ty40, align 8
+  %load45327 = load ptr, ptr %rhs, align 8
+  %load45328 = load i32, ptr %comma39, align 4
+  %add45329 = add i32 %load45328, 1
+  %call45330 = call ptr @mir2asm_after(ptr %load45327, i32 %add45329)
+  %call45331 = call ptr @mir2asm_trim(ptr %call45330)
   %addr41 = alloca ptr, align 8
-  store ptr %call44585, ptr %addr41, align 8
-  %load44586 = load ptr, ptr %b, align 8
-  %load44587 = load ptr, ptr %ty40, align 8
-  %call44588 = call i32 @mir2asm_type_is_struct_value(ptr %load44586, ptr %load44587)
-  %cmp44589 = icmp eq i32 %call44588, 1
-  %bool44590 = zext i1 %cmp44589 to i32
-  %cond44591 = icmp ne i32 %bool44590, 0
-  br i1 %cond44591, label %if.then7141, label %if.else7142
+  store ptr %call45331, ptr %addr41, align 8
+  %load45332 = load ptr, ptr %b, align 8
+  %load45333 = load ptr, ptr %ty40, align 8
+  %call45334 = call i32 @mir2asm_type_is_struct_value(ptr %load45332, ptr %load45333)
+  %cmp45335 = icmp eq i32 %call45334, 1
+  %bool45336 = zext i1 %cmp45335 to i32
+  %cond45337 = icmp ne i32 %bool45336, 0
+  br i1 %cond45337, label %if.then7269, label %if.else7270
 
-if.else7139:                                      ; preds = %if.then7135
-  br label %if.end7140
+if.else7267:                                      ; preds = %if.then7263
+  br label %if.end7268
 
-if.end7140:                                       ; preds = %if.else7139, %if.end7161
+if.end7268:                                       ; preds = %if.else7267, %if.end7289
   ret void
 
-if.then7141:                                      ; preds = %if.then7138
-  %load44592 = load ptr, ptr %b, align 8
-  %load44593 = load ptr, ptr %dest, align 8
-  %load44594 = load ptr, ptr %ty40, align 8
-  %call44595 = call i32 @mir2asm_alloc_slot_typed(ptr %load44592, ptr %load44593, i32 0, ptr %load44594)
+if.then7269:                                      ; preds = %if.then7266
+  %load45338 = load ptr, ptr %b, align 8
+  %load45339 = load ptr, ptr %dest, align 8
+  %load45340 = load ptr, ptr %ty40, align 8
+  %call45341 = call i32 @mir2asm_alloc_slot_typed(ptr %load45338, ptr %load45339, i32 0, ptr %load45340)
   %dest_off = alloca i32, align 4
-  store i32 %call44595, ptr %dest_off, align 4
-  %load44596 = load ptr, ptr %b, align 8
-  %load44597 = load ptr, ptr %addr41, align 8
-  %call44598 = call i32 @mir2asm_find_name(ptr %load44596, ptr %load44597)
+  store i32 %call45341, ptr %dest_off, align 4
+  %load45342 = load ptr, ptr %b, align 8
+  %load45343 = load ptr, ptr %addr41, align 8
+  %call45344 = call i32 @mir2asm_find_name(ptr %load45342, ptr %load45343)
   %addr_idx242 = alloca i32, align 4
-  store i32 %call44598, ptr %addr_idx242, align 4
-  %load44599 = load i32, ptr %addr_idx242, align 4
-  %cmp44600 = icmp sge i32 %load44599, 0
-  %bool44601 = zext i1 %cmp44600 to i32
-  %cond44602 = icmp ne i32 %bool44601, 0
-  br i1 %cond44602, label %and.rhs43, label %and.false44
+  store i32 %call45344, ptr %addr_idx242, align 4
+  %load45345 = load i32, ptr %addr_idx242, align 4
+  %cmp45346 = icmp sge i32 %load45345, 0
+  %bool45347 = zext i1 %cmp45346 to i32
+  %cond45348 = icmp ne i32 %bool45347, 0
+  br i1 %cond45348, label %and.rhs43, label %and.false44
 
-if.else7142:                                      ; preds = %if.then7138
-  br label %if.end7143
+if.else7270:                                      ; preds = %if.then7266
+  br label %if.end7271
 
-if.end7143:                                       ; preds = %if.else7142
-  %load44633 = load ptr, ptr %b, align 8
-  %load44634 = load ptr, ptr %addr41, align 8
-  %call44635 = call i32 @mir2asm_find_name(ptr %load44633, ptr %load44634)
+if.end7271:                                       ; preds = %if.else7270
+  %load45379 = load ptr, ptr %b, align 8
+  %load45380 = load ptr, ptr %addr41, align 8
+  %call45381 = call i32 @mir2asm_find_name(ptr %load45379, ptr %load45380)
   %addr_idx46 = alloca i32, align 4
-  store i32 %call44635, ptr %addr_idx46, align 4
-  %ifexpr44636 = alloca ptr, align 8
-  %load44637 = load i32, ptr %addr_idx46, align 4
-  %cmp44638 = icmp sge i32 %load44637, 0
-  %bool44639 = zext i1 %cmp44638 to i32
-  %cond44640 = icmp ne i32 %bool44639, 0
-  br i1 %cond44640, label %ifexpr.then7147, label %ifexpr.else7148
+  store i32 %call45381, ptr %addr_idx46, align 4
+  %ifexpr45382 = alloca ptr, align 8
+  %load45383 = load i32, ptr %addr_idx46, align 4
+  %cmp45384 = icmp sge i32 %load45383, 0
+  %bool45385 = zext i1 %cmp45384 to i32
+  %cond45386 = icmp ne i32 %bool45385, 0
+  br i1 %cond45386, label %ifexpr.then7275, label %ifexpr.else7276
 
-if.then7144:                                      ; preds = %and.merge45
-  %load44615 = load ptr, ptr %b, align 8
-  %load44616 = load i32, ptr %dest_off, align 4
-  %load44617 = load ptr, ptr %b, align 8
-  %field44619 = getelementptr %MirAsm, ptr %load44617, i32 0, i32 6
-  %fieldval44620 = load ptr, ptr %field44619, align 8
-  %load44621 = load i32, ptr %addr_idx242, align 4
-  %idx44622 = getelementptr i32, ptr %fieldval44620, i32 %load44621
-  %loadidx44623 = load i32, ptr %idx44622, align 4
-  %load44624 = load ptr, ptr %b, align 8
-  %load44625 = load ptr, ptr %ty40, align 8
-  %call44626 = call i32 @mir2asm_type_size_for(ptr %load44624, ptr %load44625)
-  call void @mir2asm_emit_copy_stack_bytes(ptr %load44615, i32 %load44616, i32 %loadidx44623, i32 %call44626)
-  br label %if.end7146
+if.then7272:                                      ; preds = %and.merge45
+  %load45361 = load ptr, ptr %b, align 8
+  %load45362 = load i32, ptr %dest_off, align 4
+  %load45363 = load ptr, ptr %b, align 8
+  %field45365 = getelementptr %MirAsm, ptr %load45363, i32 0, i32 6
+  %fieldval45366 = load ptr, ptr %field45365, align 8
+  %load45367 = load i32, ptr %addr_idx242, align 4
+  %idx45368 = getelementptr i32, ptr %fieldval45366, i32 %load45367
+  %loadidx45369 = load i32, ptr %idx45368, align 4
+  %load45370 = load ptr, ptr %b, align 8
+  %load45371 = load ptr, ptr %ty40, align 8
+  %call45372 = call i32 @mir2asm_type_size_for(ptr %load45370, ptr %load45371)
+  call void @mir2asm_emit_copy_stack_bytes(ptr %load45361, i32 %load45362, i32 %loadidx45369, i32 %call45372)
+  br label %if.end7274
 
-if.else7145:                                      ; preds = %and.merge45
-  %load44627 = load ptr, ptr %b, align 8
-  %load44628 = load i32, ptr %dest_off, align 4
-  %load44629 = load ptr, ptr %addr41, align 8
-  %load44630 = load ptr, ptr %b, align 8
-  %load44631 = load ptr, ptr %ty40, align 8
-  %call44632 = call i32 @mir2asm_type_size_for(ptr %load44630, ptr %load44631)
-  call void @mir2asm_emit_copy_ptr_to_stack(ptr %load44627, i32 %load44628, ptr %load44629, i32 %call44632)
-  br label %if.end7146
+if.else7273:                                      ; preds = %and.merge45
+  %load45373 = load ptr, ptr %b, align 8
+  %load45374 = load i32, ptr %dest_off, align 4
+  %load45375 = load ptr, ptr %addr41, align 8
+  %load45376 = load ptr, ptr %b, align 8
+  %load45377 = load ptr, ptr %ty40, align 8
+  %call45378 = call i32 @mir2asm_type_size_for(ptr %load45376, ptr %load45377)
+  call void @mir2asm_emit_copy_ptr_to_stack(ptr %load45373, i32 %load45374, ptr %load45375, i32 %call45378)
+  br label %if.end7274
 
-if.end7146:                                       ; preds = %if.else7145, %if.then7144
+if.end7274:                                       ; preds = %if.else7273, %if.then7272
   ret void
 
-and.rhs43:                                        ; preds = %if.then7141
-  %load44603 = load ptr, ptr %b, align 8
-  %field44605 = getelementptr %MirAsm, ptr %load44603, i32 0, i32 7
-  %fieldval44606 = load ptr, ptr %field44605, align 8
-  %load44607 = load i32, ptr %addr_idx242, align 4
-  %idx44608 = getelementptr i32, ptr %fieldval44606, i32 %load44607
-  %loadidx44609 = load i32, ptr %idx44608, align 4
-  %cmp44610 = icmp eq i32 %loadidx44609, 1
-  %bool44611 = zext i1 %cmp44610 to i32
-  %cond44612 = icmp ne i32 %bool44611, 0
-  br i1 %cond44612, label %and.merge45, label %and.false44
+and.rhs43:                                        ; preds = %if.then7269
+  %load45349 = load ptr, ptr %b, align 8
+  %field45351 = getelementptr %MirAsm, ptr %load45349, i32 0, i32 7
+  %fieldval45352 = load ptr, ptr %field45351, align 8
+  %load45353 = load i32, ptr %addr_idx242, align 4
+  %idx45354 = getelementptr i32, ptr %fieldval45352, i32 %load45353
+  %loadidx45355 = load i32, ptr %idx45354, align 4
+  %cmp45356 = icmp eq i32 %loadidx45355, 1
+  %bool45357 = zext i1 %cmp45356 to i32
+  %cond45358 = icmp ne i32 %bool45357, 0
+  br i1 %cond45358, label %and.merge45, label %and.false44
 
-and.false44:                                      ; preds = %and.rhs43, %if.then7141
+and.false44:                                      ; preds = %and.rhs43, %if.then7269
   br label %and.merge45
 
 and.merge45:                                      ; preds = %and.false44, %and.rhs43
-  %andval44613 = phi i32 [ 1, %and.rhs43 ], [ 0, %and.false44 ]
-  %cond44614 = icmp ne i32 %andval44613, 0
-  br i1 %cond44614, label %if.then7144, label %if.else7145
+  %andval45359 = phi i32 [ 1, %and.rhs43 ], [ 0, %and.false44 ]
+  %cond45360 = icmp ne i32 %andval45359, 0
+  br i1 %cond45360, label %if.then7272, label %if.else7273
 
-ifexpr.then7147:                                  ; preds = %if.end7143
-  %load44641 = load ptr, ptr %b, align 8
-  %field44643 = getelementptr %MirAsm, ptr %load44641, i32 0, i32 8
-  %fieldval44644 = load ptr, ptr %field44643, align 8
-  %load44645 = load i32, ptr %addr_idx46, align 4
-  %idx44646 = getelementptr ptr, ptr %fieldval44644, i32 %load44645
-  %loadidx44647 = load ptr, ptr %idx44646, align 8
-  store ptr %loadidx44647, ptr %ifexpr44636, align 8
-  br label %ifexpr.end7149
+ifexpr.then7275:                                  ; preds = %if.end7271
+  %load45387 = load ptr, ptr %b, align 8
+  %field45389 = getelementptr %MirAsm, ptr %load45387, i32 0, i32 8
+  %fieldval45390 = load ptr, ptr %field45389, align 8
+  %load45391 = load i32, ptr %addr_idx46, align 4
+  %idx45392 = getelementptr ptr, ptr %fieldval45390, i32 %load45391
+  %loadidx45393 = load ptr, ptr %idx45392, align 8
+  store ptr %loadidx45393, ptr %ifexpr45382, align 8
+  br label %ifexpr.end7277
 
-ifexpr.else7148:                                  ; preds = %if.end7143
-  store ptr @.strlit44648, ptr %ifexpr44636, align 8
-  br label %ifexpr.end7149
+ifexpr.else7276:                                  ; preds = %if.end7271
+  store ptr @.strlit45394, ptr %ifexpr45382, align 8
+  br label %ifexpr.end7277
 
-ifexpr.end7149:                                   ; preds = %ifexpr.else7148, %ifexpr.then7147
-  %ifexprval44649 = load ptr, ptr %ifexpr44636, align 8
+ifexpr.end7277:                                   ; preds = %ifexpr.else7276, %ifexpr.then7275
+  %ifexprval45395 = load ptr, ptr %ifexpr45382, align 8
   %addr_ty = alloca ptr, align 8
-  store ptr %ifexprval44649, ptr %addr_ty, align 8
-  %ifexpr44650 = alloca ptr, align 8
-  %load44651 = load ptr, ptr %addr_ty, align 8
-  %strcmp44653 = call i32 @strcmp(ptr %load44651, ptr @.strlit44652)
-  %cmp44654 = icmp eq i32 %strcmp44653, 0
-  %bool44655 = zext i1 %cmp44654 to i32
-  %cond44656 = icmp ne i32 %bool44655, 0
-  br i1 %cond44656, label %and.rhs47, label %and.false48
+  store ptr %ifexprval45395, ptr %addr_ty, align 8
+  %ifexpr45396 = alloca ptr, align 8
+  %load45397 = load ptr, ptr %addr_ty, align 8
+  %strcmp45399 = call i32 @strcmp(ptr %load45397, ptr @.strlit45398)
+  %cmp45400 = icmp eq i32 %strcmp45399, 0
+  %bool45401 = zext i1 %cmp45400 to i32
+  %cond45402 = icmp ne i32 %bool45401, 0
+  br i1 %cond45402, label %and.rhs47, label %and.false48
 
-ifexpr.then7150:                                  ; preds = %and.merge49
-  store ptr @.strlit44665, ptr %ifexpr44650, align 8
-  br label %ifexpr.end7152
+ifexpr.then7278:                                  ; preds = %and.merge49
+  store ptr @.strlit45411, ptr %ifexpr45396, align 8
+  br label %ifexpr.end7280
 
-ifexpr.else7151:                                  ; preds = %and.merge49
-  %ifexpr44666 = alloca ptr, align 8
-  %load44667 = load i32, ptr %addr_idx46, align 4
-  %cmp44668 = icmp sge i32 %load44667, 0
-  %bool44669 = zext i1 %cmp44668 to i32
-  %cond44670 = icmp ne i32 %bool44669, 0
-  br i1 %cond44670, label %and.rhs50, label %and.false51
+ifexpr.else7279:                                  ; preds = %and.merge49
+  %ifexpr45412 = alloca ptr, align 8
+  %load45413 = load i32, ptr %addr_idx46, align 4
+  %cmp45414 = icmp sge i32 %load45413, 0
+  %bool45415 = zext i1 %cmp45414 to i32
+  %cond45416 = icmp ne i32 %bool45415, 0
+  br i1 %cond45416, label %and.rhs50, label %and.false51
 
-ifexpr.end7152:                                   ; preds = %ifexpr.end7155, %ifexpr.then7150
-  %ifexprval44710 = load ptr, ptr %ifexpr44650, align 8
+ifexpr.end7280:                                   ; preds = %ifexpr.end7283, %ifexpr.then7278
+  %ifexprval45456 = load ptr, ptr %ifexpr45396, align 8
   %src_ty = alloca ptr, align 8
-  store ptr %ifexprval44710, ptr %src_ty, align 8
-  %ifexpr44711 = alloca ptr, align 8
-  %load44712 = load ptr, ptr %src_ty, align 8
-  %strcmp44714 = call i32 @strcmp(ptr %load44712, ptr @.strlit44713)
-  %cmp44715 = icmp eq i32 %strcmp44714, 0
-  %bool44716 = zext i1 %cmp44715 to i32
-  %cond44717 = icmp ne i32 %bool44716, 0
-  br i1 %cond44717, label %and.rhs62, label %and.false63
+  store ptr %ifexprval45456, ptr %src_ty, align 8
+  %ifexpr45457 = alloca ptr, align 8
+  %load45458 = load ptr, ptr %src_ty, align 8
+  %strcmp45460 = call i32 @strcmp(ptr %load45458, ptr @.strlit45459)
+  %cmp45461 = icmp eq i32 %strcmp45460, 0
+  %bool45462 = zext i1 %cmp45461 to i32
+  %cond45463 = icmp ne i32 %bool45462, 0
+  br i1 %cond45463, label %and.rhs62, label %and.false63
 
-and.rhs47:                                        ; preds = %ifexpr.end7149
-  %load44657 = load ptr, ptr %ty40, align 8
-  %strcmp44659 = call i32 @strcmp(ptr %load44657, ptr @.strlit44658)
-  %cmp44660 = icmp eq i32 %strcmp44659, 0
-  %bool44661 = zext i1 %cmp44660 to i32
-  %cond44662 = icmp ne i32 %bool44661, 0
-  br i1 %cond44662, label %and.merge49, label %and.false48
+and.rhs47:                                        ; preds = %ifexpr.end7277
+  %load45403 = load ptr, ptr %ty40, align 8
+  %strcmp45405 = call i32 @strcmp(ptr %load45403, ptr @.strlit45404)
+  %cmp45406 = icmp eq i32 %strcmp45405, 0
+  %bool45407 = zext i1 %cmp45406 to i32
+  %cond45408 = icmp ne i32 %bool45407, 0
+  br i1 %cond45408, label %and.merge49, label %and.false48
 
-and.false48:                                      ; preds = %and.rhs47, %ifexpr.end7149
+and.false48:                                      ; preds = %and.rhs47, %ifexpr.end7277
   br label %and.merge49
 
 and.merge49:                                      ; preds = %and.false48, %and.rhs47
-  %andval44663 = phi i32 [ 1, %and.rhs47 ], [ 0, %and.false48 ]
-  %cond44664 = icmp ne i32 %andval44663, 0
-  br i1 %cond44664, label %ifexpr.then7150, label %ifexpr.else7151
+  %andval45409 = phi i32 [ 1, %and.rhs47 ], [ 0, %and.false48 ]
+  %cond45410 = icmp ne i32 %andval45409, 0
+  br i1 %cond45410, label %ifexpr.then7278, label %ifexpr.else7279
 
-ifexpr.then7153:                                  ; preds = %and.merge61
-  %load44707 = load ptr, ptr %addr_ty, align 8
-  store ptr %load44707, ptr %ifexpr44666, align 8
-  br label %ifexpr.end7155
+ifexpr.then7281:                                  ; preds = %and.merge61
+  %load45453 = load ptr, ptr %addr_ty, align 8
+  store ptr %load45453, ptr %ifexpr45412, align 8
+  br label %ifexpr.end7283
 
-ifexpr.else7154:                                  ; preds = %and.merge61
-  %load44708 = load ptr, ptr %ty40, align 8
-  store ptr %load44708, ptr %ifexpr44666, align 8
-  br label %ifexpr.end7155
+ifexpr.else7282:                                  ; preds = %and.merge61
+  %load45454 = load ptr, ptr %ty40, align 8
+  store ptr %load45454, ptr %ifexpr45412, align 8
+  br label %ifexpr.end7283
 
-ifexpr.end7155:                                   ; preds = %ifexpr.else7154, %ifexpr.then7153
-  %ifexprval44709 = load ptr, ptr %ifexpr44666, align 8
-  store ptr %ifexprval44709, ptr %ifexpr44650, align 8
-  br label %ifexpr.end7152
+ifexpr.end7283:                                   ; preds = %ifexpr.else7282, %ifexpr.then7281
+  %ifexprval45455 = load ptr, ptr %ifexpr45412, align 8
+  store ptr %ifexprval45455, ptr %ifexpr45396, align 8
+  br label %ifexpr.end7280
 
-and.rhs50:                                        ; preds = %ifexpr.else7151
-  %load44671 = load ptr, ptr %b, align 8
-  %field44673 = getelementptr %MirAsm, ptr %load44671, i32 0, i32 7
-  %fieldval44674 = load ptr, ptr %field44673, align 8
-  %load44675 = load i32, ptr %addr_idx46, align 4
-  %idx44676 = getelementptr i32, ptr %fieldval44674, i32 %load44675
-  %loadidx44677 = load i32, ptr %idx44676, align 4
-  %cmp44678 = icmp eq i32 %loadidx44677, 1
-  %bool44679 = zext i1 %cmp44678 to i32
-  %cond44680 = icmp ne i32 %bool44679, 0
-  br i1 %cond44680, label %and.merge52, label %and.false51
+and.rhs50:                                        ; preds = %ifexpr.else7279
+  %load45417 = load ptr, ptr %b, align 8
+  %field45419 = getelementptr %MirAsm, ptr %load45417, i32 0, i32 7
+  %fieldval45420 = load ptr, ptr %field45419, align 8
+  %load45421 = load i32, ptr %addr_idx46, align 4
+  %idx45422 = getelementptr i32, ptr %fieldval45420, i32 %load45421
+  %loadidx45423 = load i32, ptr %idx45422, align 4
+  %cmp45424 = icmp eq i32 %loadidx45423, 1
+  %bool45425 = zext i1 %cmp45424 to i32
+  %cond45426 = icmp ne i32 %bool45425, 0
+  br i1 %cond45426, label %and.merge52, label %and.false51
 
-and.false51:                                      ; preds = %and.rhs50, %ifexpr.else7151
+and.false51:                                      ; preds = %and.rhs50, %ifexpr.else7279
   br label %and.merge52
 
 and.merge52:                                      ; preds = %and.false51, %and.rhs50
-  %andval44681 = phi i32 [ 1, %and.rhs50 ], [ 0, %and.false51 ]
-  %cond44682 = icmp ne i32 %andval44681, 0
-  br i1 %cond44682, label %and.rhs53, label %and.false54
+  %andval45427 = phi i32 [ 1, %and.rhs50 ], [ 0, %and.false51 ]
+  %cond45428 = icmp ne i32 %andval45427, 0
+  br i1 %cond45428, label %and.rhs53, label %and.false54
 
 and.rhs53:                                        ; preds = %and.merge52
-  %load44683 = load ptr, ptr %addr_ty, align 8
-  %strcmp44685 = call i32 @strcmp(ptr %load44683, ptr @.strlit44684)
-  %cmp44686 = icmp eq i32 %strcmp44685, 0
-  %bool44687 = zext i1 %cmp44686 to i32
-  %cond44688 = icmp ne i32 %bool44687, 0
-  br i1 %cond44688, label %or.true56, label %or.rhs57
+  %load45429 = load ptr, ptr %addr_ty, align 8
+  %strcmp45431 = call i32 @strcmp(ptr %load45429, ptr @.strlit45430)
+  %cmp45432 = icmp eq i32 %strcmp45431, 0
+  %bool45433 = zext i1 %cmp45432 to i32
+  %cond45434 = icmp ne i32 %bool45433, 0
+  br i1 %cond45434, label %or.true56, label %or.rhs57
 
 and.false54:                                      ; preds = %or.merge58, %and.merge52
   br label %and.merge55
 
 and.merge55:                                      ; preds = %and.false54, %or.merge58
-  %andval44697 = phi i32 [ 1, %or.merge58 ], [ 0, %and.false54 ]
-  %cond44698 = icmp ne i32 %andval44697, 0
-  br i1 %cond44698, label %and.rhs59, label %and.false60
+  %andval45443 = phi i32 [ 1, %or.merge58 ], [ 0, %and.false54 ]
+  %cond45444 = icmp ne i32 %andval45443, 0
+  br i1 %cond45444, label %and.rhs59, label %and.false60
 
 or.true56:                                        ; preds = %or.rhs57, %and.rhs53
   br label %or.merge58
 
 or.rhs57:                                         ; preds = %and.rhs53
-  %load44689 = load ptr, ptr %addr_ty, align 8
-  %strcmp44691 = call i32 @strcmp(ptr %load44689, ptr @.strlit44690)
-  %cmp44692 = icmp eq i32 %strcmp44691, 0
-  %bool44693 = zext i1 %cmp44692 to i32
-  %cond44694 = icmp ne i32 %bool44693, 0
-  br i1 %cond44694, label %or.true56, label %or.merge58
+  %load45435 = load ptr, ptr %addr_ty, align 8
+  %strcmp45437 = call i32 @strcmp(ptr %load45435, ptr @.strlit45436)
+  %cmp45438 = icmp eq i32 %strcmp45437, 0
+  %bool45439 = zext i1 %cmp45438 to i32
+  %cond45440 = icmp ne i32 %bool45439, 0
+  br i1 %cond45440, label %or.true56, label %or.merge58
 
 or.merge58:                                       ; preds = %or.true56, %or.rhs57
-  %orval44695 = phi i32 [ 1, %or.true56 ], [ 0, %or.rhs57 ]
-  %cond44696 = icmp ne i32 %orval44695, 0
-  br i1 %cond44696, label %and.merge55, label %and.false54
+  %orval45441 = phi i32 [ 1, %or.true56 ], [ 0, %or.rhs57 ]
+  %cond45442 = icmp ne i32 %orval45441, 0
+  br i1 %cond45442, label %and.merge55, label %and.false54
 
 and.rhs59:                                        ; preds = %and.merge55
-  %load44699 = load ptr, ptr %ty40, align 8
-  %strcmp44701 = call i32 @strcmp(ptr %load44699, ptr @.strlit44700)
-  %cmp44702 = icmp eq i32 %strcmp44701, 0
-  %bool44703 = zext i1 %cmp44702 to i32
-  %cond44704 = icmp ne i32 %bool44703, 0
-  br i1 %cond44704, label %and.merge61, label %and.false60
+  %load45445 = load ptr, ptr %ty40, align 8
+  %strcmp45447 = call i32 @strcmp(ptr %load45445, ptr @.strlit45446)
+  %cmp45448 = icmp eq i32 %strcmp45447, 0
+  %bool45449 = zext i1 %cmp45448 to i32
+  %cond45450 = icmp ne i32 %bool45449, 0
+  br i1 %cond45450, label %and.merge61, label %and.false60
 
 and.false60:                                      ; preds = %and.rhs59, %and.merge55
   br label %and.merge61
 
 and.merge61:                                      ; preds = %and.false60, %and.rhs59
-  %andval44705 = phi i32 [ 1, %and.rhs59 ], [ 0, %and.false60 ]
-  %cond44706 = icmp ne i32 %andval44705, 0
-  br i1 %cond44706, label %ifexpr.then7153, label %ifexpr.else7154
+  %andval45451 = phi i32 [ 1, %and.rhs59 ], [ 0, %and.false60 ]
+  %cond45452 = icmp ne i32 %andval45451, 0
+  br i1 %cond45452, label %ifexpr.then7281, label %ifexpr.else7282
 
-ifexpr.then7156:                                  ; preds = %and.merge64
-  store ptr @.strlit44726, ptr %ifexpr44711, align 8
-  br label %ifexpr.end7158
+ifexpr.then7284:                                  ; preds = %and.merge64
+  store ptr @.strlit45472, ptr %ifexpr45457, align 8
+  br label %ifexpr.end7286
 
-ifexpr.else7157:                                  ; preds = %and.merge64
-  %load44727 = load ptr, ptr %src_ty, align 8
-  store ptr %load44727, ptr %ifexpr44711, align 8
-  br label %ifexpr.end7158
+ifexpr.else7285:                                  ; preds = %and.merge64
+  %load45473 = load ptr, ptr %src_ty, align 8
+  store ptr %load45473, ptr %ifexpr45457, align 8
+  br label %ifexpr.end7286
 
-ifexpr.end7158:                                   ; preds = %ifexpr.else7157, %ifexpr.then7156
-  %ifexprval44728 = load ptr, ptr %ifexpr44711, align 8
+ifexpr.end7286:                                   ; preds = %ifexpr.else7285, %ifexpr.then7284
+  %ifexprval45474 = load ptr, ptr %ifexpr45457, align 8
   %dest_ty = alloca ptr, align 8
-  store ptr %ifexprval44728, ptr %dest_ty, align 8
-  %load44729 = load i32, ptr %addr_idx46, align 4
-  %cmp44730 = icmp sge i32 %load44729, 0
-  %bool44731 = zext i1 %cmp44730 to i32
-  %cond44732 = icmp ne i32 %bool44731, 0
-  br i1 %cond44732, label %and.rhs65, label %and.false66
+  store ptr %ifexprval45474, ptr %dest_ty, align 8
+  %load45475 = load i32, ptr %addr_idx46, align 4
+  %cmp45476 = icmp sge i32 %load45475, 0
+  %bool45477 = zext i1 %cmp45476 to i32
+  %cond45478 = icmp ne i32 %bool45477, 0
+  br i1 %cond45478, label %and.rhs65, label %and.false66
 
-and.rhs62:                                        ; preds = %ifexpr.end7152
-  %load44718 = load ptr, ptr %ty40, align 8
-  %strcmp44720 = call i32 @strcmp(ptr %load44718, ptr @.strlit44719)
-  %cmp44721 = icmp eq i32 %strcmp44720, 0
-  %bool44722 = zext i1 %cmp44721 to i32
-  %cond44723 = icmp ne i32 %bool44722, 0
-  br i1 %cond44723, label %and.merge64, label %and.false63
+and.rhs62:                                        ; preds = %ifexpr.end7280
+  %load45464 = load ptr, ptr %ty40, align 8
+  %strcmp45466 = call i32 @strcmp(ptr %load45464, ptr @.strlit45465)
+  %cmp45467 = icmp eq i32 %strcmp45466, 0
+  %bool45468 = zext i1 %cmp45467 to i32
+  %cond45469 = icmp ne i32 %bool45468, 0
+  br i1 %cond45469, label %and.merge64, label %and.false63
 
-and.false63:                                      ; preds = %and.rhs62, %ifexpr.end7152
+and.false63:                                      ; preds = %and.rhs62, %ifexpr.end7280
   br label %and.merge64
 
 and.merge64:                                      ; preds = %and.false63, %and.rhs62
-  %andval44724 = phi i32 [ 1, %and.rhs62 ], [ 0, %and.false63 ]
-  %cond44725 = icmp ne i32 %andval44724, 0
-  br i1 %cond44725, label %ifexpr.then7156, label %ifexpr.else7157
+  %andval45470 = phi i32 [ 1, %and.rhs62 ], [ 0, %and.false63 ]
+  %cond45471 = icmp ne i32 %andval45470, 0
+  br i1 %cond45471, label %ifexpr.then7284, label %ifexpr.else7285
 
-if.then7159:                                      ; preds = %and.merge67
-  %load44745 = load ptr, ptr %src_ty, align 8
-  %strcmp44747 = call i32 @strcmp(ptr %load44745, ptr @.strlit44746)
-  %cmp44748 = icmp eq i32 %strcmp44747, 0
-  %bool44749 = zext i1 %cmp44748 to i32
-  %cond44750 = icmp ne i32 %bool44749, 0
-  br i1 %cond44750, label %or.true68, label %or.rhs69
+if.then7287:                                      ; preds = %and.merge67
+  %load45491 = load ptr, ptr %src_ty, align 8
+  %strcmp45493 = call i32 @strcmp(ptr %load45491, ptr @.strlit45492)
+  %cmp45494 = icmp eq i32 %strcmp45493, 0
+  %bool45495 = zext i1 %cmp45494 to i32
+  %cond45496 = icmp ne i32 %bool45495, 0
+  br i1 %cond45496, label %or.true68, label %or.rhs69
 
-if.else7160:                                      ; preds = %and.merge67
-  %load44799 = load ptr, ptr %b, align 8
-  %load44801 = load ptr, ptr %b, align 8
-  %load44802 = load ptr, ptr %addr41, align 8
-  %call44804 = call ptr @mir2asm_operand_typed(ptr %load44801, ptr %load44802, ptr @.strlit44803)
-  %call44805 = call ptr @vix_string_concat(ptr @.strlit44800, ptr %call44804)
-  call void @mir2asm_line(ptr %load44799, ptr %call44805)
-  %load44806 = load ptr, ptr %src_ty, align 8
-  %strcmp44808 = call i32 @strcmp(ptr %load44806, ptr @.strlit44807)
-  %cmp44809 = icmp eq i32 %strcmp44808, 0
-  %bool44810 = zext i1 %cmp44809 to i32
-  %cond44811 = icmp ne i32 %bool44810, 0
-  br i1 %cond44811, label %or.true74, label %or.rhs75
+if.else7288:                                      ; preds = %and.merge67
+  %load45545 = load ptr, ptr %b, align 8
+  %load45547 = load ptr, ptr %b, align 8
+  %load45548 = load ptr, ptr %addr41, align 8
+  %call45550 = call ptr @mir2asm_operand_typed(ptr %load45547, ptr %load45548, ptr @.strlit45549)
+  %call45551 = call ptr @vix_string_concat(ptr @.strlit45546, ptr %call45550)
+  call void @mir2asm_line(ptr %load45545, ptr %call45551)
+  %load45552 = load ptr, ptr %src_ty, align 8
+  %strcmp45554 = call i32 @strcmp(ptr %load45552, ptr @.strlit45553)
+  %cmp45555 = icmp eq i32 %strcmp45554, 0
+  %bool45556 = zext i1 %cmp45555 to i32
+  %cond45557 = icmp ne i32 %bool45556, 0
+  br i1 %cond45557, label %or.true74, label %or.rhs75
 
-if.end7161:                                       ; preds = %if.end7167, %if.end7164
-  %load44842 = load ptr, ptr %b, align 8
-  %load44844 = load ptr, ptr %b, align 8
-  %load44845 = load ptr, ptr %dest, align 8
-  %load44846 = load ptr, ptr %dest_ty, align 8
-  %call44847 = call i32 @mir2asm_alloc_slot_typed(ptr %load44844, ptr %load44845, i32 0, ptr %load44846)
-  %call44848 = call ptr @mir2asm_mem(i32 %call44847)
-  %call44849 = call ptr @vix_string_concat(ptr @.strlit44843, ptr %call44848)
-  %call44851 = call ptr @vix_string_concat(ptr %call44849, ptr @.strlit44850)
-  %load44852 = load ptr, ptr %dest_ty, align 8
-  %call44853 = call ptr @mir2asm_acc(ptr %load44852)
-  %call44854 = call ptr @vix_string_concat(ptr %call44851, ptr %call44853)
-  call void @mir2asm_line(ptr %load44842, ptr %call44854)
-  br label %if.end7140
+if.end7289:                                       ; preds = %if.end7295, %if.end7292
+  %load45588 = load ptr, ptr %b, align 8
+  %load45590 = load ptr, ptr %b, align 8
+  %load45591 = load ptr, ptr %dest, align 8
+  %load45592 = load ptr, ptr %dest_ty, align 8
+  %call45593 = call i32 @mir2asm_alloc_slot_typed(ptr %load45590, ptr %load45591, i32 0, ptr %load45592)
+  %call45594 = call ptr @mir2asm_mem(i32 %call45593)
+  %call45595 = call ptr @vix_string_concat(ptr @.strlit45589, ptr %call45594)
+  %call45597 = call ptr @vix_string_concat(ptr %call45595, ptr @.strlit45596)
+  %load45598 = load ptr, ptr %dest_ty, align 8
+  %call45599 = call ptr @mir2asm_acc(ptr %load45598)
+  %call45600 = call ptr @vix_string_concat(ptr %call45597, ptr %call45599)
+  call void @mir2asm_line(ptr %load45588, ptr %call45600)
+  br label %if.end7268
 
-and.rhs65:                                        ; preds = %ifexpr.end7158
-  %load44733 = load ptr, ptr %b, align 8
-  %field44735 = getelementptr %MirAsm, ptr %load44733, i32 0, i32 7
-  %fieldval44736 = load ptr, ptr %field44735, align 8
-  %load44737 = load i32, ptr %addr_idx46, align 4
-  %idx44738 = getelementptr i32, ptr %fieldval44736, i32 %load44737
-  %loadidx44739 = load i32, ptr %idx44738, align 4
-  %cmp44740 = icmp eq i32 %loadidx44739, 1
-  %bool44741 = zext i1 %cmp44740 to i32
-  %cond44742 = icmp ne i32 %bool44741, 0
-  br i1 %cond44742, label %and.merge67, label %and.false66
+and.rhs65:                                        ; preds = %ifexpr.end7286
+  %load45479 = load ptr, ptr %b, align 8
+  %field45481 = getelementptr %MirAsm, ptr %load45479, i32 0, i32 7
+  %fieldval45482 = load ptr, ptr %field45481, align 8
+  %load45483 = load i32, ptr %addr_idx46, align 4
+  %idx45484 = getelementptr i32, ptr %fieldval45482, i32 %load45483
+  %loadidx45485 = load i32, ptr %idx45484, align 4
+  %cmp45486 = icmp eq i32 %loadidx45485, 1
+  %bool45487 = zext i1 %cmp45486 to i32
+  %cond45488 = icmp ne i32 %bool45487, 0
+  br i1 %cond45488, label %and.merge67, label %and.false66
 
-and.false66:                                      ; preds = %and.rhs65, %ifexpr.end7158
+and.false66:                                      ; preds = %and.rhs65, %ifexpr.end7286
   br label %and.merge67
 
 and.merge67:                                      ; preds = %and.false66, %and.rhs65
-  %andval44743 = phi i32 [ 1, %and.rhs65 ], [ 0, %and.false66 ]
-  %cond44744 = icmp ne i32 %andval44743, 0
-  br i1 %cond44744, label %if.then7159, label %if.else7160
+  %andval45489 = phi i32 [ 1, %and.rhs65 ], [ 0, %and.false66 ]
+  %cond45490 = icmp ne i32 %andval45489, 0
+  br i1 %cond45490, label %if.then7287, label %if.else7288
 
-if.then7162:                                      ; preds = %or.merge73
-  %load44767 = load ptr, ptr %b, align 8
-  %load44769 = load ptr, ptr %b, align 8
-  %field44771 = getelementptr %MirAsm, ptr %load44769, i32 0, i32 6
-  %fieldval44772 = load ptr, ptr %field44771, align 8
-  %load44773 = load i32, ptr %addr_idx46, align 4
-  %idx44774 = getelementptr i32, ptr %fieldval44772, i32 %load44773
-  %loadidx44775 = load i32, ptr %idx44774, align 4
-  %call44776 = call ptr @mir2asm_mem(i32 %loadidx44775)
-  %call44777 = call ptr @vix_string_concat(ptr @.strlit44768, ptr %call44776)
-  call void @mir2asm_line(ptr %load44767, ptr %call44777)
-  br label %if.end7164
+if.then7290:                                      ; preds = %or.merge73
+  %load45513 = load ptr, ptr %b, align 8
+  %load45515 = load ptr, ptr %b, align 8
+  %field45517 = getelementptr %MirAsm, ptr %load45515, i32 0, i32 6
+  %fieldval45518 = load ptr, ptr %field45517, align 8
+  %load45519 = load i32, ptr %addr_idx46, align 4
+  %idx45520 = getelementptr i32, ptr %fieldval45518, i32 %load45519
+  %loadidx45521 = load i32, ptr %idx45520, align 4
+  %call45522 = call ptr @mir2asm_mem(i32 %loadidx45521)
+  %call45523 = call ptr @vix_string_concat(ptr @.strlit45514, ptr %call45522)
+  call void @mir2asm_line(ptr %load45513, ptr %call45523)
+  br label %if.end7292
 
-if.else7163:                                      ; preds = %or.merge73
-  %load44778 = load ptr, ptr %b, align 8
-  %load44780 = load ptr, ptr %src_ty, align 8
-  %call44781 = call ptr @mir2asm_acc(ptr %load44780)
-  %call44782 = call ptr @vix_string_concat(ptr @.strlit44779, ptr %call44781)
-  %call44784 = call ptr @vix_string_concat(ptr %call44782, ptr @.strlit44783)
-  %load44785 = load ptr, ptr %src_ty, align 8
-  %call44786 = call ptr @mir2asm_mem_word(ptr %load44785)
-  %call44787 = call ptr @vix_string_concat(ptr %call44784, ptr %call44786)
-  %call44789 = call ptr @vix_string_concat(ptr %call44787, ptr @.strlit44788)
-  %load44790 = load ptr, ptr %b, align 8
-  %field44792 = getelementptr %MirAsm, ptr %load44790, i32 0, i32 6
-  %fieldval44793 = load ptr, ptr %field44792, align 8
-  %load44794 = load i32, ptr %addr_idx46, align 4
-  %idx44795 = getelementptr i32, ptr %fieldval44793, i32 %load44794
-  %loadidx44796 = load i32, ptr %idx44795, align 4
-  %call44797 = call ptr @mir2asm_mem(i32 %loadidx44796)
-  %call44798 = call ptr @vix_string_concat(ptr %call44789, ptr %call44797)
-  call void @mir2asm_line(ptr %load44778, ptr %call44798)
-  br label %if.end7164
+if.else7291:                                      ; preds = %or.merge73
+  %load45524 = load ptr, ptr %b, align 8
+  %load45526 = load ptr, ptr %src_ty, align 8
+  %call45527 = call ptr @mir2asm_acc(ptr %load45526)
+  %call45528 = call ptr @vix_string_concat(ptr @.strlit45525, ptr %call45527)
+  %call45530 = call ptr @vix_string_concat(ptr %call45528, ptr @.strlit45529)
+  %load45531 = load ptr, ptr %src_ty, align 8
+  %call45532 = call ptr @mir2asm_mem_word(ptr %load45531)
+  %call45533 = call ptr @vix_string_concat(ptr %call45530, ptr %call45532)
+  %call45535 = call ptr @vix_string_concat(ptr %call45533, ptr @.strlit45534)
+  %load45536 = load ptr, ptr %b, align 8
+  %field45538 = getelementptr %MirAsm, ptr %load45536, i32 0, i32 6
+  %fieldval45539 = load ptr, ptr %field45538, align 8
+  %load45540 = load i32, ptr %addr_idx46, align 4
+  %idx45541 = getelementptr i32, ptr %fieldval45539, i32 %load45540
+  %loadidx45542 = load i32, ptr %idx45541, align 4
+  %call45543 = call ptr @mir2asm_mem(i32 %loadidx45542)
+  %call45544 = call ptr @vix_string_concat(ptr %call45535, ptr %call45543)
+  call void @mir2asm_line(ptr %load45524, ptr %call45544)
+  br label %if.end7292
 
-if.end7164:                                       ; preds = %if.else7163, %if.then7162
-  br label %if.end7161
+if.end7292:                                       ; preds = %if.else7291, %if.then7290
+  br label %if.end7289
 
-or.true68:                                        ; preds = %or.rhs69, %if.then7159
+or.true68:                                        ; preds = %or.rhs69, %if.then7287
   br label %or.merge70
 
-or.rhs69:                                         ; preds = %if.then7159
-  %load44751 = load ptr, ptr %src_ty, align 8
-  %strcmp44753 = call i32 @strcmp(ptr %load44751, ptr @.strlit44752)
-  %cmp44754 = icmp eq i32 %strcmp44753, 0
-  %bool44755 = zext i1 %cmp44754 to i32
-  %cond44756 = icmp ne i32 %bool44755, 0
-  br i1 %cond44756, label %or.true68, label %or.merge70
+or.rhs69:                                         ; preds = %if.then7287
+  %load45497 = load ptr, ptr %src_ty, align 8
+  %strcmp45499 = call i32 @strcmp(ptr %load45497, ptr @.strlit45498)
+  %cmp45500 = icmp eq i32 %strcmp45499, 0
+  %bool45501 = zext i1 %cmp45500 to i32
+  %cond45502 = icmp ne i32 %bool45501, 0
+  br i1 %cond45502, label %or.true68, label %or.merge70
 
 or.merge70:                                       ; preds = %or.true68, %or.rhs69
-  %orval44757 = phi i32 [ 1, %or.true68 ], [ 0, %or.rhs69 ]
-  %cond44758 = icmp ne i32 %orval44757, 0
-  br i1 %cond44758, label %or.true71, label %or.rhs72
+  %orval45503 = phi i32 [ 1, %or.true68 ], [ 0, %or.rhs69 ]
+  %cond45504 = icmp ne i32 %orval45503, 0
+  br i1 %cond45504, label %or.true71, label %or.rhs72
 
 or.true71:                                        ; preds = %or.rhs72, %or.merge70
   br label %or.merge73
 
 or.rhs72:                                         ; preds = %or.merge70
-  %load44759 = load ptr, ptr %src_ty, align 8
-  %strcmp44761 = call i32 @strcmp(ptr %load44759, ptr @.strlit44760)
-  %cmp44762 = icmp eq i32 %strcmp44761, 0
-  %bool44763 = zext i1 %cmp44762 to i32
-  %cond44764 = icmp ne i32 %bool44763, 0
-  br i1 %cond44764, label %or.true71, label %or.merge73
+  %load45505 = load ptr, ptr %src_ty, align 8
+  %strcmp45507 = call i32 @strcmp(ptr %load45505, ptr @.strlit45506)
+  %cmp45508 = icmp eq i32 %strcmp45507, 0
+  %bool45509 = zext i1 %cmp45508 to i32
+  %cond45510 = icmp ne i32 %bool45509, 0
+  br i1 %cond45510, label %or.true71, label %or.merge73
 
 or.merge73:                                       ; preds = %or.true71, %or.rhs72
-  %orval44765 = phi i32 [ 1, %or.true71 ], [ 0, %or.rhs72 ]
-  %cond44766 = icmp ne i32 %orval44765, 0
-  br i1 %cond44766, label %if.then7162, label %if.else7163
+  %orval45511 = phi i32 [ 1, %or.true71 ], [ 0, %or.rhs72 ]
+  %cond45512 = icmp ne i32 %orval45511, 0
+  br i1 %cond45512, label %if.then7290, label %if.else7291
 
-if.then7165:                                      ; preds = %or.merge79
-  %load44828 = load ptr, ptr %b, align 8
-  call void @mir2asm_line(ptr %load44828, ptr @.strlit44829)
-  br label %if.end7167
+if.then7293:                                      ; preds = %or.merge79
+  %load45574 = load ptr, ptr %b, align 8
+  call void @mir2asm_line(ptr %load45574, ptr @.strlit45575)
+  br label %if.end7295
 
-if.else7166:                                      ; preds = %or.merge79
-  %load44830 = load ptr, ptr %b, align 8
-  %load44832 = load ptr, ptr %src_ty, align 8
-  %call44833 = call ptr @mir2asm_acc(ptr %load44832)
-  %call44834 = call ptr @vix_string_concat(ptr @.strlit44831, ptr %call44833)
-  %call44836 = call ptr @vix_string_concat(ptr %call44834, ptr @.strlit44835)
-  %load44837 = load ptr, ptr %src_ty, align 8
-  %call44838 = call ptr @mir2asm_mem_word(ptr %load44837)
-  %call44839 = call ptr @vix_string_concat(ptr %call44836, ptr %call44838)
-  %call44841 = call ptr @vix_string_concat(ptr %call44839, ptr @.strlit44840)
-  call void @mir2asm_line(ptr %load44830, ptr %call44841)
-  br label %if.end7167
+if.else7294:                                      ; preds = %or.merge79
+  %load45576 = load ptr, ptr %b, align 8
+  %load45578 = load ptr, ptr %src_ty, align 8
+  %call45579 = call ptr @mir2asm_acc(ptr %load45578)
+  %call45580 = call ptr @vix_string_concat(ptr @.strlit45577, ptr %call45579)
+  %call45582 = call ptr @vix_string_concat(ptr %call45580, ptr @.strlit45581)
+  %load45583 = load ptr, ptr %src_ty, align 8
+  %call45584 = call ptr @mir2asm_mem_word(ptr %load45583)
+  %call45585 = call ptr @vix_string_concat(ptr %call45582, ptr %call45584)
+  %call45587 = call ptr @vix_string_concat(ptr %call45585, ptr @.strlit45586)
+  call void @mir2asm_line(ptr %load45576, ptr %call45587)
+  br label %if.end7295
 
-if.end7167:                                       ; preds = %if.else7166, %if.then7165
-  br label %if.end7161
+if.end7295:                                       ; preds = %if.else7294, %if.then7293
+  br label %if.end7289
 
-or.true74:                                        ; preds = %or.rhs75, %if.else7160
+or.true74:                                        ; preds = %or.rhs75, %if.else7288
   br label %or.merge76
 
-or.rhs75:                                         ; preds = %if.else7160
-  %load44812 = load ptr, ptr %src_ty, align 8
-  %strcmp44814 = call i32 @strcmp(ptr %load44812, ptr @.strlit44813)
-  %cmp44815 = icmp eq i32 %strcmp44814, 0
-  %bool44816 = zext i1 %cmp44815 to i32
-  %cond44817 = icmp ne i32 %bool44816, 0
-  br i1 %cond44817, label %or.true74, label %or.merge76
+or.rhs75:                                         ; preds = %if.else7288
+  %load45558 = load ptr, ptr %src_ty, align 8
+  %strcmp45560 = call i32 @strcmp(ptr %load45558, ptr @.strlit45559)
+  %cmp45561 = icmp eq i32 %strcmp45560, 0
+  %bool45562 = zext i1 %cmp45561 to i32
+  %cond45563 = icmp ne i32 %bool45562, 0
+  br i1 %cond45563, label %or.true74, label %or.merge76
 
 or.merge76:                                       ; preds = %or.true74, %or.rhs75
-  %orval44818 = phi i32 [ 1, %or.true74 ], [ 0, %or.rhs75 ]
-  %cond44819 = icmp ne i32 %orval44818, 0
-  br i1 %cond44819, label %or.true77, label %or.rhs78
+  %orval45564 = phi i32 [ 1, %or.true74 ], [ 0, %or.rhs75 ]
+  %cond45565 = icmp ne i32 %orval45564, 0
+  br i1 %cond45565, label %or.true77, label %or.rhs78
 
 or.true77:                                        ; preds = %or.rhs78, %or.merge76
   br label %or.merge79
 
 or.rhs78:                                         ; preds = %or.merge76
-  %load44820 = load ptr, ptr %src_ty, align 8
-  %strcmp44822 = call i32 @strcmp(ptr %load44820, ptr @.strlit44821)
-  %cmp44823 = icmp eq i32 %strcmp44822, 0
-  %bool44824 = zext i1 %cmp44823 to i32
-  %cond44825 = icmp ne i32 %bool44824, 0
-  br i1 %cond44825, label %or.true77, label %or.merge79
+  %load45566 = load ptr, ptr %src_ty, align 8
+  %strcmp45568 = call i32 @strcmp(ptr %load45566, ptr @.strlit45567)
+  %cmp45569 = icmp eq i32 %strcmp45568, 0
+  %bool45570 = zext i1 %cmp45569 to i32
+  %cond45571 = icmp ne i32 %bool45570, 0
+  br i1 %cond45571, label %or.true77, label %or.merge79
 
 or.merge79:                                       ; preds = %or.true77, %or.rhs78
-  %orval44826 = phi i32 [ 1, %or.true77 ], [ 0, %or.rhs78 ]
-  %cond44827 = icmp ne i32 %orval44826, 0
-  br i1 %cond44827, label %if.then7165, label %if.else7166
+  %orval45572 = phi i32 [ 1, %or.true77 ], [ 0, %or.rhs78 ]
+  %cond45573 = icmp ne i32 %orval45572, 0
+  br i1 %cond45573, label %if.then7293, label %if.else7294
 
-if.then7168:                                      ; preds = %if.end7137
-  %load44861 = load ptr, ptr %b, align 8
-  %load44862 = load ptr, ptr %dest, align 8
-  %load44863 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44861, ptr %load44862, ptr %load44863, ptr @.strlit44864, ptr @.strlit44865)
+if.then7296:                                      ; preds = %if.end7265
+  %load45607 = load ptr, ptr %b, align 8
+  %load45608 = load ptr, ptr %dest, align 8
+  %load45609 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45607, ptr %load45608, ptr %load45609, ptr @.strlit45610, ptr @.strlit45611)
   ret void
 
-if.else7169:                                      ; preds = %if.end7137
-  br label %if.end7170
+if.else7297:                                      ; preds = %if.end7265
+  br label %if.end7298
 
-if.end7170:                                       ; preds = %if.else7169
-  %load44866 = load ptr, ptr %rhs, align 8
-  %call44868 = call i32 @mir2asm_starts_with(ptr %load44866, ptr @.strlit44867)
-  %cmp44869 = icmp eq i32 %call44868, 1
-  %bool44870 = zext i1 %cmp44869 to i32
-  %cond44871 = icmp ne i32 %bool44870, 0
-  br i1 %cond44871, label %if.then7171, label %if.else7172
+if.end7298:                                       ; preds = %if.else7297
+  %load45612 = load ptr, ptr %rhs, align 8
+  %call45614 = call i32 @mir2asm_starts_with(ptr %load45612, ptr @.strlit45613)
+  %cmp45615 = icmp eq i32 %call45614, 1
+  %bool45616 = zext i1 %cmp45615 to i32
+  %cond45617 = icmp ne i32 %bool45616, 0
+  br i1 %cond45617, label %if.then7299, label %if.else7300
 
-if.then7171:                                      ; preds = %if.end7170
-  %load44872 = load ptr, ptr %b, align 8
-  %load44873 = load ptr, ptr %dest, align 8
-  %load44874 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44872, ptr %load44873, ptr %load44874, ptr @.strlit44875, ptr @.strlit44876)
+if.then7299:                                      ; preds = %if.end7298
+  %load45618 = load ptr, ptr %b, align 8
+  %load45619 = load ptr, ptr %dest, align 8
+  %load45620 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45618, ptr %load45619, ptr %load45620, ptr @.strlit45621, ptr @.strlit45622)
   ret void
 
-if.else7172:                                      ; preds = %if.end7170
-  br label %if.end7173
+if.else7300:                                      ; preds = %if.end7298
+  br label %if.end7301
 
-if.end7173:                                       ; preds = %if.else7172
-  %load44877 = load ptr, ptr %rhs, align 8
-  %call44879 = call i32 @mir2asm_starts_with(ptr %load44877, ptr @.strlit44878)
-  %cmp44880 = icmp eq i32 %call44879, 1
-  %bool44881 = zext i1 %cmp44880 to i32
-  %cond44882 = icmp ne i32 %bool44881, 0
-  br i1 %cond44882, label %if.then7174, label %if.else7175
+if.end7301:                                       ; preds = %if.else7300
+  %load45623 = load ptr, ptr %rhs, align 8
+  %call45625 = call i32 @mir2asm_starts_with(ptr %load45623, ptr @.strlit45624)
+  %cmp45626 = icmp eq i32 %call45625, 1
+  %bool45627 = zext i1 %cmp45626 to i32
+  %cond45628 = icmp ne i32 %bool45627, 0
+  br i1 %cond45628, label %if.then7302, label %if.else7303
 
-if.then7174:                                      ; preds = %if.end7173
-  %load44883 = load ptr, ptr %b, align 8
-  %load44884 = load ptr, ptr %dest, align 8
-  %load44885 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44883, ptr %load44884, ptr %load44885, ptr @.strlit44886, ptr @.strlit44887)
+if.then7302:                                      ; preds = %if.end7301
+  %load45629 = load ptr, ptr %b, align 8
+  %load45630 = load ptr, ptr %dest, align 8
+  %load45631 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45629, ptr %load45630, ptr %load45631, ptr @.strlit45632, ptr @.strlit45633)
   ret void
 
-if.else7175:                                      ; preds = %if.end7173
-  br label %if.end7176
+if.else7303:                                      ; preds = %if.end7301
+  br label %if.end7304
 
-if.end7176:                                       ; preds = %if.else7175
-  %load44888 = load ptr, ptr %rhs, align 8
-  %call44890 = call i32 @mir2asm_starts_with(ptr %load44888, ptr @.strlit44889)
-  %cmp44891 = icmp eq i32 %call44890, 1
-  %bool44892 = zext i1 %cmp44891 to i32
-  %cond44893 = icmp ne i32 %bool44892, 0
-  br i1 %cond44893, label %if.then7177, label %if.else7178
+if.end7304:                                       ; preds = %if.else7303
+  %load45634 = load ptr, ptr %rhs, align 8
+  %call45636 = call i32 @mir2asm_starts_with(ptr %load45634, ptr @.strlit45635)
+  %cmp45637 = icmp eq i32 %call45636, 1
+  %bool45638 = zext i1 %cmp45637 to i32
+  %cond45639 = icmp ne i32 %bool45638, 0
+  br i1 %cond45639, label %if.then7305, label %if.else7306
 
-if.then7177:                                      ; preds = %if.end7176
-  %load44894 = load ptr, ptr %b, align 8
-  %load44895 = load ptr, ptr %dest, align 8
-  %load44896 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44894, ptr %load44895, ptr %load44896, ptr @.strlit44897, ptr @.strlit44898)
+if.then7305:                                      ; preds = %if.end7304
+  %load45640 = load ptr, ptr %b, align 8
+  %load45641 = load ptr, ptr %dest, align 8
+  %load45642 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45640, ptr %load45641, ptr %load45642, ptr @.strlit45643, ptr @.strlit45644)
   ret void
 
-if.else7178:                                      ; preds = %if.end7176
-  br label %if.end7179
+if.else7306:                                      ; preds = %if.end7304
+  br label %if.end7307
 
-if.end7179:                                       ; preds = %if.else7178
-  %load44899 = load ptr, ptr %rhs, align 8
-  %call44901 = call i32 @mir2asm_starts_with(ptr %load44899, ptr @.strlit44900)
-  %cmp44902 = icmp eq i32 %call44901, 1
-  %bool44903 = zext i1 %cmp44902 to i32
-  %cond44904 = icmp ne i32 %bool44903, 0
-  br i1 %cond44904, label %if.then7180, label %if.else7181
+if.end7307:                                       ; preds = %if.else7306
+  %load45645 = load ptr, ptr %rhs, align 8
+  %call45647 = call i32 @mir2asm_starts_with(ptr %load45645, ptr @.strlit45646)
+  %cmp45648 = icmp eq i32 %call45647, 1
+  %bool45649 = zext i1 %cmp45648 to i32
+  %cond45650 = icmp ne i32 %bool45649, 0
+  br i1 %cond45650, label %if.then7308, label %if.else7309
 
-if.then7180:                                      ; preds = %if.end7179
-  %load44905 = load ptr, ptr %b, align 8
-  %load44906 = load ptr, ptr %dest, align 8
-  %load44907 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44905, ptr %load44906, ptr %load44907, ptr @.strlit44908, ptr @.strlit44909)
+if.then7308:                                      ; preds = %if.end7307
+  %load45651 = load ptr, ptr %b, align 8
+  %load45652 = load ptr, ptr %dest, align 8
+  %load45653 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45651, ptr %load45652, ptr %load45653, ptr @.strlit45654, ptr @.strlit45655)
   ret void
 
-if.else7181:                                      ; preds = %if.end7179
-  br label %if.end7182
+if.else7309:                                      ; preds = %if.end7307
+  br label %if.end7310
 
-if.end7182:                                       ; preds = %if.else7181
-  %load44910 = load ptr, ptr %rhs, align 8
-  %call44912 = call i32 @mir2asm_starts_with(ptr %load44910, ptr @.strlit44911)
-  %cmp44913 = icmp eq i32 %call44912, 1
-  %bool44914 = zext i1 %cmp44913 to i32
-  %cond44915 = icmp ne i32 %bool44914, 0
-  br i1 %cond44915, label %if.then7183, label %if.else7184
+if.end7310:                                       ; preds = %if.else7309
+  %load45656 = load ptr, ptr %rhs, align 8
+  %call45658 = call i32 @mir2asm_starts_with(ptr %load45656, ptr @.strlit45657)
+  %cmp45659 = icmp eq i32 %call45658, 1
+  %bool45660 = zext i1 %cmp45659 to i32
+  %cond45661 = icmp ne i32 %bool45660, 0
+  br i1 %cond45661, label %if.then7311, label %if.else7312
 
-if.then7183:                                      ; preds = %if.end7182
-  %load44916 = load ptr, ptr %b, align 8
-  %load44917 = load ptr, ptr %dest, align 8
-  %load44918 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44916, ptr %load44917, ptr %load44918, ptr @.strlit44919, ptr @.strlit44920)
+if.then7311:                                      ; preds = %if.end7310
+  %load45662 = load ptr, ptr %b, align 8
+  %load45663 = load ptr, ptr %dest, align 8
+  %load45664 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_fbinop(ptr %load45662, ptr %load45663, ptr %load45664, ptr @.strlit45665)
   ret void
 
-if.else7184:                                      ; preds = %if.end7182
-  br label %if.end7185
+if.else7312:                                      ; preds = %if.end7310
+  br label %if.end7313
 
-if.end7185:                                       ; preds = %if.else7184
-  %load44921 = load ptr, ptr %rhs, align 8
-  %call44923 = call i32 @mir2asm_starts_with(ptr %load44921, ptr @.strlit44922)
-  %cmp44924 = icmp eq i32 %call44923, 1
-  %bool44925 = zext i1 %cmp44924 to i32
-  %cond44926 = icmp ne i32 %bool44925, 0
-  br i1 %cond44926, label %if.then7186, label %if.else7187
+if.end7313:                                       ; preds = %if.else7312
+  %load45666 = load ptr, ptr %rhs, align 8
+  %call45668 = call i32 @mir2asm_starts_with(ptr %load45666, ptr @.strlit45667)
+  %cmp45669 = icmp eq i32 %call45668, 1
+  %bool45670 = zext i1 %cmp45669 to i32
+  %cond45671 = icmp ne i32 %bool45670, 0
+  br i1 %cond45671, label %if.then7314, label %if.else7315
 
-if.then7186:                                      ; preds = %if.end7185
-  %load44927 = load ptr, ptr %b, align 8
-  %load44928 = load ptr, ptr %dest, align 8
-  %load44929 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44927, ptr %load44928, ptr %load44929, ptr @.strlit44930, ptr @.strlit44931)
+if.then7314:                                      ; preds = %if.end7313
+  %load45672 = load ptr, ptr %b, align 8
+  %load45673 = load ptr, ptr %dest, align 8
+  %load45674 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_fbinop(ptr %load45672, ptr %load45673, ptr %load45674, ptr @.strlit45675)
   ret void
 
-if.else7187:                                      ; preds = %if.end7185
-  br label %if.end7188
+if.else7315:                                      ; preds = %if.end7313
+  br label %if.end7316
 
-if.end7188:                                       ; preds = %if.else7187
-  %load44932 = load ptr, ptr %rhs, align 8
-  %call44934 = call i32 @mir2asm_starts_with(ptr %load44932, ptr @.strlit44933)
-  %cmp44935 = icmp eq i32 %call44934, 1
-  %bool44936 = zext i1 %cmp44935 to i32
-  %cond44937 = icmp ne i32 %bool44936, 0
-  br i1 %cond44937, label %if.then7189, label %if.else7190
+if.end7316:                                       ; preds = %if.else7315
+  %load45676 = load ptr, ptr %rhs, align 8
+  %call45678 = call i32 @mir2asm_starts_with(ptr %load45676, ptr @.strlit45677)
+  %cmp45679 = icmp eq i32 %call45678, 1
+  %bool45680 = zext i1 %cmp45679 to i32
+  %cond45681 = icmp ne i32 %bool45680, 0
+  br i1 %cond45681, label %if.then7317, label %if.else7318
 
-if.then7189:                                      ; preds = %if.end7188
-  %load44938 = load ptr, ptr %b, align 8
-  %load44939 = load ptr, ptr %dest, align 8
-  %load44940 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44938, ptr %load44939, ptr %load44940, ptr @.strlit44941, ptr @.strlit44942)
+if.then7317:                                      ; preds = %if.end7316
+  %load45682 = load ptr, ptr %b, align 8
+  %load45683 = load ptr, ptr %dest, align 8
+  %load45684 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_fbinop(ptr %load45682, ptr %load45683, ptr %load45684, ptr @.strlit45685)
   ret void
 
-if.else7190:                                      ; preds = %if.end7188
-  br label %if.end7191
+if.else7318:                                      ; preds = %if.end7316
+  br label %if.end7319
 
-if.end7191:                                       ; preds = %if.else7190
-  %load44943 = load ptr, ptr %rhs, align 8
-  %call44945 = call i32 @mir2asm_starts_with(ptr %load44943, ptr @.strlit44944)
-  %cmp44946 = icmp eq i32 %call44945, 1
-  %bool44947 = zext i1 %cmp44946 to i32
-  %cond44948 = icmp ne i32 %bool44947, 0
-  br i1 %cond44948, label %if.then7192, label %if.else7193
+if.end7319:                                       ; preds = %if.else7318
+  %load45686 = load ptr, ptr %rhs, align 8
+  %call45688 = call i32 @mir2asm_starts_with(ptr %load45686, ptr @.strlit45687)
+  %cmp45689 = icmp eq i32 %call45688, 1
+  %bool45690 = zext i1 %cmp45689 to i32
+  %cond45691 = icmp ne i32 %bool45690, 0
+  br i1 %cond45691, label %if.then7320, label %if.else7321
 
-if.then7192:                                      ; preds = %if.end7191
-  %load44949 = load ptr, ptr %b, align 8
-  %load44950 = load ptr, ptr %dest, align 8
-  %load44951 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44949, ptr %load44950, ptr %load44951, ptr @.strlit44952, ptr @.strlit44953)
+if.then7320:                                      ; preds = %if.end7319
+  %load45692 = load ptr, ptr %b, align 8
+  %load45693 = load ptr, ptr %dest, align 8
+  %load45694 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_fbinop(ptr %load45692, ptr %load45693, ptr %load45694, ptr @.strlit45695)
   ret void
 
-if.else7193:                                      ; preds = %if.end7191
-  br label %if.end7194
+if.else7321:                                      ; preds = %if.end7319
+  br label %if.end7322
 
-if.end7194:                                       ; preds = %if.else7193
-  %load44954 = load ptr, ptr %rhs, align 8
-  %call44956 = call i32 @mir2asm_starts_with(ptr %load44954, ptr @.strlit44955)
-  %cmp44957 = icmp eq i32 %call44956, 1
-  %bool44958 = zext i1 %cmp44957 to i32
-  %cond44959 = icmp ne i32 %bool44958, 0
-  br i1 %cond44959, label %if.then7195, label %if.else7196
+if.end7322:                                       ; preds = %if.else7321
+  %load45696 = load ptr, ptr %rhs, align 8
+  %call45698 = call i32 @mir2asm_starts_with(ptr %load45696, ptr @.strlit45697)
+  %cmp45699 = icmp eq i32 %call45698, 1
+  %bool45700 = zext i1 %cmp45699 to i32
+  %cond45701 = icmp ne i32 %bool45700, 0
+  br i1 %cond45701, label %if.then7323, label %if.else7324
 
-if.then7195:                                      ; preds = %if.end7194
-  %load44960 = load ptr, ptr %b, align 8
-  %load44961 = load ptr, ptr %dest, align 8
-  %load44962 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_binop(ptr %load44960, ptr %load44961, ptr %load44962, ptr @.strlit44963, ptr @.strlit44964)
+if.then7323:                                      ; preds = %if.end7322
+  %load45702 = load ptr, ptr %b, align 8
+  %load45703 = load ptr, ptr %dest, align 8
+  %load45704 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45702, ptr %load45703, ptr %load45704, ptr @.strlit45705, ptr @.strlit45706)
   ret void
 
-if.else7196:                                      ; preds = %if.end7194
-  br label %if.end7197
+if.else7324:                                      ; preds = %if.end7322
+  br label %if.end7325
 
-if.end7197:                                       ; preds = %if.else7196
-  %load44965 = load ptr, ptr %rhs, align 8
-  %call44967 = call i32 @mir2asm_starts_with(ptr %load44965, ptr @.strlit44966)
-  %cmp44968 = icmp eq i32 %call44967, 1
-  %bool44969 = zext i1 %cmp44968 to i32
-  %cond44970 = icmp ne i32 %bool44969, 0
-  br i1 %cond44970, label %if.then7198, label %if.else7199
+if.end7325:                                       ; preds = %if.else7324
+  %load45707 = load ptr, ptr %rhs, align 8
+  %call45709 = call i32 @mir2asm_starts_with(ptr %load45707, ptr @.strlit45708)
+  %cmp45710 = icmp eq i32 %call45709, 1
+  %bool45711 = zext i1 %cmp45710 to i32
+  %cond45712 = icmp ne i32 %bool45711, 0
+  br i1 %cond45712, label %if.then7326, label %if.else7327
 
-if.then7198:                                      ; preds = %if.end7197
-  %load44971 = load ptr, ptr %b, align 8
-  %load44972 = load ptr, ptr %dest, align 8
-  %load44973 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_unary(ptr %load44971, ptr %load44972, ptr %load44973, ptr @.strlit44974, ptr @.strlit44975)
+if.then7326:                                      ; preds = %if.end7325
+  %load45713 = load ptr, ptr %b, align 8
+  %load45714 = load ptr, ptr %dest, align 8
+  %load45715 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45713, ptr %load45714, ptr %load45715, ptr @.strlit45716, ptr @.strlit45717)
   ret void
 
-if.else7199:                                      ; preds = %if.end7197
-  br label %if.end7200
+if.else7327:                                      ; preds = %if.end7325
+  br label %if.end7328
 
-if.end7200:                                       ; preds = %if.else7199
-  %load44976 = load ptr, ptr %rhs, align 8
-  %call44978 = call i32 @mir2asm_starts_with(ptr %load44976, ptr @.strlit44977)
-  %cmp44979 = icmp eq i32 %call44978, 1
-  %bool44980 = zext i1 %cmp44979 to i32
-  %cond44981 = icmp ne i32 %bool44980, 0
-  br i1 %cond44981, label %if.then7201, label %if.else7202
+if.end7328:                                       ; preds = %if.else7327
+  %load45718 = load ptr, ptr %rhs, align 8
+  %call45720 = call i32 @mir2asm_starts_with(ptr %load45718, ptr @.strlit45719)
+  %cmp45721 = icmp eq i32 %call45720, 1
+  %bool45722 = zext i1 %cmp45721 to i32
+  %cond45723 = icmp ne i32 %bool45722, 0
+  br i1 %cond45723, label %if.then7329, label %if.else7330
 
-if.then7201:                                      ; preds = %if.end7200
-  %load44982 = load ptr, ptr %b, align 8
-  %load44983 = load ptr, ptr %dest, align 8
-  %load44984 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_icmp(ptr %load44982, ptr %load44983, ptr %load44984)
+if.then7329:                                      ; preds = %if.end7328
+  %load45724 = load ptr, ptr %b, align 8
+  %load45725 = load ptr, ptr %dest, align 8
+  %load45726 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45724, ptr %load45725, ptr %load45726, ptr @.strlit45727, ptr @.strlit45728)
   ret void
 
-if.else7202:                                      ; preds = %if.end7200
-  br label %if.end7203
+if.else7330:                                      ; preds = %if.end7328
+  br label %if.end7331
 
-if.end7203:                                       ; preds = %if.else7202
-  %load44985 = load ptr, ptr %rhs, align 8
-  %call44987 = call i32 @mir2asm_starts_with(ptr %load44985, ptr @.strlit44986)
-  %cmp44988 = icmp eq i32 %call44987, 1
-  %bool44989 = zext i1 %cmp44988 to i32
-  %cond44990 = icmp ne i32 %bool44989, 0
-  br i1 %cond44990, label %or.true80, label %or.rhs81
+if.end7331:                                       ; preds = %if.else7330
+  %load45729 = load ptr, ptr %rhs, align 8
+  %call45731 = call i32 @mir2asm_starts_with(ptr %load45729, ptr @.strlit45730)
+  %cmp45732 = icmp eq i32 %call45731, 1
+  %bool45733 = zext i1 %cmp45732 to i32
+  %cond45734 = icmp ne i32 %bool45733, 0
+  br i1 %cond45734, label %if.then7332, label %if.else7333
 
-if.then7204:                                      ; preds = %or.merge85
-  %load45007 = load ptr, ptr %b, align 8
-  %load45008 = load ptr, ptr %dest, align 8
-  %load45009 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_cast(ptr %load45007, ptr %load45008, ptr %load45009)
+if.then7332:                                      ; preds = %if.end7331
+  %load45735 = load ptr, ptr %b, align 8
+  %load45736 = load ptr, ptr %dest, align 8
+  %load45737 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45735, ptr %load45736, ptr %load45737, ptr @.strlit45738, ptr @.strlit45739)
   ret void
 
-if.else7205:                                      ; preds = %or.merge85
-  br label %if.end7206
+if.else7333:                                      ; preds = %if.end7331
+  br label %if.end7334
 
-if.end7206:                                       ; preds = %if.else7205
-  %load45010 = load ptr, ptr %rhs, align 8
-  %call45012 = call i32 @mir2asm_starts_with(ptr %load45010, ptr @.strlit45011)
-  %cmp45013 = icmp eq i32 %call45012, 1
-  %bool45014 = zext i1 %cmp45013 to i32
-  %cond45015 = icmp ne i32 %bool45014, 0
-  br i1 %cond45015, label %if.then7207, label %if.else7208
+if.end7334:                                       ; preds = %if.else7333
+  %load45740 = load ptr, ptr %rhs, align 8
+  %call45742 = call i32 @mir2asm_starts_with(ptr %load45740, ptr @.strlit45741)
+  %cmp45743 = icmp eq i32 %call45742, 1
+  %bool45744 = zext i1 %cmp45743 to i32
+  %cond45745 = icmp ne i32 %bool45744, 0
+  br i1 %cond45745, label %if.then7335, label %if.else7336
 
-or.true80:                                        ; preds = %or.rhs81, %if.end7203
+if.then7335:                                      ; preds = %if.end7334
+  %load45746 = load ptr, ptr %b, align 8
+  %load45747 = load ptr, ptr %dest, align 8
+  %load45748 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_binop(ptr %load45746, ptr %load45747, ptr %load45748, ptr @.strlit45749, ptr @.strlit45750)
+  ret void
+
+if.else7336:                                      ; preds = %if.end7334
+  br label %if.end7337
+
+if.end7337:                                       ; preds = %if.else7336
+  %load45751 = load ptr, ptr %rhs, align 8
+  %call45753 = call i32 @mir2asm_starts_with(ptr %load45751, ptr @.strlit45752)
+  %cmp45754 = icmp eq i32 %call45753, 1
+  %bool45755 = zext i1 %cmp45754 to i32
+  %cond45756 = icmp ne i32 %bool45755, 0
+  br i1 %cond45756, label %if.then7338, label %if.else7339
+
+if.then7338:                                      ; preds = %if.end7337
+  %load45757 = load ptr, ptr %b, align 8
+  %load45758 = load ptr, ptr %dest, align 8
+  %load45759 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_unary(ptr %load45757, ptr %load45758, ptr %load45759, ptr @.strlit45760, ptr @.strlit45761)
+  ret void
+
+if.else7339:                                      ; preds = %if.end7337
+  br label %if.end7340
+
+if.end7340:                                       ; preds = %if.else7339
+  %load45762 = load ptr, ptr %rhs, align 8
+  %call45764 = call i32 @mir2asm_starts_with(ptr %load45762, ptr @.strlit45763)
+  %cmp45765 = icmp eq i32 %call45764, 1
+  %bool45766 = zext i1 %cmp45765 to i32
+  %cond45767 = icmp ne i32 %bool45766, 0
+  br i1 %cond45767, label %if.then7341, label %if.else7342
+
+if.then7341:                                      ; preds = %if.end7340
+  %load45768 = load ptr, ptr %b, align 8
+  %load45769 = load ptr, ptr %dest, align 8
+  %load45770 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_icmp(ptr %load45768, ptr %load45769, ptr %load45770)
+  ret void
+
+if.else7342:                                      ; preds = %if.end7340
+  br label %if.end7343
+
+if.end7343:                                       ; preds = %if.else7342
+  %load45771 = load ptr, ptr %rhs, align 8
+  %call45773 = call i32 @mir2asm_starts_with(ptr %load45771, ptr @.strlit45772)
+  %cmp45774 = icmp eq i32 %call45773, 1
+  %bool45775 = zext i1 %cmp45774 to i32
+  %cond45776 = icmp ne i32 %bool45775, 0
+  br i1 %cond45776, label %if.then7344, label %if.else7345
+
+if.then7344:                                      ; preds = %if.end7343
+  %load45777 = load ptr, ptr %b, align 8
+  %load45778 = load ptr, ptr %dest, align 8
+  %load45779 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_fcmp(ptr %load45777, ptr %load45778, ptr %load45779)
+  ret void
+
+if.else7345:                                      ; preds = %if.end7343
+  br label %if.end7346
+
+if.end7346:                                       ; preds = %if.else7345
+  %load45780 = load ptr, ptr %rhs, align 8
+  %call45782 = call i32 @mir2asm_starts_with(ptr %load45780, ptr @.strlit45781)
+  %cmp45783 = icmp eq i32 %call45782, 1
+  %bool45784 = zext i1 %cmp45783 to i32
+  %cond45785 = icmp ne i32 %bool45784, 0
+  br i1 %cond45785, label %or.true80, label %or.rhs81
+
+if.then7347:                                      ; preds = %or.merge85
+  %load45802 = load ptr, ptr %b, align 8
+  %load45803 = load ptr, ptr %dest, align 8
+  %load45804 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_cast(ptr %load45802, ptr %load45803, ptr %load45804)
+  ret void
+
+if.else7348:                                      ; preds = %or.merge85
+  br label %if.end7349
+
+if.end7349:                                       ; preds = %if.else7348
+  %load45805 = load ptr, ptr %rhs, align 8
+  %call45807 = call i32 @mir2asm_starts_with(ptr %load45805, ptr @.strlit45806)
+  %cmp45808 = icmp eq i32 %call45807, 1
+  %bool45809 = zext i1 %cmp45808 to i32
+  %cond45810 = icmp ne i32 %bool45809, 0
+  br i1 %cond45810, label %if.then7350, label %if.else7351
+
+or.true80:                                        ; preds = %or.rhs81, %if.end7346
   br label %or.merge82
 
-or.rhs81:                                         ; preds = %if.end7203
-  %load44991 = load ptr, ptr %rhs, align 8
-  %call44993 = call i32 @mir2asm_starts_with(ptr %load44991, ptr @.strlit44992)
-  %cmp44994 = icmp eq i32 %call44993, 1
-  %bool44995 = zext i1 %cmp44994 to i32
-  %cond44996 = icmp ne i32 %bool44995, 0
-  br i1 %cond44996, label %or.true80, label %or.merge82
+or.rhs81:                                         ; preds = %if.end7346
+  %load45786 = load ptr, ptr %rhs, align 8
+  %call45788 = call i32 @mir2asm_starts_with(ptr %load45786, ptr @.strlit45787)
+  %cmp45789 = icmp eq i32 %call45788, 1
+  %bool45790 = zext i1 %cmp45789 to i32
+  %cond45791 = icmp ne i32 %bool45790, 0
+  br i1 %cond45791, label %or.true80, label %or.merge82
 
 or.merge82:                                       ; preds = %or.true80, %or.rhs81
-  %orval44997 = phi i32 [ 1, %or.true80 ], [ 0, %or.rhs81 ]
-  %cond44998 = icmp ne i32 %orval44997, 0
-  br i1 %cond44998, label %or.true83, label %or.rhs84
+  %orval45792 = phi i32 [ 1, %or.true80 ], [ 0, %or.rhs81 ]
+  %cond45793 = icmp ne i32 %orval45792, 0
+  br i1 %cond45793, label %or.true83, label %or.rhs84
 
 or.true83:                                        ; preds = %or.rhs84, %or.merge82
   br label %or.merge85
 
 or.rhs84:                                         ; preds = %or.merge82
-  %load44999 = load ptr, ptr %rhs, align 8
-  %call45001 = call i32 @mir2asm_starts_with(ptr %load44999, ptr @.strlit45000)
-  %cmp45002 = icmp eq i32 %call45001, 1
-  %bool45003 = zext i1 %cmp45002 to i32
-  %cond45004 = icmp ne i32 %bool45003, 0
-  br i1 %cond45004, label %or.true83, label %or.merge85
+  %load45794 = load ptr, ptr %rhs, align 8
+  %call45796 = call i32 @mir2asm_starts_with(ptr %load45794, ptr @.strlit45795)
+  %cmp45797 = icmp eq i32 %call45796, 1
+  %bool45798 = zext i1 %cmp45797 to i32
+  %cond45799 = icmp ne i32 %bool45798, 0
+  br i1 %cond45799, label %or.true83, label %or.merge85
 
 or.merge85:                                       ; preds = %or.true83, %or.rhs84
-  %orval45005 = phi i32 [ 1, %or.true83 ], [ 0, %or.rhs84 ]
-  %cond45006 = icmp ne i32 %orval45005, 0
-  br i1 %cond45006, label %if.then7204, label %if.else7205
+  %orval45800 = phi i32 [ 1, %or.true83 ], [ 0, %or.rhs84 ]
+  %cond45801 = icmp ne i32 %orval45800, 0
+  br i1 %cond45801, label %if.then7347, label %if.else7348
 
-if.then7207:                                      ; preds = %if.end7206
-  %load45016 = load ptr, ptr %b, align 8
-  %load45017 = load ptr, ptr %dest, align 8
-  %load45018 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_gep(ptr %load45016, ptr %load45017, ptr %load45018)
+if.then7350:                                      ; preds = %if.end7349
+  %load45811 = load ptr, ptr %b, align 8
+  %load45812 = load ptr, ptr %dest, align 8
+  %load45813 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_gep(ptr %load45811, ptr %load45812, ptr %load45813)
   ret void
 
-if.else7208:                                      ; preds = %if.end7206
-  br label %if.end7209
+if.else7351:                                      ; preds = %if.end7349
+  br label %if.end7352
 
-if.end7209:                                       ; preds = %if.else7208
-  %load45019 = load ptr, ptr %rhs, align 8
-  %call45021 = call i32 @mir2asm_starts_with(ptr %load45019, ptr @.strlit45020)
-  %cmp45022 = icmp eq i32 %call45021, 1
-  %bool45023 = zext i1 %cmp45022 to i32
-  %cond45024 = icmp ne i32 %bool45023, 0
-  br i1 %cond45024, label %if.then7210, label %if.else7211
+if.end7352:                                       ; preds = %if.else7351
+  %load45814 = load ptr, ptr %rhs, align 8
+  %call45816 = call i32 @mir2asm_starts_with(ptr %load45814, ptr @.strlit45815)
+  %cmp45817 = icmp eq i32 %call45816, 1
+  %bool45818 = zext i1 %cmp45817 to i32
+  %cond45819 = icmp ne i32 %bool45818, 0
+  br i1 %cond45819, label %if.then7353, label %if.else7354
 
-if.then7210:                                      ; preds = %if.end7209
-  %load45025 = load ptr, ptr %b, align 8
-  %load45026 = load ptr, ptr %dest, align 8
-  %load45027 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_call(ptr %load45025, ptr %load45026, ptr %load45027)
+if.then7353:                                      ; preds = %if.end7352
+  %load45820 = load ptr, ptr %b, align 8
+  %load45821 = load ptr, ptr %dest, align 8
+  %load45822 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_call(ptr %load45820, ptr %load45821, ptr %load45822)
   ret void
 
-if.else7211:                                      ; preds = %if.end7209
-  br label %if.end7212
+if.else7354:                                      ; preds = %if.end7352
+  br label %if.end7355
 
-if.end7212:                                       ; preds = %if.else7211
-  %load45028 = load ptr, ptr %rhs, align 8
-  %call45030 = call i32 @mir2asm_starts_with(ptr %load45028, ptr @.strlit45029)
-  %cmp45031 = icmp eq i32 %call45030, 1
-  %bool45032 = zext i1 %cmp45031 to i32
-  %cond45033 = icmp ne i32 %bool45032, 0
-  br i1 %cond45033, label %if.then7213, label %if.else7214
+if.end7355:                                       ; preds = %if.else7354
+  %load45823 = load ptr, ptr %rhs, align 8
+  %call45825 = call i32 @mir2asm_starts_with(ptr %load45823, ptr @.strlit45824)
+  %cmp45826 = icmp eq i32 %call45825, 1
+  %bool45827 = zext i1 %cmp45826 to i32
+  %cond45828 = icmp ne i32 %bool45827, 0
+  br i1 %cond45828, label %if.then7356, label %if.else7357
 
-if.then7213:                                      ; preds = %if.end7212
-  %load45034 = load ptr, ptr %b, align 8
-  %load45035 = load ptr, ptr %dest, align 8
-  %load45036 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_insertvalue(ptr %load45034, ptr %load45035, ptr %load45036)
+if.then7356:                                      ; preds = %if.end7355
+  %load45829 = load ptr, ptr %b, align 8
+  %load45830 = load ptr, ptr %dest, align 8
+  %load45831 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_insertvalue(ptr %load45829, ptr %load45830, ptr %load45831)
   ret void
 
-if.else7214:                                      ; preds = %if.end7212
-  br label %if.end7215
+if.else7357:                                      ; preds = %if.end7355
+  br label %if.end7358
 
-if.end7215:                                       ; preds = %if.else7214
-  %load45037 = load ptr, ptr %rhs, align 8
-  %call45039 = call i32 @mir2asm_starts_with(ptr %load45037, ptr @.strlit45038)
-  %cmp45040 = icmp eq i32 %call45039, 1
-  %bool45041 = zext i1 %cmp45040 to i32
-  %cond45042 = icmp ne i32 %bool45041, 0
-  br i1 %cond45042, label %if.then7216, label %if.else7217
+if.end7358:                                       ; preds = %if.else7357
+  %load45832 = load ptr, ptr %rhs, align 8
+  %call45834 = call i32 @mir2asm_starts_with(ptr %load45832, ptr @.strlit45833)
+  %cmp45835 = icmp eq i32 %call45834, 1
+  %bool45836 = zext i1 %cmp45835 to i32
+  %cond45837 = icmp ne i32 %bool45836, 0
+  br i1 %cond45837, label %if.then7359, label %if.else7360
 
-if.then7216:                                      ; preds = %if.end7215
-  %load45043 = load ptr, ptr %b, align 8
-  %load45044 = load ptr, ptr %dest, align 8
-  %load45045 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_extractvalue(ptr %load45043, ptr %load45044, ptr %load45045)
+if.then7359:                                      ; preds = %if.end7358
+  %load45838 = load ptr, ptr %b, align 8
+  %load45839 = load ptr, ptr %dest, align 8
+  %load45840 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_extractvalue(ptr %load45838, ptr %load45839, ptr %load45840)
   ret void
 
-if.else7217:                                      ; preds = %if.end7215
-  br label %if.end7218
+if.else7360:                                      ; preds = %if.end7358
+  br label %if.end7361
 
-if.end7218:                                       ; preds = %if.else7217
-  %load45046 = load ptr, ptr %rhs, align 8
-  %call45048 = call i32 @mir2asm_starts_with(ptr %load45046, ptr @.strlit45047)
-  %cmp45049 = icmp eq i32 %call45048, 1
-  %bool45050 = zext i1 %cmp45049 to i32
-  %cond45051 = icmp ne i32 %bool45050, 0
-  br i1 %cond45051, label %if.then7219, label %if.else7220
+if.end7361:                                       ; preds = %if.else7360
+  %load45841 = load ptr, ptr %rhs, align 8
+  %call45843 = call i32 @mir2asm_starts_with(ptr %load45841, ptr @.strlit45842)
+  %cmp45844 = icmp eq i32 %call45843, 1
+  %bool45845 = zext i1 %cmp45844 to i32
+  %cond45846 = icmp ne i32 %bool45845, 0
+  br i1 %cond45846, label %if.then7362, label %if.else7363
 
-if.then7219:                                      ; preds = %if.end7218
-  %load45052 = load ptr, ptr %rhs, align 8
-  %call45053 = call i32 @mir2asm_find_unescaped(ptr %load45052, i8 34, i32 0)
+if.then7362:                                      ; preds = %if.end7361
+  %load45847 = load ptr, ptr %rhs, align 8
+  %call45848 = call i32 @mir2asm_find_unescaped(ptr %load45847, i8 34, i32 0)
   %q1 = alloca i32, align 4
-  store i32 %call45053, ptr %q1, align 4
-  %load45054 = load ptr, ptr %rhs, align 8
-  %load45055 = load i32, ptr %q1, align 4
-  %add45056 = add i32 %load45055, 1
-  %call45057 = call i32 @mir2asm_find_unescaped(ptr %load45054, i8 34, i32 %add45056)
+  store i32 %call45848, ptr %q1, align 4
+  %load45849 = load ptr, ptr %rhs, align 8
+  %load45850 = load i32, ptr %q1, align 4
+  %add45851 = add i32 %load45850, 1
+  %call45852 = call i32 @mir2asm_find_unescaped(ptr %load45849, i8 34, i32 %add45851)
   %q2 = alloca i32, align 4
-  store i32 %call45057, ptr %q2, align 4
-  %ifexpr45058 = alloca ptr, align 8
-  %load45059 = load i32, ptr %q1, align 4
-  %cmp45060 = icmp sge i32 %load45059, 0
-  %bool45061 = zext i1 %cmp45060 to i32
-  %cond45062 = icmp ne i32 %bool45061, 0
-  br i1 %cond45062, label %and.rhs86, label %and.false87
+  store i32 %call45852, ptr %q2, align 4
+  %ifexpr45853 = alloca ptr, align 8
+  %load45854 = load i32, ptr %q1, align 4
+  %cmp45855 = icmp sge i32 %load45854, 0
+  %bool45856 = zext i1 %cmp45855 to i32
+  %cond45857 = icmp ne i32 %bool45856, 0
+  br i1 %cond45857, label %and.rhs86, label %and.false87
 
-if.else7220:                                      ; preds = %if.end7218
-  br label %if.end7221
+if.else7363:                                      ; preds = %if.end7361
+  br label %if.end7364
 
-if.end7221:                                       ; preds = %if.else7220
-  %load45097 = load ptr, ptr %rhs, align 8
-  %call45099 = call i32 @mir2asm_starts_with(ptr %load45097, ptr @.strlit45098)
-  %cmp45100 = icmp eq i32 %call45099, 1
-  %bool45101 = zext i1 %cmp45100 to i32
-  %cond45102 = icmp ne i32 %bool45101, 0
-  br i1 %cond45102, label %if.then7225, label %if.else7226
+if.end7364:                                       ; preds = %if.else7363
+  %load45892 = load ptr, ptr %rhs, align 8
+  %call45894 = call i32 @mir2asm_starts_with(ptr %load45892, ptr @.strlit45893)
+  %cmp45895 = icmp eq i32 %call45894, 1
+  %bool45896 = zext i1 %cmp45895 to i32
+  %cond45897 = icmp ne i32 %bool45896, 0
+  br i1 %cond45897, label %if.then7368, label %if.else7369
 
-ifexpr.then7222:                                  ; preds = %and.merge88
-  %load45070 = load ptr, ptr %rhs, align 8
-  %load45071 = load i32, ptr %q1, align 4
-  %add45072 = add i32 %load45071, 1
-  %load45073 = load i32, ptr %q2, align 4
-  %call45074 = call ptr @mir2asm_slice(ptr %load45070, i32 %add45072, i32 %load45073)
-  %call45075 = call ptr @mir2asm_unescape_string(ptr %call45074)
-  store ptr %call45075, ptr %ifexpr45058, align 8
-  br label %ifexpr.end7224
+ifexpr.then7365:                                  ; preds = %and.merge88
+  %load45865 = load ptr, ptr %rhs, align 8
+  %load45866 = load i32, ptr %q1, align 4
+  %add45867 = add i32 %load45866, 1
+  %load45868 = load i32, ptr %q2, align 4
+  %call45869 = call ptr @mir2asm_slice(ptr %load45865, i32 %add45867, i32 %load45868)
+  %call45870 = call ptr @mir2asm_unescape_string(ptr %call45869)
+  store ptr %call45870, ptr %ifexpr45853, align 8
+  br label %ifexpr.end7367
 
-ifexpr.else7223:                                  ; preds = %and.merge88
-  store ptr @.strlit45076, ptr %ifexpr45058, align 8
-  br label %ifexpr.end7224
+ifexpr.else7366:                                  ; preds = %and.merge88
+  store ptr @.strlit45871, ptr %ifexpr45853, align 8
+  br label %ifexpr.end7367
 
-ifexpr.end7224:                                   ; preds = %ifexpr.else7223, %ifexpr.then7222
-  %ifexprval45077 = load ptr, ptr %ifexpr45058, align 8
+ifexpr.end7367:                                   ; preds = %ifexpr.else7366, %ifexpr.then7365
+  %ifexprval45872 = load ptr, ptr %ifexpr45853, align 8
   %text = alloca ptr, align 8
-  store ptr %ifexprval45077, ptr %text, align 8
-  %load45078 = load ptr, ptr %b, align 8
-  %load45079 = load ptr, ptr %text, align 8
-  %call45080 = call ptr @mir2asm_string_label(ptr %load45078, ptr %load45079)
+  store ptr %ifexprval45872, ptr %text, align 8
+  %load45873 = load ptr, ptr %b, align 8
+  %load45874 = load ptr, ptr %text, align 8
+  %call45875 = call ptr @mir2asm_string_label(ptr %load45873, ptr %load45874)
   %label = alloca ptr, align 8
-  store ptr %call45080, ptr %label, align 8
-  %load45081 = load ptr, ptr %b, align 8
-  %load45083 = load ptr, ptr %label, align 8
-  %call45084 = call ptr @vix_string_concat(ptr @.strlit45082, ptr %load45083)
-  %call45086 = call ptr @vix_string_concat(ptr %call45084, ptr @.strlit45085)
-  call void @mir2asm_line(ptr %load45081, ptr %call45086)
-  %load45087 = load ptr, ptr %b, align 8
-  %load45089 = load ptr, ptr %b, align 8
-  %load45090 = load ptr, ptr %dest, align 8
-  %call45092 = call i32 @mir2asm_alloc_slot_typed(ptr %load45089, ptr %load45090, i32 0, ptr @.strlit45091)
-  %call45093 = call ptr @mir2asm_mem(i32 %call45092)
-  %call45094 = call ptr @vix_string_concat(ptr @.strlit45088, ptr %call45093)
-  %call45096 = call ptr @vix_string_concat(ptr %call45094, ptr @.strlit45095)
-  call void @mir2asm_line(ptr %load45087, ptr %call45096)
+  store ptr %call45875, ptr %label, align 8
+  %load45876 = load ptr, ptr %b, align 8
+  %load45878 = load ptr, ptr %label, align 8
+  %call45879 = call ptr @vix_string_concat(ptr @.strlit45877, ptr %load45878)
+  %call45881 = call ptr @vix_string_concat(ptr %call45879, ptr @.strlit45880)
+  call void @mir2asm_line(ptr %load45876, ptr %call45881)
+  %load45882 = load ptr, ptr %b, align 8
+  %load45884 = load ptr, ptr %b, align 8
+  %load45885 = load ptr, ptr %dest, align 8
+  %call45887 = call i32 @mir2asm_alloc_slot_typed(ptr %load45884, ptr %load45885, i32 0, ptr @.strlit45886)
+  %call45888 = call ptr @mir2asm_mem(i32 %call45887)
+  %call45889 = call ptr @vix_string_concat(ptr @.strlit45883, ptr %call45888)
+  %call45891 = call ptr @vix_string_concat(ptr %call45889, ptr @.strlit45890)
+  call void @mir2asm_line(ptr %load45882, ptr %call45891)
   ret void
 
-and.rhs86:                                        ; preds = %if.then7219
-  %load45063 = load i32, ptr %q2, align 4
-  %load45064 = load i32, ptr %q1, align 4
-  %cmp45065 = icmp sgt i32 %load45063, %load45064
-  %bool45066 = zext i1 %cmp45065 to i32
-  %cond45067 = icmp ne i32 %bool45066, 0
-  br i1 %cond45067, label %and.merge88, label %and.false87
+and.rhs86:                                        ; preds = %if.then7362
+  %load45858 = load i32, ptr %q2, align 4
+  %load45859 = load i32, ptr %q1, align 4
+  %cmp45860 = icmp sgt i32 %load45858, %load45859
+  %bool45861 = zext i1 %cmp45860 to i32
+  %cond45862 = icmp ne i32 %bool45861, 0
+  br i1 %cond45862, label %and.merge88, label %and.false87
 
-and.false87:                                      ; preds = %and.rhs86, %if.then7219
+and.false87:                                      ; preds = %and.rhs86, %if.then7362
   br label %and.merge88
 
 and.merge88:                                      ; preds = %and.false87, %and.rhs86
-  %andval45068 = phi i32 [ 1, %and.rhs86 ], [ 0, %and.false87 ]
-  %cond45069 = icmp ne i32 %andval45068, 0
-  br i1 %cond45069, label %ifexpr.then7222, label %ifexpr.else7223
+  %andval45863 = phi i32 [ 1, %and.rhs86 ], [ 0, %and.false87 ]
+  %cond45864 = icmp ne i32 %andval45863, 0
+  br i1 %cond45864, label %ifexpr.then7365, label %ifexpr.else7366
 
-if.then7225:                                      ; preds = %if.end7221
-  %load45103 = load ptr, ptr %b, align 8
-  %load45104 = load ptr, ptr %dest, align 8
-  %load45105 = load ptr, ptr %rhs, align 8
-  call void @mir2asm_emit_const_struct(ptr %load45103, ptr %load45104, ptr %load45105)
+if.then7368:                                      ; preds = %if.end7364
+  %load45898 = load ptr, ptr %b, align 8
+  %load45899 = load ptr, ptr %dest, align 8
+  %load45900 = load ptr, ptr %rhs, align 8
+  call void @mir2asm_emit_const_struct(ptr %load45898, ptr %load45899, ptr %load45900)
   ret void
 
-if.else7226:                                      ; preds = %if.end7221
-  br label %if.end7227
+if.else7369:                                      ; preds = %if.end7364
+  br label %if.end7370
 
-if.end7227:                                       ; preds = %if.else7226
-  %load45106 = load ptr, ptr %rhs, align 8
-  %call45108 = call i32 @mir2asm_starts_with(ptr %load45106, ptr @.strlit45107)
-  %cmp45109 = icmp eq i32 %call45108, 1
-  %bool45110 = zext i1 %cmp45109 to i32
-  %cond45111 = icmp ne i32 %bool45110, 0
-  br i1 %cond45111, label %if.then7228, label %if.else7229
+if.end7370:                                       ; preds = %if.else7369
+  %load45901 = load ptr, ptr %rhs, align 8
+  %call45903 = call i32 @mir2asm_starts_with(ptr %load45901, ptr @.strlit45902)
+  %cmp45904 = icmp eq i32 %call45903, 1
+  %bool45905 = zext i1 %cmp45904 to i32
+  %cond45906 = icmp ne i32 %bool45905, 0
+  br i1 %cond45906, label %if.then7371, label %if.else7372
 
-if.then7228:                                      ; preds = %if.end7227
-  %load45112 = load ptr, ptr %rhs, align 8
-  %call45113 = call i32 @mir2asm_find(ptr %load45112, i8 32, i32 6)
+if.then7371:                                      ; preds = %if.end7370
+  %load45907 = load ptr, ptr %rhs, align 8
+  %call45908 = call i32 @mir2asm_find(ptr %load45907, i8 32, i32 6)
   %sp89 = alloca i32, align 4
-  store i32 %call45113, ptr %sp89, align 4
-  %ifexpr45114 = alloca ptr, align 8
-  %load45115 = load i32, ptr %sp89, align 4
-  %cmp45116 = icmp sge i32 %load45115, 0
-  %bool45117 = zext i1 %cmp45116 to i32
-  %cond45118 = icmp ne i32 %bool45117, 0
-  br i1 %cond45118, label %ifexpr.then7231, label %ifexpr.else7232
+  store i32 %call45908, ptr %sp89, align 4
+  %ifexpr45909 = alloca ptr, align 8
+  %load45910 = load i32, ptr %sp89, align 4
+  %cmp45911 = icmp sge i32 %load45910, 0
+  %bool45912 = zext i1 %cmp45911 to i32
+  %cond45913 = icmp ne i32 %bool45912, 0
+  br i1 %cond45913, label %ifexpr.then7374, label %ifexpr.else7375
 
-if.else7229:                                      ; preds = %if.end7227
-  br label %if.end7230
+if.else7372:                                      ; preds = %if.end7370
+  br label %if.end7373
 
-if.end7230:                                       ; preds = %if.else7229
-  %load45192 = load ptr, ptr %b, align 8
-  %load45193 = load ptr, ptr %line, align 8
-  call void @mir2asm_emit_unsupported(ptr %load45192, ptr %load45193)
+if.end7373:                                       ; preds = %if.else7372
+  %load45987 = load ptr, ptr %b, align 8
+  %load45988 = load ptr, ptr %line, align 8
+  call void @mir2asm_emit_unsupported(ptr %load45987, ptr %load45988)
   ret void
 
-ifexpr.then7231:                                  ; preds = %if.then7228
-  %load45119 = load ptr, ptr %rhs, align 8
-  %load45120 = load i32, ptr %sp89, align 4
-  %call45121 = call ptr @mir2asm_slice(ptr %load45119, i32 6, i32 %load45120)
-  %call45122 = call ptr @mir2asm_trim(ptr %call45121)
-  store ptr %call45122, ptr %ifexpr45114, align 8
-  br label %ifexpr.end7233
+ifexpr.then7374:                                  ; preds = %if.then7371
+  %load45914 = load ptr, ptr %rhs, align 8
+  %load45915 = load i32, ptr %sp89, align 4
+  %call45916 = call ptr @mir2asm_slice(ptr %load45914, i32 6, i32 %load45915)
+  %call45917 = call ptr @mir2asm_trim(ptr %call45916)
+  store ptr %call45917, ptr %ifexpr45909, align 8
+  br label %ifexpr.end7376
 
-ifexpr.else7232:                                  ; preds = %if.then7228
-  store ptr @.strlit45123, ptr %ifexpr45114, align 8
-  br label %ifexpr.end7233
+ifexpr.else7375:                                  ; preds = %if.then7371
+  store ptr @.strlit45918, ptr %ifexpr45909, align 8
+  br label %ifexpr.end7376
 
-ifexpr.end7233:                                   ; preds = %ifexpr.else7232, %ifexpr.then7231
-  %ifexprval45124 = load ptr, ptr %ifexpr45114, align 8
+ifexpr.end7376:                                   ; preds = %ifexpr.else7375, %ifexpr.then7374
+  %ifexprval45919 = load ptr, ptr %ifexpr45909, align 8
   %ty90 = alloca ptr, align 8
-  store ptr %ifexprval45124, ptr %ty90, align 8
-  %ifexpr45125 = alloca ptr, align 8
-  %load45126 = load i32, ptr %sp89, align 4
-  %cmp45127 = icmp sge i32 %load45126, 0
-  %bool45128 = zext i1 %cmp45127 to i32
-  %cond45129 = icmp ne i32 %bool45128, 0
-  br i1 %cond45129, label %ifexpr.then7234, label %ifexpr.else7235
+  store ptr %ifexprval45919, ptr %ty90, align 8
+  %ifexpr45920 = alloca ptr, align 8
+  %load45921 = load i32, ptr %sp89, align 4
+  %cmp45922 = icmp sge i32 %load45921, 0
+  %bool45923 = zext i1 %cmp45922 to i32
+  %cond45924 = icmp ne i32 %bool45923, 0
+  br i1 %cond45924, label %ifexpr.then7377, label %ifexpr.else7378
 
-ifexpr.then7234:                                  ; preds = %ifexpr.end7233
-  %load45130 = load ptr, ptr %rhs, align 8
-  %load45131 = load i32, ptr %sp89, align 4
-  %add45132 = add i32 %load45131, 1
-  %call45133 = call ptr @mir2asm_after(ptr %load45130, i32 %add45132)
-  %call45134 = call ptr @mir2asm_trim(ptr %call45133)
-  store ptr %call45134, ptr %ifexpr45125, align 8
-  br label %ifexpr.end7236
+ifexpr.then7377:                                  ; preds = %ifexpr.end7376
+  %load45925 = load ptr, ptr %rhs, align 8
+  %load45926 = load i32, ptr %sp89, align 4
+  %add45927 = add i32 %load45926, 1
+  %call45928 = call ptr @mir2asm_after(ptr %load45925, i32 %add45927)
+  %call45929 = call ptr @mir2asm_trim(ptr %call45928)
+  store ptr %call45929, ptr %ifexpr45920, align 8
+  br label %ifexpr.end7379
 
-ifexpr.else7235:                                  ; preds = %ifexpr.end7233
-  store ptr @.strlit45135, ptr %ifexpr45125, align 8
-  br label %ifexpr.end7236
+ifexpr.else7378:                                  ; preds = %ifexpr.end7376
+  store ptr @.strlit45930, ptr %ifexpr45920, align 8
+  br label %ifexpr.end7379
 
-ifexpr.end7236:                                   ; preds = %ifexpr.else7235, %ifexpr.then7234
-  %ifexprval45136 = load ptr, ptr %ifexpr45125, align 8
+ifexpr.end7379:                                   ; preds = %ifexpr.else7378, %ifexpr.then7377
+  %ifexprval45931 = load ptr, ptr %ifexpr45920, align 8
   %val91 = alloca ptr, align 8
-  store ptr %ifexprval45136, ptr %val91, align 8
-  %load45137 = load ptr, ptr %b, align 8
-  %load45138 = load ptr, ptr %dest, align 8
-  %load45139 = load ptr, ptr %ty90, align 8
-  %call45140 = call i32 @mir2asm_alloc_slot_typed(ptr %load45137, ptr %load45138, i32 0, ptr %load45139)
+  store ptr %ifexprval45931, ptr %val91, align 8
+  %load45932 = load ptr, ptr %b, align 8
+  %load45933 = load ptr, ptr %dest, align 8
+  %load45934 = load ptr, ptr %ty90, align 8
+  %call45935 = call i32 @mir2asm_alloc_slot_typed(ptr %load45932, ptr %load45933, i32 0, ptr %load45934)
   %dest_off92 = alloca i32, align 4
-  store i32 %call45140, ptr %dest_off92, align 4
-  %load45141 = load ptr, ptr %ty90, align 8
-  %call45142 = call i32 @mir2asm_type_is_float(ptr %load45141)
-  %cmp45143 = icmp eq i32 %call45142, 1
-  %bool45144 = zext i1 %cmp45143 to i32
-  %cond45145 = icmp ne i32 %bool45144, 0
-  br i1 %cond45145, label %if.then7237, label %if.else7238
+  store i32 %call45935, ptr %dest_off92, align 4
+  %load45936 = load ptr, ptr %ty90, align 8
+  %call45937 = call i32 @mir2asm_type_is_float(ptr %load45936)
+  %cmp45938 = icmp eq i32 %call45937, 1
+  %bool45939 = zext i1 %cmp45938 to i32
+  %cond45940 = icmp ne i32 %bool45939, 0
+  br i1 %cond45940, label %if.then7380, label %if.else7381
 
-if.then7237:                                      ; preds = %ifexpr.end7236
-  %load45146 = load ptr, ptr %b, align 8
-  %load45148 = load ptr, ptr %val91, align 8
-  %load45149 = load ptr, ptr %ty90, align 8
-  call void @mir2asm_emit_load_float_arg(ptr %load45146, ptr @.strlit45147, ptr %load45148, ptr %load45149)
-  %load45150 = load ptr, ptr %ty90, align 8
-  %strcmp45152 = call i32 @strcmp(ptr %load45150, ptr @.strlit45151)
-  %cmp45153 = icmp eq i32 %strcmp45152, 0
-  %bool45154 = zext i1 %cmp45153 to i32
-  %cond45155 = icmp ne i32 %bool45154, 0
-  br i1 %cond45155, label %if.then7240, label %if.else7241
+if.then7380:                                      ; preds = %ifexpr.end7379
+  %load45941 = load ptr, ptr %b, align 8
+  %load45943 = load ptr, ptr %val91, align 8
+  %load45944 = load ptr, ptr %ty90, align 8
+  call void @mir2asm_emit_load_float_arg(ptr %load45941, ptr @.strlit45942, ptr %load45943, ptr %load45944)
+  %load45945 = load ptr, ptr %ty90, align 8
+  %strcmp45947 = call i32 @strcmp(ptr %load45945, ptr @.strlit45946)
+  %cmp45948 = icmp eq i32 %strcmp45947, 0
+  %bool45949 = zext i1 %cmp45948 to i32
+  %cond45950 = icmp ne i32 %bool45949, 0
+  br i1 %cond45950, label %if.then7383, label %if.else7384
 
-if.else7238:                                      ; preds = %ifexpr.end7236
-  %load45170 = load ptr, ptr %b, align 8
-  %load45172 = load ptr, ptr %ty90, align 8
-  %call45173 = call ptr @mir2asm_acc(ptr %load45172)
-  %call45174 = call ptr @vix_string_concat(ptr @.strlit45171, ptr %call45173)
-  %call45176 = call ptr @vix_string_concat(ptr %call45174, ptr @.strlit45175)
-  %load45177 = load ptr, ptr %b, align 8
-  %load45178 = load ptr, ptr %val91, align 8
-  %load45179 = load ptr, ptr %ty90, align 8
-  %call45180 = call ptr @mir2asm_operand_typed(ptr %load45177, ptr %load45178, ptr %load45179)
-  %call45181 = call ptr @vix_string_concat(ptr %call45176, ptr %call45180)
-  call void @mir2asm_line(ptr %load45170, ptr %call45181)
-  %load45182 = load ptr, ptr %b, align 8
-  %load45184 = load i32, ptr %dest_off92, align 4
-  %call45185 = call ptr @mir2asm_mem(i32 %load45184)
-  %call45186 = call ptr @vix_string_concat(ptr @.strlit45183, ptr %call45185)
-  %call45188 = call ptr @vix_string_concat(ptr %call45186, ptr @.strlit45187)
-  %load45189 = load ptr, ptr %ty90, align 8
-  %call45190 = call ptr @mir2asm_acc(ptr %load45189)
-  %call45191 = call ptr @vix_string_concat(ptr %call45188, ptr %call45190)
-  call void @mir2asm_line(ptr %load45182, ptr %call45191)
-  br label %if.end7239
+if.else7381:                                      ; preds = %ifexpr.end7379
+  %load45965 = load ptr, ptr %b, align 8
+  %load45967 = load ptr, ptr %ty90, align 8
+  %call45968 = call ptr @mir2asm_acc(ptr %load45967)
+  %call45969 = call ptr @vix_string_concat(ptr @.strlit45966, ptr %call45968)
+  %call45971 = call ptr @vix_string_concat(ptr %call45969, ptr @.strlit45970)
+  %load45972 = load ptr, ptr %b, align 8
+  %load45973 = load ptr, ptr %val91, align 8
+  %load45974 = load ptr, ptr %ty90, align 8
+  %call45975 = call ptr @mir2asm_operand_typed(ptr %load45972, ptr %load45973, ptr %load45974)
+  %call45976 = call ptr @vix_string_concat(ptr %call45971, ptr %call45975)
+  call void @mir2asm_line(ptr %load45965, ptr %call45976)
+  %load45977 = load ptr, ptr %b, align 8
+  %load45979 = load i32, ptr %dest_off92, align 4
+  %call45980 = call ptr @mir2asm_mem(i32 %load45979)
+  %call45981 = call ptr @vix_string_concat(ptr @.strlit45978, ptr %call45980)
+  %call45983 = call ptr @vix_string_concat(ptr %call45981, ptr @.strlit45982)
+  %load45984 = load ptr, ptr %ty90, align 8
+  %call45985 = call ptr @mir2asm_acc(ptr %load45984)
+  %call45986 = call ptr @vix_string_concat(ptr %call45983, ptr %call45985)
+  call void @mir2asm_line(ptr %load45977, ptr %call45986)
+  br label %if.end7382
 
-if.end7239:                                       ; preds = %if.else7238, %if.end7242
+if.end7382:                                       ; preds = %if.else7381, %if.end7385
   ret void
 
-if.then7240:                                      ; preds = %if.then7237
-  %load45156 = load ptr, ptr %b, align 8
-  %load45158 = load i32, ptr %dest_off92, align 4
-  %call45159 = call ptr @mir2asm_mem(i32 %load45158)
-  %call45160 = call ptr @vix_string_concat(ptr @.strlit45157, ptr %call45159)
-  %call45162 = call ptr @vix_string_concat(ptr %call45160, ptr @.strlit45161)
-  call void @mir2asm_line(ptr %load45156, ptr %call45162)
-  br label %if.end7242
+if.then7383:                                      ; preds = %if.then7380
+  %load45951 = load ptr, ptr %b, align 8
+  %load45953 = load i32, ptr %dest_off92, align 4
+  %call45954 = call ptr @mir2asm_mem(i32 %load45953)
+  %call45955 = call ptr @vix_string_concat(ptr @.strlit45952, ptr %call45954)
+  %call45957 = call ptr @vix_string_concat(ptr %call45955, ptr @.strlit45956)
+  call void @mir2asm_line(ptr %load45951, ptr %call45957)
+  br label %if.end7385
 
-if.else7241:                                      ; preds = %if.then7237
-  %load45163 = load ptr, ptr %b, align 8
-  %load45165 = load i32, ptr %dest_off92, align 4
-  %call45166 = call ptr @mir2asm_mem(i32 %load45165)
-  %call45167 = call ptr @vix_string_concat(ptr @.strlit45164, ptr %call45166)
-  %call45169 = call ptr @vix_string_concat(ptr %call45167, ptr @.strlit45168)
-  call void @mir2asm_line(ptr %load45163, ptr %call45169)
-  br label %if.end7242
+if.else7384:                                      ; preds = %if.then7380
+  %load45958 = load ptr, ptr %b, align 8
+  %load45960 = load i32, ptr %dest_off92, align 4
+  %call45961 = call ptr @mir2asm_mem(i32 %load45960)
+  %call45962 = call ptr @vix_string_concat(ptr @.strlit45959, ptr %call45961)
+  %call45964 = call ptr @vix_string_concat(ptr %call45962, ptr @.strlit45963)
+  call void @mir2asm_line(ptr %load45958, ptr %call45964)
+  br label %if.end7385
 
-if.end7242:                                       ; preds = %if.else7241, %if.then7240
-  br label %if.end7239
+if.end7385:                                       ; preds = %if.else7384, %if.then7383
+  br label %if.end7382
 }
 
 define ptr @mir2asm_x86_64(ptr %0) {
 entry:
   %mir = alloca ptr, align 8
   store ptr %0, ptr %mir, align 8
-  %load45194 = load ptr, ptr %mir, align 8
-  %call45195 = call ptr @mir2asm_x86_64_debug(ptr %load45194, i32 0)
-  ret ptr %call45195
+  %load45989 = load ptr, ptr %mir, align 8
+  %call45990 = call ptr @mir2asm_x86_64_debug(ptr %load45989, i32 0)
+  ret ptr %call45990
 }
 
 define ptr @mir2asm_x86_64_debug(ptr %0, i32 %1) {
@@ -85666,12 +87216,12 @@ entry:
   store ptr %0, ptr %mir, align 8
   %debug_mir_comments = alloca i32, align 4
   store i32 %1, ptr %debug_mir_comments, align 4
-  %call45196 = call %MirAsm @mir2asm_new()
+  %call45991 = call %MirAsm @mir2asm_new()
   %b = alloca %MirAsm, align 8
-  store %MirAsm %call45196, ptr %b, align 8
-  %fieldptr45198 = getelementptr %MirAsm, ptr %b, i32 0, i32 24
-  %load45199 = load i32, ptr %debug_mir_comments, align 4
-  store i32 %load45199, ptr %fieldptr45198, align 4
+  store %MirAsm %call45991, ptr %b, align 8
+  %fieldptr45993 = getelementptr %MirAsm, ptr %b, i32 0, i32 24
+  %load45994 = load i32, ptr %debug_mir_comments, align 4
+  store i32 %load45994, ptr %fieldptr45993, align 4
   %start = alloca i32, align 4
   store i32 0, ptr %start, align 4
   %in_string = alloca i32, align 4
@@ -85680,251 +87230,251 @@ entry:
   store i32 0, ptr %escaped, align 4
   %line_no = alloca i32, align 4
   store i32 1, ptr %line_no, align 4
-  %load45200 = load ptr, ptr %mir, align 8
-  %strlen45201 = call i32 @strlen(ptr %load45200)
+  %load45995 = load ptr, ptr %mir, align 8
+  %strlen45996 = call i32 @strlen(ptr %load45995)
   %i = alloca i32, align 4
   store i32 0, ptr %i, align 4
-  %__for_end_i7247 = alloca i32, align 4
-  store i32 %strlen45201, ptr %__for_end_i7247, align 4
-  br label %for.cond7243
+  %__for_end_i7390 = alloca i32, align 4
+  store i32 %strlen45996, ptr %__for_end_i7390, align 4
+  br label %for.cond7386
 
-for.cond7243:                                     ; preds = %for.step7245, %entry
-  %load45202 = load i32, ptr %i, align 4
-  %load45203 = load i32, ptr %__for_end_i7247, align 4
-  %cmp45204 = icmp slt i32 %load45202, %load45203
-  %bool45205 = zext i1 %cmp45204 to i32
-  %cond45206 = icmp ne i32 %bool45205, 0
-  br i1 %cond45206, label %for.body7244, label %for.end7246
+for.cond7386:                                     ; preds = %for.step7388, %entry
+  %load45997 = load i32, ptr %i, align 4
+  %load45998 = load i32, ptr %__for_end_i7390, align 4
+  %cmp45999 = icmp slt i32 %load45997, %load45998
+  %bool46000 = zext i1 %cmp45999 to i32
+  %cond46001 = icmp ne i32 %bool46000, 0
+  br i1 %cond46001, label %for.body7387, label %for.end7389
 
-for.body7244:                                     ; preds = %for.cond7243
-  %load45207 = load i32, ptr %escaped, align 4
-  %cmp45208 = icmp eq i32 %load45207, 1
-  %bool45209 = zext i1 %cmp45208 to i32
-  %cond45210 = icmp ne i32 %bool45209, 0
-  br i1 %cond45210, label %if.then7248, label %if.else7249
+for.body7387:                                     ; preds = %for.cond7386
+  %load46002 = load i32, ptr %escaped, align 4
+  %cmp46003 = icmp eq i32 %load46002, 1
+  %bool46004 = zext i1 %cmp46003 to i32
+  %cond46005 = icmp ne i32 %bool46004, 0
+  br i1 %cond46005, label %if.then7391, label %if.else7392
 
-for.step7245:                                     ; preds = %if.end7262
-  %load45265 = load i32, ptr %i, align 4
-  %add45266 = add i32 %load45265, 1
-  store i32 %add45266, ptr %i, align 4
-  br label %for.cond7243
+for.step7388:                                     ; preds = %if.end7405
+  %load46060 = load i32, ptr %i, align 4
+  %add46061 = add i32 %load46060, 1
+  store i32 %add46061, ptr %i, align 4
+  br label %for.cond7386
 
-for.end7246:                                      ; preds = %for.cond7243
-  %load45267 = load i32, ptr %start, align 4
-  %load45268 = load ptr, ptr %mir, align 8
-  %strlen45269 = call i32 @strlen(ptr %load45268)
-  %cmp45270 = icmp slt i32 %load45267, %strlen45269
-  %bool45271 = zext i1 %cmp45270 to i32
-  %cond45272 = icmp ne i32 %bool45271, 0
-  br i1 %cond45272, label %if.then7263, label %if.else7264
+for.end7389:                                      ; preds = %for.cond7386
+  %load46062 = load i32, ptr %start, align 4
+  %load46063 = load ptr, ptr %mir, align 8
+  %strlen46064 = call i32 @strlen(ptr %load46063)
+  %cmp46065 = icmp slt i32 %load46062, %strlen46064
+  %bool46066 = zext i1 %cmp46065 to i32
+  %cond46067 = icmp ne i32 %bool46066, 0
+  br i1 %cond46067, label %if.then7406, label %if.else7407
 
-if.then7248:                                      ; preds = %for.body7244
+if.then7391:                                      ; preds = %for.body7387
   store i32 0, ptr %escaped, align 4
-  br label %if.end7250
+  br label %if.end7393
 
-if.else7249:                                      ; preds = %for.body7244
-  %load45211 = load ptr, ptr %mir, align 8
-  %load45212 = load i32, ptr %i, align 4
-  %sidx45213 = getelementptr i8, ptr %load45211, i32 %load45212
-  %sbyte45214 = load i8, ptr %sidx45213, align 1
-  %schar45215 = zext i8 %sbyte45214 to i32
-  %cmp45216 = icmp eq i32 %schar45215, 92
-  %bool45217 = zext i1 %cmp45216 to i32
-  %cond45218 = icmp ne i32 %bool45217, 0
-  br i1 %cond45218, label %and.rhs, label %and.false
+if.else7392:                                      ; preds = %for.body7387
+  %load46006 = load ptr, ptr %mir, align 8
+  %load46007 = load i32, ptr %i, align 4
+  %sidx46008 = getelementptr i8, ptr %load46006, i32 %load46007
+  %sbyte46009 = load i8, ptr %sidx46008, align 1
+  %schar46010 = zext i8 %sbyte46009 to i32
+  %cmp46011 = icmp eq i32 %schar46010, 92
+  %bool46012 = zext i1 %cmp46011 to i32
+  %cond46013 = icmp ne i32 %bool46012, 0
+  br i1 %cond46013, label %and.rhs, label %and.false
 
-if.end7250:                                       ; preds = %if.end7253, %if.then7248
-  %load45239 = load ptr, ptr %mir, align 8
-  %load45240 = load i32, ptr %i, align 4
-  %sidx45241 = getelementptr i8, ptr %load45239, i32 %load45240
-  %sbyte45242 = load i8, ptr %sidx45241, align 1
-  %schar45243 = zext i8 %sbyte45242 to i32
-  %cmp45244 = icmp eq i32 %schar45243, 10
-  %bool45245 = zext i1 %cmp45244 to i32
-  %cond45246 = icmp ne i32 %bool45245, 0
-  br i1 %cond45246, label %and.rhs1, label %and.false2
+if.end7393:                                       ; preds = %if.end7396, %if.then7391
+  %load46034 = load ptr, ptr %mir, align 8
+  %load46035 = load i32, ptr %i, align 4
+  %sidx46036 = getelementptr i8, ptr %load46034, i32 %load46035
+  %sbyte46037 = load i8, ptr %sidx46036, align 1
+  %schar46038 = zext i8 %sbyte46037 to i32
+  %cmp46039 = icmp eq i32 %schar46038, 10
+  %bool46040 = zext i1 %cmp46039 to i32
+  %cond46041 = icmp ne i32 %bool46040, 0
+  br i1 %cond46041, label %and.rhs1, label %and.false2
 
-if.then7251:                                      ; preds = %and.merge
+if.then7394:                                      ; preds = %and.merge
   store i32 1, ptr %escaped, align 4
-  br label %if.end7253
+  br label %if.end7396
 
-if.else7252:                                      ; preds = %and.merge
-  %load45225 = load ptr, ptr %mir, align 8
-  %load45226 = load i32, ptr %i, align 4
-  %sidx45227 = getelementptr i8, ptr %load45225, i32 %load45226
-  %sbyte45228 = load i8, ptr %sidx45227, align 1
-  %schar45229 = zext i8 %sbyte45228 to i32
-  %cmp45230 = icmp eq i32 %schar45229, 34
-  %bool45231 = zext i1 %cmp45230 to i32
-  %cond45232 = icmp ne i32 %bool45231, 0
-  br i1 %cond45232, label %if.then7254, label %if.else7255
+if.else7395:                                      ; preds = %and.merge
+  %load46020 = load ptr, ptr %mir, align 8
+  %load46021 = load i32, ptr %i, align 4
+  %sidx46022 = getelementptr i8, ptr %load46020, i32 %load46021
+  %sbyte46023 = load i8, ptr %sidx46022, align 1
+  %schar46024 = zext i8 %sbyte46023 to i32
+  %cmp46025 = icmp eq i32 %schar46024, 34
+  %bool46026 = zext i1 %cmp46025 to i32
+  %cond46027 = icmp ne i32 %bool46026, 0
+  br i1 %cond46027, label %if.then7397, label %if.else7398
 
-if.end7253:                                       ; preds = %if.end7256, %if.then7251
-  br label %if.end7250
+if.end7396:                                       ; preds = %if.end7399, %if.then7394
+  br label %if.end7393
 
-and.rhs:                                          ; preds = %if.else7249
-  %load45219 = load i32, ptr %in_string, align 4
-  %cmp45220 = icmp eq i32 %load45219, 1
-  %bool45221 = zext i1 %cmp45220 to i32
-  %cond45222 = icmp ne i32 %bool45221, 0
-  br i1 %cond45222, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %if.else7392
+  %load46014 = load i32, ptr %in_string, align 4
+  %cmp46015 = icmp eq i32 %load46014, 1
+  %bool46016 = zext i1 %cmp46015 to i32
+  %cond46017 = icmp ne i32 %bool46016, 0
+  br i1 %cond46017, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %if.else7249
+and.false:                                        ; preds = %and.rhs, %if.else7392
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval45223 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond45224 = icmp ne i32 %andval45223, 0
-  br i1 %cond45224, label %if.then7251, label %if.else7252
+  %andval46018 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond46019 = icmp ne i32 %andval46018, 0
+  br i1 %cond46019, label %if.then7394, label %if.else7395
 
-if.then7254:                                      ; preds = %if.else7252
-  %ifexpr45233 = alloca i32, align 4
-  %load45234 = load i32, ptr %in_string, align 4
-  %cmp45235 = icmp eq i32 %load45234, 0
-  %bool45236 = zext i1 %cmp45235 to i32
-  %cond45237 = icmp ne i32 %bool45236, 0
-  br i1 %cond45237, label %ifexpr.then7257, label %ifexpr.else7258
+if.then7397:                                      ; preds = %if.else7395
+  %ifexpr46028 = alloca i32, align 4
+  %load46029 = load i32, ptr %in_string, align 4
+  %cmp46030 = icmp eq i32 %load46029, 0
+  %bool46031 = zext i1 %cmp46030 to i32
+  %cond46032 = icmp ne i32 %bool46031, 0
+  br i1 %cond46032, label %ifexpr.then7400, label %ifexpr.else7401
 
-if.else7255:                                      ; preds = %if.else7252
-  br label %if.end7256
+if.else7398:                                      ; preds = %if.else7395
+  br label %if.end7399
 
-if.end7256:                                       ; preds = %if.else7255, %ifexpr.end7259
-  br label %if.end7253
+if.end7399:                                       ; preds = %if.else7398, %ifexpr.end7402
+  br label %if.end7396
 
-ifexpr.then7257:                                  ; preds = %if.then7254
-  store i32 1, ptr %ifexpr45233, align 4
-  br label %ifexpr.end7259
+ifexpr.then7400:                                  ; preds = %if.then7397
+  store i32 1, ptr %ifexpr46028, align 4
+  br label %ifexpr.end7402
 
-ifexpr.else7258:                                  ; preds = %if.then7254
-  store i32 0, ptr %ifexpr45233, align 4
-  br label %ifexpr.end7259
+ifexpr.else7401:                                  ; preds = %if.then7397
+  store i32 0, ptr %ifexpr46028, align 4
+  br label %ifexpr.end7402
 
-ifexpr.end7259:                                   ; preds = %ifexpr.else7258, %ifexpr.then7257
-  %ifexprval45238 = load i32, ptr %ifexpr45233, align 4
-  store i32 %ifexprval45238, ptr %in_string, align 4
-  br label %if.end7256
+ifexpr.end7402:                                   ; preds = %ifexpr.else7401, %ifexpr.then7400
+  %ifexprval46033 = load i32, ptr %ifexpr46028, align 4
+  store i32 %ifexprval46033, ptr %in_string, align 4
+  br label %if.end7399
 
-if.then7260:                                      ; preds = %and.merge3
-  %load45253 = load ptr, ptr %mir, align 8
-  %load45254 = load i32, ptr %start, align 4
-  %load45255 = load i32, ptr %i, align 4
-  %call45256 = call ptr @mir2asm_slice(ptr %load45253, i32 %load45254, i32 %load45255)
-  %call45257 = call ptr @mir2asm_trim(ptr %call45256)
+if.then7403:                                      ; preds = %and.merge3
+  %load46048 = load ptr, ptr %mir, align 8
+  %load46049 = load i32, ptr %start, align 4
+  %load46050 = load i32, ptr %i, align 4
+  %call46051 = call ptr @mir2asm_slice(ptr %load46048, i32 %load46049, i32 %load46050)
+  %call46052 = call ptr @mir2asm_trim(ptr %call46051)
   %line = alloca ptr, align 8
-  store ptr %call45257, ptr %line, align 8
-  %load45258 = load ptr, ptr %line, align 8
-  %load45259 = load i32, ptr %line_no, align 4
-  call void @mir2asm_mir_comment(ptr %b, ptr %load45258, i32 %load45259)
-  %load45260 = load ptr, ptr %line, align 8
-  call void @mir2asm_emit_instruction(ptr %b, ptr %load45260)
-  %load45261 = load i32, ptr %i, align 4
-  %add45262 = add i32 %load45261, 1
-  store i32 %add45262, ptr %start, align 4
-  %load45263 = load i32, ptr %line_no, align 4
-  %add45264 = add i32 %load45263, 1
-  store i32 %add45264, ptr %line_no, align 4
-  br label %if.end7262
+  store ptr %call46052, ptr %line, align 8
+  %load46053 = load ptr, ptr %line, align 8
+  %load46054 = load i32, ptr %line_no, align 4
+  call void @mir2asm_mir_comment(ptr %b, ptr %load46053, i32 %load46054)
+  %load46055 = load ptr, ptr %line, align 8
+  call void @mir2asm_emit_instruction(ptr %b, ptr %load46055)
+  %load46056 = load i32, ptr %i, align 4
+  %add46057 = add i32 %load46056, 1
+  store i32 %add46057, ptr %start, align 4
+  %load46058 = load i32, ptr %line_no, align 4
+  %add46059 = add i32 %load46058, 1
+  store i32 %add46059, ptr %line_no, align 4
+  br label %if.end7405
 
-if.else7261:                                      ; preds = %and.merge3
-  br label %if.end7262
+if.else7404:                                      ; preds = %and.merge3
+  br label %if.end7405
 
-if.end7262:                                       ; preds = %if.else7261, %if.then7260
-  br label %for.step7245
+if.end7405:                                       ; preds = %if.else7404, %if.then7403
+  br label %for.step7388
 
-and.rhs1:                                         ; preds = %if.end7250
-  %load45247 = load i32, ptr %in_string, align 4
-  %cmp45248 = icmp eq i32 %load45247, 0
-  %bool45249 = zext i1 %cmp45248 to i32
-  %cond45250 = icmp ne i32 %bool45249, 0
-  br i1 %cond45250, label %and.merge3, label %and.false2
+and.rhs1:                                         ; preds = %if.end7393
+  %load46042 = load i32, ptr %in_string, align 4
+  %cmp46043 = icmp eq i32 %load46042, 0
+  %bool46044 = zext i1 %cmp46043 to i32
+  %cond46045 = icmp ne i32 %bool46044, 0
+  br i1 %cond46045, label %and.merge3, label %and.false2
 
-and.false2:                                       ; preds = %and.rhs1, %if.end7250
+and.false2:                                       ; preds = %and.rhs1, %if.end7393
   br label %and.merge3
 
 and.merge3:                                       ; preds = %and.false2, %and.rhs1
-  %andval45251 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
-  %cond45252 = icmp ne i32 %andval45251, 0
-  br i1 %cond45252, label %if.then7260, label %if.else7261
+  %andval46046 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
+  %cond46047 = icmp ne i32 %andval46046, 0
+  br i1 %cond46047, label %if.then7403, label %if.else7404
 
-if.then7263:                                      ; preds = %for.end7246
-  %load45273 = load ptr, ptr %mir, align 8
-  %load45274 = load i32, ptr %start, align 4
-  %call45275 = call ptr @mir2asm_after(ptr %load45273, i32 %load45274)
-  %call45276 = call ptr @mir2asm_trim(ptr %call45275)
+if.then7406:                                      ; preds = %for.end7389
+  %load46068 = load ptr, ptr %mir, align 8
+  %load46069 = load i32, ptr %start, align 4
+  %call46070 = call ptr @mir2asm_after(ptr %load46068, i32 %load46069)
+  %call46071 = call ptr @mir2asm_trim(ptr %call46070)
   %line4 = alloca ptr, align 8
-  store ptr %call45276, ptr %line4, align 8
-  %load45277 = load ptr, ptr %line4, align 8
-  %load45278 = load i32, ptr %line_no, align 4
-  call void @mir2asm_mir_comment(ptr %b, ptr %load45277, i32 %load45278)
-  %load45279 = load ptr, ptr %line4, align 8
-  call void @mir2asm_emit_instruction(ptr %b, ptr %load45279)
-  br label %if.end7265
+  store ptr %call46071, ptr %line4, align 8
+  %load46072 = load ptr, ptr %line4, align 8
+  %load46073 = load i32, ptr %line_no, align 4
+  call void @mir2asm_mir_comment(ptr %b, ptr %load46072, i32 %load46073)
+  %load46074 = load ptr, ptr %line4, align 8
+  call void @mir2asm_emit_instruction(ptr %b, ptr %load46074)
+  br label %if.end7408
 
-if.else7264:                                      ; preds = %for.end7246
-  br label %if.end7265
+if.else7407:                                      ; preds = %for.end7389
+  br label %if.end7408
 
-if.end7265:                                       ; preds = %if.else7264, %if.then7263
-  %load45280 = load %MirAsm, ptr %b, align 8
-  %extract45281 = extractvalue %MirAsm %load45280, 10
-  %cmp45282 = icmp eq i32 %extract45281, 1
-  %bool45283 = zext i1 %cmp45282 to i32
-  %cond45284 = icmp ne i32 %bool45283, 0
-  br i1 %cond45284, label %if.then7266, label %if.else7267
+if.end7408:                                       ; preds = %if.else7407, %if.then7406
+  %load46075 = load %MirAsm, ptr %b, align 8
+  %extract46076 = extractvalue %MirAsm %load46075, 10
+  %cmp46077 = icmp eq i32 %extract46076, 1
+  %bool46078 = zext i1 %cmp46077 to i32
+  %cond46079 = icmp ne i32 %bool46078, 0
+  br i1 %cond46079, label %if.then7409, label %if.else7410
 
-if.then7266:                                      ; preds = %if.end7265
+if.then7409:                                      ; preds = %if.end7408
   call void @mir2asm_end_function(ptr %b)
-  br label %if.end7268
+  br label %if.end7411
 
-if.else7267:                                      ; preds = %if.end7265
-  br label %if.end7268
+if.else7410:                                      ; preds = %if.end7408
+  br label %if.end7411
 
-if.end7268:                                       ; preds = %if.else7267, %if.then7266
-  %load45285 = load %MirAsm, ptr %b, align 8
-  %extract45286 = extractvalue %MirAsm %load45285, 0
-  %call45287 = call ptr @vix_join_lines(ptr %extract45286)
+if.end7411:                                       ; preds = %if.else7410, %if.then7409
+  %load46080 = load %MirAsm, ptr %b, align 8
+  %extract46081 = extractvalue %MirAsm %load46080, 0
+  %call46082 = call ptr @vix_join_lines(ptr %extract46081)
   %text = alloca ptr, align 8
-  store ptr %call45287, ptr %text, align 8
-  %load45288 = load %MirAsm, ptr %b, align 8
-  %extract45289 = extractvalue %MirAsm %load45288, 1
-  %call45290 = call i32 @vix_array_len(ptr %extract45289)
-  %cmp45291 = icmp sgt i32 %call45290, 0
-  %bool45292 = zext i1 %cmp45291 to i32
-  %cond45293 = icmp ne i32 %bool45292, 0
-  br i1 %cond45293, label %if.then7269, label %if.else7270
+  store ptr %call46082, ptr %text, align 8
+  %load46083 = load %MirAsm, ptr %b, align 8
+  %extract46084 = extractvalue %MirAsm %load46083, 1
+  %call46085 = call i32 @vix_array_len(ptr %extract46084)
+  %cmp46086 = icmp sgt i32 %call46085, 0
+  %bool46087 = zext i1 %cmp46086 to i32
+  %cond46088 = icmp ne i32 %bool46087, 0
+  br i1 %cond46088, label %if.then7412, label %if.else7413
 
-if.then7269:                                      ; preds = %if.end7268
-  %load45294 = load ptr, ptr %text, align 8
-  %call45296 = call ptr @vix_string_concat(ptr %load45294, ptr @.strlit45295)
-  %load45297 = load %MirAsm, ptr %b, align 8
-  %extract45298 = extractvalue %MirAsm %load45297, 1
-  %call45299 = call ptr @vix_join_lines(ptr %extract45298)
-  %call45300 = call ptr @vix_string_concat(ptr %call45296, ptr %call45299)
-  ret ptr %call45300
+if.then7412:                                      ; preds = %if.end7411
+  %load46089 = load ptr, ptr %text, align 8
+  %call46091 = call ptr @vix_string_concat(ptr %load46089, ptr @.strlit46090)
+  %load46092 = load %MirAsm, ptr %b, align 8
+  %extract46093 = extractvalue %MirAsm %load46092, 1
+  %call46094 = call ptr @vix_join_lines(ptr %extract46093)
+  %call46095 = call ptr @vix_string_concat(ptr %call46091, ptr %call46094)
+  ret ptr %call46095
 
-if.else7270:                                      ; preds = %if.end7268
-  br label %if.end7271
+if.else7413:                                      ; preds = %if.end7411
+  br label %if.end7414
 
-if.end7271:                                       ; preds = %if.else7270
-  %load45301 = load ptr, ptr %text, align 8
-  ret ptr %load45301
+if.end7414:                                       ; preds = %if.else7413
+  %load46096 = load ptr, ptr %text, align 8
+  ret ptr %load46096
 }
 
 define ptr @mir2asm(ptr %0) {
 entry:
   %mir = alloca ptr, align 8
   store ptr %0, ptr %mir, align 8
-  %load45302 = load ptr, ptr %mir, align 8
-  %call45303 = call ptr @mir2asm_x86_64(ptr %load45302)
-  ret ptr %call45303
+  %load46097 = load ptr, ptr %mir, align 8
+  %call46098 = call ptr @mir2asm_x86_64(ptr %load46097)
+  ret ptr %call46098
 }
 
 define ptr @mir2asm_debug(ptr %0) {
 entry:
   %mir = alloca ptr, align 8
   store ptr %0, ptr %mir, align 8
-  %load45304 = load ptr, ptr %mir, align 8
-  %call45305 = call ptr @mir2asm_x86_64_debug(ptr %load45304, i32 1)
-  ret ptr %call45305
+  %load46099 = load ptr, ptr %mir, align 8
+  %call46100 = call ptr @mir2asm_x86_64_debug(ptr %load46099, i32 1)
+  ret ptr %call46100
 }
 
 define i32 @string_ends_with(ptr %0, ptr %1) {
@@ -85933,402 +87483,402 @@ entry:
   store ptr %0, ptr %text, align 8
   %suffix = alloca ptr, align 8
   store ptr %1, ptr %suffix, align 8
-  %load45306 = load ptr, ptr %text, align 8
-  %strlen45307 = call i32 @strlen(ptr %load45306)
-  %load45308 = load ptr, ptr %suffix, align 8
-  %strlen45309 = call i32 @strlen(ptr %load45308)
-  %cmp45310 = icmp slt i32 %strlen45307, %strlen45309
-  %bool45311 = zext i1 %cmp45310 to i32
-  %cond45312 = icmp ne i32 %bool45311, 0
-  br i1 %cond45312, label %if.then7272, label %if.else7273
+  %load46101 = load ptr, ptr %text, align 8
+  %strlen46102 = call i32 @strlen(ptr %load46101)
+  %load46103 = load ptr, ptr %suffix, align 8
+  %strlen46104 = call i32 @strlen(ptr %load46103)
+  %cmp46105 = icmp slt i32 %strlen46102, %strlen46104
+  %bool46106 = zext i1 %cmp46105 to i32
+  %cond46107 = icmp ne i32 %bool46106, 0
+  br i1 %cond46107, label %if.then7415, label %if.else7416
 
-if.then7272:                                      ; preds = %entry
+if.then7415:                                      ; preds = %entry
   ret i32 0
 
-if.else7273:                                      ; preds = %entry
-  br label %if.end7274
+if.else7416:                                      ; preds = %entry
+  br label %if.end7417
 
-if.end7274:                                       ; preds = %if.else7273
-  %load45313 = load ptr, ptr %text, align 8
-  %strlen45314 = call i32 @strlen(ptr %load45313)
-  %load45315 = load ptr, ptr %suffix, align 8
-  %strlen45316 = call i32 @strlen(ptr %load45315)
-  %sub45317 = sub i32 %strlen45314, %strlen45316
+if.end7417:                                       ; preds = %if.else7416
+  %load46108 = load ptr, ptr %text, align 8
+  %strlen46109 = call i32 @strlen(ptr %load46108)
+  %load46110 = load ptr, ptr %suffix, align 8
+  %strlen46111 = call i32 @strlen(ptr %load46110)
+  %sub46112 = sub i32 %strlen46109, %strlen46111
   %offset = alloca i32, align 4
-  store i32 %sub45317, ptr %offset, align 4
-  %load45318 = load ptr, ptr %suffix, align 8
-  %strlen45319 = call i32 @strlen(ptr %load45318)
+  store i32 %sub46112, ptr %offset, align 4
+  %load46113 = load ptr, ptr %suffix, align 8
+  %strlen46114 = call i32 @strlen(ptr %load46113)
   %i = alloca i32, align 4
   store i32 0, ptr %i, align 4
-  %__for_end_i7279 = alloca i32, align 4
-  store i32 %strlen45319, ptr %__for_end_i7279, align 4
-  br label %for.cond7275
+  %__for_end_i7422 = alloca i32, align 4
+  store i32 %strlen46114, ptr %__for_end_i7422, align 4
+  br label %for.cond7418
 
-for.cond7275:                                     ; preds = %for.step7277, %if.end7274
-  %load45320 = load i32, ptr %i, align 4
-  %load45321 = load i32, ptr %__for_end_i7279, align 4
-  %cmp45322 = icmp slt i32 %load45320, %load45321
-  %bool45323 = zext i1 %cmp45322 to i32
-  %cond45324 = icmp ne i32 %bool45323, 0
-  br i1 %cond45324, label %for.body7276, label %for.end7278
+for.cond7418:                                     ; preds = %for.step7420, %if.end7417
+  %load46115 = load i32, ptr %i, align 4
+  %load46116 = load i32, ptr %__for_end_i7422, align 4
+  %cmp46117 = icmp slt i32 %load46115, %load46116
+  %bool46118 = zext i1 %cmp46117 to i32
+  %cond46119 = icmp ne i32 %bool46118, 0
+  br i1 %cond46119, label %for.body7419, label %for.end7421
 
-for.body7276:                                     ; preds = %for.cond7275
-  %load45325 = load ptr, ptr %text, align 8
-  %load45326 = load i32, ptr %offset, align 4
-  %load45327 = load i32, ptr %i, align 4
-  %add45328 = add i32 %load45326, %load45327
-  %sidx45329 = getelementptr i8, ptr %load45325, i32 %add45328
-  %sbyte45330 = load i8, ptr %sidx45329, align 1
-  %schar45331 = zext i8 %sbyte45330 to i32
-  %load45332 = load ptr, ptr %suffix, align 8
-  %load45333 = load i32, ptr %i, align 4
-  %sidx45334 = getelementptr i8, ptr %load45332, i32 %load45333
-  %sbyte45335 = load i8, ptr %sidx45334, align 1
-  %schar45336 = zext i8 %sbyte45335 to i32
-  %cmp45337 = icmp ne i32 %schar45331, %schar45336
-  %bool45338 = zext i1 %cmp45337 to i32
-  %cond45339 = icmp ne i32 %bool45338, 0
-  br i1 %cond45339, label %if.then7280, label %if.else7281
+for.body7419:                                     ; preds = %for.cond7418
+  %load46120 = load ptr, ptr %text, align 8
+  %load46121 = load i32, ptr %offset, align 4
+  %load46122 = load i32, ptr %i, align 4
+  %add46123 = add i32 %load46121, %load46122
+  %sidx46124 = getelementptr i8, ptr %load46120, i32 %add46123
+  %sbyte46125 = load i8, ptr %sidx46124, align 1
+  %schar46126 = zext i8 %sbyte46125 to i32
+  %load46127 = load ptr, ptr %suffix, align 8
+  %load46128 = load i32, ptr %i, align 4
+  %sidx46129 = getelementptr i8, ptr %load46127, i32 %load46128
+  %sbyte46130 = load i8, ptr %sidx46129, align 1
+  %schar46131 = zext i8 %sbyte46130 to i32
+  %cmp46132 = icmp ne i32 %schar46126, %schar46131
+  %bool46133 = zext i1 %cmp46132 to i32
+  %cond46134 = icmp ne i32 %bool46133, 0
+  br i1 %cond46134, label %if.then7423, label %if.else7424
 
-for.step7277:                                     ; preds = %if.end7282
-  %load45340 = load i32, ptr %i, align 4
-  %add45341 = add i32 %load45340, 1
-  store i32 %add45341, ptr %i, align 4
-  br label %for.cond7275
+for.step7420:                                     ; preds = %if.end7425
+  %load46135 = load i32, ptr %i, align 4
+  %add46136 = add i32 %load46135, 1
+  store i32 %add46136, ptr %i, align 4
+  br label %for.cond7418
 
-for.end7278:                                      ; preds = %for.cond7275
+for.end7421:                                      ; preds = %for.cond7418
   ret i32 1
 
-if.then7280:                                      ; preds = %for.body7276
+if.then7423:                                      ; preds = %for.body7419
   ret i32 0
 
-if.else7281:                                      ; preds = %for.body7276
-  br label %if.end7282
+if.else7424:                                      ; preds = %for.body7419
+  br label %if.end7425
 
-if.end7282:                                       ; preds = %if.else7281
-  br label %for.step7277
+if.end7425:                                       ; preds = %if.else7424
+  br label %for.step7420
 }
 
 define ptr @compiler_mode(ptr %0) {
 entry:
   %arg = alloca ptr, align 8
   store ptr %0, ptr %arg, align 8
-  %load45342 = load ptr, ptr %arg, align 8
-  %strcmp45344 = call i32 @strcmp(ptr %load45342, ptr @.strlit45343)
-  %cmp45345 = icmp eq i32 %strcmp45344, 0
-  %bool45346 = zext i1 %cmp45345 to i32
-  %cond45347 = icmp ne i32 %bool45346, 0
-  br i1 %cond45347, label %or.true, label %or.rhs
+  %load46137 = load ptr, ptr %arg, align 8
+  %strcmp46139 = call i32 @strcmp(ptr %load46137, ptr @.strlit46138)
+  %cmp46140 = icmp eq i32 %strcmp46139, 0
+  %bool46141 = zext i1 %cmp46140 to i32
+  %cond46142 = icmp ne i32 %bool46141, 0
+  br i1 %cond46142, label %or.true, label %or.rhs
 
-if.then7283:                                      ; preds = %or.merge
-  ret ptr @.strlit45356
+if.then7426:                                      ; preds = %or.merge
+  ret ptr @.strlit46151
 
-if.else7284:                                      ; preds = %or.merge
-  br label %if.end7285
+if.else7427:                                      ; preds = %or.merge
+  br label %if.end7428
 
-if.end7285:                                       ; preds = %if.else7284
-  %load45357 = load ptr, ptr %arg, align 8
-  %strcmp45359 = call i32 @strcmp(ptr %load45357, ptr @.strlit45358)
-  %cmp45360 = icmp eq i32 %strcmp45359, 0
-  %bool45361 = zext i1 %cmp45360 to i32
-  %cond45362 = icmp ne i32 %bool45361, 0
-  br i1 %cond45362, label %or.true1, label %or.rhs2
+if.end7428:                                       ; preds = %if.else7427
+  %load46152 = load ptr, ptr %arg, align 8
+  %strcmp46154 = call i32 @strcmp(ptr %load46152, ptr @.strlit46153)
+  %cmp46155 = icmp eq i32 %strcmp46154, 0
+  %bool46156 = zext i1 %cmp46155 to i32
+  %cond46157 = icmp ne i32 %bool46156, 0
+  br i1 %cond46157, label %or.true1, label %or.rhs2
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load45348 = load ptr, ptr %arg, align 8
-  %strcmp45350 = call i32 @strcmp(ptr %load45348, ptr @.strlit45349)
-  %cmp45351 = icmp eq i32 %strcmp45350, 0
-  %bool45352 = zext i1 %cmp45351 to i32
-  %cond45353 = icmp ne i32 %bool45352, 0
-  br i1 %cond45353, label %or.true, label %or.merge
+  %load46143 = load ptr, ptr %arg, align 8
+  %strcmp46145 = call i32 @strcmp(ptr %load46143, ptr @.strlit46144)
+  %cmp46146 = icmp eq i32 %strcmp46145, 0
+  %bool46147 = zext i1 %cmp46146 to i32
+  %cond46148 = icmp ne i32 %bool46147, 0
+  br i1 %cond46148, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval45354 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond45355 = icmp ne i32 %orval45354, 0
-  br i1 %cond45355, label %if.then7283, label %if.else7284
+  %orval46149 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond46150 = icmp ne i32 %orval46149, 0
+  br i1 %cond46150, label %if.then7426, label %if.else7427
 
-if.then7286:                                      ; preds = %or.merge3
-  ret ptr @.strlit45371
+if.then7429:                                      ; preds = %or.merge3
+  ret ptr @.strlit46166
 
-if.else7287:                                      ; preds = %or.merge3
-  br label %if.end7288
+if.else7430:                                      ; preds = %or.merge3
+  br label %if.end7431
 
-if.end7288:                                       ; preds = %if.else7287
-  %load45372 = load ptr, ptr %arg, align 8
-  %strcmp45374 = call i32 @strcmp(ptr %load45372, ptr @.strlit45373)
-  %cmp45375 = icmp eq i32 %strcmp45374, 0
-  %bool45376 = zext i1 %cmp45375 to i32
-  %cond45377 = icmp ne i32 %bool45376, 0
-  br i1 %cond45377, label %or.true4, label %or.rhs5
+if.end7431:                                       ; preds = %if.else7430
+  %load46167 = load ptr, ptr %arg, align 8
+  %strcmp46169 = call i32 @strcmp(ptr %load46167, ptr @.strlit46168)
+  %cmp46170 = icmp eq i32 %strcmp46169, 0
+  %bool46171 = zext i1 %cmp46170 to i32
+  %cond46172 = icmp ne i32 %bool46171, 0
+  br i1 %cond46172, label %or.true4, label %or.rhs5
 
-or.true1:                                         ; preds = %or.rhs2, %if.end7285
+or.true1:                                         ; preds = %or.rhs2, %if.end7428
   br label %or.merge3
 
-or.rhs2:                                          ; preds = %if.end7285
-  %load45363 = load ptr, ptr %arg, align 8
-  %strcmp45365 = call i32 @strcmp(ptr %load45363, ptr @.strlit45364)
-  %cmp45366 = icmp eq i32 %strcmp45365, 0
-  %bool45367 = zext i1 %cmp45366 to i32
-  %cond45368 = icmp ne i32 %bool45367, 0
-  br i1 %cond45368, label %or.true1, label %or.merge3
+or.rhs2:                                          ; preds = %if.end7428
+  %load46158 = load ptr, ptr %arg, align 8
+  %strcmp46160 = call i32 @strcmp(ptr %load46158, ptr @.strlit46159)
+  %cmp46161 = icmp eq i32 %strcmp46160, 0
+  %bool46162 = zext i1 %cmp46161 to i32
+  %cond46163 = icmp ne i32 %bool46162, 0
+  br i1 %cond46163, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval45369 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond45370 = icmp ne i32 %orval45369, 0
-  br i1 %cond45370, label %if.then7286, label %if.else7287
+  %orval46164 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond46165 = icmp ne i32 %orval46164, 0
+  br i1 %cond46165, label %if.then7429, label %if.else7430
 
-if.then7289:                                      ; preds = %or.merge36
-  %load45466 = load ptr, ptr %arg, align 8
-  ret ptr %load45466
+if.then7432:                                      ; preds = %or.merge36
+  %load46261 = load ptr, ptr %arg, align 8
+  ret ptr %load46261
 
-if.else7290:                                      ; preds = %or.merge36
-  br label %if.end7291
+if.else7433:                                      ; preds = %or.merge36
+  br label %if.end7434
 
-if.end7291:                                       ; preds = %if.else7290
+if.end7434:                                       ; preds = %if.else7433
   ret ptr null
 
-or.true4:                                         ; preds = %or.rhs5, %if.end7288
+or.true4:                                         ; preds = %or.rhs5, %if.end7431
   br label %or.merge6
 
-or.rhs5:                                          ; preds = %if.end7288
-  %load45378 = load ptr, ptr %arg, align 8
-  %strcmp45380 = call i32 @strcmp(ptr %load45378, ptr @.strlit45379)
-  %cmp45381 = icmp eq i32 %strcmp45380, 0
-  %bool45382 = zext i1 %cmp45381 to i32
-  %cond45383 = icmp ne i32 %bool45382, 0
-  br i1 %cond45383, label %or.true4, label %or.merge6
+or.rhs5:                                          ; preds = %if.end7431
+  %load46173 = load ptr, ptr %arg, align 8
+  %strcmp46175 = call i32 @strcmp(ptr %load46173, ptr @.strlit46174)
+  %cmp46176 = icmp eq i32 %strcmp46175, 0
+  %bool46177 = zext i1 %cmp46176 to i32
+  %cond46178 = icmp ne i32 %bool46177, 0
+  br i1 %cond46178, label %or.true4, label %or.merge6
 
 or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval45384 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond45385 = icmp ne i32 %orval45384, 0
-  br i1 %cond45385, label %or.true7, label %or.rhs8
+  %orval46179 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond46180 = icmp ne i32 %orval46179, 0
+  br i1 %cond46180, label %or.true7, label %or.rhs8
 
 or.true7:                                         ; preds = %or.rhs8, %or.merge6
   br label %or.merge9
 
 or.rhs8:                                          ; preds = %or.merge6
-  %load45386 = load ptr, ptr %arg, align 8
-  %strcmp45388 = call i32 @strcmp(ptr %load45386, ptr @.strlit45387)
-  %cmp45389 = icmp eq i32 %strcmp45388, 0
-  %bool45390 = zext i1 %cmp45389 to i32
-  %cond45391 = icmp ne i32 %bool45390, 0
-  br i1 %cond45391, label %or.true7, label %or.merge9
+  %load46181 = load ptr, ptr %arg, align 8
+  %strcmp46183 = call i32 @strcmp(ptr %load46181, ptr @.strlit46182)
+  %cmp46184 = icmp eq i32 %strcmp46183, 0
+  %bool46185 = zext i1 %cmp46184 to i32
+  %cond46186 = icmp ne i32 %bool46185, 0
+  br i1 %cond46186, label %or.true7, label %or.merge9
 
 or.merge9:                                        ; preds = %or.true7, %or.rhs8
-  %orval45392 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
-  %cond45393 = icmp ne i32 %orval45392, 0
-  br i1 %cond45393, label %or.true10, label %or.rhs11
+  %orval46187 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
+  %cond46188 = icmp ne i32 %orval46187, 0
+  br i1 %cond46188, label %or.true10, label %or.rhs11
 
 or.true10:                                        ; preds = %or.rhs11, %or.merge9
   br label %or.merge12
 
 or.rhs11:                                         ; preds = %or.merge9
-  %load45394 = load ptr, ptr %arg, align 8
-  %strcmp45396 = call i32 @strcmp(ptr %load45394, ptr @.strlit45395)
-  %cmp45397 = icmp eq i32 %strcmp45396, 0
-  %bool45398 = zext i1 %cmp45397 to i32
-  %cond45399 = icmp ne i32 %bool45398, 0
-  br i1 %cond45399, label %or.true10, label %or.merge12
+  %load46189 = load ptr, ptr %arg, align 8
+  %strcmp46191 = call i32 @strcmp(ptr %load46189, ptr @.strlit46190)
+  %cmp46192 = icmp eq i32 %strcmp46191, 0
+  %bool46193 = zext i1 %cmp46192 to i32
+  %cond46194 = icmp ne i32 %bool46193, 0
+  br i1 %cond46194, label %or.true10, label %or.merge12
 
 or.merge12:                                       ; preds = %or.true10, %or.rhs11
-  %orval45400 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
-  %cond45401 = icmp ne i32 %orval45400, 0
-  br i1 %cond45401, label %or.true13, label %or.rhs14
+  %orval46195 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
+  %cond46196 = icmp ne i32 %orval46195, 0
+  br i1 %cond46196, label %or.true13, label %or.rhs14
 
 or.true13:                                        ; preds = %or.rhs14, %or.merge12
   br label %or.merge15
 
 or.rhs14:                                         ; preds = %or.merge12
-  %load45402 = load ptr, ptr %arg, align 8
-  %strcmp45404 = call i32 @strcmp(ptr %load45402, ptr @.strlit45403)
-  %cmp45405 = icmp eq i32 %strcmp45404, 0
-  %bool45406 = zext i1 %cmp45405 to i32
-  %cond45407 = icmp ne i32 %bool45406, 0
-  br i1 %cond45407, label %or.true13, label %or.merge15
+  %load46197 = load ptr, ptr %arg, align 8
+  %strcmp46199 = call i32 @strcmp(ptr %load46197, ptr @.strlit46198)
+  %cmp46200 = icmp eq i32 %strcmp46199, 0
+  %bool46201 = zext i1 %cmp46200 to i32
+  %cond46202 = icmp ne i32 %bool46201, 0
+  br i1 %cond46202, label %or.true13, label %or.merge15
 
 or.merge15:                                       ; preds = %or.true13, %or.rhs14
-  %orval45408 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
-  %cond45409 = icmp ne i32 %orval45408, 0
-  br i1 %cond45409, label %or.true16, label %or.rhs17
+  %orval46203 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
+  %cond46204 = icmp ne i32 %orval46203, 0
+  br i1 %cond46204, label %or.true16, label %or.rhs17
 
 or.true16:                                        ; preds = %or.rhs17, %or.merge15
   br label %or.merge18
 
 or.rhs17:                                         ; preds = %or.merge15
-  %load45410 = load ptr, ptr %arg, align 8
-  %strcmp45412 = call i32 @strcmp(ptr %load45410, ptr @.strlit45411)
-  %cmp45413 = icmp eq i32 %strcmp45412, 0
-  %bool45414 = zext i1 %cmp45413 to i32
-  %cond45415 = icmp ne i32 %bool45414, 0
-  br i1 %cond45415, label %or.true16, label %or.merge18
+  %load46205 = load ptr, ptr %arg, align 8
+  %strcmp46207 = call i32 @strcmp(ptr %load46205, ptr @.strlit46206)
+  %cmp46208 = icmp eq i32 %strcmp46207, 0
+  %bool46209 = zext i1 %cmp46208 to i32
+  %cond46210 = icmp ne i32 %bool46209, 0
+  br i1 %cond46210, label %or.true16, label %or.merge18
 
 or.merge18:                                       ; preds = %or.true16, %or.rhs17
-  %orval45416 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
-  %cond45417 = icmp ne i32 %orval45416, 0
-  br i1 %cond45417, label %or.true19, label %or.rhs20
+  %orval46211 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
+  %cond46212 = icmp ne i32 %orval46211, 0
+  br i1 %cond46212, label %or.true19, label %or.rhs20
 
 or.true19:                                        ; preds = %or.rhs20, %or.merge18
   br label %or.merge21
 
 or.rhs20:                                         ; preds = %or.merge18
-  %load45418 = load ptr, ptr %arg, align 8
-  %strcmp45420 = call i32 @strcmp(ptr %load45418, ptr @.strlit45419)
-  %cmp45421 = icmp eq i32 %strcmp45420, 0
-  %bool45422 = zext i1 %cmp45421 to i32
-  %cond45423 = icmp ne i32 %bool45422, 0
-  br i1 %cond45423, label %or.true19, label %or.merge21
+  %load46213 = load ptr, ptr %arg, align 8
+  %strcmp46215 = call i32 @strcmp(ptr %load46213, ptr @.strlit46214)
+  %cmp46216 = icmp eq i32 %strcmp46215, 0
+  %bool46217 = zext i1 %cmp46216 to i32
+  %cond46218 = icmp ne i32 %bool46217, 0
+  br i1 %cond46218, label %or.true19, label %or.merge21
 
 or.merge21:                                       ; preds = %or.true19, %or.rhs20
-  %orval45424 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
-  %cond45425 = icmp ne i32 %orval45424, 0
-  br i1 %cond45425, label %or.true22, label %or.rhs23
+  %orval46219 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
+  %cond46220 = icmp ne i32 %orval46219, 0
+  br i1 %cond46220, label %or.true22, label %or.rhs23
 
 or.true22:                                        ; preds = %or.rhs23, %or.merge21
   br label %or.merge24
 
 or.rhs23:                                         ; preds = %or.merge21
-  %load45426 = load ptr, ptr %arg, align 8
-  %strcmp45428 = call i32 @strcmp(ptr %load45426, ptr @.strlit45427)
-  %cmp45429 = icmp eq i32 %strcmp45428, 0
-  %bool45430 = zext i1 %cmp45429 to i32
-  %cond45431 = icmp ne i32 %bool45430, 0
-  br i1 %cond45431, label %or.true22, label %or.merge24
+  %load46221 = load ptr, ptr %arg, align 8
+  %strcmp46223 = call i32 @strcmp(ptr %load46221, ptr @.strlit46222)
+  %cmp46224 = icmp eq i32 %strcmp46223, 0
+  %bool46225 = zext i1 %cmp46224 to i32
+  %cond46226 = icmp ne i32 %bool46225, 0
+  br i1 %cond46226, label %or.true22, label %or.merge24
 
 or.merge24:                                       ; preds = %or.true22, %or.rhs23
-  %orval45432 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
-  %cond45433 = icmp ne i32 %orval45432, 0
-  br i1 %cond45433, label %or.true25, label %or.rhs26
+  %orval46227 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
+  %cond46228 = icmp ne i32 %orval46227, 0
+  br i1 %cond46228, label %or.true25, label %or.rhs26
 
 or.true25:                                        ; preds = %or.rhs26, %or.merge24
   br label %or.merge27
 
 or.rhs26:                                         ; preds = %or.merge24
-  %load45434 = load ptr, ptr %arg, align 8
-  %strcmp45436 = call i32 @strcmp(ptr %load45434, ptr @.strlit45435)
-  %cmp45437 = icmp eq i32 %strcmp45436, 0
-  %bool45438 = zext i1 %cmp45437 to i32
-  %cond45439 = icmp ne i32 %bool45438, 0
-  br i1 %cond45439, label %or.true25, label %or.merge27
+  %load46229 = load ptr, ptr %arg, align 8
+  %strcmp46231 = call i32 @strcmp(ptr %load46229, ptr @.strlit46230)
+  %cmp46232 = icmp eq i32 %strcmp46231, 0
+  %bool46233 = zext i1 %cmp46232 to i32
+  %cond46234 = icmp ne i32 %bool46233, 0
+  br i1 %cond46234, label %or.true25, label %or.merge27
 
 or.merge27:                                       ; preds = %or.true25, %or.rhs26
-  %orval45440 = phi i32 [ 1, %or.true25 ], [ 0, %or.rhs26 ]
-  %cond45441 = icmp ne i32 %orval45440, 0
-  br i1 %cond45441, label %or.true28, label %or.rhs29
+  %orval46235 = phi i32 [ 1, %or.true25 ], [ 0, %or.rhs26 ]
+  %cond46236 = icmp ne i32 %orval46235, 0
+  br i1 %cond46236, label %or.true28, label %or.rhs29
 
 or.true28:                                        ; preds = %or.rhs29, %or.merge27
   br label %or.merge30
 
 or.rhs29:                                         ; preds = %or.merge27
-  %load45442 = load ptr, ptr %arg, align 8
-  %strcmp45444 = call i32 @strcmp(ptr %load45442, ptr @.strlit45443)
-  %cmp45445 = icmp eq i32 %strcmp45444, 0
-  %bool45446 = zext i1 %cmp45445 to i32
-  %cond45447 = icmp ne i32 %bool45446, 0
-  br i1 %cond45447, label %or.true28, label %or.merge30
+  %load46237 = load ptr, ptr %arg, align 8
+  %strcmp46239 = call i32 @strcmp(ptr %load46237, ptr @.strlit46238)
+  %cmp46240 = icmp eq i32 %strcmp46239, 0
+  %bool46241 = zext i1 %cmp46240 to i32
+  %cond46242 = icmp ne i32 %bool46241, 0
+  br i1 %cond46242, label %or.true28, label %or.merge30
 
 or.merge30:                                       ; preds = %or.true28, %or.rhs29
-  %orval45448 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
-  %cond45449 = icmp ne i32 %orval45448, 0
-  br i1 %cond45449, label %or.true31, label %or.rhs32
+  %orval46243 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
+  %cond46244 = icmp ne i32 %orval46243, 0
+  br i1 %cond46244, label %or.true31, label %or.rhs32
 
 or.true31:                                        ; preds = %or.rhs32, %or.merge30
   br label %or.merge33
 
 or.rhs32:                                         ; preds = %or.merge30
-  %load45450 = load ptr, ptr %arg, align 8
-  %strcmp45452 = call i32 @strcmp(ptr %load45450, ptr @.strlit45451)
-  %cmp45453 = icmp eq i32 %strcmp45452, 0
-  %bool45454 = zext i1 %cmp45453 to i32
-  %cond45455 = icmp ne i32 %bool45454, 0
-  br i1 %cond45455, label %or.true31, label %or.merge33
+  %load46245 = load ptr, ptr %arg, align 8
+  %strcmp46247 = call i32 @strcmp(ptr %load46245, ptr @.strlit46246)
+  %cmp46248 = icmp eq i32 %strcmp46247, 0
+  %bool46249 = zext i1 %cmp46248 to i32
+  %cond46250 = icmp ne i32 %bool46249, 0
+  br i1 %cond46250, label %or.true31, label %or.merge33
 
 or.merge33:                                       ; preds = %or.true31, %or.rhs32
-  %orval45456 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
-  %cond45457 = icmp ne i32 %orval45456, 0
-  br i1 %cond45457, label %or.true34, label %or.rhs35
+  %orval46251 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
+  %cond46252 = icmp ne i32 %orval46251, 0
+  br i1 %cond46252, label %or.true34, label %or.rhs35
 
 or.true34:                                        ; preds = %or.rhs35, %or.merge33
   br label %or.merge36
 
 or.rhs35:                                         ; preds = %or.merge33
-  %load45458 = load ptr, ptr %arg, align 8
-  %strcmp45460 = call i32 @strcmp(ptr %load45458, ptr @.strlit45459)
-  %cmp45461 = icmp eq i32 %strcmp45460, 0
-  %bool45462 = zext i1 %cmp45461 to i32
-  %cond45463 = icmp ne i32 %bool45462, 0
-  br i1 %cond45463, label %or.true34, label %or.merge36
+  %load46253 = load ptr, ptr %arg, align 8
+  %strcmp46255 = call i32 @strcmp(ptr %load46253, ptr @.strlit46254)
+  %cmp46256 = icmp eq i32 %strcmp46255, 0
+  %bool46257 = zext i1 %cmp46256 to i32
+  %cond46258 = icmp ne i32 %bool46257, 0
+  br i1 %cond46258, label %or.true34, label %or.merge36
 
 or.merge36:                                       ; preds = %or.true34, %or.rhs35
-  %orval45464 = phi i32 [ 1, %or.true34 ], [ 0, %or.rhs35 ]
-  %cond45465 = icmp ne i32 %orval45464, 0
-  br i1 %cond45465, label %if.then7289, label %if.else7290
+  %orval46259 = phi i32 [ 1, %or.true34 ], [ 0, %or.rhs35 ]
+  %cond46260 = icmp ne i32 %orval46259, 0
+  br i1 %cond46260, label %if.then7432, label %if.else7433
 }
 
 define ptr @strip_vix_ext(ptr %0) {
 entry:
   %name = alloca ptr, align 8
   store ptr %0, ptr %name, align 8
-  %load45467 = load ptr, ptr %name, align 8
-  %call45469 = call i32 @string_ends_with(ptr %load45467, ptr @.strlit45468)
-  %cmp45470 = icmp eq i32 %call45469, 1
-  %bool45471 = zext i1 %cmp45470 to i32
-  %cond45472 = icmp ne i32 %bool45471, 0
-  br i1 %cond45472, label %if.then7292, label %if.else7293
+  %load46262 = load ptr, ptr %name, align 8
+  %call46264 = call i32 @string_ends_with(ptr %load46262, ptr @.strlit46263)
+  %cmp46265 = icmp eq i32 %call46264, 1
+  %bool46266 = zext i1 %cmp46265 to i32
+  %cond46267 = icmp ne i32 %bool46266, 0
+  br i1 %cond46267, label %if.then7435, label %if.else7436
 
-if.then7292:                                      ; preds = %entry
+if.then7435:                                      ; preds = %entry
   %out = alloca ptr, align 8
-  store ptr @.strlit45473, ptr %out, align 8
-  %load45474 = load ptr, ptr %name, align 8
-  %strlen45475 = call i32 @strlen(ptr %load45474)
-  %sub45476 = sub i32 %strlen45475, 4
+  store ptr @.strlit46268, ptr %out, align 8
+  %load46269 = load ptr, ptr %name, align 8
+  %strlen46270 = call i32 @strlen(ptr %load46269)
+  %sub46271 = sub i32 %strlen46270, 4
   %end = alloca i32, align 4
-  store i32 %sub45476, ptr %end, align 4
-  %load45477 = load i32, ptr %end, align 4
+  store i32 %sub46271, ptr %end, align 4
+  %load46272 = load i32, ptr %end, align 4
   %i = alloca i32, align 4
   store i32 0, ptr %i, align 4
-  %__for_end_i7299 = alloca i32, align 4
-  store i32 %load45477, ptr %__for_end_i7299, align 4
-  br label %for.cond7295
+  %__for_end_i7442 = alloca i32, align 4
+  store i32 %load46272, ptr %__for_end_i7442, align 4
+  br label %for.cond7438
 
-if.else7293:                                      ; preds = %entry
-  br label %if.end7294
+if.else7436:                                      ; preds = %entry
+  br label %if.end7437
 
-if.end7294:                                       ; preds = %if.else7293
-  %load45494 = load ptr, ptr %name, align 8
-  ret ptr %load45494
+if.end7437:                                       ; preds = %if.else7436
+  %load46289 = load ptr, ptr %name, align 8
+  ret ptr %load46289
 
-for.cond7295:                                     ; preds = %for.step7297, %if.then7292
-  %load45478 = load i32, ptr %i, align 4
-  %load45479 = load i32, ptr %__for_end_i7299, align 4
-  %cmp45480 = icmp slt i32 %load45478, %load45479
-  %bool45481 = zext i1 %cmp45480 to i32
-  %cond45482 = icmp ne i32 %bool45481, 0
-  br i1 %cond45482, label %for.body7296, label %for.end7298
+for.cond7438:                                     ; preds = %for.step7440, %if.then7435
+  %load46273 = load i32, ptr %i, align 4
+  %load46274 = load i32, ptr %__for_end_i7442, align 4
+  %cmp46275 = icmp slt i32 %load46273, %load46274
+  %bool46276 = zext i1 %cmp46275 to i32
+  %cond46277 = icmp ne i32 %bool46276, 0
+  br i1 %cond46277, label %for.body7439, label %for.end7441
 
-for.body7296:                                     ; preds = %for.cond7295
-  %load45483 = load ptr, ptr %out, align 8
-  %load45484 = load ptr, ptr %name, align 8
-  %load45485 = load i32, ptr %i, align 4
-  %sidx45486 = getelementptr i8, ptr %load45484, i32 %load45485
-  %sbyte45487 = load i8, ptr %sidx45486, align 1
-  %schar45488 = zext i8 %sbyte45487 to i32
-  %call45489 = call ptr @char_string(i32 %schar45488)
-  %call45490 = call ptr @vix_string_concat(ptr %load45483, ptr %call45489)
-  store ptr %call45490, ptr %out, align 8
-  br label %for.step7297
+for.body7439:                                     ; preds = %for.cond7438
+  %load46278 = load ptr, ptr %out, align 8
+  %load46279 = load ptr, ptr %name, align 8
+  %load46280 = load i32, ptr %i, align 4
+  %sidx46281 = getelementptr i8, ptr %load46279, i32 %load46280
+  %sbyte46282 = load i8, ptr %sidx46281, align 1
+  %schar46283 = zext i8 %sbyte46282 to i32
+  %call46284 = call ptr @char_string(i32 %schar46283)
+  %call46285 = call ptr @vix_string_concat(ptr %load46278, ptr %call46284)
+  store ptr %call46285, ptr %out, align 8
+  br label %for.step7440
 
-for.step7297:                                     ; preds = %for.body7296
-  %load45491 = load i32, ptr %i, align 4
-  %add45492 = add i32 %load45491, 1
-  store i32 %add45492, ptr %i, align 4
-  br label %for.cond7295
+for.step7440:                                     ; preds = %for.body7439
+  %load46286 = load i32, ptr %i, align 4
+  %add46287 = add i32 %load46286, 1
+  store i32 %add46287, ptr %i, align 4
+  br label %for.cond7438
 
-for.end7298:                                      ; preds = %for.cond7295
-  %load45493 = load ptr, ptr %out, align 8
-  ret ptr %load45493
+for.end7441:                                      ; preds = %for.cond7438
+  %load46288 = load ptr, ptr %out, align 8
+  ret ptr %load46288
 }
 
 define i32 @find_last_char(ptr %0, i8 %1) {
@@ -86339,55 +87889,55 @@ entry:
   store i8 %1, ptr %needle, align 1
   %found = alloca i32, align 4
   store i32 -1, ptr %found, align 4
-  %load45496 = load ptr, ptr %text, align 8
-  %strlen45497 = call i32 @strlen(ptr %load45496)
+  %load46291 = load ptr, ptr %text, align 8
+  %strlen46292 = call i32 @strlen(ptr %load46291)
   %i = alloca i32, align 4
   store i32 0, ptr %i, align 4
-  %__for_end_i7304 = alloca i32, align 4
-  store i32 %strlen45497, ptr %__for_end_i7304, align 4
-  br label %for.cond7300
+  %__for_end_i7447 = alloca i32, align 4
+  store i32 %strlen46292, ptr %__for_end_i7447, align 4
+  br label %for.cond7443
 
-for.cond7300:                                     ; preds = %for.step7302, %entry
-  %load45498 = load i32, ptr %i, align 4
-  %load45499 = load i32, ptr %__for_end_i7304, align 4
-  %cmp45500 = icmp slt i32 %load45498, %load45499
-  %bool45501 = zext i1 %cmp45500 to i32
-  %cond45502 = icmp ne i32 %bool45501, 0
-  br i1 %cond45502, label %for.body7301, label %for.end7303
+for.cond7443:                                     ; preds = %for.step7445, %entry
+  %load46293 = load i32, ptr %i, align 4
+  %load46294 = load i32, ptr %__for_end_i7447, align 4
+  %cmp46295 = icmp slt i32 %load46293, %load46294
+  %bool46296 = zext i1 %cmp46295 to i32
+  %cond46297 = icmp ne i32 %bool46296, 0
+  br i1 %cond46297, label %for.body7444, label %for.end7446
 
-for.body7301:                                     ; preds = %for.cond7300
-  %load45503 = load ptr, ptr %text, align 8
-  %load45504 = load i32, ptr %i, align 4
-  %sidx45505 = getelementptr i8, ptr %load45503, i32 %load45504
-  %sbyte45506 = load i8, ptr %sidx45505, align 1
-  %schar45507 = zext i8 %sbyte45506 to i32
-  %load45508 = load i8, ptr %needle, align 1
-  %zext45509 = zext i8 %load45508 to i32
-  %cmp45510 = icmp eq i32 %schar45507, %zext45509
-  %bool45511 = zext i1 %cmp45510 to i32
-  %cond45512 = icmp ne i32 %bool45511, 0
-  br i1 %cond45512, label %if.then7305, label %if.else7306
+for.body7444:                                     ; preds = %for.cond7443
+  %load46298 = load ptr, ptr %text, align 8
+  %load46299 = load i32, ptr %i, align 4
+  %sidx46300 = getelementptr i8, ptr %load46298, i32 %load46299
+  %sbyte46301 = load i8, ptr %sidx46300, align 1
+  %schar46302 = zext i8 %sbyte46301 to i32
+  %load46303 = load i8, ptr %needle, align 1
+  %zext46304 = zext i8 %load46303 to i32
+  %cmp46305 = icmp eq i32 %schar46302, %zext46304
+  %bool46306 = zext i1 %cmp46305 to i32
+  %cond46307 = icmp ne i32 %bool46306, 0
+  br i1 %cond46307, label %if.then7448, label %if.else7449
 
-for.step7302:                                     ; preds = %if.end7307
-  %load45514 = load i32, ptr %i, align 4
-  %add45515 = add i32 %load45514, 1
-  store i32 %add45515, ptr %i, align 4
-  br label %for.cond7300
+for.step7445:                                     ; preds = %if.end7450
+  %load46309 = load i32, ptr %i, align 4
+  %add46310 = add i32 %load46309, 1
+  store i32 %add46310, ptr %i, align 4
+  br label %for.cond7443
 
-for.end7303:                                      ; preds = %for.cond7300
-  %load45516 = load i32, ptr %found, align 4
-  ret i32 %load45516
+for.end7446:                                      ; preds = %for.cond7443
+  %load46311 = load i32, ptr %found, align 4
+  ret i32 %load46311
 
-if.then7305:                                      ; preds = %for.body7301
-  %load45513 = load i32, ptr %i, align 4
-  store i32 %load45513, ptr %found, align 4
-  br label %if.end7307
+if.then7448:                                      ; preds = %for.body7444
+  %load46308 = load i32, ptr %i, align 4
+  store i32 %load46308, ptr %found, align 4
+  br label %if.end7450
 
-if.else7306:                                      ; preds = %for.body7301
-  br label %if.end7307
+if.else7449:                                      ; preds = %for.body7444
+  br label %if.end7450
 
-if.end7307:                                       ; preds = %if.else7306, %if.then7305
-  br label %for.step7302
+if.end7450:                                       ; preds = %if.else7449, %if.then7448
+  br label %for.step7445
 }
 
 define ptr @slice_string(ptr %0, i32 %1, i32 %2) {
@@ -86399,119 +87949,119 @@ entry:
   %end = alloca i32, align 4
   store i32 %2, ptr %end, align 4
   %out = alloca ptr, align 8
-  store ptr @.strlit45517, ptr %out, align 8
-  %load45518 = load i32, ptr %start, align 4
-  %load45519 = load i32, ptr %end, align 4
+  store ptr @.strlit46312, ptr %out, align 8
+  %load46313 = load i32, ptr %start, align 4
+  %load46314 = load i32, ptr %end, align 4
   %i = alloca i32, align 4
-  store i32 %load45518, ptr %i, align 4
-  %__for_end_i7312 = alloca i32, align 4
-  store i32 %load45519, ptr %__for_end_i7312, align 4
-  br label %for.cond7308
+  store i32 %load46313, ptr %i, align 4
+  %__for_end_i7455 = alloca i32, align 4
+  store i32 %load46314, ptr %__for_end_i7455, align 4
+  br label %for.cond7451
 
-for.cond7308:                                     ; preds = %for.step7310, %entry
-  %load45520 = load i32, ptr %i, align 4
-  %load45521 = load i32, ptr %__for_end_i7312, align 4
-  %cmp45522 = icmp slt i32 %load45520, %load45521
-  %bool45523 = zext i1 %cmp45522 to i32
-  %cond45524 = icmp ne i32 %bool45523, 0
-  br i1 %cond45524, label %for.body7309, label %for.end7311
+for.cond7451:                                     ; preds = %for.step7453, %entry
+  %load46315 = load i32, ptr %i, align 4
+  %load46316 = load i32, ptr %__for_end_i7455, align 4
+  %cmp46317 = icmp slt i32 %load46315, %load46316
+  %bool46318 = zext i1 %cmp46317 to i32
+  %cond46319 = icmp ne i32 %bool46318, 0
+  br i1 %cond46319, label %for.body7452, label %for.end7454
 
-for.body7309:                                     ; preds = %for.cond7308
-  %load45525 = load ptr, ptr %out, align 8
-  %load45526 = load ptr, ptr %text, align 8
-  %load45527 = load i32, ptr %i, align 4
-  %sidx45528 = getelementptr i8, ptr %load45526, i32 %load45527
-  %sbyte45529 = load i8, ptr %sidx45528, align 1
-  %schar45530 = zext i8 %sbyte45529 to i32
-  %call45531 = call ptr @char_string(i32 %schar45530)
-  %call45532 = call ptr @vix_string_concat(ptr %load45525, ptr %call45531)
-  store ptr %call45532, ptr %out, align 8
-  br label %for.step7310
+for.body7452:                                     ; preds = %for.cond7451
+  %load46320 = load ptr, ptr %out, align 8
+  %load46321 = load ptr, ptr %text, align 8
+  %load46322 = load i32, ptr %i, align 4
+  %sidx46323 = getelementptr i8, ptr %load46321, i32 %load46322
+  %sbyte46324 = load i8, ptr %sidx46323, align 1
+  %schar46325 = zext i8 %sbyte46324 to i32
+  %call46326 = call ptr @char_string(i32 %schar46325)
+  %call46327 = call ptr @vix_string_concat(ptr %load46320, ptr %call46326)
+  store ptr %call46327, ptr %out, align 8
+  br label %for.step7453
 
-for.step7310:                                     ; preds = %for.body7309
-  %load45533 = load i32, ptr %i, align 4
-  %add45534 = add i32 %load45533, 1
-  store i32 %add45534, ptr %i, align 4
-  br label %for.cond7308
+for.step7453:                                     ; preds = %for.body7452
+  %load46328 = load i32, ptr %i, align 4
+  %add46329 = add i32 %load46328, 1
+  store i32 %add46329, ptr %i, align 4
+  br label %for.cond7451
 
-for.end7311:                                      ; preds = %for.cond7308
-  %load45535 = load ptr, ptr %out, align 8
-  ret ptr %load45535
+for.end7454:                                      ; preds = %for.cond7451
+  %load46330 = load ptr, ptr %out, align 8
+  ret ptr %load46330
 }
 
 define ptr @dirname(ptr %0) {
 entry:
   %path = alloca ptr, align 8
   store ptr %0, ptr %path, align 8
-  %load45536 = load ptr, ptr %path, align 8
-  %call45537 = call i32 @find_last_char(ptr %load45536, i8 47)
+  %load46331 = load ptr, ptr %path, align 8
+  %call46332 = call i32 @find_last_char(ptr %load46331, i8 47)
   %slash = alloca i32, align 4
-  store i32 %call45537, ptr %slash, align 4
-  %load45538 = load i32, ptr %slash, align 4
-  %cmp45539 = icmp slt i32 %load45538, 0
-  %bool45540 = zext i1 %cmp45539 to i32
-  %cond45541 = icmp ne i32 %bool45540, 0
-  br i1 %cond45541, label %if.then7313, label %if.else7314
+  store i32 %call46332, ptr %slash, align 4
+  %load46333 = load i32, ptr %slash, align 4
+  %cmp46334 = icmp slt i32 %load46333, 0
+  %bool46335 = zext i1 %cmp46334 to i32
+  %cond46336 = icmp ne i32 %bool46335, 0
+  br i1 %cond46336, label %if.then7456, label %if.else7457
 
-if.then7313:                                      ; preds = %entry
-  ret ptr @.strlit45542
+if.then7456:                                      ; preds = %entry
+  ret ptr @.strlit46337
 
-if.else7314:                                      ; preds = %entry
-  br label %if.end7315
+if.else7457:                                      ; preds = %entry
+  br label %if.end7458
 
-if.end7315:                                       ; preds = %if.else7314
-  %load45543 = load i32, ptr %slash, align 4
-  %cmp45544 = icmp eq i32 %load45543, 0
-  %bool45545 = zext i1 %cmp45544 to i32
-  %cond45546 = icmp ne i32 %bool45545, 0
-  br i1 %cond45546, label %if.then7316, label %if.else7317
+if.end7458:                                       ; preds = %if.else7457
+  %load46338 = load i32, ptr %slash, align 4
+  %cmp46339 = icmp eq i32 %load46338, 0
+  %bool46340 = zext i1 %cmp46339 to i32
+  %cond46341 = icmp ne i32 %bool46340, 0
+  br i1 %cond46341, label %if.then7459, label %if.else7460
 
-if.then7316:                                      ; preds = %if.end7315
-  ret ptr @.strlit45547
+if.then7459:                                      ; preds = %if.end7458
+  ret ptr @.strlit46342
 
-if.else7317:                                      ; preds = %if.end7315
-  br label %if.end7318
+if.else7460:                                      ; preds = %if.end7458
+  br label %if.end7461
 
-if.end7318:                                       ; preds = %if.else7317
-  %load45548 = load ptr, ptr %path, align 8
-  %load45549 = load i32, ptr %slash, align 4
-  %call45550 = call ptr @slice_string(ptr %load45548, i32 0, i32 %load45549)
-  ret ptr %call45550
+if.end7461:                                       ; preds = %if.else7460
+  %load46343 = load ptr, ptr %path, align 8
+  %load46344 = load i32, ptr %slash, align 4
+  %call46345 = call ptr @slice_string(ptr %load46343, i32 0, i32 %load46344)
+  ret ptr %call46345
 }
 
 define ptr @runtime_object_path(ptr %0) {
 entry:
   %compiler_path = alloca ptr, align 8
   store ptr %0, ptr %compiler_path, align 8
-  %load45551 = load ptr, ptr %compiler_path, align 8
-  %call45552 = call ptr @vix_compiler_runtime_object_path(ptr %load45551)
-  ret ptr %call45552
+  %load46346 = load ptr, ptr %compiler_path, align 8
+  %call46347 = call ptr @vix_compiler_runtime_object_path(ptr %load46346)
+  ret ptr %call46347
 }
 
 define i32 @shell_command(ptr %0) {
 entry:
   %command = alloca ptr, align 8
   store ptr %0, ptr %command, align 8
-  %load45553 = load ptr, ptr %command, align 8
-  %call45554 = call i32 @system(ptr %load45553)
-  ret i32 %call45554
+  %load46348 = load ptr, ptr %command, align 8
+  %call46349 = call i32 @system(ptr %load46348)
+  ret i32 %call46349
 }
 
 define i32 @delete_file(ptr %0) {
 entry:
   %path = alloca ptr, align 8
   store ptr %0, ptr %path, align 8
-  %load45555 = load ptr, ptr %path, align 8
-  %call45556 = call i32 @remove(ptr %load45555)
-  ret i32 %call45556
+  %load46350 = load ptr, ptr %path, align 8
+  %call46351 = call i32 @remove(ptr %load46350)
+  ret i32 %call46351
 }
 
 define void @diag_print(ptr %0) {
 entry:
   %text = alloca ptr, align 8
   store ptr %0, ptr %text, align 8
-  %load45557 = load ptr, ptr %text, align 8
-  call void @vix_print_stderr(ptr %load45557)
+  %load46352 = load ptr, ptr %text, align 8
+  call void @vix_print_stderr(ptr %load46352)
   ret void
 }
 
@@ -86519,8 +88069,8 @@ define void @info_print(ptr %0) {
 entry:
   %text = alloca ptr, align 8
   store ptr %0, ptr %text, align 8
-  %load45558 = load ptr, ptr %text, align 8
-  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load45558)
+  %load46353 = load ptr, ptr %text, align 8
+  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46353)
   ret void
 }
 
@@ -86530,27 +88080,27 @@ entry:
   store ptr %0, ptr %filename, align 8
   %output = alloca ptr, align 8
   store ptr %1, ptr %output, align 8
-  %load45559 = load ptr, ptr %output, align 8
-  %strcmp45561 = call i32 @strcmp(ptr %load45559, ptr @.strlit45560)
-  %cmp45562 = icmp eq i32 %strcmp45561, 0
-  %bool45563 = zext i1 %cmp45562 to i32
-  %cmp45564 = icmp eq i32 %bool45563, 0
-  %bool45565 = zext i1 %cmp45564 to i32
-  %cond45566 = icmp ne i32 %bool45565, 0
-  br i1 %cond45566, label %if.then7319, label %if.else7320
+  %load46354 = load ptr, ptr %output, align 8
+  %strcmp46356 = call i32 @strcmp(ptr %load46354, ptr @.strlit46355)
+  %cmp46357 = icmp eq i32 %strcmp46356, 0
+  %bool46358 = zext i1 %cmp46357 to i32
+  %cmp46359 = icmp eq i32 %bool46358, 0
+  %bool46360 = zext i1 %cmp46359 to i32
+  %cond46361 = icmp ne i32 %bool46360, 0
+  br i1 %cond46361, label %if.then7462, label %if.else7463
 
-if.then7319:                                      ; preds = %entry
-  %load45567 = load ptr, ptr %output, align 8
-  ret ptr %load45567
+if.then7462:                                      ; preds = %entry
+  %load46362 = load ptr, ptr %output, align 8
+  ret ptr %load46362
 
-if.else7320:                                      ; preds = %entry
-  br label %if.end7321
+if.else7463:                                      ; preds = %entry
+  br label %if.end7464
 
-if.end7321:                                       ; preds = %if.else7320
-  %load45568 = load ptr, ptr %filename, align 8
-  %call45569 = call ptr @strip_vix_ext(ptr %load45568)
-  %call45571 = call ptr @vix_string_concat(ptr %call45569, ptr @.strlit45570)
-  ret ptr %call45571
+if.end7464:                                       ; preds = %if.else7463
+  %load46363 = load ptr, ptr %filename, align 8
+  %call46364 = call ptr @strip_vix_ext(ptr %load46363)
+  %call46366 = call ptr @vix_string_concat(ptr %call46364, ptr @.strlit46365)
+  ret ptr %call46366
 }
 
 define ptr @artifact_output_path(ptr %0, ptr %1, ptr %2) {
@@ -86561,94 +88111,94 @@ entry:
   store ptr %1, ptr %output, align 8
   %emit = alloca ptr, align 8
   store ptr %2, ptr %emit, align 8
-  %load45572 = load ptr, ptr %output, align 8
-  %strcmp45574 = call i32 @strcmp(ptr %load45572, ptr @.strlit45573)
-  %cmp45575 = icmp eq i32 %strcmp45574, 0
-  %bool45576 = zext i1 %cmp45575 to i32
-  %cmp45577 = icmp eq i32 %bool45576, 0
-  %bool45578 = zext i1 %cmp45577 to i32
-  %cond45579 = icmp ne i32 %bool45578, 0
-  br i1 %cond45579, label %if.then7322, label %if.else7323
+  %load46367 = load ptr, ptr %output, align 8
+  %strcmp46369 = call i32 @strcmp(ptr %load46367, ptr @.strlit46368)
+  %cmp46370 = icmp eq i32 %strcmp46369, 0
+  %bool46371 = zext i1 %cmp46370 to i32
+  %cmp46372 = icmp eq i32 %bool46371, 0
+  %bool46373 = zext i1 %cmp46372 to i32
+  %cond46374 = icmp ne i32 %bool46373, 0
+  br i1 %cond46374, label %if.then7465, label %if.else7466
 
-if.then7322:                                      ; preds = %entry
-  %load45580 = load ptr, ptr %output, align 8
-  ret ptr %load45580
+if.then7465:                                      ; preds = %entry
+  %load46375 = load ptr, ptr %output, align 8
+  ret ptr %load46375
 
-if.else7323:                                      ; preds = %entry
-  br label %if.end7324
+if.else7466:                                      ; preds = %entry
+  br label %if.end7467
 
-if.end7324:                                       ; preds = %if.else7323
-  %load45581 = load ptr, ptr %filename, align 8
-  %call45582 = call ptr @strip_vix_ext(ptr %load45581)
+if.end7467:                                       ; preds = %if.else7466
+  %load46376 = load ptr, ptr %filename, align 8
+  %call46377 = call ptr @strip_vix_ext(ptr %load46376)
   %base = alloca ptr, align 8
-  store ptr %call45582, ptr %base, align 8
-  %load45583 = load ptr, ptr %emit, align 8
-  %strcmp45585 = call i32 @strcmp(ptr %load45583, ptr @.strlit45584)
-  %cmp45586 = icmp eq i32 %strcmp45585, 0
-  %bool45587 = zext i1 %cmp45586 to i32
-  %cond45588 = icmp ne i32 %bool45587, 0
-  br i1 %cond45588, label %if.then7325, label %if.else7326
+  store ptr %call46377, ptr %base, align 8
+  %load46378 = load ptr, ptr %emit, align 8
+  %strcmp46380 = call i32 @strcmp(ptr %load46378, ptr @.strlit46379)
+  %cmp46381 = icmp eq i32 %strcmp46380, 0
+  %bool46382 = zext i1 %cmp46381 to i32
+  %cond46383 = icmp ne i32 %bool46382, 0
+  br i1 %cond46383, label %if.then7468, label %if.else7469
 
-if.then7325:                                      ; preds = %if.end7324
-  %load45589 = load ptr, ptr %base, align 8
-  ret ptr %load45589
+if.then7468:                                      ; preds = %if.end7467
+  %load46384 = load ptr, ptr %base, align 8
+  ret ptr %load46384
 
-if.else7326:                                      ; preds = %if.end7324
-  br label %if.end7327
+if.else7469:                                      ; preds = %if.end7467
+  br label %if.end7470
 
-if.end7327:                                       ; preds = %if.else7326
-  %load45590 = load ptr, ptr %emit, align 8
-  %strcmp45592 = call i32 @strcmp(ptr %load45590, ptr @.strlit45591)
-  %cmp45593 = icmp eq i32 %strcmp45592, 0
-  %bool45594 = zext i1 %cmp45593 to i32
-  %cond45595 = icmp ne i32 %bool45594, 0
-  br i1 %cond45595, label %if.then7328, label %if.else7329
+if.end7470:                                       ; preds = %if.else7469
+  %load46385 = load ptr, ptr %emit, align 8
+  %strcmp46387 = call i32 @strcmp(ptr %load46385, ptr @.strlit46386)
+  %cmp46388 = icmp eq i32 %strcmp46387, 0
+  %bool46389 = zext i1 %cmp46388 to i32
+  %cond46390 = icmp ne i32 %bool46389, 0
+  br i1 %cond46390, label %if.then7471, label %if.else7472
 
-if.then7328:                                      ; preds = %if.end7327
-  %load45596 = load ptr, ptr %base, align 8
-  %call45598 = call ptr @vix_string_concat(ptr %load45596, ptr @.strlit45597)
-  ret ptr %call45598
+if.then7471:                                      ; preds = %if.end7470
+  %load46391 = load ptr, ptr %base, align 8
+  %call46393 = call ptr @vix_string_concat(ptr %load46391, ptr @.strlit46392)
+  ret ptr %call46393
 
-if.else7329:                                      ; preds = %if.end7327
-  br label %if.end7330
+if.else7472:                                      ; preds = %if.end7470
+  br label %if.end7473
 
-if.end7330:                                       ; preds = %if.else7329
-  %load45599 = load ptr, ptr %base, align 8
-  %call45601 = call ptr @vix_string_concat(ptr %load45599, ptr @.strlit45600)
-  ret ptr %call45601
+if.end7473:                                       ; preds = %if.else7472
+  %load46394 = load ptr, ptr %base, align 8
+  %call46396 = call ptr @vix_string_concat(ptr %load46394, ptr @.strlit46395)
+  ret ptr %call46396
 }
 
 define i32 @print_help() {
 entry:
-  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45602)
-  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45603)
-  %2 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45604)
-  %3 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45605)
-  %4 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45606)
-  %5 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45607)
-  %6 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45608)
-  %7 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45609)
-  %8 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45610)
-  %9 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45611)
-  %10 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45612)
-  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45613)
-  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45614)
-  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45615)
-  %14 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45616)
-  %15 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45617)
-  %16 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45618)
-  %17 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45619)
-  %18 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45620)
-  %19 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45621)
-  %20 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45622)
-  %21 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45623)
-  %22 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45624)
+  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46397)
+  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46398)
+  %2 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46399)
+  %3 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46400)
+  %4 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46401)
+  %5 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46402)
+  %6 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46403)
+  %7 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46404)
+  %8 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46405)
+  %9 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46406)
+  %10 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46407)
+  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46408)
+  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46409)
+  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46410)
+  %14 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46411)
+  %15 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46412)
+  %16 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46413)
+  %17 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46414)
+  %18 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46415)
+  %19 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46416)
+  %20 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46417)
+  %21 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46418)
+  %22 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46419)
   ret i32 0
 }
 
 define i32 @print_version() {
 entry:
-  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit45625)
+  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit46420)
   ret i32 0
 }
 
@@ -86656,29 +88206,29 @@ define ptr @source_file_arg(ptr %0) {
 entry:
   %arg = alloca ptr, align 8
   store ptr %0, ptr %arg, align 8
-  %load45626 = load ptr, ptr %arg, align 8
-  %call45628 = call i32 @string_ends_with(ptr %load45626, ptr @.strlit45627)
-  %matchres45629 = alloca ptr, align 8
-  br label %match.test7332
+  %load46421 = load ptr, ptr %arg, align 8
+  %call46423 = call i32 @string_ends_with(ptr %load46421, ptr @.strlit46422)
+  %matchres46424 = alloca ptr, align 8
+  br label %match.test7475
 
-match.end7331:                                    ; preds = %match.test7334, %match.body7333
-  %matchval45634 = load ptr, ptr %matchres45629, align 8
-  ret ptr %matchval45634
+match.end7474:                                    ; preds = %match.test7477, %match.body7476
+  %matchval46429 = load ptr, ptr %matchres46424, align 8
+  ret ptr %matchval46429
 
-match.test7332:                                   ; preds = %entry
-  %cmp45630 = icmp eq i32 %call45628, 1
-  %bool45631 = zext i1 %cmp45630 to i32
-  %cond45632 = icmp ne i32 %bool45631, 0
-  br i1 %cond45632, label %match.body7333, label %match.test7334
+match.test7475:                                   ; preds = %entry
+  %cmp46425 = icmp eq i32 %call46423, 1
+  %bool46426 = zext i1 %cmp46425 to i32
+  %cond46427 = icmp ne i32 %bool46426, 0
+  br i1 %cond46427, label %match.body7476, label %match.test7477
 
-match.body7333:                                   ; preds = %match.test7332
-  %load45633 = load ptr, ptr %arg, align 8
-  store ptr %load45633, ptr %matchres45629, align 8
-  br label %match.end7331
+match.body7476:                                   ; preds = %match.test7475
+  %load46428 = load ptr, ptr %arg, align 8
+  store ptr %load46428, ptr %matchres46424, align 8
+  br label %match.end7474
 
-match.test7334:                                   ; preds = %match.test7332
-  store ptr null, ptr %matchres45629, align 8
-  br label %match.end7331
+match.test7477:                                   ; preds = %match.test7475
+  store ptr null, ptr %matchres46424, align 8
+  br label %match.end7474
 }
 
 define ptr @mode_success() {
@@ -86698,97 +88248,97 @@ entry:
 
 define ptr @host_target_triple() {
 entry:
-  %call45639 = call ptr @LLVMGetDefaultTargetTriple()
+  %call46434 = call ptr @LLVMGetDefaultTargetTriple()
   %triple = alloca ptr, align 8
-  store ptr %call45639, ptr %triple, align 8
-  %load45640 = load ptr, ptr %triple, align 8
-  %cmp45641 = icmp eq ptr %load45640, null
-  %bool45642 = zext i1 %cmp45641 to i32
-  %cond45643 = icmp ne i32 %bool45642, 0
-  br i1 %cond45643, label %or.true, label %or.rhs
+  store ptr %call46434, ptr %triple, align 8
+  %load46435 = load ptr, ptr %triple, align 8
+  %cmp46436 = icmp eq ptr %load46435, null
+  %bool46437 = zext i1 %cmp46436 to i32
+  %cond46438 = icmp ne i32 %bool46437, 0
+  br i1 %cond46438, label %or.true, label %or.rhs
 
-if.then7335:                                      ; preds = %or.merge
-  ret ptr @.strlit45652
+if.then7478:                                      ; preds = %or.merge
+  ret ptr @.strlit46447
 
-if.else7336:                                      ; preds = %or.merge
-  br label %if.end7337
+if.else7479:                                      ; preds = %or.merge
+  br label %if.end7480
 
-if.end7337:                                       ; preds = %if.else7336
-  %load45653 = load ptr, ptr %triple, align 8
-  ret ptr %load45653
+if.end7480:                                       ; preds = %if.else7479
+  %load46448 = load ptr, ptr %triple, align 8
+  ret ptr %load46448
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load45644 = load ptr, ptr %triple, align 8
-  %strcmp45646 = call i32 @strcmp(ptr %load45644, ptr @.strlit45645)
-  %cmp45647 = icmp eq i32 %strcmp45646, 0
-  %bool45648 = zext i1 %cmp45647 to i32
-  %cond45649 = icmp ne i32 %bool45648, 0
-  br i1 %cond45649, label %or.true, label %or.merge
+  %load46439 = load ptr, ptr %triple, align 8
+  %strcmp46441 = call i32 @strcmp(ptr %load46439, ptr @.strlit46440)
+  %cmp46442 = icmp eq i32 %strcmp46441, 0
+  %bool46443 = zext i1 %cmp46442 to i32
+  %cond46444 = icmp ne i32 %bool46443, 0
+  br i1 %cond46444, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval45650 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond45651 = icmp ne i32 %orval45650, 0
-  br i1 %cond45651, label %if.then7335, label %if.else7336
+  %orval46445 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond46446 = icmp ne i32 %orval46445, 0
+  br i1 %cond46446, label %if.then7478, label %if.else7479
 }
 
 define ptr @clang_target_arg(ptr %0) {
 entry:
   %target_triple = alloca ptr, align 8
   store ptr %0, ptr %target_triple, align 8
-  %load45654 = load ptr, ptr %target_triple, align 8
-  %strcmp45656 = call i32 @strcmp(ptr %load45654, ptr @.strlit45655)
-  %cmp45657 = icmp eq i32 %strcmp45656, 0
-  %bool45658 = zext i1 %cmp45657 to i32
-  %cond45659 = icmp ne i32 %bool45658, 0
-  br i1 %cond45659, label %if.then7338, label %if.else7339
+  %load46449 = load ptr, ptr %target_triple, align 8
+  %strcmp46451 = call i32 @strcmp(ptr %load46449, ptr @.strlit46450)
+  %cmp46452 = icmp eq i32 %strcmp46451, 0
+  %bool46453 = zext i1 %cmp46452 to i32
+  %cond46454 = icmp ne i32 %bool46453, 0
+  br i1 %cond46454, label %if.then7481, label %if.else7482
 
-if.then7338:                                      ; preds = %entry
-  ret ptr @.strlit45660
+if.then7481:                                      ; preds = %entry
+  ret ptr @.strlit46455
 
-if.else7339:                                      ; preds = %entry
-  br label %if.end7340
+if.else7482:                                      ; preds = %entry
+  br label %if.end7483
 
-if.end7340:                                       ; preds = %if.else7339
-  %load45662 = load ptr, ptr %target_triple, align 8
-  %call45663 = call ptr @vix_string_concat(ptr @.strlit45661, ptr %load45662)
-  ret ptr %call45663
+if.end7483:                                       ; preds = %if.else7482
+  %load46457 = load ptr, ptr %target_triple, align 8
+  %call46458 = call ptr @vix_string_concat(ptr @.strlit46456, ptr %load46457)
+  ret ptr %call46458
 }
 
 define i32 @self_backend_target_supported(ptr %0) {
 entry:
   %target_triple = alloca ptr, align 8
   store ptr %0, ptr %target_triple, align 8
-  %load45664 = load ptr, ptr %target_triple, align 8
-  %strcmp45666 = call i32 @strcmp(ptr %load45664, ptr @.strlit45665)
-  %cmp45667 = icmp eq i32 %strcmp45666, 0
-  %bool45668 = zext i1 %cmp45667 to i32
-  %cond45669 = icmp ne i32 %bool45668, 0
-  br i1 %cond45669, label %if.then7341, label %if.else7342
+  %load46459 = load ptr, ptr %target_triple, align 8
+  %strcmp46461 = call i32 @strcmp(ptr %load46459, ptr @.strlit46460)
+  %cmp46462 = icmp eq i32 %strcmp46461, 0
+  %bool46463 = zext i1 %cmp46462 to i32
+  %cond46464 = icmp ne i32 %bool46463, 0
+  br i1 %cond46464, label %if.then7484, label %if.else7485
 
-if.then7341:                                      ; preds = %entry
+if.then7484:                                      ; preds = %entry
   ret i32 1
 
-if.else7342:                                      ; preds = %entry
-  br label %if.end7343
+if.else7485:                                      ; preds = %entry
+  br label %if.end7486
 
-if.end7343:                                       ; preds = %if.else7342
-  %load45670 = load ptr, ptr %target_triple, align 8
-  %call45672 = call i32 @str_starts_with(ptr %load45670, ptr @.strlit45671)
-  %cmp45673 = icmp eq i32 %call45672, 1
-  %bool45674 = zext i1 %cmp45673 to i32
-  %cond45675 = icmp ne i32 %bool45674, 0
-  br i1 %cond45675, label %if.then7344, label %if.else7345
+if.end7486:                                       ; preds = %if.else7485
+  %load46465 = load ptr, ptr %target_triple, align 8
+  %call46467 = call i32 @str_starts_with(ptr %load46465, ptr @.strlit46466)
+  %cmp46468 = icmp eq i32 %call46467, 1
+  %bool46469 = zext i1 %cmp46468 to i32
+  %cond46470 = icmp ne i32 %bool46469, 0
+  br i1 %cond46470, label %if.then7487, label %if.else7488
 
-if.then7344:                                      ; preds = %if.end7343
+if.then7487:                                      ; preds = %if.end7486
   ret i32 1
 
-if.else7345:                                      ; preds = %if.end7343
-  br label %if.end7346
+if.else7488:                                      ; preds = %if.end7486
+  br label %if.end7489
 
-if.end7346:                                       ; preds = %if.else7345
+if.end7489:                                       ; preds = %if.else7488
   ret i32 0
 }
 
@@ -86812,856 +88362,856 @@ entry:
   store ptr %7, ptr %target_triple, align 8
   %backend = alloca ptr, align 8
   store ptr %8, ptr %backend, align 8
-  %load45676 = load ptr, ptr %mode, align 8
-  br label %match.test7348
+  %load46471 = load ptr, ptr %mode, align 8
+  br label %match.test7491
 
-match.end7347:                                    ; preds = %match.test7352
-  %load45694 = load ptr, ptr %src, align 8
-  %load45695 = load ptr, ptr %filename, align 8
-  %call45696 = call %AstProgram @parse_program(ptr %load45694, ptr %load45695)
+match.end7490:                                    ; preds = %match.test7495
+  %load46489 = load ptr, ptr %src, align 8
+  %load46490 = load ptr, ptr %filename, align 8
+  %call46491 = call %AstProgram @parse_program(ptr %load46489, ptr %load46490)
   %program = alloca %AstProgram, align 8
-  store %AstProgram %call45696, ptr %program, align 8
-  %load45697 = load ptr, ptr %mode, align 8
-  br label %match.test7354
+  store %AstProgram %call46491, ptr %program, align 8
+  %load46492 = load ptr, ptr %mode, align 8
+  br label %match.test7497
 
-match.test7348:                                   ; preds = %entry
-  %strcmp45678 = call i32 @strcmp(ptr %load45676, ptr @.strlit45677)
-  %cmp45679 = icmp eq i32 %strcmp45678, 0
-  %bool45680 = zext i1 %cmp45679 to i32
-  %cond45681 = icmp ne i32 %bool45680, 0
-  br i1 %cond45681, label %match.body7349, label %match.test7350
+match.test7491:                                   ; preds = %entry
+  %strcmp46473 = call i32 @strcmp(ptr %load46471, ptr @.strlit46472)
+  %cmp46474 = icmp eq i32 %strcmp46473, 0
+  %bool46475 = zext i1 %cmp46474 to i32
+  %cond46476 = icmp ne i32 %bool46475, 0
+  br i1 %cond46476, label %match.body7492, label %match.test7493
 
-match.body7349:                                   ; preds = %match.test7348
-  %load45682 = load ptr, ptr %src, align 8
-  %call45683 = call ptr @tokenize_debug(ptr %load45682)
-  call void @info_print(ptr %call45683)
-  %call45684 = call ptr @mode_success()
-  ret ptr %call45684
+match.body7492:                                   ; preds = %match.test7491
+  %load46477 = load ptr, ptr %src, align 8
+  %call46478 = call ptr @tokenize_debug(ptr %load46477)
+  call void @info_print(ptr %call46478)
+  %call46479 = call ptr @mode_success()
+  ret ptr %call46479
 
-match.test7350:                                   ; preds = %match.test7348
-  %strcmp45686 = call i32 @strcmp(ptr %load45676, ptr @.strlit45685)
-  %cmp45687 = icmp eq i32 %strcmp45686, 0
-  %bool45688 = zext i1 %cmp45687 to i32
-  %cond45689 = icmp ne i32 %bool45688, 0
-  br i1 %cond45689, label %match.body7351, label %match.test7352
+match.test7493:                                   ; preds = %match.test7491
+  %strcmp46481 = call i32 @strcmp(ptr %load46471, ptr @.strlit46480)
+  %cmp46482 = icmp eq i32 %strcmp46481, 0
+  %bool46483 = zext i1 %cmp46482 to i32
+  %cond46484 = icmp ne i32 %bool46483, 0
+  br i1 %cond46484, label %match.body7494, label %match.test7495
 
-match.body7351:                                   ; preds = %match.test7350
-  %load45690 = load ptr, ptr %src, align 8
-  %load45691 = load ptr, ptr %filename, align 8
-  %call45692 = call ptr @parse_program_stats(ptr %load45690, ptr %load45691)
-  call void @info_print(ptr %call45692)
-  %call45693 = call ptr @mode_success()
-  ret ptr %call45693
+match.body7494:                                   ; preds = %match.test7493
+  %load46485 = load ptr, ptr %src, align 8
+  %load46486 = load ptr, ptr %filename, align 8
+  %call46487 = call ptr @parse_program_stats(ptr %load46485, ptr %load46486)
+  call void @info_print(ptr %call46487)
+  %call46488 = call ptr @mode_success()
+  ret ptr %call46488
 
-match.test7352:                                   ; preds = %match.test7350
-  br label %match.end7347
+match.test7495:                                   ; preds = %match.test7493
+  br label %match.end7490
 
-match.end7353:                                    ; preds = %match.test7366
-  %load45743 = load %AstProgram, ptr %program, align 8
-  %extract45744 = extractvalue %AstProgram %load45743, 7
-  %cmp45745 = icmp eq i32 %extract45744, 0
-  %bool45746 = zext i1 %cmp45745 to i32
-  %cond45747 = icmp ne i32 %bool45746, 0
-  br i1 %cond45747, label %if.then7370, label %if.else7371
+match.end7496:                                    ; preds = %match.test7509
+  %load46538 = load %AstProgram, ptr %program, align 8
+  %extract46539 = extractvalue %AstProgram %load46538, 7
+  %cmp46540 = icmp eq i32 %extract46539, 0
+  %bool46541 = zext i1 %cmp46540 to i32
+  %cond46542 = icmp ne i32 %bool46541, 0
+  br i1 %cond46542, label %if.then7513, label %if.else7514
 
-match.test7354:                                   ; preds = %match.end7347
-  %strcmp45699 = call i32 @strcmp(ptr %load45697, ptr @.strlit45698)
-  %cmp45700 = icmp eq i32 %strcmp45699, 0
-  %bool45701 = zext i1 %cmp45700 to i32
-  %cond45702 = icmp ne i32 %bool45701, 0
-  br i1 %cond45702, label %match.body7355, label %match.test7356
+match.test7497:                                   ; preds = %match.end7490
+  %strcmp46494 = call i32 @strcmp(ptr %load46492, ptr @.strlit46493)
+  %cmp46495 = icmp eq i32 %strcmp46494, 0
+  %bool46496 = zext i1 %cmp46495 to i32
+  %cond46497 = icmp ne i32 %bool46496, 0
+  br i1 %cond46497, label %match.body7498, label %match.test7499
 
-match.body7355:                                   ; preds = %match.test7354
-  %load45703 = load %AstProgram, ptr %program, align 8
-  %extract45704 = extractvalue %AstProgram %load45703, 7
-  %cmp45705 = icmp eq i32 %extract45704, 0
-  %bool45706 = zext i1 %cmp45705 to i32
-  %cond45707 = icmp ne i32 %bool45706, 0
-  br i1 %cond45707, label %if.then7357, label %if.else7358
+match.body7498:                                   ; preds = %match.test7497
+  %load46498 = load %AstProgram, ptr %program, align 8
+  %extract46499 = extractvalue %AstProgram %load46498, 7
+  %cmp46500 = icmp eq i32 %extract46499, 0
+  %bool46501 = zext i1 %cmp46500 to i32
+  %cond46502 = icmp ne i32 %bool46501, 0
+  br i1 %cond46502, label %if.then7500, label %if.else7501
 
-match.test7356:                                   ; preds = %match.test7354
-  %strcmp45714 = call i32 @strcmp(ptr %load45697, ptr @.strlit45713)
-  %cmp45715 = icmp eq i32 %strcmp45714, 0
-  %bool45716 = zext i1 %cmp45715 to i32
-  %cond45717 = icmp ne i32 %bool45716, 0
-  br i1 %cond45717, label %match.body7360, label %match.test7361
+match.test7499:                                   ; preds = %match.test7497
+  %strcmp46509 = call i32 @strcmp(ptr %load46492, ptr @.strlit46508)
+  %cmp46510 = icmp eq i32 %strcmp46509, 0
+  %bool46511 = zext i1 %cmp46510 to i32
+  %cond46512 = icmp ne i32 %bool46511, 0
+  br i1 %cond46512, label %match.body7503, label %match.test7504
 
-if.then7357:                                      ; preds = %match.body7355
-  %load45708 = load %AstProgram, ptr %program, align 8
-  %extract45709 = extractvalue %AstProgram %load45708, 8
-  call void @info_print(ptr %extract45709)
-  br label %if.end7359
+if.then7500:                                      ; preds = %match.body7498
+  %load46503 = load %AstProgram, ptr %program, align 8
+  %extract46504 = extractvalue %AstProgram %load46503, 8
+  call void @info_print(ptr %extract46504)
+  br label %if.end7502
 
-if.else7358:                                      ; preds = %match.body7355
-  %load45710 = load %AstProgram, ptr %program, align 8
-  %call45711 = call ptr @ast_program_debug(%AstProgram %load45710)
-  call void @info_print(ptr %call45711)
-  br label %if.end7359
+if.else7501:                                      ; preds = %match.body7498
+  %load46505 = load %AstProgram, ptr %program, align 8
+  %call46506 = call ptr @ast_program_debug(%AstProgram %load46505)
+  call void @info_print(ptr %call46506)
+  br label %if.end7502
 
-if.end7359:                                       ; preds = %if.else7358, %if.then7357
-  %call45712 = call ptr @mode_success()
-  ret ptr %call45712
+if.end7502:                                       ; preds = %if.else7501, %if.then7500
+  %call46507 = call ptr @mode_success()
+  ret ptr %call46507
 
-match.body7360:                                   ; preds = %match.test7356
-  %load45718 = load %AstProgram, ptr %program, align 8
-  %extract45719 = extractvalue %AstProgram %load45718, 7
-  %cmp45720 = icmp eq i32 %extract45719, 0
-  %bool45721 = zext i1 %cmp45720 to i32
-  %cond45722 = icmp ne i32 %bool45721, 0
-  br i1 %cond45722, label %if.then7362, label %if.else7363
+match.body7503:                                   ; preds = %match.test7499
+  %load46513 = load %AstProgram, ptr %program, align 8
+  %extract46514 = extractvalue %AstProgram %load46513, 7
+  %cmp46515 = icmp eq i32 %extract46514, 0
+  %bool46516 = zext i1 %cmp46515 to i32
+  %cond46517 = icmp ne i32 %bool46516, 0
+  br i1 %cond46517, label %if.then7505, label %if.else7506
 
-match.test7361:                                   ; preds = %match.test7356
-  %strcmp45729 = call i32 @strcmp(ptr %load45697, ptr @.strlit45728)
-  %cmp45730 = icmp eq i32 %strcmp45729, 0
-  %bool45731 = zext i1 %cmp45730 to i32
-  %cond45732 = icmp ne i32 %bool45731, 0
-  br i1 %cond45732, label %match.body7365, label %match.test7366
+match.test7504:                                   ; preds = %match.test7499
+  %strcmp46524 = call i32 @strcmp(ptr %load46492, ptr @.strlit46523)
+  %cmp46525 = icmp eq i32 %strcmp46524, 0
+  %bool46526 = zext i1 %cmp46525 to i32
+  %cond46527 = icmp ne i32 %bool46526, 0
+  br i1 %cond46527, label %match.body7508, label %match.test7509
 
-if.then7362:                                      ; preds = %match.body7360
-  %load45723 = load %AstProgram, ptr %program, align 8
-  %extract45724 = extractvalue %AstProgram %load45723, 8
-  call void @info_print(ptr %extract45724)
-  br label %if.end7364
+if.then7505:                                      ; preds = %match.body7503
+  %load46518 = load %AstProgram, ptr %program, align 8
+  %extract46519 = extractvalue %AstProgram %load46518, 8
+  call void @info_print(ptr %extract46519)
+  br label %if.end7507
 
-if.else7363:                                      ; preds = %match.body7360
-  %load45725 = load %AstProgram, ptr %program, align 8
-  %call45726 = call ptr @ast(%AstProgram %load45725)
-  call void @info_print(ptr %call45726)
-  br label %if.end7364
+if.else7506:                                      ; preds = %match.body7503
+  %load46520 = load %AstProgram, ptr %program, align 8
+  %call46521 = call ptr @ast(%AstProgram %load46520)
+  call void @info_print(ptr %call46521)
+  br label %if.end7507
 
-if.end7364:                                       ; preds = %if.else7363, %if.then7362
-  %call45727 = call ptr @mode_success()
-  ret ptr %call45727
+if.end7507:                                       ; preds = %if.else7506, %if.then7505
+  %call46522 = call ptr @mode_success()
+  ret ptr %call46522
 
-match.body7365:                                   ; preds = %match.test7361
-  %load45733 = load %AstProgram, ptr %program, align 8
-  %extract45734 = extractvalue %AstProgram %load45733, 7
-  %cmp45735 = icmp eq i32 %extract45734, 0
-  %bool45736 = zext i1 %cmp45735 to i32
-  %cond45737 = icmp ne i32 %bool45736, 0
-  br i1 %cond45737, label %if.then7367, label %if.else7368
+match.body7508:                                   ; preds = %match.test7504
+  %load46528 = load %AstProgram, ptr %program, align 8
+  %extract46529 = extractvalue %AstProgram %load46528, 7
+  %cmp46530 = icmp eq i32 %extract46529, 0
+  %bool46531 = zext i1 %cmp46530 to i32
+  %cond46532 = icmp ne i32 %bool46531, 0
+  br i1 %cond46532, label %if.then7510, label %if.else7511
 
-match.test7366:                                   ; preds = %match.test7361
-  br label %match.end7353
+match.test7509:                                   ; preds = %match.test7504
+  br label %match.end7496
 
-if.then7367:                                      ; preds = %match.body7365
-  %load45738 = load %AstProgram, ptr %program, align 8
-  %extract45739 = extractvalue %AstProgram %load45738, 8
-  call void @info_print(ptr %extract45739)
-  br label %if.end7369
+if.then7510:                                      ; preds = %match.body7508
+  %load46533 = load %AstProgram, ptr %program, align 8
+  %extract46534 = extractvalue %AstProgram %load46533, 8
+  call void @info_print(ptr %extract46534)
+  br label %if.end7512
 
-if.else7368:                                      ; preds = %match.body7365
-  %load45740 = load %AstProgram, ptr %program, align 8
-  %call45741 = call ptr @ast(%AstProgram %load45740)
-  call void @info_print(ptr %call45741)
-  br label %if.end7369
+if.else7511:                                      ; preds = %match.body7508
+  %load46535 = load %AstProgram, ptr %program, align 8
+  %call46536 = call ptr @ast(%AstProgram %load46535)
+  call void @info_print(ptr %call46536)
+  br label %if.end7512
 
-if.end7369:                                       ; preds = %if.else7368, %if.then7367
-  %call45742 = call ptr @mode_success()
-  ret ptr %call45742
+if.end7512:                                       ; preds = %if.else7511, %if.then7510
+  %call46537 = call ptr @mode_success()
+  ret ptr %call46537
 
-if.then7370:                                      ; preds = %match.end7353
-  %load45748 = load %AstProgram, ptr %program, align 8
-  %extract45749 = extractvalue %AstProgram %load45748, 8
-  call void @diag_print(ptr %extract45749)
-  %call45750 = call ptr @mode_failure()
-  ret ptr %call45750
+if.then7513:                                      ; preds = %match.end7496
+  %load46543 = load %AstProgram, ptr %program, align 8
+  %extract46544 = extractvalue %AstProgram %load46543, 8
+  call void @diag_print(ptr %extract46544)
+  %call46545 = call ptr @mode_failure()
+  ret ptr %call46545
 
-if.else7371:                                      ; preds = %match.end7353
-  br label %if.end7372
+if.else7514:                                      ; preds = %match.end7496
+  br label %if.end7515
 
-if.end7372:                                       ; preds = %if.else7371
-  %load45751 = load %AstProgram, ptr %program, align 8
-  %call45752 = call %AstProgram @desugar_program(%AstProgram %load45751)
+if.end7515:                                       ; preds = %if.else7514
+  %load46546 = load %AstProgram, ptr %program, align 8
+  %call46547 = call %AstProgram @desugar_program(%AstProgram %load46546)
   %lowered_program = alloca %AstProgram, align 8
-  store %AstProgram %call45752, ptr %lowered_program, align 8
-  %load45753 = load %AstProgram, ptr %lowered_program, align 8
-  %load45754 = load ptr, ptr %src, align 8
-  %load45755 = load ptr, ptr %filename, align 8
-  %call45756 = call %SemanticResult @semantic_check_program(%AstProgram %load45753, ptr %load45754, ptr %load45755)
+  store %AstProgram %call46547, ptr %lowered_program, align 8
+  %load46548 = load %AstProgram, ptr %lowered_program, align 8
+  %load46549 = load ptr, ptr %src, align 8
+  %load46550 = load ptr, ptr %filename, align 8
+  %call46551 = call %SemanticResult @semantic_check_program(%AstProgram %load46548, ptr %load46549, ptr %load46550)
   %semantic_result = alloca %SemanticResult, align 8
-  store %SemanticResult %call45756, ptr %semantic_result, align 8
-  %load45757 = load ptr, ptr %mode, align 8
-  br label %match.test7374
+  store %SemanticResult %call46551, ptr %semantic_result, align 8
+  %load46552 = load ptr, ptr %mode, align 8
+  br label %match.test7517
 
-match.end7373:                                    ; preds = %match.test7376
-  %load45766 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract45767 = extractvalue %SemanticResult %load45766, 1
-  %cmp45768 = icmp sgt i32 %extract45767, 0
-  %bool45769 = zext i1 %cmp45768 to i32
-  %cond45770 = icmp ne i32 %bool45769, 0
-  br i1 %cond45770, label %if.then7377, label %if.else7378
+match.end7516:                                    ; preds = %match.test7519
+  %load46561 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract46562 = extractvalue %SemanticResult %load46561, 1
+  %cmp46563 = icmp sgt i32 %extract46562, 0
+  %bool46564 = zext i1 %cmp46563 to i32
+  %cond46565 = icmp ne i32 %bool46564, 0
+  br i1 %cond46565, label %if.then7520, label %if.else7521
 
-match.test7374:                                   ; preds = %if.end7372
-  %strcmp45759 = call i32 @strcmp(ptr %load45757, ptr @.strlit45758)
-  %cmp45760 = icmp eq i32 %strcmp45759, 0
-  %bool45761 = zext i1 %cmp45760 to i32
-  %cond45762 = icmp ne i32 %bool45761, 0
-  br i1 %cond45762, label %match.body7375, label %match.test7376
+match.test7517:                                   ; preds = %if.end7515
+  %strcmp46554 = call i32 @strcmp(ptr %load46552, ptr @.strlit46553)
+  %cmp46555 = icmp eq i32 %strcmp46554, 0
+  %bool46556 = zext i1 %cmp46555 to i32
+  %cond46557 = icmp ne i32 %bool46556, 0
+  br i1 %cond46557, label %match.body7518, label %match.test7519
 
-match.body7375:                                   ; preds = %match.test7374
-  %load45763 = load %SemanticResult, ptr %semantic_result, align 8
-  %call45764 = call ptr @semantic_result_debug(%SemanticResult %load45763)
-  call void @info_print(ptr %call45764)
-  %call45765 = call ptr @mode_success()
-  ret ptr %call45765
+match.body7518:                                   ; preds = %match.test7517
+  %load46558 = load %SemanticResult, ptr %semantic_result, align 8
+  %call46559 = call ptr @semantic_result_debug(%SemanticResult %load46558)
+  call void @info_print(ptr %call46559)
+  %call46560 = call ptr @mode_success()
+  ret ptr %call46560
 
-match.test7376:                                   ; preds = %match.test7374
-  br label %match.end7373
+match.test7519:                                   ; preds = %match.test7517
+  br label %match.end7516
 
-if.then7377:                                      ; preds = %match.end7373
-  %load45771 = load ptr, ptr %mode, align 8
-  br label %match.test7381
+if.then7520:                                      ; preds = %match.end7516
+  %load46566 = load ptr, ptr %mode, align 8
+  br label %match.test7524
 
-if.else7378:                                      ; preds = %match.end7373
-  br label %if.end7379
+if.else7521:                                      ; preds = %match.end7516
+  br label %if.end7522
 
-if.end7379:                                       ; preds = %if.else7378
-  %load45807 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract45808 = extractvalue %SemanticResult %load45807, 3
-  %cmp45809 = icmp sgt i32 %extract45808, 0
-  %bool45810 = zext i1 %cmp45809 to i32
-  %cond45811 = icmp ne i32 %bool45810, 0
-  br i1 %cond45811, label %if.then7392, label %if.else7393
+if.end7522:                                       ; preds = %if.else7521
+  %load46602 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract46603 = extractvalue %SemanticResult %load46602, 3
+  %cmp46604 = icmp sgt i32 %extract46603, 0
+  %bool46605 = zext i1 %cmp46604 to i32
+  %cond46606 = icmp ne i32 %bool46605, 0
+  br i1 %cond46606, label %if.then7535, label %if.else7536
 
-match.end7380:                                    ; preds = %match.test7388
-  %load45804 = load %SemanticResult, ptr %semantic_result, align 8
-  %call45805 = call ptr @semantic_result_debug(%SemanticResult %load45804)
-  call void @diag_print(ptr %call45805)
-  %call45806 = call ptr @mode_failure()
-  ret ptr %call45806
+match.end7523:                                    ; preds = %match.test7531
+  %load46599 = load %SemanticResult, ptr %semantic_result, align 8
+  %call46600 = call ptr @semantic_result_debug(%SemanticResult %load46599)
+  call void @diag_print(ptr %call46600)
+  %call46601 = call ptr @mode_failure()
+  ret ptr %call46601
 
-match.test7381:                                   ; preds = %if.then7377
-  %strcmp45773 = call i32 @strcmp(ptr %load45771, ptr @.strlit45772)
-  %cmp45774 = icmp eq i32 %strcmp45773, 0
-  %bool45775 = zext i1 %cmp45774 to i32
-  %cond45776 = icmp ne i32 %bool45775, 0
-  br i1 %cond45776, label %match.body7382, label %match.test7383
+match.test7524:                                   ; preds = %if.then7520
+  %strcmp46568 = call i32 @strcmp(ptr %load46566, ptr @.strlit46567)
+  %cmp46569 = icmp eq i32 %strcmp46568, 0
+  %bool46570 = zext i1 %cmp46569 to i32
+  %cond46571 = icmp ne i32 %bool46570, 0
+  br i1 %cond46571, label %match.body7525, label %match.test7526
 
-match.body7382:                                   ; preds = %match.test7381
-  %load45777 = load %SemanticResult, ptr %semantic_result, align 8
-  %call45778 = call ptr @semantic_result_debug(%SemanticResult %load45777)
-  call void @info_print(ptr %call45778)
-  %load45779 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract45780 = extractvalue %SemanticResult %load45779, 1
-  %load45781 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract45782 = extractvalue %SemanticResult %load45781, 2
-  %cmp45783 = icmp eq i32 %extract45780, %extract45782
-  %bool45784 = zext i1 %cmp45783 to i32
-  %cond45785 = icmp ne i32 %bool45784, 0
-  br i1 %cond45785, label %if.then7384, label %if.else7385
+match.body7525:                                   ; preds = %match.test7524
+  %load46572 = load %SemanticResult, ptr %semantic_result, align 8
+  %call46573 = call ptr @semantic_result_debug(%SemanticResult %load46572)
+  call void @info_print(ptr %call46573)
+  %load46574 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract46575 = extractvalue %SemanticResult %load46574, 1
+  %load46576 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract46577 = extractvalue %SemanticResult %load46576, 2
+  %cmp46578 = icmp eq i32 %extract46575, %extract46577
+  %bool46579 = zext i1 %cmp46578 to i32
+  %cond46580 = icmp ne i32 %bool46579, 0
+  br i1 %cond46580, label %if.then7527, label %if.else7528
 
-match.test7383:                                   ; preds = %match.test7381
-  %strcmp45789 = call i32 @strcmp(ptr %load45771, ptr @.strlit45788)
-  %cmp45790 = icmp eq i32 %strcmp45789, 0
-  %bool45791 = zext i1 %cmp45790 to i32
-  %cond45792 = icmp ne i32 %bool45791, 0
-  br i1 %cond45792, label %match.body7387, label %match.test7388
+match.test7526:                                   ; preds = %match.test7524
+  %strcmp46584 = call i32 @strcmp(ptr %load46566, ptr @.strlit46583)
+  %cmp46585 = icmp eq i32 %strcmp46584, 0
+  %bool46586 = zext i1 %cmp46585 to i32
+  %cond46587 = icmp ne i32 %bool46586, 0
+  br i1 %cond46587, label %match.body7530, label %match.test7531
 
-if.then7384:                                      ; preds = %match.body7382
-  %call45786 = call ptr @mode_success()
-  ret ptr %call45786
+if.then7527:                                      ; preds = %match.body7525
+  %call46581 = call ptr @mode_success()
+  ret ptr %call46581
 
-if.else7385:                                      ; preds = %match.body7382
-  br label %if.end7386
+if.else7528:                                      ; preds = %match.body7525
+  br label %if.end7529
 
-if.end7386:                                       ; preds = %if.else7385
-  %call45787 = call ptr @mode_failure()
-  ret ptr %call45787
+if.end7529:                                       ; preds = %if.else7528
+  %call46582 = call ptr @mode_failure()
+  ret ptr %call46582
 
-match.body7387:                                   ; preds = %match.test7383
-  %load45793 = load %SemanticResult, ptr %semantic_result, align 8
-  %call45794 = call ptr @semantic_result_debug(%SemanticResult %load45793)
-  call void @info_print(ptr %call45794)
-  %load45795 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract45796 = extractvalue %SemanticResult %load45795, 1
-  %load45797 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract45798 = extractvalue %SemanticResult %load45797, 2
-  %cmp45799 = icmp eq i32 %extract45796, %extract45798
-  %bool45800 = zext i1 %cmp45799 to i32
-  %cond45801 = icmp ne i32 %bool45800, 0
-  br i1 %cond45801, label %if.then7389, label %if.else7390
+match.body7530:                                   ; preds = %match.test7526
+  %load46588 = load %SemanticResult, ptr %semantic_result, align 8
+  %call46589 = call ptr @semantic_result_debug(%SemanticResult %load46588)
+  call void @info_print(ptr %call46589)
+  %load46590 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract46591 = extractvalue %SemanticResult %load46590, 1
+  %load46592 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract46593 = extractvalue %SemanticResult %load46592, 2
+  %cmp46594 = icmp eq i32 %extract46591, %extract46593
+  %bool46595 = zext i1 %cmp46594 to i32
+  %cond46596 = icmp ne i32 %bool46595, 0
+  br i1 %cond46596, label %if.then7532, label %if.else7533
 
-match.test7388:                                   ; preds = %match.test7383
-  br label %match.end7380
+match.test7531:                                   ; preds = %match.test7526
+  br label %match.end7523
 
-if.then7389:                                      ; preds = %match.body7387
-  %call45802 = call ptr @mode_success()
-  ret ptr %call45802
+if.then7532:                                      ; preds = %match.body7530
+  %call46597 = call ptr @mode_success()
+  ret ptr %call46597
 
-if.else7390:                                      ; preds = %match.body7387
-  br label %if.end7391
+if.else7533:                                      ; preds = %match.body7530
+  br label %if.end7534
 
-if.end7391:                                       ; preds = %if.else7390
-  %call45803 = call ptr @mode_failure()
-  ret ptr %call45803
+if.end7534:                                       ; preds = %if.else7533
+  %call46598 = call ptr @mode_failure()
+  ret ptr %call46598
 
-if.then7392:                                      ; preds = %if.end7379
-  %load45812 = load %SemanticResult, ptr %semantic_result, align 8
-  %call45813 = call ptr @semantic_result_debug(%SemanticResult %load45812)
-  call void @diag_print(ptr %call45813)
-  br label %if.end7394
+if.then7535:                                      ; preds = %if.end7522
+  %load46607 = load %SemanticResult, ptr %semantic_result, align 8
+  %call46608 = call ptr @semantic_result_debug(%SemanticResult %load46607)
+  call void @diag_print(ptr %call46608)
+  br label %if.end7537
 
-if.else7393:                                      ; preds = %if.end7379
-  br label %if.end7394
+if.else7536:                                      ; preds = %if.end7522
+  br label %if.end7537
 
-if.end7394:                                       ; preds = %if.else7393, %if.then7392
-  %load45814 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract45815 = extractvalue %SemanticResult %load45814, 5
+if.end7537:                                       ; preds = %if.else7536, %if.then7535
+  %load46609 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract46610 = extractvalue %SemanticResult %load46609, 5
   %infer_result = alloca %TypeInferResult, align 8
-  store %TypeInferResult %extract45815, ptr %infer_result, align 8
-  %load45816 = load ptr, ptr %mode, align 8
-  br label %match.test7396
+  store %TypeInferResult %extract46610, ptr %infer_result, align 8
+  %load46611 = load ptr, ptr %mode, align 8
+  br label %match.test7539
 
-match.end7395:                                    ; preds = %match.test7400
-  %load45837 = load %TypeInferResult, ptr %infer_result, align 8
-  %extract45838 = extractvalue %TypeInferResult %load45837, 0
-  %cmp45839 = icmp eq i32 %extract45838, 0
-  %bool45840 = zext i1 %cmp45839 to i32
-  %cond45841 = icmp ne i32 %bool45840, 0
-  br i1 %cond45841, label %if.then7401, label %if.else7402
+match.end7538:                                    ; preds = %match.test7543
+  %load46632 = load %TypeInferResult, ptr %infer_result, align 8
+  %extract46633 = extractvalue %TypeInferResult %load46632, 0
+  %cmp46634 = icmp eq i32 %extract46633, 0
+  %bool46635 = zext i1 %cmp46634 to i32
+  %cond46636 = icmp ne i32 %bool46635, 0
+  br i1 %cond46636, label %if.then7544, label %if.else7545
 
-match.test7396:                                   ; preds = %if.end7394
-  %strcmp45818 = call i32 @strcmp(ptr %load45816, ptr @.strlit45817)
-  %cmp45819 = icmp eq i32 %strcmp45818, 0
-  %bool45820 = zext i1 %cmp45819 to i32
-  %cond45821 = icmp ne i32 %bool45820, 0
-  br i1 %cond45821, label %match.body7397, label %match.test7398
+match.test7539:                                   ; preds = %if.end7537
+  %strcmp46613 = call i32 @strcmp(ptr %load46611, ptr @.strlit46612)
+  %cmp46614 = icmp eq i32 %strcmp46613, 0
+  %bool46615 = zext i1 %cmp46614 to i32
+  %cond46616 = icmp ne i32 %bool46615, 0
+  br i1 %cond46616, label %match.body7540, label %match.test7541
 
-match.body7397:                                   ; preds = %match.test7396
-  %load45822 = load %TypeInferResult, ptr %infer_result, align 8
-  %load45823 = load ptr, ptr %src, align 8
-  %load45824 = load ptr, ptr %filename, align 8
-  %call45825 = call ptr @typeck_result_debug(%TypeInferResult %load45822, ptr %load45823, ptr %load45824)
-  call void @info_print(ptr %call45825)
-  %call45826 = call ptr @mode_success()
-  ret ptr %call45826
+match.body7540:                                   ; preds = %match.test7539
+  %load46617 = load %TypeInferResult, ptr %infer_result, align 8
+  %load46618 = load ptr, ptr %src, align 8
+  %load46619 = load ptr, ptr %filename, align 8
+  %call46620 = call ptr @typeck_result_debug(%TypeInferResult %load46617, ptr %load46618, ptr %load46619)
+  call void @info_print(ptr %call46620)
+  %call46621 = call ptr @mode_success()
+  ret ptr %call46621
 
-match.test7398:                                   ; preds = %match.test7396
-  %strcmp45828 = call i32 @strcmp(ptr %load45816, ptr @.strlit45827)
-  %cmp45829 = icmp eq i32 %strcmp45828, 0
-  %bool45830 = zext i1 %cmp45829 to i32
-  %cond45831 = icmp ne i32 %bool45830, 0
-  br i1 %cond45831, label %match.body7399, label %match.test7400
+match.test7541:                                   ; preds = %match.test7539
+  %strcmp46623 = call i32 @strcmp(ptr %load46611, ptr @.strlit46622)
+  %cmp46624 = icmp eq i32 %strcmp46623, 0
+  %bool46625 = zext i1 %cmp46624 to i32
+  %cond46626 = icmp ne i32 %bool46625, 0
+  br i1 %cond46626, label %match.body7542, label %match.test7543
 
-match.body7399:                                   ; preds = %match.test7398
-  %load45832 = load %TypeInferResult, ptr %infer_result, align 8
-  %load45833 = load ptr, ptr %src, align 8
-  %load45834 = load ptr, ptr %filename, align 8
-  %call45835 = call ptr @typeck_result_debug(%TypeInferResult %load45832, ptr %load45833, ptr %load45834)
-  call void @info_print(ptr %call45835)
-  %call45836 = call ptr @mode_success()
-  ret ptr %call45836
+match.body7542:                                   ; preds = %match.test7541
+  %load46627 = load %TypeInferResult, ptr %infer_result, align 8
+  %load46628 = load ptr, ptr %src, align 8
+  %load46629 = load ptr, ptr %filename, align 8
+  %call46630 = call ptr @typeck_result_debug(%TypeInferResult %load46627, ptr %load46628, ptr %load46629)
+  call void @info_print(ptr %call46630)
+  %call46631 = call ptr @mode_success()
+  ret ptr %call46631
 
-match.test7400:                                   ; preds = %match.test7398
-  br label %match.end7395
+match.test7543:                                   ; preds = %match.test7541
+  br label %match.end7538
 
-if.then7401:                                      ; preds = %match.end7395
-  %load45842 = load %TypeInferResult, ptr %infer_result, align 8
-  %load45843 = load ptr, ptr %src, align 8
-  %load45844 = load ptr, ptr %filename, align 8
-  %call45845 = call ptr @typeck_result_debug(%TypeInferResult %load45842, ptr %load45843, ptr %load45844)
-  call void @diag_print(ptr %call45845)
-  %call45846 = call ptr @mode_failure()
-  ret ptr %call45846
+if.then7544:                                      ; preds = %match.end7538
+  %load46637 = load %TypeInferResult, ptr %infer_result, align 8
+  %load46638 = load ptr, ptr %src, align 8
+  %load46639 = load ptr, ptr %filename, align 8
+  %call46640 = call ptr @typeck_result_debug(%TypeInferResult %load46637, ptr %load46638, ptr %load46639)
+  call void @diag_print(ptr %call46640)
+  %call46641 = call ptr @mode_failure()
+  ret ptr %call46641
 
-if.else7402:                                      ; preds = %match.end7395
-  br label %if.end7403
+if.else7545:                                      ; preds = %match.end7538
+  br label %if.end7546
 
-if.end7403:                                       ; preds = %if.else7402
-  %load45847 = load ptr, ptr %mode, align 8
-  %strcmp45849 = call i32 @strcmp(ptr %load45847, ptr @.strlit45848)
-  %cmp45850 = icmp eq i32 %strcmp45849, 0
-  %bool45851 = zext i1 %cmp45850 to i32
-  %cond45852 = icmp ne i32 %bool45851, 0
-  br i1 %cond45852, label %if.then7404, label %if.else7405
+if.end7546:                                       ; preds = %if.else7545
+  %load46642 = load ptr, ptr %mode, align 8
+  %strcmp46644 = call i32 @strcmp(ptr %load46642, ptr @.strlit46643)
+  %cmp46645 = icmp eq i32 %strcmp46644, 0
+  %bool46646 = zext i1 %cmp46645 to i32
+  %cond46647 = icmp ne i32 %bool46646, 0
+  br i1 %cond46647, label %if.then7547, label %if.else7548
 
-if.then7404:                                      ; preds = %if.end7403
-  %load45853 = load %AstProgram, ptr %lowered_program, align 8
-  %load45854 = load ptr, ptr %target_triple, align 8
-  %call45855 = call ptr @codegen_program_target(%AstProgram %load45853, ptr %load45854)
+if.then7547:                                      ; preds = %if.end7546
+  %load46648 = load %AstProgram, ptr %lowered_program, align 8
+  %load46649 = load ptr, ptr %target_triple, align 8
+  %call46650 = call ptr @codegen_program_target(%AstProgram %load46648, ptr %load46649)
   %ir = alloca ptr, align 8
-  store ptr %call45855, ptr %ir, align 8
-  %load45856 = load ptr, ptr %ir, align 8
-  call void @info_print(ptr %load45856)
-  %call45857 = call ptr @mode_success()
-  ret ptr %call45857
+  store ptr %call46650, ptr %ir, align 8
+  %load46651 = load ptr, ptr %ir, align 8
+  call void @info_print(ptr %load46651)
+  %call46652 = call ptr @mode_success()
+  ret ptr %call46652
 
-if.else7405:                                      ; preds = %if.end7403
-  br label %if.end7406
+if.else7548:                                      ; preds = %if.end7546
+  br label %if.end7549
 
-if.end7406:                                       ; preds = %if.else7405
-  %load45858 = load ptr, ptr %mode, align 8
-  br label %match.test7408
+if.end7549:                                       ; preds = %if.else7548
+  %load46653 = load ptr, ptr %mode, align 8
+  br label %match.test7551
 
-match.end7407:                                    ; preds = %match.test7412
-  %load45878 = load ptr, ptr %mode, align 8
-  br label %match.test7414
+match.end7550:                                    ; preds = %match.test7555
+  %load46673 = load ptr, ptr %mode, align 8
+  br label %match.test7557
 
-match.test7408:                                   ; preds = %if.end7406
-  %strcmp45860 = call i32 @strcmp(ptr %load45858, ptr @.strlit45859)
-  %cmp45861 = icmp eq i32 %strcmp45860, 0
-  %bool45862 = zext i1 %cmp45861 to i32
-  %cond45863 = icmp ne i32 %bool45862, 0
-  br i1 %cond45863, label %match.body7409, label %match.test7410
+match.test7551:                                   ; preds = %if.end7549
+  %strcmp46655 = call i32 @strcmp(ptr %load46653, ptr @.strlit46654)
+  %cmp46656 = icmp eq i32 %strcmp46655, 0
+  %bool46657 = zext i1 %cmp46656 to i32
+  %cond46658 = icmp ne i32 %bool46657, 0
+  br i1 %cond46658, label %match.body7552, label %match.test7553
 
-match.body7409:                                   ; preds = %match.test7408
-  %load45864 = load %AstProgram, ptr %lowered_program, align 8
-  %call45865 = call ptr @mir_program(%AstProgram %load45864)
-  call void @info_print(ptr %call45865)
-  %call45866 = call ptr @mode_success()
-  ret ptr %call45866
+match.body7552:                                   ; preds = %match.test7551
+  %load46659 = load %AstProgram, ptr %lowered_program, align 8
+  %call46660 = call ptr @mir_program(%AstProgram %load46659)
+  call void @info_print(ptr %call46660)
+  %call46661 = call ptr @mode_success()
+  ret ptr %call46661
 
-match.test7410:                                   ; preds = %match.test7408
-  %strcmp45868 = call i32 @strcmp(ptr %load45858, ptr @.strlit45867)
-  %cmp45869 = icmp eq i32 %strcmp45868, 0
-  %bool45870 = zext i1 %cmp45869 to i32
-  %cond45871 = icmp ne i32 %bool45870, 0
-  br i1 %cond45871, label %match.body7411, label %match.test7412
+match.test7553:                                   ; preds = %match.test7551
+  %strcmp46663 = call i32 @strcmp(ptr %load46653, ptr @.strlit46662)
+  %cmp46664 = icmp eq i32 %strcmp46663, 0
+  %bool46665 = zext i1 %cmp46664 to i32
+  %cond46666 = icmp ne i32 %bool46665, 0
+  br i1 %cond46666, label %match.body7554, label %match.test7555
 
-match.body7411:                                   ; preds = %match.test7410
-  %load45872 = load %AstProgram, ptr %lowered_program, align 8
-  %call45873 = call ptr @mir_program(%AstProgram %load45872)
+match.body7554:                                   ; preds = %match.test7553
+  %load46667 = load %AstProgram, ptr %lowered_program, align 8
+  %call46668 = call ptr @mir_program(%AstProgram %load46667)
   %mir = alloca ptr, align 8
-  store ptr %call45873, ptr %mir, align 8
-  %load45874 = load ptr, ptr %mir, align 8
-  %call45875 = call ptr @mir2asm_debug(ptr %load45874)
+  store ptr %call46668, ptr %mir, align 8
+  %load46669 = load ptr, ptr %mir, align 8
+  %call46670 = call ptr @mir2asm_debug(ptr %load46669)
   %asm = alloca ptr, align 8
-  store ptr %call45875, ptr %asm, align 8
-  %load45876 = load ptr, ptr %asm, align 8
-  call void @info_print(ptr %load45876)
-  %call45877 = call ptr @mode_success()
-  ret ptr %call45877
+  store ptr %call46670, ptr %asm, align 8
+  %load46671 = load ptr, ptr %asm, align 8
+  call void @info_print(ptr %load46671)
+  %call46672 = call ptr @mode_success()
+  ret ptr %call46672
 
-match.test7412:                                   ; preds = %match.test7410
-  br label %match.end7407
+match.test7555:                                   ; preds = %match.test7553
+  br label %match.end7550
 
-match.end7413:                                    ; preds = %match.test7416
-  %load45885 = load ptr, ptr %backend, align 8
-  %strcmp45887 = call i32 @strcmp(ptr %load45885, ptr @.strlit45886)
-  %cmp45888 = icmp eq i32 %strcmp45887, 0
-  %bool45889 = zext i1 %cmp45888 to i32
-  %cond45890 = icmp ne i32 %bool45889, 0
-  br i1 %cond45890, label %and.rhs, label %and.false
+match.end7556:                                    ; preds = %match.test7559
+  %load46680 = load ptr, ptr %backend, align 8
+  %strcmp46682 = call i32 @strcmp(ptr %load46680, ptr @.strlit46681)
+  %cmp46683 = icmp eq i32 %strcmp46682, 0
+  %bool46684 = zext i1 %cmp46683 to i32
+  %cond46685 = icmp ne i32 %bool46684, 0
+  br i1 %cond46685, label %and.rhs, label %and.false
 
-match.test7414:                                   ; preds = %match.end7407
-  %strcmp45880 = call i32 @strcmp(ptr %load45878, ptr @.strlit45879)
-  %cmp45881 = icmp eq i32 %strcmp45880, 0
-  %bool45882 = zext i1 %cmp45881 to i32
-  %cond45883 = icmp ne i32 %bool45882, 0
-  br i1 %cond45883, label %match.body7415, label %match.test7416
+match.test7557:                                   ; preds = %match.end7550
+  %strcmp46675 = call i32 @strcmp(ptr %load46673, ptr @.strlit46674)
+  %cmp46676 = icmp eq i32 %strcmp46675, 0
+  %bool46677 = zext i1 %cmp46676 to i32
+  %cond46678 = icmp ne i32 %bool46677, 0
+  br i1 %cond46678, label %match.body7558, label %match.test7559
 
-match.body7415:                                   ; preds = %match.test7414
-  %call45884 = call ptr @mode_success()
-  ret ptr %call45884
+match.body7558:                                   ; preds = %match.test7557
+  %call46679 = call ptr @mode_success()
+  ret ptr %call46679
 
-match.test7416:                                   ; preds = %match.test7414
-  br label %match.end7413
+match.test7559:                                   ; preds = %match.test7557
+  br label %match.end7556
 
-if.then7417:                                      ; preds = %and.merge3
-  %load45911 = load %AstProgram, ptr %lowered_program, align 8
-  %call45912 = call ptr @mir_program(%AstProgram %load45911)
+if.then7560:                                      ; preds = %and.merge3
+  %load46706 = load %AstProgram, ptr %lowered_program, align 8
+  %call46707 = call ptr @mir_program(%AstProgram %load46706)
   %mir4 = alloca ptr, align 8
-  store ptr %call45912, ptr %mir4, align 8
-  %load45913 = load ptr, ptr %mir4, align 8
-  %call45914 = call ptr @mir2asm(ptr %load45913)
+  store ptr %call46707, ptr %mir4, align 8
+  %load46708 = load ptr, ptr %mir4, align 8
+  %call46709 = call ptr @mir2asm(ptr %load46708)
   %asm5 = alloca ptr, align 8
-  store ptr %call45914, ptr %asm5, align 8
-  %load45915 = load ptr, ptr %filename, align 8
-  %load45916 = load ptr, ptr %output, align 8
-  %load45917 = load ptr, ptr %emit, align 8
-  %call45918 = call ptr @artifact_output_path(ptr %load45915, ptr %load45916, ptr %load45917)
+  store ptr %call46709, ptr %asm5, align 8
+  %load46710 = load ptr, ptr %filename, align 8
+  %load46711 = load ptr, ptr %output, align 8
+  %load46712 = load ptr, ptr %emit, align 8
+  %call46713 = call ptr @artifact_output_path(ptr %load46710, ptr %load46711, ptr %load46712)
   %artifact_path = alloca ptr, align 8
-  store ptr %call45918, ptr %artifact_path, align 8
-  %load45919 = load ptr, ptr %emit, align 8
-  %strcmp45921 = call i32 @strcmp(ptr %load45919, ptr @.strlit45920)
-  %cmp45922 = icmp eq i32 %strcmp45921, 0
-  %bool45923 = zext i1 %cmp45922 to i32
-  %cond45924 = icmp ne i32 %bool45923, 0
-  br i1 %cond45924, label %if.then7420, label %if.else7421
+  store ptr %call46713, ptr %artifact_path, align 8
+  %load46714 = load ptr, ptr %emit, align 8
+  %strcmp46716 = call i32 @strcmp(ptr %load46714, ptr @.strlit46715)
+  %cmp46717 = icmp eq i32 %strcmp46716, 0
+  %bool46718 = zext i1 %cmp46717 to i32
+  %cond46719 = icmp ne i32 %bool46718, 0
+  br i1 %cond46719, label %if.then7563, label %if.else7564
 
-if.else7418:                                      ; preds = %and.merge3
-  br label %if.end7419
+if.else7561:                                      ; preds = %and.merge3
+  br label %if.end7562
 
-if.end7419:                                       ; preds = %if.else7418
-  %load46010 = load %AstProgram, ptr %lowered_program, align 8
-  %load46011 = load ptr, ptr %target_triple, align 8
-  %call46012 = call ptr @codegen_program_target(%AstProgram %load46010, ptr %load46011)
+if.end7562:                                       ; preds = %if.else7561
+  %load46805 = load %AstProgram, ptr %lowered_program, align 8
+  %load46806 = load ptr, ptr %target_triple, align 8
+  %call46807 = call ptr @codegen_program_target(%AstProgram %load46805, ptr %load46806)
   %ir6 = alloca ptr, align 8
-  store ptr %call46012, ptr %ir6, align 8
-  %load46013 = load ptr, ptr %emit, align 8
-  %strcmp46015 = call i32 @strcmp(ptr %load46013, ptr @.strlit46014)
-  %cmp46016 = icmp eq i32 %strcmp46015, 0
-  %bool46017 = zext i1 %cmp46016 to i32
-  %cond46018 = icmp ne i32 %bool46017, 0
-  br i1 %cond46018, label %if.then7438, label %if.else7439
+  store ptr %call46807, ptr %ir6, align 8
+  %load46808 = load ptr, ptr %emit, align 8
+  %strcmp46810 = call i32 @strcmp(ptr %load46808, ptr @.strlit46809)
+  %cmp46811 = icmp eq i32 %strcmp46810, 0
+  %bool46812 = zext i1 %cmp46811 to i32
+  %cond46813 = icmp ne i32 %bool46812, 0
+  br i1 %cond46813, label %if.then7581, label %if.else7582
 
-and.rhs:                                          ; preds = %match.end7413
-  %load45891 = load ptr, ptr %emit, align 8
-  %strcmp45893 = call i32 @strcmp(ptr %load45891, ptr @.strlit45892)
-  %cmp45894 = icmp eq i32 %strcmp45893, 0
-  %bool45895 = zext i1 %cmp45894 to i32
-  %cmp45896 = icmp eq i32 %bool45895, 0
-  %bool45897 = zext i1 %cmp45896 to i32
-  %cond45898 = icmp ne i32 %bool45897, 0
-  br i1 %cond45898, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %match.end7556
+  %load46686 = load ptr, ptr %emit, align 8
+  %strcmp46688 = call i32 @strcmp(ptr %load46686, ptr @.strlit46687)
+  %cmp46689 = icmp eq i32 %strcmp46688, 0
+  %bool46690 = zext i1 %cmp46689 to i32
+  %cmp46691 = icmp eq i32 %bool46690, 0
+  %bool46692 = zext i1 %cmp46691 to i32
+  %cond46693 = icmp ne i32 %bool46692, 0
+  br i1 %cond46693, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %match.end7413
+and.false:                                        ; preds = %and.rhs, %match.end7556
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval45899 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond45900 = icmp ne i32 %andval45899, 0
-  br i1 %cond45900, label %and.rhs1, label %and.false2
+  %andval46694 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond46695 = icmp ne i32 %andval46694, 0
+  br i1 %cond46695, label %and.rhs1, label %and.false2
 
 and.rhs1:                                         ; preds = %and.merge
-  %load45901 = load ptr, ptr %emit, align 8
-  %strcmp45903 = call i32 @strcmp(ptr %load45901, ptr @.strlit45902)
-  %cmp45904 = icmp eq i32 %strcmp45903, 0
-  %bool45905 = zext i1 %cmp45904 to i32
-  %cmp45906 = icmp eq i32 %bool45905, 0
-  %bool45907 = zext i1 %cmp45906 to i32
-  %cond45908 = icmp ne i32 %bool45907, 0
-  br i1 %cond45908, label %and.merge3, label %and.false2
+  %load46696 = load ptr, ptr %emit, align 8
+  %strcmp46698 = call i32 @strcmp(ptr %load46696, ptr @.strlit46697)
+  %cmp46699 = icmp eq i32 %strcmp46698, 0
+  %bool46700 = zext i1 %cmp46699 to i32
+  %cmp46701 = icmp eq i32 %bool46700, 0
+  %bool46702 = zext i1 %cmp46701 to i32
+  %cond46703 = icmp ne i32 %bool46702, 0
+  br i1 %cond46703, label %and.merge3, label %and.false2
 
 and.false2:                                       ; preds = %and.rhs1, %and.merge
   br label %and.merge3
 
 and.merge3:                                       ; preds = %and.false2, %and.rhs1
-  %andval45909 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
-  %cond45910 = icmp ne i32 %andval45909, 0
-  br i1 %cond45910, label %if.then7417, label %if.else7418
+  %andval46704 = phi i32 [ 1, %and.rhs1 ], [ 0, %and.false2 ]
+  %cond46705 = icmp ne i32 %andval46704, 0
+  br i1 %cond46705, label %if.then7560, label %if.else7561
 
-if.then7420:                                      ; preds = %if.then7417
-  %load45925 = load ptr, ptr %artifact_path, align 8
-  %load45926 = load ptr, ptr %asm5, align 8
-  %call45927 = call i32 @write_text_file(ptr %load45925, ptr %load45926)
-  %cmp45928 = icmp ne i32 %call45927, 0
-  %bool45929 = zext i1 %cmp45928 to i32
-  %cond45930 = icmp ne i32 %bool45929, 0
-  br i1 %cond45930, label %if.then7423, label %if.else7424
+if.then7563:                                      ; preds = %if.then7560
+  %load46720 = load ptr, ptr %artifact_path, align 8
+  %load46721 = load ptr, ptr %asm5, align 8
+  %call46722 = call i32 @write_text_file(ptr %load46720, ptr %load46721)
+  %cmp46723 = icmp ne i32 %call46722, 0
+  %bool46724 = zext i1 %cmp46723 to i32
+  %cond46725 = icmp ne i32 %bool46724, 0
+  br i1 %cond46725, label %if.then7566, label %if.else7567
 
-if.else7421:                                      ; preds = %if.then7417
-  br label %if.end7422
+if.else7564:                                      ; preds = %if.then7560
+  br label %if.end7565
 
-if.end7422:                                       ; preds = %if.else7421
-  %load45934 = load ptr, ptr %artifact_path, align 8
-  %call45936 = call ptr @vix_string_concat(ptr %load45934, ptr @.strlit45935)
+if.end7565:                                       ; preds = %if.else7564
+  %load46729 = load ptr, ptr %artifact_path, align 8
+  %call46731 = call ptr @vix_string_concat(ptr %load46729, ptr @.strlit46730)
   %asm_path = alloca ptr, align 8
-  store ptr %call45936, ptr %asm_path, align 8
-  %ifexpr45937 = alloca ptr, align 8
-  %load45938 = load ptr, ptr %emit, align 8
-  %strcmp45940 = call i32 @strcmp(ptr %load45938, ptr @.strlit45939)
-  %cmp45941 = icmp eq i32 %strcmp45940, 0
-  %bool45942 = zext i1 %cmp45941 to i32
-  %cond45943 = icmp ne i32 %bool45942, 0
-  br i1 %cond45943, label %ifexpr.then7426, label %ifexpr.else7427
+  store ptr %call46731, ptr %asm_path, align 8
+  %ifexpr46732 = alloca ptr, align 8
+  %load46733 = load ptr, ptr %emit, align 8
+  %strcmp46735 = call i32 @strcmp(ptr %load46733, ptr @.strlit46734)
+  %cmp46736 = icmp eq i32 %strcmp46735, 0
+  %bool46737 = zext i1 %cmp46736 to i32
+  %cond46738 = icmp ne i32 %bool46737, 0
+  br i1 %cond46738, label %ifexpr.then7569, label %ifexpr.else7570
 
-if.then7423:                                      ; preds = %if.then7420
-  %call45931 = call ptr @mode_failure()
-  ret ptr %call45931
+if.then7566:                                      ; preds = %if.then7563
+  %call46726 = call ptr @mode_failure()
+  ret ptr %call46726
 
-if.else7424:                                      ; preds = %if.then7420
-  br label %if.end7425
+if.else7567:                                      ; preds = %if.then7563
+  br label %if.end7568
 
-if.end7425:                                       ; preds = %if.else7424
-  %load45932 = load ptr, ptr %artifact_path, align 8
-  %9 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load45932)
-  %call45933 = call ptr @mode_success()
-  ret ptr %call45933
+if.end7568:                                       ; preds = %if.else7567
+  %load46727 = load ptr, ptr %artifact_path, align 8
+  %9 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46727)
+  %call46728 = call ptr @mode_success()
+  ret ptr %call46728
 
-ifexpr.then7426:                                  ; preds = %if.end7422
-  %load45944 = load ptr, ptr %artifact_path, align 8
-  store ptr %load45944, ptr %ifexpr45937, align 8
-  br label %ifexpr.end7428
+ifexpr.then7569:                                  ; preds = %if.end7565
+  %load46739 = load ptr, ptr %artifact_path, align 8
+  store ptr %load46739, ptr %ifexpr46732, align 8
+  br label %ifexpr.end7571
 
-ifexpr.else7427:                                  ; preds = %if.end7422
-  %load45945 = load ptr, ptr %artifact_path, align 8
-  %call45947 = call ptr @vix_string_concat(ptr %load45945, ptr @.strlit45946)
-  store ptr %call45947, ptr %ifexpr45937, align 8
-  br label %ifexpr.end7428
+ifexpr.else7570:                                  ; preds = %if.end7565
+  %load46740 = load ptr, ptr %artifact_path, align 8
+  %call46742 = call ptr @vix_string_concat(ptr %load46740, ptr @.strlit46741)
+  store ptr %call46742, ptr %ifexpr46732, align 8
+  br label %ifexpr.end7571
 
-ifexpr.end7428:                                   ; preds = %ifexpr.else7427, %ifexpr.then7426
-  %ifexprval45948 = load ptr, ptr %ifexpr45937, align 8
+ifexpr.end7571:                                   ; preds = %ifexpr.else7570, %ifexpr.then7569
+  %ifexprval46743 = load ptr, ptr %ifexpr46732, align 8
   %obj_path = alloca ptr, align 8
-  store ptr %ifexprval45948, ptr %obj_path, align 8
-  %load45949 = load ptr, ptr %asm_path, align 8
-  %load45950 = load ptr, ptr %asm5, align 8
-  %call45951 = call i32 @write_text_file(ptr %load45949, ptr %load45950)
-  %load45953 = load ptr, ptr %asm_path, align 8
-  %call45954 = call ptr @vix_string_concat(ptr @.strlit45952, ptr %load45953)
-  %call45956 = call ptr @vix_string_concat(ptr %call45954, ptr @.strlit45955)
-  %load45957 = load ptr, ptr %obj_path, align 8
-  %call45958 = call ptr @vix_string_concat(ptr %call45956, ptr %load45957)
-  %call45959 = call i32 @shell_command(ptr %call45958)
+  store ptr %ifexprval46743, ptr %obj_path, align 8
+  %load46744 = load ptr, ptr %asm_path, align 8
+  %load46745 = load ptr, ptr %asm5, align 8
+  %call46746 = call i32 @write_text_file(ptr %load46744, ptr %load46745)
+  %load46748 = load ptr, ptr %asm_path, align 8
+  %call46749 = call ptr @vix_string_concat(ptr @.strlit46747, ptr %load46748)
+  %call46751 = call ptr @vix_string_concat(ptr %call46749, ptr @.strlit46750)
+  %load46752 = load ptr, ptr %obj_path, align 8
+  %call46753 = call ptr @vix_string_concat(ptr %call46751, ptr %load46752)
+  %call46754 = call i32 @shell_command(ptr %call46753)
   %asm_result = alloca i32, align 4
-  store i32 %call45959, ptr %asm_result, align 4
-  %load45960 = load ptr, ptr %asm_path, align 8
-  %call45961 = call i32 @delete_file(ptr %load45960)
-  %load45962 = load i32, ptr %asm_result, align 4
-  %cmp45963 = icmp ne i32 %load45962, 0
-  %bool45964 = zext i1 %cmp45963 to i32
-  %cond45965 = icmp ne i32 %bool45964, 0
-  br i1 %cond45965, label %if.then7429, label %if.else7430
+  store i32 %call46754, ptr %asm_result, align 4
+  %load46755 = load ptr, ptr %asm_path, align 8
+  %call46756 = call i32 @delete_file(ptr %load46755)
+  %load46757 = load i32, ptr %asm_result, align 4
+  %cmp46758 = icmp ne i32 %load46757, 0
+  %bool46759 = zext i1 %cmp46758 to i32
+  %cond46760 = icmp ne i32 %bool46759, 0
+  br i1 %cond46760, label %if.then7572, label %if.else7573
 
-if.then7429:                                      ; preds = %ifexpr.end7428
-  %load45967 = load ptr, ptr %obj_path, align 8
-  %call45968 = call ptr @vix_string_concat(ptr @.strlit45966, ptr %load45967)
-  %call45970 = call ptr @vix_string_concat(ptr %call45968, ptr @.strlit45969)
-  call void @diag_print(ptr %call45970)
-  %call45971 = call ptr @mode_failure()
-  ret ptr %call45971
+if.then7572:                                      ; preds = %ifexpr.end7571
+  %load46762 = load ptr, ptr %obj_path, align 8
+  %call46763 = call ptr @vix_string_concat(ptr @.strlit46761, ptr %load46762)
+  %call46765 = call ptr @vix_string_concat(ptr %call46763, ptr @.strlit46764)
+  call void @diag_print(ptr %call46765)
+  %call46766 = call ptr @mode_failure()
+  ret ptr %call46766
 
-if.else7430:                                      ; preds = %ifexpr.end7428
-  br label %if.end7431
+if.else7573:                                      ; preds = %ifexpr.end7571
+  br label %if.end7574
 
-if.end7431:                                       ; preds = %if.else7430
-  %load45972 = load ptr, ptr %emit, align 8
-  %strcmp45974 = call i32 @strcmp(ptr %load45972, ptr @.strlit45973)
-  %cmp45975 = icmp eq i32 %strcmp45974, 0
-  %bool45976 = zext i1 %cmp45975 to i32
-  %cond45977 = icmp ne i32 %bool45976, 0
-  br i1 %cond45977, label %if.then7432, label %if.else7433
+if.end7574:                                       ; preds = %if.else7573
+  %load46767 = load ptr, ptr %emit, align 8
+  %strcmp46769 = call i32 @strcmp(ptr %load46767, ptr @.strlit46768)
+  %cmp46770 = icmp eq i32 %strcmp46769, 0
+  %bool46771 = zext i1 %cmp46770 to i32
+  %cond46772 = icmp ne i32 %bool46771, 0
+  br i1 %cond46772, label %if.then7575, label %if.else7576
 
-if.then7432:                                      ; preds = %if.end7431
-  %load45978 = load ptr, ptr %obj_path, align 8
-  %10 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load45978)
-  %call45979 = call ptr @mode_success()
-  ret ptr %call45979
+if.then7575:                                      ; preds = %if.end7574
+  %load46773 = load ptr, ptr %obj_path, align 8
+  %10 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46773)
+  %call46774 = call ptr @mode_success()
+  ret ptr %call46774
 
-if.else7433:                                      ; preds = %if.end7431
-  br label %if.end7434
+if.else7576:                                      ; preds = %if.end7574
+  br label %if.end7577
 
-if.end7434:                                       ; preds = %if.else7433
-  %load45981 = load ptr, ptr %obj_path, align 8
-  %call45982 = call ptr @vix_string_concat(ptr @.strlit45980, ptr %load45981)
-  %call45984 = call ptr @vix_string_concat(ptr %call45982, ptr @.strlit45983)
-  %load45985 = load ptr, ptr %runtime_object, align 8
-  %call45986 = call ptr @vix_string_concat(ptr %call45984, ptr %load45985)
-  %call45988 = call ptr @vix_string_concat(ptr %call45986, ptr @.strlit45987)
-  %load45989 = load ptr, ptr %artifact_path, align 8
-  %call45990 = call ptr @vix_string_concat(ptr %call45988, ptr %load45989)
-  %call45992 = call ptr @vix_string_concat(ptr %call45990, ptr @.strlit45991)
-  %load45993 = load ptr, ptr %link_args, align 8
-  %call45994 = call ptr @vix_string_concat(ptr %call45992, ptr %load45993)
-  %call45995 = call i32 @shell_command(ptr %call45994)
+if.end7577:                                       ; preds = %if.else7576
+  %load46776 = load ptr, ptr %obj_path, align 8
+  %call46777 = call ptr @vix_string_concat(ptr @.strlit46775, ptr %load46776)
+  %call46779 = call ptr @vix_string_concat(ptr %call46777, ptr @.strlit46778)
+  %load46780 = load ptr, ptr %runtime_object, align 8
+  %call46781 = call ptr @vix_string_concat(ptr %call46779, ptr %load46780)
+  %call46783 = call ptr @vix_string_concat(ptr %call46781, ptr @.strlit46782)
+  %load46784 = load ptr, ptr %artifact_path, align 8
+  %call46785 = call ptr @vix_string_concat(ptr %call46783, ptr %load46784)
+  %call46787 = call ptr @vix_string_concat(ptr %call46785, ptr @.strlit46786)
+  %load46788 = load ptr, ptr %link_args, align 8
+  %call46789 = call ptr @vix_string_concat(ptr %call46787, ptr %load46788)
+  %call46790 = call i32 @shell_command(ptr %call46789)
   %link_result = alloca i32, align 4
-  store i32 %call45995, ptr %link_result, align 4
-  %load45996 = load ptr, ptr %obj_path, align 8
-  %call45997 = call i32 @delete_file(ptr %load45996)
-  %load45998 = load i32, ptr %link_result, align 4
-  %cmp45999 = icmp ne i32 %load45998, 0
-  %bool46000 = zext i1 %cmp45999 to i32
-  %cond46001 = icmp ne i32 %bool46000, 0
-  br i1 %cond46001, label %if.then7435, label %if.else7436
+  store i32 %call46790, ptr %link_result, align 4
+  %load46791 = load ptr, ptr %obj_path, align 8
+  %call46792 = call i32 @delete_file(ptr %load46791)
+  %load46793 = load i32, ptr %link_result, align 4
+  %cmp46794 = icmp ne i32 %load46793, 0
+  %bool46795 = zext i1 %cmp46794 to i32
+  %cond46796 = icmp ne i32 %bool46795, 0
+  br i1 %cond46796, label %if.then7578, label %if.else7579
 
-if.then7435:                                      ; preds = %if.end7434
-  %load46003 = load ptr, ptr %artifact_path, align 8
-  %call46004 = call ptr @vix_string_concat(ptr @.strlit46002, ptr %load46003)
-  %call46006 = call ptr @vix_string_concat(ptr %call46004, ptr @.strlit46005)
-  call void @diag_print(ptr %call46006)
-  %call46007 = call ptr @mode_failure()
-  ret ptr %call46007
+if.then7578:                                      ; preds = %if.end7577
+  %load46798 = load ptr, ptr %artifact_path, align 8
+  %call46799 = call ptr @vix_string_concat(ptr @.strlit46797, ptr %load46798)
+  %call46801 = call ptr @vix_string_concat(ptr %call46799, ptr @.strlit46800)
+  call void @diag_print(ptr %call46801)
+  %call46802 = call ptr @mode_failure()
+  ret ptr %call46802
 
-if.else7436:                                      ; preds = %if.end7434
-  br label %if.end7437
+if.else7579:                                      ; preds = %if.end7577
+  br label %if.end7580
 
-if.end7437:                                       ; preds = %if.else7436
-  %load46008 = load ptr, ptr %artifact_path, align 8
-  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46008)
-  %call46009 = call ptr @mode_success()
-  ret ptr %call46009
+if.end7580:                                       ; preds = %if.else7579
+  %load46803 = load ptr, ptr %artifact_path, align 8
+  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46803)
+  %call46804 = call ptr @mode_success()
+  ret ptr %call46804
 
-if.then7438:                                      ; preds = %if.end7419
-  %load46019 = load ptr, ptr %ir6, align 8
-  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46019)
-  %call46020 = call ptr @mode_continue()
-  ret ptr %call46020
+if.then7581:                                      ; preds = %if.end7562
+  %load46814 = load ptr, ptr %ir6, align 8
+  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46814)
+  %call46815 = call ptr @mode_continue()
+  ret ptr %call46815
 
-if.else7439:                                      ; preds = %if.end7419
-  br label %if.end7440
+if.else7582:                                      ; preds = %if.end7562
+  br label %if.end7583
 
-if.end7440:                                       ; preds = %if.else7439
+if.end7583:                                       ; preds = %if.else7582
   %artifact_path7 = alloca ptr, align 8
-  store ptr @.strlit46021, ptr %artifact_path7, align 8
+  store ptr @.strlit46816, ptr %artifact_path7, align 8
   %ir_path = alloca ptr, align 8
-  store ptr @.strlit46022, ptr %ir_path, align 8
-  %load46023 = load ptr, ptr %emit, align 8
-  %strcmp46025 = call i32 @strcmp(ptr %load46023, ptr @.strlit46024)
-  %cmp46026 = icmp eq i32 %strcmp46025, 0
-  %bool46027 = zext i1 %cmp46026 to i32
-  %cond46028 = icmp ne i32 %bool46027, 0
-  br i1 %cond46028, label %if.then7441, label %if.else7442
+  store ptr @.strlit46817, ptr %ir_path, align 8
+  %load46818 = load ptr, ptr %emit, align 8
+  %strcmp46820 = call i32 @strcmp(ptr %load46818, ptr @.strlit46819)
+  %cmp46821 = icmp eq i32 %strcmp46820, 0
+  %bool46822 = zext i1 %cmp46821 to i32
+  %cond46823 = icmp ne i32 %bool46822, 0
+  br i1 %cond46823, label %if.then7584, label %if.else7585
 
-if.then7441:                                      ; preds = %if.end7440
-  %load46029 = load ptr, ptr %filename, align 8
-  %load46030 = load ptr, ptr %output, align 8
-  %call46031 = call ptr @ir_output_path(ptr %load46029, ptr %load46030)
-  store ptr %call46031, ptr %ir_path, align 8
-  br label %if.end7443
+if.then7584:                                      ; preds = %if.end7583
+  %load46824 = load ptr, ptr %filename, align 8
+  %load46825 = load ptr, ptr %output, align 8
+  %call46826 = call ptr @ir_output_path(ptr %load46824, ptr %load46825)
+  store ptr %call46826, ptr %ir_path, align 8
+  br label %if.end7586
 
-if.else7442:                                      ; preds = %if.end7440
-  %load46032 = load ptr, ptr %filename, align 8
-  %load46033 = load ptr, ptr %output, align 8
-  %load46034 = load ptr, ptr %emit, align 8
-  %call46035 = call ptr @artifact_output_path(ptr %load46032, ptr %load46033, ptr %load46034)
-  store ptr %call46035, ptr %artifact_path7, align 8
-  %load46036 = load ptr, ptr %artifact_path7, align 8
-  %call46038 = call ptr @vix_string_concat(ptr %load46036, ptr @.strlit46037)
-  store ptr %call46038, ptr %ir_path, align 8
-  br label %if.end7443
+if.else7585:                                      ; preds = %if.end7583
+  %load46827 = load ptr, ptr %filename, align 8
+  %load46828 = load ptr, ptr %output, align 8
+  %load46829 = load ptr, ptr %emit, align 8
+  %call46830 = call ptr @artifact_output_path(ptr %load46827, ptr %load46828, ptr %load46829)
+  store ptr %call46830, ptr %artifact_path7, align 8
+  %load46831 = load ptr, ptr %artifact_path7, align 8
+  %call46833 = call ptr @vix_string_concat(ptr %load46831, ptr @.strlit46832)
+  store ptr %call46833, ptr %ir_path, align 8
+  br label %if.end7586
 
-if.end7443:                                       ; preds = %if.else7442, %if.then7441
-  %load46039 = load ptr, ptr %ir_path, align 8
-  %load46040 = load ptr, ptr %ir6, align 8
-  %call46041 = call i32 @write_text_file(ptr %load46039, ptr %load46040)
-  %load46042 = load ptr, ptr %emit, align 8
-  %strcmp46044 = call i32 @strcmp(ptr %load46042, ptr @.strlit46043)
-  %cmp46045 = icmp eq i32 %strcmp46044, 0
-  %bool46046 = zext i1 %cmp46045 to i32
-  %cond46047 = icmp ne i32 %bool46046, 0
-  br i1 %cond46047, label %if.then7444, label %if.else7445
+if.end7586:                                       ; preds = %if.else7585, %if.then7584
+  %load46834 = load ptr, ptr %ir_path, align 8
+  %load46835 = load ptr, ptr %ir6, align 8
+  %call46836 = call i32 @write_text_file(ptr %load46834, ptr %load46835)
+  %load46837 = load ptr, ptr %emit, align 8
+  %strcmp46839 = call i32 @strcmp(ptr %load46837, ptr @.strlit46838)
+  %cmp46840 = icmp eq i32 %strcmp46839, 0
+  %bool46841 = zext i1 %cmp46840 to i32
+  %cond46842 = icmp ne i32 %bool46841, 0
+  br i1 %cond46842, label %if.then7587, label %if.else7588
 
-if.then7444:                                      ; preds = %if.end7443
-  %load46048 = load ptr, ptr %ir_path, align 8
-  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46048)
-  %call46049 = call ptr @mode_success()
-  ret ptr %call46049
+if.then7587:                                      ; preds = %if.end7586
+  %load46843 = load ptr, ptr %ir_path, align 8
+  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46843)
+  %call46844 = call ptr @mode_success()
+  ret ptr %call46844
 
-if.else7445:                                      ; preds = %if.end7443
-  br label %if.end7446
+if.else7588:                                      ; preds = %if.end7586
+  br label %if.end7589
 
-if.end7446:                                       ; preds = %if.else7445
-  %load46050 = load ptr, ptr %artifact_path7, align 8
-  %strcmp46052 = call i32 @strcmp(ptr %load46050, ptr @.strlit46051)
-  %cmp46053 = icmp eq i32 %strcmp46052, 0
-  %bool46054 = zext i1 %cmp46053 to i32
-  %cond46055 = icmp ne i32 %bool46054, 0
-  br i1 %cond46055, label %if.then7447, label %if.else7448
+if.end7589:                                       ; preds = %if.else7588
+  %load46845 = load ptr, ptr %artifact_path7, align 8
+  %strcmp46847 = call i32 @strcmp(ptr %load46845, ptr @.strlit46846)
+  %cmp46848 = icmp eq i32 %strcmp46847, 0
+  %bool46849 = zext i1 %cmp46848 to i32
+  %cond46850 = icmp ne i32 %bool46849, 0
+  br i1 %cond46850, label %if.then7590, label %if.else7591
 
-if.then7447:                                      ; preds = %if.end7446
-  %load46056 = load ptr, ptr %filename, align 8
-  %load46057 = load ptr, ptr %output, align 8
-  %load46058 = load ptr, ptr %emit, align 8
-  %call46059 = call ptr @artifact_output_path(ptr %load46056, ptr %load46057, ptr %load46058)
-  store ptr %call46059, ptr %artifact_path7, align 8
-  br label %if.end7449
+if.then7590:                                      ; preds = %if.end7589
+  %load46851 = load ptr, ptr %filename, align 8
+  %load46852 = load ptr, ptr %output, align 8
+  %load46853 = load ptr, ptr %emit, align 8
+  %call46854 = call ptr @artifact_output_path(ptr %load46851, ptr %load46852, ptr %load46853)
+  store ptr %call46854, ptr %artifact_path7, align 8
+  br label %if.end7592
 
-if.else7448:                                      ; preds = %if.end7446
-  br label %if.end7449
+if.else7591:                                      ; preds = %if.end7589
+  br label %if.end7592
 
-if.end7449:                                       ; preds = %if.else7448, %if.then7447
-  %load46060 = load ptr, ptr %target_triple, align 8
-  %call46061 = call ptr @clang_target_arg(ptr %load46060)
+if.end7592:                                       ; preds = %if.else7591, %if.then7590
+  %load46855 = load ptr, ptr %target_triple, align 8
+  %call46856 = call ptr @clang_target_arg(ptr %load46855)
   %target_arg = alloca ptr, align 8
-  store ptr %call46061, ptr %target_arg, align 8
+  store ptr %call46856, ptr %target_arg, align 8
   %command = alloca ptr, align 8
-  store ptr @.strlit46062, ptr %command, align 8
-  %load46063 = load ptr, ptr %emit, align 8
-  %strcmp46065 = call i32 @strcmp(ptr %load46063, ptr @.strlit46064)
-  %cmp46066 = icmp eq i32 %strcmp46065, 0
-  %bool46067 = zext i1 %cmp46066 to i32
-  %cond46068 = icmp ne i32 %bool46067, 0
-  br i1 %cond46068, label %if.then7450, label %if.else7451
+  store ptr @.strlit46857, ptr %command, align 8
+  %load46858 = load ptr, ptr %emit, align 8
+  %strcmp46860 = call i32 @strcmp(ptr %load46858, ptr @.strlit46859)
+  %cmp46861 = icmp eq i32 %strcmp46860, 0
+  %bool46862 = zext i1 %cmp46861 to i32
+  %cond46863 = icmp ne i32 %bool46862, 0
+  br i1 %cond46863, label %if.then7593, label %if.else7594
 
-if.then7450:                                      ; preds = %if.end7449
-  %load46070 = load ptr, ptr %target_arg, align 8
-  %call46071 = call ptr @vix_string_concat(ptr @.strlit46069, ptr %load46070)
-  %call46073 = call ptr @vix_string_concat(ptr %call46071, ptr @.strlit46072)
-  %load46074 = load ptr, ptr %ir_path, align 8
-  %call46075 = call ptr @vix_string_concat(ptr %call46073, ptr %load46074)
-  %call46077 = call ptr @vix_string_concat(ptr %call46075, ptr @.strlit46076)
-  %load46078 = load ptr, ptr %artifact_path7, align 8
-  %call46079 = call ptr @vix_string_concat(ptr %call46077, ptr %load46078)
-  store ptr %call46079, ptr %command, align 8
-  br label %if.end7452
+if.then7593:                                      ; preds = %if.end7592
+  %load46865 = load ptr, ptr %target_arg, align 8
+  %call46866 = call ptr @vix_string_concat(ptr @.strlit46864, ptr %load46865)
+  %call46868 = call ptr @vix_string_concat(ptr %call46866, ptr @.strlit46867)
+  %load46869 = load ptr, ptr %ir_path, align 8
+  %call46870 = call ptr @vix_string_concat(ptr %call46868, ptr %load46869)
+  %call46872 = call ptr @vix_string_concat(ptr %call46870, ptr @.strlit46871)
+  %load46873 = load ptr, ptr %artifact_path7, align 8
+  %call46874 = call ptr @vix_string_concat(ptr %call46872, ptr %load46873)
+  store ptr %call46874, ptr %command, align 8
+  br label %if.end7595
 
-if.else7451:                                      ; preds = %if.end7449
-  %load46080 = load ptr, ptr %emit, align 8
-  %strcmp46082 = call i32 @strcmp(ptr %load46080, ptr @.strlit46081)
-  %cmp46083 = icmp eq i32 %strcmp46082, 0
-  %bool46084 = zext i1 %cmp46083 to i32
-  %cond46085 = icmp ne i32 %bool46084, 0
-  br i1 %cond46085, label %if.then7453, label %if.else7454
+if.else7594:                                      ; preds = %if.end7592
+  %load46875 = load ptr, ptr %emit, align 8
+  %strcmp46877 = call i32 @strcmp(ptr %load46875, ptr @.strlit46876)
+  %cmp46878 = icmp eq i32 %strcmp46877, 0
+  %bool46879 = zext i1 %cmp46878 to i32
+  %cond46880 = icmp ne i32 %bool46879, 0
+  br i1 %cond46880, label %if.then7596, label %if.else7597
 
-if.end7452:                                       ; preds = %if.end7455, %if.then7450
-  %load46116 = load ptr, ptr %command, align 8
-  %call46117 = call i32 @shell_command(ptr %load46116)
+if.end7595:                                       ; preds = %if.end7598, %if.then7593
+  %load46911 = load ptr, ptr %command, align 8
+  %call46912 = call i32 @shell_command(ptr %load46911)
   %build_result = alloca i32, align 4
-  store i32 %call46117, ptr %build_result, align 4
-  %load46118 = load ptr, ptr %emit, align 8
-  %strcmp46120 = call i32 @strcmp(ptr %load46118, ptr @.strlit46119)
-  %cmp46121 = icmp eq i32 %strcmp46120, 0
-  %bool46122 = zext i1 %cmp46121 to i32
-  %cmp46123 = icmp eq i32 %bool46122, 0
-  %bool46124 = zext i1 %cmp46123 to i32
-  %cond46125 = icmp ne i32 %bool46124, 0
-  br i1 %cond46125, label %if.then7456, label %if.else7457
+  store i32 %call46912, ptr %build_result, align 4
+  %load46913 = load ptr, ptr %emit, align 8
+  %strcmp46915 = call i32 @strcmp(ptr %load46913, ptr @.strlit46914)
+  %cmp46916 = icmp eq i32 %strcmp46915, 0
+  %bool46917 = zext i1 %cmp46916 to i32
+  %cmp46918 = icmp eq i32 %bool46917, 0
+  %bool46919 = zext i1 %cmp46918 to i32
+  %cond46920 = icmp ne i32 %bool46919, 0
+  br i1 %cond46920, label %if.then7599, label %if.else7600
 
-if.then7453:                                      ; preds = %if.else7451
-  %load46087 = load ptr, ptr %target_arg, align 8
-  %call46088 = call ptr @vix_string_concat(ptr @.strlit46086, ptr %load46087)
-  %call46090 = call ptr @vix_string_concat(ptr %call46088, ptr @.strlit46089)
-  %load46091 = load ptr, ptr %ir_path, align 8
-  %call46092 = call ptr @vix_string_concat(ptr %call46090, ptr %load46091)
-  %call46094 = call ptr @vix_string_concat(ptr %call46092, ptr @.strlit46093)
-  %load46095 = load ptr, ptr %artifact_path7, align 8
-  %call46096 = call ptr @vix_string_concat(ptr %call46094, ptr %load46095)
-  store ptr %call46096, ptr %command, align 8
-  br label %if.end7455
+if.then7596:                                      ; preds = %if.else7594
+  %load46882 = load ptr, ptr %target_arg, align 8
+  %call46883 = call ptr @vix_string_concat(ptr @.strlit46881, ptr %load46882)
+  %call46885 = call ptr @vix_string_concat(ptr %call46883, ptr @.strlit46884)
+  %load46886 = load ptr, ptr %ir_path, align 8
+  %call46887 = call ptr @vix_string_concat(ptr %call46885, ptr %load46886)
+  %call46889 = call ptr @vix_string_concat(ptr %call46887, ptr @.strlit46888)
+  %load46890 = load ptr, ptr %artifact_path7, align 8
+  %call46891 = call ptr @vix_string_concat(ptr %call46889, ptr %load46890)
+  store ptr %call46891, ptr %command, align 8
+  br label %if.end7598
 
-if.else7454:                                      ; preds = %if.else7451
-  %load46098 = load ptr, ptr %target_arg, align 8
-  %call46099 = call ptr @vix_string_concat(ptr @.strlit46097, ptr %load46098)
-  %call46101 = call ptr @vix_string_concat(ptr %call46099, ptr @.strlit46100)
-  %load46102 = load ptr, ptr %ir_path, align 8
-  %call46103 = call ptr @vix_string_concat(ptr %call46101, ptr %load46102)
-  %call46105 = call ptr @vix_string_concat(ptr %call46103, ptr @.strlit46104)
-  %load46106 = load ptr, ptr %runtime_object, align 8
-  %call46107 = call ptr @vix_string_concat(ptr %call46105, ptr %load46106)
-  %call46109 = call ptr @vix_string_concat(ptr %call46107, ptr @.strlit46108)
-  %load46110 = load ptr, ptr %artifact_path7, align 8
-  %call46111 = call ptr @vix_string_concat(ptr %call46109, ptr %load46110)
-  %call46113 = call ptr @vix_string_concat(ptr %call46111, ptr @.strlit46112)
-  %load46114 = load ptr, ptr %link_args, align 8
-  %call46115 = call ptr @vix_string_concat(ptr %call46113, ptr %load46114)
-  store ptr %call46115, ptr %command, align 8
-  br label %if.end7455
+if.else7597:                                      ; preds = %if.else7594
+  %load46893 = load ptr, ptr %target_arg, align 8
+  %call46894 = call ptr @vix_string_concat(ptr @.strlit46892, ptr %load46893)
+  %call46896 = call ptr @vix_string_concat(ptr %call46894, ptr @.strlit46895)
+  %load46897 = load ptr, ptr %ir_path, align 8
+  %call46898 = call ptr @vix_string_concat(ptr %call46896, ptr %load46897)
+  %call46900 = call ptr @vix_string_concat(ptr %call46898, ptr @.strlit46899)
+  %load46901 = load ptr, ptr %runtime_object, align 8
+  %call46902 = call ptr @vix_string_concat(ptr %call46900, ptr %load46901)
+  %call46904 = call ptr @vix_string_concat(ptr %call46902, ptr @.strlit46903)
+  %load46905 = load ptr, ptr %artifact_path7, align 8
+  %call46906 = call ptr @vix_string_concat(ptr %call46904, ptr %load46905)
+  %call46908 = call ptr @vix_string_concat(ptr %call46906, ptr @.strlit46907)
+  %load46909 = load ptr, ptr %link_args, align 8
+  %call46910 = call ptr @vix_string_concat(ptr %call46908, ptr %load46909)
+  store ptr %call46910, ptr %command, align 8
+  br label %if.end7598
 
-if.end7455:                                       ; preds = %if.else7454, %if.then7453
-  br label %if.end7452
+if.end7598:                                       ; preds = %if.else7597, %if.then7596
+  br label %if.end7595
 
-if.then7456:                                      ; preds = %if.end7452
-  %load46126 = load ptr, ptr %ir_path, align 8
-  %call46127 = call i32 @delete_file(ptr %load46126)
-  br label %if.end7458
+if.then7599:                                      ; preds = %if.end7595
+  %load46921 = load ptr, ptr %ir_path, align 8
+  %call46922 = call i32 @delete_file(ptr %load46921)
+  br label %if.end7601
 
-if.else7457:                                      ; preds = %if.end7452
-  br label %if.end7458
+if.else7600:                                      ; preds = %if.end7595
+  br label %if.end7601
 
-if.end7458:                                       ; preds = %if.else7457, %if.then7456
-  %load46128 = load i32, ptr %build_result, align 4
-  %cmp46129 = icmp ne i32 %load46128, 0
-  %bool46130 = zext i1 %cmp46129 to i32
-  %cond46131 = icmp ne i32 %bool46130, 0
-  br i1 %cond46131, label %if.then7459, label %if.else7460
+if.end7601:                                       ; preds = %if.else7600, %if.then7599
+  %load46923 = load i32, ptr %build_result, align 4
+  %cmp46924 = icmp ne i32 %load46923, 0
+  %bool46925 = zext i1 %cmp46924 to i32
+  %cond46926 = icmp ne i32 %bool46925, 0
+  br i1 %cond46926, label %if.then7602, label %if.else7603
 
-if.then7459:                                      ; preds = %if.end7458
-  %load46133 = load ptr, ptr %artifact_path7, align 8
-  %call46134 = call ptr @vix_string_concat(ptr @.strlit46132, ptr %load46133)
-  %call46136 = call ptr @vix_string_concat(ptr %call46134, ptr @.strlit46135)
-  call void @diag_print(ptr %call46136)
-  %call46137 = call ptr @mode_failure()
-  ret ptr %call46137
+if.then7602:                                      ; preds = %if.end7601
+  %load46928 = load ptr, ptr %artifact_path7, align 8
+  %call46929 = call ptr @vix_string_concat(ptr @.strlit46927, ptr %load46928)
+  %call46931 = call ptr @vix_string_concat(ptr %call46929, ptr @.strlit46930)
+  call void @diag_print(ptr %call46931)
+  %call46932 = call ptr @mode_failure()
+  ret ptr %call46932
 
-if.else7460:                                      ; preds = %if.end7458
-  br label %if.end7461
+if.else7603:                                      ; preds = %if.end7601
+  br label %if.end7604
 
-if.end7461:                                       ; preds = %if.else7460
-  %load46138 = load ptr, ptr %artifact_path7, align 8
-  %14 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46138)
-  %call46139 = call ptr @mode_success()
-  ret ptr %call46139
+if.end7604:                                       ; preds = %if.else7603
+  %load46933 = load ptr, ptr %artifact_path7, align 8
+  %14 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load46933)
+  %call46934 = call ptr @mode_success()
+  ret ptr %call46934
 }
 
 define i32 @write_text_file(ptr %0, ptr %1) {
@@ -87670,32 +89220,32 @@ entry:
   store ptr %0, ptr %path, align 8
   %content = alloca ptr, align 8
   store ptr %1, ptr %content, align 8
-  %load46140 = load ptr, ptr %path, align 8
-  %call46142 = call ptr @fopen(ptr %load46140, ptr @.strlit46141)
+  %load46935 = load ptr, ptr %path, align 8
+  %call46937 = call ptr @fopen(ptr %load46935, ptr @.strlit46936)
   %file = alloca ptr, align 8
-  store ptr %call46142, ptr %file, align 8
-  %load46143 = load ptr, ptr %file, align 8
-  %cmp46144 = icmp eq ptr %load46143, null
-  %bool46145 = zext i1 %cmp46144 to i32
-  %cond46146 = icmp ne i32 %bool46145, 0
-  br i1 %cond46146, label %if.then7462, label %if.else7463
+  store ptr %call46937, ptr %file, align 8
+  %load46938 = load ptr, ptr %file, align 8
+  %cmp46939 = icmp eq ptr %load46938, null
+  %bool46940 = zext i1 %cmp46939 to i32
+  %cond46941 = icmp ne i32 %bool46940, 0
+  br i1 %cond46941, label %if.then7605, label %if.else7606
 
-if.then7462:                                      ; preds = %entry
-  %load46148 = load ptr, ptr %path, align 8
-  %call46149 = call ptr @vix_string_concat(ptr @.strlit46147, ptr %load46148)
-  %call46151 = call ptr @vix_string_concat(ptr %call46149, ptr @.strlit46150)
-  call void @diag_print(ptr %call46151)
+if.then7605:                                      ; preds = %entry
+  %load46943 = load ptr, ptr %path, align 8
+  %call46944 = call ptr @vix_string_concat(ptr @.strlit46942, ptr %load46943)
+  %call46946 = call ptr @vix_string_concat(ptr %call46944, ptr @.strlit46945)
+  call void @diag_print(ptr %call46946)
   ret i32 1
 
-if.else7463:                                      ; preds = %entry
-  br label %if.end7464
+if.else7606:                                      ; preds = %entry
+  br label %if.end7607
 
-if.end7464:                                       ; preds = %if.else7463
-  %load46152 = load ptr, ptr %content, align 8
-  %load46153 = load ptr, ptr %file, align 8
-  %call46154 = call i32 @fputs(ptr %load46152, ptr %load46153)
-  %load46155 = load ptr, ptr %file, align 8
-  %call46156 = call i32 @fclose(ptr %load46155)
+if.end7607:                                       ; preds = %if.else7606
+  %load46947 = load ptr, ptr %content, align 8
+  %load46948 = load ptr, ptr %file, align 8
+  %call46949 = call i32 @fputs(ptr %load46947, ptr %load46948)
+  %load46950 = load ptr, ptr %file, align 8
+  %call46951 = call i32 @fclose(ptr %load46950)
   ret i32 0
 }
 
@@ -87703,50 +89253,50 @@ define ptr @read_source_file(ptr %0) {
 entry:
   %path = alloca ptr, align 8
   store ptr %0, ptr %path, align 8
-  %load46157 = load ptr, ptr %path, align 8
-  %call46159 = call ptr @fopen(ptr %load46157, ptr @.strlit46158)
+  %load46952 = load ptr, ptr %path, align 8
+  %call46954 = call ptr @fopen(ptr %load46952, ptr @.strlit46953)
   %file = alloca ptr, align 8
-  store ptr %call46159, ptr %file, align 8
-  %load46160 = load ptr, ptr %file, align 8
-  %cmp46161 = icmp eq ptr %load46160, null
-  %bool46162 = zext i1 %cmp46161 to i32
-  %cond46163 = icmp ne i32 %bool46162, 0
-  br i1 %cond46163, label %if.then7465, label %if.else7466
+  store ptr %call46954, ptr %file, align 8
+  %load46955 = load ptr, ptr %file, align 8
+  %cmp46956 = icmp eq ptr %load46955, null
+  %bool46957 = zext i1 %cmp46956 to i32
+  %cond46958 = icmp ne i32 %bool46957, 0
+  br i1 %cond46958, label %if.then7608, label %if.else7609
 
-if.then7465:                                      ; preds = %entry
-  ret ptr @.strlit46164
+if.then7608:                                      ; preds = %entry
+  ret ptr @.strlit46959
 
-if.else7466:                                      ; preds = %entry
-  br label %if.end7467
+if.else7609:                                      ; preds = %entry
+  br label %if.end7610
 
-if.end7467:                                       ; preds = %if.else7466
-  %load46165 = load ptr, ptr %file, align 8
-  %call46166 = call i32 @fseek(ptr %load46165, i64 0, i32 2)
-  %load46167 = load ptr, ptr %file, align 8
-  %call46168 = call i64 @ftell(ptr %load46167)
+if.end7610:                                       ; preds = %if.else7609
+  %load46960 = load ptr, ptr %file, align 8
+  %call46961 = call i32 @fseek(ptr %load46960, i64 0, i32 2)
+  %load46962 = load ptr, ptr %file, align 8
+  %call46963 = call i64 @ftell(ptr %load46962)
   %size = alloca i64, align 8
-  store i64 %call46168, ptr %size, align 4
-  %load46169 = load ptr, ptr %file, align 8
-  %call46170 = call i32 @fseek(ptr %load46169, i64 0, i32 0)
-  %load46171 = load i64, ptr %size, align 4
-  %add46172 = add i64 %load46171, 1
-  %call46173 = call ptr @malloc(i64 %add46172)
+  store i64 %call46963, ptr %size, align 4
+  %load46964 = load ptr, ptr %file, align 8
+  %call46965 = call i32 @fseek(ptr %load46964, i64 0, i32 0)
+  %load46966 = load i64, ptr %size, align 4
+  %add46967 = add i64 %load46966, 1
+  %call46968 = call ptr @malloc(i64 %add46967)
   %buf = alloca ptr, align 8
-  store ptr %call46173, ptr %buf, align 8
-  %load46174 = load ptr, ptr %buf, align 8
-  %load46175 = load i64, ptr %size, align 4
-  %load46176 = load ptr, ptr %file, align 8
-  %call46177 = call i64 @fread(ptr %load46174, i64 1, i64 %load46175, ptr %load46176)
+  store ptr %call46968, ptr %buf, align 8
+  %load46969 = load ptr, ptr %buf, align 8
+  %load46970 = load i64, ptr %size, align 4
+  %load46971 = load ptr, ptr %file, align 8
+  %call46972 = call i64 @fread(ptr %load46969, i64 1, i64 %load46970, ptr %load46971)
   %n = alloca i64, align 8
-  store i64 %call46177, ptr %n, align 4
-  %load46178 = load ptr, ptr %buf, align 8
-  %load46179 = load i64, ptr %n, align 4
-  %storeidx46181 = getelementptr i8, ptr %load46178, i64 %load46179
-  store i8 0, ptr %storeidx46181, align 1
-  %load46182 = load ptr, ptr %file, align 8
-  %call46183 = call i32 @fclose(ptr %load46182)
-  %load46184 = load ptr, ptr %buf, align 8
-  ret ptr %load46184
+  store i64 %call46972, ptr %n, align 4
+  %load46973 = load ptr, ptr %buf, align 8
+  %load46974 = load i64, ptr %n, align 4
+  %storeidx46976 = getelementptr i8, ptr %load46973, i64 %load46974
+  store i8 0, ptr %storeidx46976, align 1
+  %load46977 = load ptr, ptr %file, align 8
+  %call46978 = call i32 @fclose(ptr %load46977)
+  %load46979 = load ptr, ptr %buf, align 8
+  ret ptr %load46979
 }
 
 define i32 @main(i32 %0, ptr %1) {
@@ -87756,858 +89306,858 @@ entry:
   %argv = alloca ptr, align 8
   store ptr %1, ptr %argv, align 8
   %src = alloca ptr, align 8
-  store ptr @.strlit46185, ptr %src, align 8
+  store ptr @.strlit46980, ptr %src, align 8
   %mode = alloca ptr, align 8
-  store ptr @.strlit46186, ptr %mode, align 8
+  store ptr @.strlit46981, ptr %mode, align 8
   %filename = alloca ptr, align 8
-  store ptr @.strlit46187, ptr %filename, align 8
+  store ptr @.strlit46982, ptr %filename, align 8
   %want_help = alloca i32, align 4
   store i32 0, ptr %want_help, align 4
   %want_version = alloca i32, align 4
   store i32 0, ptr %want_version, align 4
   %emit = alloca ptr, align 8
-  store ptr @.strlit46188, ptr %emit, align 8
+  store ptr @.strlit46983, ptr %emit, align 8
   %output = alloca ptr, align 8
-  store ptr @.strlit46189, ptr %output, align 8
+  store ptr @.strlit46984, ptr %output, align 8
   %has_input = alloca i32, align 4
   store i32 0, ptr %has_input, align 4
   %link_args = alloca ptr, align 8
-  store ptr @.strlit46190, ptr %link_args, align 8
-  %call46191 = call ptr @host_target_triple()
+  store ptr @.strlit46985, ptr %link_args, align 8
+  %call46986 = call ptr @host_target_triple()
   %target_triple = alloca ptr, align 8
-  store ptr %call46191, ptr %target_triple, align 8
+  store ptr %call46986, ptr %target_triple, align 8
   %backend = alloca ptr, align 8
-  store ptr @.strlit46192, ptr %backend, align 8
+  store ptr @.strlit46987, ptr %backend, align 8
   %i = alloca i32, align 4
   store i32 1, ptr %i, align 4
-  br label %while.cond7468
+  br label %while.cond7611
 
-while.cond7468:                                   ; preds = %if.end7473, %entry
-  %load46193 = load i32, ptr %i, align 4
-  %load46194 = load i32, ptr %argc, align 4
-  %cmp46195 = icmp slt i32 %load46193, %load46194
-  %bool46196 = zext i1 %cmp46195 to i32
-  %cond46197 = icmp ne i32 %bool46196, 0
-  br i1 %cond46197, label %while.body7469, label %while.end7470
+while.cond7611:                                   ; preds = %if.end7616, %entry
+  %load46988 = load i32, ptr %i, align 4
+  %load46989 = load i32, ptr %argc, align 4
+  %cmp46990 = icmp slt i32 %load46988, %load46989
+  %bool46991 = zext i1 %cmp46990 to i32
+  %cond46992 = icmp ne i32 %bool46991, 0
+  br i1 %cond46992, label %while.body7612, label %while.end7613
 
-while.body7469:                                   ; preds = %while.cond7468
-  %load46198 = load ptr, ptr %argv, align 8
-  %load46199 = load i32, ptr %i, align 4
-  %idx46200 = getelementptr ptr, ptr %load46198, i32 %load46199
-  %loadidx46201 = load ptr, ptr %idx46200, align 8
+while.body7612:                                   ; preds = %while.cond7611
+  %load46993 = load ptr, ptr %argv, align 8
+  %load46994 = load i32, ptr %i, align 4
+  %idx46995 = getelementptr ptr, ptr %load46993, i32 %load46994
+  %loadidx46996 = load ptr, ptr %idx46995, align 8
   %arg = alloca ptr, align 8
-  store ptr %loadidx46201, ptr %arg, align 8
-  %load46202 = load ptr, ptr %arg, align 8
-  %strcmp46204 = call i32 @strcmp(ptr %load46202, ptr @.strlit46203)
-  %cmp46205 = icmp eq i32 %strcmp46204, 0
-  %bool46206 = zext i1 %cmp46205 to i32
-  %cond46207 = icmp ne i32 %bool46206, 0
-  br i1 %cond46207, label %or.true, label %or.rhs
+  store ptr %loadidx46996, ptr %arg, align 8
+  %load46997 = load ptr, ptr %arg, align 8
+  %strcmp46999 = call i32 @strcmp(ptr %load46997, ptr @.strlit46998)
+  %cmp47000 = icmp eq i32 %strcmp46999, 0
+  %bool47001 = zext i1 %cmp47000 to i32
+  %cond47002 = icmp ne i32 %bool47001, 0
+  br i1 %cond47002, label %or.true, label %or.rhs
 
-while.end7470:                                    ; preds = %while.cond7468
-  %load46507 = load i32, ptr %want_help, align 4
-  %cmp46508 = icmp eq i32 %load46507, 1
-  %bool46509 = zext i1 %cmp46508 to i32
-  %cond46510 = icmp ne i32 %bool46509, 0
-  br i1 %cond46510, label %if.then7567, label %if.else7568
+while.end7613:                                    ; preds = %while.cond7611
+  %load47302 = load i32, ptr %want_help, align 4
+  %cmp47303 = icmp eq i32 %load47302, 1
+  %bool47304 = zext i1 %cmp47303 to i32
+  %cond47305 = icmp ne i32 %bool47304, 0
+  br i1 %cond47305, label %if.then7710, label %if.else7711
 
-if.then7471:                                      ; preds = %or.merge
+if.then7614:                                      ; preds = %or.merge
   store i32 1, ptr %want_help, align 4
-  br label %if.end7473
+  br label %if.end7616
 
-if.else7472:                                      ; preds = %or.merge
-  %load46216 = load ptr, ptr %arg, align 8
-  %strcmp46218 = call i32 @strcmp(ptr %load46216, ptr @.strlit46217)
-  %cmp46219 = icmp eq i32 %strcmp46218, 0
-  %bool46220 = zext i1 %cmp46219 to i32
-  %cond46221 = icmp ne i32 %bool46220, 0
-  br i1 %cond46221, label %or.true1, label %or.rhs2
+if.else7615:                                      ; preds = %or.merge
+  %load47011 = load ptr, ptr %arg, align 8
+  %strcmp47013 = call i32 @strcmp(ptr %load47011, ptr @.strlit47012)
+  %cmp47014 = icmp eq i32 %strcmp47013, 0
+  %bool47015 = zext i1 %cmp47014 to i32
+  %cond47016 = icmp ne i32 %bool47015, 0
+  br i1 %cond47016, label %or.true1, label %or.rhs2
 
-if.end7473:                                       ; preds = %if.end7476, %if.then7471
-  %load46505 = load i32, ptr %i, align 4
-  %add46506 = add i32 %load46505, 1
-  store i32 %add46506, ptr %i, align 4
-  br label %while.cond7468
+if.end7616:                                       ; preds = %if.end7619, %if.then7614
+  %load47300 = load i32, ptr %i, align 4
+  %add47301 = add i32 %load47300, 1
+  store i32 %add47301, ptr %i, align 4
+  br label %while.cond7611
 
-or.true:                                          ; preds = %or.rhs, %while.body7469
+or.true:                                          ; preds = %or.rhs, %while.body7612
   br label %or.merge
 
-or.rhs:                                           ; preds = %while.body7469
-  %load46208 = load ptr, ptr %arg, align 8
-  %strcmp46210 = call i32 @strcmp(ptr %load46208, ptr @.strlit46209)
-  %cmp46211 = icmp eq i32 %strcmp46210, 0
-  %bool46212 = zext i1 %cmp46211 to i32
-  %cond46213 = icmp ne i32 %bool46212, 0
-  br i1 %cond46213, label %or.true, label %or.merge
+or.rhs:                                           ; preds = %while.body7612
+  %load47003 = load ptr, ptr %arg, align 8
+  %strcmp47005 = call i32 @strcmp(ptr %load47003, ptr @.strlit47004)
+  %cmp47006 = icmp eq i32 %strcmp47005, 0
+  %bool47007 = zext i1 %cmp47006 to i32
+  %cond47008 = icmp ne i32 %bool47007, 0
+  br i1 %cond47008, label %or.true, label %or.merge
 
 or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval46214 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond46215 = icmp ne i32 %orval46214, 0
-  br i1 %cond46215, label %if.then7471, label %if.else7472
+  %orval47009 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond47010 = icmp ne i32 %orval47009, 0
+  br i1 %cond47010, label %if.then7614, label %if.else7615
 
-if.then7474:                                      ; preds = %or.merge3
+if.then7617:                                      ; preds = %or.merge3
   store i32 1, ptr %want_version, align 4
-  br label %if.end7476
+  br label %if.end7619
 
-if.else7475:                                      ; preds = %or.merge3
-  %load46230 = load ptr, ptr %arg, align 8
-  %strcmp46232 = call i32 @strcmp(ptr %load46230, ptr @.strlit46231)
-  %cmp46233 = icmp eq i32 %strcmp46232, 0
-  %bool46234 = zext i1 %cmp46233 to i32
-  %cond46235 = icmp ne i32 %bool46234, 0
-  br i1 %cond46235, label %if.then7477, label %if.else7478
+if.else7618:                                      ; preds = %or.merge3
+  %load47025 = load ptr, ptr %arg, align 8
+  %strcmp47027 = call i32 @strcmp(ptr %load47025, ptr @.strlit47026)
+  %cmp47028 = icmp eq i32 %strcmp47027, 0
+  %bool47029 = zext i1 %cmp47028 to i32
+  %cond47030 = icmp ne i32 %bool47029, 0
+  br i1 %cond47030, label %if.then7620, label %if.else7621
 
-if.end7476:                                       ; preds = %if.end7479, %if.then7474
-  br label %if.end7473
+if.end7619:                                       ; preds = %if.end7622, %if.then7617
+  br label %if.end7616
 
-or.true1:                                         ; preds = %or.rhs2, %if.else7472
+or.true1:                                         ; preds = %or.rhs2, %if.else7615
   br label %or.merge3
 
-or.rhs2:                                          ; preds = %if.else7472
-  %load46222 = load ptr, ptr %arg, align 8
-  %strcmp46224 = call i32 @strcmp(ptr %load46222, ptr @.strlit46223)
-  %cmp46225 = icmp eq i32 %strcmp46224, 0
-  %bool46226 = zext i1 %cmp46225 to i32
-  %cond46227 = icmp ne i32 %bool46226, 0
-  br i1 %cond46227, label %or.true1, label %or.merge3
+or.rhs2:                                          ; preds = %if.else7615
+  %load47017 = load ptr, ptr %arg, align 8
+  %strcmp47019 = call i32 @strcmp(ptr %load47017, ptr @.strlit47018)
+  %cmp47020 = icmp eq i32 %strcmp47019, 0
+  %bool47021 = zext i1 %cmp47020 to i32
+  %cond47022 = icmp ne i32 %bool47021, 0
+  br i1 %cond47022, label %or.true1, label %or.merge3
 
 or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval46228 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond46229 = icmp ne i32 %orval46228, 0
-  br i1 %cond46229, label %if.then7474, label %if.else7475
+  %orval47023 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond47024 = icmp ne i32 %orval47023, 0
+  br i1 %cond47024, label %if.then7617, label %if.else7618
 
-if.then7477:                                      ; preds = %if.else7475
-  %load46236 = load i32, ptr %i, align 4
-  %add46237 = add i32 %load46236, 1
-  %load46238 = load i32, ptr %argc, align 4
-  %cmp46239 = icmp slt i32 %add46237, %load46238
-  %bool46240 = zext i1 %cmp46239 to i32
-  %cond46241 = icmp ne i32 %bool46240, 0
-  br i1 %cond46241, label %if.then7480, label %if.else7481
+if.then7620:                                      ; preds = %if.else7618
+  %load47031 = load i32, ptr %i, align 4
+  %add47032 = add i32 %load47031, 1
+  %load47033 = load i32, ptr %argc, align 4
+  %cmp47034 = icmp slt i32 %add47032, %load47033
+  %bool47035 = zext i1 %cmp47034 to i32
+  %cond47036 = icmp ne i32 %bool47035, 0
+  br i1 %cond47036, label %if.then7623, label %if.else7624
 
-if.else7478:                                      ; preds = %if.else7475
-  %load46249 = load ptr, ptr %arg, align 8
-  %strcmp46251 = call i32 @strcmp(ptr %load46249, ptr @.strlit46250)
-  %cmp46252 = icmp eq i32 %strcmp46251, 0
-  %bool46253 = zext i1 %cmp46252 to i32
-  %cond46254 = icmp ne i32 %bool46253, 0
-  br i1 %cond46254, label %if.then7483, label %if.else7484
+if.else7621:                                      ; preds = %if.else7618
+  %load47044 = load ptr, ptr %arg, align 8
+  %strcmp47046 = call i32 @strcmp(ptr %load47044, ptr @.strlit47045)
+  %cmp47047 = icmp eq i32 %strcmp47046, 0
+  %bool47048 = zext i1 %cmp47047 to i32
+  %cond47049 = icmp ne i32 %bool47048, 0
+  br i1 %cond47049, label %if.then7626, label %if.else7627
 
-if.end7479:                                       ; preds = %if.end7485, %if.end7482
-  br label %if.end7476
+if.end7622:                                       ; preds = %if.end7628, %if.end7625
+  br label %if.end7619
 
-if.then7480:                                      ; preds = %if.then7477
-  %load46242 = load i32, ptr %i, align 4
-  %add46243 = add i32 %load46242, 1
-  store i32 %add46243, ptr %i, align 4
-  %load46244 = load ptr, ptr %argv, align 8
-  %load46245 = load i32, ptr %i, align 4
-  %idx46246 = getelementptr ptr, ptr %load46244, i32 %load46245
-  %loadidx46247 = load ptr, ptr %idx46246, align 8
-  store ptr %loadidx46247, ptr %output, align 8
-  br label %if.end7482
+if.then7623:                                      ; preds = %if.then7620
+  %load47037 = load i32, ptr %i, align 4
+  %add47038 = add i32 %load47037, 1
+  store i32 %add47038, ptr %i, align 4
+  %load47039 = load ptr, ptr %argv, align 8
+  %load47040 = load i32, ptr %i, align 4
+  %idx47041 = getelementptr ptr, ptr %load47039, i32 %load47040
+  %loadidx47042 = load ptr, ptr %idx47041, align 8
+  store ptr %loadidx47042, ptr %output, align 8
+  br label %if.end7625
 
-if.else7481:                                      ; preds = %if.then7477
-  call void @diag_print(ptr @.strlit46248)
+if.else7624:                                      ; preds = %if.then7620
+  call void @diag_print(ptr @.strlit47043)
   ret i32 1
 
-if.end7482:                                       ; preds = %if.then7480
-  br label %if.end7479
+if.end7625:                                       ; preds = %if.then7623
+  br label %if.end7622
 
-if.then7483:                                      ; preds = %if.else7478
-  store ptr @.strlit46255, ptr %emit, align 8
-  %load46256 = load i32, ptr %i, align 4
-  %add46257 = add i32 %load46256, 1
-  %load46258 = load i32, ptr %argc, align 4
-  %cmp46259 = icmp slt i32 %add46257, %load46258
-  %bool46260 = zext i1 %cmp46259 to i32
-  %cond46261 = icmp ne i32 %bool46260, 0
-  br i1 %cond46261, label %if.then7486, label %if.else7487
+if.then7626:                                      ; preds = %if.else7621
+  store ptr @.strlit47050, ptr %emit, align 8
+  %load47051 = load i32, ptr %i, align 4
+  %add47052 = add i32 %load47051, 1
+  %load47053 = load i32, ptr %argc, align 4
+  %cmp47054 = icmp slt i32 %add47052, %load47053
+  %bool47055 = zext i1 %cmp47054 to i32
+  %cond47056 = icmp ne i32 %bool47055, 0
+  br i1 %cond47056, label %if.then7629, label %if.else7630
 
-if.else7484:                                      ; preds = %if.else7478
-  %load46284 = load ptr, ptr %arg, align 8
-  %strcmp46286 = call i32 @strcmp(ptr %load46284, ptr @.strlit46285)
-  %cmp46287 = icmp eq i32 %strcmp46286, 0
-  %bool46288 = zext i1 %cmp46287 to i32
-  %cond46289 = icmp ne i32 %bool46288, 0
-  br i1 %cond46289, label %if.then7492, label %if.else7493
+if.else7627:                                      ; preds = %if.else7621
+  %load47079 = load ptr, ptr %arg, align 8
+  %strcmp47081 = call i32 @strcmp(ptr %load47079, ptr @.strlit47080)
+  %cmp47082 = icmp eq i32 %strcmp47081, 0
+  %bool47083 = zext i1 %cmp47082 to i32
+  %cond47084 = icmp ne i32 %bool47083, 0
+  br i1 %cond47084, label %if.then7635, label %if.else7636
 
-if.end7485:                                       ; preds = %if.end7494, %if.end7488
-  br label %if.end7479
+if.end7628:                                       ; preds = %if.end7637, %if.end7631
+  br label %if.end7622
 
-if.then7486:                                      ; preds = %if.then7483
-  %load46262 = load ptr, ptr %argv, align 8
-  %load46263 = load i32, ptr %i, align 4
-  %add46264 = add i32 %load46263, 1
-  %idx46265 = getelementptr ptr, ptr %load46262, i32 %add46264
-  %loadidx46266 = load ptr, ptr %idx46265, align 8
+if.then7629:                                      ; preds = %if.then7626
+  %load47057 = load ptr, ptr %argv, align 8
+  %load47058 = load i32, ptr %i, align 4
+  %add47059 = add i32 %load47058, 1
+  %idx47060 = getelementptr ptr, ptr %load47057, i32 %add47059
+  %loadidx47061 = load ptr, ptr %idx47060, align 8
   %next = alloca ptr, align 8
-  store ptr %loadidx46266, ptr %next, align 8
-  %load46267 = load ptr, ptr %next, align 8
-  %call46269 = call i32 @string_ends_with(ptr %load46267, ptr @.strlit46268)
-  %cmp46270 = icmp eq i32 %call46269, 0
-  %bool46271 = zext i1 %cmp46270 to i32
-  %cond46272 = icmp ne i32 %bool46271, 0
-  br i1 %cond46272, label %and.rhs, label %and.false
+  store ptr %loadidx47061, ptr %next, align 8
+  %load47062 = load ptr, ptr %next, align 8
+  %call47064 = call i32 @string_ends_with(ptr %load47062, ptr @.strlit47063)
+  %cmp47065 = icmp eq i32 %call47064, 0
+  %bool47066 = zext i1 %cmp47065 to i32
+  %cond47067 = icmp ne i32 %bool47066, 0
+  br i1 %cond47067, label %and.rhs, label %and.false
 
-if.else7487:                                      ; preds = %if.then7483
-  br label %if.end7488
+if.else7630:                                      ; preds = %if.then7626
+  br label %if.end7631
 
-if.end7488:                                       ; preds = %if.else7487, %if.end7491
-  br label %if.end7485
+if.end7631:                                       ; preds = %if.else7630, %if.end7634
+  br label %if.end7628
 
-if.then7489:                                      ; preds = %and.merge
-  %load46281 = load ptr, ptr %next, align 8
-  store ptr %load46281, ptr %output, align 8
-  %load46282 = load i32, ptr %i, align 4
-  %add46283 = add i32 %load46282, 1
-  store i32 %add46283, ptr %i, align 4
-  br label %if.end7491
+if.then7632:                                      ; preds = %and.merge
+  %load47076 = load ptr, ptr %next, align 8
+  store ptr %load47076, ptr %output, align 8
+  %load47077 = load i32, ptr %i, align 4
+  %add47078 = add i32 %load47077, 1
+  store i32 %add47078, ptr %i, align 4
+  br label %if.end7634
 
-if.else7490:                                      ; preds = %and.merge
-  br label %if.end7491
+if.else7633:                                      ; preds = %and.merge
+  br label %if.end7634
 
-if.end7491:                                       ; preds = %if.else7490, %if.then7489
-  br label %if.end7488
+if.end7634:                                       ; preds = %if.else7633, %if.then7632
+  br label %if.end7631
 
-and.rhs:                                          ; preds = %if.then7486
-  %load46273 = load ptr, ptr %next, align 8
-  %call46275 = call i32 @string_ends_with(ptr %load46273, ptr @.strlit46274)
-  %cmp46276 = icmp eq i32 %call46275, 1
-  %bool46277 = zext i1 %cmp46276 to i32
-  %cond46278 = icmp ne i32 %bool46277, 0
-  br i1 %cond46278, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %if.then7629
+  %load47068 = load ptr, ptr %next, align 8
+  %call47070 = call i32 @string_ends_with(ptr %load47068, ptr @.strlit47069)
+  %cmp47071 = icmp eq i32 %call47070, 1
+  %bool47072 = zext i1 %cmp47071 to i32
+  %cond47073 = icmp ne i32 %bool47072, 0
+  br i1 %cond47073, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %if.then7486
+and.false:                                        ; preds = %and.rhs, %if.then7629
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval46279 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond46280 = icmp ne i32 %andval46279, 0
-  br i1 %cond46280, label %if.then7489, label %if.else7490
+  %andval47074 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond47075 = icmp ne i32 %andval47074, 0
+  br i1 %cond47075, label %if.then7632, label %if.else7633
 
-if.then7492:                                      ; preds = %if.else7484
-  store ptr @.strlit46290, ptr %emit, align 8
-  br label %if.end7494
+if.then7635:                                      ; preds = %if.else7627
+  store ptr @.strlit47085, ptr %emit, align 8
+  br label %if.end7637
 
-if.else7493:                                      ; preds = %if.else7484
-  %load46291 = load ptr, ptr %arg, align 8
-  %strcmp46293 = call i32 @strcmp(ptr %load46291, ptr @.strlit46292)
-  %cmp46294 = icmp eq i32 %strcmp46293, 0
-  %bool46295 = zext i1 %cmp46294 to i32
-  %cond46296 = icmp ne i32 %bool46295, 0
-  br i1 %cond46296, label %if.then7495, label %if.else7496
+if.else7636:                                      ; preds = %if.else7627
+  %load47086 = load ptr, ptr %arg, align 8
+  %strcmp47088 = call i32 @strcmp(ptr %load47086, ptr @.strlit47087)
+  %cmp47089 = icmp eq i32 %strcmp47088, 0
+  %bool47090 = zext i1 %cmp47089 to i32
+  %cond47091 = icmp ne i32 %bool47090, 0
+  br i1 %cond47091, label %if.then7638, label %if.else7639
 
-if.end7494:                                       ; preds = %if.end7497, %if.then7492
-  br label %if.end7485
+if.end7637:                                       ; preds = %if.end7640, %if.then7635
+  br label %if.end7628
 
-if.then7495:                                      ; preds = %if.else7493
-  store ptr @.strlit46297, ptr %emit, align 8
-  br label %if.end7497
+if.then7638:                                      ; preds = %if.else7636
+  store ptr @.strlit47092, ptr %emit, align 8
+  br label %if.end7640
 
-if.else7496:                                      ; preds = %if.else7493
-  %load46298 = load ptr, ptr %arg, align 8
-  %call46300 = call i32 @str_starts_with(ptr %load46298, ptr @.strlit46299)
-  %cmp46301 = icmp eq i32 %call46300, 1
-  %bool46302 = zext i1 %cmp46301 to i32
-  %cond46303 = icmp ne i32 %bool46302, 0
-  br i1 %cond46303, label %if.then7498, label %if.else7499
+if.else7639:                                      ; preds = %if.else7636
+  %load47093 = load ptr, ptr %arg, align 8
+  %call47095 = call i32 @str_starts_with(ptr %load47093, ptr @.strlit47094)
+  %cmp47096 = icmp eq i32 %call47095, 1
+  %bool47097 = zext i1 %cmp47096 to i32
+  %cond47098 = icmp ne i32 %bool47097, 0
+  br i1 %cond47098, label %if.then7641, label %if.else7642
 
-if.end7497:                                       ; preds = %if.end7500, %if.then7495
-  br label %if.end7494
+if.end7640:                                       ; preds = %if.end7643, %if.then7638
+  br label %if.end7637
 
-if.then7498:                                      ; preds = %if.else7496
-  %load46304 = load ptr, ptr %arg, align 8
-  %load46305 = load ptr, ptr %arg, align 8
-  %strlen46306 = call i32 @strlen(ptr %load46305)
-  %call46307 = call ptr @slice_string(ptr %load46304, i32 8, i32 %strlen46306)
+if.then7641:                                      ; preds = %if.else7639
+  %load47099 = load ptr, ptr %arg, align 8
+  %load47100 = load ptr, ptr %arg, align 8
+  %strlen47101 = call i32 @strlen(ptr %load47100)
+  %call47102 = call ptr @slice_string(ptr %load47099, i32 8, i32 %strlen47101)
   %debug_mode = alloca ptr, align 8
-  store ptr %call46307, ptr %debug_mode, align 8
-  %load46308 = load ptr, ptr %debug_mode, align 8
-  %strcmp46310 = call i32 @strcmp(ptr %load46308, ptr @.strlit46309)
-  %cmp46311 = icmp eq i32 %strcmp46310, 0
-  %bool46312 = zext i1 %cmp46311 to i32
-  %cond46313 = icmp ne i32 %bool46312, 0
-  br i1 %cond46313, label %if.then7501, label %if.else7502
+  store ptr %call47102, ptr %debug_mode, align 8
+  %load47103 = load ptr, ptr %debug_mode, align 8
+  %strcmp47105 = call i32 @strcmp(ptr %load47103, ptr @.strlit47104)
+  %cmp47106 = icmp eq i32 %strcmp47105, 0
+  %bool47107 = zext i1 %cmp47106 to i32
+  %cond47108 = icmp ne i32 %bool47107, 0
+  br i1 %cond47108, label %if.then7644, label %if.else7645
 
-if.else7499:                                      ; preds = %if.else7496
-  %load46334 = load ptr, ptr %arg, align 8
-  %strcmp46336 = call i32 @strcmp(ptr %load46334, ptr @.strlit46335)
-  %cmp46337 = icmp eq i32 %strcmp46336, 0
-  %bool46338 = zext i1 %cmp46337 to i32
-  %cond46339 = icmp ne i32 %bool46338, 0
-  br i1 %cond46339, label %if.then7510, label %if.else7511
+if.else7642:                                      ; preds = %if.else7639
+  %load47129 = load ptr, ptr %arg, align 8
+  %strcmp47131 = call i32 @strcmp(ptr %load47129, ptr @.strlit47130)
+  %cmp47132 = icmp eq i32 %strcmp47131, 0
+  %bool47133 = zext i1 %cmp47132 to i32
+  %cond47134 = icmp ne i32 %bool47133, 0
+  br i1 %cond47134, label %if.then7653, label %if.else7654
 
-if.end7500:                                       ; preds = %if.end7512, %if.end7503
-  br label %if.end7497
+if.end7643:                                       ; preds = %if.end7655, %if.end7646
+  br label %if.end7640
 
-if.then7501:                                      ; preds = %if.then7498
-  store ptr @.strlit46314, ptr %mode, align 8
-  br label %if.end7503
+if.then7644:                                      ; preds = %if.then7641
+  store ptr @.strlit47109, ptr %mode, align 8
+  br label %if.end7646
 
-if.else7502:                                      ; preds = %if.then7498
-  %load46315 = load ptr, ptr %debug_mode, align 8
-  %strcmp46317 = call i32 @strcmp(ptr %load46315, ptr @.strlit46316)
-  %cmp46318 = icmp eq i32 %strcmp46317, 0
-  %bool46319 = zext i1 %cmp46318 to i32
-  %cond46320 = icmp ne i32 %bool46319, 0
-  br i1 %cond46320, label %if.then7504, label %if.else7505
+if.else7645:                                      ; preds = %if.then7641
+  %load47110 = load ptr, ptr %debug_mode, align 8
+  %strcmp47112 = call i32 @strcmp(ptr %load47110, ptr @.strlit47111)
+  %cmp47113 = icmp eq i32 %strcmp47112, 0
+  %bool47114 = zext i1 %cmp47113 to i32
+  %cond47115 = icmp ne i32 %bool47114, 0
+  br i1 %cond47115, label %if.then7647, label %if.else7648
 
-if.end7503:                                       ; preds = %if.end7506, %if.then7501
-  br label %if.end7500
+if.end7646:                                       ; preds = %if.end7649, %if.then7644
+  br label %if.end7643
 
-if.then7504:                                      ; preds = %if.else7502
-  store ptr @.strlit46321, ptr %mode, align 8
-  br label %if.end7506
+if.then7647:                                      ; preds = %if.else7645
+  store ptr @.strlit47116, ptr %mode, align 8
+  br label %if.end7649
 
-if.else7505:                                      ; preds = %if.else7502
-  %load46322 = load ptr, ptr %debug_mode, align 8
-  %strcmp46324 = call i32 @strcmp(ptr %load46322, ptr @.strlit46323)
-  %cmp46325 = icmp eq i32 %strcmp46324, 0
-  %bool46326 = zext i1 %cmp46325 to i32
-  %cond46327 = icmp ne i32 %bool46326, 0
-  br i1 %cond46327, label %if.then7507, label %if.else7508
+if.else7648:                                      ; preds = %if.else7645
+  %load47117 = load ptr, ptr %debug_mode, align 8
+  %strcmp47119 = call i32 @strcmp(ptr %load47117, ptr @.strlit47118)
+  %cmp47120 = icmp eq i32 %strcmp47119, 0
+  %bool47121 = zext i1 %cmp47120 to i32
+  %cond47122 = icmp ne i32 %bool47121, 0
+  br i1 %cond47122, label %if.then7650, label %if.else7651
 
-if.end7506:                                       ; preds = %if.end7509, %if.then7504
-  br label %if.end7503
+if.end7649:                                       ; preds = %if.end7652, %if.then7647
+  br label %if.end7646
 
-if.then7507:                                      ; preds = %if.else7505
-  store ptr @.strlit46328, ptr %mode, align 8
-  br label %if.end7509
+if.then7650:                                      ; preds = %if.else7648
+  store ptr @.strlit47123, ptr %mode, align 8
+  br label %if.end7652
 
-if.else7508:                                      ; preds = %if.else7505
-  %load46330 = load ptr, ptr %debug_mode, align 8
-  %call46331 = call ptr @vix_string_concat(ptr @.strlit46329, ptr %load46330)
-  %call46333 = call ptr @vix_string_concat(ptr %call46331, ptr @.strlit46332)
-  call void @diag_print(ptr %call46333)
+if.else7651:                                      ; preds = %if.else7648
+  %load47125 = load ptr, ptr %debug_mode, align 8
+  %call47126 = call ptr @vix_string_concat(ptr @.strlit47124, ptr %load47125)
+  %call47128 = call ptr @vix_string_concat(ptr %call47126, ptr @.strlit47127)
+  call void @diag_print(ptr %call47128)
   ret i32 1
 
-if.end7509:                                       ; preds = %if.then7507
-  br label %if.end7506
+if.end7652:                                       ; preds = %if.then7650
+  br label %if.end7649
 
-if.then7510:                                      ; preds = %if.else7499
-  %load46340 = load i32, ptr %i, align 4
-  %add46341 = add i32 %load46340, 1
-  %load46342 = load i32, ptr %argc, align 4
-  %cmp46343 = icmp slt i32 %add46341, %load46342
-  %bool46344 = zext i1 %cmp46343 to i32
-  %cond46345 = icmp ne i32 %bool46344, 0
-  br i1 %cond46345, label %if.then7513, label %if.else7514
+if.then7653:                                      ; preds = %if.else7642
+  %load47135 = load i32, ptr %i, align 4
+  %add47136 = add i32 %load47135, 1
+  %load47137 = load i32, ptr %argc, align 4
+  %cmp47138 = icmp slt i32 %add47136, %load47137
+  %bool47139 = zext i1 %cmp47138 to i32
+  %cond47140 = icmp ne i32 %bool47139, 0
+  br i1 %cond47140, label %if.then7656, label %if.else7657
 
-if.else7511:                                      ; preds = %if.else7499
-  %load46353 = load ptr, ptr %arg, align 8
-  %strcmp46355 = call i32 @strcmp(ptr %load46353, ptr @.strlit46354)
-  %cmp46356 = icmp eq i32 %strcmp46355, 0
-  %bool46357 = zext i1 %cmp46356 to i32
-  %cond46358 = icmp ne i32 %bool46357, 0
-  br i1 %cond46358, label %if.then7516, label %if.else7517
+if.else7654:                                      ; preds = %if.else7642
+  %load47148 = load ptr, ptr %arg, align 8
+  %strcmp47150 = call i32 @strcmp(ptr %load47148, ptr @.strlit47149)
+  %cmp47151 = icmp eq i32 %strcmp47150, 0
+  %bool47152 = zext i1 %cmp47151 to i32
+  %cond47153 = icmp ne i32 %bool47152, 0
+  br i1 %cond47153, label %if.then7659, label %if.else7660
 
-if.end7512:                                       ; preds = %if.end7518, %if.end7515
-  br label %if.end7500
+if.end7655:                                       ; preds = %if.end7661, %if.end7658
+  br label %if.end7643
 
-if.then7513:                                      ; preds = %if.then7510
-  %load46346 = load i32, ptr %i, align 4
-  %add46347 = add i32 %load46346, 1
-  store i32 %add46347, ptr %i, align 4
-  %load46348 = load ptr, ptr %argv, align 8
-  %load46349 = load i32, ptr %i, align 4
-  %idx46350 = getelementptr ptr, ptr %load46348, i32 %load46349
-  %loadidx46351 = load ptr, ptr %idx46350, align 8
-  store ptr %loadidx46351, ptr %target_triple, align 8
-  br label %if.end7515
+if.then7656:                                      ; preds = %if.then7653
+  %load47141 = load i32, ptr %i, align 4
+  %add47142 = add i32 %load47141, 1
+  store i32 %add47142, ptr %i, align 4
+  %load47143 = load ptr, ptr %argv, align 8
+  %load47144 = load i32, ptr %i, align 4
+  %idx47145 = getelementptr ptr, ptr %load47143, i32 %load47144
+  %loadidx47146 = load ptr, ptr %idx47145, align 8
+  store ptr %loadidx47146, ptr %target_triple, align 8
+  br label %if.end7658
 
-if.else7514:                                      ; preds = %if.then7510
-  call void @diag_print(ptr @.strlit46352)
+if.else7657:                                      ; preds = %if.then7653
+  call void @diag_print(ptr @.strlit47147)
   ret i32 1
 
-if.end7515:                                       ; preds = %if.then7513
-  br label %if.end7512
+if.end7658:                                       ; preds = %if.then7656
+  br label %if.end7655
 
-if.then7516:                                      ; preds = %if.else7511
-  %load46359 = load i32, ptr %i, align 4
-  %add46360 = add i32 %load46359, 1
-  %load46361 = load i32, ptr %argc, align 4
-  %cmp46362 = icmp slt i32 %add46360, %load46361
-  %bool46363 = zext i1 %cmp46362 to i32
-  %cond46364 = icmp ne i32 %bool46363, 0
-  br i1 %cond46364, label %if.then7519, label %if.else7520
+if.then7659:                                      ; preds = %if.else7654
+  %load47154 = load i32, ptr %i, align 4
+  %add47155 = add i32 %load47154, 1
+  %load47156 = load i32, ptr %argc, align 4
+  %cmp47157 = icmp slt i32 %add47155, %load47156
+  %bool47158 = zext i1 %cmp47157 to i32
+  %cond47159 = icmp ne i32 %bool47158, 0
+  br i1 %cond47159, label %if.then7662, label %if.else7663
 
-if.else7517:                                      ; preds = %if.else7511
-  %load46372 = load ptr, ptr %arg, align 8
-  %strcmp46374 = call i32 @strcmp(ptr %load46372, ptr @.strlit46373)
-  %cmp46375 = icmp eq i32 %strcmp46374, 0
-  %bool46376 = zext i1 %cmp46375 to i32
-  %cond46377 = icmp ne i32 %bool46376, 0
-  br i1 %cond46377, label %if.then7522, label %if.else7523
+if.else7660:                                      ; preds = %if.else7654
+  %load47167 = load ptr, ptr %arg, align 8
+  %strcmp47169 = call i32 @strcmp(ptr %load47167, ptr @.strlit47168)
+  %cmp47170 = icmp eq i32 %strcmp47169, 0
+  %bool47171 = zext i1 %cmp47170 to i32
+  %cond47172 = icmp ne i32 %bool47171, 0
+  br i1 %cond47172, label %if.then7665, label %if.else7666
 
-if.end7518:                                       ; preds = %if.end7524, %if.end7521
-  br label %if.end7512
+if.end7661:                                       ; preds = %if.end7667, %if.end7664
+  br label %if.end7655
 
-if.then7519:                                      ; preds = %if.then7516
-  %load46365 = load i32, ptr %i, align 4
-  %add46366 = add i32 %load46365, 1
-  store i32 %add46366, ptr %i, align 4
-  %load46367 = load ptr, ptr %argv, align 8
-  %load46368 = load i32, ptr %i, align 4
-  %idx46369 = getelementptr ptr, ptr %load46367, i32 %load46368
-  %loadidx46370 = load ptr, ptr %idx46369, align 8
-  store ptr %loadidx46370, ptr %backend, align 8
-  br label %if.end7521
+if.then7662:                                      ; preds = %if.then7659
+  %load47160 = load i32, ptr %i, align 4
+  %add47161 = add i32 %load47160, 1
+  store i32 %add47161, ptr %i, align 4
+  %load47162 = load ptr, ptr %argv, align 8
+  %load47163 = load i32, ptr %i, align 4
+  %idx47164 = getelementptr ptr, ptr %load47162, i32 %load47163
+  %loadidx47165 = load ptr, ptr %idx47164, align 8
+  store ptr %loadidx47165, ptr %backend, align 8
+  br label %if.end7664
 
-if.else7520:                                      ; preds = %if.then7516
-  call void @diag_print(ptr @.strlit46371)
+if.else7663:                                      ; preds = %if.then7659
+  call void @diag_print(ptr @.strlit47166)
   ret i32 1
 
-if.end7521:                                       ; preds = %if.then7519
-  br label %if.end7518
+if.end7664:                                       ; preds = %if.then7662
+  br label %if.end7661
 
-if.then7522:                                      ; preds = %if.else7517
-  store ptr @.strlit46378, ptr %backend, align 8
-  br label %if.end7524
+if.then7665:                                      ; preds = %if.else7660
+  store ptr @.strlit47173, ptr %backend, align 8
+  br label %if.end7667
 
-if.else7523:                                      ; preds = %if.else7517
-  %load46379 = load ptr, ptr %arg, align 8
-  %strcmp46381 = call i32 @strcmp(ptr %load46379, ptr @.strlit46380)
-  %cmp46382 = icmp eq i32 %strcmp46381, 0
-  %bool46383 = zext i1 %cmp46382 to i32
-  %cond46384 = icmp ne i32 %bool46383, 0
-  br i1 %cond46384, label %if.then7525, label %if.else7526
+if.else7666:                                      ; preds = %if.else7660
+  %load47174 = load ptr, ptr %arg, align 8
+  %strcmp47176 = call i32 @strcmp(ptr %load47174, ptr @.strlit47175)
+  %cmp47177 = icmp eq i32 %strcmp47176, 0
+  %bool47178 = zext i1 %cmp47177 to i32
+  %cond47179 = icmp ne i32 %bool47178, 0
+  br i1 %cond47179, label %if.then7668, label %if.else7669
 
-if.end7524:                                       ; preds = %if.end7527, %if.then7522
-  br label %if.end7518
+if.end7667:                                       ; preds = %if.end7670, %if.then7665
+  br label %if.end7661
 
-if.then7525:                                      ; preds = %if.else7523
-  store ptr @.strlit46385, ptr %backend, align 8
-  br label %if.end7527
+if.then7668:                                      ; preds = %if.else7666
+  store ptr @.strlit47180, ptr %backend, align 8
+  br label %if.end7670
 
-if.else7526:                                      ; preds = %if.else7523
-  %load46386 = load ptr, ptr %arg, align 8
-  %strcmp46388 = call i32 @strcmp(ptr %load46386, ptr @.strlit46387)
-  %cmp46389 = icmp eq i32 %strcmp46388, 0
-  %bool46390 = zext i1 %cmp46389 to i32
-  %cond46391 = icmp ne i32 %bool46390, 0
-  br i1 %cond46391, label %or.true4, label %or.rhs5
+if.else7669:                                      ; preds = %if.else7666
+  %load47181 = load ptr, ptr %arg, align 8
+  %strcmp47183 = call i32 @strcmp(ptr %load47181, ptr @.strlit47182)
+  %cmp47184 = icmp eq i32 %strcmp47183, 0
+  %bool47185 = zext i1 %cmp47184 to i32
+  %cond47186 = icmp ne i32 %bool47185, 0
+  br i1 %cond47186, label %or.true4, label %or.rhs5
 
-if.end7527:                                       ; preds = %if.end7530, %if.then7525
-  br label %if.end7524
+if.end7670:                                       ; preds = %if.end7673, %if.then7668
+  br label %if.end7667
 
-if.then7528:                                      ; preds = %or.merge6
-  %load46400 = load i32, ptr %i, align 4
-  %add46401 = add i32 %load46400, 1
-  %load46402 = load i32, ptr %argc, align 4
-  %cmp46403 = icmp slt i32 %add46401, %load46402
-  %bool46404 = zext i1 %cmp46403 to i32
-  %cond46405 = icmp ne i32 %bool46404, 0
-  br i1 %cond46405, label %if.then7531, label %if.else7532
+if.then7671:                                      ; preds = %or.merge6
+  %load47195 = load i32, ptr %i, align 4
+  %add47196 = add i32 %load47195, 1
+  %load47197 = load i32, ptr %argc, align 4
+  %cmp47198 = icmp slt i32 %add47196, %load47197
+  %bool47199 = zext i1 %cmp47198 to i32
+  %cond47200 = icmp ne i32 %bool47199, 0
+  br i1 %cond47200, label %if.then7674, label %if.else7675
 
-if.else7529:                                      ; preds = %or.merge6
-  %load46423 = load ptr, ptr %arg, align 8
-  %call46425 = call i32 @str_starts_with(ptr %load46423, ptr @.strlit46424)
-  %cmp46426 = icmp eq i32 %call46425, 1
-  %bool46427 = zext i1 %cmp46426 to i32
-  %cond46428 = icmp ne i32 %bool46427, 0
-  br i1 %cond46428, label %or.true7, label %or.rhs8
+if.else7672:                                      ; preds = %or.merge6
+  %load47218 = load ptr, ptr %arg, align 8
+  %call47220 = call i32 @str_starts_with(ptr %load47218, ptr @.strlit47219)
+  %cmp47221 = icmp eq i32 %call47220, 1
+  %bool47222 = zext i1 %cmp47221 to i32
+  %cond47223 = icmp ne i32 %bool47222, 0
+  br i1 %cond47223, label %or.true7, label %or.rhs8
 
-if.end7530:                                       ; preds = %if.end7536, %if.end7533
-  br label %if.end7527
+if.end7673:                                       ; preds = %if.end7679, %if.end7676
+  br label %if.end7670
 
-or.true4:                                         ; preds = %or.rhs5, %if.else7526
+or.true4:                                         ; preds = %or.rhs5, %if.else7669
   br label %or.merge6
 
-or.rhs5:                                          ; preds = %if.else7526
-  %load46392 = load ptr, ptr %arg, align 8
-  %strcmp46394 = call i32 @strcmp(ptr %load46392, ptr @.strlit46393)
-  %cmp46395 = icmp eq i32 %strcmp46394, 0
-  %bool46396 = zext i1 %cmp46395 to i32
-  %cond46397 = icmp ne i32 %bool46396, 0
-  br i1 %cond46397, label %or.true4, label %or.merge6
+or.rhs5:                                          ; preds = %if.else7669
+  %load47187 = load ptr, ptr %arg, align 8
+  %strcmp47189 = call i32 @strcmp(ptr %load47187, ptr @.strlit47188)
+  %cmp47190 = icmp eq i32 %strcmp47189, 0
+  %bool47191 = zext i1 %cmp47190 to i32
+  %cond47192 = icmp ne i32 %bool47191, 0
+  br i1 %cond47192, label %or.true4, label %or.merge6
 
 or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval46398 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond46399 = icmp ne i32 %orval46398, 0
-  br i1 %cond46399, label %if.then7528, label %if.else7529
+  %orval47193 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond47194 = icmp ne i32 %orval47193, 0
+  br i1 %cond47194, label %if.then7671, label %if.else7672
 
-if.then7531:                                      ; preds = %if.then7528
-  %load46406 = load i32, ptr %i, align 4
-  %add46407 = add i32 %load46406, 1
-  store i32 %add46407, ptr %i, align 4
-  %load46408 = load ptr, ptr %link_args, align 8
-  %call46410 = call ptr @vix_string_concat(ptr %load46408, ptr @.strlit46409)
-  %load46411 = load ptr, ptr %arg, align 8
-  %call46412 = call ptr @vix_string_concat(ptr %call46410, ptr %load46411)
-  %load46413 = load ptr, ptr %argv, align 8
-  %load46414 = load i32, ptr %i, align 4
-  %idx46415 = getelementptr ptr, ptr %load46413, i32 %load46414
-  %loadidx46416 = load ptr, ptr %idx46415, align 8
-  %call46417 = call ptr @vix_string_concat(ptr %call46412, ptr %loadidx46416)
-  store ptr %call46417, ptr %link_args, align 8
-  br label %if.end7533
+if.then7674:                                      ; preds = %if.then7671
+  %load47201 = load i32, ptr %i, align 4
+  %add47202 = add i32 %load47201, 1
+  store i32 %add47202, ptr %i, align 4
+  %load47203 = load ptr, ptr %link_args, align 8
+  %call47205 = call ptr @vix_string_concat(ptr %load47203, ptr @.strlit47204)
+  %load47206 = load ptr, ptr %arg, align 8
+  %call47207 = call ptr @vix_string_concat(ptr %call47205, ptr %load47206)
+  %load47208 = load ptr, ptr %argv, align 8
+  %load47209 = load i32, ptr %i, align 4
+  %idx47210 = getelementptr ptr, ptr %load47208, i32 %load47209
+  %loadidx47211 = load ptr, ptr %idx47210, align 8
+  %call47212 = call ptr @vix_string_concat(ptr %call47207, ptr %loadidx47211)
+  store ptr %call47212, ptr %link_args, align 8
+  br label %if.end7676
 
-if.else7532:                                      ; preds = %if.then7528
-  %load46419 = load ptr, ptr %arg, align 8
-  %call46420 = call ptr @vix_string_concat(ptr @.strlit46418, ptr %load46419)
-  %call46422 = call ptr @vix_string_concat(ptr %call46420, ptr @.strlit46421)
-  call void @diag_print(ptr %call46422)
+if.else7675:                                      ; preds = %if.then7671
+  %load47214 = load ptr, ptr %arg, align 8
+  %call47215 = call ptr @vix_string_concat(ptr @.strlit47213, ptr %load47214)
+  %call47217 = call ptr @vix_string_concat(ptr %call47215, ptr @.strlit47216)
+  call void @diag_print(ptr %call47217)
   ret i32 1
 
-if.end7533:                                       ; preds = %if.then7531
-  br label %if.end7530
+if.end7676:                                       ; preds = %if.then7674
+  br label %if.end7673
 
-if.then7534:                                      ; preds = %or.merge9
-  %load46437 = load ptr, ptr %link_args, align 8
-  %call46439 = call ptr @vix_string_concat(ptr %load46437, ptr @.strlit46438)
-  %load46440 = load ptr, ptr %arg, align 8
-  %call46441 = call ptr @vix_string_concat(ptr %call46439, ptr %load46440)
-  store ptr %call46441, ptr %link_args, align 8
-  br label %if.end7536
+if.then7677:                                      ; preds = %or.merge9
+  %load47232 = load ptr, ptr %link_args, align 8
+  %call47234 = call ptr @vix_string_concat(ptr %load47232, ptr @.strlit47233)
+  %load47235 = load ptr, ptr %arg, align 8
+  %call47236 = call ptr @vix_string_concat(ptr %call47234, ptr %load47235)
+  store ptr %call47236, ptr %link_args, align 8
+  br label %if.end7679
 
-if.else7535:                                      ; preds = %or.merge9
-  %load46442 = load ptr, ptr %arg, align 8
-  %call46443 = call ptr @compiler_mode(ptr %load46442)
-  br label %match.test7538
+if.else7678:                                      ; preds = %or.merge9
+  %load47237 = load ptr, ptr %arg, align 8
+  %call47238 = call ptr @compiler_mode(ptr %load47237)
+  br label %match.test7681
 
-if.end7536:                                       ; preds = %match.end7537, %if.then7534
-  br label %if.end7530
+if.end7679:                                       ; preds = %match.end7680, %if.then7677
+  br label %if.end7673
 
-or.true7:                                         ; preds = %or.rhs8, %if.else7529
+or.true7:                                         ; preds = %or.rhs8, %if.else7672
   br label %or.merge9
 
-or.rhs8:                                          ; preds = %if.else7529
-  %load46429 = load ptr, ptr %arg, align 8
-  %call46431 = call i32 @str_starts_with(ptr %load46429, ptr @.strlit46430)
-  %cmp46432 = icmp eq i32 %call46431, 1
-  %bool46433 = zext i1 %cmp46432 to i32
-  %cond46434 = icmp ne i32 %bool46433, 0
-  br i1 %cond46434, label %or.true7, label %or.merge9
+or.rhs8:                                          ; preds = %if.else7672
+  %load47224 = load ptr, ptr %arg, align 8
+  %call47226 = call i32 @str_starts_with(ptr %load47224, ptr @.strlit47225)
+  %cmp47227 = icmp eq i32 %call47226, 1
+  %bool47228 = zext i1 %cmp47227 to i32
+  %cond47229 = icmp ne i32 %bool47228, 0
+  br i1 %cond47229, label %or.true7, label %or.merge9
 
 or.merge9:                                        ; preds = %or.true7, %or.rhs8
-  %orval46435 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
-  %cond46436 = icmp ne i32 %orval46435, 0
-  br i1 %cond46436, label %if.then7534, label %if.else7535
+  %orval47230 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
+  %cond47231 = icmp ne i32 %orval47230, 0
+  br i1 %cond47231, label %if.then7677, label %if.else7678
 
-match.end7537:                                    ; preds = %match.test7557, %match.end7558, %if.end7543
-  br label %if.end7536
+match.end7680:                                    ; preds = %match.test7700, %match.end7701, %if.end7686
+  br label %if.end7679
 
-match.test7538:                                   ; preds = %if.else7535
-  %cmp46444 = icmp ne ptr %call46443, null
-  %bool46445 = zext i1 %cmp46444 to i32
-  %cond46446 = icmp ne i32 %bool46445, 0
-  br i1 %cond46446, label %match.body7539, label %match.test7540
+match.test7681:                                   ; preds = %if.else7678
+  %cmp47239 = icmp ne ptr %call47238, null
+  %bool47240 = zext i1 %cmp47239 to i32
+  %cond47241 = icmp ne i32 %bool47240, 0
+  br i1 %cond47241, label %match.body7682, label %match.test7683
 
-match.body7539:                                   ; preds = %match.test7538
+match.body7682:                                   ; preds = %match.test7681
   %next_mode = alloca ptr, align 8
-  store ptr %call46443, ptr %next_mode, align 8
-  %load46447 = load ptr, ptr %next_mode, align 8
-  %strcmp46449 = call i32 @strcmp(ptr %load46447, ptr @.strlit46448)
-  %cmp46450 = icmp eq i32 %strcmp46449, 0
-  %bool46451 = zext i1 %cmp46450 to i32
-  %cond46452 = icmp ne i32 %bool46451, 0
-  br i1 %cond46452, label %if.then7541, label %if.else7542
+  store ptr %call47238, ptr %next_mode, align 8
+  %load47242 = load ptr, ptr %next_mode, align 8
+  %strcmp47244 = call i32 @strcmp(ptr %load47242, ptr @.strlit47243)
+  %cmp47245 = icmp eq i32 %strcmp47244, 0
+  %bool47246 = zext i1 %cmp47245 to i32
+  %cond47247 = icmp ne i32 %bool47246, 0
+  br i1 %cond47247, label %if.then7684, label %if.else7685
 
-match.test7540:                                   ; preds = %match.test7538
-  %cmp46481 = icmp eq ptr %call46443, null
-  %bool46482 = zext i1 %cmp46481 to i32
-  %cond46483 = icmp ne i32 %bool46482, 0
-  br i1 %cond46483, label %match.body7556, label %match.test7557
+match.test7683:                                   ; preds = %match.test7681
+  %cmp47276 = icmp eq ptr %call47238, null
+  %bool47277 = zext i1 %cmp47276 to i32
+  %cond47278 = icmp ne i32 %bool47277, 0
+  br i1 %cond47278, label %match.body7699, label %match.test7700
 
-if.then7541:                                      ; preds = %match.body7539
+if.then7684:                                      ; preds = %match.body7682
   store i32 1, ptr %want_help, align 4
-  br label %if.end7543
+  br label %if.end7686
 
-if.else7542:                                      ; preds = %match.body7539
-  %load46453 = load ptr, ptr %next_mode, align 8
-  %strcmp46455 = call i32 @strcmp(ptr %load46453, ptr @.strlit46454)
-  %cmp46456 = icmp eq i32 %strcmp46455, 0
-  %bool46457 = zext i1 %cmp46456 to i32
-  %cond46458 = icmp ne i32 %bool46457, 0
-  br i1 %cond46458, label %if.then7544, label %if.else7545
+if.else7685:                                      ; preds = %match.body7682
+  %load47248 = load ptr, ptr %next_mode, align 8
+  %strcmp47250 = call i32 @strcmp(ptr %load47248, ptr @.strlit47249)
+  %cmp47251 = icmp eq i32 %strcmp47250, 0
+  %bool47252 = zext i1 %cmp47251 to i32
+  %cond47253 = icmp ne i32 %bool47252, 0
+  br i1 %cond47253, label %if.then7687, label %if.else7688
 
-if.end7543:                                       ; preds = %if.end7546, %if.then7541
-  br label %match.end7537
+if.end7686:                                       ; preds = %if.end7689, %if.then7684
+  br label %match.end7680
 
-if.then7544:                                      ; preds = %if.else7542
+if.then7687:                                      ; preds = %if.else7685
   store i32 1, ptr %want_version, align 4
-  br label %if.end7546
+  br label %if.end7689
 
-if.else7545:                                      ; preds = %if.else7542
-  %load46459 = load ptr, ptr %next_mode, align 8
-  %strcmp46461 = call i32 @strcmp(ptr %load46459, ptr @.strlit46460)
-  %cmp46462 = icmp eq i32 %strcmp46461, 0
-  %bool46463 = zext i1 %cmp46462 to i32
-  %cond46464 = icmp ne i32 %bool46463, 0
-  br i1 %cond46464, label %if.then7547, label %if.else7548
+if.else7688:                                      ; preds = %if.else7685
+  %load47254 = load ptr, ptr %next_mode, align 8
+  %strcmp47256 = call i32 @strcmp(ptr %load47254, ptr @.strlit47255)
+  %cmp47257 = icmp eq i32 %strcmp47256, 0
+  %bool47258 = zext i1 %cmp47257 to i32
+  %cond47259 = icmp ne i32 %bool47258, 0
+  br i1 %cond47259, label %if.then7690, label %if.else7691
 
-if.end7546:                                       ; preds = %if.end7549, %if.then7544
-  br label %if.end7543
+if.end7689:                                       ; preds = %if.end7692, %if.then7687
+  br label %if.end7686
 
-if.then7547:                                      ; preds = %if.else7545
-  store ptr @.strlit46465, ptr %emit, align 8
-  br label %if.end7549
+if.then7690:                                      ; preds = %if.else7688
+  store ptr @.strlit47260, ptr %emit, align 8
+  br label %if.end7692
 
-if.else7548:                                      ; preds = %if.else7545
-  %load46466 = load ptr, ptr %next_mode, align 8
-  %strcmp46468 = call i32 @strcmp(ptr %load46466, ptr @.strlit46467)
-  %cmp46469 = icmp eq i32 %strcmp46468, 0
-  %bool46470 = zext i1 %cmp46469 to i32
-  %cond46471 = icmp ne i32 %bool46470, 0
-  br i1 %cond46471, label %if.then7550, label %if.else7551
+if.else7691:                                      ; preds = %if.else7688
+  %load47261 = load ptr, ptr %next_mode, align 8
+  %strcmp47263 = call i32 @strcmp(ptr %load47261, ptr @.strlit47262)
+  %cmp47264 = icmp eq i32 %strcmp47263, 0
+  %bool47265 = zext i1 %cmp47264 to i32
+  %cond47266 = icmp ne i32 %bool47265, 0
+  br i1 %cond47266, label %if.then7693, label %if.else7694
 
-if.end7549:                                       ; preds = %if.end7552, %if.then7547
-  br label %if.end7546
+if.end7692:                                       ; preds = %if.end7695, %if.then7690
+  br label %if.end7689
 
-if.then7550:                                      ; preds = %if.else7548
-  store ptr @.strlit46472, ptr %emit, align 8
-  br label %if.end7552
+if.then7693:                                      ; preds = %if.else7691
+  store ptr @.strlit47267, ptr %emit, align 8
+  br label %if.end7695
 
-if.else7551:                                      ; preds = %if.else7548
-  %load46473 = load ptr, ptr %next_mode, align 8
-  %strcmp46475 = call i32 @strcmp(ptr %load46473, ptr @.strlit46474)
-  %cmp46476 = icmp eq i32 %strcmp46475, 0
-  %bool46477 = zext i1 %cmp46476 to i32
-  %cond46478 = icmp ne i32 %bool46477, 0
-  br i1 %cond46478, label %if.then7553, label %if.else7554
+if.else7694:                                      ; preds = %if.else7691
+  %load47268 = load ptr, ptr %next_mode, align 8
+  %strcmp47270 = call i32 @strcmp(ptr %load47268, ptr @.strlit47269)
+  %cmp47271 = icmp eq i32 %strcmp47270, 0
+  %bool47272 = zext i1 %cmp47271 to i32
+  %cond47273 = icmp ne i32 %bool47272, 0
+  br i1 %cond47273, label %if.then7696, label %if.else7697
 
-if.end7552:                                       ; preds = %if.end7555, %if.then7550
-  br label %if.end7549
+if.end7695:                                       ; preds = %if.end7698, %if.then7693
+  br label %if.end7692
 
-if.then7553:                                      ; preds = %if.else7551
-  store ptr @.strlit46479, ptr %emit, align 8
-  br label %if.end7555
+if.then7696:                                      ; preds = %if.else7694
+  store ptr @.strlit47274, ptr %emit, align 8
+  br label %if.end7698
 
-if.else7554:                                      ; preds = %if.else7551
-  %load46480 = load ptr, ptr %next_mode, align 8
-  store ptr %load46480, ptr %mode, align 8
-  br label %if.end7555
+if.else7697:                                      ; preds = %if.else7694
+  %load47275 = load ptr, ptr %next_mode, align 8
+  store ptr %load47275, ptr %mode, align 8
+  br label %if.end7698
 
-if.end7555:                                       ; preds = %if.else7554, %if.then7553
-  br label %if.end7552
+if.end7698:                                       ; preds = %if.else7697, %if.then7696
+  br label %if.end7695
 
-match.body7556:                                   ; preds = %match.test7540
-  %load46484 = load ptr, ptr %arg, align 8
-  %call46485 = call ptr @source_file_arg(ptr %load46484)
-  br label %match.test7559
+match.body7699:                                   ; preds = %match.test7683
+  %load47279 = load ptr, ptr %arg, align 8
+  %call47280 = call ptr @source_file_arg(ptr %load47279)
+  br label %match.test7702
 
-match.test7557:                                   ; preds = %match.test7540
-  br label %match.end7537
+match.test7700:                                   ; preds = %match.test7683
+  br label %match.end7680
 
-match.end7558:                                    ; preds = %match.test7566, %if.end7564
-  br label %match.end7537
+match.end7701:                                    ; preds = %match.test7709, %if.end7707
+  br label %match.end7680
 
-match.test7559:                                   ; preds = %match.body7556
-  %cmp46486 = icmp ne ptr %call46485, null
-  %bool46487 = zext i1 %cmp46486 to i32
-  %cond46488 = icmp ne i32 %bool46487, 0
-  br i1 %cond46488, label %match.body7560, label %match.test7561
+match.test7702:                                   ; preds = %match.body7699
+  %cmp47281 = icmp ne ptr %call47280, null
+  %bool47282 = zext i1 %cmp47281 to i32
+  %cond47283 = icmp ne i32 %bool47282, 0
+  br i1 %cond47283, label %match.body7703, label %match.test7704
 
-match.body7560:                                   ; preds = %match.test7559
+match.body7703:                                   ; preds = %match.test7702
   %path = alloca ptr, align 8
-  store ptr %call46485, ptr %path, align 8
-  %load46489 = load i32, ptr %has_input, align 4
-  %cmp46490 = icmp eq i32 %load46489, 1
-  %bool46491 = zext i1 %cmp46490 to i32
-  %cond46492 = icmp ne i32 %bool46491, 0
-  br i1 %cond46492, label %if.then7562, label %if.else7563
+  store ptr %call47280, ptr %path, align 8
+  %load47284 = load i32, ptr %has_input, align 4
+  %cmp47285 = icmp eq i32 %load47284, 1
+  %bool47286 = zext i1 %cmp47285 to i32
+  %cond47287 = icmp ne i32 %bool47286, 0
+  br i1 %cond47287, label %if.then7705, label %if.else7706
 
-match.test7561:                                   ; preds = %match.test7559
-  %cmp46497 = icmp eq ptr %call46485, null
-  %bool46498 = zext i1 %cmp46497 to i32
-  %cond46499 = icmp ne i32 %bool46498, 0
-  br i1 %cond46499, label %match.body7565, label %match.test7566
+match.test7704:                                   ; preds = %match.test7702
+  %cmp47292 = icmp eq ptr %call47280, null
+  %bool47293 = zext i1 %cmp47292 to i32
+  %cond47294 = icmp ne i32 %bool47293, 0
+  br i1 %cond47294, label %match.body7708, label %match.test7709
 
-if.then7562:                                      ; preds = %match.body7560
-  call void @diag_print(ptr @.strlit46493)
+if.then7705:                                      ; preds = %match.body7703
+  call void @diag_print(ptr @.strlit47288)
   ret i32 1
 
-if.else7563:                                      ; preds = %match.body7560
-  br label %if.end7564
+if.else7706:                                      ; preds = %match.body7703
+  br label %if.end7707
 
-if.end7564:                                       ; preds = %if.else7563
-  %load46494 = load ptr, ptr %path, align 8
-  %call46495 = call ptr @read_source_file(ptr %load46494)
-  store ptr %call46495, ptr %src, align 8
-  %load46496 = load ptr, ptr %path, align 8
-  store ptr %load46496, ptr %filename, align 8
+if.end7707:                                       ; preds = %if.else7706
+  %load47289 = load ptr, ptr %path, align 8
+  %call47290 = call ptr @read_source_file(ptr %load47289)
+  store ptr %call47290, ptr %src, align 8
+  %load47291 = load ptr, ptr %path, align 8
+  store ptr %load47291, ptr %filename, align 8
   store i32 1, ptr %has_input, align 4
-  br label %match.end7558
+  br label %match.end7701
 
-match.body7565:                                   ; preds = %match.test7561
-  %load46501 = load ptr, ptr %arg, align 8
-  %call46502 = call ptr @vix_string_concat(ptr @.strlit46500, ptr %load46501)
-  %call46504 = call ptr @vix_string_concat(ptr %call46502, ptr @.strlit46503)
-  call void @diag_print(ptr %call46504)
+match.body7708:                                   ; preds = %match.test7704
+  %load47296 = load ptr, ptr %arg, align 8
+  %call47297 = call ptr @vix_string_concat(ptr @.strlit47295, ptr %load47296)
+  %call47299 = call ptr @vix_string_concat(ptr %call47297, ptr @.strlit47298)
+  call void @diag_print(ptr %call47299)
   ret i32 1
 
-match.test7566:                                   ; preds = %match.test7561
-  br label %match.end7558
+match.test7709:                                   ; preds = %match.test7704
+  br label %match.end7701
 
-if.then7567:                                      ; preds = %while.end7470
-  %call46511 = call i32 @print_help()
-  ret i32 %call46511
+if.then7710:                                      ; preds = %while.end7613
+  %call47306 = call i32 @print_help()
+  ret i32 %call47306
 
-if.else7568:                                      ; preds = %while.end7470
-  br label %if.end7569
+if.else7711:                                      ; preds = %while.end7613
+  br label %if.end7712
 
-if.end7569:                                       ; preds = %if.else7568
-  %load46512 = load i32, ptr %want_version, align 4
-  %cmp46513 = icmp eq i32 %load46512, 1
-  %bool46514 = zext i1 %cmp46513 to i32
-  %cond46515 = icmp ne i32 %bool46514, 0
-  br i1 %cond46515, label %if.then7570, label %if.else7571
+if.end7712:                                       ; preds = %if.else7711
+  %load47307 = load i32, ptr %want_version, align 4
+  %cmp47308 = icmp eq i32 %load47307, 1
+  %bool47309 = zext i1 %cmp47308 to i32
+  %cond47310 = icmp ne i32 %bool47309, 0
+  br i1 %cond47310, label %if.then7713, label %if.else7714
 
-if.then7570:                                      ; preds = %if.end7569
-  %call46516 = call i32 @print_version()
-  ret i32 %call46516
+if.then7713:                                      ; preds = %if.end7712
+  %call47311 = call i32 @print_version()
+  ret i32 %call47311
 
-if.else7571:                                      ; preds = %if.end7569
-  br label %if.end7572
+if.else7714:                                      ; preds = %if.end7712
+  br label %if.end7715
 
-if.end7572:                                       ; preds = %if.else7571
-  %load46517 = load i32, ptr %has_input, align 4
-  %cmp46518 = icmp eq i32 %load46517, 0
-  %bool46519 = zext i1 %cmp46518 to i32
-  %cond46520 = icmp ne i32 %bool46519, 0
-  br i1 %cond46520, label %if.then7573, label %if.else7574
+if.end7715:                                       ; preds = %if.else7714
+  %load47312 = load i32, ptr %has_input, align 4
+  %cmp47313 = icmp eq i32 %load47312, 0
+  %bool47314 = zext i1 %cmp47313 to i32
+  %cond47315 = icmp ne i32 %bool47314, 0
+  br i1 %cond47315, label %if.then7716, label %if.else7717
 
-if.then7573:                                      ; preds = %if.end7572
-  call void @diag_print(ptr @.strlit46521)
-  call void @diag_print(ptr @.strlit46522)
+if.then7716:                                      ; preds = %if.end7715
+  call void @diag_print(ptr @.strlit47316)
+  call void @diag_print(ptr @.strlit47317)
   ret i32 1
 
-if.else7574:                                      ; preds = %if.end7572
-  br label %if.end7575
+if.else7717:                                      ; preds = %if.end7715
+  br label %if.end7718
 
-if.end7575:                                       ; preds = %if.else7574
-  %load46523 = load ptr, ptr %src, align 8
-  %strcmp46525 = call i32 @strcmp(ptr %load46523, ptr @.strlit46524)
-  %cmp46526 = icmp eq i32 %strcmp46525, 0
-  %bool46527 = zext i1 %cmp46526 to i32
-  %cond46528 = icmp ne i32 %bool46527, 0
-  br i1 %cond46528, label %if.then7576, label %if.else7577
+if.end7718:                                       ; preds = %if.else7717
+  %load47318 = load ptr, ptr %src, align 8
+  %strcmp47320 = call i32 @strcmp(ptr %load47318, ptr @.strlit47319)
+  %cmp47321 = icmp eq i32 %strcmp47320, 0
+  %bool47322 = zext i1 %cmp47321 to i32
+  %cond47323 = icmp ne i32 %bool47322, 0
+  br i1 %cond47323, label %if.then7719, label %if.else7720
 
-if.then7576:                                      ; preds = %if.end7575
-  %load46530 = load ptr, ptr %filename, align 8
-  %call46531 = call ptr @vix_string_concat(ptr @.strlit46529, ptr %load46530)
-  %call46533 = call ptr @vix_string_concat(ptr %call46531, ptr @.strlit46532)
-  call void @diag_print(ptr %call46533)
+if.then7719:                                      ; preds = %if.end7718
+  %load47325 = load ptr, ptr %filename, align 8
+  %call47326 = call ptr @vix_string_concat(ptr @.strlit47324, ptr %load47325)
+  %call47328 = call ptr @vix_string_concat(ptr %call47326, ptr @.strlit47327)
+  call void @diag_print(ptr %call47328)
   ret i32 1
 
-if.else7577:                                      ; preds = %if.end7575
-  br label %if.end7578
+if.else7720:                                      ; preds = %if.end7718
+  br label %if.end7721
 
-if.end7578:                                       ; preds = %if.else7577
-  %load46534 = load ptr, ptr %backend, align 8
-  %strcmp46536 = call i32 @strcmp(ptr %load46534, ptr @.strlit46535)
-  %cmp46537 = icmp eq i32 %strcmp46536, 0
-  %bool46538 = zext i1 %cmp46537 to i32
-  %cmp46539 = icmp eq i32 %bool46538, 0
-  %bool46540 = zext i1 %cmp46539 to i32
-  %cond46541 = icmp ne i32 %bool46540, 0
-  br i1 %cond46541, label %and.rhs10, label %and.false11
+if.end7721:                                       ; preds = %if.else7720
+  %load47329 = load ptr, ptr %backend, align 8
+  %strcmp47331 = call i32 @strcmp(ptr %load47329, ptr @.strlit47330)
+  %cmp47332 = icmp eq i32 %strcmp47331, 0
+  %bool47333 = zext i1 %cmp47332 to i32
+  %cmp47334 = icmp eq i32 %bool47333, 0
+  %bool47335 = zext i1 %cmp47334 to i32
+  %cond47336 = icmp ne i32 %bool47335, 0
+  br i1 %cond47336, label %and.rhs10, label %and.false11
 
-if.then7579:                                      ; preds = %and.merge12
-  %load46553 = load ptr, ptr %backend, align 8
-  %call46554 = call ptr @vix_string_concat(ptr @.strlit46552, ptr %load46553)
-  %call46556 = call ptr @vix_string_concat(ptr %call46554, ptr @.strlit46555)
-  call void @diag_print(ptr %call46556)
+if.then7722:                                      ; preds = %and.merge12
+  %load47348 = load ptr, ptr %backend, align 8
+  %call47349 = call ptr @vix_string_concat(ptr @.strlit47347, ptr %load47348)
+  %call47351 = call ptr @vix_string_concat(ptr %call47349, ptr @.strlit47350)
+  call void @diag_print(ptr %call47351)
   ret i32 1
 
-if.else7580:                                      ; preds = %and.merge12
-  br label %if.end7581
+if.else7723:                                      ; preds = %and.merge12
+  br label %if.end7724
 
-if.end7581:                                       ; preds = %if.else7580
-  %load46557 = load ptr, ptr %backend, align 8
-  %strcmp46559 = call i32 @strcmp(ptr %load46557, ptr @.strlit46558)
-  %cmp46560 = icmp eq i32 %strcmp46559, 0
-  %bool46561 = zext i1 %cmp46560 to i32
-  %cond46562 = icmp ne i32 %bool46561, 0
-  br i1 %cond46562, label %and.rhs13, label %and.false14
+if.end7724:                                       ; preds = %if.else7723
+  %load47352 = load ptr, ptr %backend, align 8
+  %strcmp47354 = call i32 @strcmp(ptr %load47352, ptr @.strlit47353)
+  %cmp47355 = icmp eq i32 %strcmp47354, 0
+  %bool47356 = zext i1 %cmp47355 to i32
+  %cond47357 = icmp ne i32 %bool47356, 0
+  br i1 %cond47357, label %and.rhs13, label %and.false14
 
-and.rhs10:                                        ; preds = %if.end7578
-  %load46542 = load ptr, ptr %backend, align 8
-  %strcmp46544 = call i32 @strcmp(ptr %load46542, ptr @.strlit46543)
-  %cmp46545 = icmp eq i32 %strcmp46544, 0
-  %bool46546 = zext i1 %cmp46545 to i32
-  %cmp46547 = icmp eq i32 %bool46546, 0
-  %bool46548 = zext i1 %cmp46547 to i32
-  %cond46549 = icmp ne i32 %bool46548, 0
-  br i1 %cond46549, label %and.merge12, label %and.false11
+and.rhs10:                                        ; preds = %if.end7721
+  %load47337 = load ptr, ptr %backend, align 8
+  %strcmp47339 = call i32 @strcmp(ptr %load47337, ptr @.strlit47338)
+  %cmp47340 = icmp eq i32 %strcmp47339, 0
+  %bool47341 = zext i1 %cmp47340 to i32
+  %cmp47342 = icmp eq i32 %bool47341, 0
+  %bool47343 = zext i1 %cmp47342 to i32
+  %cond47344 = icmp ne i32 %bool47343, 0
+  br i1 %cond47344, label %and.merge12, label %and.false11
 
-and.false11:                                      ; preds = %and.rhs10, %if.end7578
+and.false11:                                      ; preds = %and.rhs10, %if.end7721
   br label %and.merge12
 
 and.merge12:                                      ; preds = %and.false11, %and.rhs10
-  %andval46550 = phi i32 [ 1, %and.rhs10 ], [ 0, %and.false11 ]
-  %cond46551 = icmp ne i32 %andval46550, 0
-  br i1 %cond46551, label %if.then7579, label %if.else7580
+  %andval47345 = phi i32 [ 1, %and.rhs10 ], [ 0, %and.false11 ]
+  %cond47346 = icmp ne i32 %andval47345, 0
+  br i1 %cond47346, label %if.then7722, label %if.else7723
 
-if.then7582:                                      ; preds = %and.merge15
-  %load46571 = load ptr, ptr %target_triple, align 8
-  %call46572 = call ptr @vix_string_concat(ptr @.strlit46570, ptr %load46571)
-  %call46574 = call ptr @vix_string_concat(ptr %call46572, ptr @.strlit46573)
-  call void @diag_print(ptr %call46574)
+if.then7725:                                      ; preds = %and.merge15
+  %load47366 = load ptr, ptr %target_triple, align 8
+  %call47367 = call ptr @vix_string_concat(ptr @.strlit47365, ptr %load47366)
+  %call47369 = call ptr @vix_string_concat(ptr %call47367, ptr @.strlit47368)
+  call void @diag_print(ptr %call47369)
   ret i32 1
 
-if.else7583:                                      ; preds = %and.merge15
-  br label %if.end7584
+if.else7726:                                      ; preds = %and.merge15
+  br label %if.end7727
 
-if.end7584:                                       ; preds = %if.else7583
-  %load46575 = load ptr, ptr %mode, align 8
-  %load46576 = load ptr, ptr %src, align 8
-  %load46577 = load ptr, ptr %filename, align 8
-  %load46578 = load ptr, ptr %emit, align 8
-  %load46579 = load ptr, ptr %output, align 8
-  %load46580 = load ptr, ptr %argv, align 8
-  %idx46581 = getelementptr ptr, ptr %load46580, i32 0
-  %loadidx46582 = load ptr, ptr %idx46581, align 8
-  %call46583 = call ptr @runtime_object_path(ptr %loadidx46582)
-  %load46584 = load ptr, ptr %link_args, align 8
-  %load46585 = load ptr, ptr %target_triple, align 8
-  %load46586 = load ptr, ptr %backend, align 8
-  %call46587 = call ptr @run_mode(ptr %load46575, ptr %load46576, ptr %load46577, ptr %load46578, ptr %load46579, ptr %call46583, ptr %load46584, ptr %load46585, ptr %load46586)
-  br label %match.test7586
+if.end7727:                                       ; preds = %if.else7726
+  %load47370 = load ptr, ptr %mode, align 8
+  %load47371 = load ptr, ptr %src, align 8
+  %load47372 = load ptr, ptr %filename, align 8
+  %load47373 = load ptr, ptr %emit, align 8
+  %load47374 = load ptr, ptr %output, align 8
+  %load47375 = load ptr, ptr %argv, align 8
+  %idx47376 = getelementptr ptr, ptr %load47375, i32 0
+  %loadidx47377 = load ptr, ptr %idx47376, align 8
+  %call47378 = call ptr @runtime_object_path(ptr %loadidx47377)
+  %load47379 = load ptr, ptr %link_args, align 8
+  %load47380 = load ptr, ptr %target_triple, align 8
+  %load47381 = load ptr, ptr %backend, align 8
+  %call47382 = call ptr @run_mode(ptr %load47370, ptr %load47371, ptr %load47372, ptr %load47373, ptr %load47374, ptr %call47378, ptr %load47379, ptr %load47380, ptr %load47381)
+  br label %match.test7729
 
-and.rhs13:                                        ; preds = %if.end7581
-  %load46563 = load ptr, ptr %target_triple, align 8
-  %call46564 = call i32 @self_backend_target_supported(ptr %load46563)
-  %cmp46565 = icmp eq i32 %call46564, 0
-  %bool46566 = zext i1 %cmp46565 to i32
-  %cond46567 = icmp ne i32 %bool46566, 0
-  br i1 %cond46567, label %and.merge15, label %and.false14
+and.rhs13:                                        ; preds = %if.end7724
+  %load47358 = load ptr, ptr %target_triple, align 8
+  %call47359 = call i32 @self_backend_target_supported(ptr %load47358)
+  %cmp47360 = icmp eq i32 %call47359, 0
+  %bool47361 = zext i1 %cmp47360 to i32
+  %cond47362 = icmp ne i32 %bool47361, 0
+  br i1 %cond47362, label %and.merge15, label %and.false14
 
-and.false14:                                      ; preds = %and.rhs13, %if.end7581
+and.false14:                                      ; preds = %and.rhs13, %if.end7724
   br label %and.merge15
 
 and.merge15:                                      ; preds = %and.false14, %and.rhs13
-  %andval46568 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
-  %cond46569 = icmp ne i32 %andval46568, 0
-  br i1 %cond46569, label %if.then7582, label %if.else7583
+  %andval47363 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
+  %cond47364 = icmp ne i32 %andval47363, 0
+  br i1 %cond47364, label %if.then7725, label %if.else7726
 
-match.end7585:                                    ; preds = %match.test7590
+match.end7728:                                    ; preds = %match.test7733
   ret i32 0
 
-match.test7586:                                   ; preds = %if.end7584
-  %cmp46588 = icmp ne ptr %call46587, null
-  %bool46589 = zext i1 %cmp46588 to i32
-  %cond46590 = icmp ne i32 %bool46589, 0
-  br i1 %cond46590, label %match.body7587, label %match.test7588
+match.test7729:                                   ; preds = %if.end7727
+  %cmp47383 = icmp ne ptr %call47382, null
+  %bool47384 = zext i1 %cmp47383 to i32
+  %cond47385 = icmp ne i32 %bool47384, 0
+  br i1 %cond47385, label %match.body7730, label %match.test7731
 
-match.body7587:                                   ; preds = %match.test7586
-  %ptrtoint46591 = ptrtoint ptr %call46587 to i64
-  %sub46592 = sub i64 %ptrtoint46591, 1
+match.body7730:                                   ; preds = %match.test7729
+  %ptrtoint47386 = ptrtoint ptr %call47382 to i64
+  %sub47387 = sub i64 %ptrtoint47386, 1
   %code = alloca i32, align 4
-  store i64 %sub46592, ptr %code, align 4
-  %load46593 = load i32, ptr %code, align 4
-  ret i32 %load46593
+  store i64 %sub47387, ptr %code, align 4
+  %load47388 = load i32, ptr %code, align 4
+  ret i32 %load47388
 
-match.test7588:                                   ; preds = %match.test7586
-  %cmp46594 = icmp eq ptr %call46587, null
-  %bool46595 = zext i1 %cmp46594 to i32
-  %cond46596 = icmp ne i32 %bool46595, 0
-  br i1 %cond46596, label %match.body7589, label %match.test7590
+match.test7731:                                   ; preds = %match.test7729
+  %cmp47389 = icmp eq ptr %call47382, null
+  %bool47390 = zext i1 %cmp47389 to i32
+  %cond47391 = icmp ne i32 %bool47390, 0
+  br i1 %cond47391, label %match.body7732, label %match.test7733
 
-match.body7589:                                   ; preds = %match.test7588
+match.body7732:                                   ; preds = %match.test7731
   ret i32 0
 
-match.test7590:                                   ; preds = %match.test7588
-  br label %match.end7585
+match.test7733:                                   ; preds = %match.test7731
+  br label %match.end7728
 }

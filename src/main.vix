@@ -350,7 +350,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             print(obj_path)
             return mode_success()
         }
-        let link_result = shell_command("clang -no-pie " + obj_path + " " + runtime_object + " -o " + artifact_path + " " + link_args)
+        let link_result = shell_command("clang -fuse-ld=lld -no-pie " + obj_path + " " + runtime_object + " -o " + artifact_path + " " + link_args)
         delete_file(obj_path)
         if (link_result != 0)
         {
@@ -401,7 +401,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     }
     else
     {
-        command = "clang" + target_arg + " " + ir_path + " " + runtime_object + " -o " + artifact_path + " " + link_args
+        command = "clang" + target_arg + " -fuse-ld=lld " + ir_path + " " + runtime_object + " -o " + artifact_path + " " + link_args
     }
     let build_result = shell_command(command)
     if (emit != "ir")

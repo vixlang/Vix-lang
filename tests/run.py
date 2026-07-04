@@ -25,7 +25,9 @@ TESTS = {
     "test_extern_printf.vix": {"exit": 7, "stdout": "7\n"},
     "test_syscall_io.vix": {"exit": 0, "stdout": "Hello syscall\n"},
     "test_std_io_compat.vix": {"exit": 0, "stdout": "Compat io\n"},
-    "test_unsupported_float.vix": {"compile_fails": True},
+    "test_unsupported_float.vix": {"exit": 0},
+    "test_float_stack_args.vix": {"exit": 0},
+    "test_stack_args.vix": {"exit": 74},
 }
 
 for i in range(100):

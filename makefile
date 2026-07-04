@@ -37,7 +37,7 @@ $(VIXC_OBJ): $(VIX_SOURCES) $(VIXC) | $(BUILD_DIR)
 	$(VIXC) $(SRC_DIR)/main.vix -obj -o $@
 
 $(TARGET): $(VIXC_OBJ) $(HELPER_OBJ) $(RUNTIME_OBJ) | $(BUILD_DIR)
-	$(CLANG) -o $@ $^ $(LLVM_LDFLAGS)
+	$(CLANG) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS)
 
 clean:
 	rm -f $(TARGET) $(HELPER_OBJ) $(RUNTIME_OBJ) $(VIXC_OBJ) test test.ll

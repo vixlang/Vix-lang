@@ -1,8 +1,0 @@
-fn main(): i32
-{
-    let y = {
-        let x = 3
-        x + 4
-    }
-    return y
-}

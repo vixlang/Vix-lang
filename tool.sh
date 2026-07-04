@@ -17,7 +17,6 @@ echo "build OK!"
 
 cd ..
 rm -rf build runtime
-cd ..
 sleep 5
 echo "git commit ..."
 git add .

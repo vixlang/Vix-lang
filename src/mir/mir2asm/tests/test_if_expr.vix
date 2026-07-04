@@ -1,6 +1,0 @@
-fn main(): i32
-{
-    let x = 3
-    let y = if (x == 3) { 7 } else { 2 }
-    return y
-}
