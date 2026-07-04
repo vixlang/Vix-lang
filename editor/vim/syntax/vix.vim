@@ -60,7 +60,7 @@ syn match vixAttribute '#\[.\{-}\]'
 
 " Operators
 syn match vixOperator '=>\|==\|!=\|<=\|>=\|+=\|-=\|->\|\.\.\.\|\.\.'
-syn match vixOperator '[-+*/%=<>!&|^~;]'
+syn match vixOperator '[-+*%=<>!&|^~;]'
 
 " Delimiters
 syn match vixDelimiter '[{}()\[\],:]'
@@ -69,7 +69,7 @@ syn match vixDelimiter '[{}()\[\],:]'
 syn match vixADT '\<[A-Z][a-zA-Z0-9_]*\>'
 
 hi def link vixTodo        Todo
-hi def link vixComment     Comment
+hi def vixComment guifg=#6c9e31 ctermfg=green
 hi def link vixString      String
 hi def link vixChar        String
 hi def link vixNumber      Number

@@ -133,6 +133,7 @@ pub type LlvmBuilder = struct {
     label_counter: i32,
     printf_fn: ptr,
     malloc_fn: ptr,
+    calloc_fn: ptr,
     strcmp_fn: ptr,
     strlen_fn: ptr
 }
@@ -241,7 +242,12 @@ pub fn type_array_element(ty: string): string
 {
     if (type_text_is_array(ty) == 0 or ty.length <= 2) { return "unknown" }
     let mut result = ""
+    let mut end = ty.length - 1
     for (i in 1 .. ty.length - 1)
+    {
+        if (ty[i] == '*') { end = i }
+    }
+    for (i in 1 .. end)
     {
         let s: string = malloc(2)
         s[0] = ty[i]
@@ -249,6 +255,34 @@ pub fn type_array_element(ty: string): string
         result = result + s
     }
     return result
+}
+
+pub fn type_text_is_fixed_array(ty: string): i32
+{
+    if (type_text_is_array(ty) == 0) { return 0 }
+    for (i in 1 .. ty.length - 1)
+    {
+        if (ty[i] == '*') { return 1 }
+    }
+    return 0
+}
+
+pub fn type_fixed_array_count(ty: string): i32
+{
+    let mut count = 0
+    let mut in_count = 0
+    for (i in 1 .. ty.length - 1)
+    {
+        if (ty[i] == '*')
+        {
+            in_count = 1
+        }
+        elif (in_count == 1 and ty[i] >= '0' and ty[i] <= '9')
+        {
+            count = count * 10 + (ty[i] - '0')
+        }
+    }
+    return count
 }
 
 pub fn is_ptr_to_struct(ty: string): i32
@@ -404,11 +438,13 @@ pub fn llvm_new_for_target(target_triple: string): LlvmBuilder
     let printf_fn = vix_LLVMAddFunction(module, "printf", printf_ty)
     let malloc_ty = vix_LLVMFunctionType1(LLVMPointerType(LLVMInt8Type(), 0), LLVMInt64Type(), 0)
     let malloc_fn = vix_LLVMAddFunction(module, "malloc", malloc_ty)
+    let calloc_ty = vix_LLVMFunctionType2(LLVMPointerType(LLVMInt8Type(), 0), LLVMInt64Type(), LLVMInt64Type(), 0)
+    let calloc_fn = vix_LLVMAddFunction(module, "calloc", calloc_ty)
     let strcmp_ty = vix_LLVMFunctionType2(LLVMInt32Type(), LLVMPointerType(LLVMInt8Type(), 0), LLVMPointerType(LLVMInt8Type(), 0), 0)
     let strcmp_fn = vix_LLVMAddFunction(module, "strcmp", strcmp_ty)
     let strlen_ty = vix_LLVMFunctionType1(LLVMInt32Type(), LLVMPointerType(LLVMInt8Type(), 0), 0)
     let strlen_fn = vix_LLVMAddFunction(module, "strlen", strlen_ty)
-    return LlvmBuilder{ module: module, builder: builder, current_fn: nil, current_block: nil, temp_counter: 0, label_counter: 0, printf_fn: printf_fn, malloc_fn: malloc_fn, strcmp_fn: strcmp_fn, strlen_fn: strlen_fn }
+    return LlvmBuilder{ module: module, builder: builder, current_fn: nil, current_block: nil, temp_counter: 0, label_counter: 0, printf_fn: printf_fn, malloc_fn: malloc_fn, calloc_fn: calloc_fn, strcmp_fn: strcmp_fn, strlen_fn: strlen_fn }
 }
 
 pub fn llvm_get_code(b: &LlvmBuilder): string
@@ -558,6 +594,15 @@ pub fn llvm_alloc_var(b: &LlvmBuilder, name: string, ty: string): ptr
     set_var(b, name, alloca)
     set_var_type(b, name, ty)
     return alloca
+}
+
+pub fn llvm_define_fixed_array_var(b: &LlvmBuilder, name: string, ty: string)
+{
+    let element_ty_text = type_array_element(ty)
+    let count = type_fixed_array_count(ty)
+    let args = [llvm_const_i64(count), llvm_sizeof_i64(b, element_ty_text)]
+    let data_ptr = vix_LLVMBuildCall2(b.builder, vix_LLVMFunctionType2(LLVMPointerType(LLVMInt8Type(), 0), LLVMInt64Type(), LLVMInt64Type(), 0), b.calloc_fn, args, 2, llvm_temp(b, "calloc"))
+    llvm_define_var(b, name, ty, data_ptr)
 }
 
 pub fn llvm_load_i32_var(b: &LlvmBuilder, name: string): ptr

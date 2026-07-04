@@ -14,10 +14,29 @@ pub fn puts(s: string): i32
 	syscall(1, 1, s, len)
 	return 0
 }
+pub fn readln(): string
+{
+	let buf:[u8 * 256]
+	let bytes = syscall(0,0,buf,255)
+	if(bytes > 0)
+	{
+		return buf
+	}
+	else 
+	{
+		return ""
+	}
+}
 
 macro $println(fmt: expr, $(args: expr)*)
 {
         let _ = printf($fmt, $(args),*)
 	let _ = printf("\n")
 }
-
+fn main(): i32
+{
+	$println("Hello world!")
+	let a = readln()
+	$println("%s\n",a)
+	return 0
+}

@@ -98,6 +98,7 @@ pub fn mir_register_program(program: AstProgram)
         register_function_sig(program.functions[i].name, program.functions[i].ret_ty, program.functions[i].param_types)
     }
     register_function_sig_vararg("printf", "i32", ["ptr"], 1)
+    register_function_sig_vararg("calloc", "ptr", ["usize", "usize"], 0)
     register_function_sig_vararg("strcmp", "i32", ["ptr", "ptr"], 0)
     register_function_sig_vararg("strlen", "i32", ["ptr"], 0)
     register_function_sig_vararg("vix_array_len", "i32", ["ptr"], 0)
@@ -678,6 +679,13 @@ pub fn mir_stmt(b: &MirBuilder, es: &ExprStore, store: &StmtStore, stmt_idx: i32
             let ty = if (stmt.type_text != "") { stmt.type_text } else { mir_expr_type(es, expr) }
             mir_define_local(stmt.assign_name, ty)
             mir_inst(b, mir_var_addr(stmt.assign_name) + " = alloca " + mir_type(ty))
+            if (type_text_is_fixed_array(ty) == 1 and expr.tag == "array_literal" and expr.args.length == 0)
+            {
+                let buf = mir_temp(b)
+                mir_inst(b, buf + " = call @calloc(usize " + mir_i32(type_fixed_array_count(ty)) + ", usize sizeof(" + mir_type(type_array_element(ty)) + ")): ptr")
+                mir_inst(b, "store ptr " + buf + ", " + mir_var_addr(stmt.assign_name))
+                return
+            }
             mir_store_expr_to_name(b, es, store, stmt.assign_name, stmt.assign_idx, ty)
         }
         "assign" -> {
@@ -990,6 +998,7 @@ pub fn mir_program(program: AstProgram): string
         out = out + "): " + mir_type(ext.ret_ty) + "\n"
     }
     if (mir_program_has_extern(program, "printf") == 0) { out = out + "    extern_vararg fn @printf(ptr): i32\n" }
+    if (mir_program_has_extern(program, "calloc") == 0) { out = out + "    extern fn @calloc(usize, usize): ptr\n" }
     if (mir_program_has_extern(program, "strcmp") == 0) { out = out + "    extern fn @strcmp(ptr, ptr): i32\n" }
     if (mir_program_has_extern(program, "strlen") == 0) { out = out + "    extern fn @strlen(ptr): i32\n" }
     out = out + "    extern fn @vix_array_len(ptr): i32\n"

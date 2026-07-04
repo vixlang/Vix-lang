@@ -121,6 +121,11 @@ pub fn type_can_assign(target_ty: string, value_ty: string): i32
     if (target_ty == "ptr" and value_ty == "string") { return 1 }
     if (target_ty == "string" and value_ty == "ptr") { return 1 }
     if (target_ty == "ptr" and type_is_array_text_semantic(value_ty) == 1) { return 1 }
+    if (target_ty == "string" and type_is_array_text_semantic(value_ty) == 1)
+    {
+        let elem_ty = type_array_element_typeinfer(value_ty)
+        if (elem_ty == "u8" or elem_ty == "i8" or elem_ty == "char") { return 1 }
+    }
     return 0
 }
 
@@ -481,7 +486,12 @@ pub fn type_array_element_typeinfer(ty: string): string
 {
     if (type_text_is_array_typeinfer(ty) == 0 or ty.length <= 2) { return "unknown" }
     let mut result = ""
+    let mut end = ty.length - 1
     for (i in 1 .. ty.length - 1)
+    {
+        if (ty[i] == '*') { end = i }
+    }
+    for (i in 1 .. end)
     {
         let s: string = malloc(2)
         s[0] = ty[i]

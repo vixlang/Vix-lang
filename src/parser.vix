@@ -1138,11 +1138,18 @@ pub fn parse_statement(parser: &Parser): i32
         let name = parser_text(parser)
         if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
         let mut type_text = ""
+        let mut has_type = 0
         if (parser_text(parser) == ":")
         {
             parser_advance(parser)
             type_text = parse_type_text(parser)
             if (parser.ok == 0) { return -1 }
+            has_type = 1
+        }
+        if (parser_text(parser) != "=" and has_type == 1)
+        {
+            parser_accept_text(parser, ";")
+            return parser_stmt_at(parser, ast_stmt_let_typed_mut(parser.store, name, type_text, ast_expr_array(parser.expr_store, []), is_mut), name_line, name_col)
         }
         parser_expect_text(parser, "=")
         if (parser.ok == 0) { return -1 }
@@ -1227,6 +1234,15 @@ pub fn parse_type_text(parser: &Parser): string
         parser_advance(parser)
         let inner = parse_type_text(parser)
         if (parser.ok == 0) { return "unknown" }
+        if (parser_text(parser) == "*")
+        {
+            parser_advance(parser)
+            let count = parser_int(parser)
+            if (parser_expect_kind(parser, tk_number()) == 0) { return "unknown" }
+            parser_expect_text(parser, "]")
+            if (parser.ok == 0) { return "unknown" }
+            return "[" + inner + "*" + ast_i32(count) + "]"
+        }
         parser_expect_text(parser, "]")
         if (parser.ok == 0) { return "unknown" }
         return "[" + inner + "]"

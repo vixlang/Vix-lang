@@ -675,6 +675,11 @@ pub fn codegen_stmt_in_loop(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, 
         "let" -> {
             let expr = expr_store_get(es, stmt.assign_idx)
             let ty = if (stmt.type_text != "") { stmt.type_text } else { codegen_expr_type(b, es, expr) }
+            if (type_text_is_fixed_array(ty) == 1 and expr.tag == "array_literal" and expr.args.length == 0)
+            {
+                llvm_define_fixed_array_var(b, stmt.assign_name, ty)
+                return
+            }
             let val = codegen_expr_value_typed(b, es, store, expr, ty)
             llvm_define_var(b, stmt.assign_name, ty, val)
         }
