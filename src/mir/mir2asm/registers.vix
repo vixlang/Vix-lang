@@ -29,41 +29,49 @@ pub fn mir2asm_arg_reg_typed(index: i32, ty: string): string
 {
     if (mir2asm_type_is_float(ty) == 1)
     {
-        if (index == 0) { return "xmm0" }
-        if (index == 1) { return "xmm1" }
-        if (index == 2) { return "xmm2" }
-        if (index == 3) { return "xmm3" }
-        if (index == 4) { return "xmm4" }
-        if (index == 5) { return "xmm5" }
-        if (index == 6) { return "xmm6" }
-        if (index == 7) { return "xmm7" }
-        return "xmm0"
+        return match index {
+            0 -> "xmm0"
+            1 -> "xmm1"
+            2 -> "xmm2"
+            3 -> "xmm3"
+            4 -> "xmm4"
+            5 -> "xmm5"
+            6 -> "xmm6"
+            7 -> "xmm7"
+            _ -> "xmm0"
+        }
     }
     if (ty == "i8" or ty == "u8" or ty == "char")
     {
-        if (index == 0) { return "dil" }
-        if (index == 1) { return "sil" }
-        if (index == 2) { return "dl" }
-        if (index == 3) { return "cl" }
-        if (index == 4) { return "r8b" }
-        if (index == 5) { return "r9b" }
-        return "al"
+        return match index {
+            0 -> "dil"
+            1 -> "sil"
+            2 -> "dl"
+            3 -> "cl"
+            4 -> "r8b"
+            5 -> "r9b"
+            _ -> "al"
+        }
     }
     if (mir2asm_type_is_64(ty) == 1)
     {
-        if (index == 0) { return "rdi" }
-        if (index == 1) { return "rsi" }
-        if (index == 2) { return "rdx" }
-        if (index == 3) { return "rcx" }
-        if (index == 4) { return "r8" }
-        if (index == 5) { return "r9" }
-        return "rax"
+        return match index {
+            0 -> "rdi"
+            1 -> "rsi"
+            2 -> "rdx"
+            3 -> "rcx"
+            4 -> "r8"
+            5 -> "r9"
+            _ -> "rax"
+        }
     }
-    if (index == 0) { return "edi" }
-    if (index == 1) { return "esi" }
-    if (index == 2) { return "edx" }
-    if (index == 3) { return "ecx" }
-    if (index == 4) { return "r8d" }
-    if (index == 5) { return "r9d" }
-    return "eax"
+    return match index {
+        0 -> "edi"
+        1 -> "esi"
+        2 -> "edx"
+        3 -> "ecx"
+        4 -> "r8d"
+        5 -> "r9d"
+        _ -> "eax"
+    }
 }

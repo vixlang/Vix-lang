@@ -27,25 +27,55 @@ pub fn mir_escape_string(text: string): string
 
 pub fn mir_type(ty: string): string
 {
-    if (ty == "") { return "i32" }
-    if (ty == "bool") { return "i1" }
-    if (ty == "char") { return "i8" }
-    if (ty == "string") { return "ptr" }
-    if (type_text_is_ptr_to_array(ty) == 1) { return "ptr" }
-    if (is_ptr_to_struct(ty) == 1) { return "ptr:" + mir_type(strip_ptr_prefix(ty)) }
-    if (type_text_is_array(ty) == 1) { return "ptr" }
-    if (mir_type_is_option_text(ty) == 1) { return "ptr" }
-    if (type_is_struct(type_text_base_name_builder(ty)) == 1) { return "@" + type_text_base_name_builder(ty) }
-    return ty
+    return match ty {
+        "" -> "i32"
+        "bool" -> "i1"
+        "char" -> "i8"
+        "string" -> "ptr"
+        _ -> {
+            if (type_text_is_ptr_to_array(ty) == 1)
+	    {
+		return "ptr"
+	    }
+            if (is_ptr_to_struct(ty) == 1)
+	    {
+		return "ptr:" + mir_type(strip_ptr_prefix(ty))
+	    }
+            if (type_text_is_array(ty) == 1)
+	    {
+		return "ptr"
+	    }
+            if (mir_type_is_option_text(ty) == 1)
+	    {
+		return "ptr"
+	    }
+            if (type_is_struct(type_text_base_name_builder(ty)) == 1)
+	    {
+		return "@" + type_text_base_name_builder(ty)
+	    }
+            ty
+        }
+    }
 }
 
 pub fn mir_zero_value(ty: string): string
 {
-    if (ty == "void") { return "" }
-    if (ty == "f32" or ty == "f64") { return "0.0" }
-    if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1) { return "null" }
-    if (type_is_struct(type_text_base_name_builder(ty)) == 1) { return "undef" }
-    return "0"
+    return match ty {
+        "void" -> ""
+        "f32" | "f64" -> "0.0"
+        "ptr" | "string" -> "null"
+        _ -> {
+            if (is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1)
+	    {
+	        return "null"
+            }
+            if (type_is_struct(type_text_base_name_builder(ty)) == 1)
+	    {
+		return "undef"
+	    }
+            "0"
+        }
+    }
 }
 
 pub fn mir_type_is_option_text(ty: string): i32
@@ -77,6 +107,18 @@ pub fn mir_get_local_ty(name: string): string
     return get_local_var_type(name)
 }
 
+macro mir_register_builtin_function_sigs() {
+    register_function_sig_vararg("printf", "i32", ["ptr"], 1)
+    register_function_sig_vararg("calloc", "ptr", ["usize", "usize"], 0)
+    register_function_sig_vararg("strcmp", "i32", ["ptr", "ptr"], 0)
+    register_function_sig_vararg("strlen", "i32", ["ptr"], 0)
+    register_function_sig_vararg("vix_array_len", "i32", ["ptr"], 0)
+    register_function_sig_vararg("vix_array_push_i32", "ptr", ["ptr", "i32"], 0)
+    register_function_sig_vararg("vix_array_push_ptr", "ptr", ["ptr", "ptr"], 0)
+    register_function_sig_vararg("vix_array_push_bytes", "ptr", ["ptr", "ptr", "usize"], 0)
+    register_function_sig_vararg("vix_string_concat", "string", ["string", "string"], 0)
+}
+
 pub fn mir_register_program(program: AstProgram)
 {
     reset_function_sigs()
@@ -97,15 +139,7 @@ pub fn mir_register_program(program: AstProgram)
     {
         register_function_sig(program.functions[i].name, program.functions[i].ret_ty, program.functions[i].param_types)
     }
-    register_function_sig_vararg("printf", "i32", ["ptr"], 1)
-    register_function_sig_vararg("calloc", "ptr", ["usize", "usize"], 0)
-    register_function_sig_vararg("strcmp", "i32", ["ptr", "ptr"], 0)
-    register_function_sig_vararg("strlen", "i32", ["ptr"], 0)
-    register_function_sig_vararg("vix_array_len", "i32", ["ptr"], 0)
-    register_function_sig_vararg("vix_array_push_i32", "ptr", ["ptr", "i32"], 0)
-    register_function_sig_vararg("vix_array_push_ptr", "ptr", ["ptr", "ptr"], 0)
-    register_function_sig_vararg("vix_array_push_bytes", "ptr", ["ptr", "ptr", "usize"], 0)
-    register_function_sig_vararg("vix_string_concat", "string", ["string", "string"], 0)
+    $mir_register_builtin_function_sigs()
 }
 
 pub fn mir_program_has_extern(program: AstProgram, name: string): i32
@@ -119,69 +153,65 @@ pub fn mir_program_has_extern(program: AstProgram, name: string): i32
 
 pub fn mir_expr_type(es: &ExprStore, expr: AstExpr): string
 {
-    if (expr.tag == "int") { return "i32" }
-    if (expr.tag == "float") { return "f64" }
-    if (expr.tag == "bool") { return "bool" }
-    if (expr.tag == "string") { return "string" }
-    if (expr.tag == "ident") { return mir_get_local_ty(expr.text) }
-    if (expr.tag == "addr") { return "ptr" }
-    if (expr.tag == "deref")
-    {
-        let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
-        if (is_ptr_to_struct(base_ty) == 1) { return strip_ptr_prefix(base_ty) }
-        if (base_ty == "string") { return "i8" }
-        return "i32"
-    }
-    if (expr.tag == "field")
-    {
-        let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
-        if (expr.text == "length") { return "i32" }
-        return get_struct_field_type(type_text_base_name_builder(strip_ptr_prefix(base_ty)), expr.text)
-    }
-    if (expr.tag == "struct_literal") { return expr.text }
-    if (expr.tag == "index")
-    {
-        let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
-        return type_text_index_element(base_ty)
-    }
-    if (expr.tag == "unaryop")
-    {
-        if (expr.text == "!") { return "bool" }
-        return mir_expr_type(es, expr_store_get(es, expr.left_idx))
-    }
-    if (expr.tag == "binop")
-    {
-        if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=" or expr.text == "and" or expr.text == "or") { return "bool" }
-        let left_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
-        let right_ty = mir_expr_type(es, expr_store_get(es, expr.right_idx))
-        if (expr.text == "+" and (left_ty == "string" or left_ty == "ptr") and type_is_integer(right_ty) == 1) { return left_ty }
-        if (expr.text == "+" and type_is_integer(left_ty) == 1 and (right_ty == "string" or right_ty == "ptr")) { return right_ty }
-        if (expr.text == "+" and (left_ty == "string" or left_ty == "ptr") and (right_ty == "string" or right_ty == "ptr")) { return "string" }
-        return type_numeric_result(left_ty, right_ty)
-    }
-    if (expr.tag == "call") { return get_function_return_type(expr.text) }
-    if (expr.tag == "array_literal") { return "[i32]" }
-    if (expr.tag == "block_expr")
-    {
-        if (expr.right_idx >= 0) { return mir_expr_type(es, expr_store_get(es, expr.right_idx)) }
-        return "i32"
-    }
-    if (expr.tag == "if_expr") { return mir_expr_type(es, expr_store_get(es, expr.right_idx)) }
-    if (expr.tag == "match_expr")
-    {
-        let mut result_ty = "unknown"
-        let arm_count = expr.args.length / 2
-        for (i in 0 .. arm_count)
-        {
-            let body_idx = expr.args[i * 2 + 1]
-            if (body_idx >= 0 and result_ty == "unknown")
-            {
-                result_ty = mir_expr_type(es, expr_store_get(es, body_idx))
-            }
+    return match expr.tag {
+        "int" -> "i32"
+        "float" -> "f64"
+        "bool" -> "bool"
+        "string" -> "string"
+        "ident" -> mir_get_local_ty(expr.text)
+        "addr" -> "ptr"
+        "deref" -> {
+            let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
+            if (is_ptr_to_struct(base_ty) == 1) { return strip_ptr_prefix(base_ty) }
+            if (base_ty == "string") { return "i8" }
+            "i32"
         }
-        if (result_ty != "unknown") { return result_ty }
+        "field" -> {
+            let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
+            if (expr.text == "length") { return "i32" }
+            get_struct_field_type(type_text_base_name_builder(strip_ptr_prefix(base_ty)), expr.text)
+        }
+        "struct_literal" -> expr.text
+        "index" -> {
+            let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
+            type_text_index_element(base_ty)
+        }
+        "unaryop" -> {
+            if (expr.text == "!") { return "bool" }
+            mir_expr_type(es, expr_store_get(es, expr.left_idx))
+        }
+        "binop" -> {
+            if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=" or expr.text == "and" or expr.text == "or") { return "bool" }
+            let left_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
+            let right_ty = mir_expr_type(es, expr_store_get(es, expr.right_idx))
+            if (expr.text == "+" and (left_ty == "string" or left_ty == "ptr") and type_is_integer(right_ty) == 1) { return left_ty }
+            if (expr.text == "+" and type_is_integer(left_ty) == 1 and (right_ty == "string" or right_ty == "ptr")) { return right_ty }
+            if (expr.text == "+" and (left_ty == "string" or left_ty == "ptr") and (right_ty == "string" or right_ty == "ptr")) { return "string" }
+            type_numeric_result(left_ty, right_ty)
+        }
+        "call" -> get_function_return_type(expr.text)
+        "array_literal" -> "[i32]"
+        "block_expr" -> {
+            if (expr.right_idx >= 0) { return mir_expr_type(es, expr_store_get(es, expr.right_idx)) }
+            "i32"
+        }
+        "if_expr" -> mir_expr_type(es, expr_store_get(es, expr.right_idx))
+        "match_expr" -> {
+            let mut result_ty = "unknown"
+            let arm_count = expr.args.length / 2
+            for (i in 0 .. arm_count)
+            {
+                let body_idx = expr.args[i * 2 + 1]
+                if (body_idx >= 0 and result_ty == "unknown")
+                {
+                    result_ty = mir_expr_type(es, expr_store_get(es, body_idx))
+                }
+            }
+            if (result_ty != "unknown") { return result_ty }
+            "i32"
+        }
+        _ -> "i32"
     }
-    return "i32"
 }
 
 pub fn mir_cast_if_needed(b: &MirBuilder, value: MirValue, to_ty: string): MirValue
@@ -264,10 +294,14 @@ pub fn mir_array_push_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, a
 
 pub fn mir_type_size_hint(ty: string): i32
 {
-    if (ty == "i8" or ty == "u8" or ty == "char" or ty == "bool") { return 1 }
-    if (ty == "f64") { return 8 }
-    if (ty == "i64" or ty == "u64" or ty == "usize" or ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1) { return 8 }
-    return 4
+    return match ty {
+        "i8" | "u8" | "char" | "bool" -> 1
+        "f64" | "i64" | "u64" | "usize" | "ptr" | "string" -> 8
+        _ -> {
+            if (is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1) { return 8 }
+            4
+        }
+    }
 }
 
 pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr, expected_ty: string): MirValue

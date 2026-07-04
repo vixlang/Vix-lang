@@ -123,17 +123,17 @@ pub fn mir2asm_emit_unsupported(b: &MirAsm, line: string)
 
 pub fn mir2asm_emit_save_arg(b: &MirAsm, ty: string, dest: string, reg: string)
 {
-    if (ty == "f64")
-    {
-        mir2asm_line(b, "    movq qword " + dest + ", " + reg)
-        return
+    match ty {
+        "f64" -> {
+            mir2asm_line(b, "    movq qword " + dest + ", " + reg)
+        }
+        "f32" -> {
+            mir2asm_line(b, "    movd dword " + dest + ", " + reg)
+        }
+        _ -> {
+            mir2asm_line(b, "    mov " + mir2asm_mem_word(ty) + " " + dest + ", " + reg)
+        }
     }
-    if (ty == "f32")
-    {
-        mir2asm_line(b, "    movd dword " + dest + ", " + reg)
-        return
-    }
-    mir2asm_line(b, "    mov " + mir2asm_mem_word(ty) + " " + dest + ", " + reg)
 }
 
 pub fn mir2asm_incoming_stack_arg(float_arg: i32, arg: i32): string
@@ -145,20 +145,20 @@ pub fn mir2asm_incoming_stack_arg(float_arg: i32, arg: i32): string
 
 pub fn mir2asm_emit_save_stack_arg(b: &MirAsm, ty: string, dest: string, src: string)
 {
-    if (ty == "f64")
-    {
-        mir2asm_line(b, "    movq xmm0, qword " + src)
-        mir2asm_line(b, "    movq qword " + dest + ", xmm0")
-        return
+    match ty {
+        "f64" -> {
+            mir2asm_line(b, "    movq xmm0, qword " + src)
+            mir2asm_line(b, "    movq qword " + dest + ", xmm0")
+        }
+        "f32" -> {
+            mir2asm_line(b, "    movd xmm0, dword " + src)
+            mir2asm_line(b, "    movd dword " + dest + ", xmm0")
+        }
+        _ -> {
+            mir2asm_line(b, "    mov " + mir2asm_acc(ty) + ", " + mir2asm_mem_word(ty) + " " + src)
+            mir2asm_line(b, "    mov " + mir2asm_mem_word(ty) + " " + dest + ", " + mir2asm_acc(ty))
+        }
     }
-    if (ty == "f32")
-    {
-        mir2asm_line(b, "    movd xmm0, dword " + src)
-        mir2asm_line(b, "    movd dword " + dest + ", xmm0")
-        return
-    }
-    mir2asm_line(b, "    mov " + mir2asm_acc(ty) + ", " + mir2asm_mem_word(ty) + " " + src)
-    mir2asm_line(b, "    mov " + mir2asm_mem_word(ty) + " " + dest + ", " + mir2asm_acc(ty))
 }
 
 pub fn mir2asm_float_label(b: &MirAsm, val: string, ty: string): string
