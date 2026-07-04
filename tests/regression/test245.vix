@@ -1,9 +1,0 @@
-fn main(): i32 {
-    let x = 3
-    match x {
-        1 -> print("one")
-        2 -> print("two")
-        _ -> print("other")
-    }
-    return 0
-}

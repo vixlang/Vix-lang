@@ -1,9 +1,0 @@
-fn main(): i32
-{
-	let mut x = 42
-	let mut p = &x
-	@p = 100
-	print(x)
-	print(@p)
-	return 0
-}

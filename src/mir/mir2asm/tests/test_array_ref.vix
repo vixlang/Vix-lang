@@ -1,0 +1,11 @@
+fn update(arr: &[i32]): i32
+{
+    arr[0] = arr[1] + 2
+    return arr[0]
+}
+
+fn main(): i32
+{
+    let arr = [3, 5]
+    return update(arr)
+}

@@ -1,9 +1,0 @@
-fn countdown(n: i32) {
-    if (n <= 0) { return }
-    print(n)
-    countdown(n - 1)
-}
-fn main(): i32 {
-    countdown(5)
-    return 0
-}

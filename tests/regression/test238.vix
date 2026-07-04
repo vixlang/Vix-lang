@@ -1,7 +1,0 @@
-fn identity:[T](x: T): T { return x }
-fn main(): i32 {
-    print(identity:[i32](42))
-    print(identity:[string]("hello"))
-    print(identity:[f64](3.14))
-    return 0
-}

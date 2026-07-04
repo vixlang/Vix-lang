@@ -1,9 +1,0 @@
-fn main(): i32 {
-    let kind = 1
-    match kind {
-        1 -> print("int")
-        2 -> print("float")
-        3 -> print("text")
-    }
-    return 0
-}

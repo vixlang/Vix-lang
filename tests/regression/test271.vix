@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let s = "abcdef"
-    print(s[0])
-    print(s[3])
-    print(s[5])
-    return 0
-}

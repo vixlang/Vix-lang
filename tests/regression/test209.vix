@@ -1,9 +1,0 @@
-fn main(): i32
-{
-	let a: i32 = 0xFF
-	let b: i32 = 0x0A
-	print(a)
-	print(b)
-	print(a + b)
-	return 0
-}

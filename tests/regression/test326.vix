@@ -1,7 +1,0 @@
-fn abs(n: i32): i32 { if (n < 0) { return -n } return n }
-fn main(): i32 {
-    print(abs(5))
-    print(abs(-5))
-    print(abs(0))
-    return 0
-}

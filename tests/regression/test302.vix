@@ -1,8 +1,0 @@
-type Node = struct { val: i32, next: &Node }
-fn main(): i32 {
-    let a = Node{ val: 1, next: nil }
-    let b = Node{ val: 2, next: nil }
-    print(a.val)
-    print(b.val)
-    return 0
-}

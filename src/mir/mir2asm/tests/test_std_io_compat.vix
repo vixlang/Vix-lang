@@ -1,0 +1,8 @@
+import "../../../../std/io.vix"
+
+fn main(): i32
+{
+    let msg = "Compat io\n"
+    io_stdout(msg, 10)
+    return 0
+}

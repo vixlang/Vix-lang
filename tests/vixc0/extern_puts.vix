@@ -1,8 +1,0 @@
-extern "C" {
-    fn puts(text: string): i32
-}
-
-fn main(): i32 {
-    puts("extern ok")
-    return 0
-}

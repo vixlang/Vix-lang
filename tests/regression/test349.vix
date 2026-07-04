@@ -1,8 +1,0 @@
-fn main(): i32 {
-    let mut p: i64 = 1
-    for (i in 0 .. 20) {
-        print(p)
-        p = p * 2
-    }
-    return 0
-}

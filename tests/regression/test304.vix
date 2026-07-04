@@ -1,8 +1,0 @@
-fn main(): i32 {
-    let arr = [10, 20, 30, 40, 50]
-    let p = &arr[0]
-    print(@p)
-    print(@(p + 1))
-    print(@(p + 2))
-    return 0
-}

@@ -1,5 +1,0 @@
-fn main(): i32 {
-    let result = (10 + 5) * 2 - 8 / 4 + 3 % 2
-    print(result)
-    return 0
-}

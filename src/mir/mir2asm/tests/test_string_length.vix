@@ -1,0 +1,5 @@
+fn main(): i32
+{
+    let s = "Hello IO!"
+    return s.length
+}

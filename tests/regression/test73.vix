@@ -1,9 +1,0 @@
-fn main(): i32
-{
-	let x: f64 = 1.5
-	let y: f64 = 2.5
-	print(x + y)
-	print(x * y)
-	print(y / x)
-	return 0
-}

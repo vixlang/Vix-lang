@@ -1,9 +1,0 @@
-fn main(): i32
-{
-	let list = [10, 20, 30]
-	print(list[0])
-	print(list[1])
-	print(list[2])
-	print(list.length)
-	return 0
-}

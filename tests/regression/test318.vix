@@ -1,8 +1,0 @@
-fn add1(x: i32): i32 { return x + 1 }
-fn double(x: i32): i32 { return x * 2 }
-fn square(x: i32): i32 { return x * x }
-fn main(): i32 {
-    let x = 5
-    print(square(double(add1(x))))
-    return 0
-}

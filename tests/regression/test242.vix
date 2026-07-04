@@ -1,9 +1,0 @@
-fn main(): i32 {
-    let c = 1
-    match c {
-        1 -> print("red")
-        2 -> print("green")
-        3 -> print("blue")
-    }
-    return 0
-}

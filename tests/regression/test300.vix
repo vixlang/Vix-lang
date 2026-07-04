@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let n :i32= 10
-    let f :f64 = 3.0
-    let result:f64 = n + f
-    print(result)
-    return 0
-}

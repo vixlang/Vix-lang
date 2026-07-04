@@ -1,8 +1,0 @@
-fn main(): i32 {
-    let pairs = [(1, "one"), (2, "two"), (3, "three")]
-    print(pairs[0].0)
-    print(pairs[0].1)
-    print(pairs[2].0)
-    print(pairs[2].1)
-    return 0
-}

@@ -1,8 +1,0 @@
-type AllInt = struct { a: i32, b: i32, c: i32 }
-fn main(): i32 {
-    let x = AllInt{ a: 1, b: 2, c: 3 }
-    print(x.a)
-    print(x.b)
-    print(x.c)
-    return 0
-}

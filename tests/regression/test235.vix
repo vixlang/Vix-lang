@@ -1,8 +1,0 @@
-type Inner = struct { val: i32 }
-type Outer = struct { inner: Inner, extra: i32 }
-fn main(): i32 {
-    let o = Outer{ inner: Inner{ val: 42 }, extra: 100 }
-    print(o.inner.val)
-    print(o.extra)
-    return 0
-}

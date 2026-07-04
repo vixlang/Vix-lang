@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let a: i64 = 1000000
-    let b: i64 = 1000000
-    let c: i64 = a * b
-    print(c)
-    return 0
-}

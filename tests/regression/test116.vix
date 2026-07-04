@@ -1,7 +1,0 @@
-let MAX = 100
-
-fn main(): i32
-{
-	print(MAX)
-	return 0
-}

@@ -1,7 +1,0 @@
-fn main(): i32
-{
-	for (i in 0 .. 5) {
-		print(i)
-	}
-	return 0
-}

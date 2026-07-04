@@ -1,0 +1,13 @@
+fn mix_28(a: i32, b: i32): i32
+{
+    let left = (a + 78) * 3
+    let right = (b + 40) * 2
+    return (left - right + 37) % 251
+}
+
+fn main(): i32
+{
+    let raw = mix_28(35, 9)
+    if (raw < 0) { return raw + 251 }
+    return raw
+}

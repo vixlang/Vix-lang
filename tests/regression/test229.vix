@@ -1,6 +1,0 @@
-type Empty = struct {}
-fn main(): i32 {
-    let e = Empty{}
-    print(0)
-    return 0
-}

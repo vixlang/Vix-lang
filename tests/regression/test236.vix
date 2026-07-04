@@ -1,8 +1,0 @@
-type Vec2 = struct { x: i32, y: i32 }
-fn sum(v: Vec2): i32 { return v.x + v.y }
-fn main(): i32 {
-    let v = Vec2{ x: 10, y: 20 }
-    print(sum(v))
-    print(v.x)
-    return 0
-}

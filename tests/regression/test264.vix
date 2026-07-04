@@ -1,8 +1,0 @@
-fn main(): i32 {
-    let arr = [10, 20, 30, 40, 50]
-    let mut idx = 2
-    print(arr[idx])
-    idx = 4
-    print(arr[idx])
-    return 0
-}

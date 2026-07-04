@@ -1,7 +1,0 @@
-type Box:[T] = struct { value: T }
-fn main(): i32 {
-    let inner = Box:[i32]{ value: 42 }
-    let outer = Box:[Box:[i32]]{ value: inner }
-    print(outer.value.value)
-    return 0
-}

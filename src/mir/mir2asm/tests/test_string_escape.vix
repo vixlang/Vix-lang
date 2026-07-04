@@ -1,0 +1,16 @@
+fn quoted(): string
+{
+    return "const ptr \"\n"
+}
+
+fn after_quote(): i32
+{
+    return 9
+}
+
+fn main(): i32
+{
+    let s = quoted()
+    if (s[10] == '"') { return after_quote() }
+    return 1
+}

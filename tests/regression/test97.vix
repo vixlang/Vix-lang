@@ -1,8 +1,0 @@
-fn main(): i32
-{
-	let arr = [1, 2, 3, 4, 5]
-	print(arr.length)
-	let empty_arr: [i32 * 0] = []
-	print("ok")
-	return 0
-}

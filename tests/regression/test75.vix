@@ -1,8 +1,0 @@
-fn main(): i32
-{
-	let greeting = "Hello, World!"
-	print(greeting)
-	let empty = ""
-	print("not-empty")
-	return 0
-}

@@ -1,9 +1,0 @@
-fn main(): i32 {
-    let x = 10
-    print(x)
-    let y = 20
-    print(y)
-    let z = 30
-    print(z)
-    return 0
-}

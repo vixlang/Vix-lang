@@ -1,0 +1,6 @@
+fn main(): i32
+{
+    let arr = [1, 2, 3]
+    arr.push(4)
+    return arr.length + arr[0] + arr[3]
+}

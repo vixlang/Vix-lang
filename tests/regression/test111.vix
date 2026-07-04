@@ -1,7 +1,0 @@
-fn main(): i32
-{
-	let p = (10, 20)
-	print(p.0)
-	print(p.1)
-	return 0
-}

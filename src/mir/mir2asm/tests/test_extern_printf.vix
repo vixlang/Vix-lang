@@ -1,0 +1,10 @@
+extern "C"
+{
+    fn printf(fmt: string, ...): i32
+}
+
+fn main(): i32
+{
+    printf("%d\n", 7)
+    return 7
+}

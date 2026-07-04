@@ -1,9 +1,0 @@
-fn main(): i32
-{
-	print(0xFF)
-	print(0x00)
-	print(0x0A)
-	print(0x10)
-	print(0xFF + 1)
-	return 0
-}

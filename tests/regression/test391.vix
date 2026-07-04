@@ -1,9 +1,0 @@
-fn repeat_rec(s: string, n: i32): string {
-    if (n <= 0) { return "" }
-    return s + repeat_rec(s, n - 1)
-}
-fn main(): i32 {
-    print(repeat_rec("ab", 3))
-    print(repeat_rec("x", 5))
-    return 0
-}

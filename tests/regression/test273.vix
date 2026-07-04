@@ -1,9 +1,0 @@
-fn apply(f: fn(i32): i32, x: i32): i32 {
-    return f(x)
-}
-fn double(x: i32): i32 { return x * 2 }
-fn main(): i32 {
-    print(apply(double, 5))
-    print(apply(fn(x: i32): i32 { return x + 10 }, 5))
-    return 0
-}

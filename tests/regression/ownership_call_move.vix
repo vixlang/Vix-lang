@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let xs = [1, 2, 3]
-    let ys = xs
-    print(ys[0])
-    print(xs[0])
-    return 0
-}

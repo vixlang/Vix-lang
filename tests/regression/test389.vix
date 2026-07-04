@@ -1,9 +1,0 @@
-fn main(): i32 {
-    let mut sum: i64 = 0
-    for (i in 0 .. 10000) {
-        let v: i64 = i
-        sum = sum + v
-    }
-    print(sum)
-    return 0
-}

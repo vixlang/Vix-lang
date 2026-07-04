@@ -1,6 +1,0 @@
-type Tree = struct { val: i32, has_val: i32 }
-fn main(): i32 {
-    let t = Tree{ val: 6, has_val: 1 }
-    print(t.val)
-    return 0
-}

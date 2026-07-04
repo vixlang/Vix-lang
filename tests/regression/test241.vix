@@ -1,6 +1,0 @@
-fn first:[T](arr: [T]): T { return arr[0] }
-fn main(): i32 {
-    print(first:[i32]([10, 20, 30]))
-    print(first:[string](["a", "b", "c"]))
-    return 0
-}

@@ -1,9 +1,0 @@
-fn safe_div(a: i32, b: i32): i32 {
-    if (b == 0) { return 0 }
-    return a / b
-}
-fn main(): i32 {
-    print(safe_div(10, 3))
-    print(safe_div(10, 0))
-    return 0
-}

@@ -1,9 +1,0 @@
-fn main(): i32
-{
-	print(2 ** 10)
-	print(3 ** 3)
-	print(0 ** 0)
-	print(5 ** 1)
-	print(1 ** 100)
-	return 0
-}

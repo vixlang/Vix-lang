@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let l = [1, 2, 3, 4, 5]
-    print(l.length)
-    let empty: [i32] = []
-    print(empty.length)
-    return 0
-}

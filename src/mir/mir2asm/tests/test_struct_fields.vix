@@ -1,0 +1,10 @@
+type Pair = struct {
+    a: i32,
+    b: i32
+}
+
+fn main(): i32
+{
+    let p = Pair{ a: 4, b: 9 }
+    return p.a + p.b
+}

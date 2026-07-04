@@ -1,7 +1,0 @@
-type Record = struct { id: i32, name: string }
-fn main(): i32 {
-    let r = Record{ id: 1, name: "test" }
-    print(r.id)
-    print(r.name)
-    return 0
-}

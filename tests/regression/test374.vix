@@ -1,7 +1,0 @@
-fn add1(x: i32): i32 { return x + 1 }
-fn double(x: i32): i32 { return x * 2 }
-fn main(): i32 {
-    print(double(add1(5)))
-    print(add1(double(5)))
-    return 0
-}

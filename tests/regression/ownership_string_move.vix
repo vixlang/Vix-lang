@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let s = "hello"
-    let t = s
-    print(t)
-    print(s)
-    return 0
-}

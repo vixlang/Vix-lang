@@ -1,7 +1,0 @@
-type Flag = struct { active: i32, name: string }
-fn main(): i32 {
-    let f = Flag{ active: 1, name: "test" }
-    print(f.active)
-    print(f.name)
-    return 0
-}

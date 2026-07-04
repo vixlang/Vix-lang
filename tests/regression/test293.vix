@@ -1,8 +1,0 @@
-fn main(): i32 {
-    let arr = [10, 20, 30, 40, 50]
-    let mut sum = 0
-    for (v in arr) { sum = sum + v }
-    print(sum)
-    print(sum / arr.length)
-    return 0
-}

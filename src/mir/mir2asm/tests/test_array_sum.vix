@@ -1,0 +1,15 @@
+fn sum_arr(arr: [i32]): i32
+{
+    let mut sum = 0
+    for (i in 0 .. arr.length)
+    {
+        sum = sum + arr[i]
+    }
+    return sum
+}
+
+fn main(): i32
+{
+    let arr = [1, 2, 3, 4]
+    return sum_arr(arr)
+}

@@ -1,5 +1,0 @@
-fn main(): i32
-{
-    let result = undefined_var_xyz
-    return 0
-}

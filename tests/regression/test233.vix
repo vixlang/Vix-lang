@@ -1,8 +1,0 @@
-type Point = struct { x: i32, y: i32 }
-fn main(): i32 {
-    let pts = [Point{ x: 1, y: 2 }, Point{ x: 3, y: 4 }, Point{ x: 5, y: 6 }]
-    print(pts[0].x)
-    print(pts[1].y)
-    print(pts[2].x)
-    return 0
-}

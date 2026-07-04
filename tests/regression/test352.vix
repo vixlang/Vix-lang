@@ -1,7 +1,0 @@
-fn triangular(n: i32): i32 { return n * (n + 1) / 2 }
-fn main(): i32 {
-    for (i in 1 .. 11) {
-        print(triangular(i))
-    }
-    return 0
-}

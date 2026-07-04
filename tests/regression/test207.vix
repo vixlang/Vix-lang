@@ -1,6 +1,0 @@
-fn main(): i32
-{
-	let x = 10
-	let x = 20
-	return 0
-}

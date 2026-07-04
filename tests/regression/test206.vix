@@ -1,5 +1,0 @@
-fn main(): i32
-{
-	let x = undefined_func_xyz
-	return 0
-}

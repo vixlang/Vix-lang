@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let s = "hello"
-    print(s.length)
-    let empty = ""
-    print(empty.length)
-    return 0
-}

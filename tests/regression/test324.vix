@@ -1,7 +1,0 @@
-fn max_i32(a: i32, b: i32): i32 { if (a > b) { return a } return b }
-fn main(): i32 {
-    print(max_i32(10, 20))
-    print(max_i32(50, 30))
-    print(max_i32(-5, -3))
-    return 0
-}

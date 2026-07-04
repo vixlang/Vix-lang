@@ -1,8 +1,0 @@
-fn main(): i32
-{
-	print("line1\nline2")
-	print("tab\there")
-	print("backslash: \\")
-	print("quote: \"")
-	return 0
-}

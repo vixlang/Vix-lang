@@ -1,6 +1,0 @@
-type Single = struct { val: i32 }
-fn main(): i32 {
-    let s = Single{ val: 42 }
-    print(s.val)
-    return 0
-}

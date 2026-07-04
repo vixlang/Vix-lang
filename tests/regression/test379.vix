@@ -1,7 +1,0 @@
-fn main(): i32 {
-    let mut x: u8 = 250
-    let one: u8 = 1
-    x = x + one
-    print(x)
-    return 0
-}

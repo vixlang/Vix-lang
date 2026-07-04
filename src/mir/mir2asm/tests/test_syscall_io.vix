@@ -1,0 +1,8 @@
+import "../../../../core/io.vix"
+
+fn main(): i32
+{
+    let msg = "Hello syscall\n"
+    io_stdout(msg, 14)
+    return 0
+}

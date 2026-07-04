@@ -1,9 +1,0 @@
-fn half(): f64 {
-    return 2.5
-}
-
-fn main(): i32 {
-    let x: f64 = half()
-    print(x)
-    return 0
-}

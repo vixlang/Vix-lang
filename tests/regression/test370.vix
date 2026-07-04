@@ -1,7 +1,0 @@
-fn max(a: i32, b: i32): i32 { if (a > b) { return a } return b }
-fn main(): i32 {
-    let d1 = 3
-    let d2 = 2
-    print(max(d1, d2))
-    return 0
-}

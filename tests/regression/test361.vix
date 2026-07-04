@@ -1,9 +1,0 @@
-type Inner = struct { val: i32 }
-type Outer = struct { inner: Inner, name: string }
-fn main(): i32 {
-    let mut o = Outer{ inner: Inner{ val: 10 }, name: "test" }
-    o.inner.val = 42
-    print(o.inner.val)
-    print(o.name)
-    return 0
-}

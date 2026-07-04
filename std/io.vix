@@ -1,18 +1,1 @@
-extern "C"
-{
-    fn printf(format: ptr, ...): i32
-    fn fprintf(file: ptr, format: ptr, ...): i32
-    fn fopen(filename: ptr, mode: ptr): ptr
-    fn fclose(file: ptr): i32
-    fn fread(buf: ptr, size: i64, count: i64, file: ptr): i64
-    fn fwrite(buf: ptr, size: i64, count: i64, file: ptr): i64
-}
-pub fn puts(s: ptr): i32
-{
-    return printf("%s\n", s)
-}
-pub fn panic(msg: ptr)
-{
-    printf("Panic: %s\n", msg)
-    while (1) {}
-}
+import "../core/io.vix"

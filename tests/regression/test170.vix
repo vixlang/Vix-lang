@@ -1,9 +1,0 @@
-fn main(): i32
-{
-	let pair = (10, 20)
-	print(pair.0 + pair.1)
-	print(pair.0 * pair.1)
-	let triple = (1, 2, 3)
-	print(triple.0 + triple.1 + triple.2)
-	return 0
-}

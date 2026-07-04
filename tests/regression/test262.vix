@@ -1,8 +1,0 @@
-fn main(): i32 {
-    let arr: [i32] = []
-    print(arr.length)
-    arr.push(42)
-    print(arr.length)
-    print(arr[0])
-    return 0
-}

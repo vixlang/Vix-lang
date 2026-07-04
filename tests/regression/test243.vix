@@ -1,7 +1,0 @@
-fn circle_area(r: f64): f64 { return 3.14 * r * r }
-fn rect_area(w: f64, h: f64): f64 { return w * h }
-fn main(): i32 {
-    print(circle_area(5.0))
-    print(rect_area(3.0, 4.0))
-    return 0
-}

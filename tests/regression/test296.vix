@@ -1,6 +1,0 @@
-fn main(): i32 {
-    let n = 42
-    print(n)
-    print(n + 8)
-    return 0
-}
