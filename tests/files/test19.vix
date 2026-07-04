@@ -1,4 +1,4 @@
-import "../../../std/io.vix"
+import "../../std/io.vix"
 
 fn main(): i32
 {
