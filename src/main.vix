@@ -141,7 +141,7 @@ fn print_help(): i32
     print("  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)")
     print("  -S                     Emit assembly to <file> (default: <input>.s)")
     print("  -obj                   Emit object file (default: <input>.o)")
-    print("  --target <triple>      Generate code for target triple (default: host)")
+    print("  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)")
     print("  --backend <llvm|self>  Select codegen backend (default: llvm)")
     print("  -l<lib>, -l <lib>      Link executable with a system library")
     print("  -L<dir>, -L <dir>      Add a system library search path")
@@ -187,6 +187,13 @@ fn clang_target_arg(target_triple: string): string
 {
     if (target_triple == "") { return "" }
     return " --target=" + target_triple
+}
+
+fn self_backend_target_supported(target_triple: string): i32
+{
+    if (target_triple == "") { return 1 }
+    if (str_starts_with(target_triple, "x86_64") == 1) { return 1 }
+    return 0
 }
 
 fn run_mode(mode: string, src: string, filename: string, emit: string, output: string, runtime_object: string, link_args: string, target_triple: string, backend: string): ?i32
@@ -616,6 +623,12 @@ fn main(argc: i32, argv: &string): i32
     if (backend != "llvm" and backend != "self")
     {
         diag_print("vixc: error: unknown backend '" + backend + "'")
+        return 1
+    }
+
+    if (backend == "self" and self_backend_target_supported(target_triple) == 0)
+    {
+        diag_print("vixc: error: self backend only supports x86_64 targets, got '" + target_triple + "'")
         return 1
     }
 
