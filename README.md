@@ -21,6 +21,8 @@ runtime-related components, examples, and language documentation.
 
 
 > 🎉 🎉 🎉 Vix is fully self-hosted! The compiler now compiles itself. No external dependencies. Next: stdlib, packages, and tooling 🚀
+> This branch is an experimental bootstrap branch, and it's not recommended to download it for now. If you want to use vix, please go to: https://github.com/vixlang/Vix-lang
+
 
 ## Why Vix?
 
