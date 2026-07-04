@@ -21,6 +21,9 @@ runtime-related components, examples, and language documentation.
 
 
 > 🎉 🎉 🎉 Vix is fully self-hosted! The compiler now compiles itself. No external dependencies. Next: stdlib, packages, and tooling 🚀
+
+
+
 > This branch is an experimental bootstrap branch, and it's not recommended to download it for now. If you want to use vix, please go to: https://github.com/vixlang/Vix-lang
 
 
@@ -42,15 +45,6 @@ fn main(): i32
     return 0
 }
 ```
-
-## Repository Layout
-
-- `src/`: Compiler source code and build scripts.
-- `include/`: Public/internal headers for parser, type system, codegen, and semantic analysis.
-- `examples/`: Language examples and sample programs.
-- `docs/` : RELEASE NOTES.
-- `test/`: Language regression and behavior tests.
-- `CMakeLists.txt`: Top-level CMake entry for project builds.
 
 ## Documentation
 
