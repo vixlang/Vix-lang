@@ -64,6 +64,56 @@ pub fn mir2asm_set_slot_ty(b: &MirAsm, value: string, ty: string)
     if (idx >= 0) { b.slot_tys[idx] = ty }
 }
 
+pub fn mir2asm_pending_load_clear(b: &MirAsm)
+{
+    b.pending_load_active = 0
+    b.pending_load_dest = ""
+    b.pending_load_addr = ""
+    b.pending_load_src_ty = ""
+    b.pending_load_dest_ty = ""
+    b.pending_load_direct_offset = 0
+}
+
+pub fn mir2asm_pending_load_start(b: &MirAsm, dest: string, addr: string, src_ty: string, dest_ty: string, direct_offset: i32)
+{
+    mir2asm_pending_load_materialize(b)
+    b.pending_load_active = 1
+    b.pending_load_dest = mir2asm_clean_name(dest)
+    b.pending_load_addr = mir2asm_clean_name(addr)
+    b.pending_load_src_ty = src_ty
+    b.pending_load_dest_ty = dest_ty
+    b.pending_load_direct_offset = direct_offset
+}
+
+pub fn mir2asm_pending_load_matches(b: &MirAsm, value: string): i32
+{
+    if (b.pending_load_active == 0) { return 0 }
+    return if (b.pending_load_dest == mir2asm_clean_name(mir2asm_trim(value))) { 1 } else { 0 }
+}
+
+pub fn mir2asm_pending_load_memory_operand(b: &MirAsm, ty: string): string
+{
+    if (b.pending_load_active == 0) { return "" }
+    if (mir2asm_type_is_byte(b.pending_load_src_ty) == 1 and mir2asm_type_is_byte(ty) == 0) { return "" }
+    return mir2asm_mem_word(b.pending_load_src_ty) + " " + mir2asm_mem(b.pending_load_direct_offset)
+}
+
+pub fn mir2asm_pending_load_materialize(b: &MirAsm)
+{
+    if (b.pending_load_active == 0) { return }
+    let dest_off = mir2asm_alloc_slot_typed(b, b.pending_load_dest, 0, b.pending_load_dest_ty)
+    if (mir2asm_type_is_byte(b.pending_load_src_ty) == 1 and mir2asm_type_is_byte(b.pending_load_dest_ty) == 0)
+    {
+        mir2asm_line(b, "    movzx eax, byte " + mir2asm_mem(b.pending_load_direct_offset))
+    }
+    else
+    {
+        mir2asm_line(b, "    mov " + mir2asm_acc(b.pending_load_src_ty) + ", " + mir2asm_mem_word(b.pending_load_src_ty) + " " + mir2asm_mem(b.pending_load_direct_offset))
+    }
+    mir2asm_line(b, "    mov " + mir2asm_mem_word(b.pending_load_dest_ty) + " " + mir2asm_mem(dest_off) + ", " + mir2asm_acc(b.pending_load_dest_ty))
+    mir2asm_pending_load_clear(b)
+}
+
 pub fn mir2asm_value_slot_ty(b: &MirAsm, value: string): string
 {
     let idx = mir2asm_find_name(b, value)
@@ -88,6 +138,12 @@ pub fn mir2asm_pointee_ty(ty: string): string
 pub fn mir2asm_operand_typed(b: &MirAsm, value: string, ty: string): string
 {
     let v = mir2asm_trim(value)
+    if (mir2asm_pending_load_matches(b, v) == 1)
+    {
+        let pending_op = mir2asm_pending_load_memory_operand(b, ty)
+        if (pending_op != "") { return pending_op }
+        mir2asm_pending_load_materialize(b)
+    }
     if (v == "null" or v == "undef") { return "0" }
     if (v.length == 0) { return "0" }
     if (mir2asm_starts_with(v, "sizeof(") == 1 and v[v.length - 1] == ')')
