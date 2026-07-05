@@ -1,0 +1,25 @@
+#[no_main]
+
+extern "C"
+{
+    fn vix_api_llc_compile_object(input_path: string, output_path: string, target_triple: string): i32
+    fn vix_api_llc_compile_asm(input_path: string, output_path: string, target_triple: string): i32
+    fn vix_api_llc_error(): string
+}
+
+pub fn llc_compile_object(input_path: string, output_path: string, target_triple: string): i32
+{
+    return vix_api_llc_compile_object(input_path, output_path, target_triple)
+}
+
+pub fn llc_compile_asm(input_path: string, output_path: string, target_triple: string): i32
+{
+    return vix_api_llc_compile_asm(input_path, output_path, target_triple)
+}
+
+pub fn llc_last_error(): string
+{
+    let err = vix_api_llc_error()
+    if (err == nil) { return "" }
+    return err
+}

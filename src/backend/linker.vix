@@ -1,0 +1,34 @@
+#[no_main]
+
+extern "C"
+{
+    fn vix_api_link_executable_std(object_path: string, runtime_object: string, output_path: string, link_args: string): i32
+    fn vix_api_link_executable_nostd(object_path: string, output_path: string, link_args: string): i32
+    fn vix_api_link_error(): string
+}
+
+pub fn linker_link_executable(object_path: string, runtime_object: string, output_path: string, link_args: string, no_std: i32): i32
+{
+    if (no_std == 1)
+    {
+        return vix_api_link_executable_nostd(object_path, output_path, link_args)
+    }
+    return vix_api_link_executable_std(object_path, runtime_object, output_path, link_args)
+}
+
+pub fn linker_link_executable_std(object_path: string, runtime_object: string, output_path: string, link_args: string): i32
+{
+    return vix_api_link_executable_std(object_path, runtime_object, output_path, link_args)
+}
+
+pub fn linker_link_executable_nostd(object_path: string, output_path: string, link_args: string): i32
+{
+    return vix_api_link_executable_nostd(object_path, output_path, link_args)
+}
+
+pub fn linker_last_error(): string
+{
+    let err = vix_api_link_error()
+    if (err == nil) { return "" }
+    return err
+}

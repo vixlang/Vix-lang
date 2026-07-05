@@ -8,6 +8,8 @@ import "codegen.vix"
 import "mir/mir.vix"
 import "mir/mir2asm/mod.vix"
 import "error.vix"
+import "backend/llc.vix"
+import "backend/linker.vix"
 
 extern "C"
 {
@@ -26,6 +28,7 @@ extern "C"
     fn vix_diag_yellow(): string
     fn vix_diag_reset(): string
     fn vix_compiler_runtime_object_path(argv0: string): string
+    fn vix_api_source_has_no_std(src: string): i32
 }
 
 fn string_ends_with(text: string, suffix: string): i32
@@ -185,12 +188,6 @@ fn host_target_triple(): string
     return triple
 }
 
-fn clang_target_arg(target_triple: string): string
-{
-    if (target_triple == "") { return "" }
-    return " --target=" + target_triple
-}
-
 fn self_backend_target_supported(target_triple: string): i32
 {
     if (target_triple == "") { return 1 }
@@ -200,6 +197,8 @@ fn self_backend_target_supported(target_triple: string): i32
 
 fn run_mode(mode: string, src: string, filename: string, emit: string, output: string, runtime_object: string, link_args: string, target_triple: string, backend: string): ?i32
 {
+    let no_std = vix_api_source_has_no_std(src)
+
     match mode
     {
         "--lex" -> {
@@ -352,7 +351,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             print(obj_path)
             return mode_success()
         }
-        let link_result = shell_command("clang -fuse-ld=lld -no-pie " + obj_path + " " + runtime_object + " -o " + artifact_path + " " + link_args)
+        let link_result = if (no_std == 1) { linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
         delete_file(obj_path)
         if (link_result != 0)
         {
@@ -391,27 +390,35 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     {
         artifact_path = artifact_output_path(filename, output, emit)
     }
-    let target_arg = clang_target_arg(target_triple)
-    let mut command = ""
+    let mut build_result = 0
     if (emit == "asm")
     {
-        command = "clang" + target_arg + " -S " + ir_path + " -o " + artifact_path
+        build_result = llc_compile_asm(ir_path, artifact_path, target_triple)
     }
     elif (emit == "-obj")
     {
-        command = "clang" + target_arg + " -c " + ir_path + " -o " + artifact_path
+        build_result = llc_compile_object(ir_path, artifact_path, target_triple)
     }
     else
     {
-        command = "clang" + target_arg + " -fuse-ld=lld " + ir_path + " " + runtime_object + " -o " + artifact_path + " " + link_args
+        let obj_path = artifact_path + ".tmp.o"
+        build_result = llc_compile_object(ir_path, obj_path, target_triple)
+        if (build_result == 0)
+        {
+            build_result = if (no_std == 1) { linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
+        }
+        delete_file(obj_path)
     }
-    let build_result = shell_command(command)
     if (emit != "ir")
     {
         delete_file(ir_path)
     }
     if (build_result != 0)
     {
+        let llc_err = llc_last_error()
+        let link_err = linker_last_error()
+        if (llc_err != "") { diag_print(llc_err) }
+        if (link_err != "") { diag_print(link_err) }
         diag_print("vixc: error: failed to build '" + artifact_path + "'")
         return mode_failure()
     }

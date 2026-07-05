@@ -12,8 +12,11 @@ mkdir -p build runtime
 
 gcc -c src/helper.c -o build/helper.o $(llvm-config --cflags) -Wno-deprecated-declarations
 gcc -c src/runtime.c -o runtime/runtime.o
+gcc -c lib/api.c -o build/api.o
+clang++ -c lib/llvm/Llc.cpp -o build/Llc.o $(llvm-config --cxxflags) -Wno-deprecated-declarations
+clang++ -c lib/llvm/Linker.cpp -o build/Linker.o $(llvm-config --cxxflags) -Wno-deprecated-declarations
 
-clang -fuse-ld=lld -o vixc seed/vixc.ll build/helper.o runtime/runtime.o $(llvm-config --ldflags --libs)
+clang++ -fuse-ld=lld -o vixc seed/vixc.ll build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o $(llvm-config --ldflags --libs all) -llldELF -llldCommon
 echo "build vixc ok!"
 ./vixc src/main.vix --check
 mv vixc seed/

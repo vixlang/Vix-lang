@@ -1,7 +1,10 @@
 LLVM_CFLAGS := $(shell llvm-config --cflags)
-LLVM_LDFLAGS := $(shell llvm-config --ldflags --libs)
+LLVM_CXXFLAGS := $(shell llvm-config --cxxflags)
+LLVM_LDFLAGS := $(shell llvm-config --ldflags --libs all)
+LLD_LIBS := -llldELF -llldCommon
 
 GCC ?= gcc
+CXX ?= clang++
 CLANG ?= clang
 VIXC ?= ./seed/vixc
 
@@ -13,6 +16,10 @@ TARGET := $(BUILD_DIR)/vixc
 HELPER_OBJ := $(BUILD_DIR)/helper.o
 RUNTIME_OBJ := $(RUNTIME_DIR)/runtime.o
 VIXC_OBJ := $(BUILD_DIR)/vixc.o
+API_OBJ := $(BUILD_DIR)/api.o
+LLC_OBJ := $(BUILD_DIR)/Llc.o
+LINKER_OBJ := $(BUILD_DIR)/Linker.o
+LLVM_API_OBJS := $(API_OBJ) $(LLC_OBJ) $(LINKER_OBJ)
 
 VIX_SOURCES := $(shell find $(SRC_DIR) -type f -name '*.vix')
 
@@ -26,6 +33,15 @@ $(BUILD_DIR) $(RUNTIME_DIR):
 $(HELPER_OBJ): $(SRC_DIR)/helper.c | $(BUILD_DIR)
 	$(GCC) -c $< -o $@ $(LLVM_CFLAGS) -Wno-deprecated-declarations
 
+$(API_OBJ): lib/api.c | $(BUILD_DIR)
+	$(GCC) -c $< -o $@
+
+$(LLC_OBJ): lib/llvm/Llc.cpp | $(BUILD_DIR)
+	$(CXX) -c $< -o $@ $(LLVM_CXXFLAGS) -Wno-deprecated-declarations
+
+$(LINKER_OBJ): lib/llvm/Linker.cpp | $(BUILD_DIR)
+	$(CXX) -c $< -o $@ $(LLVM_CXXFLAGS) -Wno-deprecated-declarations
+
 $(RUNTIME_OBJ): $(SRC_DIR)/runtime.c | $(RUNTIME_DIR)
 	$(GCC) -c $< -o $@
 
@@ -36,11 +52,11 @@ $(VIXC):
 $(VIXC_OBJ): $(VIX_SOURCES) $(VIXC) | $(BUILD_DIR)
 	$(VIXC) $(SRC_DIR)/main.vix -obj -o $@
 
-$(TARGET): $(VIXC_OBJ) $(HELPER_OBJ) $(RUNTIME_OBJ) | $(BUILD_DIR)
-	$(CLANG) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS)
+$(TARGET): $(VIXC_OBJ) $(HELPER_OBJ) $(RUNTIME_OBJ) $(LLVM_API_OBJS) | $(BUILD_DIR)
+	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(LLD_LIBS)
 
 clean:
-	rm -f $(TARGET) $(HELPER_OBJ) $(RUNTIME_OBJ) $(VIXC_OBJ) test test.ll
+	rm -f $(TARGET) $(HELPER_OBJ) $(RUNTIME_OBJ) $(VIXC_OBJ) $(LLVM_API_OBJS) test test.ll
 
 test: all
 	$(TARGET) ../tests/vixc0/let_and_print.vix -o test
