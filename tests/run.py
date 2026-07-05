@@ -28,6 +28,12 @@ NAMED_TESTS = {
     "test20.vix": {"exit": 0},
     "test21.vix": {"exit": 0},
     "test22.vix": {"exit": 74},
+    "test123.vix": {"exit": 42},
+    "test124.vix": {"exit": 10},
+    "test125.vix": {"exit": 17},
+    "test126.vix": {"exit": 26},
+    "test127.vix": {"exit": 36},
+    "test128.vix": {"exit": 28},
 }
 
 TESTS = dict(NAMED_TESTS)

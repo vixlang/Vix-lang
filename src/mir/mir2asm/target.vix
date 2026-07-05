@@ -131,31 +131,43 @@ pub fn mir2asm_mir_comment(b: &MirAsm, line: string, line_no: i32)
 
 pub fn mir2asm_type_is_64(ty: string): i32
 {
-    if (ty == "i64" or ty == "u64" or ty == "usize" or ty == "ptr" or ty == "string") { return 1 }
-    if (ty == "f64") { return 1 }
+    match ty
+    {
+        "i64" | "u64" | "usize" | "ptr" | "string" | "f64" -> { return 1 }
+        _ -> {}
+    }
     if (mir2asm_starts_with(ty, "ptr:") == 1) { return 1 }
     return 0
 }
 
 pub fn mir2asm_type_is_float(ty: string): i32
 {
-    if (ty == "f32" or ty == "f64") { return 1 }
-    return 0
+    return match ty
+    {
+        "f32" | "f64" -> 1
+        _ -> 0
+    }
 }
 
 pub fn mir2asm_mem_word(ty: string): string
 {
     if (mir2asm_type_is_64(ty) == 1) { return "qword" }
-    if (ty == "i8" or ty == "u8" or ty == "char") { return "byte" }
-    return "dword"
+    return match ty
+    {
+        "i8" | "u8" | "char" -> "byte"
+        _ -> "dword"
+    }
 }
 
 pub fn mir2asm_type_size(ty: string): i32
 {
-    if (ty == "i8" or ty == "u8" or ty == "char") { return 1 }
-    if (ty == "i64" or ty == "u64" or ty == "usize" or ty == "ptr" or ty == "string") { return 8 }
-    if (ty == "f64") { return 8 }
-    if (ty == "f32") { return 4 }
+    match ty
+    {
+        "i8" | "u8" | "char" -> { return 1 }
+        "i64" | "u64" | "usize" | "ptr" | "string" | "f64" -> { return 8 }
+        "f32" -> { return 4 }
+        _ -> {}
+    }
     if (mir2asm_starts_with(ty, "ptr:") == 1) { return 8 }
     return 4
 }

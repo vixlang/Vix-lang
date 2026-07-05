@@ -301,6 +301,38 @@ pub fn desugar_expr(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: 
         }
         return ast_expr_method_call(es, desugar_expr(adts, es, store, expr.left_idx), expr.text, args2)
     }
+    if (expr.tag == "if_expr")
+    {
+        return ast_expr_if(es, desugar_expr(adts, es, store, expr.left_idx), desugar_expr(adts, es, store, expr.right_idx), desugar_expr(adts, es, store, expr.args[0]))
+    }
+    if (expr.tag == "match_expr")
+    {
+        let mut patterns: [i32] = []
+        let mut bodies: [i32] = []
+        let num_arms = expr.args.length / 2
+        for (m in 0 .. num_arms)
+        {
+            let pattern_idx = expr.args[m * 2]
+            let body_idx = expr.args[m * 2 + 1]
+            if (pattern_idx >= 0)
+            {
+                patterns.push(desugar_expr(adts, es, store, pattern_idx))
+            }
+            else
+            {
+                patterns.push(pattern_idx)
+            }
+            if (body_idx >= 0)
+            {
+                bodies.push(desugar_expr(adts, es, store, body_idx))
+            }
+            else
+            {
+                bodies.push(body_idx)
+            }
+        }
+        return ast_expr_match(es, desugar_expr(adts, es, store, expr.left_idx), patterns, bodies)
+    }
     return idx
 }
 

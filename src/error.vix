@@ -62,80 +62,93 @@ pub fn strip_func_prefix(message: string): string
     return message
 }
 
+pub fn parse_error_code(msg: string): string
+{
+    if (str_starts_with(msg, "expected '") == 1) { return "E1001" }
+    if (str_starts_with(msg, "unexpected token") == 1) { return "E1002" }
+    if (str_starts_with(msg, "unexpected statement") == 1) { return "E1002" }
+    if (str_starts_with(msg, "unexpected token after identifier") == 1) { return "E1002" }
+    if (str_starts_with(msg, "expected if or elif") == 1) { return "E1003" }
+    if (str_starts_with(msg, "empty source") == 1) { return "E1004" }
+    if (str_starts_with(msg, "expected function") == 1) { return "E1005" }
+    return "E1000"
+}
+
+pub fn name_error_code(msg: string): string
+{
+    if (str_starts_with(msg, "undefined symbol '") == 1) { return "E2001" }
+    if (str_starts_with(msg, "duplicate symbol '") == 1) { return "E2002" }
+    if (str_starts_with(msg, "undefined function '") == 1) { return "E2003" }
+    if (str_starts_with(msg, "duplicate function '") == 1) { return "E2004" }
+    if (str_starts_with(msg, "duplicate struct '") == 1) { return "E2006" }
+    if (str_starts_with(msg, "duplicate parameter '") == 1) { return "E2007" }
+    if (str_starts_with(msg, "duplicate field '") == 1) { return "E2008" }
+    if (str_starts_with(msg, "for iterator '") == 1) { return "E2009" }
+    if (str_starts_with(msg, "function '") == 1) { return "E2010" }
+    return "E2000"
+}
+
+pub fn type_error_code(msg: string): string
+{
+    if (str_starts_with(msg, "cannot initialize '") == 1) { return "E3001" }
+    if (str_starts_with(msg, "cannot assign to immutable binding '") == 1) { return "E3013" }
+    if (str_starts_with(msg, "cannot assign field '") == 1) { return "E3013" }
+    if (str_starts_with(msg, "cannot assign '") == 1) { return "E3002" }
+    if (str_starts_with(msg, "cannot dereference value of type '") == 1) { return "E3003" }
+    if (str_starts_with(msg, "cannot store through value of type '") == 1) { return "E3004" }
+    if (str_starts_with(msg, "cannot store '") == 1) { return "E3015" }
+    if (str_starts_with(msg, "unknown field '") == 1) { return "E3005" }
+    if (str_starts_with(msg, "unknown struct '") == 1) { return "E3006" }
+    if (str_starts_with(msg, "cannot index value of type '") == 1) { return "E3007" }
+    if (str_starts_with(msg, "index expression expects integer index") == 1) { return "E3014" }
+    if (str_starts_with(msg, "struct '") == 1) { return "E3021" }
+    if (str_starts_with(msg, "missing field '") == 1) { return "E3022" }
+    if (str_starts_with(msg, "duplicate initializer field '") == 1) { return "E3023" }
+    if (str_starts_with(msg, "array element type '") == 1) { return "E3024" }
+    if (str_starts_with(msg, "method 'push'") == 1) { return "E3025" }
+    if (str_starts_with(msg, "cannot compare '") == 1) { return "E3011" }
+    if (str_starts_with(msg, "return value type '") == 1) { return "E3012" }
+    if (str_starts_with(msg, "match pattern type '") == 1) { return "E3018" }
+    if (str_starts_with(msg, "match return value type '") == 1) { return "E3012" }
+    if (str_starts_with(msg, "while condition must be bool") == 1) { return "E3016" }
+    if (str_starts_with(msg, "if condition must be bool") == 1) { return "E3016" }
+    if (str_starts_with(msg, "for range start must be integer") == 1) { return "E3017" }
+    if (str_starts_with(msg, "for range end must be integer") == 1) { return "E3017" }
+    if (str_starts_with(msg, "operator '+' cannot mix") == 1) { return "E3010" }
+    if (str_starts_with(msg, "operator '") == 1) { return "E3008" }
+    if (str_starts_with(msg, "function '") == 1) { return "E3020" }
+    if (str_starts_with(msg, "'break' used outside loop") == 1) { return "E3019" }
+    if (str_starts_with(msg, "'continue' used outside loop") == 1) { return "E3019" }
+    return "E3000"
+}
+
+pub fn semantic_error_code(msg: string): string
+{
+    if (str_starts_with(msg, "no 'main' function defined") == 1) { return "E4001" }
+    if (str_starts_with(msg, "entry function 'main'") == 1) { return "E4002" }
+    return "E4000"
+}
+
+pub fn semantic_warning_code(msg: string): string
+{
+    if (str_starts_with(msg, "unused variable '") == 1) { return "W4001" }
+    if (str_starts_with(msg, "no 'main' function defined") == 1) { return "W4002" }
+    if (str_starts_with(msg, "entry function 'main'") == 1) { return "W4003" }
+    return "W4000"
+}
+
 pub fn error_code_for_type(error_type: string, message: string): string
 {
     let msg = strip_func_prefix(message)
-    if (error_type == "ParseError")
+    return match error_type
     {
-        if (str_starts_with(msg, "expected '") == 1) { return "E1001" }
-        if (str_starts_with(msg, "unexpected token") == 1) { return "E1002" }
-        if (str_starts_with(msg, "unexpected statement") == 1) { return "E1002" }
-        if (str_starts_with(msg, "unexpected token after identifier") == 1) { return "E1002" }
-        if (str_starts_with(msg, "expected if or elif") == 1) { return "E1003" }
-        if (str_starts_with(msg, "empty source") == 1) { return "E1004" }
-        if (str_starts_with(msg, "expected function") == 1) { return "E1005" }
-        return "E1000"
+        "ParseError" -> parse_error_code(msg)
+        "NameError" -> name_error_code(msg)
+        "TypeError" -> type_error_code(msg)
+        "SemanticError" -> semantic_error_code(msg)
+        "SemanticWarning" -> semantic_warning_code(msg)
+        _ -> "E0000"
     }
-    if (error_type == "NameError")
-    {
-        if (str_starts_with(msg, "undefined symbol '") == 1) { return "E2001" }
-        if (str_starts_with(msg, "duplicate symbol '") == 1) { return "E2002" }
-        if (str_starts_with(msg, "undefined function '") == 1) { return "E2003" }
-        if (str_starts_with(msg, "duplicate function '") == 1) { return "E2004" }
-        if (str_starts_with(msg, "duplicate struct '") == 1) { return "E2006" }
-        if (str_starts_with(msg, "duplicate parameter '") == 1) { return "E2007" }
-        if (str_starts_with(msg, "duplicate field '") == 1) { return "E2008" }
-        if (str_starts_with(msg, "for iterator '") == 1) { return "E2009" }
-        if (str_starts_with(msg, "function '") == 1) { return "E2010" }
-        return "E2000"
-    }
-    if (error_type == "TypeError")
-    {
-        if (str_starts_with(msg, "cannot initialize '") == 1) { return "E3001" }
-        if (str_starts_with(msg, "cannot assign to immutable binding '") == 1) { return "E3013" }
-        if (str_starts_with(msg, "cannot assign field '") == 1) { return "E3013" }
-        if (str_starts_with(msg, "cannot assign '") == 1) { return "E3002" }
-        if (str_starts_with(msg, "cannot dereference value of type '") == 1) { return "E3003" }
-        if (str_starts_with(msg, "cannot store through value of type '") == 1) { return "E3004" }
-        if (str_starts_with(msg, "cannot store '") == 1) { return "E3015" }
-        if (str_starts_with(msg, "unknown field '") == 1) { return "E3005" }
-        if (str_starts_with(msg, "unknown struct '") == 1) { return "E3006" }
-        if (str_starts_with(msg, "cannot index value of type '") == 1) { return "E3007" }
-        if (str_starts_with(msg, "index expression expects integer index") == 1) { return "E3014" }
-        if (str_starts_with(msg, "struct '") == 1) { return "E3021" }
-        if (str_starts_with(msg, "missing field '") == 1) { return "E3022" }
-        if (str_starts_with(msg, "duplicate initializer field '") == 1) { return "E3023" }
-        if (str_starts_with(msg, "array element type '") == 1) { return "E3024" }
-        if (str_starts_with(msg, "method 'push'") == 1) { return "E3025" }
-        if (str_starts_with(msg, "cannot compare '") == 1) { return "E3011" }
-        if (str_starts_with(msg, "return value type '") == 1) { return "E3012" }
-        if (str_starts_with(msg, "match pattern type '") == 1) { return "E3018" }
-        if (str_starts_with(msg, "match return value type '") == 1) { return "E3012" }
-        if (str_starts_with(msg, "while condition must be bool") == 1) { return "E3016" }
-        if (str_starts_with(msg, "if condition must be bool") == 1) { return "E3016" }
-        if (str_starts_with(msg, "for range start must be integer") == 1) { return "E3017" }
-        if (str_starts_with(msg, "for range end must be integer") == 1) { return "E3017" }
-        if (str_starts_with(msg, "operator '+' cannot mix") == 1) { return "E3010" }
-        if (str_starts_with(msg, "operator '") == 1) { return "E3008" }
-        if (str_starts_with(msg, "function '") == 1) { return "E3020" }
-        if (str_starts_with(msg, "'break' used outside loop") == 1) { return "E3019" }
-        if (str_starts_with(msg, "'continue' used outside loop") == 1) { return "E3019" }
-        return "E3000"
-    }
-    if (error_type == "SemanticError")
-    {
-        if (str_starts_with(msg, "no 'main' function defined") == 1) { return "E4001" }
-        if (str_starts_with(msg, "entry function 'main'") == 1) { return "E4002" }
-        return "E4000"
-    }
-    if (error_type == "SemanticWarning")
-    {
-        if (str_starts_with(msg, "unused variable '") == 1) { return "W4001" }
-        if (str_starts_with(msg, "no 'main' function defined") == 1) { return "W4002" }
-        if (str_starts_with(msg, "entry function 'main'") == 1) { return "W4003" }
-        return "W4000"
-    }
-    return "E0000"
 }
 
 pub fn diag_error_level(): i32 { return 0 }

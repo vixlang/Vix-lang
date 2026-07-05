@@ -1,0 +1,18 @@
+import "imported_adt.vix"
+
+fn eval(e: ImportedExpr): i32
+{
+    match e
+    {
+        ImportedNum(n) -> { return n }
+        ImportedNil -> { return 0 }
+    }
+    return 0
+}
+
+fn main(): i32
+{
+    let x = ImportedNum(42)
+    let y = ImportedNil
+    return eval(x) + eval(y)
+}

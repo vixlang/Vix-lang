@@ -13,9 +13,13 @@ pub type SymbolTable = struct {
     error_length: i32
 }
 
+macro symtable_default_error_fields() {
+    ok: 1, error: "", error_line: 0, error_col: 0, error_length: 1
+}
+
 pub fn symtable_new(): SymbolTable
 {
-    return SymbolTable{ names: [], types: [], mutable: [], depths: [], depth: 0, ok: 1, error: "", error_line: 0, error_col: 0, error_length: 1 }
+    return SymbolTable{ names: [], types: [], mutable: [], depths: [], depth: 0, $symtable_default_error_fields() }
 }
 
 pub fn symtable_fail(table: &SymbolTable, message: string)

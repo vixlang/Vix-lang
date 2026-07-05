@@ -1,0 +1,23 @@
+macro $make_check(name: ident)
+{
+    type $name = Pass(i32) | Fail
+}
+
+$make_check(Check)
+
+fn score(result: Check): i32
+{
+    match result
+    {
+        Pass(value) -> { return value }
+        Fail -> { return 5 }
+    }
+    return 0
+}
+
+fn main(): i32
+{
+    let ok = Pass(31) : Check
+    let bad = Fail
+    return score(ok) + score(bad)
+}

@@ -1,0 +1,20 @@
+macro $arr[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $add_one(x: expr)
+{
+    ($x + 1)
+}
+
+fn main(): i32
+{
+    let values = $arr[3, $add_one(4), 7, 11]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total
+}

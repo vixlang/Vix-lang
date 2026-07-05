@@ -1,0 +1,19 @@
+macro $make_add_const(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        return x + 9
+    }
+}
+
+macro $inc(x: expr)
+{
+    ($x + 1)
+}
+
+fn main(): i32
+{
+    $make_add_const(add9)
+    let value = $inc(4)
+    return add9(value) + 3
+}

@@ -1,0 +1,25 @@
+type Choice = Hit(i32) | Miss
+
+fn choose(text: string): Choice
+{
+    return match text
+    {
+        "hit" -> Hit(7)
+        _ -> Miss
+    }
+}
+
+fn score(choice: Choice): i32
+{
+    match choice
+    {
+        Hit(value) -> { return value }
+        Miss -> { return 3 }
+    }
+    return 0
+}
+
+fn main(): i32
+{
+    return score(choose("hit")) + score(choose("miss"))
+}

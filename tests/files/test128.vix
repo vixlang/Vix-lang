@@ -1,0 +1,29 @@
+macro $make_scale(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        return x * 3
+    }
+}
+
+macro $pack[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $twice(x: expr)
+{
+    ($x + $x)
+}
+
+fn main(): i32
+{
+    $make_scale(scale3)
+    let values = $pack[scale3(2), $twice(5), scale3($twice(2))]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total
+}

@@ -39,12 +39,14 @@ fn string_ends_with(text: string, suffix: string): i32
     return 1
 }
 
-fn compiler_mode(arg: string): ?string
+type CompilerModeResult = CompilerModeName(string) | CompilerModeUnknown
+
+fn compiler_mode(arg: string): CompilerModeResult
 {
-    if (arg == "-h" or arg == "--help") { return Some("--help") }
-    if (arg == "-v" or arg == "--version") { return Some("--version") }
-    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S") { return Some(arg) }
-    return None
+    if (arg == "-h" or arg == "--help") { return CompilerModeName("--help") }
+    if (arg == "-v" or arg == "--version") { return CompilerModeName("--version") }
+    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
+    return CompilerModeUnknown
 }
 
 fn strip_vix_ext(name: string): string
@@ -574,7 +576,7 @@ fn main(argc: i32, argv: &string): i32
         {
             match compiler_mode(arg)
             {
-                Some(next_mode) -> {
+                CompilerModeName(next_mode) -> {
                     if (next_mode == "--help") { want_help = 1 }
                     elif (next_mode == "--version") { want_version = 1 }
                     elif (next_mode == "-ll") { emit = "ir" }
@@ -582,7 +584,7 @@ fn main(argc: i32, argv: &string): i32
                     elif (next_mode == "-S") { emit = "asm" }
                     else { mode = next_mode }
                 }
-                None -> match source_file_arg(arg)
+                CompilerModeUnknown -> match source_file_arg(arg)
                 {
                     Some(path) -> {
                         if (has_input == 1)
