@@ -355,6 +355,8 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         delete_file(obj_path)
         if (link_result != 0)
         {
+            let link_err = linker_last_error()
+            if (link_err != "") { diag_print(link_err) }
             diag_print("vixc: error: failed to link '" + artifact_path + "'")
             return mode_failure()
         }
@@ -576,6 +578,10 @@ fn main(argc: i32, argv: &string): i32
             }
         }
         elif (str_starts_with(arg, "-l") == 1 or str_starts_with(arg, "-L") == 1)
+        {
+            link_args = link_args + " " + arg
+        }
+        elif (string_ends_with(arg, ".o") == 1)
         {
             link_args = link_args + " " + arg
         }

@@ -498,6 +498,14 @@ pub fn desugar_stmt(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: 
     return desugar_stmt_env(adts, es, store, idx, names, types)
 }
 
+pub fn desugar_global_let(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, stmt: AstStmt): i32
+{
+    let inferred_ty = desugar_expr_adt_type(adts, es, stmt.assign_idx, stmt.type_text)
+    let declared_ty = if (stmt.type_text != "") { stmt.type_text } else { inferred_ty }
+    let expr_idx = desugar_expr_expected(adts, es, store, stmt.assign_idx, declared_ty)
+    return ast_stmt_let_typed_mut(store, stmt.assign_name, declared_ty, expr_idx, 0)
+}
+
 pub fn desugar_stmt_env(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: i32, names: [string], types: [string]): i32
 {
     if (idx < 0) { return idx }
@@ -639,9 +647,28 @@ pub fn desugar_stmt_env(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, i
 
 pub fn desugar_function(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, func: AstFunction): AstFunction
 {
+    return desugar_function_with_globals(adts, es, store, [], func)
+}
+
+pub fn desugar_function_with_globals(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, globals: [AstStmt], func: AstFunction): AstFunction
+{
     let mut param_types: [string] = []
     let mut names: [string] = []
     let mut types: [string] = []
+    let mut prefix_indices: [i32] = []
+    for (g in 0 .. globals.length)
+    {
+        let global_stmt = globals[g]
+        let global_idx = desugar_global_let(adts, es, store, global_stmt)
+        prefix_indices.push(global_idx)
+        let mut global_ty = desugar_expr_adt_type(adts, es, global_stmt.assign_idx, global_stmt.type_text)
+        if (global_stmt.type_text != "") { global_ty = global_stmt.type_text }
+        if (global_ty != "")
+        {
+            names.push(global_stmt.assign_name)
+            types.push(global_ty)
+        }
+    }
     for (i in 0 .. func.param_types.length)
     {
         param_types.push(func.param_types[i])
@@ -651,13 +678,19 @@ pub fn desugar_function(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, f
             types.push(func.param_types[i])
         }
     }
-    return ast_function_with_loc(ast_function_full_vararg(func.name, func.ret_ty, desugar_stmt_env(adts, es, store, func.body_idx, names, types), func.param_names, param_types, func.is_var_arg), func.line, func.col)
+    let body_idx = desugar_stmt_env(adts, es, store, func.body_idx, names, types)
+    if (prefix_indices.length > 0)
+    {
+        prefix_indices.push(body_idx)
+        return ast_function_with_loc(ast_function_full_vararg(func.name, func.ret_ty, ast_stmt_block_indices(store, prefix_indices), func.param_names, param_types, func.is_var_arg), func.line, func.col)
+    }
+    return ast_function_with_loc(ast_function_full_vararg(func.name, func.ret_ty, body_idx, func.param_names, param_types, func.is_var_arg), func.line, func.col)
 }
 
 pub fn desugar_program(program: AstProgram): AstProgram
 {
     if (program.ok == 0) { return program }
-    if (program.adts.length == 0) { return program }
+    if (program.adts.length == 0 and program.globals.length == 0) { return program }
     let es = program.expr_store
     let store = program.store
     let mut structs: [AstStructDecl] = []
@@ -681,7 +714,7 @@ pub fn desugar_program(program: AstProgram): AstProgram
     }
     for (m in 0 .. program.functions.length)
     {
-        functions.push(desugar_function(program.adts, &es, &store, program.functions[m]))
+        functions.push(desugar_function_with_globals(program.adts, &es, &store, program.globals, program.functions[m]))
     }
-    return ast_program_ok_functions_with_externs_structs_and_adts(functions, extern_functions, structs, program.adts, es, store)
+    return ast_program_ok_functions_with_externs_globals_structs_and_adts(functions, extern_functions, [], structs, program.adts, es, store)
 }

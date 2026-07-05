@@ -74,6 +74,7 @@ pub fn mir2asm_value_slot_ty(b: &MirAsm, value: string): string
 pub fn mir2asm_type_is_byte(ty: string): i32
 {
     if (ty == "i8" or ty == "u8" or ty == "char") { return 1 }
+    if (ty.length == 2 and (ty[0] == 'i' or ty[0] == 'u') and ty[1] == '8') { return 1 }
     return 0
 }
 

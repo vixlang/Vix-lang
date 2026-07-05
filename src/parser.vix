@@ -1606,6 +1606,7 @@ pub fn parse_program(src: string, filename: string): AstProgram
     let uses_builtin_result = parse_stream_uses_result_ctor(&parser_stream)
     let mut functions: [AstFunction] = []
     let mut extern_functions: [AstFunction] = []
+    let mut globals: [AstStmt] = []
     let mut structs: [AstStructDecl] = []
     let mut adts: [AstAdtDecl] = []
 
@@ -1650,6 +1651,18 @@ pub fn parse_program(src: string, filename: string): AstProgram
                 adts.push(decl)
             }
         }
+        elif (parser_text(&parser) == "let")
+        {
+            let global_idx = parse_statement(&parser)
+            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            let global_stmt = stmt_store_get(parser.store, global_idx)
+            if (global_stmt.is_mut == 1)
+            {
+                parser_fail(&parser, "top-level let must be immutable")
+                return ast_program_err(parser.error)
+            }
+            globals.push(global_stmt)
+        }
         elif (parser_text(&parser) == "fn" or parser_text(&parser) == "pub")
         {
             let func = parse_function(&parser)
@@ -1675,7 +1688,7 @@ pub fn parse_program(src: string, filename: string): AstProgram
     {
         adts.push(parse_builtin_result_decl())
     }
-    return ast_program_ok_functions_with_externs_structs_and_adts(functions, extern_functions, structs, adts, parser.expr_store, parser.store)
+    return ast_program_ok_functions_with_externs_globals_structs_and_adts(functions, extern_functions, globals, structs, adts, parser.expr_store, parser.store)
 }
 
 pub fn parse_program_stats(src: string, filename: string): string

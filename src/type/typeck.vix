@@ -959,23 +959,23 @@ pub fn infer_expr_type(env: &SymbolTable, funcs: &FunctionSymbols, structs: &Str
                 }
                 else
                 {
-                    infer_expr_type(env, funcs, structs, es, store, body_idx)
+                    let body_ty = infer_expr_type(env, funcs, structs, es, store, body_idx)
                     if (env.ok == 0)
                     {
                         symtable_pop_scope(env)
                         return "unknown"
                     }
-                    if (type_can_assign(result_ty, infer_expr_type(env, funcs, structs, es, store, body_idx)) == 1)
+                    if (type_can_assign(result_ty, body_ty) == 1)
                     {
                     }
-                    elif (type_can_assign(infer_expr_type(env, funcs, structs, es, store, body_idx), result_ty) == 1)
+                    elif (type_can_assign(body_ty, result_ty) == 1)
                     {
-                        result_ty = infer_expr_type(env, funcs, structs, es, store, body_idx)
+                        result_ty = body_ty
                     }
                     else
                     {
                         let body_expr = expr_store_get(es, body_idx)
-                        symtable_fail_expr(env, "match return value type '" + infer_expr_type(env, funcs, structs, es, store, body_idx) + "' does not match '" + result_ty + "'", body_expr)
+                        symtable_fail_expr(env, "match return value type '" + body_ty + "' does not match '" + result_ty + "'", body_expr)
                         symtable_pop_scope(env)
                         return "unknown"
                     }

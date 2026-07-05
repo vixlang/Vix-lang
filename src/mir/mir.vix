@@ -1002,48 +1002,49 @@ pub fn mir_emit_function(program: AstProgram, func: AstFunction): string
         else { mir_emit_term(&b, "ret " + mir_type(func.ret_ty) + " " + mir_zero_value(func.ret_ty)) }
     }
     mir_line(&b, "}")
-    return b.out
+    return vix_join_lines(b.out)
 }
 
 pub fn mir_program(program: AstProgram): string
 {
     if (program.ok == 0) { return program.error }
     mir_register_program(program)
-    let mut out = "mir_module vixc0 {\n"
+    let mut out: [string] = ["mir_module vixc0 {"]
     for (i in 0 .. program.structs.length)
     {
-        out = out + "    type @" + program.structs[i].name + " = { "
+        let mut line = "    type @" + program.structs[i].name + " = { "
         for (j in 0 .. program.structs[i].field_types.length)
         {
-            if (j > 0) { out = out + ", " }
-            out = out + mir_type(program.structs[i].field_types[j])
+            if (j > 0) { line = line + ", " }
+            line = line + mir_type(program.structs[i].field_types[j])
         }
-        out = out + " }\n"
+        out.push(line + " }")
     }
     for (i in 0 .. program.extern_functions.length)
     {
         let ext = program.extern_functions[i]
-        out = out + "    " + if (ext.is_var_arg == 1) { "extern_vararg" } else { "extern" } + " fn @" + ext.name + "("
+        let mut line = "    " + if (ext.is_var_arg == 1) { "extern_vararg" } else { "extern" } + " fn @" + ext.name + "("
         for (j in 0 .. ext.param_types.length)
         {
-            if (j > 0) { out = out + ", " }
-            out = out + mir_type(ext.param_types[j])
+            if (j > 0) { line = line + ", " }
+            line = line + mir_type(ext.param_types[j])
         }
-        out = out + "): " + mir_type(ext.ret_ty) + "\n"
+        out.push(line + "): " + mir_type(ext.ret_ty))
     }
-    if (mir_program_has_extern(program, "printf") == 0) { out = out + "    extern_vararg fn @printf(ptr): i32\n" }
-    if (mir_program_has_extern(program, "calloc") == 0) { out = out + "    extern fn @calloc(usize, usize): ptr\n" }
-    if (mir_program_has_extern(program, "strcmp") == 0) { out = out + "    extern fn @strcmp(ptr, ptr): i32\n" }
-    if (mir_program_has_extern(program, "strlen") == 0) { out = out + "    extern fn @strlen(ptr): i32\n" }
-    out = out + "    extern fn @vix_array_len(ptr): i32\n"
-    out = out + "    extern fn @vix_array_push_i32(ptr, i32): ptr\n"
-    out = out + "    extern fn @vix_array_push_ptr(ptr, ptr): ptr\n"
-    out = out + "    extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr\n"
-    out = out + "    extern fn @vix_string_concat(ptr, ptr): ptr\n"
+    if (mir_program_has_extern(program, "printf") == 0) { out.push("    extern_vararg fn @printf(ptr): i32") }
+    if (mir_program_has_extern(program, "calloc") == 0) { out.push("    extern fn @calloc(usize, usize): ptr") }
+    if (mir_program_has_extern(program, "strcmp") == 0) { out.push("    extern fn @strcmp(ptr, ptr): i32") }
+    if (mir_program_has_extern(program, "strlen") == 0) { out.push("    extern fn @strlen(ptr): i32") }
+    out.push("    extern fn @vix_array_len(ptr): i32")
+    out.push("    extern fn @vix_array_push_i32(ptr, i32): ptr")
+    out.push("    extern fn @vix_array_push_ptr(ptr, ptr): ptr")
+    out.push("    extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr")
+    out.push("    extern fn @vix_string_concat(ptr, ptr): ptr")
     for (i in 0 .. program.functions.length)
     {
-        out = out + "\n" + mir_emit_function(program, program.functions[i])
+        out.push("")
+        out.push(mir_emit_function(program, program.functions[i]))
     }
-    out = out + "}\n"
-    return out
+    out.push("}")
+    return vix_join_lines(out)
 }

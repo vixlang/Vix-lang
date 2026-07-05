@@ -1,8 +1,13 @@
 #[no_main]
 import "builder.vix"
 
+extern "C"
+{
+    fn vix_join_lines(lines: [string]): string
+}
+
 pub type MirBuilder = struct {
-    out: string,
+    out: [string],
     temp_counter: i32,
     label_counter: i32,
     terminated: i32,
@@ -11,7 +16,7 @@ pub type MirBuilder = struct {
 
 pub fn mir_builder_new(): MirBuilder
 {
-    return MirBuilder{ out: "", temp_counter: 0, label_counter: 0, terminated: 0, ret_ty: "void" }
+    return MirBuilder{ out: [], temp_counter: 0, label_counter: 0, terminated: 0, ret_ty: "void" }
 }
 
 pub fn mir_block_is_open(b: &MirBuilder): i32
@@ -41,7 +46,7 @@ pub fn mir_label(b: &MirBuilder, prefix: string): string
 
 pub fn mir_line(b: &MirBuilder, text: string)
 {
-    b.out = b.out + text + "\n"
+    b.out.push(text)
 }
 
 pub fn mir_inst(b: &MirBuilder, text: string)

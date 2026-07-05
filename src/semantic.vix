@@ -93,12 +93,13 @@ pub type SemanticScope = struct {
     lines: [i32],
     cols: [i32],
     warn_unused: [i32],
+    active_len: i32,
     depth: i32
 }
 
 pub fn semantic_scope_new(): SemanticScope
 {
-    return SemanticScope{ names: [], depths: [], used: [], lines: [], cols: [], warn_unused: [], depth: 0 }
+    return SemanticScope{ names: [], depths: [], used: [], lines: [], cols: [], warn_unused: [], active_len: 0, depth: 0 }
 }
 
 pub fn semantic_scope_push(scope: &SemanticScope)
@@ -108,32 +109,12 @@ pub fn semantic_scope_push(scope: &SemanticScope)
 
 pub fn semantic_scope_truncate(scope: &SemanticScope, keep: i32)
 {
-    let mut new_names: [string] = []
-    let mut new_depths: [i32] = []
-    let mut new_used: [i32] = []
-    let mut new_lines: [i32] = []
-    let mut new_cols: [i32] = []
-    let mut new_warn_unused: [i32] = []
-    for (i in 0 .. keep)
-    {
-        new_names.push(scope.names[i])
-        new_depths.push(scope.depths[i])
-        new_used.push(scope.used[i])
-        new_lines.push(scope.lines[i])
-        new_cols.push(scope.cols[i])
-        new_warn_unused.push(scope.warn_unused[i])
-    }
-    scope.names = new_names
-    scope.depths = new_depths
-    scope.used = new_used
-    scope.lines = new_lines
-    scope.cols = new_cols
-    scope.warn_unused = new_warn_unused
+    scope.active_len = keep
 }
 
 pub fn semantic_scope_warn_unused_current(scope: &SemanticScope, result: &SemanticResult, source: string, filename: string)
 {
-    let mut i = scope.names.length - 1
+    let mut i = scope.active_len - 1
     while (i >= 0)
     {
         if (scope.depths[i] < scope.depth) { return }
@@ -150,7 +131,7 @@ pub fn semantic_scope_pop(scope: &SemanticScope, result: &SemanticResult, source
     if (scope.depth > 0)
     {
         semantic_scope_warn_unused_current(scope, result, source, filename)
-        let mut keep = scope.names.length
+        let mut keep = scope.active_len
         while (keep > 0)
         {
             if (scope.depths[keep - 1] >= scope.depth)
@@ -169,7 +150,7 @@ pub fn semantic_scope_pop(scope: &SemanticScope, result: &SemanticResult, source
 
 pub fn semantic_scope_find_current(scope: &SemanticScope, name: string): i32
 {
-    for (i in 0 .. scope.names.length)
+    for (i in 0 .. scope.active_len)
     {
         if (scope.names[i] == name and scope.depths[i] == scope.depth)
         {
@@ -181,7 +162,7 @@ pub fn semantic_scope_find_current(scope: &SemanticScope, name: string): i32
 
 pub fn semantic_scope_lookup(scope: &SemanticScope, name: string): i32
 {
-    let mut i = scope.names.length - 1
+    let mut i = scope.active_len - 1
     while (i >= 0)
     {
         if (scope.names[i] == name and scope.depths[i] <= scope.depth)
@@ -201,12 +182,26 @@ pub fn semantic_scope_declare(scope: &SemanticScope, result: &SemanticResult, so
         semantic_add_error_loc(result, source, filename, "NameError", "duplicate symbol '" + name + "'", func_name, line, col, diag_strlen(name))
         return 0
     }
-    scope.names.push(name)
-    scope.depths.push(scope.depth)
-    scope.used.push(0)
-    scope.lines.push(line)
-    scope.cols.push(col)
-    scope.warn_unused.push(if (name == "_") { 0 } else { 1 })
+    let idx = scope.active_len
+    if (idx < scope.names.length)
+    {
+        scope.names[idx] = name
+        scope.depths[idx] = scope.depth
+        scope.used[idx] = 0
+        scope.lines[idx] = line
+        scope.cols[idx] = col
+        scope.warn_unused[idx] = if (name == "_") { 0 } else { 1 }
+    }
+    else
+    {
+        scope.names.push(name)
+        scope.depths.push(scope.depth)
+        scope.used.push(0)
+        scope.lines.push(line)
+        scope.cols.push(col)
+        scope.warn_unused.push(if (name == "_") { 0 } else { 1 })
+    }
+    scope.active_len += 1
     return 1
 }
 
@@ -214,12 +209,26 @@ pub fn semantic_scope_declare_existing(scope: &SemanticScope, name: string)
 {
     if (semantic_scope_find_current(scope, name) < 0)
     {
-        scope.names.push(name)
-        scope.depths.push(scope.depth)
-        scope.used.push(0)
-        scope.lines.push(0)
-        scope.cols.push(0)
-        scope.warn_unused.push(0)
+        let idx = scope.active_len
+        if (idx < scope.names.length)
+        {
+            scope.names[idx] = name
+            scope.depths[idx] = scope.depth
+            scope.used[idx] = 0
+            scope.lines[idx] = 0
+            scope.cols[idx] = 0
+            scope.warn_unused[idx] = 0
+        }
+        else
+        {
+            scope.names.push(name)
+            scope.depths.push(scope.depth)
+            scope.used.push(0)
+            scope.lines.push(0)
+            scope.cols.push(0)
+            scope.warn_unused.push(0)
+        }
+        scope.active_len += 1
     }
 }
 

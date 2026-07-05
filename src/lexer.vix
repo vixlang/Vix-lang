@@ -356,6 +356,7 @@ pub fn tokenize(src: string): TokenStream
                                 text = text + match next {
                                     'n' -> char_string(10)
                                     't' -> char_string(9)
+                                    'r' -> char_string(13)
                                     92 -> char_string(92)
                                     '"' -> char_string('"')
                                     _ -> char_string(next)

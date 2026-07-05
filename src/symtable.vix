@@ -5,6 +5,7 @@ pub type SymbolTable = struct {
     types: [string],
     mutable: [i32],
     depths: [i32],
+    active_len: i32,
     depth: i32,
     ok: i32,
     error: string,
@@ -19,7 +20,7 @@ macro symtable_default_error_fields() {
 
 pub fn symtable_new(): SymbolTable
 {
-    return SymbolTable{ names: [], types: [], mutable: [], depths: [], depth: 0, $symtable_default_error_fields() }
+    return SymbolTable{ names: [], types: [], mutable: [], depths: [], active_len: 0, depth: 0, $symtable_default_error_fields() }
 }
 
 pub fn symtable_fail(table: &SymbolTable, message: string)
@@ -61,28 +62,14 @@ pub fn symtable_push_scope(table: &SymbolTable)
 
 pub fn symtable_truncate(table: &SymbolTable, keep: i32)
 {
-    let mut new_names: [string] = []
-    let mut new_types: [string] = []
-    let mut new_mutable: [i32] = []
-    let mut new_depths: [i32] = []
-    for (i in 0 .. keep)
-    {
-        new_names.push(table.names[i])
-        new_types.push(table.types[i])
-        new_mutable.push(table.mutable[i])
-        new_depths.push(table.depths[i])
-    }
-    table.names = new_names
-    table.types = new_types
-    table.mutable = new_mutable
-    table.depths = new_depths
+    table.active_len = keep
 }
 
 pub fn symtable_pop_scope(table: &SymbolTable)
 {
     if (table.depth > 0)
     {
-        let mut keep = table.names.length
+        let mut keep = table.active_len
         while (keep > 0)
         {
             if (table.depths[keep - 1] >= table.depth)
@@ -101,7 +88,7 @@ pub fn symtable_pop_scope(table: &SymbolTable)
 
 pub fn symtable_find_current(table: &SymbolTable, name: string): i32
 {
-    for (i in 0 .. table.names.length)
+    for (i in 0 .. table.active_len)
     {
         if (table.names[i] == name and table.depths[i] == table.depth)
         {
@@ -113,7 +100,7 @@ pub fn symtable_find_current(table: &SymbolTable, name: string): i32
 
 pub fn symtable_lookup_index(table: &SymbolTable, name: string): i32
 {
-    let mut i = table.names.length - 1
+    let mut i = table.active_len - 1
     while (i >= 0)
     {
         if (table.names[i] == name and table.depths[i] <= table.depth)
@@ -138,10 +125,22 @@ pub fn symtable_declare_mut(table: &SymbolTable, name: string, ty: string, is_mu
         symtable_fail(table, "duplicate symbol '" + name + "'")
         return
     }
-    table.names.push(name)
-    table.types.push(ty)
-    table.mutable.push(is_mut)
-    table.depths.push(table.depth)
+    let idx = table.active_len
+    if (idx < table.names.length)
+    {
+        table.names[idx] = name
+        table.types[idx] = ty
+        table.mutable[idx] = is_mut
+        table.depths[idx] = table.depth
+    }
+    else
+    {
+        table.names.push(name)
+        table.types.push(ty)
+        table.mutable.push(is_mut)
+        table.depths.push(table.depth)
+    }
+    table.active_len += 1
 }
 
 pub fn symtable_assign(table: &SymbolTable, name: string, ty: string)

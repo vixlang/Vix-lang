@@ -152,6 +152,7 @@ pub fn mir2asm_type_is_float(ty: string): i32
 pub fn mir2asm_mem_word(ty: string): string
 {
     if (mir2asm_type_is_64(ty) == 1) { return "qword" }
+    if (ty.length == 2 and (ty[0] == 'i' or ty[0] == 'u') and ty[1] == '8') { return "byte" }
     return match ty
     {
         "i8" | "u8" | "char" -> "byte"

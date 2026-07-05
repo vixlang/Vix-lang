@@ -25,10 +25,11 @@ pub type MirAsm = struct {
     struct_sizes: [i32],
     struct_field_tys: [string],
     struct_field_offsets: [i32],
+    extern_names: [string],
     debug_mir_comments: i32
 }
 
 pub fn mir2asm_new(): MirAsm
 {
-    return MirAsm{ out: ["default rel", "section .text"], data: [], string_values: [], string_labels: [], string_counter: 0, names: [], offsets: [], is_addr: [], slot_tys: [], stack_next: 0, in_fn: 0, fn_name: "", fn_ret_ty: "", fn_sret: 0, ret_label: "", frame_patch_index: -1, param_names: [], param_tys: [], param_regs: [], struct_names: [], struct_field_counts: [], struct_sizes: [], struct_field_tys: [], struct_field_offsets: [], debug_mir_comments: 0 }
+    return MirAsm{ out: ["default rel", "section .text"], data: [], string_values: [], string_labels: [], string_counter: 0, names: [], offsets: [], is_addr: [], slot_tys: [], stack_next: 0, in_fn: 0, fn_name: "", fn_ret_ty: "", fn_sret: 0, ret_label: "", frame_patch_index: -1, param_names: [], param_tys: [], param_regs: [], struct_names: [], struct_field_counts: [], struct_sizes: [], struct_field_tys: [], struct_field_offsets: [], extern_names: [], debug_mir_comments: 0 }
 }

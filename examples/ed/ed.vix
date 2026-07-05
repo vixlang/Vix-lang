@@ -543,7 +543,7 @@ fn process_insert(ed: &Editor, c: i8)
     editor_scroll(ed)
 }
 
-fn main(argc: i32, argv: ptr): i32
+fn main(argc: i32, argv: &string): i32
 {
     let mut ed = Editor {
         lines: [""],
