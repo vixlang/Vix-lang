@@ -1,0 +1,312 @@
+macro $make_affine(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        let base = x * 2
+        let shifted = base + 4
+        return shifted
+    }
+}
+
+macro $pack[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $twice(x: expr)
+{
+    ($x + $x)
+}
+
+macro $bias(x: expr)
+{
+    ($x + 6)
+}
+
+$make_affine(gen_320_0)
+
+$make_affine(gen_320_1)
+
+$make_affine(gen_320_2)
+
+$make_affine(gen_320_3)
+
+$make_affine(gen_320_4)
+
+$make_affine(gen_320_5)
+
+$make_affine(gen_320_6)
+
+$make_affine(gen_320_7)
+
+$make_affine(gen_320_8)
+
+$make_affine(gen_320_9)
+
+$make_affine(gen_320_10)
+
+$make_affine(gen_320_11)
+
+$make_affine(gen_320_12)
+
+$make_affine(gen_320_13)
+
+$make_affine(gen_320_14)
+
+$make_affine(gen_320_15)
+
+$make_affine(gen_320_16)
+
+$make_affine(gen_320_17)
+
+$make_affine(gen_320_18)
+
+$make_affine(gen_320_19)
+
+$make_affine(gen_320_20)
+
+$make_affine(gen_320_21)
+
+$make_affine(gen_320_22)
+
+$make_affine(gen_320_23)
+
+$make_affine(gen_320_24)
+
+$make_affine(gen_320_25)
+
+$make_affine(gen_320_26)
+
+$make_affine(gen_320_27)
+
+$make_affine(gen_320_28)
+
+$make_affine(gen_320_29)
+
+$make_affine(gen_320_30)
+
+$make_affine(gen_320_31)
+
+$make_affine(gen_320_32)
+
+$make_affine(gen_320_33)
+
+$make_affine(gen_320_34)
+
+$make_affine(gen_320_35)
+
+$make_affine(gen_320_36)
+
+$make_affine(gen_320_37)
+
+$make_affine(gen_320_38)
+
+$make_affine(gen_320_39)
+
+$make_affine(gen_320_40)
+
+$make_affine(gen_320_41)
+
+$make_affine(gen_320_42)
+
+$make_affine(gen_320_43)
+
+$make_affine(gen_320_44)
+
+$make_affine(gen_320_45)
+
+$make_affine(gen_320_46)
+
+$make_affine(gen_320_47)
+
+$make_affine(gen_320_48)
+
+$make_affine(gen_320_49)
+
+$make_affine(gen_320_50)
+
+$make_affine(gen_320_51)
+
+$make_affine(gen_320_52)
+
+$make_affine(gen_320_53)
+
+$make_affine(gen_320_54)
+
+$make_affine(gen_320_55)
+
+$make_affine(gen_320_56)
+
+$make_affine(gen_320_57)
+
+$make_affine(gen_320_58)
+
+$make_affine(gen_320_59)
+
+$make_affine(gen_320_60)
+
+$make_affine(gen_320_61)
+
+$make_affine(gen_320_62)
+
+$make_affine(gen_320_63)
+
+$make_affine(gen_320_64)
+
+$make_affine(gen_320_65)
+
+$make_affine(gen_320_66)
+
+$make_affine(gen_320_67)
+
+$make_affine(gen_320_68)
+
+$make_affine(gen_320_69)
+
+$make_affine(gen_320_70)
+
+$make_affine(gen_320_71)
+
+$make_affine(gen_320_72)
+
+$make_affine(gen_320_73)
+
+$make_affine(gen_320_74)
+
+$make_affine(gen_320_75)
+
+$make_affine(gen_320_76)
+
+$make_affine(gen_320_77)
+
+$make_affine(gen_320_78)
+
+$make_affine(gen_320_79)
+
+$make_affine(gen_320_80)
+
+$make_affine(gen_320_81)
+
+$make_affine(gen_320_82)
+
+$make_affine(gen_320_83)
+
+$make_affine(gen_320_84)
+
+$make_affine(gen_320_85)
+
+$make_affine(gen_320_86)
+
+$make_affine(gen_320_87)
+
+$make_affine(gen_320_88)
+
+$make_affine(gen_320_89)
+
+$make_affine(gen_320_90)
+
+$make_affine(gen_320_91)
+
+fn main(): i32
+{
+    let values = $pack[
+        gen_320_0(6),
+        gen_320_1($twice(7)),
+        $twice(gen_320_2(8)),
+        gen_320_3($bias(9)),
+        gen_320_4(10),
+        gen_320_5($twice(11)),
+        $twice(gen_320_6(12)),
+        gen_320_7($bias(13)),
+        gen_320_8(14),
+        gen_320_9($twice(15)),
+        $twice(gen_320_10(16)),
+        gen_320_11($bias(17)),
+        gen_320_12(18),
+        gen_320_13($twice(19)),
+        $twice(gen_320_14(20)),
+        gen_320_15($bias(21)),
+        gen_320_16(22),
+        gen_320_17($twice(23)),
+        $twice(gen_320_18(24)),
+        gen_320_19($bias(25)),
+        gen_320_20(26),
+        gen_320_21($twice(27)),
+        $twice(gen_320_22(28)),
+        gen_320_23($bias(29)),
+        gen_320_24(30),
+        gen_320_25($twice(31)),
+        $twice(gen_320_26(32)),
+        gen_320_27($bias(33)),
+        gen_320_28(34),
+        gen_320_29($twice(35)),
+        $twice(gen_320_30(36)),
+        gen_320_31($bias(37)),
+        gen_320_32(38),
+        gen_320_33($twice(39)),
+        $twice(gen_320_34(40)),
+        gen_320_35($bias(41)),
+        gen_320_36(42),
+        gen_320_37($twice(43)),
+        $twice(gen_320_38(44)),
+        gen_320_39($bias(45)),
+        gen_320_40(46),
+        gen_320_41($twice(47)),
+        $twice(gen_320_42(48)),
+        gen_320_43($bias(49)),
+        gen_320_44(50),
+        gen_320_45($twice(51)),
+        $twice(gen_320_46(52)),
+        gen_320_47($bias(53)),
+        gen_320_48(54),
+        gen_320_49($twice(55)),
+        $twice(gen_320_50(56)),
+        gen_320_51($bias(57)),
+        gen_320_52(58),
+        gen_320_53($twice(59)),
+        $twice(gen_320_54(60)),
+        gen_320_55($bias(61)),
+        gen_320_56(62),
+        gen_320_57($twice(63)),
+        $twice(gen_320_58(64)),
+        gen_320_59($bias(65)),
+        gen_320_60(66),
+        gen_320_61($twice(67)),
+        $twice(gen_320_62(68)),
+        gen_320_63($bias(69)),
+        gen_320_64(70),
+        gen_320_65($twice(71)),
+        $twice(gen_320_66(72)),
+        gen_320_67($bias(73)),
+        gen_320_68(74),
+        gen_320_69($twice(75)),
+        $twice(gen_320_70(76)),
+        gen_320_71($bias(77)),
+        gen_320_72(78),
+        gen_320_73($twice(79)),
+        $twice(gen_320_74(80)),
+        gen_320_75($bias(81)),
+        gen_320_76(82),
+        gen_320_77($twice(83)),
+        $twice(gen_320_78(84)),
+        gen_320_79($bias(85)),
+        gen_320_80(86),
+        gen_320_81($twice(87)),
+        $twice(gen_320_82(88)),
+        gen_320_83($bias(89)),
+        gen_320_84(90),
+        gen_320_85($twice(91)),
+        $twice(gen_320_86(92)),
+        gen_320_87($bias(93)),
+        gen_320_88(94),
+        gen_320_89($twice(95)),
+        $twice(gen_320_90(96)),
+        gen_320_91($bias(97))
+    ]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total % 251
+}

@@ -1,0 +1,312 @@
+macro $make_affine(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        let base = x * 3
+        let shifted = base + 6
+        return shifted
+    }
+}
+
+macro $pack[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $twice(x: expr)
+{
+    ($x + $x)
+}
+
+macro $bias(x: expr)
+{
+    ($x + 4)
+}
+
+$make_affine(gen_311_0)
+
+$make_affine(gen_311_1)
+
+$make_affine(gen_311_2)
+
+$make_affine(gen_311_3)
+
+$make_affine(gen_311_4)
+
+$make_affine(gen_311_5)
+
+$make_affine(gen_311_6)
+
+$make_affine(gen_311_7)
+
+$make_affine(gen_311_8)
+
+$make_affine(gen_311_9)
+
+$make_affine(gen_311_10)
+
+$make_affine(gen_311_11)
+
+$make_affine(gen_311_12)
+
+$make_affine(gen_311_13)
+
+$make_affine(gen_311_14)
+
+$make_affine(gen_311_15)
+
+$make_affine(gen_311_16)
+
+$make_affine(gen_311_17)
+
+$make_affine(gen_311_18)
+
+$make_affine(gen_311_19)
+
+$make_affine(gen_311_20)
+
+$make_affine(gen_311_21)
+
+$make_affine(gen_311_22)
+
+$make_affine(gen_311_23)
+
+$make_affine(gen_311_24)
+
+$make_affine(gen_311_25)
+
+$make_affine(gen_311_26)
+
+$make_affine(gen_311_27)
+
+$make_affine(gen_311_28)
+
+$make_affine(gen_311_29)
+
+$make_affine(gen_311_30)
+
+$make_affine(gen_311_31)
+
+$make_affine(gen_311_32)
+
+$make_affine(gen_311_33)
+
+$make_affine(gen_311_34)
+
+$make_affine(gen_311_35)
+
+$make_affine(gen_311_36)
+
+$make_affine(gen_311_37)
+
+$make_affine(gen_311_38)
+
+$make_affine(gen_311_39)
+
+$make_affine(gen_311_40)
+
+$make_affine(gen_311_41)
+
+$make_affine(gen_311_42)
+
+$make_affine(gen_311_43)
+
+$make_affine(gen_311_44)
+
+$make_affine(gen_311_45)
+
+$make_affine(gen_311_46)
+
+$make_affine(gen_311_47)
+
+$make_affine(gen_311_48)
+
+$make_affine(gen_311_49)
+
+$make_affine(gen_311_50)
+
+$make_affine(gen_311_51)
+
+$make_affine(gen_311_52)
+
+$make_affine(gen_311_53)
+
+$make_affine(gen_311_54)
+
+$make_affine(gen_311_55)
+
+$make_affine(gen_311_56)
+
+$make_affine(gen_311_57)
+
+$make_affine(gen_311_58)
+
+$make_affine(gen_311_59)
+
+$make_affine(gen_311_60)
+
+$make_affine(gen_311_61)
+
+$make_affine(gen_311_62)
+
+$make_affine(gen_311_63)
+
+$make_affine(gen_311_64)
+
+$make_affine(gen_311_65)
+
+$make_affine(gen_311_66)
+
+$make_affine(gen_311_67)
+
+$make_affine(gen_311_68)
+
+$make_affine(gen_311_69)
+
+$make_affine(gen_311_70)
+
+$make_affine(gen_311_71)
+
+$make_affine(gen_311_72)
+
+$make_affine(gen_311_73)
+
+$make_affine(gen_311_74)
+
+$make_affine(gen_311_75)
+
+$make_affine(gen_311_76)
+
+$make_affine(gen_311_77)
+
+$make_affine(gen_311_78)
+
+$make_affine(gen_311_79)
+
+$make_affine(gen_311_80)
+
+$make_affine(gen_311_81)
+
+$make_affine(gen_311_82)
+
+$make_affine(gen_311_83)
+
+$make_affine(gen_311_84)
+
+$make_affine(gen_311_85)
+
+$make_affine(gen_311_86)
+
+$make_affine(gen_311_87)
+
+$make_affine(gen_311_88)
+
+$make_affine(gen_311_89)
+
+$make_affine(gen_311_90)
+
+$make_affine(gen_311_91)
+
+fn main(): i32
+{
+    let values = $pack[
+        gen_311_0(6),
+        gen_311_1($twice(7)),
+        $twice(gen_311_2(8)),
+        gen_311_3($bias(9)),
+        gen_311_4(10),
+        gen_311_5($twice(11)),
+        $twice(gen_311_6(12)),
+        gen_311_7($bias(13)),
+        gen_311_8(14),
+        gen_311_9($twice(15)),
+        $twice(gen_311_10(16)),
+        gen_311_11($bias(17)),
+        gen_311_12(18),
+        gen_311_13($twice(19)),
+        $twice(gen_311_14(20)),
+        gen_311_15($bias(21)),
+        gen_311_16(22),
+        gen_311_17($twice(23)),
+        $twice(gen_311_18(24)),
+        gen_311_19($bias(25)),
+        gen_311_20(26),
+        gen_311_21($twice(27)),
+        $twice(gen_311_22(28)),
+        gen_311_23($bias(29)),
+        gen_311_24(30),
+        gen_311_25($twice(31)),
+        $twice(gen_311_26(32)),
+        gen_311_27($bias(33)),
+        gen_311_28(34),
+        gen_311_29($twice(35)),
+        $twice(gen_311_30(36)),
+        gen_311_31($bias(37)),
+        gen_311_32(38),
+        gen_311_33($twice(39)),
+        $twice(gen_311_34(40)),
+        gen_311_35($bias(41)),
+        gen_311_36(42),
+        gen_311_37($twice(43)),
+        $twice(gen_311_38(44)),
+        gen_311_39($bias(45)),
+        gen_311_40(46),
+        gen_311_41($twice(47)),
+        $twice(gen_311_42(48)),
+        gen_311_43($bias(49)),
+        gen_311_44(50),
+        gen_311_45($twice(51)),
+        $twice(gen_311_46(52)),
+        gen_311_47($bias(53)),
+        gen_311_48(54),
+        gen_311_49($twice(55)),
+        $twice(gen_311_50(56)),
+        gen_311_51($bias(57)),
+        gen_311_52(58),
+        gen_311_53($twice(59)),
+        $twice(gen_311_54(60)),
+        gen_311_55($bias(61)),
+        gen_311_56(62),
+        gen_311_57($twice(63)),
+        $twice(gen_311_58(64)),
+        gen_311_59($bias(65)),
+        gen_311_60(66),
+        gen_311_61($twice(67)),
+        $twice(gen_311_62(68)),
+        gen_311_63($bias(69)),
+        gen_311_64(70),
+        gen_311_65($twice(71)),
+        $twice(gen_311_66(72)),
+        gen_311_67($bias(73)),
+        gen_311_68(74),
+        gen_311_69($twice(75)),
+        $twice(gen_311_70(76)),
+        gen_311_71($bias(77)),
+        gen_311_72(78),
+        gen_311_73($twice(79)),
+        $twice(gen_311_74(80)),
+        gen_311_75($bias(81)),
+        gen_311_76(82),
+        gen_311_77($twice(83)),
+        $twice(gen_311_78(84)),
+        gen_311_79($bias(85)),
+        gen_311_80(86),
+        gen_311_81($twice(87)),
+        $twice(gen_311_82(88)),
+        gen_311_83($bias(89)),
+        gen_311_84(90),
+        gen_311_85($twice(91)),
+        $twice(gen_311_86(92)),
+        gen_311_87($bias(93)),
+        gen_311_88(94),
+        gen_311_89($twice(95)),
+        $twice(gen_311_90(96)),
+        gen_311_91($bias(97))
+    ]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total % 251
+}

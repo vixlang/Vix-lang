@@ -1,0 +1,312 @@
+macro $make_affine(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        let base = x * 3
+        let shifted = base + 7
+        return shifted
+    }
+}
+
+macro $pack[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $twice(x: expr)
+{
+    ($x + $x)
+}
+
+macro $bias(x: expr)
+{
+    ($x + 6)
+}
+
+$make_affine(gen_26_0)
+
+$make_affine(gen_26_1)
+
+$make_affine(gen_26_2)
+
+$make_affine(gen_26_3)
+
+$make_affine(gen_26_4)
+
+$make_affine(gen_26_5)
+
+$make_affine(gen_26_6)
+
+$make_affine(gen_26_7)
+
+$make_affine(gen_26_8)
+
+$make_affine(gen_26_9)
+
+$make_affine(gen_26_10)
+
+$make_affine(gen_26_11)
+
+$make_affine(gen_26_12)
+
+$make_affine(gen_26_13)
+
+$make_affine(gen_26_14)
+
+$make_affine(gen_26_15)
+
+$make_affine(gen_26_16)
+
+$make_affine(gen_26_17)
+
+$make_affine(gen_26_18)
+
+$make_affine(gen_26_19)
+
+$make_affine(gen_26_20)
+
+$make_affine(gen_26_21)
+
+$make_affine(gen_26_22)
+
+$make_affine(gen_26_23)
+
+$make_affine(gen_26_24)
+
+$make_affine(gen_26_25)
+
+$make_affine(gen_26_26)
+
+$make_affine(gen_26_27)
+
+$make_affine(gen_26_28)
+
+$make_affine(gen_26_29)
+
+$make_affine(gen_26_30)
+
+$make_affine(gen_26_31)
+
+$make_affine(gen_26_32)
+
+$make_affine(gen_26_33)
+
+$make_affine(gen_26_34)
+
+$make_affine(gen_26_35)
+
+$make_affine(gen_26_36)
+
+$make_affine(gen_26_37)
+
+$make_affine(gen_26_38)
+
+$make_affine(gen_26_39)
+
+$make_affine(gen_26_40)
+
+$make_affine(gen_26_41)
+
+$make_affine(gen_26_42)
+
+$make_affine(gen_26_43)
+
+$make_affine(gen_26_44)
+
+$make_affine(gen_26_45)
+
+$make_affine(gen_26_46)
+
+$make_affine(gen_26_47)
+
+$make_affine(gen_26_48)
+
+$make_affine(gen_26_49)
+
+$make_affine(gen_26_50)
+
+$make_affine(gen_26_51)
+
+$make_affine(gen_26_52)
+
+$make_affine(gen_26_53)
+
+$make_affine(gen_26_54)
+
+$make_affine(gen_26_55)
+
+$make_affine(gen_26_56)
+
+$make_affine(gen_26_57)
+
+$make_affine(gen_26_58)
+
+$make_affine(gen_26_59)
+
+$make_affine(gen_26_60)
+
+$make_affine(gen_26_61)
+
+$make_affine(gen_26_62)
+
+$make_affine(gen_26_63)
+
+$make_affine(gen_26_64)
+
+$make_affine(gen_26_65)
+
+$make_affine(gen_26_66)
+
+$make_affine(gen_26_67)
+
+$make_affine(gen_26_68)
+
+$make_affine(gen_26_69)
+
+$make_affine(gen_26_70)
+
+$make_affine(gen_26_71)
+
+$make_affine(gen_26_72)
+
+$make_affine(gen_26_73)
+
+$make_affine(gen_26_74)
+
+$make_affine(gen_26_75)
+
+$make_affine(gen_26_76)
+
+$make_affine(gen_26_77)
+
+$make_affine(gen_26_78)
+
+$make_affine(gen_26_79)
+
+$make_affine(gen_26_80)
+
+$make_affine(gen_26_81)
+
+$make_affine(gen_26_82)
+
+$make_affine(gen_26_83)
+
+$make_affine(gen_26_84)
+
+$make_affine(gen_26_85)
+
+$make_affine(gen_26_86)
+
+$make_affine(gen_26_87)
+
+$make_affine(gen_26_88)
+
+$make_affine(gen_26_89)
+
+$make_affine(gen_26_90)
+
+$make_affine(gen_26_91)
+
+fn main(): i32
+{
+    let values = $pack[
+        gen_26_0(9),
+        gen_26_1($twice(10)),
+        $twice(gen_26_2(11)),
+        gen_26_3($bias(12)),
+        gen_26_4(13),
+        gen_26_5($twice(14)),
+        $twice(gen_26_6(15)),
+        gen_26_7($bias(16)),
+        gen_26_8(17),
+        gen_26_9($twice(18)),
+        $twice(gen_26_10(19)),
+        gen_26_11($bias(20)),
+        gen_26_12(21),
+        gen_26_13($twice(22)),
+        $twice(gen_26_14(23)),
+        gen_26_15($bias(24)),
+        gen_26_16(25),
+        gen_26_17($twice(26)),
+        $twice(gen_26_18(27)),
+        gen_26_19($bias(28)),
+        gen_26_20(29),
+        gen_26_21($twice(30)),
+        $twice(gen_26_22(31)),
+        gen_26_23($bias(32)),
+        gen_26_24(33),
+        gen_26_25($twice(34)),
+        $twice(gen_26_26(35)),
+        gen_26_27($bias(36)),
+        gen_26_28(37),
+        gen_26_29($twice(38)),
+        $twice(gen_26_30(39)),
+        gen_26_31($bias(40)),
+        gen_26_32(41),
+        gen_26_33($twice(42)),
+        $twice(gen_26_34(43)),
+        gen_26_35($bias(44)),
+        gen_26_36(45),
+        gen_26_37($twice(46)),
+        $twice(gen_26_38(47)),
+        gen_26_39($bias(48)),
+        gen_26_40(49),
+        gen_26_41($twice(50)),
+        $twice(gen_26_42(51)),
+        gen_26_43($bias(52)),
+        gen_26_44(53),
+        gen_26_45($twice(54)),
+        $twice(gen_26_46(55)),
+        gen_26_47($bias(56)),
+        gen_26_48(57),
+        gen_26_49($twice(58)),
+        $twice(gen_26_50(59)),
+        gen_26_51($bias(60)),
+        gen_26_52(61),
+        gen_26_53($twice(62)),
+        $twice(gen_26_54(63)),
+        gen_26_55($bias(64)),
+        gen_26_56(65),
+        gen_26_57($twice(66)),
+        $twice(gen_26_58(67)),
+        gen_26_59($bias(68)),
+        gen_26_60(69),
+        gen_26_61($twice(70)),
+        $twice(gen_26_62(71)),
+        gen_26_63($bias(72)),
+        gen_26_64(73),
+        gen_26_65($twice(74)),
+        $twice(gen_26_66(75)),
+        gen_26_67($bias(76)),
+        gen_26_68(77),
+        gen_26_69($twice(78)),
+        $twice(gen_26_70(79)),
+        gen_26_71($bias(80)),
+        gen_26_72(81),
+        gen_26_73($twice(82)),
+        $twice(gen_26_74(83)),
+        gen_26_75($bias(84)),
+        gen_26_76(85),
+        gen_26_77($twice(86)),
+        $twice(gen_26_78(87)),
+        gen_26_79($bias(88)),
+        gen_26_80(89),
+        gen_26_81($twice(90)),
+        $twice(gen_26_82(91)),
+        gen_26_83($bias(92)),
+        gen_26_84(93),
+        gen_26_85($twice(94)),
+        $twice(gen_26_86(95)),
+        gen_26_87($bias(96)),
+        gen_26_88(97),
+        gen_26_89($twice(98)),
+        $twice(gen_26_90(99)),
+        gen_26_91($bias(100))
+    ]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total % 251
+}

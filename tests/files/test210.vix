@@ -1,0 +1,312 @@
+macro $make_affine(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        let base = x * 2
+        let shifted = base + 4
+        return shifted
+    }
+}
+
+macro $pack[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $twice(x: expr)
+{
+    ($x + $x)
+}
+
+macro $bias(x: expr)
+{
+    ($x + 1)
+}
+
+$make_affine(gen_210_0)
+
+$make_affine(gen_210_1)
+
+$make_affine(gen_210_2)
+
+$make_affine(gen_210_3)
+
+$make_affine(gen_210_4)
+
+$make_affine(gen_210_5)
+
+$make_affine(gen_210_6)
+
+$make_affine(gen_210_7)
+
+$make_affine(gen_210_8)
+
+$make_affine(gen_210_9)
+
+$make_affine(gen_210_10)
+
+$make_affine(gen_210_11)
+
+$make_affine(gen_210_12)
+
+$make_affine(gen_210_13)
+
+$make_affine(gen_210_14)
+
+$make_affine(gen_210_15)
+
+$make_affine(gen_210_16)
+
+$make_affine(gen_210_17)
+
+$make_affine(gen_210_18)
+
+$make_affine(gen_210_19)
+
+$make_affine(gen_210_20)
+
+$make_affine(gen_210_21)
+
+$make_affine(gen_210_22)
+
+$make_affine(gen_210_23)
+
+$make_affine(gen_210_24)
+
+$make_affine(gen_210_25)
+
+$make_affine(gen_210_26)
+
+$make_affine(gen_210_27)
+
+$make_affine(gen_210_28)
+
+$make_affine(gen_210_29)
+
+$make_affine(gen_210_30)
+
+$make_affine(gen_210_31)
+
+$make_affine(gen_210_32)
+
+$make_affine(gen_210_33)
+
+$make_affine(gen_210_34)
+
+$make_affine(gen_210_35)
+
+$make_affine(gen_210_36)
+
+$make_affine(gen_210_37)
+
+$make_affine(gen_210_38)
+
+$make_affine(gen_210_39)
+
+$make_affine(gen_210_40)
+
+$make_affine(gen_210_41)
+
+$make_affine(gen_210_42)
+
+$make_affine(gen_210_43)
+
+$make_affine(gen_210_44)
+
+$make_affine(gen_210_45)
+
+$make_affine(gen_210_46)
+
+$make_affine(gen_210_47)
+
+$make_affine(gen_210_48)
+
+$make_affine(gen_210_49)
+
+$make_affine(gen_210_50)
+
+$make_affine(gen_210_51)
+
+$make_affine(gen_210_52)
+
+$make_affine(gen_210_53)
+
+$make_affine(gen_210_54)
+
+$make_affine(gen_210_55)
+
+$make_affine(gen_210_56)
+
+$make_affine(gen_210_57)
+
+$make_affine(gen_210_58)
+
+$make_affine(gen_210_59)
+
+$make_affine(gen_210_60)
+
+$make_affine(gen_210_61)
+
+$make_affine(gen_210_62)
+
+$make_affine(gen_210_63)
+
+$make_affine(gen_210_64)
+
+$make_affine(gen_210_65)
+
+$make_affine(gen_210_66)
+
+$make_affine(gen_210_67)
+
+$make_affine(gen_210_68)
+
+$make_affine(gen_210_69)
+
+$make_affine(gen_210_70)
+
+$make_affine(gen_210_71)
+
+$make_affine(gen_210_72)
+
+$make_affine(gen_210_73)
+
+$make_affine(gen_210_74)
+
+$make_affine(gen_210_75)
+
+$make_affine(gen_210_76)
+
+$make_affine(gen_210_77)
+
+$make_affine(gen_210_78)
+
+$make_affine(gen_210_79)
+
+$make_affine(gen_210_80)
+
+$make_affine(gen_210_81)
+
+$make_affine(gen_210_82)
+
+$make_affine(gen_210_83)
+
+$make_affine(gen_210_84)
+
+$make_affine(gen_210_85)
+
+$make_affine(gen_210_86)
+
+$make_affine(gen_210_87)
+
+$make_affine(gen_210_88)
+
+$make_affine(gen_210_89)
+
+$make_affine(gen_210_90)
+
+$make_affine(gen_210_91)
+
+fn main(): i32
+{
+    let values = $pack[
+        gen_210_0(4),
+        gen_210_1($twice(5)),
+        $twice(gen_210_2(6)),
+        gen_210_3($bias(7)),
+        gen_210_4(8),
+        gen_210_5($twice(9)),
+        $twice(gen_210_6(10)),
+        gen_210_7($bias(11)),
+        gen_210_8(12),
+        gen_210_9($twice(13)),
+        $twice(gen_210_10(14)),
+        gen_210_11($bias(15)),
+        gen_210_12(16),
+        gen_210_13($twice(17)),
+        $twice(gen_210_14(18)),
+        gen_210_15($bias(19)),
+        gen_210_16(20),
+        gen_210_17($twice(21)),
+        $twice(gen_210_18(22)),
+        gen_210_19($bias(23)),
+        gen_210_20(24),
+        gen_210_21($twice(25)),
+        $twice(gen_210_22(26)),
+        gen_210_23($bias(27)),
+        gen_210_24(28),
+        gen_210_25($twice(29)),
+        $twice(gen_210_26(30)),
+        gen_210_27($bias(31)),
+        gen_210_28(32),
+        gen_210_29($twice(33)),
+        $twice(gen_210_30(34)),
+        gen_210_31($bias(35)),
+        gen_210_32(36),
+        gen_210_33($twice(37)),
+        $twice(gen_210_34(38)),
+        gen_210_35($bias(39)),
+        gen_210_36(40),
+        gen_210_37($twice(41)),
+        $twice(gen_210_38(42)),
+        gen_210_39($bias(43)),
+        gen_210_40(44),
+        gen_210_41($twice(45)),
+        $twice(gen_210_42(46)),
+        gen_210_43($bias(47)),
+        gen_210_44(48),
+        gen_210_45($twice(49)),
+        $twice(gen_210_46(50)),
+        gen_210_47($bias(51)),
+        gen_210_48(52),
+        gen_210_49($twice(53)),
+        $twice(gen_210_50(54)),
+        gen_210_51($bias(55)),
+        gen_210_52(56),
+        gen_210_53($twice(57)),
+        $twice(gen_210_54(58)),
+        gen_210_55($bias(59)),
+        gen_210_56(60),
+        gen_210_57($twice(61)),
+        $twice(gen_210_58(62)),
+        gen_210_59($bias(63)),
+        gen_210_60(64),
+        gen_210_61($twice(65)),
+        $twice(gen_210_62(66)),
+        gen_210_63($bias(67)),
+        gen_210_64(68),
+        gen_210_65($twice(69)),
+        $twice(gen_210_66(70)),
+        gen_210_67($bias(71)),
+        gen_210_68(72),
+        gen_210_69($twice(73)),
+        $twice(gen_210_70(74)),
+        gen_210_71($bias(75)),
+        gen_210_72(76),
+        gen_210_73($twice(77)),
+        $twice(gen_210_74(78)),
+        gen_210_75($bias(79)),
+        gen_210_76(80),
+        gen_210_77($twice(81)),
+        $twice(gen_210_78(82)),
+        gen_210_79($bias(83)),
+        gen_210_80(84),
+        gen_210_81($twice(85)),
+        $twice(gen_210_82(86)),
+        gen_210_83($bias(87)),
+        gen_210_84(88),
+        gen_210_85($twice(89)),
+        $twice(gen_210_86(90)),
+        gen_210_87($bias(91)),
+        gen_210_88(92),
+        gen_210_89($twice(93)),
+        $twice(gen_210_90(94)),
+        gen_210_91($bias(95))
+    ]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total % 251
+}

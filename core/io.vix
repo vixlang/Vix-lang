@@ -34,10 +34,3 @@ macro $println(fmt: expr, $(args: expr)*)
         let _ = printf($fmt, $(args),*)
 	let _ = printf("\n")
 }
-fn main(): i32
-{
-	$println("Hello world!")
-	let a = readln("input:")
-	$println("%s\n",a)
-	return 0
-}

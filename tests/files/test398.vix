@@ -1,0 +1,312 @@
+macro $make_affine(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        let base = x * 5
+        let shifted = base + 5
+        return shifted
+    }
+}
+
+macro $pack[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $twice(x: expr)
+{
+    ($x + $x)
+}
+
+macro $bias(x: expr)
+{
+    ($x + 7)
+}
+
+$make_affine(gen_398_0)
+
+$make_affine(gen_398_1)
+
+$make_affine(gen_398_2)
+
+$make_affine(gen_398_3)
+
+$make_affine(gen_398_4)
+
+$make_affine(gen_398_5)
+
+$make_affine(gen_398_6)
+
+$make_affine(gen_398_7)
+
+$make_affine(gen_398_8)
+
+$make_affine(gen_398_9)
+
+$make_affine(gen_398_10)
+
+$make_affine(gen_398_11)
+
+$make_affine(gen_398_12)
+
+$make_affine(gen_398_13)
+
+$make_affine(gen_398_14)
+
+$make_affine(gen_398_15)
+
+$make_affine(gen_398_16)
+
+$make_affine(gen_398_17)
+
+$make_affine(gen_398_18)
+
+$make_affine(gen_398_19)
+
+$make_affine(gen_398_20)
+
+$make_affine(gen_398_21)
+
+$make_affine(gen_398_22)
+
+$make_affine(gen_398_23)
+
+$make_affine(gen_398_24)
+
+$make_affine(gen_398_25)
+
+$make_affine(gen_398_26)
+
+$make_affine(gen_398_27)
+
+$make_affine(gen_398_28)
+
+$make_affine(gen_398_29)
+
+$make_affine(gen_398_30)
+
+$make_affine(gen_398_31)
+
+$make_affine(gen_398_32)
+
+$make_affine(gen_398_33)
+
+$make_affine(gen_398_34)
+
+$make_affine(gen_398_35)
+
+$make_affine(gen_398_36)
+
+$make_affine(gen_398_37)
+
+$make_affine(gen_398_38)
+
+$make_affine(gen_398_39)
+
+$make_affine(gen_398_40)
+
+$make_affine(gen_398_41)
+
+$make_affine(gen_398_42)
+
+$make_affine(gen_398_43)
+
+$make_affine(gen_398_44)
+
+$make_affine(gen_398_45)
+
+$make_affine(gen_398_46)
+
+$make_affine(gen_398_47)
+
+$make_affine(gen_398_48)
+
+$make_affine(gen_398_49)
+
+$make_affine(gen_398_50)
+
+$make_affine(gen_398_51)
+
+$make_affine(gen_398_52)
+
+$make_affine(gen_398_53)
+
+$make_affine(gen_398_54)
+
+$make_affine(gen_398_55)
+
+$make_affine(gen_398_56)
+
+$make_affine(gen_398_57)
+
+$make_affine(gen_398_58)
+
+$make_affine(gen_398_59)
+
+$make_affine(gen_398_60)
+
+$make_affine(gen_398_61)
+
+$make_affine(gen_398_62)
+
+$make_affine(gen_398_63)
+
+$make_affine(gen_398_64)
+
+$make_affine(gen_398_65)
+
+$make_affine(gen_398_66)
+
+$make_affine(gen_398_67)
+
+$make_affine(gen_398_68)
+
+$make_affine(gen_398_69)
+
+$make_affine(gen_398_70)
+
+$make_affine(gen_398_71)
+
+$make_affine(gen_398_72)
+
+$make_affine(gen_398_73)
+
+$make_affine(gen_398_74)
+
+$make_affine(gen_398_75)
+
+$make_affine(gen_398_76)
+
+$make_affine(gen_398_77)
+
+$make_affine(gen_398_78)
+
+$make_affine(gen_398_79)
+
+$make_affine(gen_398_80)
+
+$make_affine(gen_398_81)
+
+$make_affine(gen_398_82)
+
+$make_affine(gen_398_83)
+
+$make_affine(gen_398_84)
+
+$make_affine(gen_398_85)
+
+$make_affine(gen_398_86)
+
+$make_affine(gen_398_87)
+
+$make_affine(gen_398_88)
+
+$make_affine(gen_398_89)
+
+$make_affine(gen_398_90)
+
+$make_affine(gen_398_91)
+
+fn main(): i32
+{
+    let values = $pack[
+        gen_398_0(3),
+        gen_398_1($twice(4)),
+        $twice(gen_398_2(5)),
+        gen_398_3($bias(6)),
+        gen_398_4(7),
+        gen_398_5($twice(8)),
+        $twice(gen_398_6(9)),
+        gen_398_7($bias(10)),
+        gen_398_8(11),
+        gen_398_9($twice(12)),
+        $twice(gen_398_10(13)),
+        gen_398_11($bias(14)),
+        gen_398_12(15),
+        gen_398_13($twice(16)),
+        $twice(gen_398_14(17)),
+        gen_398_15($bias(18)),
+        gen_398_16(19),
+        gen_398_17($twice(20)),
+        $twice(gen_398_18(21)),
+        gen_398_19($bias(22)),
+        gen_398_20(23),
+        gen_398_21($twice(24)),
+        $twice(gen_398_22(25)),
+        gen_398_23($bias(26)),
+        gen_398_24(27),
+        gen_398_25($twice(28)),
+        $twice(gen_398_26(29)),
+        gen_398_27($bias(30)),
+        gen_398_28(31),
+        gen_398_29($twice(32)),
+        $twice(gen_398_30(33)),
+        gen_398_31($bias(34)),
+        gen_398_32(35),
+        gen_398_33($twice(36)),
+        $twice(gen_398_34(37)),
+        gen_398_35($bias(38)),
+        gen_398_36(39),
+        gen_398_37($twice(40)),
+        $twice(gen_398_38(41)),
+        gen_398_39($bias(42)),
+        gen_398_40(43),
+        gen_398_41($twice(44)),
+        $twice(gen_398_42(45)),
+        gen_398_43($bias(46)),
+        gen_398_44(47),
+        gen_398_45($twice(48)),
+        $twice(gen_398_46(49)),
+        gen_398_47($bias(50)),
+        gen_398_48(51),
+        gen_398_49($twice(52)),
+        $twice(gen_398_50(53)),
+        gen_398_51($bias(54)),
+        gen_398_52(55),
+        gen_398_53($twice(56)),
+        $twice(gen_398_54(57)),
+        gen_398_55($bias(58)),
+        gen_398_56(59),
+        gen_398_57($twice(60)),
+        $twice(gen_398_58(61)),
+        gen_398_59($bias(62)),
+        gen_398_60(63),
+        gen_398_61($twice(64)),
+        $twice(gen_398_62(65)),
+        gen_398_63($bias(66)),
+        gen_398_64(67),
+        gen_398_65($twice(68)),
+        $twice(gen_398_66(69)),
+        gen_398_67($bias(70)),
+        gen_398_68(71),
+        gen_398_69($twice(72)),
+        $twice(gen_398_70(73)),
+        gen_398_71($bias(74)),
+        gen_398_72(75),
+        gen_398_73($twice(76)),
+        $twice(gen_398_74(77)),
+        gen_398_75($bias(78)),
+        gen_398_76(79),
+        gen_398_77($twice(80)),
+        $twice(gen_398_78(81)),
+        gen_398_79($bias(82)),
+        gen_398_80(83),
+        gen_398_81($twice(84)),
+        $twice(gen_398_82(85)),
+        gen_398_83($bias(86)),
+        gen_398_84(87),
+        gen_398_85($twice(88)),
+        $twice(gen_398_86(89)),
+        gen_398_87($bias(90)),
+        gen_398_88(91),
+        gen_398_89($twice(92)),
+        $twice(gen_398_90(93)),
+        gen_398_91($bias(94))
+    ]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total % 251
+}

@@ -1,0 +1,312 @@
+macro $make_affine(name: ident)
+{
+    fn $name(x: i32): i32
+    {
+        let base = x * 3
+        let shifted = base + 7
+        return shifted
+    }
+}
+
+macro $pack[items: expr*]
+{
+    [$(items),*]
+}
+
+macro $twice(x: expr)
+{
+    ($x + $x)
+}
+
+macro $bias(x: expr)
+{
+    ($x + 1)
+}
+
+$make_affine(gen_301_0)
+
+$make_affine(gen_301_1)
+
+$make_affine(gen_301_2)
+
+$make_affine(gen_301_3)
+
+$make_affine(gen_301_4)
+
+$make_affine(gen_301_5)
+
+$make_affine(gen_301_6)
+
+$make_affine(gen_301_7)
+
+$make_affine(gen_301_8)
+
+$make_affine(gen_301_9)
+
+$make_affine(gen_301_10)
+
+$make_affine(gen_301_11)
+
+$make_affine(gen_301_12)
+
+$make_affine(gen_301_13)
+
+$make_affine(gen_301_14)
+
+$make_affine(gen_301_15)
+
+$make_affine(gen_301_16)
+
+$make_affine(gen_301_17)
+
+$make_affine(gen_301_18)
+
+$make_affine(gen_301_19)
+
+$make_affine(gen_301_20)
+
+$make_affine(gen_301_21)
+
+$make_affine(gen_301_22)
+
+$make_affine(gen_301_23)
+
+$make_affine(gen_301_24)
+
+$make_affine(gen_301_25)
+
+$make_affine(gen_301_26)
+
+$make_affine(gen_301_27)
+
+$make_affine(gen_301_28)
+
+$make_affine(gen_301_29)
+
+$make_affine(gen_301_30)
+
+$make_affine(gen_301_31)
+
+$make_affine(gen_301_32)
+
+$make_affine(gen_301_33)
+
+$make_affine(gen_301_34)
+
+$make_affine(gen_301_35)
+
+$make_affine(gen_301_36)
+
+$make_affine(gen_301_37)
+
+$make_affine(gen_301_38)
+
+$make_affine(gen_301_39)
+
+$make_affine(gen_301_40)
+
+$make_affine(gen_301_41)
+
+$make_affine(gen_301_42)
+
+$make_affine(gen_301_43)
+
+$make_affine(gen_301_44)
+
+$make_affine(gen_301_45)
+
+$make_affine(gen_301_46)
+
+$make_affine(gen_301_47)
+
+$make_affine(gen_301_48)
+
+$make_affine(gen_301_49)
+
+$make_affine(gen_301_50)
+
+$make_affine(gen_301_51)
+
+$make_affine(gen_301_52)
+
+$make_affine(gen_301_53)
+
+$make_affine(gen_301_54)
+
+$make_affine(gen_301_55)
+
+$make_affine(gen_301_56)
+
+$make_affine(gen_301_57)
+
+$make_affine(gen_301_58)
+
+$make_affine(gen_301_59)
+
+$make_affine(gen_301_60)
+
+$make_affine(gen_301_61)
+
+$make_affine(gen_301_62)
+
+$make_affine(gen_301_63)
+
+$make_affine(gen_301_64)
+
+$make_affine(gen_301_65)
+
+$make_affine(gen_301_66)
+
+$make_affine(gen_301_67)
+
+$make_affine(gen_301_68)
+
+$make_affine(gen_301_69)
+
+$make_affine(gen_301_70)
+
+$make_affine(gen_301_71)
+
+$make_affine(gen_301_72)
+
+$make_affine(gen_301_73)
+
+$make_affine(gen_301_74)
+
+$make_affine(gen_301_75)
+
+$make_affine(gen_301_76)
+
+$make_affine(gen_301_77)
+
+$make_affine(gen_301_78)
+
+$make_affine(gen_301_79)
+
+$make_affine(gen_301_80)
+
+$make_affine(gen_301_81)
+
+$make_affine(gen_301_82)
+
+$make_affine(gen_301_83)
+
+$make_affine(gen_301_84)
+
+$make_affine(gen_301_85)
+
+$make_affine(gen_301_86)
+
+$make_affine(gen_301_87)
+
+$make_affine(gen_301_88)
+
+$make_affine(gen_301_89)
+
+$make_affine(gen_301_90)
+
+$make_affine(gen_301_91)
+
+fn main(): i32
+{
+    let values = $pack[
+        gen_301_0(5),
+        gen_301_1($twice(6)),
+        $twice(gen_301_2(7)),
+        gen_301_3($bias(8)),
+        gen_301_4(9),
+        gen_301_5($twice(10)),
+        $twice(gen_301_6(11)),
+        gen_301_7($bias(12)),
+        gen_301_8(13),
+        gen_301_9($twice(14)),
+        $twice(gen_301_10(15)),
+        gen_301_11($bias(16)),
+        gen_301_12(17),
+        gen_301_13($twice(18)),
+        $twice(gen_301_14(19)),
+        gen_301_15($bias(20)),
+        gen_301_16(21),
+        gen_301_17($twice(22)),
+        $twice(gen_301_18(23)),
+        gen_301_19($bias(24)),
+        gen_301_20(25),
+        gen_301_21($twice(26)),
+        $twice(gen_301_22(27)),
+        gen_301_23($bias(28)),
+        gen_301_24(29),
+        gen_301_25($twice(30)),
+        $twice(gen_301_26(31)),
+        gen_301_27($bias(32)),
+        gen_301_28(33),
+        gen_301_29($twice(34)),
+        $twice(gen_301_30(35)),
+        gen_301_31($bias(36)),
+        gen_301_32(37),
+        gen_301_33($twice(38)),
+        $twice(gen_301_34(39)),
+        gen_301_35($bias(40)),
+        gen_301_36(41),
+        gen_301_37($twice(42)),
+        $twice(gen_301_38(43)),
+        gen_301_39($bias(44)),
+        gen_301_40(45),
+        gen_301_41($twice(46)),
+        $twice(gen_301_42(47)),
+        gen_301_43($bias(48)),
+        gen_301_44(49),
+        gen_301_45($twice(50)),
+        $twice(gen_301_46(51)),
+        gen_301_47($bias(52)),
+        gen_301_48(53),
+        gen_301_49($twice(54)),
+        $twice(gen_301_50(55)),
+        gen_301_51($bias(56)),
+        gen_301_52(57),
+        gen_301_53($twice(58)),
+        $twice(gen_301_54(59)),
+        gen_301_55($bias(60)),
+        gen_301_56(61),
+        gen_301_57($twice(62)),
+        $twice(gen_301_58(63)),
+        gen_301_59($bias(64)),
+        gen_301_60(65),
+        gen_301_61($twice(66)),
+        $twice(gen_301_62(67)),
+        gen_301_63($bias(68)),
+        gen_301_64(69),
+        gen_301_65($twice(70)),
+        $twice(gen_301_66(71)),
+        gen_301_67($bias(72)),
+        gen_301_68(73),
+        gen_301_69($twice(74)),
+        $twice(gen_301_70(75)),
+        gen_301_71($bias(76)),
+        gen_301_72(77),
+        gen_301_73($twice(78)),
+        $twice(gen_301_74(79)),
+        gen_301_75($bias(80)),
+        gen_301_76(81),
+        gen_301_77($twice(82)),
+        $twice(gen_301_78(83)),
+        gen_301_79($bias(84)),
+        gen_301_80(85),
+        gen_301_81($twice(86)),
+        $twice(gen_301_82(87)),
+        gen_301_83($bias(88)),
+        gen_301_84(89),
+        gen_301_85($twice(90)),
+        $twice(gen_301_86(91)),
+        gen_301_87($bias(92)),
+        gen_301_88(93),
+        gen_301_89($twice(94)),
+        $twice(gen_301_90(95)),
+        gen_301_91($bias(96))
+    ]
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        total = total + values[i]
+    }
+    return total % 251
+}

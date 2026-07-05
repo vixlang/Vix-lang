@@ -46,6 +46,28 @@ for i in range(100):
     TESTS[f"test{i + 23}.vix"] = {"exit": (left - right + c) % 251}
 
 
+def large_macro_expected(idx: int) -> int:
+    mul = 2 + idx % 5
+    add = 3 + idx % 11
+    bias = 1 + idx % 7
+    total = 0
+    for j in range(92):
+        x = j + 1 + idx % 9
+        if j % 4 == 0:
+            total += mul * x + add
+        elif j % 4 == 1:
+            total += mul * (x + x) + add
+        elif j % 4 == 2:
+            total += (mul * x + add) + (mul * x + add)
+        else:
+            total += mul * (x + bias) + add
+    return total % 251
+
+
+for i in range(129, 401):
+    TESTS[f"test{i}.vix"] = {"exit": large_macro_expected(i)}
+
+
 def repo_root() -> Path:
     path = Path(__file__).resolve()
     for parent in path.parents:
