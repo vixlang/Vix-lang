@@ -6,6 +6,7 @@ import "semantic.vix"
 import "desugar.vix"
 import "codegen.vix"
 import "mir/mir.vix"
+import "mir/opt.vix"
 import "mir/mir2asm/mod.vix"
 import "error.vix"
 import "backend/llc.vix"
@@ -48,7 +49,7 @@ fn compiler_mode(arg: string): CompilerModeResult
 {
     if (arg == "-h" or arg == "--help") { return CompilerModeName("--help") }
     if (arg == "-v" or arg == "--version") { return CompilerModeName("--version") }
-    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
+    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S" or arg == "-opt") { return CompilerModeName(arg) }
     return CompilerModeUnknown
 }
 
@@ -146,6 +147,7 @@ fn print_help(): i32
     print("  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)")
     print("  -S                     Emit assembly to <file> (default: <input>.s)")
     print("  -obj                   Emit object file (default: <input>.o)")
+    print("  -opt                   Optimize MIR before self-backend codegen/debug output")
     print("  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)")
     print("  --backend <llvm|self>  Select codegen backend (default: llvm)")
     print("  -l<lib>, -l <lib>      Link executable with a system library")
@@ -195,7 +197,7 @@ fn self_backend_target_supported(target_triple: string): i32
     return 0
 }
 
-fn run_mode(mode: string, src: string, filename: string, emit: string, output: string, runtime_object: string, link_args: string, target_triple: string, backend: string): ?i32
+fn run_mode(mode: string, src: string, filename: string, emit: string, output: string, runtime_object: string, link_args: string, target_triple: string, backend: string, optimize_mir: i32): ?i32
 {
     let no_std = vix_api_source_has_no_std(src)
 
@@ -307,11 +309,13 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     match mode
     {
         "debug_mir" -> {
-            info_print(mir_program(lowered_program))
+            let mir = mir_program(lowered_program)
+            info_print(if (optimize_mir == 1) { mir_opt_program(mir) } else { mir })
             return mode_success()
         }
         "debug_asm" -> {
-            let mir = mir_program(lowered_program)
+            let raw_mir = mir_program(lowered_program)
+            let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
             let asm = mir2asm_debug(mir)
             info_print(asm)
             return mode_success()
@@ -327,7 +331,8 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
 
     if (backend == "self" and emit != "ir" and emit != "stdout")
     {
-        let mir = mir_program(lowered_program)
+        let raw_mir = mir_program(lowered_program)
+        let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
         let asm = mir2asm(mir)
         let artifact_path = artifact_output_path(filename, output, emit)
         if (emit == "asm")
@@ -471,6 +476,7 @@ fn main(argc: i32, argv: &string): i32
     let mut link_args = ""
     let mut target_triple = host_target_triple()
     let mut backend = "llvm"
+    let mut optimize_mir = 0
 
     let mut i = 1
     while (i < argc)
@@ -513,6 +519,10 @@ fn main(argc: i32, argv: &string): i32
         elif (arg == "-obj")
         {
             emit = "-obj"
+        }
+        elif (arg == "-opt")
+        {
+            optimize_mir = 1
         }
         elif (arg == "-S")
         {
@@ -595,6 +605,7 @@ fn main(argc: i32, argv: &string): i32
                     elif (next_mode == "-ll") { emit = "ir" }
                     elif (next_mode == "-obj") { emit = "-obj" }
                     elif (next_mode == "-S") { emit = "asm" }
+                    elif (next_mode == "-opt") { optimize_mir = 1 }
                     else { mode = next_mode }
                 }
                 CompilerModeUnknown -> match source_file_arg(arg)
@@ -647,7 +658,7 @@ fn main(argc: i32, argv: &string): i32
         return 1
     }
 
-    match run_mode(mode, src, filename, emit, output, runtime_object_path(argv[0]), link_args, target_triple, backend)
+    match run_mode(mode, src, filename, emit, output, runtime_object_path(argv[0]), link_args, target_triple, backend, optimize_mir)
     {
         Some(code) -> return code
         None -> return 0

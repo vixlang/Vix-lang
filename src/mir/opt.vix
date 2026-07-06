@@ -1,0 +1,269 @@
+#[no_main]
+
+extern "C"
+{
+    fn vix_join_lines(lines: [string]): string
+    fn vix_substr(text: string, start: i32, end: i32): string
+    fn vix_trim_ascii(text: string): string
+}
+
+pub fn mir_opt_starts_with(text: string, prefix: string): i32
+{
+    if (text.length < prefix.length) { return 0 }
+    for (i in 0 .. prefix.length)
+    {
+        if (text[i] != prefix[i]) { return 0 }
+    }
+    return 1
+}
+
+pub fn mir_opt_slice(text: string, start: i32, end: i32): string
+{
+    return vix_substr(text, start, end)
+}
+
+pub fn mir_opt_after(text: string, start: i32): string
+{
+    return mir_opt_slice(text, start, text.length)
+}
+
+pub fn mir_opt_trim(text: string): string
+{
+    return vix_trim_ascii(text)
+}
+
+pub fn mir_opt_find(text: string, needle: i8, start: i32): i32
+{
+    for (i in start .. text.length)
+    {
+        if (text[i] == needle) { return i }
+    }
+    return -1
+}
+
+pub fn mir_opt_is_name_char(c: i8): i32
+{
+    if (c >= 'a' and c <= 'z') { return 1 }
+    if (c >= 'A' and c <= 'Z') { return 1 }
+    if (c >= '0' and c <= '9') { return 1 }
+    if (c == '_' or c == '.' or c == '%' or c == '@') { return 1 }
+    return 0
+}
+
+pub fn mir_opt_contains_name(text: string, name: string): i32
+{
+    if (name == "" or text.length < name.length) { return 0 }
+    let limit = text.length - name.length + 1
+    for (i in 0 .. limit)
+    {
+        let mut ok = 1
+        for (j in 0 .. name.length)
+        {
+            if (text[i + j] != name[j]) { ok = 0 }
+        }
+        if (ok == 1)
+        {
+            let left_ok = if (i == 0) { 1 } else { 1 - mir_opt_is_name_char(text[i - 1]) }
+            let right_pos = i + name.length
+            let right_ok = if (right_pos >= text.length) { 1 } else { 1 - mir_opt_is_name_char(text[right_pos]) }
+            if (left_ok == 1 and right_ok == 1) { return 1 }
+        }
+    }
+    return 0
+}
+
+pub fn mir_opt_replace_name(text: string, name: string, replacement: string): string
+{
+    if (name == "") { return text }
+    let mut out = ""
+    let mut i = 0
+    while (i < text.length)
+    {
+        let mut ok = 0
+        if (i + name.length <= text.length)
+        {
+            ok = 1
+            for (j in 0 .. name.length)
+            {
+                if (text[i + j] != name[j]) { ok = 0 }
+            }
+            if (ok == 1)
+            {
+                let left_ok = if (i == 0) { 1 } else { 1 - mir_opt_is_name_char(text[i - 1]) }
+                let right_pos = i + name.length
+                let right_ok = if (right_pos >= text.length) { 1 } else { 1 - mir_opt_is_name_char(text[right_pos]) }
+                if (left_ok == 0 or right_ok == 0) { ok = 0 }
+            }
+        }
+        if (ok == 1)
+        {
+            out = out + replacement
+            i += name.length
+        }
+        else
+        {
+            out = out + char_string(text[i])
+            i += 1
+        }
+    }
+    return out
+}
+
+pub fn mir_opt_dest(line: string): string
+{
+    let eq = mir_opt_find(line, '=', 0)
+    if (eq < 0) { return "" }
+    return mir_opt_trim(mir_opt_slice(line, 0, eq))
+}
+
+pub fn mir_opt_rhs(line: string): string
+{
+    let eq = mir_opt_find(line, '=', 0)
+    if (eq < 0) { return line }
+    return mir_opt_trim(mir_opt_after(line, eq + 1))
+}
+
+pub fn mir_opt_slot_index(slots: [string], slot: string): i32
+{
+    for (i in 0 .. slots.length)
+    {
+        if (slots[i] == slot) { return i }
+    }
+    return -1
+}
+
+pub fn mir_opt_parse_load_addr(rhs: string): string
+{
+    if (mir_opt_starts_with(rhs, "load ") == 0) { return "" }
+    let comma = mir_opt_find(rhs, ',', 0)
+    if (comma < 0) { return "" }
+    return mir_opt_trim(mir_opt_after(rhs, comma + 1))
+}
+
+pub fn mir_opt_parse_store_addr(line: string): string
+{
+    if (mir_opt_starts_with(line, "store ") == 0) { return "" }
+    let comma = mir_opt_find(line, ',', 0)
+    if (comma < 0) { return "" }
+    return mir_opt_trim(mir_opt_after(line, comma + 1))
+}
+
+pub fn mir_opt_parse_store_value(line: string): string
+{
+    if (mir_opt_starts_with(line, "store ") == 0) { return "" }
+    let comma = mir_opt_find(line, ',', 0)
+    if (comma < 0) { return "" }
+    let before = mir_opt_trim(mir_opt_slice(line, 6, comma))
+    let sp = mir_opt_find(before, ' ', 0)
+    if (sp < 0) { return "" }
+    return mir_opt_trim(mir_opt_after(before, sp + 1))
+}
+
+pub fn mir_opt_split_lines(text: string): [string]
+{
+    let mut lines: [string] = []
+    let mut start = 0
+    for (i in 0 .. text.length)
+    {
+        if (text[i] == 10)
+        {
+            lines.push(mir_opt_slice(text, start, i))
+            start = i + 1
+        }
+    }
+    if (start < text.length)
+    {
+        lines.push(mir_opt_after(text, start))
+    }
+    return lines
+}
+
+pub fn mir_opt_is_block(line: string): i32
+{
+    return mir_opt_starts_with(line, "block ")
+}
+
+pub fn mir_opt_is_terminator(line: string): i32
+{
+    if (mir_opt_starts_with(line, "ret ") == 1) { return 1 }
+    if (mir_opt_starts_with(line, "br label ") == 1) { return 1 }
+    if (mir_opt_starts_with(line, "br_cond ") == 1) { return 1 }
+    return 0
+}
+
+pub fn mir_opt_branch_target(line: string): string
+{
+    if (mir_opt_starts_with(line, "br label ") == 0) { return "" }
+    return mir_opt_trim(mir_opt_after(line, 9))
+}
+
+pub fn mir_opt_block_name(line: string): string
+{
+    if (mir_opt_is_block(line) == 0) { return "" }
+    let mut end = line.length
+    if (end > 0 and line[end - 1] == ':') { end -= 1 }
+    return mir_opt_trim(mir_opt_slice(line, 6, end))
+}
+
+pub fn mir_opt_next_nonempty_trimmed(lines: [string], start: i32): string
+{
+    for (i in start .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (line != "") { return line }
+    }
+    return ""
+}
+
+pub fn mir_opt_remove_unreachable(lines: [string]): [string]
+{
+    let mut out: [string] = []
+    let mut unreachable = 0
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (line == "")
+        {
+            if (unreachable == 0) { out.push(lines[i]) }
+        }
+        elif (mir_opt_is_block(line) == 1 or line == "}")
+        {
+            unreachable = 0
+            out.push(lines[i])
+        }
+        elif (unreachable == 0)
+        {
+            out.push(lines[i])
+            if (mir_opt_is_terminator(line) == 1) { unreachable = 1 }
+        }
+    }
+    return out
+}
+
+pub fn mir_opt_remove_fallthrough_branches(lines: [string]): [string]
+{
+    let mut out: [string] = []
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (mir_opt_starts_with(line, "br label ") == 1)
+        {
+            let target = mir_opt_branch_target(line)
+            let next = mir_opt_next_nonempty_trimmed(lines, i + 1)
+            if (target != "" and mir_opt_block_name(next) == target)
+            {
+                continue
+            }
+        }
+        out.push(lines[i])
+    }
+    return out
+}
+
+pub fn mir_opt_program(mir: string): string
+{
+    let lines = mir_opt_split_lines(mir)
+    let live_lines = mir_opt_remove_unreachable(lines)
+    let compact_lines = mir_opt_remove_fallthrough_branches(live_lines)
+    return vix_join_lines(compact_lines)
+}
