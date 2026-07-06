@@ -765,13 +765,17 @@ pub fn mir_stmt(b: &MirBuilder, es: &ExprStore, store: &StmtStore, stmt_idx: i32
             let else_label = mir_label(b, "if.else")
             let end_label = mir_label(b, "if.end")
             let cond = mir_truthy(b, mir_expr_value(b, es, store, expr_store_get(es, stmt.value_idx)))
-            mir_emit_term(b, "br_cond " + cond.name + ", label " + then_label + ", label " + else_label)
+            let false_label = if (stmt.assign_idx >= 0) { else_label } else { end_label }
+            mir_emit_term(b, "br_cond " + cond.name + ", label " + then_label + ", label " + false_label)
             mir_block(b, then_label)
             mir_stmt(b, es, store, stmt.body_idx, break_label, continue_label)
             if (mir_block_is_open(b) == 1) { mir_emit_term(b, "br label " + end_label) }
-            mir_block(b, else_label)
-            if (stmt.assign_idx >= 0) { mir_stmt(b, es, store, stmt.assign_idx, break_label, continue_label) }
-            if (mir_block_is_open(b) == 1) { mir_emit_term(b, "br label " + end_label) }
+            if (stmt.assign_idx >= 0)
+            {
+                mir_block(b, else_label)
+                mir_stmt(b, es, store, stmt.assign_idx, break_label, continue_label)
+                if (mir_block_is_open(b) == 1) { mir_emit_term(b, "br label " + end_label) }
+            }
             mir_block(b, end_label)
         }
         "while" -> {

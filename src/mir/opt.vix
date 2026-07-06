@@ -260,10 +260,281 @@ pub fn mir_opt_remove_fallthrough_branches(lines: [string]): [string]
     return out
 }
 
+pub fn mir_opt_is_alloca(line: string): i32
+{
+    if (mir_opt_dest(line) != "" and mir_opt_starts_with(mir_opt_rhs(line), "alloca ") == 1) { return 1 }
+    return 0
+}
+
+pub fn mir_opt_slot_is_address_only(lines: [string], slot: string): i32
+{
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (mir_opt_contains_name(line, slot) == 1)
+        {
+            if (mir_opt_dest(line) == slot and mir_opt_starts_with(mir_opt_rhs(line), "alloca ") == 1) {}
+            elif (mir_opt_parse_load_addr(mir_opt_rhs(line)) == slot) {}
+            elif (mir_opt_parse_store_addr(line) == slot) {}
+            else { return 0 }
+        }
+    }
+    return 1
+}
+
+pub fn mir_opt_single_entry_store_value(lines: [string], slot: string): string
+{
+    let mut current_block = ""
+    let mut store_count = 0
+    let mut value = ""
+    let mut block = ""
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (mir_opt_is_block(line) == 1) { current_block = mir_opt_block_name(line) }
+        elif (mir_opt_parse_store_addr(line) == slot)
+        {
+            store_count += 1
+            value = mir_opt_parse_store_value(line)
+            block = current_block
+        }
+    }
+    if (store_count == 1 and block == "%entry") { return value }
+    return ""
+}
+
+pub fn mir_opt_promotable_value(lines: [string], slot: string): string
+{
+    if (mir_opt_slot_is_address_only(lines, slot) == 0) { return "" }
+    return mir_opt_single_entry_store_value(lines, slot)
+}
+
+pub fn mir_opt_known_slot_index(slots: [string], slot: string): i32
+{
+    for (i in 0 .. slots.length)
+    {
+        if (slots[i] == slot) { return i }
+    }
+    return -1
+}
+
+pub fn mir_opt_promote_single_store_allocas(lines: [string]): [string]
+{
+    let mut slots: [string] = []
+    let mut values: [string] = []
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (mir_opt_is_alloca(line) == 1)
+        {
+            let slot = mir_opt_dest(line)
+            let value = mir_opt_promotable_value(lines, slot)
+            if (value != "")
+            {
+                slots.push(slot)
+                values.push(value)
+            }
+        }
+    }
+    if (slots.length == 0) { return lines }
+
+    let mut out: [string] = []
+    let mut aliases: [string] = []
+    let mut replacements: [string] = []
+    for (i in 0 .. lines.length)
+    {
+        let raw = lines[i]
+        let line = mir_opt_trim(raw)
+        let dest = mir_opt_dest(line)
+        let rhs = mir_opt_rhs(line)
+        let alloca_idx = mir_opt_known_slot_index(slots, dest)
+        if (alloca_idx >= 0 and mir_opt_starts_with(rhs, "alloca ") == 1) { continue }
+
+        let store_addr = mir_opt_parse_store_addr(line)
+        let store_idx = mir_opt_known_slot_index(slots, store_addr)
+        if (store_idx >= 0) { continue }
+
+        let load_addr = mir_opt_parse_load_addr(rhs)
+        let load_idx = mir_opt_known_slot_index(slots, load_addr)
+        if (dest != "" and load_idx >= 0)
+        {
+            aliases.push(dest)
+            replacements.push(values[load_idx])
+            continue
+        }
+
+        let mut rewritten = raw
+        for (j in 0 .. aliases.length)
+        {
+            rewritten = mir_opt_replace_name(rewritten, aliases[j], replacements[j])
+        }
+        out.push(rewritten)
+    }
+    return out
+}
+
+pub fn mir_opt_empty_block_successor(lines: [string], index: i32): string
+{
+    let block = mir_opt_trim(lines[index])
+    if (mir_opt_is_block(block) == 0 or mir_opt_block_name(block) == "%entry") { return "" }
+    let mut i = index + 1
+    while (i < lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (line == "") {}
+        elif (mir_opt_is_block(line) == 1) { return mir_opt_block_name(line) }
+        else { return "" }
+        i += 1
+    }
+    return ""
+}
+
+pub fn mir_opt_empty_block_index(blocks: [string], block: string): i32
+{
+    for (i in 0 .. blocks.length)
+    {
+        if (blocks[i] == block) { return i }
+    }
+    return -1
+}
+
+pub fn mir_opt_remove_empty_blocks_in_function(lines: [string]): [string]
+{
+    let mut blocks: [string] = []
+    let mut successors: [string] = []
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (mir_opt_is_block(line) == 1)
+        {
+            let next = mir_opt_empty_block_successor(lines, i)
+            if (next != "")
+            {
+                blocks.push(mir_opt_block_name(line))
+                successors.push(next)
+            }
+        }
+    }
+    if (blocks.length == 0) { return lines }
+
+    let mut out: [string] = []
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (mir_opt_is_block(line) == 1 and mir_opt_empty_block_index(blocks, mir_opt_block_name(line)) >= 0)
+        {
+            continue
+        }
+        let mut rewritten = lines[i]
+        for (j in 0 .. blocks.length)
+        {
+            rewritten = mir_opt_replace_name(rewritten, blocks[j], successors[j])
+        }
+        out.push(rewritten)
+    }
+    return out
+}
+
+pub fn mir_opt_next_block_after_empty(lines: [string], index: i32): string
+{
+    let mut i = index + 1
+    while (i < lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (line == "") { i += 1 }
+        elif (mir_opt_is_block(line) == 1) { return mir_opt_block_name(line) }
+        else { return "" }
+    }
+    return ""
+}
+
+pub fn mir_opt_remove_empty_blocks(lines: [string]): [string]
+{
+    let mut empty_blocks: [string] = []
+    let mut next_blocks: [string] = []
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (mir_opt_is_block(line) == 1)
+        {
+            let name = mir_opt_block_name(line)
+            let next = mir_opt_next_block_after_empty(lines, i)
+            if (name != "%entry" and next != "")
+            {
+                empty_blocks.push(name)
+                next_blocks.push(next)
+            }
+        }
+    }
+    if (empty_blocks.length == 0) { return lines }
+
+    let mut out: [string] = []
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        let mut skip = 0
+        if (mir_opt_is_block(line) == 1 and mir_opt_empty_block_index(empty_blocks, mir_opt_block_name(line)) >= 0)
+        {
+            skip = 1
+        }
+        if (skip == 0)
+        {
+            let mut rewritten = lines[i]
+            for (j in 0 .. empty_blocks.length)
+            {
+                rewritten = mir_opt_replace_name(rewritten, empty_blocks[j], next_blocks[j])
+            }
+            out.push(rewritten)
+        }
+    }
+    return out
+}
+
+pub fn mir_opt_promote_functions(lines: [string]): [string]
+{
+    let mut out: [string] = []
+    let mut fn_lines: [string] = []
+    let mut in_fn = 0
+    for (i in 0 .. lines.length)
+    {
+        let line = mir_opt_trim(lines[i])
+        if (in_fn == 0 and mir_opt_starts_with(line, "fn @") == 1)
+        {
+            in_fn = 1
+            fn_lines = []
+            fn_lines.push(lines[i])
+        }
+        elif (in_fn == 1)
+        {
+            fn_lines.push(lines[i])
+            if (line == "}")
+            {
+                let promoted = mir_opt_promote_single_store_allocas(fn_lines)
+                let no_empty = mir_opt_remove_empty_blocks_in_function(promoted)
+                for (j in 0 .. no_empty.length) { out.push(no_empty[j]) }
+                in_fn = 0
+            }
+        }
+        else
+        {
+            out.push(lines[i])
+        }
+    }
+    if (in_fn == 1)
+    {
+        let promoted2 = mir_opt_promote_single_store_allocas(fn_lines)
+        let no_empty2 = mir_opt_remove_empty_blocks_in_function(promoted2)
+        for (j in 0 .. no_empty2.length) { out.push(no_empty2[j]) }
+    }
+    return out
+}
+
 pub fn mir_opt_program(mir: string): string
 {
     let lines = mir_opt_split_lines(mir)
-    let live_lines = mir_opt_remove_unreachable(lines)
-    let compact_lines = mir_opt_remove_fallthrough_branches(live_lines)
+    let promoted_lines = mir_opt_promote_functions(lines)
+    let live_lines = mir_opt_remove_unreachable(promoted_lines)
+    let no_empty_lines = mir_opt_remove_empty_blocks(live_lines)
+    let compact_lines = mir_opt_remove_fallthrough_branches(no_empty_lines)
     return vix_join_lines(compact_lines)
 }
