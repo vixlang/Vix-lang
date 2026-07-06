@@ -183,11 +183,13 @@ pub fn newline_should_insert_semicolon(src: string, pos: i32, stream: &TokenStre
 
 pub fn is_keyword(text: string): i32
 {
-    if (text == "fn" or text == "return" or text == "let" or text == "mut" or text == "if" or text == "elif" or text == "else" or text == "while" or text == "for" or text == "in") { return 1 }
-    if (text == "match" or text == "struct" or text == "type" or text == "pub" or text == "import" or text == "extern" or text == "break" or text == "continue") { return 1 }
-    if (text == "i32" or text == "i64" or text == "i8" or text == "f32" or text == "f64" or text == "string" or text == "void" or text == "nil" or text == "true" or text == "false") { return 1 }
-    if (text == "and" or text == "or" or text == "print") { return 1 }
-    return 0
+    match text {
+        "fn" | "return" | "let" | "mut" | "if" | "elif" | "else" | "while" | "for" | "in" -> { return 1 }
+        "match" | "struct" | "type" | "pub" | "import" | "extern" | "break" | "continue" -> { return 1 }
+        "i32" | "i64" | "i8" | "f32" | "f64" | "string" | "void" | "nil" | "true" | "false" -> { return 1 }
+        "and" | "or" | "print" -> { return 1 }
+        _ -> { return 0 }
+    }
 }
 
 pub fn tokenize(src: string): TokenStream
@@ -202,93 +204,41 @@ pub fn tokenize(src: string): TokenStream
         match peek_char(src, pos)
         {
             Some(c) -> {
-                if (c == 32 or c == 13)
-                {
-                    pos += 1
-                    column += 1
-                }
-                elif (c == 9)
-                {
-                    pos += 1
-                    column = ((column - 1) / 8 + 1) * 8 + 1
-                }
-                elif (c == 10)
-                {
-                    pos += 1
-                    if (newline_should_insert_semicolon(src, pos, &stream) == 1)
-                    {
-                        stream_push(&stream, tk_symbol(), ";", 0, line, column)
-                    }
-                    line += 1
-                    column = 1
-                }
-                elif (c == '/' and pos + 1 < src.length and src[pos + 1] == '/')
-                {
-                    while (pos < src.length and src[pos] != 10)
-                    {
+                match c {
+                    32 | 13 -> {
                         pos += 1
                         column += 1
                     }
-                }
-                elif (is_alpha(c) == 1)
-                {
-                    let start_col = column
-                    let mut text = ""
-                    while (pos < src.length and is_ident(src[pos]) == 1)
-                    {
-                        text = text + char_string(src[pos])
+                    9 -> {
                         pos += 1
-                        column += 1
+                        column = ((column - 1) / 8 + 1) * 8 + 1
                     }
-                    if (text == "true")
-                    {
-                        stream_push(&stream, tk_bool(), text, 1, line, start_col)
-                    }
-                    elif (text == "false")
-                    {
-                        stream_push(&stream, tk_bool(), text, 0, line, start_col)
-                    }
-                    elif (is_keyword(text) == 1)
-                    {
-                        stream_push(&stream, tk_keyword(), text, 0, line, start_col)
-                    }
-                    else
-                    {
-                        stream_push(&stream, tk_ident(), text, 0, line, start_col)
-                    }
-                }
-                elif (is_digit(c) == 1)
-                {
-                    let start_col = column
-                    let mut value = 0
-                    let mut text = ""
-                    while (pos < src.length and is_digit(src[pos]) == 1)
-                    {
-                        value = value * 10 + (src[pos] - '0')
-                        text = text + char_string(src[pos])
+                    10 -> {
                         pos += 1
-                        column += 1
-                    }
-                    if (pos < src.length and src[pos] == '.' and pos + 1 < src.length and is_digit(src[pos + 1]) == 1)
-                    {
-                        text = text + "."
-                        pos += 1
-                        column += 1
-                        while (pos < src.length and is_digit(src[pos]) == 1)
+                        if (newline_should_insert_semicolon(src, pos, &stream) == 1)
                         {
-                            text = text + char_string(src[pos])
+                            stream_push(&stream, tk_symbol(), ";", 0, line, column)
+                        }
+                        line += 1
+                        column = 1
+                    }
+                    '/' -> {
+                        if (pos + 1 < src.length and src[pos + 1] == '/')
+                        {
+                            while (pos < src.length and src[pos] != 10)
+                            {
+                                pos += 1
+                                column += 1
+                            }
+                        }
+                        else
+                        {
+                            stream_push(&stream, tk_symbol(), char_string(c), 0, line, column)
                             pos += 1
                             column += 1
                         }
-                        stream_push_full(&stream, tk_float(), text, 0, atof(text), line, start_col)
                     }
-                    else
-                    {
-                        stream_push(&stream, tk_number(), "", value, line, start_col)
-                    }
-                }
-                elif (c == 39)
-                {
+                    39 -> {
                     let start_col = column
                     pos += 1
                     column += 1
@@ -333,9 +283,8 @@ pub fn tokenize(src: string): TokenStream
                         column += 1
                     }
                     stream_push(&stream, tk_number(), "", value, line, start_col)
-                }
-                elif (c == '"')
-                {
+                    }
+                    '"' -> {
                     let start_col = column
                     let mut text = ""
                     pos += 1
@@ -378,90 +327,115 @@ pub fn tokenize(src: string): TokenStream
                         column += 1
                     }
                     stream_push(&stream, tk_string(), text, 0, line, start_col)
-                }
-                elif (c == '=' and pos + 1 < src.length and src[pos + 1] == '>')
-                {
-                    stream_push(&stream, tk_symbol(), "=>", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '=' and pos + 1 < src.length and src[pos + 1] == '=')
-                {
-                    stream_push(&stream, tk_symbol(), "==", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '!' and pos + 1 < src.length and src[pos + 1] == '=')
-                {
-                    stream_push(&stream, tk_symbol(), "!=", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '<' and pos + 1 < src.length and src[pos + 1] == '=')
-                {
-                    stream_push(&stream, tk_symbol(), "<=", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '<' and pos + 1 < src.length and src[pos + 1] == '<')
-                {
-                    stream_push(&stream, tk_symbol(), "<<", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '>' and pos + 1 < src.length and src[pos + 1] == '=')
-                {
-                    stream_push(&stream, tk_symbol(), ">=", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '>' and pos + 1 < src.length and src[pos + 1] == '>')
-                {
-                    stream_push(&stream, tk_symbol(), ">>", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '+' and pos + 1 < src.length and src[pos + 1] == '=')
-                {
-                    stream_push(&stream, tk_symbol(), "+=", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '-' and pos + 1 < src.length and src[pos + 1] == '=')
-                {
-                    stream_push(&stream, tk_symbol(), "-=", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '-' and pos + 1 < src.length and src[pos + 1] == '>')
-                {
-                    stream_push(&stream, tk_symbol(), "->", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '*' and pos + 1 < src.length and src[pos + 1] == '*')
-                {
-                    stream_push(&stream, tk_symbol(), "**", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                elif (c == '.' and pos + 2 < src.length and src[pos + 1] == '.' and src[pos + 2] == '.')
-                {
-                    stream_push(&stream, tk_symbol(), "...", 0, line, column)
-                    pos += 3
-                    column += 3
-                }
-                elif (c == '.' and pos + 1 < src.length and src[pos + 1] == '.')
-                {
-                    stream_push(&stream, tk_symbol(), "..", 0, line, column)
-                    pos += 2
-                    column += 2
-                }
-                else
-                {
-                    stream_push(&stream, tk_symbol(), char_string(c), 0, line, column)
-                    pos += 1
-                    column += 1
+                    }
+                    _ -> {
+                        if (is_alpha(c) == 1)
+                        {
+                            let start_col = column
+                            let mut text = ""
+                            while (pos < src.length and is_ident(src[pos]) == 1)
+                            {
+                                text = text + char_string(src[pos])
+                                pos += 1
+                                column += 1
+                            }
+                            match text {
+                                "true" -> stream_push(&stream, tk_bool(), text, 1, line, start_col)
+                                "false" -> stream_push(&stream, tk_bool(), text, 0, line, start_col)
+                                _ -> {
+                                    if (is_keyword(text) == 1)
+                                    {
+                                        stream_push(&stream, tk_keyword(), text, 0, line, start_col)
+                                    }
+                                    else
+                                    {
+                                        stream_push(&stream, tk_ident(), text, 0, line, start_col)
+                                    }
+                                }
+                            }
+                        }
+                        elif (is_digit(c) == 1)
+                        {
+                            let start_col = column
+                            let mut value = 0
+                            let mut text = ""
+                            while (pos < src.length and is_digit(src[pos]) == 1)
+                            {
+                                value = value * 10 + (src[pos] - '0')
+                                text = text + char_string(src[pos])
+                                pos += 1
+                                column += 1
+                            }
+                            if (pos < src.length and src[pos] == '.' and pos + 1 < src.length and is_digit(src[pos + 1]) == 1)
+                            {
+                                text = text + "."
+                                pos += 1
+                                column += 1
+                                while (pos < src.length and is_digit(src[pos]) == 1)
+                                {
+                                    text = text + char_string(src[pos])
+                                    pos += 1
+                                    column += 1
+                                }
+                                stream_push_full(&stream, tk_float(), text, 0, atof(text), line, start_col)
+                            }
+                            else
+                            {
+                                stream_push(&stream, tk_number(), "", value, line, start_col)
+                            }
+                        }
+                        else
+                        {
+                            let mut symbol = char_string(c)
+                            let mut symbol_len = 1
+                            if (pos + 1 < src.length)
+                            {
+                                let next = src[pos + 1]
+                                match c {
+                                    '=' -> {
+                                        if (next == '>') { symbol = "=>" }
+                                        elif (next == '=') { symbol = "==" }
+                                    }
+                                    '!' -> {
+                                        if (next == '=') { symbol = "!=" }
+                                    }
+                                    '<' -> {
+                                        if (next == '=') { symbol = "<=" }
+                                        elif (next == '<') { symbol = "<<" }
+                                    }
+                                    '>' -> {
+                                        if (next == '=') { symbol = ">=" }
+                                        elif (next == '>') { symbol = ">>" }
+                                    }
+                                    '+' -> {
+                                        if (next == '=') { symbol = "+=" }
+                                    }
+                                    '-' -> {
+                                        if (next == '=') { symbol = "-=" }
+                                        elif (next == '>') { symbol = "->" }
+                                    }
+                                    '*' -> {
+                                        if (next == '*') { symbol = "**" }
+                                    }
+                                    '.' -> {
+                                        if (next == '.' and pos + 2 < src.length and src[pos + 2] == '.')
+                                        {
+                                            symbol = "..."
+                                        }
+                                        elif (next == '.')
+                                        {
+                                            symbol = ".."
+                                        }
+                                    }
+                                    _ -> {}
+                                }
+                                symbol_len = symbol.length
+                            }
+                            stream_push(&stream, tk_symbol(), symbol, 0, line, column)
+                            pos += symbol_len
+                            column += symbol_len
+                        }
+                    }
                 }
             }
             None -> pos = src.length

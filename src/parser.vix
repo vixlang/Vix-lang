@@ -398,7 +398,7 @@ pub fn parse_match_expr(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     
     let mut subject_idx = -1
-    if (parser_kind(parser) == tk_ident() and stream_text_at(parser.stream, parser.pos + 1) == "{")
+    if ((parser_kind(parser) == tk_ident() or parser_kind(parser) == tk_keyword()) and stream_text_at(parser.stream, parser.pos + 1) == "{")
     {
         let subject_name = parser_text(parser)
         parser_advance(parser)
@@ -557,7 +557,16 @@ pub fn parse_block_expression(parser: &Parser): i32
                     elif (scan_text == ")") { paren_depth -= 1 }
                     scan_pos += 1
                 }
-                if (scan_pos >= stream_len(parser.stream) or (stream_text_at(parser.stream, scan_pos) != "}" and stream_text_at(parser.stream, scan_pos) != "else"))
+                let mut after_call = ""
+                if (scan_pos < stream_len(parser.stream))
+                {
+                    after_call = stream_text_at(parser.stream, scan_pos)
+                }
+                if (after_call == "+" or after_call == "-" or after_call == "*" or after_call == "/" or after_call == "==" or after_call == "!=" or after_call == "<" or after_call == "<=" or after_call == ">" or after_call == ">=" or after_call == "and" or after_call == "or")
+                {
+                    is_stmt_start = 0
+                }
+                elif (scan_pos >= stream_len(parser.stream) or (after_call != "}" and after_call != "else"))
                 {
                     is_stmt_start = 1
                 }
@@ -1056,7 +1065,7 @@ pub fn parse_match_statement(parser: &Parser): i32
     parser_expect_text(parser, "match")
     if (parser.ok == 0) { return -1 }
     let mut subject_idx = -1
-    if (parser_kind(parser) == tk_ident() and stream_text_at(parser.stream, parser.pos + 1) == "{")
+    if ((parser_kind(parser) == tk_ident() or parser_kind(parser) == tk_keyword()) and stream_text_at(parser.stream, parser.pos + 1) == "{")
     {
         let subject_name = parser_text(parser)
         parser_advance(parser)
