@@ -1,0 +1,19 @@
+#[no_main]
+
+extern "C"
+{
+    fn vix_api_optimize_ir(input_path: string, output_path: string, target_triple: string, opt_level: i32): i32
+    fn vix_api_passes_error(): string
+}
+
+pub fn passes_optimize_ir(input_path: string, output_path: string, target_triple: string, opt_level: i32): i32
+{
+    return vix_api_optimize_ir(input_path, output_path, target_triple, opt_level)
+}
+
+pub fn passes_last_error(): string
+{
+    let err = vix_api_passes_error()
+    if (err == nil) { return "" }
+    return err
+}

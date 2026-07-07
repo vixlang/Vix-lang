@@ -1,5 +1,6 @@
-; ModuleID = 'vixc0'
+; ModuleID = 'main.ll.tmp.raw.ll'
 source_filename = "vixc0"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
 %CompilerModeResult = type { i32, i32, ptr, ptr, double }
@@ -4010,190 +4011,206 @@ target triple = "x86_64-pc-linux-gnu"
 @.strlit48190 = internal constant [15 x i8] c"section .data\0A\00"
 @.strlit48214 = internal constant [1 x i8] zeroinitializer
 @.strlit48243 = internal constant [1 x i8] zeroinitializer
-@.strlit48282 = internal constant [3 x i8] c"-h\00"
-@.strlit48288 = internal constant [7 x i8] c"--help\00"
-@.strlit48295 = internal constant [7 x i8] c"--help\00"
-@.strlit48298 = internal constant [3 x i8] c"-v\00"
-@.strlit48304 = internal constant [10 x i8] c"--version\00"
-@.strlit48311 = internal constant [10 x i8] c"--version\00"
-@.strlit48314 = internal constant [6 x i8] c"--lex\00"
-@.strlit48320 = internal constant [14 x i8] c"--parse-stats\00"
-@.strlit48328 = internal constant [9 x i8] c"--parser\00"
-@.strlit48336 = internal constant [6 x i8] c"--ast\00"
-@.strlit48344 = internal constant [5 x i8] c"-ast\00"
-@.strlit48352 = internal constant [12 x i8] c"--typeinfer\00"
-@.strlit48360 = internal constant [10 x i8] c"--tyinfer\00"
-@.strlit48368 = internal constant [11 x i8] c"--semantic\00"
-@.strlit48376 = internal constant [8 x i8] c"--check\00"
-@.strlit48384 = internal constant [4 x i8] c"-ll\00"
-@.strlit48392 = internal constant [5 x i8] c"-obj\00"
-@.strlit48400 = internal constant [3 x i8] c"-S\00"
-@.strlit48408 = internal constant [5 x i8] c"-opt\00"
-@.strlit48419 = internal constant [5 x i8] c".vix\00"
-@.strlit48424 = internal constant [1 x i8] zeroinitializer
-@.strlit48468 = internal constant [1 x i8] zeroinitializer
-@.strlit48493 = internal constant [2 x i8] c".\00"
-@.strlit48498 = internal constant [2 x i8] c"/\00"
+@.strlit48255 = internal constant [1 x i8] zeroinitializer
+@.strlit48294 = internal constant [3 x i8] c"-h\00"
+@.strlit48300 = internal constant [7 x i8] c"--help\00"
+@.strlit48307 = internal constant [7 x i8] c"--help\00"
+@.strlit48310 = internal constant [3 x i8] c"-v\00"
+@.strlit48316 = internal constant [10 x i8] c"--version\00"
+@.strlit48323 = internal constant [10 x i8] c"--version\00"
+@.strlit48326 = internal constant [6 x i8] c"--lex\00"
+@.strlit48332 = internal constant [14 x i8] c"--parse-stats\00"
+@.strlit48340 = internal constant [9 x i8] c"--parser\00"
+@.strlit48348 = internal constant [6 x i8] c"--ast\00"
+@.strlit48356 = internal constant [5 x i8] c"-ast\00"
+@.strlit48364 = internal constant [12 x i8] c"--typeinfer\00"
+@.strlit48372 = internal constant [10 x i8] c"--tyinfer\00"
+@.strlit48380 = internal constant [11 x i8] c"--semantic\00"
+@.strlit48388 = internal constant [8 x i8] c"--check\00"
+@.strlit48396 = internal constant [4 x i8] c"-ll\00"
+@.strlit48404 = internal constant [5 x i8] c"-obj\00"
+@.strlit48412 = internal constant [3 x i8] c"-S\00"
+@.strlit48423 = internal constant [5 x i8] c".vix\00"
+@.strlit48428 = internal constant [1 x i8] zeroinitializer
+@.strlit48472 = internal constant [1 x i8] zeroinitializer
+@.strlit48497 = internal constant [2 x i8] c".\00"
+@.strlit48502 = internal constant [2 x i8] c"/\00"
 @.fmt.string = internal constant [4 x i8] c"%s\0A\00"
-@.strlit48511 = internal constant [1 x i8] zeroinitializer
-@.strlit48521 = internal constant [4 x i8] c".ll\00"
-@.strlit48524 = internal constant [1 x i8] zeroinitializer
-@.strlit48535 = internal constant [4 x i8] c"exe\00"
-@.strlit48542 = internal constant [4 x i8] c"asm\00"
-@.strlit48548 = internal constant [3 x i8] c".s\00"
-@.strlit48551 = internal constant [3 x i8] c".o\00"
-@.strlit48553 = internal constant [38 x i8] c"OVERVIEW: Vix Compiler LLVM Bootstrap\00"
-@.strlit48554 = internal constant [1 x i8] zeroinitializer
-@.strlit48555 = internal constant [34 x i8] c"USAGE: vixc [options] <input.vix>\00"
-@.strlit48556 = internal constant [1 x i8] zeroinitializer
-@.strlit48557 = internal constant [9 x i8] c"OPTIONS:\00"
-@.strlit48558 = internal constant [48 x i8] c"  -o <file>              Write output to <file>\00"
-@.strlit48559 = internal constant [70 x i8] c"  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)\00"
-@.strlit48560 = internal constant [70 x i8] c"  -S                     Emit assembly to <file> (default: <input>.s)\00"
-@.strlit48561 = internal constant [63 x i8] c"  -obj                   Emit object file (default: <input>.o)\00"
-@.strlit48562 = internal constant [79 x i8] c"  -opt                   Optimize MIR before self-backend codegen/debug output\00"
-@.strlit48563 = internal constant [91 x i8] c"  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)\00"
-@.strlit48564 = internal constant [64 x i8] c"  --backend <llvm|self>  Select codegen backend (default: llvm)\00"
-@.strlit48565 = internal constant [63 x i8] c"  -l<lib>, -l <lib>      Link executable with a system library\00"
-@.strlit48566 = internal constant [58 x i8] c"  -L<dir>, -L <dir>      Add a system library search path\00"
-@.strlit48567 = internal constant [50 x i8] c"  --check                Syntax & type check only\00"
-@.strlit48568 = internal constant [48 x i8] c"  --lex                  Print tokens to stdout\00"
-@.strlit48569 = internal constant [67 x i8] c"  --parse-stats          Print lightweight parser input statistics\00"
-@.strlit48570 = internal constant [52 x i8] c"  --parser               Print parse tree to stdout\00"
-@.strlit48571 = internal constant [51 x i8] c"  --ast / -ast                 Print AST to stdout\00"
-@.strlit48572 = internal constant [63 x i8] c"  --typeinfer            Print type inference result to stdout\00"
-@.strlit48573 = internal constant [59 x i8] c"  --semantic             Print semantic analysis to stdout\00"
-@.strlit48574 = internal constant [70 x i8] c"  --debug=<mir|asm|llvm> Print selected intermediate output to stdout\00"
-@.strlit48575 = internal constant [62 x i8] c"  -v, --version          Display compiler version information\00"
-@.strlit48576 = internal constant [51 x i8] c"  -h, --help             Display this help message\00"
-@.strlit48577 = internal constant [23 x i8] c"vixc 0.4.4 (bootstrap)\00"
-@.strlit48579 = internal constant [5 x i8] c".vix\00"
-@.strlit48597 = internal constant [1 x i8] zeroinitializer
-@.strlit48604 = internal constant [1 x i8] zeroinitializer
-@.strlit48607 = internal constant [1 x i8] zeroinitializer
-@.strlit48613 = internal constant [7 x i8] c"x86_64\00"
-@.strlit48621 = internal constant [6 x i8] c"--lex\00"
-@.strlit48629 = internal constant [14 x i8] c"--parse-stats\00"
-@.strlit48642 = internal constant [9 x i8] c"--parser\00"
-@.strlit48657 = internal constant [6 x i8] c"--ast\00"
-@.strlit48672 = internal constant [5 x i8] c"-ast\00"
-@.strlit48702 = internal constant [11 x i8] c"--semantic\00"
-@.strlit48716 = internal constant [12 x i8] c"--typeinfer\00"
-@.strlit48732 = internal constant [10 x i8] c"--tyinfer\00"
-@.strlit48761 = internal constant [12 x i8] c"--typeinfer\00"
-@.strlit48771 = internal constant [10 x i8] c"--tyinfer\00"
-@.strlit48792 = internal constant [11 x i8] c"debug_llvm\00"
-@.strlit48803 = internal constant [10 x i8] c"debug_mir\00"
-@.strlit48820 = internal constant [10 x i8] c"debug_asm\00"
-@.strlit48841 = internal constant [8 x i8] c"--check\00"
-@.strlit48848 = internal constant [5 x i8] c"self\00"
-@.strlit48854 = internal constant [3 x i8] c"ir\00"
-@.strlit48864 = internal constant [7 x i8] c"stdout\00"
-@.strlit48891 = internal constant [4 x i8] c"asm\00"
-@.strlit48906 = internal constant [9 x i8] c".tmp.asm\00"
-@.strlit48910 = internal constant [5 x i8] c"-obj\00"
-@.strlit48917 = internal constant [7 x i8] c".tmp.o\00"
-@.strlit48923 = internal constant [15 x i8] c"nasm -f elf64 \00"
-@.strlit48926 = internal constant [5 x i8] c" -o \00"
-@.strlit48937 = internal constant [34 x i8] c"vixc: error: failed to assemble '\00"
-@.strlit48940 = internal constant [2 x i8] c"'\00"
-@.strlit48944 = internal constant [5 x i8] c"-obj\00"
-@.strlit48974 = internal constant [1 x i8] zeroinitializer
-@.strlit48982 = internal constant [30 x i8] c"vixc: error: failed to link '\00"
-@.strlit48985 = internal constant [2 x i8] c"'\00"
-@.strlit48994 = internal constant [7 x i8] c"stdout\00"
-@.strlit49001 = internal constant [1 x i8] zeroinitializer
-@.strlit49002 = internal constant [1 x i8] zeroinitializer
-@.strlit49004 = internal constant [3 x i8] c"ir\00"
-@.strlit49017 = internal constant [8 x i8] c".tmp.ll\00"
-@.strlit49023 = internal constant [3 x i8] c"ir\00"
+@.strlit48515 = internal constant [1 x i8] zeroinitializer
+@.strlit48525 = internal constant [4 x i8] c".ll\00"
+@.strlit48528 = internal constant [1 x i8] zeroinitializer
+@.strlit48539 = internal constant [4 x i8] c"exe\00"
+@.strlit48546 = internal constant [4 x i8] c"asm\00"
+@.strlit48552 = internal constant [3 x i8] c".s\00"
+@.strlit48555 = internal constant [3 x i8] c".o\00"
+@.strlit48558 = internal constant [8 x i8] c"-opt=l0\00"
+@.strlit48564 = internal constant [8 x i8] c"-opt=l1\00"
+@.strlit48570 = internal constant [8 x i8] c"-opt=l2\00"
+@.strlit48576 = internal constant [8 x i8] c"-opt=l3\00"
+@.strlit48582 = internal constant [38 x i8] c"OVERVIEW: Vix Compiler LLVM Bootstrap\00"
+@.strlit48583 = internal constant [1 x i8] zeroinitializer
+@.strlit48584 = internal constant [34 x i8] c"USAGE: vixc [options] <input.vix>\00"
+@.strlit48585 = internal constant [1 x i8] zeroinitializer
+@.strlit48586 = internal constant [9 x i8] c"OPTIONS:\00"
+@.strlit48587 = internal constant [48 x i8] c"  -o <file>              Write output to <file>\00"
+@.strlit48588 = internal constant [70 x i8] c"  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)\00"
+@.strlit48589 = internal constant [70 x i8] c"  -S                     Emit assembly to <file> (default: <input>.s)\00"
+@.strlit48590 = internal constant [63 x i8] c"  -obj                   Emit object file (default: <input>.o)\00"
+@.strlit48591 = internal constant [75 x i8] c"  -opt=lN                Optimize LLVM IR with level N (0..3; default: l0)\00"
+@.strlit48592 = internal constant [91 x i8] c"  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)\00"
+@.strlit48593 = internal constant [73 x i8] c"  --backend <llvm|self|self-opt>  Select codegen backend (default: llvm)\00"
+@.strlit48594 = internal constant [63 x i8] c"  -l<lib>, -l <lib>      Link executable with a system library\00"
+@.strlit48595 = internal constant [58 x i8] c"  -L<dir>, -L <dir>      Add a system library search path\00"
+@.strlit48596 = internal constant [50 x i8] c"  --check                Syntax & type check only\00"
+@.strlit48597 = internal constant [48 x i8] c"  --lex                  Print tokens to stdout\00"
+@.strlit48598 = internal constant [67 x i8] c"  --parse-stats          Print lightweight parser input statistics\00"
+@.strlit48599 = internal constant [52 x i8] c"  --parser               Print parse tree to stdout\00"
+@.strlit48600 = internal constant [51 x i8] c"  --ast / -ast                 Print AST to stdout\00"
+@.strlit48601 = internal constant [63 x i8] c"  --typeinfer            Print type inference result to stdout\00"
+@.strlit48602 = internal constant [59 x i8] c"  --semantic             Print semantic analysis to stdout\00"
+@.strlit48603 = internal constant [70 x i8] c"  --debug=<mir|asm|llvm> Print selected intermediate output to stdout\00"
+@.strlit48604 = internal constant [62 x i8] c"  -v, --version          Display compiler version information\00"
+@.strlit48605 = internal constant [51 x i8] c"  -h, --help             Display this help message\00"
+@.strlit48606 = internal constant [23 x i8] c"vixc 0.4.4 (bootstrap)\00"
+@.strlit48608 = internal constant [5 x i8] c".vix\00"
+@.strlit48626 = internal constant [1 x i8] zeroinitializer
+@.strlit48633 = internal constant [1 x i8] zeroinitializer
+@.strlit48636 = internal constant [1 x i8] zeroinitializer
+@.strlit48642 = internal constant [7 x i8] c"x86_64\00"
+@.strlit48650 = internal constant [6 x i8] c"--lex\00"
+@.strlit48658 = internal constant [14 x i8] c"--parse-stats\00"
+@.strlit48671 = internal constant [9 x i8] c"--parser\00"
+@.strlit48686 = internal constant [6 x i8] c"--ast\00"
+@.strlit48701 = internal constant [5 x i8] c"-ast\00"
+@.strlit48731 = internal constant [11 x i8] c"--semantic\00"
+@.strlit48745 = internal constant [12 x i8] c"--typeinfer\00"
+@.strlit48761 = internal constant [10 x i8] c"--tyinfer\00"
+@.strlit48790 = internal constant [12 x i8] c"--typeinfer\00"
+@.strlit48800 = internal constant [10 x i8] c"--tyinfer\00"
+@.strlit48821 = internal constant [11 x i8] c"debug_llvm\00"
+@.strlit48832 = internal constant [10 x i8] c"debug_mir\00"
+@.strlit48849 = internal constant [10 x i8] c"debug_asm\00"
+@.strlit48870 = internal constant [8 x i8] c"--check\00"
+@.strlit48877 = internal constant [5 x i8] c"self\00"
+@.strlit48883 = internal constant [3 x i8] c"ir\00"
+@.strlit48893 = internal constant [7 x i8] c"stdout\00"
+@.strlit48920 = internal constant [4 x i8] c"asm\00"
+@.strlit48935 = internal constant [9 x i8] c".tmp.asm\00"
+@.strlit48939 = internal constant [5 x i8] c"-obj\00"
+@.strlit48946 = internal constant [7 x i8] c".tmp.o\00"
+@.strlit48952 = internal constant [15 x i8] c"nasm -f elf64 \00"
+@.strlit48955 = internal constant [5 x i8] c" -o \00"
+@.strlit48966 = internal constant [34 x i8] c"vixc: error: failed to assemble '\00"
+@.strlit48969 = internal constant [2 x i8] c"'\00"
+@.strlit48973 = internal constant [5 x i8] c"-obj\00"
+@.strlit49003 = internal constant [1 x i8] zeroinitializer
+@.strlit49011 = internal constant [30 x i8] c"vixc: error: failed to link '\00"
+@.strlit49014 = internal constant [2 x i8] c"'\00"
+@.strlit49023 = internal constant [7 x i8] c"stdout\00"
+@.strlit49030 = internal constant [1 x i8] zeroinitializer
 @.strlit49031 = internal constant [1 x i8] zeroinitializer
-@.strlit49041 = internal constant [4 x i8] c"asm\00"
-@.strlit49051 = internal constant [5 x i8] c"-obj\00"
-@.strlit49061 = internal constant [7 x i8] c".tmp.o\00"
-@.strlit49089 = internal constant [3 x i8] c"ir\00"
-@.strlit49105 = internal constant [1 x i8] zeroinitializer
-@.strlit49114 = internal constant [1 x i8] zeroinitializer
-@.strlit49122 = internal constant [31 x i8] c"vixc: error: failed to build '\00"
-@.strlit49125 = internal constant [2 x i8] c"'\00"
-@.strlit49131 = internal constant [2 x i8] c"w\00"
-@.strlit49137 = internal constant [33 x i8] c"vixc: error: cannot write file '\00"
-@.strlit49140 = internal constant [2 x i8] c"'\00"
-@.strlit49148 = internal constant [2 x i8] c"r\00"
-@.strlit49154 = internal constant [1 x i8] zeroinitializer
-@.strlit49175 = internal constant [1 x i8] zeroinitializer
-@.strlit49176 = internal constant [8 x i8] c"codegen\00"
-@.strlit49177 = internal constant [1 x i8] zeroinitializer
-@.strlit49178 = internal constant [4 x i8] c"exe\00"
-@.strlit49179 = internal constant [1 x i8] zeroinitializer
-@.strlit49180 = internal constant [1 x i8] zeroinitializer
-@.strlit49182 = internal constant [5 x i8] c"llvm\00"
-@.strlit49193 = internal constant [3 x i8] c"-h\00"
-@.strlit49199 = internal constant [7 x i8] c"--help\00"
-@.strlit49207 = internal constant [3 x i8] c"-v\00"
-@.strlit49213 = internal constant [10 x i8] c"--version\00"
-@.strlit49221 = internal constant [3 x i8] c"-o\00"
-@.strlit49238 = internal constant [39 x i8] c"vixc: error: '-o' requires an argument\00"
-@.strlit49240 = internal constant [4 x i8] c"-ll\00"
-@.strlit49245 = internal constant [3 x i8] c"ir\00"
-@.strlit49258 = internal constant [5 x i8] c".vix\00"
-@.strlit49264 = internal constant [4 x i8] c".ll\00"
-@.strlit49275 = internal constant [5 x i8] c"-obj\00"
-@.strlit49280 = internal constant [5 x i8] c"-obj\00"
-@.strlit49282 = internal constant [5 x i8] c"-opt\00"
-@.strlit49288 = internal constant [3 x i8] c"-S\00"
-@.strlit49293 = internal constant [4 x i8] c"asm\00"
-@.strlit49295 = internal constant [9 x i8] c"--debug=\00"
-@.strlit49305 = internal constant [4 x i8] c"mir\00"
-@.strlit49310 = internal constant [10 x i8] c"debug_mir\00"
-@.strlit49312 = internal constant [4 x i8] c"asm\00"
-@.strlit49317 = internal constant [10 x i8] c"debug_asm\00"
-@.strlit49319 = internal constant [5 x i8] c"llvm\00"
-@.strlit49324 = internal constant [11 x i8] c"debug_llvm\00"
-@.strlit49325 = internal constant [36 x i8] c"vixc: error: unknown debug output '\00"
-@.strlit49328 = internal constant [2 x i8] c"'\00"
-@.strlit49331 = internal constant [9 x i8] c"--target\00"
-@.strlit49348 = internal constant [45 x i8] c"vixc: error: '--target' requires an argument\00"
-@.strlit49350 = internal constant [10 x i8] c"--backend\00"
-@.strlit49367 = internal constant [46 x i8] c"vixc: error: '--backend' requires an argument\00"
-@.strlit49369 = internal constant [15 x i8] c"--backend=self\00"
-@.strlit49374 = internal constant [5 x i8] c"self\00"
-@.strlit49376 = internal constant [15 x i8] c"--backend=llvm\00"
-@.strlit49381 = internal constant [5 x i8] c"llvm\00"
-@.strlit49383 = internal constant [3 x i8] c"-l\00"
-@.strlit49389 = internal constant [3 x i8] c"-L\00"
-@.strlit49405 = internal constant [2 x i8] c" \00"
-@.strlit49414 = internal constant [15 x i8] c"vixc: error: '\00"
-@.strlit49417 = internal constant [23 x i8] c"' requires an argument\00"
-@.strlit49420 = internal constant [3 x i8] c"-l\00"
-@.strlit49426 = internal constant [3 x i8] c"-L\00"
-@.strlit49434 = internal constant [2 x i8] c" \00"
-@.strlit49439 = internal constant [3 x i8] c".o\00"
-@.strlit49445 = internal constant [2 x i8] c" \00"
-@.strlit49459 = internal constant [7 x i8] c"--help\00"
-@.strlit49465 = internal constant [10 x i8] c"--version\00"
-@.strlit49471 = internal constant [4 x i8] c"-ll\00"
-@.strlit49476 = internal constant [3 x i8] c"ir\00"
-@.strlit49478 = internal constant [5 x i8] c"-obj\00"
-@.strlit49483 = internal constant [5 x i8] c"-obj\00"
-@.strlit49485 = internal constant [3 x i8] c"-S\00"
-@.strlit49490 = internal constant [4 x i8] c"asm\00"
-@.strlit49492 = internal constant [5 x i8] c"-opt\00"
-@.strlit49513 = internal constant [48 x i8] c"vixc: error: multiple input files not supported\00"
-@.strlit49520 = internal constant [48 x i8] c"vixc: error: unrecognized command-line option '\00"
-@.strlit49523 = internal constant [3 x i8] c"'\0A\00"
-@.strlit49541 = internal constant [34 x i8] c"vixc: fatal error: no input files\00"
-@.strlit49542 = internal constant [24 x i8] c"compilation terminated.\00"
-@.strlit49544 = internal constant [1 x i8] zeroinitializer
-@.strlit49549 = internal constant [32 x i8] c"vixc: error: cannot read file '\00"
-@.strlit49552 = internal constant [2 x i8] c"'\00"
-@.strlit49555 = internal constant [5 x i8] c"llvm\00"
-@.strlit49563 = internal constant [5 x i8] c"self\00"
-@.strlit49572 = internal constant [31 x i8] c"vixc: error: unknown backend '\00"
-@.strlit49575 = internal constant [2 x i8] c"'\00"
-@.strlit49578 = internal constant [5 x i8] c"self\00"
-@.strlit49590 = internal constant [62 x i8] c"vixc: error: self backend only supports x86_64 targets, got '\00"
-@.strlit49593 = internal constant [2 x i8] c"'\00"
+@.strlit49032 = internal constant [1 x i8] zeroinitializer
+@.strlit49034 = internal constant [3 x i8] c"ir\00"
+@.strlit49043 = internal constant [12 x i8] c".tmp.raw.ll\00"
+@.strlit49050 = internal constant [12 x i8] c".tmp.raw.ll\00"
+@.strlit49053 = internal constant [8 x i8] c".tmp.ll\00"
+@.strlit49075 = internal constant [1 x i8] zeroinitializer
+@.strlit49083 = internal constant [42 x i8] c"vixc: error: failed to optimize LLVM IR '\00"
+@.strlit49086 = internal constant [2 x i8] c"'\00"
+@.strlit49090 = internal constant [3 x i8] c"ir\00"
+@.strlit49098 = internal constant [1 x i8] zeroinitializer
+@.strlit49108 = internal constant [4 x i8] c"asm\00"
+@.strlit49118 = internal constant [5 x i8] c"-obj\00"
+@.strlit49128 = internal constant [7 x i8] c".tmp.o\00"
+@.strlit49156 = internal constant [3 x i8] c"ir\00"
+@.strlit49173 = internal constant [1 x i8] zeroinitializer
+@.strlit49182 = internal constant [1 x i8] zeroinitializer
+@.strlit49191 = internal constant [1 x i8] zeroinitializer
+@.strlit49199 = internal constant [31 x i8] c"vixc: error: failed to build '\00"
+@.strlit49202 = internal constant [2 x i8] c"'\00"
+@.strlit49208 = internal constant [2 x i8] c"w\00"
+@.strlit49214 = internal constant [33 x i8] c"vixc: error: cannot write file '\00"
+@.strlit49217 = internal constant [2 x i8] c"'\00"
+@.strlit49225 = internal constant [2 x i8] c"r\00"
+@.strlit49231 = internal constant [1 x i8] zeroinitializer
+@.strlit49252 = internal constant [1 x i8] zeroinitializer
+@.strlit49253 = internal constant [8 x i8] c"codegen\00"
+@.strlit49254 = internal constant [1 x i8] zeroinitializer
+@.strlit49255 = internal constant [4 x i8] c"exe\00"
+@.strlit49256 = internal constant [1 x i8] zeroinitializer
+@.strlit49257 = internal constant [1 x i8] zeroinitializer
+@.strlit49259 = internal constant [5 x i8] c"llvm\00"
+@.strlit49270 = internal constant [3 x i8] c"-h\00"
+@.strlit49276 = internal constant [7 x i8] c"--help\00"
+@.strlit49284 = internal constant [3 x i8] c"-v\00"
+@.strlit49290 = internal constant [10 x i8] c"--version\00"
+@.strlit49298 = internal constant [3 x i8] c"-o\00"
+@.strlit49315 = internal constant [39 x i8] c"vixc: error: '-o' requires an argument\00"
+@.strlit49317 = internal constant [4 x i8] c"-ll\00"
+@.strlit49322 = internal constant [3 x i8] c"ir\00"
+@.strlit49335 = internal constant [5 x i8] c".vix\00"
+@.strlit49341 = internal constant [4 x i8] c".ll\00"
+@.strlit49352 = internal constant [5 x i8] c"-obj\00"
+@.strlit49357 = internal constant [5 x i8] c"-obj\00"
+@.strlit49359 = internal constant [6 x i8] c"-opt=\00"
+@.strlit49370 = internal constant [57 x i8] c"vixc: error: expected '-opt=lN' where N is 0, 1, 2, or 3\00"
+@.strlit49372 = internal constant [3 x i8] c"-S\00"
+@.strlit49377 = internal constant [4 x i8] c"asm\00"
+@.strlit49379 = internal constant [9 x i8] c"--debug=\00"
+@.strlit49389 = internal constant [4 x i8] c"mir\00"
+@.strlit49394 = internal constant [10 x i8] c"debug_mir\00"
+@.strlit49396 = internal constant [4 x i8] c"asm\00"
+@.strlit49401 = internal constant [10 x i8] c"debug_asm\00"
+@.strlit49403 = internal constant [5 x i8] c"llvm\00"
+@.strlit49408 = internal constant [11 x i8] c"debug_llvm\00"
+@.strlit49409 = internal constant [36 x i8] c"vixc: error: unknown debug output '\00"
+@.strlit49412 = internal constant [2 x i8] c"'\00"
+@.strlit49415 = internal constant [9 x i8] c"--target\00"
+@.strlit49432 = internal constant [45 x i8] c"vixc: error: '--target' requires an argument\00"
+@.strlit49434 = internal constant [10 x i8] c"--backend\00"
+@.strlit49452 = internal constant [9 x i8] c"self-opt\00"
+@.strlit49457 = internal constant [5 x i8] c"self\00"
+@.strlit49459 = internal constant [5 x i8] c"llvm\00"
+@.strlit49464 = internal constant [46 x i8] c"vixc: error: '--backend' requires an argument\00"
+@.strlit49466 = internal constant [15 x i8] c"--backend=self\00"
+@.strlit49471 = internal constant [5 x i8] c"self\00"
+@.strlit49473 = internal constant [19 x i8] c"--backend=self-opt\00"
+@.strlit49478 = internal constant [5 x i8] c"self\00"
+@.strlit49480 = internal constant [15 x i8] c"--backend=llvm\00"
+@.strlit49485 = internal constant [5 x i8] c"llvm\00"
+@.strlit49487 = internal constant [3 x i8] c"-l\00"
+@.strlit49493 = internal constant [3 x i8] c"-L\00"
+@.strlit49509 = internal constant [2 x i8] c" \00"
+@.strlit49518 = internal constant [15 x i8] c"vixc: error: '\00"
+@.strlit49521 = internal constant [23 x i8] c"' requires an argument\00"
+@.strlit49524 = internal constant [3 x i8] c"-l\00"
+@.strlit49530 = internal constant [3 x i8] c"-L\00"
+@.strlit49538 = internal constant [2 x i8] c" \00"
+@.strlit49543 = internal constant [3 x i8] c".o\00"
+@.strlit49549 = internal constant [2 x i8] c" \00"
+@.strlit49563 = internal constant [7 x i8] c"--help\00"
+@.strlit49569 = internal constant [10 x i8] c"--version\00"
+@.strlit49575 = internal constant [4 x i8] c"-ll\00"
+@.strlit49580 = internal constant [3 x i8] c"ir\00"
+@.strlit49582 = internal constant [5 x i8] c"-obj\00"
+@.strlit49587 = internal constant [5 x i8] c"-obj\00"
+@.strlit49589 = internal constant [3 x i8] c"-S\00"
+@.strlit49594 = internal constant [4 x i8] c"asm\00"
+@.strlit49611 = internal constant [48 x i8] c"vixc: error: multiple input files not supported\00"
+@.strlit49618 = internal constant [48 x i8] c"vixc: error: unrecognized command-line option '\00"
+@.strlit49621 = internal constant [3 x i8] c"'\0A\00"
+@.strlit49639 = internal constant [34 x i8] c"vixc: fatal error: no input files\00"
+@.strlit49640 = internal constant [24 x i8] c"compilation terminated.\00"
+@.strlit49642 = internal constant [1 x i8] zeroinitializer
+@.strlit49647 = internal constant [32 x i8] c"vixc: error: cannot read file '\00"
+@.strlit49650 = internal constant [2 x i8] c"'\00"
+@.strlit49653 = internal constant [5 x i8] c"llvm\00"
+@.strlit49661 = internal constant [5 x i8] c"self\00"
+@.strlit49670 = internal constant [31 x i8] c"vixc: error: unknown backend '\00"
+@.strlit49673 = internal constant [2 x i8] c"'\00"
+@.strlit49676 = internal constant [5 x i8] c"self\00"
+@.strlit49688 = internal constant [62 x i8] c"vixc: error: self backend only supports x86_64 targets, got '\00"
+@.strlit49691 = internal constant [2 x i8] c"'\00"
 
 declare i32 @printf(ptr, ...)
 
@@ -4434,6 +4451,10 @@ declare i32 @vix_api_link_executable_std(ptr, ptr, ptr, ptr)
 declare i32 @vix_api_link_executable_nostd(ptr, ptr, ptr)
 
 declare ptr @vix_api_link_error()
+
+declare i32 @vix_api_optimize_ir(ptr, ptr, ptr, i32)
+
+declare ptr @vix_api_passes_error()
 
 declare i32 @fputs(ptr, ptr)
 
@@ -4778,7 +4799,7 @@ or.rhs:                                           ; preds = %entry
   %cond148 = icmp ne i32 %bool147, 0
   br i1 %cond148, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval149 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond150 = icmp ne i32 %orval149, 0
   br i1 %cond150, label %if.then0, label %if.else1
@@ -4831,7 +4852,7 @@ or.rhs:                                           ; preds = %and.merge
   %cond174 = icmp ne i32 %bool173, 0
   br i1 %cond174, label %and.rhs1, label %and.false2
 
-or.merge:                                         ; preds = %or.true, %and.merge3
+or.merge:                                         ; preds = %and.merge3, %or.true
   %orval182 = phi i32 [ 1, %or.true ], [ 0, %and.merge3 ]
   %cond183 = icmp ne i32 %orval182, 0
   br i1 %cond183, label %or.true4, label %or.rhs5
@@ -4863,7 +4884,7 @@ or.rhs5:                                          ; preds = %or.merge
   %cond188 = icmp ne i32 %bool187, 0
   br i1 %cond188, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval189 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond190 = icmp ne i32 %orval189, 0
   br i1 %cond190, label %if.then3, label %if.else4
@@ -4937,7 +4958,7 @@ or.rhs:                                           ; preds = %entry
   %cond212 = icmp ne i32 %bool211, 0
   br i1 %cond212, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval213 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond214 = icmp ne i32 %orval213, 0
   br i1 %cond214, label %if.then9, label %if.else10
@@ -4999,7 +5020,7 @@ or.rhs:                                           ; preds = %entry
   %cond232 = icmp ne i32 %bool231, 0
   br i1 %cond232, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval233 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond234 = icmp ne i32 %orval233, 0
   br i1 %cond234, label %or.true1, label %or.rhs2
@@ -5015,7 +5036,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond239 = icmp ne i32 %bool238, 0
   br i1 %cond239, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval240 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond241 = icmp ne i32 %orval240, 0
   br i1 %cond241, label %or.true4, label %or.rhs5
@@ -5031,7 +5052,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond246 = icmp ne i32 %bool245, 0
   br i1 %cond246, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval247 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond248 = icmp ne i32 %orval247, 0
   br i1 %cond248, label %or.true7, label %or.rhs8
@@ -5047,7 +5068,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond253 = icmp ne i32 %bool252, 0
   br i1 %cond253, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval254 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond255 = icmp ne i32 %orval254, 0
   br i1 %cond255, label %if.then12, label %if.else13
@@ -5072,7 +5093,7 @@ or.rhs11:                                         ; preds = %if.end14
   %cond267 = icmp ne i32 %bool266, 0
   br i1 %cond267, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval268 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond269 = icmp ne i32 %orval268, 0
   br i1 %cond269, label %or.true13, label %or.rhs14
@@ -5088,7 +5109,7 @@ or.rhs14:                                         ; preds = %or.merge12
   %cond275 = icmp ne i32 %bool274, 0
   br i1 %cond275, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval276 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond277 = icmp ne i32 %orval276, 0
   br i1 %cond277, label %or.true16, label %or.rhs17
@@ -5104,7 +5125,7 @@ or.rhs17:                                         ; preds = %or.merge15
   %cond283 = icmp ne i32 %bool282, 0
   br i1 %cond283, label %or.true16, label %or.merge18
 
-or.merge18:                                       ; preds = %or.true16, %or.rhs17
+or.merge18:                                       ; preds = %or.rhs17, %or.true16
   %orval284 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
   %cond285 = icmp ne i32 %orval284, 0
   br i1 %cond285, label %or.true19, label %or.rhs20
@@ -5120,7 +5141,7 @@ or.rhs20:                                         ; preds = %or.merge18
   %cond291 = icmp ne i32 %bool290, 0
   br i1 %cond291, label %or.true19, label %or.merge21
 
-or.merge21:                                       ; preds = %or.true19, %or.rhs20
+or.merge21:                                       ; preds = %or.rhs20, %or.true19
   %orval292 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
   %cond293 = icmp ne i32 %orval292, 0
   br i1 %cond293, label %or.true22, label %or.rhs23
@@ -5136,7 +5157,7 @@ or.rhs23:                                         ; preds = %or.merge21
   %cond299 = icmp ne i32 %bool298, 0
   br i1 %cond299, label %or.true22, label %or.merge24
 
-or.merge24:                                       ; preds = %or.true22, %or.rhs23
+or.merge24:                                       ; preds = %or.rhs23, %or.true22
   %orval300 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
   %cond301 = icmp ne i32 %orval300, 0
   br i1 %cond301, label %if.then15, label %if.else16
@@ -5210,7 +5231,7 @@ or.rhs:                                           ; preds = %while.body19
   %cond324 = icmp ne i32 %bool323, 0
   br i1 %cond324, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval325 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond326 = icmp ne i32 %orval325, 0
   br i1 %cond326, label %or.true1, label %or.rhs2
@@ -5229,7 +5250,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond334 = icmp ne i32 %bool333, 0
   br i1 %cond334, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval335 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond336 = icmp ne i32 %orval335, 0
   br i1 %cond336, label %or.true4, label %or.rhs5
@@ -5248,7 +5269,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond344 = icmp ne i32 %bool343, 0
   br i1 %cond344, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval345 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond346 = icmp ne i32 %orval345, 0
   br i1 %cond346, label %if.then21, label %if.else22
@@ -5447,7 +5468,7 @@ or.rhs:                                           ; preds = %match.body38
   %cond439 = icmp ne i32 %bool438, 0
   br i1 %cond439, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval440 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond441 = icmp ne i32 %orval440, 0
   br i1 %cond441, label %or.true1, label %or.rhs2
@@ -5463,7 +5484,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond446 = icmp ne i32 %bool445, 0
   br i1 %cond446, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval447 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond448 = icmp ne i32 %orval447, 0
   br i1 %cond448, label %or.true4, label %or.rhs5
@@ -5479,7 +5500,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond453 = icmp ne i32 %bool452, 0
   br i1 %cond453, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval454 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond455 = icmp ne i32 %orval454, 0
   br i1 %cond455, label %if.then40, label %if.else41
@@ -6006,7 +6027,7 @@ if.else132:                                       ; preds = %and.merge
   store i32 %add724, ptr %column, align 4
   br label %if.end133
 
-if.end133:                                        ; preds = %if.else132, %while.end136
+if.end133:                                        ; preds = %while.end136, %if.else132
   br label %match.end116
 
 and.rhs:                                          ; preds = %match.body129
@@ -6109,7 +6130,7 @@ if.then139:                                       ; preds = %match.body137
 if.else140:                                       ; preds = %match.body137
   br label %if.end141
 
-if.end141:                                        ; preds = %if.else140, %if.end144
+if.end141:                                        ; preds = %if.end144, %if.else140
   %load841 = load i32, ptr %pos, align 4
   %load842 = load ptr, ptr %src, align 8
   %strlen843 = call i32 @strlen(ptr %load842)
@@ -6149,7 +6170,7 @@ if.else143:                                       ; preds = %and.merge6
   store i32 %add840, ptr %column, align 4
   br label %if.end144
 
-if.end144:                                        ; preds = %if.else143, %if.end147
+if.end144:                                        ; preds = %if.end147, %if.else143
   br label %if.end141
 
 and.rhs4:                                         ; preds = %if.then139
@@ -6476,7 +6497,7 @@ if.else173:                                       ; preds = %and.merge25
   store i32 %add999, ptr %column, align 4
   br label %if.end174
 
-if.end174:                                        ; preds = %if.else173, %if.end177
+if.end174:                                        ; preds = %if.end177, %if.else173
   br label %while.cond169
 
 and.rhs23:                                        ; preds = %while.body170
@@ -6934,7 +6955,7 @@ if.else215:                                       ; preds = %and.merge58
   call void @stream_push(ptr %stream, i32 %call1216, ptr @.strlit1217, i32 %load1218, i32 %load1219, i32 %load1220)
   br label %if.end216
 
-if.end216:                                        ; preds = %if.else215, %while.end219
+if.end216:                                        ; preds = %while.end219, %if.else215
   br label %if.end210
 
 and.rhs50:                                        ; preds = %while.end213
@@ -7067,7 +7088,7 @@ if.then220:                                       ; preds = %if.else209
 if.else221:                                       ; preds = %if.else209
   br label %if.end222
 
-if.end222:                                        ; preds = %if.else221, %match.end223
+if.end222:                                        ; preds = %match.end223, %if.else221
   %call1361 = call i32 @tk_symbol()
   %load1362 = load ptr, ptr %symbol, align 8
   %load1363 = load i32, ptr %line, align 4
@@ -7083,7 +7104,7 @@ if.end222:                                        ; preds = %if.else221, %match.
   store i32 %add1370, ptr %column, align 4
   br label %if.end210
 
-match.end223:                                     ; preds = %match.test273, %if.end276, %if.end271, %if.end263, %if.end258, %if.end250, %if.end242, %if.end237, %if.end229
+match.end223:                                     ; preds = %if.end276, %match.test273, %if.end271, %if.end263, %if.end258, %if.end250, %if.end242, %if.end237, %if.end229
   %load1359 = load ptr, ptr %symbol, align 8
   %strlen1360 = call i32 @strlen(ptr %load1359)
   store i32 %strlen1360, ptr %symbol_len, align 4
@@ -8267,7 +8288,7 @@ or.rhs:                                           ; preds = %while.cond308
   %cond1962 = icmp ne i32 %bool1961, 0
   br i1 %cond1962, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval1963 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond1964 = icmp ne i32 %orval1963, 0
   br i1 %cond1964, label %while.body309, label %while.end310
@@ -9500,7 +9521,7 @@ if.then322:                                       ; preds = %entry
 if.else323:                                       ; preds = %entry
   br label %if.end324
 
-if.end324:                                        ; preds = %if.else323, %for.end328
+if.end324:                                        ; preds = %for.end328, %if.else323
   %load3075 = load %AstFunction, ptr %entry1, align 8
   %insert3076 = insertvalue %AstProgram undef, %AstFunction %load3075, 0
   %load3077 = load ptr, ptr %functions, align 8
@@ -9986,7 +10007,7 @@ or.rhs:                                           ; preds = %for.body375
   %cond3332 = icmp ne i32 %bool3331, 0
   br i1 %cond3332, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval3333 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond3334 = icmp ne i32 %orval3333, 0
   br i1 %cond3334, label %if.then379, label %if.else380
@@ -10821,7 +10842,7 @@ if.then481:                                       ; preds = %for.body477
 if.else482:                                       ; preds = %for.body477
   br label %if.end483
 
-if.end483:                                        ; preds = %if.else482, %if.end486
+if.end483:                                        ; preds = %if.end486, %if.else482
   br label %for.step478
 
 if.then484:                                       ; preds = %if.then481
@@ -13171,7 +13192,7 @@ if.then689:                                       ; preds = %entry
 if.else690:                                       ; preds = %entry
   br label %if.end691
 
-if.end691:                                        ; preds = %if.else690, %for.end695
+if.end691:                                        ; preds = %for.end695, %if.else690
   %load5341 = load ptr, ptr %out, align 8
   %load5342 = load ptr, ptr %indent1, align 8
   %call5343 = call ptr @vix_string_concat(ptr %load5341, ptr %load5342)
@@ -13332,7 +13353,7 @@ if.then708:                                       ; preds = %if.end707
 if.else709:                                       ; preds = %if.end707
   br label %if.end710
 
-if.end710:                                        ; preds = %if.else709, %for.end714
+if.end710:                                        ; preds = %for.end714, %if.else709
   %load5466 = load %AstProgram, ptr %program, align 8
   %extract5467 = extractvalue %AstProgram %load5466, 4
   %call5468 = call i32 @vix_array_len(ptr %extract5467)
@@ -13425,7 +13446,7 @@ if.then719:                                       ; preds = %if.end710
 if.else720:                                       ; preds = %if.end710
   br label %if.end721
 
-if.end721:                                        ; preds = %if.else720, %for.end725
+if.end721:                                        ; preds = %for.end725, %if.else720
   %load5493 = load %AstProgram, ptr %program, align 8
   %extract5494 = extractvalue %AstProgram %load5493, 5
   %call5495 = call i32 @vix_array_len(ptr %extract5494)
@@ -13479,7 +13500,7 @@ if.then727:                                       ; preds = %if.end721
 if.else728:                                       ; preds = %if.end721
   br label %if.end729
 
-if.end729:                                        ; preds = %if.else728, %for.end733
+if.end729:                                        ; preds = %for.end733, %if.else728
   %load5520 = load %AstProgram, ptr %program, align 8
   %extract5521 = extractvalue %AstProgram %load5520, 2
   %call5522 = call i32 @vix_array_len(ptr %extract5521)
@@ -13533,7 +13554,7 @@ if.then735:                                       ; preds = %if.end729
 if.else736:                                       ; preds = %if.end729
   br label %if.end737
 
-if.end737:                                        ; preds = %if.else736, %for.end741
+if.end737:                                        ; preds = %for.end741, %if.else736
   %load5551 = load ptr, ptr %out, align 8
   %call5553 = call ptr @vix_string_concat(ptr %load5551, ptr @.strlit5552)
   store ptr %call5553, ptr %out, align 8
@@ -14856,7 +14877,7 @@ if.then948:                                       ; preds = %while.end941
 if.else949:                                       ; preds = %while.end941
   br label %if.end950
 
-if.end950:                                        ; preds = %if.else949, %if.end953
+if.end950:                                        ; preds = %if.end953, %if.else949
   %load6164 = load i32, ptr %line_start, align 4
   %end = alloca i32, align 4
   store i32 %load6164, ptr %end, align 4
@@ -15139,7 +15160,7 @@ if.else974:                                       ; preds = %for.body969
   store i32 %add6271, ptr %col, align 4
   br label %if.end975
 
-if.end975:                                        ; preds = %if.else974, %while.end978
+if.end975:                                        ; preds = %while.end978, %if.else974
   br label %for.step970
 
 while.cond976:                                    ; preds = %while.body977, %if.then973
@@ -15817,7 +15838,7 @@ or.rhs:                                           ; preds = %entry
   %cond6527 = icmp ne i32 %bool6526, 0
   br i1 %cond6527, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval6528 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond6529 = icmp ne i32 %orval6528, 0
   br i1 %cond6529, label %if.then1050, label %if.else1051
@@ -15880,7 +15901,7 @@ if.then1056:                                      ; preds = %ifexpr.end1055
 if.else1057:                                      ; preds = %ifexpr.end1055
   br label %if.end1058
 
-if.end1058:                                       ; preds = %if.else1057, %if.end1061
+if.end1058:                                       ; preds = %if.end1061, %if.else1057
   %load6590 = load ptr, ptr %src, align 8
   %load6591 = load i32, ptr %line, align 4
   %call6592 = call ptr @source_get_line(ptr %load6590, i32 %load6591)
@@ -16924,7 +16945,7 @@ if.then1145:                                      ; preds = %entry
 if.else1146:                                      ; preds = %entry
   br label %if.end1147
 
-if.end1147:                                       ; preds = %if.else1146, %while.end1150
+if.end1147:                                       ; preds = %while.end1150, %if.else1146
   %load7197 = load i32, ptr %start, align 4
   %i = alloca i32, align 4
   store i32 %load7197, ptr %i, align 4
@@ -17127,7 +17148,7 @@ and.rhs7:                                         ; preds = %while.cond1165
 and.false8:                                       ; preds = %or.merge, %while.cond1165
   br label %and.merge9
 
-and.merge9:                                       ; preds = %and.false8, %or.merge
+and.merge9:                                       ; preds = %or.merge, %and.false8
   %andval7256 = phi i32 [ 1, %or.merge ], [ 0, %and.false8 ]
   %cond7257 = icmp ne i32 %andval7256, 0
   br i1 %cond7257, label %while.body1166, label %while.end1167
@@ -17146,7 +17167,7 @@ or.rhs:                                           ; preds = %and.rhs7
   %cond7253 = icmp ne i32 %bool7252, 0
   br i1 %cond7253, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval7254 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond7255 = icmp ne i32 %orval7254, 0
   br i1 %cond7255, label %and.merge9, label %and.false8
@@ -17177,7 +17198,7 @@ or.rhs11:                                         ; preds = %while.end1167
   %cond7273 = icmp ne i32 %bool7272, 0
   br i1 %cond7273, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval7274 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond7275 = icmp ne i32 %orval7274, 0
   br i1 %cond7275, label %if.then1168, label %if.else1169
@@ -17270,7 +17291,7 @@ or.rhs20:                                         ; preds = %while.end1173
   %cond7320 = icmp ne i32 %bool7319, 0
   br i1 %cond7320, label %or.true19, label %or.merge21
 
-or.merge21:                                       ; preds = %or.true19, %or.rhs20
+or.merge21:                                       ; preds = %or.rhs20, %or.true19
   %orval7321 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
   %cond7322 = icmp ne i32 %orval7321, 0
   br i1 %cond7322, label %if.then1174, label %if.else1175
@@ -17382,7 +17403,7 @@ and.rhs:                                          ; preds = %while.cond1183
 and.false:                                        ; preds = %or.merge, %while.cond1183
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge
+and.merge:                                        ; preds = %or.merge, %and.false
   %andval7379 = phi i32 [ 1, %or.merge ], [ 0, %and.false ]
   %cond7380 = icmp ne i32 %andval7379, 0
   br i1 %cond7380, label %while.body1184, label %while.end1185
@@ -17401,7 +17422,7 @@ or.rhs:                                           ; preds = %and.rhs
   %cond7376 = icmp ne i32 %bool7375, 0
   br i1 %cond7376, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval7377 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond7378 = icmp ne i32 %orval7377, 0
   br i1 %cond7378, label %and.merge, label %and.false
@@ -17434,7 +17455,7 @@ or.rhs2:                                          ; preds = %while.end1185
   %cond7396 = icmp ne i32 %bool7395, 0
   br i1 %cond7396, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval7397 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond7398 = icmp ne i32 %orval7397, 0
   br i1 %cond7398, label %if.then1186, label %if.else1187
@@ -17739,7 +17760,7 @@ or.rhs:                                           ; preds = %entry
   %cond7536 = icmp ne i32 %bool7535, 0
   br i1 %cond7536, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval7537 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond7538 = icmp ne i32 %orval7537, 0
   br i1 %cond7538, label %or.true1, label %or.rhs2
@@ -17755,7 +17776,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond7543 = icmp ne i32 %bool7542, 0
   br i1 %cond7543, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval7544 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond7545 = icmp ne i32 %orval7544, 0
   br i1 %cond7545, label %or.true4, label %or.rhs5
@@ -17771,7 +17792,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond7550 = icmp ne i32 %bool7549, 0
   br i1 %cond7550, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval7551 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond7552 = icmp ne i32 %orval7551, 0
   br i1 %cond7552, label %if.then1211, label %if.else1212
@@ -17808,7 +17829,7 @@ or.rhs:                                           ; preds = %entry
   %cond7562 = icmp ne i32 %bool7561, 0
   br i1 %cond7562, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval7563 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond7564 = icmp ne i32 %orval7563, 0
   br i1 %cond7564, label %or.true1, label %or.rhs2
@@ -17824,7 +17845,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond7569 = icmp ne i32 %bool7568, 0
   br i1 %cond7569, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval7570 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond7571 = icmp ne i32 %orval7570, 0
   br i1 %cond7571, label %if.then1214, label %if.else1215
@@ -17925,7 +17946,7 @@ or.rhs:                                           ; preds = %entry
   %cond7605 = icmp ne i32 %bool7604, 0
   br i1 %cond7605, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval7606 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond7607 = icmp ne i32 %orval7606, 0
   br i1 %cond7607, label %if.then1220, label %if.else1221
@@ -18024,7 +18045,7 @@ or.rhs:                                           ; preds = %entry
   %cond7647 = icmp ne i32 %bool7646, 0
   br i1 %cond7647, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval7648 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond7649 = icmp ne i32 %orval7648, 0
   br i1 %cond7649, label %if.then1231, label %if.else1232
@@ -18632,7 +18653,7 @@ if.then1297:                                      ; preds = %and.merge
 if.else1298:                                      ; preds = %and.merge
   br label %if.end1299
 
-if.end1299:                                       ; preds = %if.else1298, %if.end1308
+if.end1299:                                       ; preds = %if.end1308, %if.else1298
   %load7989 = load i32, ptr %p, align 4
   %add7990 = add i32 %load7989, 1
   store i32 %add7990, ptr %p, align 4
@@ -18857,7 +18878,7 @@ or.rhs:                                           ; preds = %while.body1316
   %cond8032 = icmp ne i32 %bool8031, 0
   br i1 %cond8032, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval8033 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond8034 = icmp ne i32 %orval8033, 0
   br i1 %cond8034, label %or.true1, label %or.rhs2
@@ -18876,7 +18897,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond8042 = icmp ne i32 %bool8041, 0
   br i1 %cond8042, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval8043 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond8044 = icmp ne i32 %orval8043, 0
   br i1 %cond8044, label %or.true4, label %or.rhs5
@@ -18895,7 +18916,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond8052 = icmp ne i32 %bool8051, 0
   br i1 %cond8052, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval8053 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond8054 = icmp ne i32 %orval8053, 0
   br i1 %cond8054, label %if.then1318, label %if.else1319
@@ -18918,7 +18939,7 @@ if.then1321:                                      ; preds = %while.end1317
 if.else1322:                                      ; preds = %while.end1317
   br label %if.end1323
 
-if.end1323:                                       ; preds = %if.else1322, %if.end1326
+if.end1323:                                       ; preds = %if.end1326, %if.else1322
   %load8074 = load ptr, ptr %text, align 8
   ret ptr %load8074
 
@@ -19805,7 +19826,7 @@ entry:
   store i32 0, ptr %changed, align 4
   br label %while.cond1411
 
-while.cond1411:                                   ; preds = %if.end1416, %if.end1455, %if.end1425, %entry
+while.cond1411:                                   ; preds = %if.end1455, %if.end1425, %if.end1416, %entry
   %load8487 = load i32, ptr %i, align 4
   %load8488 = load ptr, ptr %src, align 8
   %strlen8489 = call i32 @strlen(ptr %load8488)
@@ -19961,7 +19982,7 @@ if.then1426:                                      ; preds = %and.merge9
 if.else1427:                                      ; preds = %and.merge9
   br label %if.end1428
 
-if.end1428:                                       ; preds = %if.else1427, %if.end1434
+if.end1428:                                       ; preds = %if.end1434, %if.else1427
   br label %if.end1416
 
 and.rhs4:                                         ; preds = %if.else1415
@@ -20077,7 +20098,7 @@ if.then1432:                                      ; preds = %while.end1431
 if.else1433:                                      ; preds = %while.end1431
   br label %if.end1434
 
-if.end1434:                                       ; preds = %if.else1433, %if.end1443
+if.end1434:                                       ; preds = %if.end1443, %if.else1433
   br label %if.end1428
 
 ifexpr.then1435:                                  ; preds = %if.then1432
@@ -20139,7 +20160,7 @@ if.then1441:                                      ; preds = %and.merge15
 if.else1442:                                      ; preds = %and.merge15
   br label %if.end1443
 
-if.end1443:                                       ; preds = %if.else1442, %if.end1446
+if.end1443:                                       ; preds = %if.end1446, %if.else1442
   br label %if.end1434
 
 and.rhs13:                                        ; preds = %ifexpr.end1440
@@ -20463,7 +20484,7 @@ entry:
   store i32 0, ptr %segment_start, align 4
   br label %while.cond1473
 
-while.cond1473:                                   ; preds = %if.end1493, %if.end1499, %while.end1490, %if.end1481, %entry
+while.cond1473:                                   ; preds = %if.end1499, %if.end1493, %while.end1490, %if.end1481, %entry
   %load8820 = load i32, ptr %i, align 4
   %load8821 = load ptr, ptr %src, align 8
   %strlen8822 = call i32 @strlen(ptr %load8821)
@@ -20663,7 +20684,7 @@ and.rhs4:                                         ; preds = %while.cond1488
 and.false5:                                       ; preds = %or.merge, %while.cond1488
   br label %and.merge6
 
-and.merge6:                                       ; preds = %and.false5, %or.merge
+and.merge6:                                       ; preds = %or.merge, %and.false5
   %andval8915 = phi i32 [ 1, %or.merge ], [ 0, %and.false5 ]
   %cond8916 = icmp ne i32 %andval8915, 0
   br i1 %cond8916, label %while.body1489, label %while.end1490
@@ -20682,7 +20703,7 @@ or.rhs:                                           ; preds = %and.rhs4
   %cond8912 = icmp ne i32 %bool8911, 0
   br i1 %cond8912, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval8913 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond8914 = icmp ne i32 %orval8913, 0
   br i1 %cond8914, label %and.merge6, label %and.false5
@@ -20749,7 +20770,7 @@ if.then1497:                                      ; preds = %if.end1496
 if.else1498:                                      ; preds = %if.end1496
   br label %if.end1499
 
-if.end1499:                                       ; preds = %if.else1498, %if.end1502
+if.end1499:                                       ; preds = %if.end1502, %if.else1498
   %load8987 = load i32, ptr %import_end, align 4
   store i32 %load8987, ptr %i, align 4
   %load8988 = load i32, ptr %i, align 4
@@ -20776,7 +20797,7 @@ if.then1500:                                      ; preds = %if.then1497
 if.else1501:                                      ; preds = %if.then1497
   br label %if.end1502
 
-if.end1502:                                       ; preds = %if.else1501, %if.end1505
+if.end1502:                                       ; preds = %if.end1505, %if.else1501
   br label %if.end1499
 
 if.then1503:                                      ; preds = %if.then1500
@@ -21105,7 +21126,7 @@ if.then1521:                                      ; preds = %entry
 if.else1522:                                      ; preds = %entry
   br label %if.end1523
 
-if.end1523:                                       ; preds = %if.else1522, %if.end1529
+if.end1523:                                       ; preds = %if.end1529, %if.else1522
   ret void
 
 if.then1524:                                      ; preds = %and.merge57
@@ -21498,7 +21519,7 @@ if.then1527:                                      ; preds = %if.end1526
 if.else1528:                                      ; preds = %if.end1526
   br label %if.end1529
 
-if.end1529:                                       ; preds = %if.else1528, %if.end1532
+if.end1529:                                       ; preds = %if.end1532, %if.else1528
   %load9380 = load ptr, ptr %parser, align 8
   %fieldptr9382 = getelementptr %Parser, ptr %load9380, i32 0, i32 3
   %load9383 = load ptr, ptr %parser, align 8
@@ -22112,7 +22133,7 @@ and.rhs:                                          ; preds = %if.end1580
 and.false:                                        ; preds = %or.merge12, %if.end1580
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge12
+and.merge:                                        ; preds = %or.merge12, %and.false
   %andval9715 = phi i32 [ 1, %or.merge12 ], [ 0, %and.false ]
   %cond9716 = icmp ne i32 %andval9715, 0
   br i1 %cond9716, label %if.then1581, label %if.else1582
@@ -22129,7 +22150,7 @@ or.rhs:                                           ; preds = %and.rhs
   %cond9676 = icmp ne i32 %bool9675, 0
   br i1 %cond9676, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval9677 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond9678 = icmp ne i32 %orval9677, 0
   br i1 %cond9678, label %or.true1, label %or.rhs2
@@ -22146,7 +22167,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond9685 = icmp ne i32 %bool9684, 0
   br i1 %cond9685, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval9686 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond9687 = icmp ne i32 %orval9686, 0
   br i1 %cond9687, label %or.true4, label %or.rhs5
@@ -22163,7 +22184,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond9694 = icmp ne i32 %bool9693, 0
   br i1 %cond9694, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval9695 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond9696 = icmp ne i32 %orval9695, 0
   br i1 %cond9696, label %or.true7, label %or.rhs8
@@ -22180,7 +22201,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond9703 = icmp ne i32 %bool9702, 0
   br i1 %cond9703, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval9704 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond9705 = icmp ne i32 %orval9704, 0
   br i1 %cond9705, label %or.true10, label %or.rhs11
@@ -22197,7 +22218,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond9712 = icmp ne i32 %bool9711, 0
   br i1 %cond9712, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval9713 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond9714 = icmp ne i32 %orval9713, 0
   br i1 %cond9714, label %and.merge, label %and.false
@@ -22299,7 +22320,7 @@ and.rhs:                                          ; preds = %while.cond1590
 and.false:                                        ; preds = %or.merge, %while.cond1590
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge
+and.merge:                                        ; preds = %or.merge, %and.false
   %andval9778 = phi i32 [ 1, %or.merge ], [ 0, %and.false ]
   %cond9779 = icmp ne i32 %andval9778, 0
   br i1 %cond9779, label %while.body1591, label %while.end1592
@@ -22316,7 +22337,7 @@ or.rhs:                                           ; preds = %and.rhs
   %cond9775 = icmp ne i32 %bool9774, 0
   br i1 %cond9775, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval9776 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond9777 = icmp ne i32 %orval9776, 0
   br i1 %cond9777, label %and.merge, label %and.false
@@ -22419,7 +22440,7 @@ and.rhs:                                          ; preds = %while.cond1599
 and.false:                                        ; preds = %or.merge, %while.cond1599
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge
+and.merge:                                        ; preds = %or.merge, %and.false
   %andval9841 = phi i32 [ 1, %or.merge ], [ 0, %and.false ]
   %cond9842 = icmp ne i32 %andval9841, 0
   br i1 %cond9842, label %while.body1600, label %while.end1601
@@ -22436,7 +22457,7 @@ or.rhs:                                           ; preds = %and.rhs
   %cond9838 = icmp ne i32 %bool9837, 0
   br i1 %cond9838, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval9839 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond9840 = icmp ne i32 %orval9839, 0
   br i1 %cond9840, label %and.merge, label %and.false
@@ -22539,7 +22560,7 @@ and.rhs:                                          ; preds = %while.cond1608
 and.false:                                        ; preds = %or.merge3, %while.cond1608
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge3
+and.merge:                                        ; preds = %or.merge3, %and.false
   %andval9913 = phi i32 [ 1, %or.merge3 ], [ 0, %and.false ]
   %cond9914 = icmp ne i32 %andval9913, 0
   br i1 %cond9914, label %while.body1609, label %while.end1610
@@ -22556,7 +22577,7 @@ or.rhs:                                           ; preds = %and.rhs
   %cond9901 = icmp ne i32 %bool9900, 0
   br i1 %cond9901, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval9902 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond9903 = icmp ne i32 %orval9902, 0
   br i1 %cond9903, label %or.true1, label %or.rhs2
@@ -22573,7 +22594,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond9910 = icmp ne i32 %bool9909, 0
   br i1 %cond9910, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval9911 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond9912 = icmp ne i32 %orval9911, 0
   br i1 %cond9912, label %and.merge, label %and.false
@@ -22625,7 +22646,7 @@ if.end1616:                                       ; preds = %if.else1615
   %matchres9954 = alloca i32, align 4
   br label %match.test1618
 
-match.end1617:                                    ; preds = %match.test1635, %if.end1638, %if.end1633, %if.end1628, %if.end1623
+match.end1617:                                    ; preds = %if.end1638, %match.test1635, %if.end1633, %if.end1628, %if.end1623
   %matchval10074 = load i32, ptr %matchres9954, align 4
   ret i32 %matchval10074
 
@@ -23280,7 +23301,7 @@ if.then1876:                                      ; preds = %if.then1873
 if.else1877:                                      ; preds = %if.then1873
   br label %if.end1878
 
-if.end1878:                                       ; preds = %if.else1877, %while.end1884
+if.end1878:                                       ; preds = %while.end1884, %if.else1877
   %load11469 = load ptr, ptr %parser, align 8
   %call11471 = call i32 @parser_expect_text(ptr %load11469, ptr @.strlit11470)
   %load11472 = load ptr, ptr %parser, align 8
@@ -23524,7 +23545,7 @@ if.then1909:                                      ; preds = %if.then1906
 if.else1910:                                      ; preds = %if.then1906
   br label %if.end1911
 
-if.end1911:                                       ; preds = %if.else1910, %while.end1917
+if.end1911:                                       ; preds = %while.end1917, %if.else1910
   %load11621 = load ptr, ptr %parser, align 8
   %call11623 = call i32 @parser_expect_text(ptr %load11621, ptr @.strlit11622)
   %load11624 = load ptr, ptr %parser, align 8
@@ -23702,7 +23723,7 @@ or.rhs:                                           ; preds = %while.cond1642
   %cond10105 = icmp ne i32 %bool10104, 0
   br i1 %cond10105, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval10106 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond10107 = icmp ne i32 %orval10106, 0
   br i1 %cond10107, label %or.true1, label %or.rhs2
@@ -23719,7 +23740,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond10114 = icmp ne i32 %bool10113, 0
   br i1 %cond10114, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval10115 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond10116 = icmp ne i32 %orval10115, 0
   br i1 %cond10116, label %while.body1643, label %while.end1644
@@ -23875,7 +23896,7 @@ if.then1660:                                      ; preds = %if.else1655
 if.else1661:                                      ; preds = %if.else1655
   br label %if.end1662
 
-if.end1662:                                       ; preds = %if.else1661, %if.end1680
+if.end1662:                                       ; preds = %if.end1680, %if.else1661
   br label %if.end1656
 
 if.then1663:                                      ; preds = %if.then1660
@@ -23894,7 +23915,7 @@ if.then1663:                                      ; preds = %if.then1660
 if.else1664:                                      ; preds = %if.then1660
   br label %if.end1665
 
-if.end1665:                                       ; preds = %if.else1664, %while.end1671
+if.end1665:                                       ; preds = %while.end1671, %if.else1664
   %load10246 = load ptr, ptr %parser, align 8
   %call10248 = call i32 @parser_expect_text(ptr %load10246, ptr @.strlit10247)
   %load10249 = load ptr, ptr %parser, align 8
@@ -24113,7 +24134,7 @@ or.rhs:                                           ; preds = %if.end1683
   %cond10321 = icmp ne i32 %bool10320, 0
   br i1 %cond10321, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval10322 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond10323 = icmp ne i32 %orval10322, 0
   br i1 %cond10323, label %and.rhs, label %and.false
@@ -24252,7 +24273,7 @@ or.rhs5:                                          ; preds = %while.end1698
   %cond10404 = icmp ne i32 %bool10403, 0
   br i1 %cond10404, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval10405 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond10406 = icmp ne i32 %orval10405, 0
   br i1 %cond10406, label %if.then1699, label %if.else1700
@@ -24607,7 +24628,7 @@ or.rhs:                                           ; preds = %while.end1773
   %cond10730 = icmp ne i32 %bool10729, 0
   br i1 %cond10730, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval10731 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond10732 = icmp ne i32 %orval10731, 0
   br i1 %cond10732, label %if.then1774, label %if.else1775
@@ -24643,7 +24664,7 @@ or.rhs2:                                          ; preds = %if.end1776
   %cond10747 = icmp ne i32 %bool10746, 0
   br i1 %cond10747, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval10748 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond10749 = icmp ne i32 %orval10748, 0
   br i1 %cond10749, label %or.true4, label %or.rhs5
@@ -24659,7 +24680,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond10755 = icmp ne i32 %bool10754, 0
   br i1 %cond10755, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval10756 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond10757 = icmp ne i32 %orval10756, 0
   br i1 %cond10757, label %or.true7, label %or.rhs8
@@ -24675,7 +24696,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond10763 = icmp ne i32 %bool10762, 0
   br i1 %cond10763, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval10764 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond10765 = icmp ne i32 %orval10764, 0
   br i1 %cond10765, label %or.true10, label %or.rhs11
@@ -24691,7 +24712,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond10771 = icmp ne i32 %bool10770, 0
   br i1 %cond10771, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval10772 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond10773 = icmp ne i32 %orval10772, 0
   br i1 %cond10773, label %or.true13, label %or.rhs14
@@ -24707,7 +24728,7 @@ or.rhs14:                                         ; preds = %or.merge12
   %cond10779 = icmp ne i32 %bool10778, 0
   br i1 %cond10779, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval10780 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond10781 = icmp ne i32 %orval10780, 0
   br i1 %cond10781, label %or.true16, label %or.rhs17
@@ -24723,7 +24744,7 @@ or.rhs17:                                         ; preds = %or.merge15
   %cond10787 = icmp ne i32 %bool10786, 0
   br i1 %cond10787, label %or.true16, label %or.merge18
 
-or.merge18:                                       ; preds = %or.true16, %or.rhs17
+or.merge18:                                       ; preds = %or.rhs17, %or.true16
   %orval10788 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
   %cond10789 = icmp ne i32 %orval10788, 0
   br i1 %cond10789, label %or.true19, label %or.rhs20
@@ -24739,7 +24760,7 @@ or.rhs20:                                         ; preds = %or.merge18
   %cond10795 = icmp ne i32 %bool10794, 0
   br i1 %cond10795, label %or.true19, label %or.merge21
 
-or.merge21:                                       ; preds = %or.true19, %or.rhs20
+or.merge21:                                       ; preds = %or.rhs20, %or.true19
   %orval10796 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
   %cond10797 = icmp ne i32 %orval10796, 0
   br i1 %cond10797, label %or.true22, label %or.rhs23
@@ -24755,7 +24776,7 @@ or.rhs23:                                         ; preds = %or.merge21
   %cond10803 = icmp ne i32 %bool10802, 0
   br i1 %cond10803, label %or.true22, label %or.merge24
 
-or.merge24:                                       ; preds = %or.true22, %or.rhs23
+or.merge24:                                       ; preds = %or.rhs23, %or.true22
   %orval10804 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
   %cond10805 = icmp ne i32 %orval10804, 0
   br i1 %cond10805, label %or.true25, label %or.rhs26
@@ -24771,7 +24792,7 @@ or.rhs26:                                         ; preds = %or.merge24
   %cond10811 = icmp ne i32 %bool10810, 0
   br i1 %cond10811, label %or.true25, label %or.merge27
 
-or.merge27:                                       ; preds = %or.true25, %or.rhs26
+or.merge27:                                       ; preds = %or.rhs26, %or.true25
   %orval10812 = phi i32 [ 1, %or.true25 ], [ 0, %or.rhs26 ]
   %cond10813 = icmp ne i32 %orval10812, 0
   br i1 %cond10813, label %ifexpr.then1777, label %ifexpr.else1778
@@ -24796,7 +24817,7 @@ if.then1780:                                      ; preds = %ifexpr.end1779
 if.else1781:                                      ; preds = %ifexpr.end1779
   br label %if.end1782
 
-if.end1782:                                       ; preds = %if.else1781, %if.end1797
+if.end1782:                                       ; preds = %if.end1797, %if.else1781
   %load11109 = load i32, ptr %is_stmt_start, align 4
   %cmp11110 = icmp eq i32 %load11109, 0
   %bool11111 = zext i1 %cmp11110 to i32
@@ -24878,7 +24899,7 @@ or.rhs29:                                         ; preds = %if.end1788
   %cond10876 = icmp ne i32 %bool10875, 0
   br i1 %cond10876, label %or.true28, label %or.merge30
 
-or.merge30:                                       ; preds = %or.true28, %or.rhs29
+or.merge30:                                       ; preds = %or.rhs29, %or.true28
   %orval10877 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
   %cond10878 = icmp ne i32 %orval10877, 0
   br i1 %cond10878, label %or.true31, label %or.rhs32
@@ -24894,7 +24915,7 @@ or.rhs32:                                         ; preds = %or.merge30
   %cond10884 = icmp ne i32 %bool10883, 0
   br i1 %cond10884, label %or.true31, label %or.merge33
 
-or.merge33:                                       ; preds = %or.true31, %or.rhs32
+or.merge33:                                       ; preds = %or.rhs32, %or.true31
   %orval10885 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
   %cond10886 = icmp ne i32 %orval10885, 0
   br i1 %cond10886, label %if.then1789, label %if.else1790
@@ -24925,7 +24946,7 @@ or.rhs35:                                         ; preds = %if.end1791
   %cond10898 = icmp ne i32 %bool10897, 0
   br i1 %cond10898, label %or.true34, label %or.merge36
 
-or.merge36:                                       ; preds = %or.true34, %or.rhs35
+or.merge36:                                       ; preds = %or.rhs35, %or.true34
   %orval10899 = phi i32 [ 1, %or.true34 ], [ 0, %or.rhs35 ]
   %cond10900 = icmp ne i32 %orval10899, 0
   br i1 %cond10900, label %or.true37, label %or.rhs38
@@ -24941,7 +24962,7 @@ or.rhs38:                                         ; preds = %or.merge36
   %cond10906 = icmp ne i32 %bool10905, 0
   br i1 %cond10906, label %and.rhs40, label %and.false41
 
-or.merge39:                                       ; preds = %or.true37, %and.merge42
+or.merge39:                                       ; preds = %and.merge42, %or.true37
   %orval10923 = phi i32 [ 1, %or.true37 ], [ 0, %and.merge42 ]
   %cond10924 = icmp ne i32 %orval10923, 0
   br i1 %cond10924, label %if.then1792, label %if.else1793
@@ -24957,7 +24978,7 @@ and.rhs40:                                        ; preds = %or.rhs38
 and.false41:                                      ; preds = %or.merge45, %or.rhs38
   br label %and.merge42
 
-and.merge42:                                      ; preds = %and.false41, %or.merge45
+and.merge42:                                      ; preds = %or.merge45, %and.false41
   %andval10921 = phi i32 [ 1, %or.merge45 ], [ 0, %and.false41 ]
   %cond10922 = icmp ne i32 %andval10921, 0
   br i1 %cond10922, label %or.true37, label %or.merge39
@@ -24973,7 +24994,7 @@ or.rhs44:                                         ; preds = %and.rhs40
   %cond10918 = icmp ne i32 %bool10917, 0
   br i1 %cond10918, label %or.true43, label %or.merge45
 
-or.merge45:                                       ; preds = %or.true43, %or.rhs44
+or.merge45:                                       ; preds = %or.rhs44, %or.true43
   %orval10919 = phi i32 [ 1, %or.true43 ], [ 0, %or.rhs44 ]
   %cond10920 = icmp ne i32 %orval10919, 0
   br i1 %cond10920, label %and.merge42, label %and.false41
@@ -24992,7 +25013,7 @@ if.then1795:                                      ; preds = %if.end1794
 if.else1796:                                      ; preds = %if.end1794
   br label %if.end1797
 
-if.end1797:                                       ; preds = %if.else1796, %if.end1812
+if.end1797:                                       ; preds = %if.end1812, %if.else1796
   br label %if.end1782
 
 while.cond1798:                                   ; preds = %if.end1803, %if.then1795
@@ -25125,7 +25146,7 @@ or.rhs50:                                         ; preds = %if.end1809
   %cond10998 = icmp ne i32 %bool10997, 0
   br i1 %cond10998, label %or.true49, label %or.merge51
 
-or.merge51:                                       ; preds = %or.true49, %or.rhs50
+or.merge51:                                       ; preds = %or.rhs50, %or.true49
   %orval10999 = phi i32 [ 1, %or.true49 ], [ 0, %or.rhs50 ]
   %cond11000 = icmp ne i32 %orval10999, 0
   br i1 %cond11000, label %or.true52, label %or.rhs53
@@ -25141,7 +25162,7 @@ or.rhs53:                                         ; preds = %or.merge51
   %cond11006 = icmp ne i32 %bool11005, 0
   br i1 %cond11006, label %or.true52, label %or.merge54
 
-or.merge54:                                       ; preds = %or.true52, %or.rhs53
+or.merge54:                                       ; preds = %or.rhs53, %or.true52
   %orval11007 = phi i32 [ 1, %or.true52 ], [ 0, %or.rhs53 ]
   %cond11008 = icmp ne i32 %orval11007, 0
   br i1 %cond11008, label %or.true55, label %or.rhs56
@@ -25157,7 +25178,7 @@ or.rhs56:                                         ; preds = %or.merge54
   %cond11014 = icmp ne i32 %bool11013, 0
   br i1 %cond11014, label %or.true55, label %or.merge57
 
-or.merge57:                                       ; preds = %or.true55, %or.rhs56
+or.merge57:                                       ; preds = %or.rhs56, %or.true55
   %orval11015 = phi i32 [ 1, %or.true55 ], [ 0, %or.rhs56 ]
   %cond11016 = icmp ne i32 %orval11015, 0
   br i1 %cond11016, label %or.true58, label %or.rhs59
@@ -25173,7 +25194,7 @@ or.rhs59:                                         ; preds = %or.merge57
   %cond11022 = icmp ne i32 %bool11021, 0
   br i1 %cond11022, label %or.true58, label %or.merge60
 
-or.merge60:                                       ; preds = %or.true58, %or.rhs59
+or.merge60:                                       ; preds = %or.rhs59, %or.true58
   %orval11023 = phi i32 [ 1, %or.true58 ], [ 0, %or.rhs59 ]
   %cond11024 = icmp ne i32 %orval11023, 0
   br i1 %cond11024, label %or.true61, label %or.rhs62
@@ -25189,7 +25210,7 @@ or.rhs62:                                         ; preds = %or.merge60
   %cond11030 = icmp ne i32 %bool11029, 0
   br i1 %cond11030, label %or.true61, label %or.merge63
 
-or.merge63:                                       ; preds = %or.true61, %or.rhs62
+or.merge63:                                       ; preds = %or.rhs62, %or.true61
   %orval11031 = phi i32 [ 1, %or.true61 ], [ 0, %or.rhs62 ]
   %cond11032 = icmp ne i32 %orval11031, 0
   br i1 %cond11032, label %or.true64, label %or.rhs65
@@ -25205,7 +25226,7 @@ or.rhs65:                                         ; preds = %or.merge63
   %cond11038 = icmp ne i32 %bool11037, 0
   br i1 %cond11038, label %or.true64, label %or.merge66
 
-or.merge66:                                       ; preds = %or.true64, %or.rhs65
+or.merge66:                                       ; preds = %or.rhs65, %or.true64
   %orval11039 = phi i32 [ 1, %or.true64 ], [ 0, %or.rhs65 ]
   %cond11040 = icmp ne i32 %orval11039, 0
   br i1 %cond11040, label %or.true67, label %or.rhs68
@@ -25221,7 +25242,7 @@ or.rhs68:                                         ; preds = %or.merge66
   %cond11046 = icmp ne i32 %bool11045, 0
   br i1 %cond11046, label %or.true67, label %or.merge69
 
-or.merge69:                                       ; preds = %or.true67, %or.rhs68
+or.merge69:                                       ; preds = %or.rhs68, %or.true67
   %orval11047 = phi i32 [ 1, %or.true67 ], [ 0, %or.rhs68 ]
   %cond11048 = icmp ne i32 %orval11047, 0
   br i1 %cond11048, label %or.true70, label %or.rhs71
@@ -25237,7 +25258,7 @@ or.rhs71:                                         ; preds = %or.merge69
   %cond11054 = icmp ne i32 %bool11053, 0
   br i1 %cond11054, label %or.true70, label %or.merge72
 
-or.merge72:                                       ; preds = %or.true70, %or.rhs71
+or.merge72:                                       ; preds = %or.rhs71, %or.true70
   %orval11055 = phi i32 [ 1, %or.true70 ], [ 0, %or.rhs71 ]
   %cond11056 = icmp ne i32 %orval11055, 0
   br i1 %cond11056, label %or.true73, label %or.rhs74
@@ -25253,7 +25274,7 @@ or.rhs74:                                         ; preds = %or.merge72
   %cond11062 = icmp ne i32 %bool11061, 0
   br i1 %cond11062, label %or.true73, label %or.merge75
 
-or.merge75:                                       ; preds = %or.true73, %or.rhs74
+or.merge75:                                       ; preds = %or.rhs74, %or.true73
   %orval11063 = phi i32 [ 1, %or.true73 ], [ 0, %or.rhs74 ]
   %cond11064 = icmp ne i32 %orval11063, 0
   br i1 %cond11064, label %or.true76, label %or.rhs77
@@ -25269,7 +25290,7 @@ or.rhs77:                                         ; preds = %or.merge75
   %cond11070 = icmp ne i32 %bool11069, 0
   br i1 %cond11070, label %or.true76, label %or.merge78
 
-or.merge78:                                       ; preds = %or.true76, %or.rhs77
+or.merge78:                                       ; preds = %or.rhs77, %or.true76
   %orval11071 = phi i32 [ 1, %or.true76 ], [ 0, %or.rhs77 ]
   %cond11072 = icmp ne i32 %orval11071, 0
   br i1 %cond11072, label %or.true79, label %or.rhs80
@@ -25285,7 +25306,7 @@ or.rhs80:                                         ; preds = %or.merge78
   %cond11078 = icmp ne i32 %bool11077, 0
   br i1 %cond11078, label %or.true79, label %or.merge81
 
-or.merge81:                                       ; preds = %or.true79, %or.rhs80
+or.merge81:                                       ; preds = %or.rhs80, %or.true79
   %orval11079 = phi i32 [ 1, %or.true79 ], [ 0, %or.rhs80 ]
   %cond11080 = icmp ne i32 %orval11079, 0
   br i1 %cond11080, label %if.then1810, label %if.else1811
@@ -25313,7 +25334,7 @@ or.rhs83:                                         ; preds = %if.else1811
   %cond11096 = icmp ne i32 %bool11095, 0
   br i1 %cond11096, label %and.rhs85, label %and.false86
 
-or.merge84:                                       ; preds = %or.true82, %and.merge87
+or.merge84:                                       ; preds = %and.merge87, %or.true82
   %orval11107 = phi i32 [ 1, %or.true82 ], [ 0, %and.merge87 ]
   %cond11108 = icmp ne i32 %orval11107, 0
   br i1 %cond11108, label %if.then1813, label %if.else1814
@@ -25947,7 +25968,7 @@ if.then2202:                                      ; preds = %if.end2201
 if.else2203:                                      ; preds = %if.end2201
   br label %if.end2204
 
-if.end2204:                                       ; preds = %if.else2203, %if.end2207
+if.end2204:                                       ; preds = %if.end2207, %if.else2203
   %load13023 = load ptr, ptr %parser, align 8
   %call13024 = call ptr @parser_text(ptr %load13023)
   %strcmp13026 = call i32 @strcmp(ptr %call13024, ptr @.strlit13025)
@@ -26066,7 +26087,7 @@ if.then2217:                                      ; preds = %if.end2216
 if.else2218:                                      ; preds = %if.end2216
   br label %if.end2219
 
-if.end2219:                                       ; preds = %if.else2218, %if.end2222
+if.end2219:                                       ; preds = %if.end2222, %if.else2218
   %load13095 = load ptr, ptr %parser, align 8
   %call13097 = call i32 @parser_accept_text(ptr %load13095, ptr @.strlit13096)
   %load13098 = load ptr, ptr %parser, align 8
@@ -26155,7 +26176,7 @@ or.rhs:                                           ; preds = %if.then2223
   %cond13130 = icmp ne i32 %bool13129, 0
   br i1 %cond13130, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval13131 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond13132 = icmp ne i32 %orval13131, 0
   br i1 %cond13132, label %or.true2, label %or.rhs3
@@ -26171,7 +26192,7 @@ or.rhs3:                                          ; preds = %or.merge
   %cond13137 = icmp ne i32 %bool13136, 0
   br i1 %cond13137, label %or.true2, label %or.merge4
 
-or.merge4:                                        ; preds = %or.true2, %or.rhs3
+or.merge4:                                        ; preds = %or.rhs3, %or.true2
   %orval13138 = phi i32 [ 1, %or.true2 ], [ 0, %or.rhs3 ]
   %cond13139 = icmp ne i32 %orval13138, 0
   br i1 %cond13139, label %if.then2226, label %if.else2227
@@ -26441,7 +26462,7 @@ or.rhs8:                                          ; preds = %if.end2264
   %cond13313 = icmp ne i32 %bool13312, 0
   br i1 %cond13313, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval13314 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond13315 = icmp ne i32 %orval13314, 0
   br i1 %cond13315, label %if.then2265, label %if.else2266
@@ -26479,7 +26500,7 @@ or.rhs11:                                         ; preds = %if.end2267
   %cond13340 = icmp ne i32 %bool13339, 0
   br i1 %cond13340, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval13341 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond13342 = icmp ne i32 %orval13341, 0
   br i1 %cond13342, label %or.true13, label %or.rhs14
@@ -26496,7 +26517,7 @@ or.rhs14:                                         ; preds = %or.merge12
   %cond13348 = icmp ne i32 %bool13347, 0
   br i1 %cond13348, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval13349 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond13350 = icmp ne i32 %orval13349, 0
   br i1 %cond13350, label %or.true16, label %or.rhs17
@@ -26513,7 +26534,7 @@ or.rhs17:                                         ; preds = %or.merge15
   %cond13356 = icmp ne i32 %bool13355, 0
   br i1 %cond13356, label %or.true16, label %or.merge18
 
-or.merge18:                                       ; preds = %or.true16, %or.rhs17
+or.merge18:                                       ; preds = %or.rhs17, %or.true16
   %orval13357 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
   %cond13358 = icmp ne i32 %orval13357, 0
   br i1 %cond13358, label %or.true19, label %or.rhs20
@@ -26530,7 +26551,7 @@ or.rhs20:                                         ; preds = %or.merge18
   %cond13365 = icmp ne i32 %bool13364, 0
   br i1 %cond13365, label %or.true19, label %or.merge21
 
-or.merge21:                                       ; preds = %or.true19, %or.rhs20
+or.merge21:                                       ; preds = %or.rhs20, %or.true19
   %orval13366 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
   %cond13367 = icmp ne i32 %orval13366, 0
   br i1 %cond13367, label %or.true22, label %or.rhs23
@@ -26547,7 +26568,7 @@ or.rhs23:                                         ; preds = %or.merge21
   %cond13374 = icmp ne i32 %bool13373, 0
   br i1 %cond13374, label %or.true22, label %or.merge24
 
-or.merge24:                                       ; preds = %or.true22, %or.rhs23
+or.merge24:                                       ; preds = %or.rhs23, %or.true22
   %orval13375 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
   %cond13376 = icmp ne i32 %orval13375, 0
   br i1 %cond13376, label %or.true25, label %or.rhs26
@@ -26564,7 +26585,7 @@ or.rhs26:                                         ; preds = %or.merge24
   %cond13383 = icmp ne i32 %bool13382, 0
   br i1 %cond13383, label %or.true25, label %or.merge27
 
-or.merge27:                                       ; preds = %or.true25, %or.rhs26
+or.merge27:                                       ; preds = %or.rhs26, %or.true25
   %orval13384 = phi i32 [ 1, %or.true25 ], [ 0, %or.rhs26 ]
   %cond13385 = icmp ne i32 %orval13384, 0
   br i1 %cond13385, label %or.true28, label %or.rhs29
@@ -26581,7 +26602,7 @@ or.rhs29:                                         ; preds = %or.merge27
   %cond13392 = icmp ne i32 %bool13391, 0
   br i1 %cond13392, label %or.true28, label %or.merge30
 
-or.merge30:                                       ; preds = %or.true28, %or.rhs29
+or.merge30:                                       ; preds = %or.rhs29, %or.true28
   %orval13393 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
   %cond13394 = icmp ne i32 %orval13393, 0
   br i1 %cond13394, label %or.true31, label %or.rhs32
@@ -26598,7 +26619,7 @@ or.rhs32:                                         ; preds = %or.merge30
   %cond13401 = icmp ne i32 %bool13400, 0
   br i1 %cond13401, label %or.true31, label %or.merge33
 
-or.merge33:                                       ; preds = %or.true31, %or.rhs32
+or.merge33:                                       ; preds = %or.rhs32, %or.true31
   %orval13402 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
   %cond13403 = icmp ne i32 %orval13402, 0
   br i1 %cond13403, label %or.true34, label %or.rhs35
@@ -26615,7 +26636,7 @@ or.rhs35:                                         ; preds = %or.merge33
   %cond13410 = icmp ne i32 %bool13409, 0
   br i1 %cond13410, label %or.true34, label %or.merge36
 
-or.merge36:                                       ; preds = %or.true34, %or.rhs35
+or.merge36:                                       ; preds = %or.rhs35, %or.true34
   %orval13411 = phi i32 [ 1, %or.true34 ], [ 0, %or.rhs35 ]
   %cond13412 = icmp ne i32 %orval13411, 0
   br i1 %cond13412, label %if.then2268, label %if.else2269
@@ -27293,7 +27314,7 @@ if.then1999:                                      ; preds = %if.then1996
 if.else2000:                                      ; preds = %if.then1996
   br label %if.end2001
 
-if.end2001:                                       ; preds = %if.else2000, %while.end2007
+if.end2001:                                       ; preds = %while.end2007, %if.else2000
   %load12148 = load ptr, ptr %parser, align 8
   %call12150 = call i32 @parser_expect_text(ptr %load12148, ptr @.strlit12149)
   %load12151 = load ptr, ptr %parser, align 8
@@ -28046,7 +28067,7 @@ or.rhs:                                           ; preds = %while.end2094
   %cond12544 = icmp ne i32 %bool12543, 0
   br i1 %cond12544, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval12545 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond12546 = icmp ne i32 %orval12545, 0
   br i1 %cond12546, label %if.then2095, label %if.else2096
@@ -28277,7 +28298,7 @@ or.rhs2:                                          ; preds = %while.end2127
   %cond12667 = icmp ne i32 %bool12666, 0
   br i1 %cond12667, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval12668 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond12669 = icmp ne i32 %orval12668, 0
   br i1 %cond12669, label %if.then2128, label %if.else2129
@@ -28390,7 +28411,7 @@ or.rhs:                                           ; preds = %if.end2136
   %cond12727 = icmp ne i32 %bool12726, 0
   br i1 %cond12727, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval12728 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond12729 = icmp ne i32 %orval12728, 0
   br i1 %cond12729, label %and.rhs, label %and.false
@@ -28543,7 +28564,7 @@ or.rhs5:                                          ; preds = %while.end2151
   %cond12810 = icmp ne i32 %bool12809, 0
   br i1 %cond12810, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval12811 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond12812 = icmp ne i32 %orval12811, 0
   br i1 %cond12812, label %if.then2152, label %if.else2153
@@ -28747,7 +28768,7 @@ or.rhs:                                           ; preds = %entry
   %cond13450 = icmp ne i32 %bool13449, 0
   br i1 %cond13450, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval13451 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond13452 = icmp ne i32 %orval13451, 0
   br i1 %cond13452, label %if.then2274, label %if.else2275
@@ -29020,7 +29041,7 @@ if.then2313:                                      ; preds = %if.end2312
 if.else2314:                                      ; preds = %if.end2312
   br label %if.end2315
 
-if.end2315:                                       ; preds = %if.else2314, %while.end2321
+if.end2315:                                       ; preds = %while.end2321, %if.else2314
   %load13651 = load ptr, ptr %parser, align 8
   %call13653 = call i32 @parser_expect_text(ptr %load13651, ptr @.strlit13652)
   %load13654 = load ptr, ptr %parser, align 8
@@ -29243,7 +29264,7 @@ if.then2346:                                      ; preds = %if.end2345
 if.else2347:                                      ; preds = %if.end2345
   br label %if.end2348
 
-if.end2348:                                       ; preds = %if.else2347, %while.end2360
+if.end2348:                                       ; preds = %while.end2360, %if.else2347
   %load13829 = load ptr, ptr %parser, align 8
   %call13831 = call i32 @parser_expect_text(ptr %load13829, ptr @.strlit13830)
   %cmp13832 = icmp eq i32 %call13831, 0
@@ -29499,7 +29520,7 @@ if.then2382:                                      ; preds = %entry
 if.else2383:                                      ; preds = %entry
   br label %if.end2384
 
-if.end2384:                                       ; preds = %if.else2383, %if.end2387
+if.end2384:                                       ; preds = %if.end2387, %if.else2383
   %load14000 = load ptr, ptr %parser, align 8
   %call14002 = call i32 @parser_expect_text(ptr %load14000, ptr @.strlit14001)
   %cmp14003 = icmp eq i32 %call14002, 0
@@ -30289,7 +30310,7 @@ if.then2481:                                      ; preds = %entry
 if.else2482:                                      ; preds = %entry
   br label %if.end2483
 
-if.end2483:                                       ; preds = %if.else2482, %while.end2489
+if.end2483:                                       ; preds = %while.end2489, %if.else2482
   %load14423 = load ptr, ptr %params, align 8
   ret ptr %load14423
 
@@ -30601,7 +30622,7 @@ if.then2517:                                      ; preds = %if.end2516
 if.else2518:                                      ; preds = %if.end2516
   br label %if.end2519
 
-if.end2519:                                       ; preds = %if.else2518, %if.end2525
+if.end2519:                                       ; preds = %if.end2525, %if.else2518
   %load14588 = load ptr, ptr %variant_names, align 8
   %load14589 = load ptr, ptr %variant_name, align 8
   %call14590 = call ptr @vix_array_push_ptr(ptr %load14588, ptr %load14589)
@@ -30767,7 +30788,7 @@ if.then2538:                                      ; preds = %if.end2537
 if.else2539:                                      ; preds = %if.end2537
   br label %if.end2540
 
-if.end2540:                                       ; preds = %if.else2539, %while.end2543
+if.end2540:                                       ; preds = %while.end2543, %if.else2539
   %load14692 = load ptr, ptr %parser, align 8
   %fieldptr14694 = getelementptr %Parser, ptr %load14692, i32 0, i32 0
   %load14695 = load i32, ptr %pos, align 4
@@ -31021,7 +31042,7 @@ or.rhs:                                           ; preds = %for.body2567
   %cond14776 = icmp ne i32 %bool14775, 0
   br i1 %cond14776, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval14777 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond14778 = icmp ne i32 %orval14777, 0
   br i1 %cond14778, label %and.rhs, label %and.false
@@ -31356,7 +31377,7 @@ or.rhs:                                           ; preds = %if.else2587
   %cond14925 = icmp ne i32 %bool14924, 0
   br i1 %cond14925, label %and.rhs1, label %and.false2
 
-or.merge:                                         ; preds = %or.true, %and.merge3
+or.merge:                                         ; preds = %and.merge3, %or.true
   %orval14939 = phi i32 [ 1, %or.true ], [ 0, %and.merge3 ]
   %cond14940 = icmp ne i32 %orval14939, 0
   br i1 %cond14940, label %if.then2610, label %if.else2611
@@ -31540,7 +31561,7 @@ or.rhs6:                                          ; preds = %if.else2623
   %cond15017 = icmp ne i32 %bool15016, 0
   br i1 %cond15017, label %or.true5, label %or.merge7
 
-or.merge7:                                        ; preds = %or.true5, %or.rhs6
+or.merge7:                                        ; preds = %or.rhs6, %or.true5
   %orval15018 = phi i32 [ 1, %or.true5 ], [ 0, %or.rhs6 ]
   %cond15019 = icmp ne i32 %orval15018, 0
   br i1 %cond15019, label %if.then2631, label %if.else2632
@@ -31731,7 +31752,7 @@ entry:
   store i32 0, ptr %i, align 4
   br label %while.cond2646
 
-while.cond2646:                                   ; preds = %if.end2654, %if.end2657, %if.then2649, %entry
+while.cond2646:                                   ; preds = %if.end2657, %if.end2654, %if.then2649, %entry
   %load15122 = load i32, ptr %i, align 4
   %load15123 = load ptr, ptr %src, align 8
   %strlen15124 = call i32 @strlen(ptr %load15123)
@@ -31835,7 +31856,7 @@ if.then2655:                                      ; preds = %and.merge
 if.else2656:                                      ; preds = %and.merge
   br label %if.end2657
 
-if.end2657:                                       ; preds = %if.else2656, %if.end2660
+if.end2657:                                       ; preds = %if.end2660, %if.else2656
   %load15185 = load i32, ptr %import_end, align 4
   store i32 %load15185, ptr %i, align 4
   br label %while.cond2646
@@ -32160,7 +32181,7 @@ if.then2681:                                      ; preds = %entry
 if.else2682:                                      ; preds = %entry
   br label %if.end2683
 
-if.end2683:                                       ; preds = %if.else2682, %while.end2686
+if.end2683:                                       ; preds = %while.end2686, %if.else2682
   ret void
 
 while.cond2684:                                   ; preds = %if.end2689, %if.then2681
@@ -32670,7 +32691,7 @@ or.rhs:                                           ; preds = %entry
   %cond15643 = icmp ne i32 %bool15642, 0
   br i1 %cond15643, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15644 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15645 = icmp ne i32 %orval15644, 0
   br i1 %cond15645, label %or.true1, label %or.rhs2
@@ -32686,7 +32707,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond15651 = icmp ne i32 %bool15650, 0
   br i1 %cond15651, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval15652 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond15653 = icmp ne i32 %orval15652, 0
   br i1 %cond15653, label %if.then2722, label %if.else2723
@@ -32723,7 +32744,7 @@ or.rhs:                                           ; preds = %entry
   %cond15665 = icmp ne i32 %bool15664, 0
   br i1 %cond15665, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15666 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15667 = icmp ne i32 %orval15666, 0
   br i1 %cond15667, label %if.then2725, label %if.else2726
@@ -32760,7 +32781,7 @@ or.rhs:                                           ; preds = %entry
   %cond15679 = icmp ne i32 %bool15678, 0
   br i1 %cond15679, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15680 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15681 = icmp ne i32 %orval15680, 0
   br i1 %cond15681, label %or.true1, label %or.rhs2
@@ -32776,7 +32797,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond15687 = icmp ne i32 %bool15686, 0
   br i1 %cond15687, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval15688 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond15689 = icmp ne i32 %orval15688, 0
   br i1 %cond15689, label %or.true4, label %or.rhs5
@@ -32792,7 +32813,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond15695 = icmp ne i32 %bool15694, 0
   br i1 %cond15695, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval15696 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond15697 = icmp ne i32 %orval15696, 0
   br i1 %cond15697, label %or.true7, label %or.rhs8
@@ -32808,7 +32829,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond15703 = icmp ne i32 %bool15702, 0
   br i1 %cond15703, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval15704 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond15705 = icmp ne i32 %orval15704, 0
   br i1 %cond15705, label %if.then2728, label %if.else2729
@@ -32845,7 +32866,7 @@ or.rhs:                                           ; preds = %entry
   %cond15715 = icmp ne i32 %bool15714, 0
   br i1 %cond15715, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15716 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15717 = icmp ne i32 %orval15716, 0
   br i1 %cond15717, label %if.then2731, label %if.else2732
@@ -32915,7 +32936,7 @@ or.rhs:                                           ; preds = %if.end2739
   %cond15739 = icmp ne i32 %bool15738, 0
   br i1 %cond15739, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15740 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15741 = icmp ne i32 %orval15740, 0
   br i1 %cond15741, label %if.then2740, label %if.else2741
@@ -32940,7 +32961,7 @@ or.rhs2:                                          ; preds = %if.end2742
   %cond15753 = icmp ne i32 %bool15752, 0
   br i1 %cond15753, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval15754 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond15755 = icmp ne i32 %orval15754, 0
   br i1 %cond15755, label %or.true4, label %or.rhs5
@@ -32956,7 +32977,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond15761 = icmp ne i32 %bool15760, 0
   br i1 %cond15761, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval15762 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond15763 = icmp ne i32 %orval15762, 0
   br i1 %cond15763, label %if.then2743, label %if.else2744
@@ -32993,7 +33014,7 @@ or.rhs:                                           ; preds = %entry
   %cond15775 = icmp ne i32 %bool15774, 0
   br i1 %cond15775, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15776 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15777 = icmp ne i32 %orval15776, 0
   br i1 %cond15777, label %or.true1, label %or.rhs2
@@ -33009,7 +33030,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond15783 = icmp ne i32 %bool15782, 0
   br i1 %cond15783, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval15784 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond15785 = icmp ne i32 %orval15784, 0
   br i1 %cond15785, label %if.then2746, label %if.else2747
@@ -33046,7 +33067,7 @@ or.rhs:                                           ; preds = %entry
   %cond15795 = icmp ne i32 %bool15794, 0
   br i1 %cond15795, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15796 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15797 = icmp ne i32 %orval15796, 0
   br i1 %cond15797, label %or.true1, label %or.rhs2
@@ -33062,7 +33083,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond15803 = icmp ne i32 %bool15802, 0
   br i1 %cond15803, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval15804 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond15805 = icmp ne i32 %orval15804, 0
   br i1 %cond15805, label %if.then2749, label %if.else2750
@@ -33099,7 +33120,7 @@ or.rhs:                                           ; preds = %entry
   %cond15815 = icmp ne i32 %bool15814, 0
   br i1 %cond15815, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15816 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15817 = icmp ne i32 %orval15816, 0
   br i1 %cond15817, label %if.then2752, label %if.else2753
@@ -33136,7 +33157,7 @@ or.rhs:                                           ; preds = %entry
   %cond15829 = icmp ne i32 %bool15828, 0
   br i1 %cond15829, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15830 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15831 = icmp ne i32 %orval15830, 0
   br i1 %cond15831, label %or.true1, label %or.rhs2
@@ -33152,7 +33173,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond15837 = icmp ne i32 %bool15836, 0
   br i1 %cond15837, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval15838 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond15839 = icmp ne i32 %orval15838, 0
   br i1 %cond15839, label %or.true4, label %or.rhs5
@@ -33168,7 +33189,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond15845 = icmp ne i32 %bool15844, 0
   br i1 %cond15845, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval15846 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond15847 = icmp ne i32 %orval15846, 0
   br i1 %cond15847, label %if.then2755, label %if.else2756
@@ -33242,7 +33263,7 @@ or.rhs:                                           ; preds = %if.end2763
   %cond15873 = icmp ne i32 %bool15872, 0
   br i1 %cond15873, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval15874 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond15875 = icmp ne i32 %orval15874, 0
   br i1 %cond15875, label %if.then2764, label %if.else2765
@@ -33272,7 +33293,7 @@ or.rhs2:                                          ; preds = %if.end2766
   %cond15888 = icmp ne i32 %bool15887, 0
   br i1 %cond15888, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval15889 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond15890 = icmp ne i32 %orval15889, 0
   br i1 %cond15890, label %if.then2767, label %if.else2768
@@ -33297,7 +33318,7 @@ or.rhs5:                                          ; preds = %if.end2769
   %cond15901 = icmp ne i32 %bool15900, 0
   br i1 %cond15901, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval15902 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond15903 = icmp ne i32 %orval15902, 0
   br i1 %cond15903, label %if.then2770, label %if.else2771
@@ -33597,7 +33618,7 @@ or.rhs:                                           ; preds = %entry
   %cond16031 = icmp ne i32 %bool16030, 0
   br i1 %cond16031, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval16032 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond16033 = icmp ne i32 %orval16032, 0
   br i1 %cond16033, label %or.true1, label %or.rhs2
@@ -33613,7 +33634,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond16039 = icmp ne i32 %bool16038, 0
   br i1 %cond16039, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval16040 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond16041 = icmp ne i32 %orval16040, 0
   br i1 %cond16041, label %if.then2787, label %if.else2788
@@ -33808,7 +33829,7 @@ or.rhs14:                                         ; preds = %if.end2807
   %cond16128 = icmp ne i32 %bool16127, 0
   br i1 %cond16128, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval16129 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond16130 = icmp ne i32 %orval16129, 0
   br i1 %cond16130, label %and.rhs16, label %and.false17
@@ -34026,7 +34047,7 @@ if.then2829:                                      ; preds = %and.merge39
 if.else2830:                                      ; preds = %and.merge39
   br label %if.end2831
 
-if.end2831:                                       ; preds = %if.else2830, %if.end2834
+if.end2831:                                       ; preds = %if.end2834, %if.else2830
   ret i32 0
 
 and.rhs37:                                        ; preds = %if.end2828
@@ -34065,7 +34086,7 @@ or.rhs41:                                         ; preds = %if.then2829
   %cond16245 = icmp ne i32 %bool16244, 0
   br i1 %cond16245, label %or.true40, label %or.merge42
 
-or.merge42:                                       ; preds = %or.true40, %or.rhs41
+or.merge42:                                       ; preds = %or.rhs41, %or.true40
   %orval16246 = phi i32 [ 1, %or.true40 ], [ 0, %or.rhs41 ]
   %cond16247 = icmp ne i32 %orval16246, 0
   br i1 %cond16247, label %or.true43, label %or.rhs44
@@ -34081,7 +34102,7 @@ or.rhs44:                                         ; preds = %or.merge42
   %cond16253 = icmp ne i32 %bool16252, 0
   br i1 %cond16253, label %or.true43, label %or.merge45
 
-or.merge45:                                       ; preds = %or.true43, %or.rhs44
+or.merge45:                                       ; preds = %or.rhs44, %or.true43
   %orval16254 = phi i32 [ 1, %or.true43 ], [ 0, %or.rhs44 ]
   %cond16255 = icmp ne i32 %orval16254, 0
   br i1 %cond16255, label %if.then2832, label %if.else2833
@@ -34294,7 +34315,7 @@ or.rhs:                                           ; preds = %entry
   %cond17357 = icmp ne i32 %bool17356, 0
   br i1 %cond17357, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval17358 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond17359 = icmp ne i32 %orval17358, 0
   br i1 %cond17359, label %if.then3016, label %if.else3017
@@ -34419,7 +34440,7 @@ or.rhs:                                           ; preds = %entry
   %cond16267 = icmp ne i32 %bool16266, 0
   br i1 %cond16267, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval16268 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond16269 = icmp ne i32 %orval16268, 0
   br i1 %cond16269, label %if.then2835, label %if.else2836
@@ -35229,7 +35250,7 @@ if.then2926:                                      ; preds = %and.merge3
 if.else2927:                                      ; preds = %and.merge3
   br label %if.end2928
 
-if.end2928:                                       ; preds = %if.else2927, %if.end2931
+if.end2928:                                       ; preds = %if.end2931, %if.else2927
   ret void
 
 and.rhs:                                          ; preds = %if.end2925
@@ -35673,7 +35694,7 @@ or.rhs:                                           ; preds = %for.body2955
   %cond16970 = icmp ne i32 %bool16969, 0
   br i1 %cond16970, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval16971 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond16972 = icmp ne i32 %orval16971, 0
   br i1 %cond16972, label %and.rhs1, label %and.false2
@@ -36323,7 +36344,7 @@ or.rhs:                                           ; preds = %if.end3009
   %cond17321 = icmp ne i32 %bool17320, 0
   br i1 %cond17321, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval17322 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond17323 = icmp ne i32 %orval17322, 0
   br i1 %cond17323, label %if.then3010, label %if.else3011
@@ -36461,7 +36482,7 @@ or.rhs:                                           ; preds = %if.end3040
   %cond17441 = icmp ne i32 %bool17440, 0
   br i1 %cond17441, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval17442 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond17443 = icmp ne i32 %orval17442, 0
   br i1 %cond17443, label %if.then3041, label %if.else3042
@@ -36715,7 +36736,7 @@ or.rhs:                                           ; preds = %if.else3063
   %cond17570 = icmp ne i32 %bool17569, 0
   br i1 %cond17570, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval17571 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond17572 = icmp ne i32 %orval17571, 0
   br i1 %cond17572, label %or.true1, label %or.rhs2
@@ -36731,7 +36752,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond17577 = icmp ne i32 %bool17576, 0
   br i1 %cond17577, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval17578 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond17579 = icmp ne i32 %orval17578, 0
   br i1 %cond17579, label %or.true4, label %or.rhs5
@@ -36747,7 +36768,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond17584 = icmp ne i32 %bool17583, 0
   br i1 %cond17584, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval17585 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond17586 = icmp ne i32 %orval17585, 0
   br i1 %cond17586, label %if.then3065, label %if.else3066
@@ -36790,7 +36811,7 @@ if.end3157:                                       ; preds = %if.else3156
   %matchres18164 = alloca ptr, align 8
   br label %match.test3159
 
-match.end3158:                                    ; preds = %match.test3414, %for.end3439, %for.end3372, %if.end3363, %if.end3343, %for.end3328, %match.body3315, %match.body3313, %match.body3311, %for.end3297, %for.end3270, %if.end3225, %if.end3211, %if.end3194, %if.end3183, %if.end3175, %match.body3166, %match.body3164, %match.body3162, %match.body3160
+match.end3158:                                    ; preds = %for.end3439, %match.test3414, %for.end3372, %if.end3363, %if.end3343, %for.end3328, %match.body3315, %match.body3313, %match.body3311, %for.end3297, %for.end3270, %if.end3225, %if.end3211, %if.end3194, %if.end3183, %if.end3175, %match.body3166, %match.body3164, %match.body3162, %match.body3160
   %matchval19580 = load ptr, ptr %matchres18164, align 8
   ret ptr %matchval19580
 
@@ -37693,7 +37714,7 @@ if.then3272:                                      ; preds = %for.body3268
 if.else3273:                                      ; preds = %for.body3268
   br label %if.end3274
 
-if.end3274:                                       ; preds = %if.else3273, %if.end3285
+if.end3274:                                       ; preds = %if.end3285, %if.else3273
   br label %for.step3269
 
 for.cond3275:                                     ; preds = %for.step3277, %if.then3272
@@ -37890,7 +37911,7 @@ or.rhs:                                           ; preds = %and.merge19
   %cond18786 = icmp ne i32 %bool18785, 0
   br i1 %cond18786, label %and.rhs20, label %and.false21
 
-or.merge:                                         ; preds = %or.true, %and.merge22
+or.merge:                                         ; preds = %and.merge22, %or.true
   %orval18796 = phi i32 [ 1, %or.true ], [ 0, %and.merge22 ]
   %cond18797 = icmp ne i32 %orval18796, 0
   br i1 %cond18797, label %if.then3291, label %if.else3292
@@ -38010,7 +38031,7 @@ if.then3302:                                      ; preds = %if.end3301
 if.else3303:                                      ; preds = %if.end3301
   br label %if.end3304
 
-if.end3304:                                       ; preds = %if.else3303, %if.end3310
+if.end3304:                                       ; preds = %if.end3310, %if.else3303
   br label %for.step3296
 
 ifexpr.then3305:                                  ; preds = %and.merge31
@@ -38642,7 +38663,7 @@ if.then3374:                                      ; preds = %for.body3370
 if.else3375:                                      ; preds = %for.body3370
   br label %if.end3376
 
-if.end3376:                                       ; preds = %if.else3375, %if.end3379
+if.end3376:                                       ; preds = %if.end3379, %if.else3375
   %load19325 = load i32, ptr %body_idx, align 4
   %cmp19326 = icmp slt i32 %load19325, 0
   %bool19327 = zext i1 %cmp19326 to i32
@@ -38790,7 +38811,7 @@ if.then3392:                                      ; preds = %if.end3391
 if.else3393:                                      ; preds = %if.end3391
   br label %if.end3394
 
-if.end3394:                                       ; preds = %if.else3393, %if.end3397
+if.end3394:                                       ; preds = %if.end3397, %if.else3393
   %load19349 = load ptr, ptr %result_ty, align 8
   %strcmp19351 = call i32 @strcmp(ptr %load19349, ptr @.strlit19350)
   %cmp19352 = icmp eq i32 %strcmp19351, 0
@@ -39289,7 +39310,7 @@ if.then3077:                                      ; preds = %if.else3069
 if.else3078:                                      ; preds = %if.else3069
   br label %if.end3079
 
-if.end3079:                                       ; preds = %if.else3078, %if.end3085
+if.end3079:                                       ; preds = %if.end3085, %if.else3078
   br label %if.end3070
 
 if.then3080:                                      ; preds = %if.then3077
@@ -39428,7 +39449,7 @@ or.rhs:                                           ; preds = %if.end3091
   %cond17709 = icmp ne i32 %bool17708, 0
   br i1 %cond17709, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval17710 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond17711 = icmp ne i32 %orval17710, 0
   br i1 %cond17711, label %or.true1, label %or.rhs2
@@ -39445,7 +39466,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond17718 = icmp ne i32 %bool17717, 0
   br i1 %cond17718, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval17719 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond17720 = icmp ne i32 %orval17719, 0
   br i1 %cond17720, label %or.true4, label %or.rhs5
@@ -39462,7 +39483,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond17727 = icmp ne i32 %bool17726, 0
   br i1 %cond17727, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval17728 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond17729 = icmp ne i32 %orval17728, 0
   br i1 %cond17729, label %or.true7, label %or.rhs8
@@ -39479,7 +39500,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond17736 = icmp ne i32 %bool17735, 0
   br i1 %cond17736, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval17737 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond17738 = icmp ne i32 %orval17737, 0
   br i1 %cond17738, label %or.true10, label %or.rhs11
@@ -39496,7 +39517,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond17745 = icmp ne i32 %bool17744, 0
   br i1 %cond17745, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval17746 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond17747 = icmp ne i32 %orval17746, 0
   br i1 %cond17747, label %if.then3092, label %if.else3093
@@ -39548,7 +39569,7 @@ or.rhs14:                                         ; preds = %and.merge
   %cond17767 = icmp ne i32 %bool17766, 0
   br i1 %cond17767, label %and.rhs16, label %and.false17
 
-or.merge15:                                       ; preds = %or.true13, %and.merge18
+or.merge15:                                       ; preds = %and.merge18, %or.true13
   %orval17775 = phi i32 [ 1, %or.true13 ], [ 0, %and.merge18 ]
   %cond17776 = icmp ne i32 %orval17775, 0
   br i1 %cond17776, label %ifexpr.then3095, label %ifexpr.else3096
@@ -39616,7 +39637,7 @@ or.rhs23:                                         ; preds = %and.merge21
   %cond17798 = icmp ne i32 %bool17797, 0
   br i1 %cond17798, label %and.rhs25, label %and.false26
 
-or.merge24:                                       ; preds = %or.true22, %and.merge27
+or.merge24:                                       ; preds = %and.merge27, %or.true22
   %orval17807 = phi i32 [ 1, %or.true22 ], [ 0, %and.merge27 ]
   %cond17808 = icmp ne i32 %orval17807, 0
   br i1 %cond17808, label %ifexpr.then3098, label %ifexpr.else3099
@@ -39682,7 +39703,7 @@ or.rhs32:                                         ; preds = %and.merge30
   %cond17829 = icmp ne i32 %bool17828, 0
   br i1 %cond17829, label %and.rhs34, label %and.false35
 
-or.merge33:                                       ; preds = %or.true31, %and.merge36
+or.merge33:                                       ; preds = %and.merge36, %or.true31
   %orval17837 = phi i32 [ 1, %or.true31 ], [ 0, %and.merge36 ]
   %cond17838 = icmp ne i32 %orval17837, 0
   br i1 %cond17838, label %ifexpr.then3101, label %ifexpr.else3102
@@ -39812,7 +39833,7 @@ and.rhs52:                                        ; preds = %and.merge51
 and.false53:                                      ; preds = %or.merge57, %and.merge51
   br label %and.merge54
 
-and.merge54:                                      ; preds = %and.false53, %or.merge57
+and.merge54:                                      ; preds = %or.merge57, %and.false53
   %andval17898 = phi i32 [ 1, %or.merge57 ], [ 0, %and.false53 ]
   %cond17899 = icmp ne i32 %andval17898, 0
   br i1 %cond17899, label %if.then3104, label %if.else3105
@@ -39828,7 +39849,7 @@ or.rhs56:                                         ; preds = %and.rhs52
   %cond17895 = icmp ne i32 %bool17894, 0
   br i1 %cond17895, label %or.true55, label %or.merge57
 
-or.merge57:                                       ; preds = %or.true55, %or.rhs56
+or.merge57:                                       ; preds = %or.rhs56, %or.true55
   %orval17896 = phi i32 [ 1, %or.true55 ], [ 0, %or.rhs56 ]
   %cond17897 = icmp ne i32 %orval17896, 0
   br i1 %cond17897, label %and.merge54, label %and.false53
@@ -39865,7 +39886,7 @@ or.rhs59:                                         ; preds = %if.else3093
   %cond17917 = icmp ne i32 %bool17916, 0
   br i1 %cond17917, label %or.true58, label %or.merge60
 
-or.merge60:                                       ; preds = %or.true58, %or.rhs59
+or.merge60:                                       ; preds = %or.rhs59, %or.true58
   %orval17918 = phi i32 [ 1, %or.true58 ], [ 0, %or.rhs59 ]
   %cond17919 = icmp ne i32 %orval17918, 0
   br i1 %cond17919, label %if.then3107, label %if.else3108
@@ -39951,7 +39972,7 @@ or.rhs62:                                         ; preds = %if.then3116
   %cond17955 = icmp ne i32 %bool17954, 0
   br i1 %cond17955, label %or.true61, label %or.merge63
 
-or.merge63:                                       ; preds = %or.true61, %or.rhs62
+or.merge63:                                       ; preds = %or.rhs62, %or.true61
   %orval17956 = phi i32 [ 1, %or.true61 ], [ 0, %or.rhs62 ]
   %cond17957 = icmp ne i32 %orval17956, 0
   br i1 %cond17957, label %or.true64, label %or.rhs65
@@ -39967,7 +39988,7 @@ or.rhs65:                                         ; preds = %or.merge63
   %cond17963 = icmp ne i32 %bool17962, 0
   br i1 %cond17963, label %or.true64, label %or.merge66
 
-or.merge66:                                       ; preds = %or.true64, %or.rhs65
+or.merge66:                                       ; preds = %or.rhs65, %or.true64
   %orval17964 = phi i32 [ 1, %or.true64 ], [ 0, %or.rhs65 ]
   %cond17965 = icmp ne i32 %orval17964, 0
   br i1 %cond17965, label %or.true67, label %or.rhs68
@@ -39983,7 +40004,7 @@ or.rhs68:                                         ; preds = %or.merge66
   %cond17971 = icmp ne i32 %bool17970, 0
   br i1 %cond17971, label %or.true67, label %or.merge69
 
-or.merge69:                                       ; preds = %or.true67, %or.rhs68
+or.merge69:                                       ; preds = %or.rhs68, %or.true67
   %orval17972 = phi i32 [ 1, %or.true67 ], [ 0, %or.rhs68 ]
   %cond17973 = icmp ne i32 %orval17972, 0
   br i1 %cond17973, label %if.then3119, label %if.else3120
@@ -40019,7 +40040,7 @@ or.rhs71:                                         ; preds = %if.then3119
   %cond17986 = icmp ne i32 %bool17985, 0
   br i1 %cond17986, label %or.true70, label %or.merge72
 
-or.merge72:                                       ; preds = %or.true70, %or.rhs71
+or.merge72:                                       ; preds = %or.rhs71, %or.true70
   %orval17987 = phi i32 [ 1, %or.true70 ], [ 0, %or.rhs71 ]
   %cond17988 = icmp ne i32 %orval17987, 0
   br i1 %cond17988, label %ifexpr.then3122, label %ifexpr.else3123
@@ -40061,7 +40082,7 @@ or.rhs74:                                         ; preds = %ifexpr.end3124
   %cond18002 = icmp ne i32 %bool18001, 0
   br i1 %cond18002, label %or.true73, label %or.merge75
 
-or.merge75:                                       ; preds = %or.true73, %or.rhs74
+or.merge75:                                       ; preds = %or.rhs74, %or.true73
   %orval18003 = phi i32 [ 1, %or.true73 ], [ 0, %or.rhs74 ]
   %cond18004 = icmp ne i32 %orval18003, 0
   br i1 %cond18004, label %ifexpr.then3125, label %ifexpr.else3126
@@ -40184,7 +40205,7 @@ or.rhs83:                                         ; preds = %if.else3135
   %cond18057 = icmp ne i32 %bool18056, 0
   br i1 %cond18057, label %or.true82, label %or.merge84
 
-or.merge84:                                       ; preds = %or.true82, %or.rhs83
+or.merge84:                                       ; preds = %or.rhs83, %or.true82
   %orval18058 = phi i32 [ 1, %or.true82 ], [ 0, %or.rhs83 ]
   %cond18059 = icmp ne i32 %orval18058, 0
   br i1 %cond18059, label %if.then3140, label %if.else3141
@@ -40216,7 +40237,7 @@ or.rhs86:                                         ; preds = %if.else3120
   %cond18074 = icmp ne i32 %bool18073, 0
   br i1 %cond18074, label %or.true85, label %or.merge87
 
-or.merge87:                                       ; preds = %or.true85, %or.rhs86
+or.merge87:                                       ; preds = %or.rhs86, %or.true85
   %orval18075 = phi i32 [ 1, %or.true85 ], [ 0, %or.rhs86 ]
   %cond18076 = icmp ne i32 %orval18075, 0
   br i1 %cond18076, label %if.then3143, label %if.else3144
@@ -40252,7 +40273,7 @@ or.rhs89:                                         ; preds = %if.else3117
   %cond18096 = icmp ne i32 %bool18095, 0
   br i1 %cond18096, label %or.true88, label %or.merge90
 
-or.merge90:                                       ; preds = %or.true88, %or.rhs89
+or.merge90:                                       ; preds = %or.rhs89, %or.true88
   %orval18097 = phi i32 [ 1, %or.true88 ], [ 0, %or.rhs89 ]
   %cond18098 = icmp ne i32 %orval18097, 0
   br i1 %cond18098, label %or.true91, label %or.rhs92
@@ -40269,7 +40290,7 @@ or.rhs92:                                         ; preds = %or.merge90
   %cond18105 = icmp ne i32 %bool18104, 0
   br i1 %cond18105, label %or.true91, label %or.merge93
 
-or.merge93:                                       ; preds = %or.true91, %or.rhs92
+or.merge93:                                       ; preds = %or.rhs92, %or.true91
   %orval18106 = phi i32 [ 1, %or.true91 ], [ 0, %or.rhs92 ]
   %cond18107 = icmp ne i32 %orval18106, 0
   br i1 %cond18107, label %or.true94, label %or.rhs95
@@ -40286,7 +40307,7 @@ or.rhs95:                                         ; preds = %or.merge93
   %cond18114 = icmp ne i32 %bool18113, 0
   br i1 %cond18114, label %or.true94, label %or.merge96
 
-or.merge96:                                       ; preds = %or.true94, %or.rhs95
+or.merge96:                                       ; preds = %or.rhs95, %or.true94
   %orval18115 = phi i32 [ 1, %or.true94 ], [ 0, %or.rhs95 ]
   %cond18116 = icmp ne i32 %orval18115, 0
   br i1 %cond18116, label %if.then3146, label %if.else3147
@@ -40318,7 +40339,7 @@ or.rhs98:                                         ; preds = %if.then3146
   %cond18126 = icmp ne i32 %bool18125, 0
   br i1 %cond18126, label %or.true97, label %or.merge99
 
-or.merge99:                                       ; preds = %or.true97, %or.rhs98
+or.merge99:                                       ; preds = %or.rhs98, %or.true97
   %orval18127 = phi i32 [ 1, %or.true97 ], [ 0, %or.rhs98 ]
   %cond18128 = icmp ne i32 %orval18127, 0
   br i1 %cond18128, label %if.then3149, label %if.else3150
@@ -40350,7 +40371,7 @@ or.rhs101:                                        ; preds = %if.else3147
   %cond18144 = icmp ne i32 %bool18143, 0
   br i1 %cond18144, label %or.true100, label %or.merge102
 
-or.merge102:                                      ; preds = %or.true100, %or.rhs101
+or.merge102:                                      ; preds = %or.rhs101, %or.true100
   %orval18145 = phi i32 [ 1, %or.true100 ], [ 0, %or.rhs101 ]
   %cond18146 = icmp ne i32 %orval18145, 0
   br i1 %cond18146, label %if.then3152, label %if.else3153
@@ -40414,7 +40435,7 @@ or.rhs:                                           ; preds = %entry
   %cond20942 = icmp ne i32 %bool20941, 0
   br i1 %cond20942, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval20943 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond20944 = icmp ne i32 %orval20943, 0
   br i1 %cond20944, label %if.then3704, label %if.else3705
@@ -40613,12 +40634,12 @@ or.rhs:                                           ; preds = %entry
   %cond19591 = icmp ne i32 %bool19590, 0
   br i1 %cond19591, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval19592 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond19593 = icmp ne i32 %orval19592, 0
   br i1 %cond19593, label %if.then3444, label %if.else3445
 
-match.end3447:                                    ; preds = %match.test3700, %if.end3703, %for.end3661, %if.end3652, %if.end3647, %if.end3633, %if.end3628, %if.end3623, %if.end3603, %if.end3579, %match.body3573, %match.body3571, %if.end3570, %if.end3562, %if.end3554, %if.end3528, %if.end3508, %if.end3488, %if.end3465
+match.end3447:                                    ; preds = %if.end3703, %match.test3700, %for.end3661, %if.end3652, %if.end3647, %if.end3633, %if.end3628, %if.end3623, %if.end3603, %if.end3579, %match.body3573, %match.body3571, %if.end3570, %if.end3562, %if.end3554, %if.end3528, %if.end3508, %if.end3488, %if.end3465
   ret void
 
 match.test3448:                                   ; preds = %if.end3446
@@ -40690,7 +40711,7 @@ if.then3454:                                      ; preds = %if.end3453
 if.else3455:                                      ; preds = %if.end3453
   br label %if.end3456
 
-if.end3456:                                       ; preds = %if.else3455, %if.end3462
+if.end3456:                                       ; preds = %if.end3462, %if.else3455
   %load19693 = load ptr, ptr %env, align 8
   %load19694 = load %AstStmt, ptr %stmt, align 8
   %extract19695 = extractvalue %AstStmt %load19694, 14
@@ -41470,7 +41491,7 @@ if.then3534:                                      ; preds = %if.end3533
 if.else3535:                                      ; preds = %if.end3533
   br label %if.end3536
 
-if.end3536:                                       ; preds = %if.else3535, %if.end3539
+if.end3536:                                       ; preds = %if.end3539, %if.else3535
   %load20117 = load ptr, ptr %env, align 8
   %field20119 = getelementptr %SymbolTable, ptr %load20117, i32 0, i32 6
   %fieldval20120 = load i32, ptr %field20119, align 4
@@ -41679,7 +41700,7 @@ or.rhs33:                                         ; preds = %match.body3555
   %cond20216 = icmp ne i32 %bool20215, 0
   br i1 %cond20216, label %or.true32, label %or.merge34
 
-or.merge34:                                       ; preds = %or.true32, %or.rhs33
+or.merge34:                                       ; preds = %or.rhs33, %or.true32
   %orval20217 = phi i32 [ 1, %or.true32 ], [ 0, %or.rhs33 ]
   %cond20218 = icmp ne i32 %orval20217, 0
   br i1 %cond20218, label %if.then3557, label %if.else3558
@@ -42579,7 +42600,7 @@ if.then3666:                                      ; preds = %if.then3663
 if.else3667:                                      ; preds = %if.then3663
   br label %if.end3668
 
-if.end3668:                                       ; preds = %if.else3667, %if.end3674
+if.end3668:                                       ; preds = %if.end3674, %if.else3667
   %load20796 = load ptr, ptr %env, align 8
   %load20797 = load ptr, ptr %funcs, align 8
   %load20798 = load ptr, ptr %structs, align 8
@@ -42643,7 +42664,7 @@ if.then3672:                                      ; preds = %and.merge56
 if.else3673:                                      ; preds = %and.merge56
   br label %if.end3674
 
-if.end3674:                                       ; preds = %if.else3673, %if.end3677
+if.end3674:                                       ; preds = %if.end3677, %if.else3673
   br label %if.end3668
 
 and.rhs54:                                        ; preds = %if.end3671
@@ -42679,7 +42700,7 @@ if.then3675:                                      ; preds = %and.merge59
 if.else3676:                                      ; preds = %and.merge59
   br label %if.end3677
 
-if.end3677:                                       ; preds = %if.else3676, %if.end3680
+if.end3677:                                       ; preds = %if.end3680, %if.else3676
   br label %if.end3674
 
 and.rhs57:                                        ; preds = %if.then3672
@@ -44158,7 +44179,7 @@ if.then3823:                                      ; preds = %entry
 if.else3824:                                      ; preds = %entry
   br label %if.end3825
 
-if.end3825:                                       ; preds = %if.else3824, %while.end3828
+if.end3825:                                       ; preds = %while.end3828, %if.else3824
   ret void
 
 while.cond3826:                                   ; preds = %if.end3831, %if.then3823
@@ -44615,7 +44636,7 @@ if.then3861:                                      ; preds = %entry
 if.else3862:                                      ; preds = %entry
   br label %if.end3863
 
-if.end3863:                                       ; preds = %if.else3862, %if.end3866
+if.end3863:                                       ; preds = %if.end3866, %if.else3862
   ret void
 
 if.then3864:                                      ; preds = %if.then3861
@@ -45421,7 +45442,7 @@ if.end3940:                                       ; preds = %if.else3939
   %extract22496 = extractvalue %AstExpr %load22495, 0
   br label %match.test3942
 
-match.end3941:                                    ; preds = %match.test4012, %if.end4015, %if.end4010, %for.end3998, %for.end3991, %if.end3985, %for.end3979, %match.body3972, %match.body3970, %match.body3968, %for.end3966, %for.end3956, %match.body3949, %match.body3947, %match.body3945, %match.body3943
+match.end3941:                                    ; preds = %if.end4015, %match.test4012, %if.end4010, %for.end3998, %for.end3991, %if.end3985, %for.end3979, %match.body3972, %match.body3970, %match.body3968, %for.end3966, %for.end3956, %match.body3949, %match.body3947, %match.body3945, %match.body3943
   ret void
 
 match.test3942:                                   ; preds = %if.end3940
@@ -46163,7 +46184,7 @@ if.then4019:                                      ; preds = %and.merge3
 if.else4020:                                      ; preds = %and.merge3
   br label %if.end4021
 
-if.end4021:                                       ; preds = %if.else4020, %if.end4024
+if.end4021:                                       ; preds = %if.end4024, %if.else4020
   %load22960 = load ptr, ptr %scope, align 8
   %load22961 = load %AstProgram, ptr %program, align 8
   %load22962 = load i32, ptr %idx, align 4
@@ -46278,7 +46299,7 @@ if.then4028:                                      ; preds = %and.merge3
 if.else4029:                                      ; preds = %and.merge3
   br label %if.end4030
 
-if.end4030:                                       ; preds = %if.else4029, %if.end4033
+if.end4030:                                       ; preds = %if.end4033, %if.else4029
   ret void
 
 and.rhs:                                          ; preds = %if.end4027
@@ -46553,7 +46574,7 @@ if.end4036:                                       ; preds = %if.else4035
   %extract23038 = extractvalue %AstStmt %load23037, 0
   br label %match.test4038
 
-match.end4037:                                    ; preds = %match.test4083, %for.end4087, %if.end4081, %if.end4076, %match.body4070, %if.end4059, %match.body4053, %match.body4051, %match.body4049, %match.body4047, %match.body4045, %match.body4043, %match.body4041, %match.body4039
+match.end4037:                                    ; preds = %for.end4087, %match.test4083, %if.end4081, %if.end4076, %match.body4070, %if.end4059, %match.body4053, %match.body4051, %match.body4049, %match.body4047, %match.body4045, %match.body4043, %match.body4041, %match.body4039
   ret void
 
 match.test4038:                                   ; preds = %if.end4036
@@ -48403,7 +48424,7 @@ or.rhs:                                           ; preds = %if.end4256
   %cond24188 = icmp ne i32 %bool24187, 0
   br i1 %cond24188, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval24189 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond24190 = icmp ne i32 %orval24189, 0
   br i1 %cond24190, label %if.then4257, label %if.else4258
@@ -48428,7 +48449,7 @@ or.rhs2:                                          ; preds = %if.end4259
   %cond24202 = icmp ne i32 %bool24201, 0
   br i1 %cond24202, label %and.rhs, label %and.false
 
-or.merge3:                                        ; preds = %or.true1, %and.merge9
+or.merge3:                                        ; preds = %and.merge9, %or.true1
   %orval24230 = phi i32 [ 1, %or.true1 ], [ 0, %and.merge9 ]
   %cond24231 = icmp ne i32 %orval24230, 0
   br i1 %cond24231, label %if.then4260, label %if.else4261
@@ -48538,7 +48559,7 @@ or.rhs:                                           ; preds = %if.end4265
   %cond24252 = icmp ne i32 %bool24251, 0
   br i1 %cond24252, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval24253 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond24254 = icmp ne i32 %orval24253, 0
   br i1 %cond24254, label %if.then4266, label %if.else4267
@@ -48563,7 +48584,7 @@ or.rhs2:                                          ; preds = %if.end4268
   %cond24266 = icmp ne i32 %bool24265, 0
   br i1 %cond24266, label %and.rhs, label %and.false
 
-or.merge3:                                        ; preds = %or.true1, %and.merge9
+or.merge3:                                        ; preds = %and.merge9, %or.true1
   %orval24294 = phi i32 [ 1, %or.true1 ], [ 0, %and.merge9 ]
   %cond24295 = icmp ne i32 %orval24294, 0
   br i1 %cond24295, label %if.then4269, label %if.else4270
@@ -48797,7 +48818,7 @@ if.then4294:                                      ; preds = %for.body4290
 if.else4295:                                      ; preds = %for.body4290
   br label %if.end4296
 
-if.end4296:                                       ; preds = %if.else4295, %if.end4299
+if.end4296:                                       ; preds = %if.end4299, %if.else4295
   br label %for.step4291
 
 if.then4297:                                      ; preds = %if.then4294
@@ -48917,7 +48938,7 @@ if.then4303:                                      ; preds = %and.merge
 if.else4304:                                      ; preds = %and.merge
   br label %if.end4305
 
-if.end4305:                                       ; preds = %if.else4304, %for.end4309
+if.end4305:                                       ; preds = %for.end4309, %if.else4304
   %load24469 = load ptr, ptr %es, align 8
   %load24470 = load ptr, ptr %expected_ty, align 8
   %call24471 = call ptr @desugar_type_base(ptr %load24470)
@@ -49221,7 +49242,7 @@ if.then4463:                                      ; preds = %if.end4462
 if.else4464:                                      ; preds = %if.end4462
   br label %if.end4465
 
-if.end4465:                                       ; preds = %if.else4464, %if.end4468
+if.end4465:                                       ; preds = %if.end4468, %if.else4464
   %load25076 = load %AstExpr, ptr %expr, align 8
   %extract25077 = extractvalue %AstExpr %load25076, 0
   %strcmp25079 = call i32 @strcmp(ptr %extract25077, ptr @.strlit25078)
@@ -49254,7 +49275,7 @@ if.then4466:                                      ; preds = %if.then4463
 if.else4467:                                      ; preds = %if.then4463
   br label %if.end4468
 
-if.end4468:                                       ; preds = %if.else4467, %if.end4471
+if.end4468:                                       ; preds = %if.end4471, %if.else4467
   br label %if.end4465
 
 if.then4469:                                      ; preds = %if.then4466
@@ -49964,7 +49985,7 @@ if.then4317:                                      ; preds = %if.end4316
 if.else4318:                                      ; preds = %if.end4316
   br label %if.end4319
 
-if.end4319:                                       ; preds = %if.else4318, %for.end4323
+if.end4319:                                       ; preds = %for.end4323, %if.else4318
   %load24594 = load ptr, ptr %es, align 8
   %load24595 = load %AstAdtDecl, ptr %decl, align 8
   %extract24596 = extractvalue %AstAdtDecl %load24595, 0
@@ -50209,7 +50230,7 @@ or.rhs:                                           ; preds = %if.end4372
   %cond24751 = icmp ne i32 %bool24750, 0
   br i1 %cond24751, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval24752 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond24753 = icmp ne i32 %orval24752, 0
   br i1 %cond24753, label %and.rhs, label %and.false
@@ -50226,7 +50247,7 @@ and.rhs:                                          ; preds = %or.merge
 and.false:                                        ; preds = %or.merge3, %or.merge
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge3
+and.merge:                                        ; preds = %or.merge3, %and.false
   %andval24770 = phi i32 [ 1, %or.merge3 ], [ 0, %and.false ]
   %cond24771 = icmp ne i32 %andval24770, 0
   br i1 %cond24771, label %if.then4373, label %if.else4374
@@ -50243,7 +50264,7 @@ or.rhs2:                                          ; preds = %and.rhs
   %cond24767 = icmp ne i32 %bool24766, 0
   br i1 %cond24767, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval24768 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond24769 = icmp ne i32 %orval24768, 0
   br i1 %cond24769, label %and.merge, label %and.false
@@ -50620,7 +50641,7 @@ if.then4429:                                      ; preds = %if.end4428
 if.else4430:                                      ; preds = %if.end4428
   br label %if.end4431
 
-if.end4431:                                       ; preds = %if.else4430, %for.end4435
+if.end4431:                                       ; preds = %for.end4435, %if.else4430
   ret i32 0
 
 for.cond4432:                                     ; preds = %for.step4434, %if.then4429
@@ -50721,7 +50742,7 @@ or.rhs:                                           ; preds = %if.end4442
   %cond24966 = icmp ne i32 %bool24965, 0
   br i1 %cond24966, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval24967 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond24968 = icmp ne i32 %orval24967, 0
   br i1 %cond24968, label %if.then4443, label %if.else4444
@@ -50751,7 +50772,7 @@ or.rhs2:                                          ; preds = %if.end4445
   %cond24980 = icmp ne i32 %bool24979, 0
   br i1 %cond24980, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval24981 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond24982 = icmp ne i32 %orval24981, 0
   br i1 %cond24982, label %if.then4446, label %if.else4447
@@ -50782,7 +50803,7 @@ or.rhs5:                                          ; preds = %if.end4448
   %cond24994 = icmp ne i32 %bool24993, 0
   br i1 %cond24994, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval24995 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond24996 = icmp ne i32 %orval24995, 0
   br i1 %cond24996, label %if.then4449, label %if.else4450
@@ -50893,7 +50914,7 @@ if.then4539:                                      ; preds = %if.end4538
 if.else4540:                                      ; preds = %if.end4538
   br label %if.end4541
 
-if.end4541:                                       ; preds = %if.else4540, %if.end4547
+if.end4541:                                       ; preds = %if.end4547, %if.else4540
   %load25479 = load ptr, ptr %adts, align 8
   %load25480 = load ptr, ptr %es, align 8
   %load25481 = load ptr, ptr %store, align 8
@@ -51115,7 +51136,7 @@ if.then4566:                                      ; preds = %or.merge
 if.else4567:                                      ; preds = %or.merge
   br label %if.end4568
 
-if.end4568:                                       ; preds = %if.else4567, %if.end4571
+if.end4568:                                       ; preds = %if.end4571, %if.else4567
   ret ptr @.strlit25566
 
 or.true:                                          ; preds = %or.rhs, %if.end4556
@@ -51130,7 +51151,7 @@ or.rhs:                                           ; preds = %if.end4556
   %cond25550 = icmp ne i32 %bool25549, 0
   br i1 %cond25550, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval25551 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond25552 = icmp ne i32 %orval25551, 0
   br i1 %cond25552, label %if.then4566, label %if.else4567
@@ -51279,7 +51300,7 @@ if.then4590:                                      ; preds = %or.merge
 if.else4591:                                      ; preds = %or.merge
   br label %if.end4592
 
-if.end4592:                                       ; preds = %if.else4591, %if.end4595
+if.end4592:                                       ; preds = %if.end4595, %if.else4591
   ret ptr @.strlit25648
 
 or.true:                                          ; preds = %or.rhs, %if.end4589
@@ -51294,7 +51315,7 @@ or.rhs:                                           ; preds = %if.end4589
   %cond25632 = icmp ne i32 %bool25631, 0
   br i1 %cond25632, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval25633 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond25634 = icmp ne i32 %orval25633, 0
   br i1 %cond25634, label %if.then4590, label %if.else4591
@@ -51454,7 +51475,7 @@ or.rhs:                                           ; preds = %if.end4601
   %cond25688 = icmp ne i32 %bool25687, 0
   br i1 %cond25688, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval25689 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond25690 = icmp ne i32 %orval25689, 0
   br i1 %cond25690, label %if.then4602, label %if.else4603
@@ -51514,7 +51535,7 @@ or.rhs2:                                          ; preds = %if.end4604
   %cond25736 = icmp ne i32 %bool25735, 0
   br i1 %cond25736, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval25737 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond25738 = icmp ne i32 %orval25737, 0
   br i1 %cond25738, label %if.then4605, label %if.else4606
@@ -51635,7 +51656,7 @@ if.then4614:                                      ; preds = %or.merge
 if.else4615:                                      ; preds = %or.merge
   br label %if.end4616
 
-if.end4616:                                       ; preds = %if.else4615, %if.end4619
+if.end4616:                                       ; preds = %if.end4619, %if.else4615
   %load25855 = load ptr, ptr %es, align 8
   %load25857 = load i32, ptr %subject_idx, align 4
   %load25858 = load ptr, ptr %adts, align 8
@@ -51687,7 +51708,7 @@ or.rhs:                                           ; preds = %if.end4613
   %cond25807 = icmp ne i32 %bool25806, 0
   br i1 %cond25807, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval25808 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond25809 = icmp ne i32 %orval25808, 0
   br i1 %cond25809, label %if.then4614, label %if.else4615
@@ -51808,7 +51829,7 @@ if.then4625:                                      ; preds = %for.body4621
 if.else4626:                                      ; preds = %for.body4621
   br label %if.end4627
 
-if.end4627:                                       ; preds = %if.else4626, %if.end4630
+if.end4627:                                       ; preds = %if.end4630, %if.else4626
   br label %for.step4622
 
 if.then4628:                                      ; preds = %and.merge
@@ -51832,7 +51853,7 @@ or.rhs:                                           ; preds = %if.then4625
   %cond25918 = icmp ne i32 %bool25917, 0
   br i1 %cond25918, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval25919 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond25920 = icmp ne i32 %orval25919, 0
   br i1 %cond25920, label %and.rhs, label %and.false
@@ -52165,7 +52186,7 @@ if.end4666:                                       ; preds = %if.else4665
   %matchres26114 = alloca i32, align 4
   br label %match.test4668
 
-match.end4667:                                    ; preds = %match.test4808, %for.end4817, %for.end4805, %for.end4793, %for.end4781, %if.end4702, %match.body4686, %match.body4684, %match.body4682, %match.body4680, %match.body4678, %match.body4676, %ifexpr.end4675, %match.body4669
+match.end4667:                                    ; preds = %for.end4817, %match.test4808, %for.end4805, %for.end4793, %for.end4781, %if.end4702, %match.body4686, %match.body4684, %match.body4682, %match.body4680, %match.body4678, %match.body4676, %ifexpr.end4675, %match.body4669
   %matchval26805 = load i32, ptr %matchres26114, align 4
   ret i32 %matchval26805
 
@@ -52749,7 +52770,7 @@ if.then4731:                                      ; preds = %if.end4710
 if.else4732:                                      ; preds = %if.end4710
   br label %if.end4733
 
-if.end4733:                                       ; preds = %if.else4732, %if.end4736
+if.end4733:                                       ; preds = %if.end4736, %if.else4732
   br label %for.step4705
 
 if.then4734:                                      ; preds = %if.then4731
@@ -53004,7 +53025,7 @@ if.then4765:                                      ; preds = %if.end4744
 if.else4766:                                      ; preds = %if.end4744
   br label %if.end4767
 
-if.end4767:                                       ; preds = %if.else4766, %if.end4770
+if.end4767:                                       ; preds = %if.end4770, %if.else4766
   br label %for.step4739
 
 if.then4768:                                      ; preds = %if.then4765
@@ -54406,7 +54427,7 @@ or.rhs:                                           ; preds = %entry
   %cond27193 = icmp ne i32 %bool27192, 0
   br i1 %cond27193, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval27194 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond27195 = icmp ne i32 %orval27194, 0
   br i1 %cond27195, label %if.then4884, label %if.else4885
@@ -54933,7 +54954,7 @@ or.rhs:                                           ; preds = %if.end4941
   %cond27424 = icmp ne i32 %bool27423, 0
   br i1 %cond27424, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval27425 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond27426 = icmp ne i32 %orval27425, 0
   br i1 %cond27426, label %if.then4942, label %if.else4943
@@ -55182,7 +55203,7 @@ or.rhs:                                           ; preds = %for.body4952
   %cond27527 = icmp ne i32 %bool27526, 0
   br i1 %cond27527, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval27528 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond27529 = icmp ne i32 %orval27528, 0
   br i1 %cond27529, label %if.then4956, label %if.else4957
@@ -55383,7 +55404,7 @@ or.rhs:                                           ; preds = %if.end4972
   %cond27623 = icmp ne i32 %bool27622, 0
   br i1 %cond27623, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval27624 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond27625 = icmp ne i32 %orval27624, 0
   br i1 %cond27625, label %if.then4973, label %if.else4974
@@ -55460,7 +55481,7 @@ or.rhs2:                                          ; preds = %if.end4984
   %cond27660 = icmp ne i32 %bool27659, 0
   br i1 %cond27660, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval27661 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond27662 = icmp ne i32 %orval27661, 0
   br i1 %cond27662, label %or.true4, label %or.rhs5
@@ -55476,7 +55497,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond27668 = icmp ne i32 %bool27667, 0
   br i1 %cond27668, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval27669 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond27670 = icmp ne i32 %orval27669, 0
   br i1 %cond27670, label %if.then4985, label %if.else4986
@@ -55507,7 +55528,7 @@ or.rhs8:                                          ; preds = %if.end4987
   %cond27683 = icmp ne i32 %bool27682, 0
   br i1 %cond27683, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval27684 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond27685 = icmp ne i32 %orval27684, 0
   br i1 %cond27685, label %or.true10, label %or.rhs11
@@ -55523,7 +55544,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond27691 = icmp ne i32 %bool27690, 0
   br i1 %cond27691, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval27692 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond27693 = icmp ne i32 %orval27692, 0
   br i1 %cond27693, label %if.then4988, label %if.else4989
@@ -55581,7 +55602,7 @@ or.rhs14:                                         ; preds = %if.end4996
   %cond27720 = icmp ne i32 %bool27719, 0
   br i1 %cond27720, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval27721 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond27722 = icmp ne i32 %orval27721, 0
   br i1 %cond27722, label %if.then4997, label %if.else4998
@@ -56293,7 +56314,7 @@ or.rhs:                                           ; preds = %entry
   %cond28065 = icmp ne i32 %bool28064, 0
   br i1 %cond28065, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval28066 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond28067 = icmp ne i32 %orval28066, 0
   br i1 %cond28067, label %if.then5025, label %if.else5026
@@ -56324,7 +56345,7 @@ or.rhs2:                                          ; preds = %if.end5027
   %cond28081 = icmp ne i32 %bool28080, 0
   br i1 %cond28081, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval28082 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond28083 = icmp ne i32 %orval28082, 0
   br i1 %cond28083, label %or.true4, label %or.rhs5
@@ -56340,7 +56361,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond28089 = icmp ne i32 %bool28088, 0
   br i1 %cond28089, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval28090 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond28091 = icmp ne i32 %orval28090, 0
   br i1 %cond28091, label %if.then5028, label %if.else5029
@@ -56372,7 +56393,7 @@ or.rhs8:                                          ; preds = %if.end5030
   %cond28104 = icmp ne i32 %bool28103, 0
   br i1 %cond28104, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval28105 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond28106 = icmp ne i32 %orval28105, 0
   br i1 %cond28106, label %or.true10, label %or.rhs11
@@ -56388,7 +56409,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond28111 = icmp ne i32 %bool28110, 0
   br i1 %cond28111, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval28112 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond28113 = icmp ne i32 %orval28112, 0
   br i1 %cond28113, label %or.true13, label %or.rhs14
@@ -56404,7 +56425,7 @@ or.rhs14:                                         ; preds = %or.merge12
   %cond28118 = icmp ne i32 %bool28117, 0
   br i1 %cond28118, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval28119 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond28120 = icmp ne i32 %orval28119, 0
   br i1 %cond28120, label %or.true16, label %or.rhs17
@@ -56420,7 +56441,7 @@ or.rhs17:                                         ; preds = %or.merge15
   %cond28125 = icmp ne i32 %bool28124, 0
   br i1 %cond28125, label %or.true16, label %or.merge18
 
-or.merge18:                                       ; preds = %or.true16, %or.rhs17
+or.merge18:                                       ; preds = %or.rhs17, %or.true16
   %orval28126 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
   %cond28127 = icmp ne i32 %orval28126, 0
   br i1 %cond28127, label %if.then5031, label %if.else5032
@@ -56888,7 +56909,7 @@ or.rhs:                                           ; preds = %if.end5039
   %cond28637 = icmp ne i32 %bool28636, 0
   br i1 %cond28637, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval28638 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond28639 = icmp ne i32 %orval28638, 0
   br i1 %cond28639, label %and.rhs, label %and.false
@@ -56904,7 +56925,7 @@ and.rhs:                                          ; preds = %or.merge
 and.false:                                        ; preds = %or.merge3, %or.merge
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge3
+and.merge:                                        ; preds = %or.merge3, %and.false
   %andval28654 = phi i32 [ 1, %or.merge3 ], [ 0, %and.false ]
   %cond28655 = icmp ne i32 %andval28654, 0
   br i1 %cond28655, label %if.then5040, label %if.else5041
@@ -56920,7 +56941,7 @@ or.rhs2:                                          ; preds = %and.rhs
   %cond28651 = icmp ne i32 %bool28650, 0
   br i1 %cond28651, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval28652 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond28653 = icmp ne i32 %orval28652, 0
   br i1 %cond28653, label %and.merge, label %and.false
@@ -57037,7 +57058,7 @@ or.rhs11:                                         ; preds = %if.end5048
   %cond28728 = icmp ne i32 %bool28727, 0
   br i1 %cond28728, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval28729 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond28730 = icmp ne i32 %orval28729, 0
   br i1 %cond28730, label %or.true13, label %or.rhs14
@@ -57053,7 +57074,7 @@ or.rhs14:                                         ; preds = %or.merge12
   %cond28736 = icmp ne i32 %bool28735, 0
   br i1 %cond28736, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval28737 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond28738 = icmp ne i32 %orval28737, 0
   br i1 %cond28738, label %and.rhs16, label %and.false17
@@ -57069,7 +57090,7 @@ and.rhs16:                                        ; preds = %or.merge15
 and.false17:                                      ; preds = %or.merge30, %or.merge15
   br label %and.merge18
 
-and.merge18:                                      ; preds = %and.false17, %or.merge30
+and.merge18:                                      ; preds = %or.merge30, %and.false17
   %andval28777 = phi i32 [ 1, %or.merge30 ], [ 0, %and.false17 ]
   %cond28778 = icmp ne i32 %andval28777, 0
   br i1 %cond28778, label %if.then5049, label %if.else5050
@@ -57085,7 +57106,7 @@ or.rhs20:                                         ; preds = %and.rhs16
   %cond28750 = icmp ne i32 %bool28749, 0
   br i1 %cond28750, label %or.true19, label %or.merge21
 
-or.merge21:                                       ; preds = %or.true19, %or.rhs20
+or.merge21:                                       ; preds = %or.rhs20, %or.true19
   %orval28751 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
   %cond28752 = icmp ne i32 %orval28751, 0
   br i1 %cond28752, label %or.true22, label %or.rhs23
@@ -57101,7 +57122,7 @@ or.rhs23:                                         ; preds = %or.merge21
   %cond28758 = icmp ne i32 %bool28757, 0
   br i1 %cond28758, label %or.true22, label %or.merge24
 
-or.merge24:                                       ; preds = %or.true22, %or.rhs23
+or.merge24:                                       ; preds = %or.rhs23, %or.true22
   %orval28759 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
   %cond28760 = icmp ne i32 %orval28759, 0
   br i1 %cond28760, label %or.true25, label %or.rhs26
@@ -57117,7 +57138,7 @@ or.rhs26:                                         ; preds = %or.merge24
   %cond28766 = icmp ne i32 %bool28765, 0
   br i1 %cond28766, label %or.true25, label %or.merge27
 
-or.merge27:                                       ; preds = %or.true25, %or.rhs26
+or.merge27:                                       ; preds = %or.rhs26, %or.true25
   %orval28767 = phi i32 [ 1, %or.true25 ], [ 0, %or.rhs26 ]
   %cond28768 = icmp ne i32 %orval28767, 0
   br i1 %cond28768, label %or.true28, label %or.rhs29
@@ -57133,7 +57154,7 @@ or.rhs29:                                         ; preds = %or.merge27
   %cond28774 = icmp ne i32 %bool28773, 0
   br i1 %cond28774, label %or.true28, label %or.merge30
 
-or.merge30:                                       ; preds = %or.true28, %or.rhs29
+or.merge30:                                       ; preds = %or.rhs29, %or.true28
   %orval28775 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
   %cond28776 = icmp ne i32 %orval28775, 0
   br i1 %cond28776, label %and.merge18, label %and.false17
@@ -57172,7 +57193,7 @@ or.rhs32:                                         ; preds = %if.end5051
   %cond28801 = icmp ne i32 %bool28800, 0
   br i1 %cond28801, label %or.true31, label %or.merge33
 
-or.merge33:                                       ; preds = %or.true31, %or.rhs32
+or.merge33:                                       ; preds = %or.rhs32, %or.true31
   %orval28802 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
   %cond28803 = icmp ne i32 %orval28802, 0
   br i1 %cond28803, label %and.rhs34, label %and.false35
@@ -57188,7 +57209,7 @@ and.rhs34:                                        ; preds = %or.merge33
 and.false35:                                      ; preds = %or.merge42, %or.merge33
   br label %and.merge36
 
-and.merge36:                                      ; preds = %and.false35, %or.merge42
+and.merge36:                                      ; preds = %or.merge42, %and.false35
   %andval28826 = phi i32 [ 1, %or.merge42 ], [ 0, %and.false35 ]
   %cond28827 = icmp ne i32 %andval28826, 0
   br i1 %cond28827, label %if.then5052, label %if.else5053
@@ -57204,7 +57225,7 @@ or.rhs38:                                         ; preds = %and.rhs34
   %cond28815 = icmp ne i32 %bool28814, 0
   br i1 %cond28815, label %or.true37, label %or.merge39
 
-or.merge39:                                       ; preds = %or.true37, %or.rhs38
+or.merge39:                                       ; preds = %or.rhs38, %or.true37
   %orval28816 = phi i32 [ 1, %or.true37 ], [ 0, %or.rhs38 ]
   %cond28817 = icmp ne i32 %orval28816, 0
   br i1 %cond28817, label %or.true40, label %or.rhs41
@@ -57220,7 +57241,7 @@ or.rhs41:                                         ; preds = %or.merge39
   %cond28823 = icmp ne i32 %bool28822, 0
   br i1 %cond28823, label %or.true40, label %or.merge42
 
-or.merge42:                                       ; preds = %or.true40, %or.rhs41
+or.merge42:                                       ; preds = %or.rhs41, %or.true40
   %orval28824 = phi i32 [ 1, %or.true40 ], [ 0, %or.rhs41 ]
   %cond28825 = icmp ne i32 %orval28824, 0
   br i1 %cond28825, label %and.merge36, label %and.false35
@@ -57255,7 +57276,7 @@ or.rhs44:                                         ; preds = %if.end5054
   %cond28850 = icmp ne i32 %bool28849, 0
   br i1 %cond28850, label %or.true43, label %or.merge45
 
-or.merge45:                                       ; preds = %or.true43, %or.rhs44
+or.merge45:                                       ; preds = %or.rhs44, %or.true43
   %orval28851 = phi i32 [ 1, %or.true43 ], [ 0, %or.rhs44 ]
   %cond28852 = icmp ne i32 %orval28851, 0
   br i1 %cond28852, label %or.true46, label %or.rhs47
@@ -57271,7 +57292,7 @@ or.rhs47:                                         ; preds = %or.merge45
   %cond28858 = icmp ne i32 %bool28857, 0
   br i1 %cond28858, label %or.true46, label %or.merge48
 
-or.merge48:                                       ; preds = %or.true46, %or.rhs47
+or.merge48:                                       ; preds = %or.rhs47, %or.true46
   %orval28859 = phi i32 [ 1, %or.true46 ], [ 0, %or.rhs47 ]
   %cond28860 = icmp ne i32 %orval28859, 0
   br i1 %cond28860, label %and.rhs49, label %and.false50
@@ -57287,7 +57308,7 @@ and.rhs49:                                        ; preds = %or.merge48
 and.false50:                                      ; preds = %or.merge63, %or.merge48
   br label %and.merge51
 
-and.merge51:                                      ; preds = %and.false50, %or.merge63
+and.merge51:                                      ; preds = %or.merge63, %and.false50
   %andval28899 = phi i32 [ 1, %or.merge63 ], [ 0, %and.false50 ]
   %cond28900 = icmp ne i32 %andval28899, 0
   br i1 %cond28900, label %if.then5055, label %if.else5056
@@ -57303,7 +57324,7 @@ or.rhs53:                                         ; preds = %and.rhs49
   %cond28872 = icmp ne i32 %bool28871, 0
   br i1 %cond28872, label %or.true52, label %or.merge54
 
-or.merge54:                                       ; preds = %or.true52, %or.rhs53
+or.merge54:                                       ; preds = %or.rhs53, %or.true52
   %orval28873 = phi i32 [ 1, %or.true52 ], [ 0, %or.rhs53 ]
   %cond28874 = icmp ne i32 %orval28873, 0
   br i1 %cond28874, label %or.true55, label %or.rhs56
@@ -57319,7 +57340,7 @@ or.rhs56:                                         ; preds = %or.merge54
   %cond28880 = icmp ne i32 %bool28879, 0
   br i1 %cond28880, label %or.true55, label %or.merge57
 
-or.merge57:                                       ; preds = %or.true55, %or.rhs56
+or.merge57:                                       ; preds = %or.rhs56, %or.true55
   %orval28881 = phi i32 [ 1, %or.true55 ], [ 0, %or.rhs56 ]
   %cond28882 = icmp ne i32 %orval28881, 0
   br i1 %cond28882, label %or.true58, label %or.rhs59
@@ -57335,7 +57356,7 @@ or.rhs59:                                         ; preds = %or.merge57
   %cond28888 = icmp ne i32 %bool28887, 0
   br i1 %cond28888, label %or.true58, label %or.merge60
 
-or.merge60:                                       ; preds = %or.true58, %or.rhs59
+or.merge60:                                       ; preds = %or.rhs59, %or.true58
   %orval28889 = phi i32 [ 1, %or.true58 ], [ 0, %or.rhs59 ]
   %cond28890 = icmp ne i32 %orval28889, 0
   br i1 %cond28890, label %or.true61, label %or.rhs62
@@ -57351,7 +57372,7 @@ or.rhs62:                                         ; preds = %or.merge60
   %cond28896 = icmp ne i32 %bool28895, 0
   br i1 %cond28896, label %or.true61, label %or.merge63
 
-or.merge63:                                       ; preds = %or.true61, %or.rhs62
+or.merge63:                                       ; preds = %or.rhs62, %or.true61
   %orval28897 = phi i32 [ 1, %or.true61 ], [ 0, %or.rhs62 ]
   %cond28898 = icmp ne i32 %orval28897, 0
   br i1 %cond28898, label %and.merge51, label %and.false50
@@ -57936,7 +57957,7 @@ or.rhs:                                           ; preds = %entry
   %cond28967 = icmp ne i32 %bool28966, 0
   br i1 %cond28967, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval28968 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond28969 = icmp ne i32 %orval28968, 0
   br i1 %cond28969, label %if.then5058, label %if.else5059
@@ -58272,7 +58293,7 @@ or.rhs:                                           ; preds = %entry
   %cond29150 = icmp ne i32 %bool29149, 0
   br i1 %cond29150, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval29151 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond29152 = icmp ne i32 %orval29151, 0
   br i1 %cond29152, label %or.true1, label %or.rhs2
@@ -58288,7 +58309,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond29158 = icmp ne i32 %bool29157, 0
   br i1 %cond29158, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval29159 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond29160 = icmp ne i32 %orval29159, 0
   br i1 %cond29160, label %ifexpr.then5075, label %ifexpr.else5076
@@ -58322,7 +58343,7 @@ or.rhs5:                                          ; preds = %ifexpr.else5076
   %cond29174 = icmp ne i32 %bool29173, 0
   br i1 %cond29174, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval29175 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond29176 = icmp ne i32 %orval29175, 0
   br i1 %cond29176, label %ifexpr.then5078, label %ifexpr.else5079
@@ -58411,7 +58432,7 @@ or.rhs8:                                          ; preds = %ifexpr.else5085
   %cond29220 = icmp ne i32 %bool29219, 0
   br i1 %cond29220, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval29221 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond29222 = icmp ne i32 %orval29221, 0
   br i1 %cond29222, label %or.true10, label %or.rhs11
@@ -58427,7 +58448,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond29228 = icmp ne i32 %bool29227, 0
   br i1 %cond29228, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval29229 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond29230 = icmp ne i32 %orval29229, 0
   br i1 %cond29230, label %ifexpr.then5087, label %ifexpr.else5088
@@ -58685,7 +58706,7 @@ or.rhs:                                           ; preds = %entry
   %cond29400 = icmp ne i32 %bool29399, 0
   br i1 %cond29400, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval29401 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond29402 = icmp ne i32 %orval29401, 0
   br i1 %cond29402, label %or.true1, label %or.rhs2
@@ -58701,7 +58722,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond29408 = icmp ne i32 %bool29407, 0
   br i1 %cond29408, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval29409 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond29410 = icmp ne i32 %orval29409, 0
   br i1 %cond29410, label %if.then5093, label %if.else5094
@@ -58738,7 +58759,7 @@ or.rhs:                                           ; preds = %entry
   %cond29422 = icmp ne i32 %bool29421, 0
   br i1 %cond29422, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval29423 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond29424 = icmp ne i32 %orval29423, 0
   br i1 %cond29424, label %if.then5096, label %if.else5097
@@ -58775,7 +58796,7 @@ or.rhs:                                           ; preds = %entry
   %cond29436 = icmp ne i32 %bool29435, 0
   br i1 %cond29436, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval29437 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond29438 = icmp ne i32 %orval29437, 0
   br i1 %cond29438, label %or.true1, label %or.rhs2
@@ -58791,7 +58812,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond29443 = icmp ne i32 %bool29442, 0
   br i1 %cond29443, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval29444 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond29445 = icmp ne i32 %orval29444, 0
   br i1 %cond29445, label %or.true4, label %or.rhs5
@@ -58807,7 +58828,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond29450 = icmp ne i32 %bool29449, 0
   br i1 %cond29450, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval29451 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond29452 = icmp ne i32 %orval29451, 0
   br i1 %cond29452, label %or.true7, label %or.rhs8
@@ -58823,7 +58844,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond29457 = icmp ne i32 %bool29456, 0
   br i1 %cond29457, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval29458 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond29459 = icmp ne i32 %orval29458, 0
   br i1 %cond29459, label %if.then5099, label %if.else5100
@@ -58865,7 +58886,7 @@ or.rhs:                                           ; preds = %entry
   %cond29471 = icmp ne i32 %bool29470, 0
   br i1 %cond29471, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval29472 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond29473 = icmp ne i32 %orval29472, 0
   br i1 %cond29473, label %if.then5102, label %if.else5103
@@ -59510,7 +59531,7 @@ or.rhs:                                           ; preds = %if.then5162
   %cond29788 = icmp ne i32 %bool29787, 0
   br i1 %cond29788, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval29789 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond29790 = icmp ne i32 %orval29789, 0
   br i1 %cond29790, label %or.true3, label %or.rhs4
@@ -59527,7 +59548,7 @@ or.rhs4:                                          ; preds = %or.merge
   %cond29797 = icmp ne i32 %bool29796, 0
   br i1 %cond29797, label %or.true3, label %or.merge5
 
-or.merge5:                                        ; preds = %or.true3, %or.rhs4
+or.merge5:                                        ; preds = %or.rhs4, %or.true3
   %orval29798 = phi i32 [ 1, %or.true3 ], [ 0, %or.rhs4 ]
   %cond29799 = icmp ne i32 %orval29798, 0
   br i1 %cond29799, label %or.true6, label %or.rhs7
@@ -59544,7 +59565,7 @@ or.rhs7:                                          ; preds = %or.merge5
   %cond29806 = icmp ne i32 %bool29805, 0
   br i1 %cond29806, label %or.true6, label %or.merge8
 
-or.merge8:                                        ; preds = %or.true6, %or.rhs7
+or.merge8:                                        ; preds = %or.rhs7, %or.true6
   %orval29807 = phi i32 [ 1, %or.true6 ], [ 0, %or.rhs7 ]
   %cond29808 = icmp ne i32 %orval29807, 0
   br i1 %cond29808, label %or.true9, label %or.rhs10
@@ -59561,7 +59582,7 @@ or.rhs10:                                         ; preds = %or.merge8
   %cond29815 = icmp ne i32 %bool29814, 0
   br i1 %cond29815, label %or.true9, label %or.merge11
 
-or.merge11:                                       ; preds = %or.true9, %or.rhs10
+or.merge11:                                       ; preds = %or.rhs10, %or.true9
   %orval29816 = phi i32 [ 1, %or.true9 ], [ 0, %or.rhs10 ]
   %cond29817 = icmp ne i32 %orval29816, 0
   br i1 %cond29817, label %or.true12, label %or.rhs13
@@ -59578,7 +59599,7 @@ or.rhs13:                                         ; preds = %or.merge11
   %cond29824 = icmp ne i32 %bool29823, 0
   br i1 %cond29824, label %or.true12, label %or.merge14
 
-or.merge14:                                       ; preds = %or.true12, %or.rhs13
+or.merge14:                                       ; preds = %or.rhs13, %or.true12
   %orval29825 = phi i32 [ 1, %or.true12 ], [ 0, %or.rhs13 ]
   %cond29826 = icmp ne i32 %orval29825, 0
   br i1 %cond29826, label %or.true15, label %or.rhs16
@@ -59595,7 +59616,7 @@ or.rhs16:                                         ; preds = %or.merge14
   %cond29833 = icmp ne i32 %bool29832, 0
   br i1 %cond29833, label %or.true15, label %or.merge17
 
-or.merge17:                                       ; preds = %or.true15, %or.rhs16
+or.merge17:                                       ; preds = %or.rhs16, %or.true15
   %orval29834 = phi i32 [ 1, %or.true15 ], [ 0, %or.rhs16 ]
   %cond29835 = icmp ne i32 %orval29834, 0
   br i1 %cond29835, label %or.true18, label %or.rhs19
@@ -59612,7 +59633,7 @@ or.rhs19:                                         ; preds = %or.merge17
   %cond29842 = icmp ne i32 %bool29841, 0
   br i1 %cond29842, label %or.true18, label %or.merge20
 
-or.merge20:                                       ; preds = %or.true18, %or.rhs19
+or.merge20:                                       ; preds = %or.rhs19, %or.true18
   %orval29843 = phi i32 [ 1, %or.true18 ], [ 0, %or.rhs19 ]
   %cond29844 = icmp ne i32 %orval29843, 0
   br i1 %cond29844, label %if.then5165, label %if.else5166
@@ -59644,7 +59665,7 @@ and.rhs21:                                        ; preds = %if.end5167
 and.false22:                                      ; preds = %or.merge26, %if.end5167
   br label %and.merge23
 
-and.merge23:                                      ; preds = %and.false22, %or.merge26
+and.merge23:                                      ; preds = %or.merge26, %and.false22
   %andval29881 = phi i32 [ 1, %or.merge26 ], [ 0, %and.false22 ]
   %cond29882 = icmp ne i32 %andval29881, 0
   br i1 %cond29882, label %and.rhs27, label %and.false28
@@ -59660,7 +59681,7 @@ or.rhs25:                                         ; preds = %and.rhs21
   %cond29878 = icmp ne i32 %bool29877, 0
   br i1 %cond29878, label %or.true24, label %or.merge26
 
-or.merge26:                                       ; preds = %or.true24, %or.rhs25
+or.merge26:                                       ; preds = %or.rhs25, %or.true24
   %orval29879 = phi i32 [ 1, %or.true24 ], [ 0, %or.rhs25 ]
   %cond29880 = icmp ne i32 %orval29879, 0
   br i1 %cond29880, label %and.merge23, label %and.false22
@@ -59724,7 +59745,7 @@ and.rhs33:                                        ; preds = %and.merge32
 and.false34:                                      ; preds = %or.merge38, %and.merge32
   br label %and.merge35
 
-and.merge35:                                      ; preds = %and.false34, %or.merge38
+and.merge35:                                      ; preds = %or.merge38, %and.false34
   %andval29919 = phi i32 [ 1, %or.merge38 ], [ 0, %and.false34 ]
   %cond29920 = icmp ne i32 %andval29919, 0
   br i1 %cond29920, label %if.then5171, label %if.else5172
@@ -59740,7 +59761,7 @@ or.rhs37:                                         ; preds = %and.rhs33
   %cond29916 = icmp ne i32 %bool29915, 0
   br i1 %cond29916, label %or.true36, label %or.merge38
 
-or.merge38:                                       ; preds = %or.true36, %or.rhs37
+or.merge38:                                       ; preds = %or.rhs37, %or.true36
   %orval29917 = phi i32 [ 1, %or.true36 ], [ 0, %or.rhs37 ]
   %cond29918 = icmp ne i32 %orval29917, 0
   br i1 %cond29918, label %and.merge35, label %and.false34
@@ -59768,7 +59789,7 @@ and.rhs39:                                        ; preds = %if.end5173
 and.false40:                                      ; preds = %or.merge44, %if.end5173
   br label %and.merge41
 
-and.merge41:                                      ; preds = %and.false40, %or.merge44
+and.merge41:                                      ; preds = %or.merge44, %and.false40
   %andval29943 = phi i32 [ 1, %or.merge44 ], [ 0, %and.false40 ]
   %cond29944 = icmp ne i32 %andval29943, 0
   br i1 %cond29944, label %and.rhs45, label %and.false46
@@ -59784,7 +59805,7 @@ or.rhs43:                                         ; preds = %and.rhs39
   %cond29940 = icmp ne i32 %bool29939, 0
   br i1 %cond29940, label %or.true42, label %or.merge44
 
-or.merge44:                                       ; preds = %or.true42, %or.rhs43
+or.merge44:                                       ; preds = %or.rhs43, %or.true42
   %orval29941 = phi i32 [ 1, %or.true42 ], [ 0, %or.rhs43 ]
   %cond29942 = icmp ne i32 %orval29941, 0
   br i1 %cond29942, label %and.merge41, label %and.false40
@@ -59800,7 +59821,7 @@ and.rhs45:                                        ; preds = %and.merge41
 and.false46:                                      ; preds = %or.merge50, %and.merge41
   br label %and.merge47
 
-and.merge47:                                      ; preds = %and.false46, %or.merge50
+and.merge47:                                      ; preds = %or.merge50, %and.false46
   %andval29959 = phi i32 [ 1, %or.merge50 ], [ 0, %and.false46 ]
   %cond29960 = icmp ne i32 %andval29959, 0
   br i1 %cond29960, label %if.then5174, label %if.else5175
@@ -59816,7 +59837,7 @@ or.rhs49:                                         ; preds = %and.rhs45
   %cond29956 = icmp ne i32 %bool29955, 0
   br i1 %cond29956, label %or.true48, label %or.merge50
 
-or.merge50:                                       ; preds = %or.true48, %or.rhs49
+or.merge50:                                       ; preds = %or.rhs49, %or.true48
   %orval29957 = phi i32 [ 1, %or.true48 ], [ 0, %or.rhs49 ]
   %cond29958 = icmp ne i32 %orval29957, 0
   br i1 %cond29958, label %and.merge47, label %and.false46
@@ -59931,7 +59952,7 @@ if.then5192:                                      ; preds = %if.end5191
 if.else5193:                                      ; preds = %if.end5191
   br label %if.end5194
 
-if.end5194:                                       ; preds = %if.else5193, %if.end5214
+if.end5194:                                       ; preds = %if.end5214, %if.else5193
   ret ptr @.strlit30097
 
 for.cond5195:                                     ; preds = %for.step5197, %if.then5192
@@ -59985,7 +60006,7 @@ if.then5200:                                      ; preds = %for.body5196
 if.else5201:                                      ; preds = %for.body5196
   br label %if.end5202
 
-if.end5202:                                       ; preds = %if.else5201, %if.end5205
+if.end5202:                                       ; preds = %if.end5205, %if.else5201
   br label %for.step5197
 
 if.then5203:                                      ; preds = %if.then5200
@@ -60358,7 +60379,7 @@ or.rhs:                                           ; preds = %if.end5367
   %cond31221 = icmp ne i32 %bool31220, 0
   br i1 %cond31221, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval31222 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond31223 = icmp ne i32 %orval31222, 0
   br i1 %cond31223, label %or.true1, label %or.rhs2
@@ -60374,7 +60395,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond31229 = icmp ne i32 %bool31228, 0
   br i1 %cond31229, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval31230 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond31231 = icmp ne i32 %orval31230, 0
   br i1 %cond31231, label %if.then5368, label %if.else5369
@@ -60409,7 +60430,7 @@ or.rhs5:                                          ; preds = %if.end5370
   %cond31246 = icmp ne i32 %bool31245, 0
   br i1 %cond31246, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval31247 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond31248 = icmp ne i32 %orval31247, 0
   br i1 %cond31248, label %or.true7, label %or.rhs8
@@ -60425,7 +60446,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond31254 = icmp ne i32 %bool31253, 0
   br i1 %cond31254, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval31255 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond31256 = icmp ne i32 %orval31255, 0
   br i1 %cond31256, label %if.then5371, label %if.else5372
@@ -60458,7 +60479,7 @@ or.rhs11:                                         ; preds = %if.end5373
   %cond31273 = icmp ne i32 %bool31272, 0
   br i1 %cond31273, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval31274 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond31275 = icmp ne i32 %orval31274, 0
   br i1 %cond31275, label %if.then5374, label %if.else5375
@@ -61145,7 +61166,7 @@ or.rhs31:                                         ; preds = %if.end5444
   %cond31646 = icmp ne i32 %bool31645, 0
   br i1 %cond31646, label %or.true30, label %or.merge32
 
-or.merge32:                                       ; preds = %or.true30, %or.rhs31
+or.merge32:                                       ; preds = %or.rhs31, %or.true30
   %orval31647 = phi i32 [ 1, %or.true30 ], [ 0, %or.rhs31 ]
   %cond31648 = icmp ne i32 %orval31647, 0
   br i1 %cond31648, label %if.then5445, label %if.else5446
@@ -62190,7 +62211,7 @@ if.then5529:                                      ; preds = %if.then5526
 if.else5530:                                      ; preds = %if.then5526
   br label %if.end5531
 
-if.end5531:                                       ; preds = %if.else5530, %if.end5543
+if.end5531:                                       ; preds = %if.end5543, %if.else5530
   %load32463 = load ptr, ptr %out, align 8
   ret ptr %load32463
 
@@ -62334,7 +62355,7 @@ or.rhs72:                                         ; preds = %if.else5536
   %cond32385 = icmp ne i32 %bool32384, 0
   br i1 %cond32385, label %or.true71, label %or.merge73
 
-or.merge73:                                       ; preds = %or.true71, %or.rhs72
+or.merge73:                                       ; preds = %or.rhs72, %or.true71
   %orval32386 = phi i32 [ 1, %or.true71 ], [ 0, %or.rhs72 ]
   %cond32387 = icmp ne i32 %orval32386, 0
   br i1 %cond32387, label %or.true74, label %or.rhs75
@@ -62350,7 +62371,7 @@ or.rhs75:                                         ; preds = %or.merge73
   %cond32393 = icmp ne i32 %bool32392, 0
   br i1 %cond32393, label %or.true74, label %or.merge76
 
-or.merge76:                                       ; preds = %or.true74, %or.rhs75
+or.merge76:                                       ; preds = %or.rhs75, %or.true74
   %orval32394 = phi i32 [ 1, %or.true74 ], [ 0, %or.rhs75 ]
   %cond32395 = icmp ne i32 %orval32394, 0
   br i1 %cond32395, label %or.true77, label %or.rhs78
@@ -62366,7 +62387,7 @@ or.rhs78:                                         ; preds = %or.merge76
   %cond32401 = icmp ne i32 %bool32400, 0
   br i1 %cond32401, label %or.true77, label %or.merge79
 
-or.merge79:                                       ; preds = %or.true77, %or.rhs78
+or.merge79:                                       ; preds = %or.rhs78, %or.true77
   %orval32402 = phi i32 [ 1, %or.true77 ], [ 0, %or.rhs78 ]
   %cond32403 = icmp ne i32 %orval32402, 0
   br i1 %cond32403, label %or.true80, label %or.rhs81
@@ -62382,7 +62403,7 @@ or.rhs81:                                         ; preds = %or.merge79
   %cond32409 = icmp ne i32 %bool32408, 0
   br i1 %cond32409, label %or.true80, label %or.merge82
 
-or.merge82:                                       ; preds = %or.true80, %or.rhs81
+or.merge82:                                       ; preds = %or.rhs81, %or.true80
   %orval32410 = phi i32 [ 1, %or.true80 ], [ 0, %or.rhs81 ]
   %cond32411 = icmp ne i32 %orval32410, 0
   br i1 %cond32411, label %if.then5538, label %if.else5539
@@ -62888,7 +62909,7 @@ and.rhs:                                          ; preds = %if.end5235
 and.false:                                        ; preds = %or.merge, %if.end5235
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge
+and.merge:                                        ; preds = %or.merge, %and.false
   %andval30429 = phi i32 [ 1, %or.merge ], [ 0, %and.false ]
   %cond30430 = icmp ne i32 %andval30429, 0
   br i1 %cond30430, label %and.rhs9, label %and.false10
@@ -62904,7 +62925,7 @@ or.rhs:                                           ; preds = %and.rhs
   %cond30426 = icmp ne i32 %bool30425, 0
   br i1 %cond30426, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval30427 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond30428 = icmp ne i32 %orval30427, 0
   br i1 %cond30428, label %and.merge, label %and.false
@@ -62986,7 +63007,7 @@ and.rhs15:                                        ; preds = %and.merge14
 and.false16:                                      ; preds = %or.merge20, %and.merge14
   br label %and.merge17
 
-and.merge17:                                      ; preds = %and.false16, %or.merge20
+and.merge17:                                      ; preds = %or.merge20, %and.false16
   %andval30482 = phi i32 [ 1, %or.merge20 ], [ 0, %and.false16 ]
   %cond30483 = icmp ne i32 %andval30482, 0
   br i1 %cond30483, label %if.then5239, label %if.else5240
@@ -63002,7 +63023,7 @@ or.rhs19:                                         ; preds = %and.rhs15
   %cond30479 = icmp ne i32 %bool30478, 0
   br i1 %cond30479, label %or.true18, label %or.merge20
 
-or.merge20:                                       ; preds = %or.true18, %or.rhs19
+or.merge20:                                       ; preds = %or.rhs19, %or.true18
   %orval30480 = phi i32 [ 1, %or.true18 ], [ 0, %or.rhs19 ]
   %cond30481 = icmp ne i32 %orval30480, 0
   br i1 %cond30481, label %and.merge17, label %and.false16
@@ -63045,7 +63066,7 @@ or.rhs24:                                         ; preds = %if.end5241
   %cond30514 = icmp ne i32 %bool30513, 0
   br i1 %cond30514, label %or.true23, label %or.merge25
 
-or.merge25:                                       ; preds = %or.true23, %or.rhs24
+or.merge25:                                       ; preds = %or.rhs24, %or.true23
   %orval30515 = phi i32 [ 1, %or.true23 ], [ 0, %or.rhs24 ]
   %cond30516 = icmp ne i32 %orval30515, 0
   br i1 %cond30516, label %and.rhs26, label %and.false27
@@ -63113,7 +63134,7 @@ or.rhs33:                                         ; preds = %ifexpr.else5243
   %cond30548 = icmp ne i32 %bool30547, 0
   br i1 %cond30548, label %or.true32, label %or.merge34
 
-or.merge34:                                       ; preds = %or.true32, %or.rhs33
+or.merge34:                                       ; preds = %or.rhs33, %or.true32
   %orval30549 = phi i32 [ 1, %or.true32 ], [ 0, %or.rhs33 ]
   %cond30550 = icmp ne i32 %orval30549, 0
   br i1 %cond30550, label %and.rhs35, label %and.false36
@@ -63129,7 +63150,7 @@ and.rhs35:                                        ; preds = %or.merge34
 and.false36:                                      ; preds = %or.merge40, %or.merge34
   br label %and.merge37
 
-and.merge37:                                      ; preds = %and.false36, %or.merge40
+and.merge37:                                      ; preds = %or.merge40, %and.false36
   %andval30563 = phi i32 [ 1, %or.merge40 ], [ 0, %and.false36 ]
   %cond30564 = icmp ne i32 %andval30563, 0
   br i1 %cond30564, label %ifexpr.then5245, label %ifexpr.else5246
@@ -63145,7 +63166,7 @@ or.rhs39:                                         ; preds = %and.rhs35
   %cond30560 = icmp ne i32 %bool30559, 0
   br i1 %cond30560, label %or.true38, label %or.merge40
 
-or.merge40:                                       ; preds = %or.true38, %or.rhs39
+or.merge40:                                       ; preds = %or.rhs39, %or.true38
   %orval30561 = phi i32 [ 1, %or.true38 ], [ 0, %or.rhs39 ]
   %cond30562 = icmp ne i32 %orval30561, 0
   br i1 %cond30562, label %and.merge37, label %and.false36
@@ -63181,7 +63202,7 @@ and.rhs41:                                        ; preds = %ifexpr.else5246
 and.false42:                                      ; preds = %or.merge46, %ifexpr.else5246
   br label %and.merge43
 
-and.merge43:                                      ; preds = %and.false42, %or.merge46
+and.merge43:                                      ; preds = %or.merge46, %and.false42
   %andval30588 = phi i32 [ 1, %or.merge46 ], [ 0, %and.false42 ]
   %cond30589 = icmp ne i32 %andval30588, 0
   br i1 %cond30589, label %and.rhs47, label %and.false48
@@ -63197,7 +63218,7 @@ or.rhs45:                                         ; preds = %and.rhs41
   %cond30585 = icmp ne i32 %bool30584, 0
   br i1 %cond30585, label %or.true44, label %or.merge46
 
-or.merge46:                                       ; preds = %or.true44, %or.rhs45
+or.merge46:                                       ; preds = %or.rhs45, %or.true44
   %orval30586 = phi i32 [ 1, %or.true44 ], [ 0, %or.rhs45 ]
   %cond30587 = icmp ne i32 %orval30586, 0
   br i1 %cond30587, label %and.merge43, label %and.false42
@@ -63213,7 +63234,7 @@ and.rhs47:                                        ; preds = %and.merge43
 and.false48:                                      ; preds = %or.merge52, %and.merge43
   br label %and.merge49
 
-and.merge49:                                      ; preds = %and.false48, %or.merge52
+and.merge49:                                      ; preds = %or.merge52, %and.false48
   %andval30604 = phi i32 [ 1, %or.merge52 ], [ 0, %and.false48 ]
   %cond30605 = icmp ne i32 %andval30604, 0
   br i1 %cond30605, label %ifexpr.then5248, label %ifexpr.else5249
@@ -63229,7 +63250,7 @@ or.rhs51:                                         ; preds = %and.rhs47
   %cond30601 = icmp ne i32 %bool30600, 0
   br i1 %cond30601, label %or.true50, label %or.merge52
 
-or.merge52:                                       ; preds = %or.true50, %or.rhs51
+or.merge52:                                       ; preds = %or.rhs51, %or.true50
   %orval30602 = phi i32 [ 1, %or.true50 ], [ 0, %or.rhs51 ]
   %cond30603 = icmp ne i32 %orval30602, 0
   br i1 %cond30603, label %and.merge49, label %and.false48
@@ -64203,7 +64224,7 @@ or.rhs:                                           ; preds = %if.end5355
   %cond31137 = icmp ne i32 %bool31136, 0
   br i1 %cond31137, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval31138 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond31139 = icmp ne i32 %orval31138, 0
   br i1 %cond31139, label %or.true1, label %or.rhs2
@@ -64219,7 +64240,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond31144 = icmp ne i32 %bool31143, 0
   br i1 %cond31144, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval31145 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond31146 = icmp ne i32 %orval31145, 0
   br i1 %cond31146, label %or.true4, label %or.rhs5
@@ -64235,7 +64256,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond31151 = icmp ne i32 %bool31150, 0
   br i1 %cond31151, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval31152 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond31153 = icmp ne i32 %orval31152, 0
   br i1 %cond31153, label %if.then5356, label %if.else5357
@@ -64276,7 +64297,7 @@ or.rhs8:                                          ; preds = %if.end5358
   %cond31167 = icmp ne i32 %bool31166, 0
   br i1 %cond31167, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval31168 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond31169 = icmp ne i32 %orval31168, 0
   br i1 %cond31169, label %or.true10, label %or.rhs11
@@ -64292,7 +64313,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond31175 = icmp ne i32 %bool31174, 0
   br i1 %cond31175, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval31176 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond31177 = icmp ne i32 %orval31176, 0
   br i1 %cond31177, label %ifexpr.then5359, label %ifexpr.else5360
@@ -64452,7 +64473,7 @@ or.rhs:                                           ; preds = %if.end5552
   %cond32531 = icmp ne i32 %bool32530, 0
   br i1 %cond32531, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval32532 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond32533 = icmp ne i32 %orval32532, 0
   br i1 %cond32533, label %if.then5553, label %if.else5554
@@ -64509,7 +64530,7 @@ or.rhs:                                           ; preds = %entry
   %cond32550 = icmp ne i32 %bool32549, 0
   br i1 %cond32550, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval32551 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond32552 = icmp ne i32 %orval32551, 0
   br i1 %cond32552, label %if.then5556, label %if.else5557
@@ -64548,7 +64569,7 @@ or.rhs2:                                          ; preds = %if.end5558
   %cond32569 = icmp ne i32 %bool32568, 0
   br i1 %cond32569, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval32570 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond32571 = icmp ne i32 %orval32570, 0
   br i1 %cond32571, label %or.true4, label %or.rhs5
@@ -64564,7 +64585,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond32576 = icmp ne i32 %bool32575, 0
   br i1 %cond32576, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval32577 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond32578 = icmp ne i32 %orval32577, 0
   br i1 %cond32578, label %if.then5559, label %if.else5560
@@ -64604,7 +64625,7 @@ or.rhs8:                                          ; preds = %if.end5561
   %cond32598 = icmp ne i32 %bool32597, 0
   br i1 %cond32598, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval32599 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond32600 = icmp ne i32 %orval32599, 0
   br i1 %cond32600, label %if.then5562, label %if.else5563
@@ -64631,7 +64652,7 @@ if.then5565:                                      ; preds = %and.merge15
 if.else5566:                                      ; preds = %and.merge15
   br label %if.end5567
 
-if.end5567:                                       ; preds = %if.else5566, %if.end5570
+if.end5567:                                       ; preds = %if.end5570, %if.else5566
   %load32676 = load ptr, ptr %b, align 8
   %load32677 = load %AstExpr, ptr %bind_expr, align 8
   %extract32678 = extractvalue %AstExpr %load32677, 1
@@ -64815,7 +64836,7 @@ entry:
   %extract32801 = extractvalue %AstStmt %load32800, 0
   br label %match.test5584
 
-match.end5583:                                    ; preds = %match.test5685, %if.end5688, %if.end5683, %if.end5661, %if.end5650, %if.end5642, %match.body5633, %match.body5631, %if.end5630, %if.end5625, %match.body5619, %match.body5617, %match.body5615, %ifexpr.end5611, %ifexpr.end5606, %match.body5600, %if.end5599, %match.body5590, %if.end5589
+match.end5583:                                    ; preds = %if.end5688, %match.test5685, %if.end5683, %if.end5661, %if.end5650, %if.end5642, %match.body5633, %match.body5631, %if.end5630, %if.end5625, %match.body5619, %match.body5617, %match.body5615, %ifexpr.end5611, %ifexpr.end5606, %match.body5600, %if.end5599, %match.body5590, %if.end5589
   ret void
 
 match.test5584:                                   ; preds = %entry
@@ -67359,7 +67380,7 @@ or.rhs:                                           ; preds = %match.test5800
   %cond34284 = icmp ne i32 %bool34283, 0
   br i1 %cond34284, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval34285 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond34286 = icmp ne i32 %orval34285, 0
   br i1 %cond34286, label %or.true1, label %or.rhs2
@@ -67375,7 +67396,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond34291 = icmp ne i32 %bool34290, 0
   br i1 %cond34291, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval34292 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond34293 = icmp ne i32 %orval34292, 0
   br i1 %cond34293, label %if.then5801, label %if.else5802
@@ -67758,7 +67779,7 @@ entry:
   %matchres34535 = alloca ptr, align 8
   br label %match.test5848
 
-match.end5847:                                    ; preds = %match.test5909, %if.end5920, %match.body5906, %if.end5905, %match.body5899, %match.body5897, %if.end5896, %if.end5882, %match.body5876, %match.body5874, %if.end5873, %if.end5868, %match.body5859, %match.body5857, %match.body5855, %match.body5853, %match.body5851, %match.body5849
+match.end5847:                                    ; preds = %if.end5920, %match.test5909, %match.body5906, %if.end5905, %match.body5899, %match.body5897, %if.end5896, %if.end5882, %match.body5876, %match.body5874, %if.end5873, %if.end5868, %match.body5859, %match.body5857, %match.body5855, %match.body5853, %match.body5851, %match.body5849
   %matchval34952 = load ptr, ptr %matchres34535, align 8
   ret ptr %matchval34952
 
@@ -68052,7 +68073,7 @@ or.rhs:                                           ; preds = %match.body5883
   %cond34682 = icmp ne i32 %bool34681, 0
   br i1 %cond34682, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval34683 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond34684 = icmp ne i32 %orval34683, 0
   br i1 %cond34684, label %or.true3, label %or.rhs4
@@ -68069,7 +68090,7 @@ or.rhs4:                                          ; preds = %or.merge
   %cond34691 = icmp ne i32 %bool34690, 0
   br i1 %cond34691, label %or.true3, label %or.merge5
 
-or.merge5:                                        ; preds = %or.true3, %or.rhs4
+or.merge5:                                        ; preds = %or.rhs4, %or.true3
   %orval34692 = phi i32 [ 1, %or.true3 ], [ 0, %or.rhs4 ]
   %cond34693 = icmp ne i32 %orval34692, 0
   br i1 %cond34693, label %or.true6, label %or.rhs7
@@ -68086,7 +68107,7 @@ or.rhs7:                                          ; preds = %or.merge5
   %cond34700 = icmp ne i32 %bool34699, 0
   br i1 %cond34700, label %or.true6, label %or.merge8
 
-or.merge8:                                        ; preds = %or.true6, %or.rhs7
+or.merge8:                                        ; preds = %or.rhs7, %or.true6
   %orval34701 = phi i32 [ 1, %or.true6 ], [ 0, %or.rhs7 ]
   %cond34702 = icmp ne i32 %orval34701, 0
   br i1 %cond34702, label %or.true9, label %or.rhs10
@@ -68103,7 +68124,7 @@ or.rhs10:                                         ; preds = %or.merge8
   %cond34709 = icmp ne i32 %bool34708, 0
   br i1 %cond34709, label %or.true9, label %or.merge11
 
-or.merge11:                                       ; preds = %or.true9, %or.rhs10
+or.merge11:                                       ; preds = %or.rhs10, %or.true9
   %orval34710 = phi i32 [ 1, %or.true9 ], [ 0, %or.rhs10 ]
   %cond34711 = icmp ne i32 %orval34710, 0
   br i1 %cond34711, label %or.true12, label %or.rhs13
@@ -68120,7 +68141,7 @@ or.rhs13:                                         ; preds = %or.merge11
   %cond34718 = icmp ne i32 %bool34717, 0
   br i1 %cond34718, label %or.true12, label %or.merge14
 
-or.merge14:                                       ; preds = %or.true12, %or.rhs13
+or.merge14:                                       ; preds = %or.rhs13, %or.true12
   %orval34719 = phi i32 [ 1, %or.true12 ], [ 0, %or.rhs13 ]
   %cond34720 = icmp ne i32 %orval34719, 0
   br i1 %cond34720, label %or.true15, label %or.rhs16
@@ -68137,7 +68158,7 @@ or.rhs16:                                         ; preds = %or.merge14
   %cond34727 = icmp ne i32 %bool34726, 0
   br i1 %cond34727, label %or.true15, label %or.merge17
 
-or.merge17:                                       ; preds = %or.true15, %or.rhs16
+or.merge17:                                       ; preds = %or.rhs16, %or.true15
   %orval34728 = phi i32 [ 1, %or.true15 ], [ 0, %or.rhs16 ]
   %cond34729 = icmp ne i32 %orval34728, 0
   br i1 %cond34729, label %or.true18, label %or.rhs19
@@ -68154,7 +68175,7 @@ or.rhs19:                                         ; preds = %or.merge17
   %cond34736 = icmp ne i32 %bool34735, 0
   br i1 %cond34736, label %or.true18, label %or.merge20
 
-or.merge20:                                       ; preds = %or.true18, %or.rhs19
+or.merge20:                                       ; preds = %or.rhs19, %or.true18
   %orval34737 = phi i32 [ 1, %or.true18 ], [ 0, %or.rhs19 ]
   %cond34738 = icmp ne i32 %orval34737, 0
   br i1 %cond34738, label %if.then5885, label %if.else5886
@@ -68186,7 +68207,7 @@ and.rhs:                                          ; preds = %if.end5887
 and.false:                                        ; preds = %or.merge23, %if.end5887
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge23
+and.merge:                                        ; preds = %or.merge23, %and.false
   %andval34773 = phi i32 [ 1, %or.merge23 ], [ 0, %and.false ]
   %cond34774 = icmp ne i32 %andval34773, 0
   br i1 %cond34774, label %and.rhs24, label %and.false25
@@ -68202,7 +68223,7 @@ or.rhs22:                                         ; preds = %and.rhs
   %cond34770 = icmp ne i32 %bool34769, 0
   br i1 %cond34770, label %or.true21, label %or.merge23
 
-or.merge23:                                       ; preds = %or.true21, %or.rhs22
+or.merge23:                                       ; preds = %or.rhs22, %or.true21
   %orval34771 = phi i32 [ 1, %or.true21 ], [ 0, %or.rhs22 ]
   %cond34772 = icmp ne i32 %orval34771, 0
   br i1 %cond34772, label %and.merge, label %and.false
@@ -68266,7 +68287,7 @@ and.rhs30:                                        ; preds = %and.merge29
 and.false31:                                      ; preds = %or.merge35, %and.merge29
   br label %and.merge32
 
-and.merge32:                                      ; preds = %and.false31, %or.merge35
+and.merge32:                                      ; preds = %or.merge35, %and.false31
   %andval34811 = phi i32 [ 1, %or.merge35 ], [ 0, %and.false31 ]
   %cond34812 = icmp ne i32 %andval34811, 0
   br i1 %cond34812, label %if.then5891, label %if.else5892
@@ -68282,7 +68303,7 @@ or.rhs34:                                         ; preds = %and.rhs30
   %cond34808 = icmp ne i32 %bool34807, 0
   br i1 %cond34808, label %or.true33, label %or.merge35
 
-or.merge35:                                       ; preds = %or.true33, %or.rhs34
+or.merge35:                                       ; preds = %or.rhs34, %or.true33
   %orval34809 = phi i32 [ 1, %or.true33 ], [ 0, %or.rhs34 ]
   %cond34810 = icmp ne i32 %orval34809, 0
   br i1 %cond34810, label %and.merge32, label %and.false31
@@ -68311,7 +68332,7 @@ and.rhs36:                                        ; preds = %if.end5893
 and.false37:                                      ; preds = %or.merge41, %if.end5893
   br label %and.merge38
 
-and.merge38:                                      ; preds = %and.false37, %or.merge41
+and.merge38:                                      ; preds = %or.merge41, %and.false37
   %andval34835 = phi i32 [ 1, %or.merge41 ], [ 0, %and.false37 ]
   %cond34836 = icmp ne i32 %andval34835, 0
   br i1 %cond34836, label %and.rhs42, label %and.false43
@@ -68327,7 +68348,7 @@ or.rhs40:                                         ; preds = %and.rhs36
   %cond34832 = icmp ne i32 %bool34831, 0
   br i1 %cond34832, label %or.true39, label %or.merge41
 
-or.merge41:                                       ; preds = %or.true39, %or.rhs40
+or.merge41:                                       ; preds = %or.rhs40, %or.true39
   %orval34833 = phi i32 [ 1, %or.true39 ], [ 0, %or.rhs40 ]
   %cond34834 = icmp ne i32 %orval34833, 0
   br i1 %cond34834, label %and.merge38, label %and.false37
@@ -68343,7 +68364,7 @@ and.rhs42:                                        ; preds = %and.merge38
 and.false43:                                      ; preds = %or.merge47, %and.merge38
   br label %and.merge44
 
-and.merge44:                                      ; preds = %and.false43, %or.merge47
+and.merge44:                                      ; preds = %or.merge47, %and.false43
   %andval34851 = phi i32 [ 1, %or.merge47 ], [ 0, %and.false43 ]
   %cond34852 = icmp ne i32 %andval34851, 0
   br i1 %cond34852, label %if.then5894, label %if.else5895
@@ -68359,7 +68380,7 @@ or.rhs46:                                         ; preds = %and.rhs42
   %cond34848 = icmp ne i32 %bool34847, 0
   br i1 %cond34848, label %or.true45, label %or.merge47
 
-or.merge47:                                       ; preds = %or.true45, %or.rhs46
+or.merge47:                                       ; preds = %or.rhs46, %or.true45
   %orval34849 = phi i32 [ 1, %or.true45 ], [ 0, %or.rhs46 ]
   %cond34850 = icmp ne i32 %orval34849, 0
   br i1 %cond34850, label %and.merge44, label %and.false43
@@ -68597,7 +68618,7 @@ or.rhs:                                           ; preds = %entry
   %cond34965 = icmp ne i32 %bool34964, 0
   br i1 %cond34965, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval34966 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond34967 = icmp ne i32 %orval34966, 0
   br i1 %cond34967, label %if.then5921, label %if.else5922
@@ -68646,7 +68667,7 @@ or.rhs2:                                          ; preds = %if.end5923
   %cond34989 = icmp ne i32 %bool34988, 0
   br i1 %cond34989, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval34990 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond34991 = icmp ne i32 %orval34990, 0
   br i1 %cond34991, label %and.rhs, label %and.false
@@ -68662,7 +68683,7 @@ and.rhs:                                          ; preds = %or.merge3
 and.false:                                        ; preds = %or.merge9, %or.merge3
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge9
+and.merge:                                        ; preds = %or.merge9, %and.false
   %andval35014 = phi i32 [ 1, %or.merge9 ], [ 0, %and.false ]
   %cond35015 = icmp ne i32 %andval35014, 0
   br i1 %cond35015, label %if.then5924, label %if.else5925
@@ -68678,7 +68699,7 @@ or.rhs5:                                          ; preds = %and.rhs
   %cond35003 = icmp ne i32 %bool35002, 0
   br i1 %cond35003, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval35004 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond35005 = icmp ne i32 %orval35004, 0
   br i1 %cond35005, label %or.true7, label %or.rhs8
@@ -68694,7 +68715,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond35011 = icmp ne i32 %bool35010, 0
   br i1 %cond35011, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval35012 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond35013 = icmp ne i32 %orval35012, 0
   br i1 %cond35013, label %and.merge, label %and.false
@@ -68743,7 +68764,7 @@ or.rhs11:                                         ; preds = %if.end5926
   %cond35048 = icmp ne i32 %bool35047, 0
   br i1 %cond35048, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval35049 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond35050 = icmp ne i32 %orval35049, 0
   br i1 %cond35050, label %or.true13, label %or.rhs14
@@ -68760,7 +68781,7 @@ or.rhs14:                                         ; preds = %or.merge12
   %cond35057 = icmp ne i32 %bool35056, 0
   br i1 %cond35057, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval35058 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond35059 = icmp ne i32 %orval35058, 0
   br i1 %cond35059, label %and.rhs16, label %and.false17
@@ -68824,7 +68845,7 @@ and.rhs19:                                        ; preds = %if.end5929
 and.false20:                                      ; preds = %or.merge24, %if.end5929
   br label %and.merge21
 
-and.merge21:                                      ; preds = %and.false20, %or.merge24
+and.merge21:                                      ; preds = %or.merge24, %and.false20
   %andval35107 = phi i32 [ 1, %or.merge24 ], [ 0, %and.false20 ]
   %cond35108 = icmp ne i32 %andval35107, 0
   br i1 %cond35108, label %if.then5930, label %if.else5931
@@ -68840,7 +68861,7 @@ or.rhs23:                                         ; preds = %and.rhs19
   %cond35104 = icmp ne i32 %bool35103, 0
   br i1 %cond35104, label %or.true22, label %or.merge24
 
-or.merge24:                                       ; preds = %or.true22, %or.rhs23
+or.merge24:                                       ; preds = %or.rhs23, %or.true22
   %orval35105 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
   %cond35106 = icmp ne i32 %orval35105, 0
   br i1 %cond35106, label %and.merge21, label %and.false20
@@ -69021,7 +69042,7 @@ or.rhs:                                           ; preds = %entry
   %cond35245 = icmp ne i32 %bool35244, 0
   br i1 %cond35245, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval35246 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond35247 = icmp ne i32 %orval35246, 0
   br i1 %cond35247, label %or.true1, label %or.rhs2
@@ -69037,7 +69058,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond35252 = icmp ne i32 %bool35251, 0
   br i1 %cond35252, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval35253 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond35254 = icmp ne i32 %orval35253, 0
   br i1 %cond35254, label %or.true4, label %or.rhs5
@@ -69053,7 +69074,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond35259 = icmp ne i32 %bool35258, 0
   br i1 %cond35259, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval35260 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond35261 = icmp ne i32 %orval35260, 0
   br i1 %cond35261, label %or.true7, label %or.rhs8
@@ -69069,7 +69090,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond35266 = icmp ne i32 %bool35265, 0
   br i1 %cond35266, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval35267 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond35268 = icmp ne i32 %orval35267, 0
   br i1 %cond35268, label %if.then5942, label %if.else5943
@@ -69277,7 +69298,7 @@ or.rhs:                                           ; preds = %if.end5953
   %cond35333 = icmp ne i32 %bool35332, 0
   br i1 %cond35333, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval35334 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond35335 = icmp ne i32 %orval35334, 0
   br i1 %cond35335, label %or.true1, label %or.rhs2
@@ -69293,7 +69314,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond35341 = icmp ne i32 %bool35340, 0
   br i1 %cond35341, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval35342 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond35343 = icmp ne i32 %orval35342, 0
   br i1 %cond35343, label %or.true4, label %or.rhs5
@@ -69309,7 +69330,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond35349 = icmp ne i32 %bool35348, 0
   br i1 %cond35349, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval35350 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond35351 = icmp ne i32 %orval35350, 0
   br i1 %cond35351, label %or.true7, label %or.rhs8
@@ -69325,7 +69346,7 @@ or.rhs8:                                          ; preds = %or.merge6
   %cond35357 = icmp ne i32 %bool35356, 0
   br i1 %cond35357, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval35358 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond35359 = icmp ne i32 %orval35358, 0
   br i1 %cond35359, label %if.then5954, label %if.else5955
@@ -69572,7 +69593,7 @@ or.rhs:                                           ; preds = %if.then5984
   %cond35577 = icmp ne i32 %bool35576, 0
   br i1 %cond35577, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval35578 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond35579 = icmp ne i32 %orval35578, 0
   br i1 %cond35579, label %ifexpr.then5987, label %ifexpr.else5988
@@ -70194,7 +70215,7 @@ or.rhs18:                                         ; preds = %if.then6028
   %cond36012 = icmp ne i32 %bool36011, 0
   br i1 %cond36012, label %or.true17, label %or.merge19
 
-or.merge19:                                       ; preds = %or.true17, %or.rhs18
+or.merge19:                                       ; preds = %or.rhs18, %or.true17
   %orval36013 = phi i32 [ 1, %or.true17 ], [ 0, %or.rhs18 ]
   %cond36014 = icmp ne i32 %orval36013, 0
   br i1 %cond36014, label %if.then6031, label %if.else6032
@@ -70586,7 +70607,7 @@ or.rhs27:                                         ; preds = %if.then6066
   %cond36264 = icmp ne i32 %bool36263, 0
   br i1 %cond36264, label %or.true26, label %or.merge28
 
-or.merge28:                                       ; preds = %or.true26, %or.rhs27
+or.merge28:                                       ; preds = %or.rhs27, %or.true26
   %orval36265 = phi i32 [ 1, %or.true26 ], [ 0, %or.rhs27 ]
   %cond36266 = icmp ne i32 %orval36265, 0
   br i1 %cond36266, label %or.true29, label %or.rhs30
@@ -70602,7 +70623,7 @@ or.rhs30:                                         ; preds = %or.merge28
   %cond36271 = icmp ne i32 %bool36270, 0
   br i1 %cond36271, label %or.true29, label %or.merge31
 
-or.merge31:                                       ; preds = %or.true29, %or.rhs30
+or.merge31:                                       ; preds = %or.rhs30, %or.true29
   %orval36272 = phi i32 [ 1, %or.true29 ], [ 0, %or.rhs30 ]
   %cond36273 = icmp ne i32 %orval36272, 0
   br i1 %cond36273, label %or.true32, label %or.rhs33
@@ -70618,7 +70639,7 @@ or.rhs33:                                         ; preds = %or.merge31
   %cond36278 = icmp ne i32 %bool36277, 0
   br i1 %cond36278, label %or.true32, label %or.merge34
 
-or.merge34:                                       ; preds = %or.true32, %or.rhs33
+or.merge34:                                       ; preds = %or.rhs33, %or.true32
   %orval36279 = phi i32 [ 1, %or.true32 ], [ 0, %or.rhs33 ]
   %cond36280 = icmp ne i32 %orval36279, 0
   br i1 %cond36280, label %if.then6069, label %if.else6070
@@ -71610,7 +71631,7 @@ or.rhs:                                           ; preds = %match.test5962
   %cond35456 = icmp ne i32 %bool35455, 0
   br i1 %cond35456, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval35457 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond35458 = icmp ne i32 %orval35457, 0
   br i1 %cond35458, label %or.true1, label %or.rhs2
@@ -71626,7 +71647,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond35463 = icmp ne i32 %bool35462, 0
   br i1 %cond35463, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval35464 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond35465 = icmp ne i32 %orval35464, 0
   br i1 %cond35465, label %if.then5963, label %if.else5964
@@ -71741,7 +71762,7 @@ or.rhs:                                           ; preds = %entry
   %cond36973 = icmp ne i32 %bool36972, 0
   br i1 %cond36973, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval36974 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond36975 = icmp ne i32 %orval36974, 0
   br i1 %cond36975, label %if.then6151, label %if.else6152
@@ -71812,7 +71833,7 @@ and.rhs:                                          ; preds = %if.end6153
 and.false:                                        ; preds = %or.merge3, %if.end6153
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge3
+and.merge:                                        ; preds = %or.merge3, %and.false
   %andval37054 = phi i32 [ 1, %or.merge3 ], [ 0, %and.false ]
   %cond37055 = icmp ne i32 %andval37054, 0
   br i1 %cond37055, label %and.rhs4, label %and.false5
@@ -71828,7 +71849,7 @@ or.rhs2:                                          ; preds = %and.rhs
   %cond37051 = icmp ne i32 %bool37050, 0
   br i1 %cond37051, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval37052 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond37053 = icmp ne i32 %orval37052, 0
   br i1 %cond37053, label %and.merge, label %and.false
@@ -71931,7 +71952,7 @@ and.rhs10:                                        ; preds = %and.merge9
 and.false11:                                      ; preds = %or.merge15, %and.merge9
   br label %and.merge12
 
-and.merge12:                                      ; preds = %and.false11, %or.merge15
+and.merge12:                                      ; preds = %or.merge15, %and.false11
   %andval37129 = phi i32 [ 1, %or.merge15 ], [ 0, %and.false11 ]
   %cond37130 = icmp ne i32 %andval37129, 0
   br i1 %cond37130, label %if.then6157, label %if.else6158
@@ -71947,7 +71968,7 @@ or.rhs14:                                         ; preds = %and.rhs10
   %cond37126 = icmp ne i32 %bool37125, 0
   br i1 %cond37126, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
   %orval37127 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
   %cond37128 = icmp ne i32 %orval37127, 0
   br i1 %cond37128, label %and.merge12, label %and.false11
@@ -72017,7 +72038,7 @@ and.rhs19:                                        ; preds = %if.end6159
 and.false20:                                      ; preds = %or.merge24, %if.end6159
   br label %and.merge21
 
-and.merge21:                                      ; preds = %and.false20, %or.merge24
+and.merge21:                                      ; preds = %or.merge24, %and.false20
   %andval37190 = phi i32 [ 1, %or.merge24 ], [ 0, %and.false20 ]
   %cond37191 = icmp ne i32 %andval37190, 0
   br i1 %cond37191, label %and.rhs25, label %and.false26
@@ -72033,7 +72054,7 @@ or.rhs23:                                         ; preds = %and.rhs19
   %cond37187 = icmp ne i32 %bool37186, 0
   br i1 %cond37187, label %or.true22, label %or.merge24
 
-or.merge24:                                       ; preds = %or.true22, %or.rhs23
+or.merge24:                                       ; preds = %or.rhs23, %or.true22
   %orval37188 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
   %cond37189 = icmp ne i32 %orval37188, 0
   br i1 %cond37189, label %and.merge21, label %and.false20
@@ -72049,7 +72070,7 @@ and.rhs25:                                        ; preds = %and.merge21
 and.false26:                                      ; preds = %or.merge30, %and.merge21
   br label %and.merge27
 
-and.merge27:                                      ; preds = %and.false26, %or.merge30
+and.merge27:                                      ; preds = %or.merge30, %and.false26
   %andval37206 = phi i32 [ 1, %or.merge30 ], [ 0, %and.false26 ]
   %cond37207 = icmp ne i32 %andval37206, 0
   br i1 %cond37207, label %if.then6160, label %if.else6161
@@ -72065,7 +72086,7 @@ or.rhs29:                                         ; preds = %and.rhs25
   %cond37203 = icmp ne i32 %bool37202, 0
   br i1 %cond37203, label %or.true28, label %or.merge30
 
-or.merge30:                                       ; preds = %or.true28, %or.rhs29
+or.merge30:                                       ; preds = %or.rhs29, %or.true28
   %orval37204 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
   %cond37205 = icmp ne i32 %orval37204, 0
   br i1 %cond37205, label %and.merge27, label %and.false26
@@ -72145,7 +72166,7 @@ or.rhs32:                                         ; preds = %if.end6162
   %cond37259 = icmp ne i32 %bool37258, 0
   br i1 %cond37259, label %or.true31, label %or.merge33
 
-or.merge33:                                       ; preds = %or.true31, %or.rhs32
+or.merge33:                                       ; preds = %or.rhs32, %or.true31
   %orval37260 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
   %cond37261 = icmp ne i32 %orval37260, 0
   br i1 %cond37261, label %and.rhs34, label %and.false35
@@ -72277,7 +72298,7 @@ or.rhs44:                                         ; preds = %if.end6165
   %cond37355 = icmp ne i32 %bool37354, 0
   br i1 %cond37355, label %or.true43, label %or.merge45
 
-or.merge45:                                       ; preds = %or.true43, %or.rhs44
+or.merge45:                                       ; preds = %or.rhs44, %or.true43
   %orval37356 = phi i32 [ 1, %or.true43 ], [ 0, %or.rhs44 ]
   %cond37357 = icmp ne i32 %orval37356, 0
   br i1 %cond37357, label %or.true46, label %or.rhs47
@@ -72294,7 +72315,7 @@ or.rhs47:                                         ; preds = %or.merge45
   %cond37364 = icmp ne i32 %bool37363, 0
   br i1 %cond37364, label %or.true46, label %or.merge48
 
-or.merge48:                                       ; preds = %or.true46, %or.rhs47
+or.merge48:                                       ; preds = %or.rhs47, %or.true46
   %orval37365 = phi i32 [ 1, %or.true46 ], [ 0, %or.rhs47 ]
   %cond37366 = icmp ne i32 %orval37365, 0
   br i1 %cond37366, label %or.true49, label %or.rhs50
@@ -72311,7 +72332,7 @@ or.rhs50:                                         ; preds = %or.merge48
   %cond37373 = icmp ne i32 %bool37372, 0
   br i1 %cond37373, label %or.true49, label %or.merge51
 
-or.merge51:                                       ; preds = %or.true49, %or.rhs50
+or.merge51:                                       ; preds = %or.rhs50, %or.true49
   %orval37374 = phi i32 [ 1, %or.true49 ], [ 0, %or.rhs50 ]
   %cond37375 = icmp ne i32 %orval37374, 0
   br i1 %cond37375, label %or.true52, label %or.rhs53
@@ -72328,7 +72349,7 @@ or.rhs53:                                         ; preds = %or.merge51
   %cond37382 = icmp ne i32 %bool37381, 0
   br i1 %cond37382, label %or.true52, label %or.merge54
 
-or.merge54:                                       ; preds = %or.true52, %or.rhs53
+or.merge54:                                       ; preds = %or.rhs53, %or.true52
   %orval37383 = phi i32 [ 1, %or.true52 ], [ 0, %or.rhs53 ]
   %cond37384 = icmp ne i32 %orval37383, 0
   br i1 %cond37384, label %or.true55, label %or.rhs56
@@ -72345,7 +72366,7 @@ or.rhs56:                                         ; preds = %or.merge54
   %cond37391 = icmp ne i32 %bool37390, 0
   br i1 %cond37391, label %or.true55, label %or.merge57
 
-or.merge57:                                       ; preds = %or.true55, %or.rhs56
+or.merge57:                                       ; preds = %or.rhs56, %or.true55
   %orval37392 = phi i32 [ 1, %or.true55 ], [ 0, %or.rhs56 ]
   %cond37393 = icmp ne i32 %orval37392, 0
   br i1 %cond37393, label %ifexpr.then6169, label %ifexpr.else6170
@@ -72420,7 +72441,7 @@ or.rhs65:                                         ; preds = %ifexpr.end6171
   %cond37452 = icmp ne i32 %bool37451, 0
   br i1 %cond37452, label %or.true64, label %or.merge66
 
-or.merge66:                                       ; preds = %or.true64, %or.rhs65
+or.merge66:                                       ; preds = %or.rhs65, %or.true64
   %orval37453 = phi i32 [ 1, %or.true64 ], [ 0, %or.rhs65 ]
   %cond37454 = icmp ne i32 %orval37453, 0
   br i1 %cond37454, label %or.true67, label %or.rhs68
@@ -72437,7 +72458,7 @@ or.rhs68:                                         ; preds = %or.merge66
   %cond37461 = icmp ne i32 %bool37460, 0
   br i1 %cond37461, label %or.true67, label %or.merge69
 
-or.merge69:                                       ; preds = %or.true67, %or.rhs68
+or.merge69:                                       ; preds = %or.rhs68, %or.true67
   %orval37462 = phi i32 [ 1, %or.true67 ], [ 0, %or.rhs68 ]
   %cond37463 = icmp ne i32 %orval37462, 0
   br i1 %cond37463, label %or.true70, label %or.rhs71
@@ -72454,7 +72475,7 @@ or.rhs71:                                         ; preds = %or.merge69
   %cond37470 = icmp ne i32 %bool37469, 0
   br i1 %cond37470, label %or.true70, label %or.merge72
 
-or.merge72:                                       ; preds = %or.true70, %or.rhs71
+or.merge72:                                       ; preds = %or.rhs71, %or.true70
   %orval37471 = phi i32 [ 1, %or.true70 ], [ 0, %or.rhs71 ]
   %cond37472 = icmp ne i32 %orval37471, 0
   br i1 %cond37472, label %or.true73, label %or.rhs74
@@ -72471,7 +72492,7 @@ or.rhs74:                                         ; preds = %or.merge72
   %cond37479 = icmp ne i32 %bool37478, 0
   br i1 %cond37479, label %or.true73, label %or.merge75
 
-or.merge75:                                       ; preds = %or.true73, %or.rhs74
+or.merge75:                                       ; preds = %or.rhs74, %or.true73
   %orval37480 = phi i32 [ 1, %or.true73 ], [ 0, %or.rhs74 ]
   %cond37481 = icmp ne i32 %orval37480, 0
   br i1 %cond37481, label %or.true76, label %or.rhs77
@@ -72488,7 +72509,7 @@ or.rhs77:                                         ; preds = %or.merge75
   %cond37488 = icmp ne i32 %bool37487, 0
   br i1 %cond37488, label %or.true76, label %or.merge78
 
-or.merge78:                                       ; preds = %or.true76, %or.rhs77
+or.merge78:                                       ; preds = %or.rhs77, %or.true76
   %orval37489 = phi i32 [ 1, %or.true76 ], [ 0, %or.rhs77 ]
   %cond37490 = icmp ne i32 %orval37489, 0
   br i1 %cond37490, label %or.true79, label %or.rhs80
@@ -72505,7 +72526,7 @@ or.rhs80:                                         ; preds = %or.merge78
   %cond37497 = icmp ne i32 %bool37496, 0
   br i1 %cond37497, label %or.true79, label %or.merge81
 
-or.merge81:                                       ; preds = %or.true79, %or.rhs80
+or.merge81:                                       ; preds = %or.rhs80, %or.true79
   %orval37498 = phi i32 [ 1, %or.true79 ], [ 0, %or.rhs80 ]
   %cond37499 = icmp ne i32 %orval37498, 0
   br i1 %cond37499, label %or.true82, label %or.rhs83
@@ -72522,7 +72543,7 @@ or.rhs83:                                         ; preds = %or.merge81
   %cond37506 = icmp ne i32 %bool37505, 0
   br i1 %cond37506, label %or.true82, label %or.merge84
 
-or.merge84:                                       ; preds = %or.true82, %or.rhs83
+or.merge84:                                       ; preds = %or.rhs83, %or.true82
   %orval37507 = phi i32 [ 1, %or.true82 ], [ 0, %or.rhs83 ]
   %cond37508 = icmp ne i32 %orval37507, 0
   br i1 %cond37508, label %or.true85, label %or.rhs86
@@ -72539,7 +72560,7 @@ or.rhs86:                                         ; preds = %or.merge84
   %cond37515 = icmp ne i32 %bool37514, 0
   br i1 %cond37515, label %or.true85, label %or.merge87
 
-or.merge87:                                       ; preds = %or.true85, %or.rhs86
+or.merge87:                                       ; preds = %or.rhs86, %or.true85
   %orval37516 = phi i32 [ 1, %or.true85 ], [ 0, %or.rhs86 ]
   %cond37517 = icmp ne i32 %orval37516, 0
   br i1 %cond37517, label %if.then6175, label %if.else6176
@@ -72608,7 +72629,7 @@ or.rhs89:                                         ; preds = %if.then6178
   %cond37537 = icmp ne i32 %bool37536, 0
   br i1 %cond37537, label %or.true88, label %or.merge90
 
-or.merge90:                                       ; preds = %or.true88, %or.rhs89
+or.merge90:                                       ; preds = %or.rhs89, %or.true88
   %orval37538 = phi i32 [ 1, %or.true88 ], [ 0, %or.rhs89 ]
   %cond37539 = icmp ne i32 %orval37538, 0
   br i1 %cond37539, label %if.then6181, label %if.else6182
@@ -72655,7 +72676,7 @@ or.rhs92:                                         ; preds = %if.then6184
   %cond37560 = icmp ne i32 %bool37559, 0
   br i1 %cond37560, label %or.true91, label %or.merge93
 
-or.merge93:                                       ; preds = %or.true91, %or.rhs92
+or.merge93:                                       ; preds = %or.rhs92, %or.true91
   %orval37561 = phi i32 [ 1, %or.true91 ], [ 0, %or.rhs92 ]
   %cond37562 = icmp ne i32 %orval37561, 0
   br i1 %cond37562, label %if.then6187, label %if.else6188
@@ -72702,7 +72723,7 @@ or.rhs95:                                         ; preds = %if.then6190
   %cond37583 = icmp ne i32 %bool37582, 0
   br i1 %cond37583, label %or.true94, label %or.merge96
 
-or.merge96:                                       ; preds = %or.true94, %or.rhs95
+or.merge96:                                       ; preds = %or.rhs95, %or.true94
   %orval37584 = phi i32 [ 1, %or.true94 ], [ 0, %or.rhs95 ]
   %cond37585 = icmp ne i32 %orval37584, 0
   br i1 %cond37585, label %if.then6193, label %if.else6194
@@ -72749,7 +72770,7 @@ or.rhs98:                                         ; preds = %if.then6196
   %cond37606 = icmp ne i32 %bool37605, 0
   br i1 %cond37606, label %or.true97, label %or.merge99
 
-or.merge99:                                       ; preds = %or.true97, %or.rhs98
+or.merge99:                                       ; preds = %or.rhs98, %or.true97
   %orval37607 = phi i32 [ 1, %or.true97 ], [ 0, %or.rhs98 ]
   %cond37608 = icmp ne i32 %orval37607, 0
   br i1 %cond37608, label %if.then6199, label %if.else6200
@@ -72796,7 +72817,7 @@ or.rhs101:                                        ; preds = %if.then6202
   %cond37629 = icmp ne i32 %bool37628, 0
   br i1 %cond37629, label %or.true100, label %or.merge102
 
-or.merge102:                                      ; preds = %or.true100, %or.rhs101
+or.merge102:                                      ; preds = %or.rhs101, %or.true100
   %orval37630 = phi i32 [ 1, %or.true100 ], [ 0, %or.rhs101 ]
   %cond37631 = icmp ne i32 %orval37630, 0
   br i1 %cond37631, label %if.then6205, label %if.else6206
@@ -72925,7 +72946,7 @@ or.rhs105:                                        ; preds = %if.then6223
   %cond37719 = icmp ne i32 %bool37718, 0
   br i1 %cond37719, label %or.true104, label %or.merge106
 
-or.merge106:                                      ; preds = %or.true104, %or.rhs105
+or.merge106:                                      ; preds = %or.rhs105, %or.true104
   %orval37720 = phi i32 [ 1, %or.true104 ], [ 0, %or.rhs105 ]
   %cond37721 = icmp ne i32 %orval37720, 0
   br i1 %cond37721, label %if.then6226, label %if.else6227
@@ -72972,7 +72993,7 @@ or.rhs108:                                        ; preds = %if.then6229
   %cond37742 = icmp ne i32 %bool37741, 0
   br i1 %cond37742, label %or.true107, label %or.merge109
 
-or.merge109:                                      ; preds = %or.true107, %or.rhs108
+or.merge109:                                      ; preds = %or.rhs108, %or.true107
   %orval37743 = phi i32 [ 1, %or.true107 ], [ 0, %or.rhs108 ]
   %cond37744 = icmp ne i32 %orval37743, 0
   br i1 %cond37744, label %if.then6232, label %if.else6233
@@ -73018,7 +73039,7 @@ or.rhs111:                                        ; preds = %if.then6235
   %cond37765 = icmp ne i32 %bool37764, 0
   br i1 %cond37765, label %or.true110, label %or.merge112
 
-or.merge112:                                      ; preds = %or.true110, %or.rhs111
+or.merge112:                                      ; preds = %or.rhs111, %or.true110
   %orval37766 = phi i32 [ 1, %or.true110 ], [ 0, %or.rhs111 ]
   %cond37767 = icmp ne i32 %orval37766, 0
   br i1 %cond37767, label %if.then6238, label %if.else6239
@@ -73045,7 +73066,7 @@ or.rhs114:                                        ; preds = %if.else6236
   %cond37781 = icmp ne i32 %bool37780, 0
   br i1 %cond37781, label %or.true113, label %or.merge115
 
-or.merge115:                                      ; preds = %or.true113, %or.rhs114
+or.merge115:                                      ; preds = %or.rhs114, %or.true113
   %orval37782 = phi i32 [ 1, %or.true113 ], [ 0, %or.rhs114 ]
   %cond37783 = icmp ne i32 %orval37782, 0
   br i1 %cond37783, label %if.then6241, label %if.else6242
@@ -73095,7 +73116,7 @@ or.rhs117:                                        ; preds = %if.end6219
   %cond37798 = icmp ne i32 %bool37797, 0
   br i1 %cond37798, label %or.true116, label %or.merge118
 
-or.merge118:                                      ; preds = %or.true116, %or.rhs117
+or.merge118:                                      ; preds = %or.rhs117, %or.true116
   %orval37799 = phi i32 [ 1, %or.true116 ], [ 0, %or.rhs117 ]
   %cond37800 = icmp ne i32 %orval37799, 0
   br i1 %cond37800, label %if.then6244, label %if.else6245
@@ -73323,7 +73344,7 @@ or.rhs:                                           ; preds = %entry
   %cond37870 = icmp ne i32 %bool37869, 0
   br i1 %cond37870, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval37871 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond37872 = icmp ne i32 %orval37871, 0
   br i1 %cond37872, label %if.then6247, label %if.else6248
@@ -73685,7 +73706,7 @@ or.rhs9:                                          ; preds = %match.body6272
   %cond38092 = icmp ne i32 %bool38091, 0
   br i1 %cond38092, label %or.true8, label %or.merge10
 
-or.merge10:                                       ; preds = %or.true8, %or.rhs9
+or.merge10:                                       ; preds = %or.rhs9, %or.true8
   %orval38093 = phi i32 [ 1, %or.true8 ], [ 0, %or.rhs9 ]
   %cond38094 = icmp ne i32 %orval38093, 0
   br i1 %cond38094, label %or.true11, label %or.rhs12
@@ -73701,7 +73722,7 @@ or.rhs12:                                         ; preds = %or.merge10
   %cond38100 = icmp ne i32 %bool38099, 0
   br i1 %cond38100, label %or.true11, label %or.merge13
 
-or.merge13:                                       ; preds = %or.true11, %or.rhs12
+or.merge13:                                       ; preds = %or.rhs12, %or.true11
   %orval38101 = phi i32 [ 1, %or.true11 ], [ 0, %or.rhs12 ]
   %cond38102 = icmp ne i32 %orval38101, 0
   br i1 %cond38102, label %ifexpr.then6274, label %ifexpr.else6275
@@ -73735,7 +73756,7 @@ or.rhs15:                                         ; preds = %ifexpr.else6275
   %cond38116 = icmp ne i32 %bool38115, 0
   br i1 %cond38116, label %or.true14, label %or.merge16
 
-or.merge16:                                       ; preds = %or.true14, %or.rhs15
+or.merge16:                                       ; preds = %or.rhs15, %or.true14
   %orval38117 = phi i32 [ 1, %or.true14 ], [ 0, %or.rhs15 ]
   %cond38118 = icmp ne i32 %orval38117, 0
   br i1 %cond38118, label %ifexpr.then6277, label %ifexpr.else6278
@@ -74055,7 +74076,7 @@ if.then6318:                                      ; preds = %if.end6317
 if.else6319:                                      ; preds = %if.end6317
   br label %if.end6320
 
-if.end6320:                                       ; preds = %if.else6319, %if.end6323
+if.end6320:                                       ; preds = %if.end6323, %if.else6319
   %load38341 = load ptr, ptr %b, align 8
   %load38342 = load ptr, ptr %end_label, align 8
   call void @mir_block(ptr %load38341, ptr %load38342)
@@ -74877,7 +74898,7 @@ or.rhs:                                           ; preds = %if.else6364
   %cond39055 = icmp ne i32 %bool39054, 0
   br i1 %cond39055, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval39056 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond39057 = icmp ne i32 %orval39056, 0
   br i1 %cond39057, label %if.then6366, label %if.else6367
@@ -74933,7 +74954,7 @@ or.rhs:                                           ; preds = %entry
   %cond39107 = icmp ne i32 %bool39106, 0
   br i1 %cond39107, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval39108 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond39109 = icmp ne i32 %orval39108, 0
   br i1 %cond39109, label %if.then6369, label %if.else6370
@@ -74972,7 +74993,7 @@ or.rhs2:                                          ; preds = %if.end6371
   %cond39126 = icmp ne i32 %bool39125, 0
   br i1 %cond39126, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval39127 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond39128 = icmp ne i32 %orval39127, 0
   br i1 %cond39128, label %or.true4, label %or.rhs5
@@ -74988,7 +75009,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond39133 = icmp ne i32 %bool39132, 0
   br i1 %cond39133, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval39134 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond39135 = icmp ne i32 %orval39134, 0
   br i1 %cond39135, label %if.then6372, label %if.else6373
@@ -75043,7 +75064,7 @@ or.rhs8:                                          ; preds = %if.end6374
   %cond39155 = icmp ne i32 %bool39154, 0
   br i1 %cond39155, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval39156 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond39157 = icmp ne i32 %orval39156, 0
   br i1 %cond39157, label %if.then6375, label %if.else6376
@@ -75587,7 +75608,7 @@ if.then6411:                                      ; preds = %for.end6409
 if.else6412:                                      ; preds = %for.end6409
   br label %if.end6413
 
-if.end6413:                                       ; preds = %if.else6412, %if.end6416
+if.end6413:                                       ; preds = %if.end6416, %if.else6412
   call void @mir_line(ptr %b, ptr @.strlit39514)
   %load39515 = load %MirBuilder, ptr %b, align 8
   %extract39516 = extractvalue %MirBuilder %load39515, 0
@@ -76284,7 +76305,7 @@ or.rhs:                                           ; preds = %if.end6493
   %cond39838 = icmp ne i32 %bool39837, 0
   br i1 %cond39838, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval39839 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond39840 = icmp ne i32 %orval39839, 0
   br i1 %cond39840, label %or.true7, label %or.rhs8
@@ -76300,7 +76321,7 @@ or.rhs8:                                          ; preds = %or.merge
   %cond39845 = icmp ne i32 %bool39844, 0
   br i1 %cond39845, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval39846 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond39847 = icmp ne i32 %orval39846, 0
   br i1 %cond39847, label %or.true10, label %or.rhs11
@@ -76316,7 +76337,7 @@ or.rhs11:                                         ; preds = %or.merge9
   %cond39852 = icmp ne i32 %bool39851, 0
   br i1 %cond39852, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval39853 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond39854 = icmp ne i32 %orval39853, 0
   br i1 %cond39854, label %if.then6494, label %if.else6495
@@ -76370,7 +76391,7 @@ or.rhs:                                           ; preds = %entry
   %cond39867 = icmp ne i32 %bool39866, 0
   br i1 %cond39867, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval39868 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond39869 = icmp ne i32 %orval39868, 0
   br i1 %cond39869, label %if.then6497, label %if.else6498
@@ -76463,7 +76484,7 @@ if.then6513:                                      ; preds = %for.end6508
 if.else6514:                                      ; preds = %for.end6508
   br label %if.end6515
 
-if.end6515:                                       ; preds = %if.else6514, %if.end6524
+if.end6515:                                       ; preds = %if.end6524, %if.else6514
   br label %for.step6502
 
 ifexpr.then6516:                                  ; preds = %if.then6513
@@ -76620,7 +76641,7 @@ if.then6531:                                      ; preds = %while.body6529
 if.else6532:                                      ; preds = %while.body6529
   br label %if.end6533
 
-if.end6533:                                       ; preds = %if.else6532, %if.end6544
+if.end6533:                                       ; preds = %if.end6544, %if.else6532
   %load40049 = load i32, ptr %ok, align 4
   %cmp40050 = icmp eq i32 %load40049, 1
   %bool40051 = zext i1 %cmp40050 to i32
@@ -76687,7 +76708,7 @@ if.then6542:                                      ; preds = %for.end6537
 if.else6543:                                      ; preds = %for.end6537
   br label %if.end6544
 
-if.end6544:                                       ; preds = %if.else6543, %if.end6553
+if.end6544:                                       ; preds = %if.end6553, %if.else6543
   br label %if.end6533
 
 ifexpr.then6545:                                  ; preds = %if.then6542
@@ -76770,7 +76791,7 @@ or.rhs:                                           ; preds = %ifexpr.end6550
   %cond40046 = icmp ne i32 %bool40045, 0
   br i1 %cond40046, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval40047 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond40048 = icmp ne i32 %orval40047, 0
   br i1 %cond40048, label %if.then6551, label %if.else6552
@@ -77478,7 +77499,7 @@ or.rhs:                                           ; preds = %if.else6635
   %cond40342 = icmp ne i32 %bool40341, 0
   br i1 %cond40342, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval40343 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond40344 = icmp ne i32 %orval40343, 0
   br i1 %cond40344, label %if.then6640, label %if.else6641
@@ -77501,7 +77522,7 @@ if.then6643:                                      ; preds = %if.else6641
 if.else6644:                                      ; preds = %if.else6641
   br label %if.end6645
 
-if.end6645:                                       ; preds = %if.else6644, %if.end6648
+if.end6645:                                       ; preds = %if.end6648, %if.else6644
   br label %if.end6642
 
 if.then6646:                                      ; preds = %if.then6643
@@ -77552,7 +77573,7 @@ for.body6650:                                     ; preds = %for.cond6649
   %cond40386 = icmp ne i32 %bool40385, 0
   br i1 %cond40386, label %if.then6654, label %if.else6655
 
-for.step6651:                                     ; preds = %if.end6656, %if.then6657
+for.step6651:                                     ; preds = %if.then6657, %if.end6656
   %load40416 = load i32, ptr %i, align 4
   %add40417 = add i32 %load40416, 1
   store i32 %add40417, ptr %i, align 4
@@ -77585,7 +77606,7 @@ if.then6654:                                      ; preds = %for.body6650
 if.else6655:                                      ; preds = %for.body6650
   br label %if.end6656
 
-if.end6656:                                       ; preds = %if.else6655, %if.end6659
+if.end6656:                                       ; preds = %if.end6659, %if.else6655
   %load40410 = load ptr, ptr %out, align 8
   %load40411 = load ptr, ptr %lines, align 8
   %load40412 = load i32, ptr %i, align 4
@@ -77724,7 +77745,7 @@ if.then6668:                                      ; preds = %for.body6664
 if.else6669:                                      ; preds = %for.body6664
   br label %if.end6670
 
-if.end6670:                                       ; preds = %if.else6669, %if.end6673
+if.end6670:                                       ; preds = %if.end6673, %if.else6669
   br label %for.step6665
 
 if.then6671:                                      ; preds = %and.merge
@@ -78064,7 +78085,7 @@ if.then6710:                                      ; preds = %for.body6706
 if.else6711:                                      ; preds = %for.body6706
   br label %if.end6712
 
-if.end6712:                                       ; preds = %if.else6711, %if.end6715
+if.end6712:                                       ; preds = %if.end6715, %if.else6711
   br label %for.step6707
 
 if.then6713:                                      ; preds = %if.then6710
@@ -78342,7 +78363,7 @@ or.rhs:                                           ; preds = %entry
   %cond40723 = icmp ne i32 %bool40722, 0
   br i1 %cond40723, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval40724 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond40725 = icmp ne i32 %orval40724, 0
   br i1 %cond40725, label %if.then6738, label %if.else6739
@@ -78528,7 +78549,7 @@ if.then6763:                                      ; preds = %for.body6759
 if.else6764:                                      ; preds = %for.body6759
   br label %if.end6765
 
-if.end6765:                                       ; preds = %if.else6764, %if.end6768
+if.end6765:                                       ; preds = %if.end6768, %if.else6764
   br label %for.step6760
 
 if.then6766:                                      ; preds = %if.then6763
@@ -78818,7 +78839,7 @@ if.then6799:                                      ; preds = %for.body6795
 if.else6800:                                      ; preds = %for.body6795
   br label %if.end6801
 
-if.end6801:                                       ; preds = %if.else6800, %if.end6804
+if.end6801:                                       ; preds = %if.end6804, %if.else6800
   br label %for.step6796
 
 if.then6802:                                      ; preds = %and.merge
@@ -78959,7 +78980,7 @@ if.then6816:                                      ; preds = %if.end6815
 if.else6817:                                      ; preds = %if.end6815
   br label %if.end6818
 
-if.end6818:                                       ; preds = %if.else6817, %for.end6822
+if.end6818:                                       ; preds = %for.end6822, %if.else6817
   br label %for.step6810
 
 for.cond6819:                                     ; preds = %for.step6821, %if.then6816
@@ -79114,7 +79135,7 @@ if.else6833:                                      ; preds = %if.else6830
   store ptr %call41088, ptr %out, align 8
   br label %if.end6834
 
-if.end6834:                                       ; preds = %if.else6833, %if.end6837
+if.end6834:                                       ; preds = %if.end6837, %if.else6833
   br label %if.end6831
 
 if.then6835:                                      ; preds = %if.then6832
@@ -79137,7 +79158,7 @@ if.then6835:                                      ; preds = %if.then6832
 if.else6836:                                      ; preds = %if.then6832
   br label %if.end6837
 
-if.end6837:                                       ; preds = %if.else6836, %for.end6841
+if.end6837:                                       ; preds = %for.end6841, %if.else6836
   br label %if.end6834
 
 for.cond6838:                                     ; preds = %for.step6840, %if.then6835
@@ -79188,7 +79209,7 @@ if.then6843:                                      ; preds = %for.end6827
 if.else6844:                                      ; preds = %for.end6827
   br label %if.end6845
 
-if.end6845:                                       ; preds = %if.else6844, %for.end6849
+if.end6845:                                       ; preds = %for.end6849, %if.else6844
   %load41114 = load ptr, ptr %out, align 8
   ret ptr %load41114
 
@@ -79563,7 +79584,7 @@ or.rhs:                                           ; preds = %entry
   %cond41266 = icmp ne i32 %bool41265, 0
   br i1 %cond41266, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval41267 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond41268 = icmp ne i32 %orval41267, 0
   br i1 %cond41268, label %or.true1, label %or.rhs2
@@ -79582,7 +79603,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond41276 = icmp ne i32 %bool41275, 0
   br i1 %cond41276, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval41277 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond41278 = icmp ne i32 %orval41277, 0
   br i1 %cond41278, label %if.then6884, label %if.else6885
@@ -79648,7 +79669,7 @@ if.then6895:                                      ; preds = %if.else6893
 if.else6896:                                      ; preds = %if.else6893
   br label %if.end6897
 
-if.end6897:                                       ; preds = %if.else6896, %if.end6900
+if.end6897:                                       ; preds = %if.end6900, %if.else6896
   br label %if.end6894
 
 if.then6898:                                      ; preds = %if.then6895
@@ -79870,7 +79891,7 @@ or.rhs:                                           ; preds = %for.body6908
   %cond41391 = icmp ne i32 %bool41390, 0
   br i1 %cond41391, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval41392 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond41393 = icmp ne i32 %orval41392, 0
   br i1 %cond41393, label %if.then6912, label %if.else6913
@@ -80095,7 +80116,7 @@ and.rhs:                                          ; preds = %if.end6941
 and.false:                                        ; preds = %or.merge, %if.end6941
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge
+and.merge:                                        ; preds = %or.merge, %and.false
   %andval41509 = phi i32 [ 1, %or.merge ], [ 0, %and.false ]
   %cond41510 = icmp ne i32 %andval41509, 0
   br i1 %cond41510, label %and.rhs1, label %and.false2
@@ -80113,7 +80134,7 @@ or.rhs:                                           ; preds = %and.rhs
   %cond41506 = icmp ne i32 %bool41505, 0
   br i1 %cond41506, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval41507 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond41508 = icmp ne i32 %orval41507, 0
   br i1 %cond41508, label %and.merge, label %and.false
@@ -80681,7 +80702,7 @@ or.rhs:                                           ; preds = %entry
   %cond41759 = icmp ne i32 %bool41758, 0
   br i1 %cond41759, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval41760 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond41761 = icmp ne i32 %orval41760, 0
   br i1 %cond41761, label %or.true1, label %or.rhs2
@@ -80696,7 +80717,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond41765 = icmp ne i32 %bool41764, 0
   br i1 %cond41765, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval41766 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond41767 = icmp ne i32 %orval41766, 0
   br i1 %cond41767, label %or.true4, label %or.rhs5
@@ -80717,7 +80738,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond41778 = icmp ne i32 %bool41777, 0
   br i1 %cond41778, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval41779 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond41780 = icmp ne i32 %orval41779, 0
   br i1 %cond41780, label %if.then7014, label %if.else7015
@@ -80774,7 +80795,7 @@ or.rhs:                                           ; preds = %entry
   %cond41804 = icmp ne i32 %bool41803, 0
   br i1 %cond41804, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval41805 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond41806 = icmp ne i32 %orval41805, 0
   br i1 %cond41806, label %or.true1, label %or.rhs2
@@ -80789,7 +80810,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond41810 = icmp ne i32 %bool41809, 0
   br i1 %cond41810, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval41811 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond41812 = icmp ne i32 %orval41811, 0
   br i1 %cond41812, label %or.true4, label %or.rhs5
@@ -80810,7 +80831,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond41823 = icmp ne i32 %bool41822, 0
   br i1 %cond41823, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval41824 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond41825 = icmp ne i32 %orval41824, 0
   br i1 %cond41825, label %if.then7017, label %if.else7018
@@ -80930,7 +80951,7 @@ if.else7030:                                      ; preds = %and.merge
   store i32 %add41943, ptr %i, align 4
   br label %if.end7031
 
-if.end7031:                                       ; preds = %if.else7030, %if.end7034
+if.end7031:                                       ; preds = %if.end7034, %if.else7030
   br label %while.cond7026
 
 and.rhs:                                          ; preds = %while.body7027
@@ -81263,7 +81284,7 @@ or.rhs:                                           ; preds = %if.end7068
   %cond42071 = icmp ne i32 %bool42070, 0
   br i1 %cond42071, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval42072 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond42073 = icmp ne i32 %orval42072, 0
   br i1 %cond42073, label %or.true1, label %or.rhs2
@@ -81279,7 +81300,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond42079 = icmp ne i32 %bool42078, 0
   br i1 %cond42079, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval42080 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond42081 = icmp ne i32 %orval42080, 0
   br i1 %cond42081, label %if.then7069, label %if.else7070
@@ -81480,7 +81501,7 @@ or.rhs:                                           ; preds = %if.end7080
   %cond42153 = icmp ne i32 %bool42152, 0
   br i1 %cond42153, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval42154 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond42155 = icmp ne i32 %orval42154, 0
   br i1 %cond42155, label %or.true1, label %or.rhs2
@@ -81496,7 +81517,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond42161 = icmp ne i32 %bool42160, 0
   br i1 %cond42161, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval42162 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond42163 = icmp ne i32 %orval42162, 0
   br i1 %cond42163, label %if.then7099, label %if.else7100
@@ -81961,7 +81982,7 @@ if.then7205:                                      ; preds = %entry
 if.else7206:                                      ; preds = %entry
   br label %if.end7207
 
-if.end7207:                                       ; preds = %if.else7206, %if.end7210
+if.end7207:                                       ; preds = %if.end7210, %if.else7206
   %load42738 = load ptr, ptr %v, align 8
   %strcmp42740 = call i32 @strcmp(ptr %load42738, ptr @.strlit42739)
   %cmp42741 = icmp eq i32 %strcmp42740, 0
@@ -82006,7 +82027,7 @@ or.rhs:                                           ; preds = %if.end7207
   %cond42749 = icmp ne i32 %bool42748, 0
   br i1 %cond42749, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval42750 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond42751 = icmp ne i32 %orval42750, 0
   br i1 %cond42751, label %if.then7211, label %if.else7212
@@ -82677,7 +82698,7 @@ or.rhs:                                           ; preds = %entry
   %cond42658 = icmp ne i32 %bool42657, 0
   br i1 %cond42658, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval42659 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond42660 = icmp ne i32 %orval42659, 0
   br i1 %cond42660, label %or.true1, label %or.rhs2
@@ -82693,7 +82714,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond42666 = icmp ne i32 %bool42665, 0
   br i1 %cond42666, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval42667 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond42668 = icmp ne i32 %orval42667, 0
   br i1 %cond42668, label %if.then7193, label %if.else7194
@@ -82720,7 +82741,7 @@ and.rhs:                                          ; preds = %if.end7195
 and.false:                                        ; preds = %or.merge6, %if.end7195
   br label %and.merge
 
-and.merge:                                        ; preds = %and.false, %or.merge6
+and.merge:                                        ; preds = %or.merge6, %and.false
   %andval42690 = phi i32 [ 1, %or.merge6 ], [ 0, %and.false ]
   %cond42691 = icmp ne i32 %andval42690, 0
   br i1 %cond42691, label %and.rhs7, label %and.false8
@@ -82738,7 +82759,7 @@ or.rhs5:                                          ; preds = %and.rhs
   %cond42687 = icmp ne i32 %bool42686, 0
   br i1 %cond42687, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval42688 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond42689 = icmp ne i32 %orval42688, 0
   br i1 %cond42689, label %and.merge, label %and.false
@@ -83214,7 +83235,7 @@ or.rhs:                                           ; preds = %entry
   %cond43007 = icmp ne i32 %bool43006, 0
   br i1 %cond43007, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval43008 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond43009 = icmp ne i32 %orval43008, 0
   br i1 %cond43009, label %if.then7288, label %if.else7289
@@ -83234,7 +83255,7 @@ if.else7292:                                      ; preds = %if.end7290
   store ptr @.strlit43081, ptr %fieldptr43080, align 8
   br label %if.end7293
 
-if.end7293:                                       ; preds = %if.else7292, %ifexpr.end7296
+if.end7293:                                       ; preds = %ifexpr.end7296, %if.else7292
   %load43082 = load ptr, ptr %b, align 8
   %fieldptr43084 = getelementptr %MirAsm, ptr %load43082, i32 0, i32 13
   %load43085 = load ptr, ptr %b, align 8
@@ -83420,7 +83441,7 @@ if.then7306:                                      ; preds = %while.body7304
 if.else7307:                                      ; preds = %while.body7304
   br label %if.end7308
 
-if.end7308:                                       ; preds = %if.else7307, %if.end7311
+if.end7308:                                       ; preds = %if.end7311, %if.else7307
   %load43355 = load i32, ptr %pos, align 4
   %add43356 = add i32 %load43355, 1
   store i32 %add43356, ptr %pos, align 4
@@ -83441,7 +83462,7 @@ if.then7309:                                      ; preds = %and.merge3
 if.else7310:                                      ; preds = %and.merge3
   br label %if.end7311
 
-if.end7311:                                       ; preds = %if.else7310, %if.end7335
+if.end7311:                                       ; preds = %if.end7335, %if.else7310
   br label %if.end7308
 
 and.rhs1:                                         ; preds = %if.then7306
@@ -83504,7 +83525,7 @@ or.rhs5:                                          ; preds = %if.then7309
   %cond43214 = icmp ne i32 %bool43213, 0
   br i1 %cond43214, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval43215 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond43216 = icmp ne i32 %orval43215, 0
   br i1 %cond43216, label %if.then7312, label %if.else7313
@@ -83589,7 +83610,7 @@ if.then7318:                                      ; preds = %and.merge12
 if.else7319:                                      ; preds = %and.merge12
   br label %if.end7320
 
-if.end7320:                                       ; preds = %if.else7319, %if.end7323
+if.end7320:                                       ; preds = %if.end7323, %if.else7319
   br label %if.end7317
 
 and.rhs10:                                        ; preds = %if.else7316
@@ -84323,7 +84344,7 @@ or.rhs:                                           ; preds = %for.body7375
   %cond43632 = icmp ne i32 %bool43631, 0
   br i1 %cond43632, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval43633 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond43634 = icmp ne i32 %orval43633, 0
   br i1 %cond43634, label %or.true1, label %or.rhs2
@@ -84342,7 +84363,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond43642 = icmp ne i32 %bool43641, 0
   br i1 %cond43642, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval43643 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond43644 = icmp ne i32 %orval43643, 0
   br i1 %cond43644, label %if.then7379, label %if.else7380
@@ -84405,7 +84426,7 @@ or.rhs:                                           ; preds = %entry
   %cond43664 = icmp ne i32 %bool43663, 0
   br i1 %cond43664, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval43665 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond43666 = icmp ne i32 %orval43665, 0
   br i1 %cond43666, label %or.true1, label %or.rhs2
@@ -84421,7 +84442,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond43672 = icmp ne i32 %bool43671, 0
   br i1 %cond43672, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval43673 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond43674 = icmp ne i32 %orval43673, 0
   br i1 %cond43674, label %if.then7382, label %if.else7383
@@ -84540,7 +84561,7 @@ or.rhs5:                                          ; preds = %and.merge
   %cond43748 = icmp ne i32 %bool43747, 0
   br i1 %cond43748, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval43749 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond43750 = icmp ne i32 %orval43749, 0
   br i1 %cond43750, label %if.then7391, label %if.else7392
@@ -84760,7 +84781,7 @@ or.rhs:                                           ; preds = %entry
   %cond43884 = icmp ne i32 %bool43883, 0
   br i1 %cond43884, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval43885 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond43886 = icmp ne i32 %orval43885, 0
   br i1 %cond43886, label %or.true1, label %or.rhs2
@@ -84776,7 +84797,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond43892 = icmp ne i32 %bool43891, 0
   br i1 %cond43892, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval43893 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond43894 = icmp ne i32 %orval43893, 0
   br i1 %cond43894, label %if.then7406, label %if.else7407
@@ -84910,7 +84931,7 @@ or.rhs:                                           ; preds = %entry
   %cond43964 = icmp ne i32 %bool43963, 0
   br i1 %cond43964, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval43965 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond43966 = icmp ne i32 %orval43965, 0
   br i1 %cond43966, label %or.true1, label %or.rhs2
@@ -84925,7 +84946,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond43970 = icmp ne i32 %bool43969, 0
   br i1 %cond43970, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval43971 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond43972 = icmp ne i32 %orval43971, 0
   br i1 %cond43972, label %or.true4, label %or.rhs5
@@ -84940,7 +84961,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond43976 = icmp ne i32 %bool43975, 0
   br i1 %cond43976, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval43977 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond43978 = icmp ne i32 %orval43977, 0
   br i1 %cond43978, label %if.then7412, label %if.else7413
@@ -85055,7 +85076,7 @@ or.rhs8:                                          ; preds = %while.body7419
   %cond44010 = icmp ne i32 %bool44009, 0
   br i1 %cond44010, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
   %orval44011 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
   %cond44012 = icmp ne i32 %orval44011, 0
   br i1 %cond44012, label %ifexpr.then7421, label %ifexpr.else7422
@@ -85075,7 +85096,7 @@ if.then7424:                                      ; preds = %ifexpr.end7423
 if.else7425:                                      ; preds = %ifexpr.end7423
   br label %if.end7426
 
-if.end7426:                                       ; preds = %if.else7425, %if.end7435
+if.end7426:                                       ; preds = %if.end7435, %if.else7425
   %load44074 = load i32, ptr %end, align 4
   %add44075 = add i32 %load44074, 1
   store i32 %add44075, ptr %pos, align 4
@@ -85764,7 +85785,7 @@ or.rhs:                                           ; preds = %entry
   %cond44524 = icmp ne i32 %bool44523, 0
   br i1 %cond44524, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval44525 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond44526 = icmp ne i32 %orval44525, 0
   br i1 %cond44526, label %if.then7493, label %if.else7494
@@ -86014,7 +86035,7 @@ or.rhs:                                           ; preds = %entry
   %cond44623 = icmp ne i32 %bool44622, 0
   br i1 %cond44623, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval44624 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond44625 = icmp ne i32 %orval44624, 0
   br i1 %cond44625, label %or.true1, label %or.rhs2
@@ -86029,7 +86050,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond44629 = icmp ne i32 %bool44628, 0
   br i1 %cond44629, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval44630 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond44631 = icmp ne i32 %orval44630, 0
   br i1 %cond44631, label %if.then7510, label %if.else7511
@@ -86236,7 +86257,7 @@ or.rhs:                                           ; preds = %entry
   %cond44762 = icmp ne i32 %bool44761, 0
   br i1 %cond44762, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval44763 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond44764 = icmp ne i32 %orval44763, 0
   br i1 %cond44764, label %if.then7522, label %if.else7523
@@ -86327,7 +86348,7 @@ or.rhs2:                                          ; preds = %if.then7528
   %cond44822 = icmp ne i32 %bool44821, 0
   br i1 %cond44822, label %and.rhs, label %and.false
 
-or.merge3:                                        ; preds = %or.true1, %and.merge
+or.merge3:                                        ; preds = %and.merge, %or.true1
   %orval44832 = phi i32 [ 1, %or.true1 ], [ 0, %and.merge ]
   %cond44833 = icmp ne i32 %orval44832, 0
   br i1 %cond44833, label %if.then7531, label %if.else7532
@@ -86465,7 +86486,7 @@ or.rhs5:                                          ; preds = %if.end7530
   %cond44894 = icmp ne i32 %bool44893, 0
   br i1 %cond44894, label %and.rhs7, label %and.false8
 
-or.merge6:                                        ; preds = %or.true4, %and.merge9
+or.merge6:                                        ; preds = %and.merge9, %or.true4
   %orval44904 = phi i32 [ 1, %or.true4 ], [ 0, %and.merge9 ]
   %cond44905 = icmp ne i32 %orval44904, 0
   br i1 %cond44905, label %if.then7537, label %if.else7538
@@ -86581,7 +86602,7 @@ or.rhs:                                           ; preds = %entry
   %cond44981 = icmp ne i32 %bool44980, 0
   br i1 %cond44981, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval44982 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond44983 = icmp ne i32 %orval44982, 0
   br i1 %cond44983, label %if.then7540, label %if.else7541
@@ -86635,7 +86656,7 @@ or.rhs2:                                          ; preds = %if.end7542
   %cond45021 = icmp ne i32 %bool45020, 0
   br i1 %cond45021, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval45022 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond45023 = icmp ne i32 %orval45022, 0
   br i1 %cond45023, label %if.then7543, label %if.else7544
@@ -86738,7 +86759,7 @@ or.rhs5:                                          ; preds = %if.else7544
   %cond45069 = icmp ne i32 %bool45068, 0
   br i1 %cond45069, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval45070 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond45071 = icmp ne i32 %orval45070, 0
   br i1 %cond45071, label %if.then7552, label %if.else7553
@@ -86864,7 +86885,7 @@ if.then7558:                                      ; preds = %entry
 if.else7559:                                      ; preds = %entry
   br label %if.end7560
 
-if.end7560:                                       ; preds = %if.else7559, %if.end7563
+if.end7560:                                       ; preds = %if.end7563, %if.else7559
   %load45210 = load ptr, ptr %op, align 8
   %strcmp45212 = call i32 @strcmp(ptr %load45210, ptr @.strlit45211)
   %cmp45213 = icmp eq i32 %strcmp45212, 0
@@ -86892,7 +86913,7 @@ if.then7564:                                      ; preds = %if.end7560
 if.else7565:                                      ; preds = %if.end7560
   br label %if.end7566
 
-if.end7566:                                       ; preds = %if.else7565, %if.end7569
+if.end7566:                                       ; preds = %if.end7569, %if.else7565
   %load45224 = load ptr, ptr %op, align 8
   %strcmp45226 = call i32 @strcmp(ptr %load45224, ptr @.strlit45225)
   %cmp45227 = icmp eq i32 %strcmp45226, 0
@@ -86920,7 +86941,7 @@ if.then7570:                                      ; preds = %if.end7566
 if.else7571:                                      ; preds = %if.end7566
   br label %if.end7572
 
-if.end7572:                                       ; preds = %if.else7571, %if.end7575
+if.end7572:                                       ; preds = %if.end7575, %if.else7571
   %load45238 = load ptr, ptr %ty, align 8
   %strcmp45240 = call i32 @strcmp(ptr %load45238, ptr @.strlit45239)
   %cmp45241 = icmp eq i32 %strcmp45240, 0
@@ -87045,7 +87066,7 @@ or.rhs:                                           ; preds = %entry
   %cond45262 = icmp ne i32 %bool45261, 0
   br i1 %cond45262, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval45263 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond45264 = icmp ne i32 %orval45263, 0
   br i1 %cond45264, label %if.then7579, label %if.else7580
@@ -87175,7 +87196,7 @@ or.rhs:                                           ; preds = %if.end7587
   %cond45349 = icmp ne i32 %bool45348, 0
   br i1 %cond45349, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval45350 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond45351 = icmp ne i32 %orval45350, 0
   br i1 %cond45351, label %if.then7588, label %if.else7589
@@ -87238,7 +87259,7 @@ or.rhs2:                                          ; preds = %if.then7591
   %cond45388 = icmp ne i32 %bool45387, 0
   br i1 %cond45388, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval45389 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond45390 = icmp ne i32 %orval45389, 0
   br i1 %cond45390, label %or.true4, label %or.rhs5
@@ -87254,7 +87275,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond45396 = icmp ne i32 %bool45395, 0
   br i1 %cond45396, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval45397 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond45398 = icmp ne i32 %orval45397, 0
   br i1 %cond45398, label %if.then7594, label %if.else7595
@@ -87514,7 +87535,7 @@ or.rhs:                                           ; preds = %entry
   %cond45582 = icmp ne i32 %bool45581, 0
   br i1 %cond45582, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval45583 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond45584 = icmp ne i32 %orval45583, 0
   br i1 %cond45584, label %or.true1, label %or.rhs2
@@ -87529,7 +87550,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond45588 = icmp ne i32 %bool45587, 0
   br i1 %cond45588, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval45589 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond45590 = icmp ne i32 %orval45589, 0
   br i1 %cond45590, label %or.true4, label %or.rhs5
@@ -87544,7 +87565,7 @@ or.rhs5:                                          ; preds = %or.merge3
   %cond45594 = icmp ne i32 %bool45593, 0
   br i1 %cond45594, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval45595 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond45596 = icmp ne i32 %orval45595, 0
   br i1 %cond45596, label %if.then7606, label %if.else7607
@@ -87987,7 +88008,7 @@ or.rhs:                                           ; preds = %if.end7632
   %cond45839 = icmp ne i32 %bool45838, 0
   br i1 %cond45839, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval45840 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond45841 = icmp ne i32 %orval45840, 0
   br i1 %cond45841, label %if.then7633, label %if.else7634
@@ -88029,7 +88050,7 @@ or.rhs:                                           ; preds = %entry
   %cond45916 = icmp ne i32 %bool45915, 0
   br i1 %cond45916, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval45917 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond45918 = icmp ne i32 %orval45917, 0
   br i1 %cond45918, label %if.then7636, label %if.else7637
@@ -88059,7 +88080,7 @@ or.rhs2:                                          ; preds = %if.end7638
   %cond45931 = icmp ne i32 %bool45930, 0
   br i1 %cond45931, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval45932 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond45933 = icmp ne i32 %orval45932, 0
   br i1 %cond45933, label %if.then7639, label %if.else7640
@@ -88235,7 +88256,7 @@ or.rhs:                                           ; preds = %if.end7656
   %cond45995 = icmp ne i32 %bool45994, 0
   br i1 %cond45995, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval45996 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond45997 = icmp ne i32 %orval45996, 0
   br i1 %cond45997, label %if.then7657, label %if.else7658
@@ -88395,7 +88416,7 @@ or.rhs:                                           ; preds = %while.body7667
   %cond46086 = icmp ne i32 %bool46085, 0
   br i1 %cond46086, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval46087 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond46088 = icmp ne i32 %orval46087, 0
   br i1 %cond46088, label %ifexpr.then7669, label %ifexpr.else7670
@@ -88417,7 +88438,7 @@ if.then7672:                                      ; preds = %ifexpr.end7671
 if.else7673:                                      ; preds = %ifexpr.end7671
   br label %if.end7674
 
-if.end7674:                                       ; preds = %if.else7673, %if.end7677
+if.end7674:                                       ; preds = %if.end7677, %if.else7673
   %load46128 = load i32, ptr %end, align 4
   %add46129 = add i32 %load46128, 1
   store i32 %add46129, ptr %pos, align 4
@@ -88519,7 +88540,7 @@ or.rhs:                                           ; preds = %entry
   %cond46145 = icmp ne i32 %bool46144, 0
   br i1 %cond46145, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval46146 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond46147 = icmp ne i32 %orval46146, 0
   br i1 %cond46147, label %if.then7684, label %if.else7685
@@ -88614,7 +88635,7 @@ or.rhs2:                                          ; preds = %while.body7688
   %cond46173 = icmp ne i32 %bool46172, 0
   br i1 %cond46173, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval46174 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond46175 = icmp ne i32 %orval46174, 0
   br i1 %cond46175, label %ifexpr.then7690, label %ifexpr.else7691
@@ -88730,7 +88751,7 @@ or.rhs:                                           ; preds = %entry
   %cond46247 = icmp ne i32 %bool46246, 0
   br i1 %cond46247, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval46248 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond46249 = icmp ne i32 %orval46248, 0
   br i1 %cond46249, label %if.then7699, label %if.else7700
@@ -88975,7 +88996,7 @@ or.rhs5:                                          ; preds = %while.body7718
   %cond46353 = icmp ne i32 %bool46352, 0
   br i1 %cond46353, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
   %orval46354 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
   %cond46355 = icmp ne i32 %orval46354, 0
   br i1 %cond46355, label %ifexpr.then7720, label %ifexpr.else7721
@@ -89010,7 +89031,7 @@ if.then7723:                                      ; preds = %ifexpr.end7722
 if.else7724:                                      ; preds = %ifexpr.end7722
   br label %if.end7725
 
-if.end7725:                                       ; preds = %if.else7724, %if.end7740
+if.end7725:                                       ; preds = %if.end7740, %if.else7724
   %load46660 = load i32, ptr %end, align 4
   %add46661 = add i32 %load46660, 1
   store i32 %add46661, ptr %pos, align 4
@@ -89031,7 +89052,7 @@ if.then7726:                                      ; preds = %and.merge9
 if.else7727:                                      ; preds = %and.merge9
   br label %if.end7728
 
-if.end7728:                                       ; preds = %if.else7727, %if.end7731
+if.end7728:                                       ; preds = %if.end7731, %if.else7727
   %load46452 = load ptr, ptr %arg_ty, align 8
   %call46453 = call i32 @mir2asm_type_is_float(ptr %load46452)
   %cmp46454 = icmp eq i32 %call46453, 1
@@ -89050,7 +89071,7 @@ and.rhs7:                                         ; preds = %if.then7723
 and.false8:                                       ; preds = %or.merge12, %if.then7723
   br label %and.merge9
 
-and.merge9:                                       ; preds = %and.false8, %or.merge12
+and.merge9:                                       ; preds = %or.merge12, %and.false8
   %andval46400 = phi i32 [ 1, %or.merge12 ], [ 0, %and.false8 ]
   %cond46401 = icmp ne i32 %andval46400, 0
   br i1 %cond46401, label %if.then7726, label %if.else7727
@@ -89066,7 +89087,7 @@ or.rhs11:                                         ; preds = %and.rhs7
   %cond46397 = icmp ne i32 %bool46396, 0
   br i1 %cond46397, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
   %orval46398 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
   %cond46399 = icmp ne i32 %orval46398, 0
   br i1 %cond46399, label %and.merge9, label %and.false8
@@ -89488,7 +89509,7 @@ if.then7768:                                      ; preds = %and.merge27
 if.else7769:                                      ; preds = %and.merge27
   br label %if.end7770
 
-if.end7770:                                       ; preds = %if.else7769, %if.end7773
+if.end7770:                                       ; preds = %if.end7773, %if.else7769
   ret void
 
 and.rhs25:                                        ; preds = %if.end7767
@@ -89593,7 +89614,7 @@ or.rhs:                                           ; preds = %entry
   %cond46750 = icmp ne i32 %bool46749, 0
   br i1 %cond46750, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
+or.merge:                                         ; preds = %or.rhs, %or.true
   %orval46751 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
   %cond46752 = icmp ne i32 %orval46751, 0
   br i1 %cond46752, label %or.true1, label %or.rhs2
@@ -89609,7 +89630,7 @@ or.rhs2:                                          ; preds = %or.merge
   %cond46758 = icmp ne i32 %bool46757, 0
   br i1 %cond46758, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
   %orval46759 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
   %cond46760 = icmp ne i32 %orval46759, 0
   br i1 %cond46760, label %if.then7777, label %if.else7778
@@ -90267,7 +90288,7 @@ if.then7843:                                      ; preds = %and.merge20
 if.else7844:                                      ; preds = %and.merge20
   br label %if.end7845
 
-if.end7845:                                       ; preds = %if.else7844, %if.end7863
+if.end7845:                                       ; preds = %if.end7863, %if.else7844
   ret void
 
 and.rhs18:                                        ; preds = %if.then7840
@@ -90464,7 +90485,7 @@ or.rhs31:                                         ; preds = %if.else7856
   %cond47236 = icmp ne i32 %bool47235, 0
   br i1 %cond47236, label %or.true30, label %or.merge32
 
-or.merge32:                                       ; preds = %or.true30, %or.rhs31
+or.merge32:                                       ; preds = %or.rhs31, %or.true30
   %orval47237 = phi i32 [ 1, %or.true30 ], [ 0, %or.rhs31 ]
   %cond47238 = icmp ne i32 %orval47237, 0
   br i1 %cond47238, label %or.true33, label %or.rhs34
@@ -90480,7 +90501,7 @@ or.rhs34:                                         ; preds = %or.merge32
   %cond47244 = icmp ne i32 %bool47243, 0
   br i1 %cond47244, label %or.true33, label %or.merge35
 
-or.merge35:                                       ; preds = %or.true33, %or.rhs34
+or.merge35:                                       ; preds = %or.rhs34, %or.true33
   %orval47245 = phi i32 [ 1, %or.true33 ], [ 0, %or.rhs34 ]
   %cond47246 = icmp ne i32 %orval47245, 0
   br i1 %cond47246, label %if.then7858, label %if.else7859
@@ -90787,7 +90808,7 @@ if.then7891:                                      ; preds = %if.then7888
 if.else7892:                                      ; preds = %if.then7888
   br label %if.end7893
 
-if.end7893:                                       ; preds = %if.else7892, %if.end7914
+if.end7893:                                       ; preds = %if.end7914, %if.else7892
   ret void
 
 if.then7894:                                      ; preds = %if.then7891
@@ -90984,7 +91005,7 @@ and.rhs56:                                        ; preds = %and.merge55
 and.false57:                                      ; preds = %or.merge61, %and.merge55
   br label %and.merge58
 
-and.merge58:                                      ; preds = %and.false57, %or.merge61
+and.merge58:                                      ; preds = %or.merge61, %and.false57
   %andval47574 = phi i32 [ 1, %or.merge61 ], [ 0, %and.false57 ]
   %cond47575 = icmp ne i32 %andval47574, 0
   br i1 %cond47575, label %and.rhs62, label %and.false63
@@ -91000,7 +91021,7 @@ or.rhs60:                                         ; preds = %and.rhs56
   %cond47571 = icmp ne i32 %bool47570, 0
   br i1 %cond47571, label %or.true59, label %or.merge61
 
-or.merge61:                                       ; preds = %or.true59, %or.rhs60
+or.merge61:                                       ; preds = %or.rhs60, %or.true59
   %orval47572 = phi i32 [ 1, %or.true59 ], [ 0, %or.rhs60 ]
   %cond47573 = icmp ne i32 %orval47572, 0
   br i1 %cond47573, label %and.merge58, label %and.false57
@@ -91156,7 +91177,7 @@ or.rhs72:                                         ; preds = %if.else7913
   %cond47652 = icmp ne i32 %bool47651, 0
   br i1 %cond47652, label %or.true71, label %or.merge73
 
-or.merge73:                                       ; preds = %or.true71, %or.rhs72
+or.merge73:                                       ; preds = %or.rhs72, %or.true71
   %orval47653 = phi i32 [ 1, %or.true71 ], [ 0, %or.rhs72 ]
   %cond47654 = icmp ne i32 %orval47653, 0
   br i1 %cond47654, label %or.true74, label %or.rhs75
@@ -91172,7 +91193,7 @@ or.rhs75:                                         ; preds = %or.merge73
   %cond47660 = icmp ne i32 %bool47659, 0
   br i1 %cond47660, label %or.true74, label %or.merge76
 
-or.merge76:                                       ; preds = %or.true74, %or.rhs75
+or.merge76:                                       ; preds = %or.rhs75, %or.true74
   %orval47661 = phi i32 [ 1, %or.true74 ], [ 0, %or.rhs75 ]
   %cond47662 = icmp ne i32 %orval47661, 0
   br i1 %cond47662, label %if.then7915, label %if.else7916
@@ -91512,7 +91533,7 @@ or.rhs78:                                         ; preds = %if.end7968
   %cond47885 = icmp ne i32 %bool47884, 0
   br i1 %cond47885, label %or.true77, label %or.merge79
 
-or.merge79:                                       ; preds = %or.true77, %or.rhs78
+or.merge79:                                       ; preds = %or.rhs78, %or.true77
   %orval47886 = phi i32 [ 1, %or.true77 ], [ 0, %or.rhs78 ]
   %cond47887 = icmp ne i32 %orval47886, 0
   br i1 %cond47887, label %or.true80, label %or.rhs81
@@ -91528,7 +91549,7 @@ or.rhs81:                                         ; preds = %or.merge79
   %cond47893 = icmp ne i32 %bool47892, 0
   br i1 %cond47893, label %or.true80, label %or.merge82
 
-or.merge82:                                       ; preds = %or.true80, %or.rhs81
+or.merge82:                                       ; preds = %or.rhs81, %or.true80
   %orval47894 = phi i32 [ 1, %or.true80 ], [ 0, %or.rhs81 ]
   %cond47895 = icmp ne i32 %orval47894, 0
   br i1 %cond47895, label %if.then7969, label %if.else7970
@@ -91821,7 +91842,7 @@ if.else8003:                                      ; preds = %ifexpr.end8001
   call void @mir2asm_line(ptr %load48072, ptr %call48086)
   br label %if.end8004
 
-if.end8004:                                       ; preds = %if.else8003, %if.end8007
+if.end8004:                                       ; preds = %if.end8007, %if.else8003
   ret void
 
 if.then8005:                                      ; preds = %if.then8002
@@ -91983,7 +92004,7 @@ if.then8019:                                      ; preds = %if.else8017
 if.else8020:                                      ; preds = %if.else8017
   br label %if.end8021
 
-if.end8021:                                       ; preds = %if.else8020, %ifexpr.end8024
+if.end8021:                                       ; preds = %ifexpr.end8024, %if.else8020
   br label %if.end8018
 
 ifexpr.then8022:                                  ; preds = %if.then8019
@@ -92266,428 +92287,452 @@ if.end8045:                                       ; preds = %if.else8044
   ret ptr %load48244
 }
 
+define i32 @passes_optimize_ir(ptr %0, ptr %1, ptr %2, i32 %3) {
+entry:
+  %input_path = alloca ptr, align 8
+  store ptr %0, ptr %input_path, align 8
+  %output_path = alloca ptr, align 8
+  store ptr %1, ptr %output_path, align 8
+  %target_triple = alloca ptr, align 8
+  store ptr %2, ptr %target_triple, align 8
+  %opt_level = alloca i32, align 4
+  store i32 %3, ptr %opt_level, align 4
+  %load48245 = load ptr, ptr %input_path, align 8
+  %load48246 = load ptr, ptr %output_path, align 8
+  %load48247 = load ptr, ptr %target_triple, align 8
+  %load48248 = load i32, ptr %opt_level, align 4
+  %call48249 = call i32 @vix_api_optimize_ir(ptr %load48245, ptr %load48246, ptr %load48247, i32 %load48248)
+  ret i32 %call48249
+}
+
+define ptr @passes_last_error() {
+entry:
+  %call48250 = call ptr @vix_api_passes_error()
+  %err = alloca ptr, align 8
+  store ptr %call48250, ptr %err, align 8
+  %load48251 = load ptr, ptr %err, align 8
+  %cmp48252 = icmp eq ptr %load48251, null
+  %bool48253 = zext i1 %cmp48252 to i32
+  %cond48254 = icmp ne i32 %bool48253, 0
+  br i1 %cond48254, label %if.then8046, label %if.else8047
+
+if.then8046:                                      ; preds = %entry
+  ret ptr @.strlit48255
+
+if.else8047:                                      ; preds = %entry
+  br label %if.end8048
+
+if.end8048:                                       ; preds = %if.else8047
+  %load48256 = load ptr, ptr %err, align 8
+  ret ptr %load48256
+}
+
 define i32 @string_ends_with(ptr %0, ptr %1) {
 entry:
   %text = alloca ptr, align 8
   store ptr %0, ptr %text, align 8
   %suffix = alloca ptr, align 8
   store ptr %1, ptr %suffix, align 8
-  %load48245 = load ptr, ptr %text, align 8
-  %strlen48246 = call i32 @strlen(ptr %load48245)
-  %load48247 = load ptr, ptr %suffix, align 8
-  %strlen48248 = call i32 @strlen(ptr %load48247)
-  %cmp48249 = icmp slt i32 %strlen48246, %strlen48248
-  %bool48250 = zext i1 %cmp48249 to i32
-  %cond48251 = icmp ne i32 %bool48250, 0
-  br i1 %cond48251, label %if.then8046, label %if.else8047
-
-if.then8046:                                      ; preds = %entry
-  ret i32 0
-
-if.else8047:                                      ; preds = %entry
-  br label %if.end8048
-
-if.end8048:                                       ; preds = %if.else8047
-  %load48252 = load ptr, ptr %text, align 8
-  %strlen48253 = call i32 @strlen(ptr %load48252)
-  %load48254 = load ptr, ptr %suffix, align 8
-  %strlen48255 = call i32 @strlen(ptr %load48254)
-  %sub48256 = sub i32 %strlen48253, %strlen48255
-  %offset = alloca i32, align 4
-  store i32 %sub48256, ptr %offset, align 4
-  %load48257 = load ptr, ptr %suffix, align 8
+  %load48257 = load ptr, ptr %text, align 8
   %strlen48258 = call i32 @strlen(ptr %load48257)
-  %i = alloca i32, align 4
-  store i32 0, ptr %i, align 4
-  %__for_end_i8053 = alloca i32, align 4
-  store i32 %strlen48258, ptr %__for_end_i8053, align 4
-  br label %for.cond8049
-
-for.cond8049:                                     ; preds = %for.step8051, %if.end8048
-  %load48259 = load i32, ptr %i, align 4
-  %load48260 = load i32, ptr %__for_end_i8053, align 4
-  %cmp48261 = icmp slt i32 %load48259, %load48260
+  %load48259 = load ptr, ptr %suffix, align 8
+  %strlen48260 = call i32 @strlen(ptr %load48259)
+  %cmp48261 = icmp slt i32 %strlen48258, %strlen48260
   %bool48262 = zext i1 %cmp48261 to i32
   %cond48263 = icmp ne i32 %bool48262, 0
-  br i1 %cond48263, label %for.body8050, label %for.end8052
+  br i1 %cond48263, label %if.then8049, label %if.else8050
 
-for.body8050:                                     ; preds = %for.cond8049
-  %load48264 = load ptr, ptr %text, align 8
-  %load48265 = load i32, ptr %offset, align 4
-  %load48266 = load i32, ptr %i, align 4
-  %add48267 = add i32 %load48265, %load48266
-  %sidx48268 = getelementptr i8, ptr %load48264, i32 %add48267
-  %sbyte48269 = load i8, ptr %sidx48268, align 1
-  %schar48270 = zext i8 %sbyte48269 to i32
-  %load48271 = load ptr, ptr %suffix, align 8
-  %load48272 = load i32, ptr %i, align 4
-  %sidx48273 = getelementptr i8, ptr %load48271, i32 %load48272
-  %sbyte48274 = load i8, ptr %sidx48273, align 1
-  %schar48275 = zext i8 %sbyte48274 to i32
-  %cmp48276 = icmp ne i32 %schar48270, %schar48275
-  %bool48277 = zext i1 %cmp48276 to i32
-  %cond48278 = icmp ne i32 %bool48277, 0
-  br i1 %cond48278, label %if.then8054, label %if.else8055
-
-for.step8051:                                     ; preds = %if.end8056
-  %load48279 = load i32, ptr %i, align 4
-  %add48280 = add i32 %load48279, 1
-  store i32 %add48280, ptr %i, align 4
-  br label %for.cond8049
-
-for.end8052:                                      ; preds = %for.cond8049
-  ret i32 1
-
-if.then8054:                                      ; preds = %for.body8050
+if.then8049:                                      ; preds = %entry
   ret i32 0
 
-if.else8055:                                      ; preds = %for.body8050
-  br label %if.end8056
+if.else8050:                                      ; preds = %entry
+  br label %if.end8051
 
-if.end8056:                                       ; preds = %if.else8055
-  br label %for.step8051
+if.end8051:                                       ; preds = %if.else8050
+  %load48264 = load ptr, ptr %text, align 8
+  %strlen48265 = call i32 @strlen(ptr %load48264)
+  %load48266 = load ptr, ptr %suffix, align 8
+  %strlen48267 = call i32 @strlen(ptr %load48266)
+  %sub48268 = sub i32 %strlen48265, %strlen48267
+  %offset = alloca i32, align 4
+  store i32 %sub48268, ptr %offset, align 4
+  %load48269 = load ptr, ptr %suffix, align 8
+  %strlen48270 = call i32 @strlen(ptr %load48269)
+  %i = alloca i32, align 4
+  store i32 0, ptr %i, align 4
+  %__for_end_i8056 = alloca i32, align 4
+  store i32 %strlen48270, ptr %__for_end_i8056, align 4
+  br label %for.cond8052
+
+for.cond8052:                                     ; preds = %for.step8054, %if.end8051
+  %load48271 = load i32, ptr %i, align 4
+  %load48272 = load i32, ptr %__for_end_i8056, align 4
+  %cmp48273 = icmp slt i32 %load48271, %load48272
+  %bool48274 = zext i1 %cmp48273 to i32
+  %cond48275 = icmp ne i32 %bool48274, 0
+  br i1 %cond48275, label %for.body8053, label %for.end8055
+
+for.body8053:                                     ; preds = %for.cond8052
+  %load48276 = load ptr, ptr %text, align 8
+  %load48277 = load i32, ptr %offset, align 4
+  %load48278 = load i32, ptr %i, align 4
+  %add48279 = add i32 %load48277, %load48278
+  %sidx48280 = getelementptr i8, ptr %load48276, i32 %add48279
+  %sbyte48281 = load i8, ptr %sidx48280, align 1
+  %schar48282 = zext i8 %sbyte48281 to i32
+  %load48283 = load ptr, ptr %suffix, align 8
+  %load48284 = load i32, ptr %i, align 4
+  %sidx48285 = getelementptr i8, ptr %load48283, i32 %load48284
+  %sbyte48286 = load i8, ptr %sidx48285, align 1
+  %schar48287 = zext i8 %sbyte48286 to i32
+  %cmp48288 = icmp ne i32 %schar48282, %schar48287
+  %bool48289 = zext i1 %cmp48288 to i32
+  %cond48290 = icmp ne i32 %bool48289, 0
+  br i1 %cond48290, label %if.then8057, label %if.else8058
+
+for.step8054:                                     ; preds = %if.end8059
+  %load48291 = load i32, ptr %i, align 4
+  %add48292 = add i32 %load48291, 1
+  store i32 %add48292, ptr %i, align 4
+  br label %for.cond8052
+
+for.end8055:                                      ; preds = %for.cond8052
+  ret i32 1
+
+if.then8057:                                      ; preds = %for.body8053
+  ret i32 0
+
+if.else8058:                                      ; preds = %for.body8053
+  br label %if.end8059
+
+if.end8059:                                       ; preds = %if.else8058
+  br label %for.step8054
 }
 
 define %CompilerModeResult @compiler_mode(ptr %0) {
 entry:
   %arg = alloca ptr, align 8
   store ptr %0, ptr %arg, align 8
-  %load48281 = load ptr, ptr %arg, align 8
-  %strcmp48283 = call i32 @strcmp(ptr %load48281, ptr @.strlit48282)
-  %cmp48284 = icmp eq i32 %strcmp48283, 0
-  %bool48285 = zext i1 %cmp48284 to i32
-  %cond48286 = icmp ne i32 %bool48285, 0
-  br i1 %cond48286, label %or.true, label %or.rhs
+  %load48293 = load ptr, ptr %arg, align 8
+  %strcmp48295 = call i32 @strcmp(ptr %load48293, ptr @.strlit48294)
+  %cmp48296 = icmp eq i32 %strcmp48295, 0
+  %bool48297 = zext i1 %cmp48296 to i32
+  %cond48298 = icmp ne i32 %bool48297, 0
+  br i1 %cond48298, label %or.true, label %or.rhs
 
-if.then8057:                                      ; preds = %or.merge
-  %call48296 = call %CompilerModeResult @CompilerModeName(ptr @.strlit48295)
-  ret %CompilerModeResult %call48296
+if.then8060:                                      ; preds = %or.merge
+  %call48308 = call %CompilerModeResult @CompilerModeName(ptr @.strlit48307)
+  ret %CompilerModeResult %call48308
 
-if.else8058:                                      ; preds = %or.merge
-  br label %if.end8059
+if.else8061:                                      ; preds = %or.merge
+  br label %if.end8062
 
-if.end8059:                                       ; preds = %if.else8058
-  %load48297 = load ptr, ptr %arg, align 8
-  %strcmp48299 = call i32 @strcmp(ptr %load48297, ptr @.strlit48298)
-  %cmp48300 = icmp eq i32 %strcmp48299, 0
-  %bool48301 = zext i1 %cmp48300 to i32
-  %cond48302 = icmp ne i32 %bool48301, 0
-  br i1 %cond48302, label %or.true1, label %or.rhs2
+if.end8062:                                       ; preds = %if.else8061
+  %load48309 = load ptr, ptr %arg, align 8
+  %strcmp48311 = call i32 @strcmp(ptr %load48309, ptr @.strlit48310)
+  %cmp48312 = icmp eq i32 %strcmp48311, 0
+  %bool48313 = zext i1 %cmp48312 to i32
+  %cond48314 = icmp ne i32 %bool48313, 0
+  br i1 %cond48314, label %or.true1, label %or.rhs2
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load48287 = load ptr, ptr %arg, align 8
-  %strcmp48289 = call i32 @strcmp(ptr %load48287, ptr @.strlit48288)
-  %cmp48290 = icmp eq i32 %strcmp48289, 0
-  %bool48291 = zext i1 %cmp48290 to i32
-  %cond48292 = icmp ne i32 %bool48291, 0
-  br i1 %cond48292, label %or.true, label %or.merge
+  %load48299 = load ptr, ptr %arg, align 8
+  %strcmp48301 = call i32 @strcmp(ptr %load48299, ptr @.strlit48300)
+  %cmp48302 = icmp eq i32 %strcmp48301, 0
+  %bool48303 = zext i1 %cmp48302 to i32
+  %cond48304 = icmp ne i32 %bool48303, 0
+  br i1 %cond48304, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval48293 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond48294 = icmp ne i32 %orval48293, 0
-  br i1 %cond48294, label %if.then8057, label %if.else8058
+or.merge:                                         ; preds = %or.rhs, %or.true
+  %orval48305 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond48306 = icmp ne i32 %orval48305, 0
+  br i1 %cond48306, label %if.then8060, label %if.else8061
 
-if.then8060:                                      ; preds = %or.merge3
-  %call48312 = call %CompilerModeResult @CompilerModeName(ptr @.strlit48311)
-  ret %CompilerModeResult %call48312
+if.then8063:                                      ; preds = %or.merge3
+  %call48324 = call %CompilerModeResult @CompilerModeName(ptr @.strlit48323)
+  ret %CompilerModeResult %call48324
 
-if.else8061:                                      ; preds = %or.merge3
-  br label %if.end8062
-
-if.end8062:                                       ; preds = %if.else8061
-  %load48313 = load ptr, ptr %arg, align 8
-  %strcmp48315 = call i32 @strcmp(ptr %load48313, ptr @.strlit48314)
-  %cmp48316 = icmp eq i32 %strcmp48315, 0
-  %bool48317 = zext i1 %cmp48316 to i32
-  %cond48318 = icmp ne i32 %bool48317, 0
-  br i1 %cond48318, label %or.true4, label %or.rhs5
-
-or.true1:                                         ; preds = %or.rhs2, %if.end8059
-  br label %or.merge3
-
-or.rhs2:                                          ; preds = %if.end8059
-  %load48303 = load ptr, ptr %arg, align 8
-  %strcmp48305 = call i32 @strcmp(ptr %load48303, ptr @.strlit48304)
-  %cmp48306 = icmp eq i32 %strcmp48305, 0
-  %bool48307 = zext i1 %cmp48306 to i32
-  %cond48308 = icmp ne i32 %bool48307, 0
-  br i1 %cond48308, label %or.true1, label %or.merge3
-
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval48309 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond48310 = icmp ne i32 %orval48309, 0
-  br i1 %cond48310, label %if.then8060, label %if.else8061
-
-if.then8063:                                      ; preds = %or.merge39
-  %load48415 = load ptr, ptr %arg, align 8
-  %call48416 = call %CompilerModeResult @CompilerModeName(ptr %load48415)
-  ret %CompilerModeResult %call48416
-
-if.else8064:                                      ; preds = %or.merge39
+if.else8064:                                      ; preds = %or.merge3
   br label %if.end8065
 
 if.end8065:                                       ; preds = %if.else8064
-  %call48417 = call %CompilerModeResult @CompilerModeUnknown()
-  ret %CompilerModeResult %call48417
+  %load48325 = load ptr, ptr %arg, align 8
+  %strcmp48327 = call i32 @strcmp(ptr %load48325, ptr @.strlit48326)
+  %cmp48328 = icmp eq i32 %strcmp48327, 0
+  %bool48329 = zext i1 %cmp48328 to i32
+  %cond48330 = icmp ne i32 %bool48329, 0
+  br i1 %cond48330, label %or.true4, label %or.rhs5
 
-or.true4:                                         ; preds = %or.rhs5, %if.end8062
+or.true1:                                         ; preds = %or.rhs2, %if.end8062
+  br label %or.merge3
+
+or.rhs2:                                          ; preds = %if.end8062
+  %load48315 = load ptr, ptr %arg, align 8
+  %strcmp48317 = call i32 @strcmp(ptr %load48315, ptr @.strlit48316)
+  %cmp48318 = icmp eq i32 %strcmp48317, 0
+  %bool48319 = zext i1 %cmp48318 to i32
+  %cond48320 = icmp ne i32 %bool48319, 0
+  br i1 %cond48320, label %or.true1, label %or.merge3
+
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
+  %orval48321 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond48322 = icmp ne i32 %orval48321, 0
+  br i1 %cond48322, label %if.then8063, label %if.else8064
+
+if.then8066:                                      ; preds = %or.merge36
+  %load48419 = load ptr, ptr %arg, align 8
+  %call48420 = call %CompilerModeResult @CompilerModeName(ptr %load48419)
+  ret %CompilerModeResult %call48420
+
+if.else8067:                                      ; preds = %or.merge36
+  br label %if.end8068
+
+if.end8068:                                       ; preds = %if.else8067
+  %call48421 = call %CompilerModeResult @CompilerModeUnknown()
+  ret %CompilerModeResult %call48421
+
+or.true4:                                         ; preds = %or.rhs5, %if.end8065
   br label %or.merge6
 
-or.rhs5:                                          ; preds = %if.end8062
-  %load48319 = load ptr, ptr %arg, align 8
-  %strcmp48321 = call i32 @strcmp(ptr %load48319, ptr @.strlit48320)
-  %cmp48322 = icmp eq i32 %strcmp48321, 0
-  %bool48323 = zext i1 %cmp48322 to i32
-  %cond48324 = icmp ne i32 %bool48323, 0
-  br i1 %cond48324, label %or.true4, label %or.merge6
+or.rhs5:                                          ; preds = %if.end8065
+  %load48331 = load ptr, ptr %arg, align 8
+  %strcmp48333 = call i32 @strcmp(ptr %load48331, ptr @.strlit48332)
+  %cmp48334 = icmp eq i32 %strcmp48333, 0
+  %bool48335 = zext i1 %cmp48334 to i32
+  %cond48336 = icmp ne i32 %bool48335, 0
+  br i1 %cond48336, label %or.true4, label %or.merge6
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval48325 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond48326 = icmp ne i32 %orval48325, 0
-  br i1 %cond48326, label %or.true7, label %or.rhs8
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
+  %orval48337 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond48338 = icmp ne i32 %orval48337, 0
+  br i1 %cond48338, label %or.true7, label %or.rhs8
 
 or.true7:                                         ; preds = %or.rhs8, %or.merge6
   br label %or.merge9
 
 or.rhs8:                                          ; preds = %or.merge6
-  %load48327 = load ptr, ptr %arg, align 8
-  %strcmp48329 = call i32 @strcmp(ptr %load48327, ptr @.strlit48328)
-  %cmp48330 = icmp eq i32 %strcmp48329, 0
-  %bool48331 = zext i1 %cmp48330 to i32
-  %cond48332 = icmp ne i32 %bool48331, 0
-  br i1 %cond48332, label %or.true7, label %or.merge9
+  %load48339 = load ptr, ptr %arg, align 8
+  %strcmp48341 = call i32 @strcmp(ptr %load48339, ptr @.strlit48340)
+  %cmp48342 = icmp eq i32 %strcmp48341, 0
+  %bool48343 = zext i1 %cmp48342 to i32
+  %cond48344 = icmp ne i32 %bool48343, 0
+  br i1 %cond48344, label %or.true7, label %or.merge9
 
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
-  %orval48333 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
-  %cond48334 = icmp ne i32 %orval48333, 0
-  br i1 %cond48334, label %or.true10, label %or.rhs11
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
+  %orval48345 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
+  %cond48346 = icmp ne i32 %orval48345, 0
+  br i1 %cond48346, label %or.true10, label %or.rhs11
 
 or.true10:                                        ; preds = %or.rhs11, %or.merge9
   br label %or.merge12
 
 or.rhs11:                                         ; preds = %or.merge9
-  %load48335 = load ptr, ptr %arg, align 8
-  %strcmp48337 = call i32 @strcmp(ptr %load48335, ptr @.strlit48336)
-  %cmp48338 = icmp eq i32 %strcmp48337, 0
-  %bool48339 = zext i1 %cmp48338 to i32
-  %cond48340 = icmp ne i32 %bool48339, 0
-  br i1 %cond48340, label %or.true10, label %or.merge12
+  %load48347 = load ptr, ptr %arg, align 8
+  %strcmp48349 = call i32 @strcmp(ptr %load48347, ptr @.strlit48348)
+  %cmp48350 = icmp eq i32 %strcmp48349, 0
+  %bool48351 = zext i1 %cmp48350 to i32
+  %cond48352 = icmp ne i32 %bool48351, 0
+  br i1 %cond48352, label %or.true10, label %or.merge12
 
-or.merge12:                                       ; preds = %or.true10, %or.rhs11
-  %orval48341 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
-  %cond48342 = icmp ne i32 %orval48341, 0
-  br i1 %cond48342, label %or.true13, label %or.rhs14
+or.merge12:                                       ; preds = %or.rhs11, %or.true10
+  %orval48353 = phi i32 [ 1, %or.true10 ], [ 0, %or.rhs11 ]
+  %cond48354 = icmp ne i32 %orval48353, 0
+  br i1 %cond48354, label %or.true13, label %or.rhs14
 
 or.true13:                                        ; preds = %or.rhs14, %or.merge12
   br label %or.merge15
 
 or.rhs14:                                         ; preds = %or.merge12
-  %load48343 = load ptr, ptr %arg, align 8
-  %strcmp48345 = call i32 @strcmp(ptr %load48343, ptr @.strlit48344)
-  %cmp48346 = icmp eq i32 %strcmp48345, 0
-  %bool48347 = zext i1 %cmp48346 to i32
-  %cond48348 = icmp ne i32 %bool48347, 0
-  br i1 %cond48348, label %or.true13, label %or.merge15
+  %load48355 = load ptr, ptr %arg, align 8
+  %strcmp48357 = call i32 @strcmp(ptr %load48355, ptr @.strlit48356)
+  %cmp48358 = icmp eq i32 %strcmp48357, 0
+  %bool48359 = zext i1 %cmp48358 to i32
+  %cond48360 = icmp ne i32 %bool48359, 0
+  br i1 %cond48360, label %or.true13, label %or.merge15
 
-or.merge15:                                       ; preds = %or.true13, %or.rhs14
-  %orval48349 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
-  %cond48350 = icmp ne i32 %orval48349, 0
-  br i1 %cond48350, label %or.true16, label %or.rhs17
+or.merge15:                                       ; preds = %or.rhs14, %or.true13
+  %orval48361 = phi i32 [ 1, %or.true13 ], [ 0, %or.rhs14 ]
+  %cond48362 = icmp ne i32 %orval48361, 0
+  br i1 %cond48362, label %or.true16, label %or.rhs17
 
 or.true16:                                        ; preds = %or.rhs17, %or.merge15
   br label %or.merge18
 
 or.rhs17:                                         ; preds = %or.merge15
-  %load48351 = load ptr, ptr %arg, align 8
-  %strcmp48353 = call i32 @strcmp(ptr %load48351, ptr @.strlit48352)
-  %cmp48354 = icmp eq i32 %strcmp48353, 0
-  %bool48355 = zext i1 %cmp48354 to i32
-  %cond48356 = icmp ne i32 %bool48355, 0
-  br i1 %cond48356, label %or.true16, label %or.merge18
+  %load48363 = load ptr, ptr %arg, align 8
+  %strcmp48365 = call i32 @strcmp(ptr %load48363, ptr @.strlit48364)
+  %cmp48366 = icmp eq i32 %strcmp48365, 0
+  %bool48367 = zext i1 %cmp48366 to i32
+  %cond48368 = icmp ne i32 %bool48367, 0
+  br i1 %cond48368, label %or.true16, label %or.merge18
 
-or.merge18:                                       ; preds = %or.true16, %or.rhs17
-  %orval48357 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
-  %cond48358 = icmp ne i32 %orval48357, 0
-  br i1 %cond48358, label %or.true19, label %or.rhs20
+or.merge18:                                       ; preds = %or.rhs17, %or.true16
+  %orval48369 = phi i32 [ 1, %or.true16 ], [ 0, %or.rhs17 ]
+  %cond48370 = icmp ne i32 %orval48369, 0
+  br i1 %cond48370, label %or.true19, label %or.rhs20
 
 or.true19:                                        ; preds = %or.rhs20, %or.merge18
   br label %or.merge21
 
 or.rhs20:                                         ; preds = %or.merge18
-  %load48359 = load ptr, ptr %arg, align 8
-  %strcmp48361 = call i32 @strcmp(ptr %load48359, ptr @.strlit48360)
-  %cmp48362 = icmp eq i32 %strcmp48361, 0
-  %bool48363 = zext i1 %cmp48362 to i32
-  %cond48364 = icmp ne i32 %bool48363, 0
-  br i1 %cond48364, label %or.true19, label %or.merge21
+  %load48371 = load ptr, ptr %arg, align 8
+  %strcmp48373 = call i32 @strcmp(ptr %load48371, ptr @.strlit48372)
+  %cmp48374 = icmp eq i32 %strcmp48373, 0
+  %bool48375 = zext i1 %cmp48374 to i32
+  %cond48376 = icmp ne i32 %bool48375, 0
+  br i1 %cond48376, label %or.true19, label %or.merge21
 
-or.merge21:                                       ; preds = %or.true19, %or.rhs20
-  %orval48365 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
-  %cond48366 = icmp ne i32 %orval48365, 0
-  br i1 %cond48366, label %or.true22, label %or.rhs23
+or.merge21:                                       ; preds = %or.rhs20, %or.true19
+  %orval48377 = phi i32 [ 1, %or.true19 ], [ 0, %or.rhs20 ]
+  %cond48378 = icmp ne i32 %orval48377, 0
+  br i1 %cond48378, label %or.true22, label %or.rhs23
 
 or.true22:                                        ; preds = %or.rhs23, %or.merge21
   br label %or.merge24
 
 or.rhs23:                                         ; preds = %or.merge21
-  %load48367 = load ptr, ptr %arg, align 8
-  %strcmp48369 = call i32 @strcmp(ptr %load48367, ptr @.strlit48368)
-  %cmp48370 = icmp eq i32 %strcmp48369, 0
-  %bool48371 = zext i1 %cmp48370 to i32
-  %cond48372 = icmp ne i32 %bool48371, 0
-  br i1 %cond48372, label %or.true22, label %or.merge24
+  %load48379 = load ptr, ptr %arg, align 8
+  %strcmp48381 = call i32 @strcmp(ptr %load48379, ptr @.strlit48380)
+  %cmp48382 = icmp eq i32 %strcmp48381, 0
+  %bool48383 = zext i1 %cmp48382 to i32
+  %cond48384 = icmp ne i32 %bool48383, 0
+  br i1 %cond48384, label %or.true22, label %or.merge24
 
-or.merge24:                                       ; preds = %or.true22, %or.rhs23
-  %orval48373 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
-  %cond48374 = icmp ne i32 %orval48373, 0
-  br i1 %cond48374, label %or.true25, label %or.rhs26
+or.merge24:                                       ; preds = %or.rhs23, %or.true22
+  %orval48385 = phi i32 [ 1, %or.true22 ], [ 0, %or.rhs23 ]
+  %cond48386 = icmp ne i32 %orval48385, 0
+  br i1 %cond48386, label %or.true25, label %or.rhs26
 
 or.true25:                                        ; preds = %or.rhs26, %or.merge24
   br label %or.merge27
 
 or.rhs26:                                         ; preds = %or.merge24
-  %load48375 = load ptr, ptr %arg, align 8
-  %strcmp48377 = call i32 @strcmp(ptr %load48375, ptr @.strlit48376)
-  %cmp48378 = icmp eq i32 %strcmp48377, 0
-  %bool48379 = zext i1 %cmp48378 to i32
-  %cond48380 = icmp ne i32 %bool48379, 0
-  br i1 %cond48380, label %or.true25, label %or.merge27
+  %load48387 = load ptr, ptr %arg, align 8
+  %strcmp48389 = call i32 @strcmp(ptr %load48387, ptr @.strlit48388)
+  %cmp48390 = icmp eq i32 %strcmp48389, 0
+  %bool48391 = zext i1 %cmp48390 to i32
+  %cond48392 = icmp ne i32 %bool48391, 0
+  br i1 %cond48392, label %or.true25, label %or.merge27
 
-or.merge27:                                       ; preds = %or.true25, %or.rhs26
-  %orval48381 = phi i32 [ 1, %or.true25 ], [ 0, %or.rhs26 ]
-  %cond48382 = icmp ne i32 %orval48381, 0
-  br i1 %cond48382, label %or.true28, label %or.rhs29
+or.merge27:                                       ; preds = %or.rhs26, %or.true25
+  %orval48393 = phi i32 [ 1, %or.true25 ], [ 0, %or.rhs26 ]
+  %cond48394 = icmp ne i32 %orval48393, 0
+  br i1 %cond48394, label %or.true28, label %or.rhs29
 
 or.true28:                                        ; preds = %or.rhs29, %or.merge27
   br label %or.merge30
 
 or.rhs29:                                         ; preds = %or.merge27
-  %load48383 = load ptr, ptr %arg, align 8
-  %strcmp48385 = call i32 @strcmp(ptr %load48383, ptr @.strlit48384)
-  %cmp48386 = icmp eq i32 %strcmp48385, 0
-  %bool48387 = zext i1 %cmp48386 to i32
-  %cond48388 = icmp ne i32 %bool48387, 0
-  br i1 %cond48388, label %or.true28, label %or.merge30
+  %load48395 = load ptr, ptr %arg, align 8
+  %strcmp48397 = call i32 @strcmp(ptr %load48395, ptr @.strlit48396)
+  %cmp48398 = icmp eq i32 %strcmp48397, 0
+  %bool48399 = zext i1 %cmp48398 to i32
+  %cond48400 = icmp ne i32 %bool48399, 0
+  br i1 %cond48400, label %or.true28, label %or.merge30
 
-or.merge30:                                       ; preds = %or.true28, %or.rhs29
-  %orval48389 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
-  %cond48390 = icmp ne i32 %orval48389, 0
-  br i1 %cond48390, label %or.true31, label %or.rhs32
+or.merge30:                                       ; preds = %or.rhs29, %or.true28
+  %orval48401 = phi i32 [ 1, %or.true28 ], [ 0, %or.rhs29 ]
+  %cond48402 = icmp ne i32 %orval48401, 0
+  br i1 %cond48402, label %or.true31, label %or.rhs32
 
 or.true31:                                        ; preds = %or.rhs32, %or.merge30
   br label %or.merge33
 
 or.rhs32:                                         ; preds = %or.merge30
-  %load48391 = load ptr, ptr %arg, align 8
-  %strcmp48393 = call i32 @strcmp(ptr %load48391, ptr @.strlit48392)
-  %cmp48394 = icmp eq i32 %strcmp48393, 0
-  %bool48395 = zext i1 %cmp48394 to i32
-  %cond48396 = icmp ne i32 %bool48395, 0
-  br i1 %cond48396, label %or.true31, label %or.merge33
+  %load48403 = load ptr, ptr %arg, align 8
+  %strcmp48405 = call i32 @strcmp(ptr %load48403, ptr @.strlit48404)
+  %cmp48406 = icmp eq i32 %strcmp48405, 0
+  %bool48407 = zext i1 %cmp48406 to i32
+  %cond48408 = icmp ne i32 %bool48407, 0
+  br i1 %cond48408, label %or.true31, label %or.merge33
 
-or.merge33:                                       ; preds = %or.true31, %or.rhs32
-  %orval48397 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
-  %cond48398 = icmp ne i32 %orval48397, 0
-  br i1 %cond48398, label %or.true34, label %or.rhs35
+or.merge33:                                       ; preds = %or.rhs32, %or.true31
+  %orval48409 = phi i32 [ 1, %or.true31 ], [ 0, %or.rhs32 ]
+  %cond48410 = icmp ne i32 %orval48409, 0
+  br i1 %cond48410, label %or.true34, label %or.rhs35
 
 or.true34:                                        ; preds = %or.rhs35, %or.merge33
   br label %or.merge36
 
 or.rhs35:                                         ; preds = %or.merge33
-  %load48399 = load ptr, ptr %arg, align 8
-  %strcmp48401 = call i32 @strcmp(ptr %load48399, ptr @.strlit48400)
-  %cmp48402 = icmp eq i32 %strcmp48401, 0
-  %bool48403 = zext i1 %cmp48402 to i32
-  %cond48404 = icmp ne i32 %bool48403, 0
-  br i1 %cond48404, label %or.true34, label %or.merge36
+  %load48411 = load ptr, ptr %arg, align 8
+  %strcmp48413 = call i32 @strcmp(ptr %load48411, ptr @.strlit48412)
+  %cmp48414 = icmp eq i32 %strcmp48413, 0
+  %bool48415 = zext i1 %cmp48414 to i32
+  %cond48416 = icmp ne i32 %bool48415, 0
+  br i1 %cond48416, label %or.true34, label %or.merge36
 
-or.merge36:                                       ; preds = %or.true34, %or.rhs35
-  %orval48405 = phi i32 [ 1, %or.true34 ], [ 0, %or.rhs35 ]
-  %cond48406 = icmp ne i32 %orval48405, 0
-  br i1 %cond48406, label %or.true37, label %or.rhs38
-
-or.true37:                                        ; preds = %or.rhs38, %or.merge36
-  br label %or.merge39
-
-or.rhs38:                                         ; preds = %or.merge36
-  %load48407 = load ptr, ptr %arg, align 8
-  %strcmp48409 = call i32 @strcmp(ptr %load48407, ptr @.strlit48408)
-  %cmp48410 = icmp eq i32 %strcmp48409, 0
-  %bool48411 = zext i1 %cmp48410 to i32
-  %cond48412 = icmp ne i32 %bool48411, 0
-  br i1 %cond48412, label %or.true37, label %or.merge39
-
-or.merge39:                                       ; preds = %or.true37, %or.rhs38
-  %orval48413 = phi i32 [ 1, %or.true37 ], [ 0, %or.rhs38 ]
-  %cond48414 = icmp ne i32 %orval48413, 0
-  br i1 %cond48414, label %if.then8063, label %if.else8064
+or.merge36:                                       ; preds = %or.rhs35, %or.true34
+  %orval48417 = phi i32 [ 1, %or.true34 ], [ 0, %or.rhs35 ]
+  %cond48418 = icmp ne i32 %orval48417, 0
+  br i1 %cond48418, label %if.then8066, label %if.else8067
 }
 
 define ptr @strip_vix_ext(ptr %0) {
 entry:
   %name = alloca ptr, align 8
   store ptr %0, ptr %name, align 8
-  %load48418 = load ptr, ptr %name, align 8
-  %call48420 = call i32 @string_ends_with(ptr %load48418, ptr @.strlit48419)
-  %cmp48421 = icmp eq i32 %call48420, 1
-  %bool48422 = zext i1 %cmp48421 to i32
-  %cond48423 = icmp ne i32 %bool48422, 0
-  br i1 %cond48423, label %if.then8066, label %if.else8067
+  %load48422 = load ptr, ptr %name, align 8
+  %call48424 = call i32 @string_ends_with(ptr %load48422, ptr @.strlit48423)
+  %cmp48425 = icmp eq i32 %call48424, 1
+  %bool48426 = zext i1 %cmp48425 to i32
+  %cond48427 = icmp ne i32 %bool48426, 0
+  br i1 %cond48427, label %if.then8069, label %if.else8070
 
-if.then8066:                                      ; preds = %entry
+if.then8069:                                      ; preds = %entry
   %out = alloca ptr, align 8
-  store ptr @.strlit48424, ptr %out, align 8
-  %load48425 = load ptr, ptr %name, align 8
-  %strlen48426 = call i32 @strlen(ptr %load48425)
-  %sub48427 = sub i32 %strlen48426, 4
+  store ptr @.strlit48428, ptr %out, align 8
+  %load48429 = load ptr, ptr %name, align 8
+  %strlen48430 = call i32 @strlen(ptr %load48429)
+  %sub48431 = sub i32 %strlen48430, 4
   %end = alloca i32, align 4
-  store i32 %sub48427, ptr %end, align 4
-  %load48428 = load i32, ptr %end, align 4
+  store i32 %sub48431, ptr %end, align 4
+  %load48432 = load i32, ptr %end, align 4
   %i = alloca i32, align 4
   store i32 0, ptr %i, align 4
-  %__for_end_i8073 = alloca i32, align 4
-  store i32 %load48428, ptr %__for_end_i8073, align 4
-  br label %for.cond8069
+  %__for_end_i8076 = alloca i32, align 4
+  store i32 %load48432, ptr %__for_end_i8076, align 4
+  br label %for.cond8072
 
-if.else8067:                                      ; preds = %entry
-  br label %if.end8068
+if.else8070:                                      ; preds = %entry
+  br label %if.end8071
 
-if.end8068:                                       ; preds = %if.else8067
-  %load48445 = load ptr, ptr %name, align 8
-  ret ptr %load48445
+if.end8071:                                       ; preds = %if.else8070
+  %load48449 = load ptr, ptr %name, align 8
+  ret ptr %load48449
 
-for.cond8069:                                     ; preds = %for.step8071, %if.then8066
-  %load48429 = load i32, ptr %i, align 4
-  %load48430 = load i32, ptr %__for_end_i8073, align 4
-  %cmp48431 = icmp slt i32 %load48429, %load48430
-  %bool48432 = zext i1 %cmp48431 to i32
-  %cond48433 = icmp ne i32 %bool48432, 0
-  br i1 %cond48433, label %for.body8070, label %for.end8072
+for.cond8072:                                     ; preds = %for.step8074, %if.then8069
+  %load48433 = load i32, ptr %i, align 4
+  %load48434 = load i32, ptr %__for_end_i8076, align 4
+  %cmp48435 = icmp slt i32 %load48433, %load48434
+  %bool48436 = zext i1 %cmp48435 to i32
+  %cond48437 = icmp ne i32 %bool48436, 0
+  br i1 %cond48437, label %for.body8073, label %for.end8075
 
-for.body8070:                                     ; preds = %for.cond8069
-  %load48434 = load ptr, ptr %out, align 8
-  %load48435 = load ptr, ptr %name, align 8
-  %load48436 = load i32, ptr %i, align 4
-  %sidx48437 = getelementptr i8, ptr %load48435, i32 %load48436
-  %sbyte48438 = load i8, ptr %sidx48437, align 1
-  %schar48439 = zext i8 %sbyte48438 to i32
-  %call48440 = call ptr @char_string(i32 %schar48439)
-  %call48441 = call ptr @vix_string_concat(ptr %load48434, ptr %call48440)
-  store ptr %call48441, ptr %out, align 8
-  br label %for.step8071
+for.body8073:                                     ; preds = %for.cond8072
+  %load48438 = load ptr, ptr %out, align 8
+  %load48439 = load ptr, ptr %name, align 8
+  %load48440 = load i32, ptr %i, align 4
+  %sidx48441 = getelementptr i8, ptr %load48439, i32 %load48440
+  %sbyte48442 = load i8, ptr %sidx48441, align 1
+  %schar48443 = zext i8 %sbyte48442 to i32
+  %call48444 = call ptr @char_string(i32 %schar48443)
+  %call48445 = call ptr @vix_string_concat(ptr %load48438, ptr %call48444)
+  store ptr %call48445, ptr %out, align 8
+  br label %for.step8074
 
-for.step8071:                                     ; preds = %for.body8070
-  %load48442 = load i32, ptr %i, align 4
-  %add48443 = add i32 %load48442, 1
-  store i32 %add48443, ptr %i, align 4
-  br label %for.cond8069
+for.step8074:                                     ; preds = %for.body8073
+  %load48446 = load i32, ptr %i, align 4
+  %add48447 = add i32 %load48446, 1
+  store i32 %add48447, ptr %i, align 4
+  br label %for.cond8072
 
-for.end8072:                                      ; preds = %for.cond8069
-  %load48444 = load ptr, ptr %out, align 8
-  ret ptr %load48444
+for.end8075:                                      ; preds = %for.cond8072
+  %load48448 = load ptr, ptr %out, align 8
+  ret ptr %load48448
 }
 
 define i32 @find_last_char(ptr %0, i8 %1) {
@@ -92698,55 +92743,55 @@ entry:
   store i8 %1, ptr %needle, align 1
   %found = alloca i32, align 4
   store i32 -1, ptr %found, align 4
-  %load48447 = load ptr, ptr %text, align 8
-  %strlen48448 = call i32 @strlen(ptr %load48447)
+  %load48451 = load ptr, ptr %text, align 8
+  %strlen48452 = call i32 @strlen(ptr %load48451)
   %i = alloca i32, align 4
   store i32 0, ptr %i, align 4
-  %__for_end_i8078 = alloca i32, align 4
-  store i32 %strlen48448, ptr %__for_end_i8078, align 4
-  br label %for.cond8074
+  %__for_end_i8081 = alloca i32, align 4
+  store i32 %strlen48452, ptr %__for_end_i8081, align 4
+  br label %for.cond8077
 
-for.cond8074:                                     ; preds = %for.step8076, %entry
-  %load48449 = load i32, ptr %i, align 4
-  %load48450 = load i32, ptr %__for_end_i8078, align 4
-  %cmp48451 = icmp slt i32 %load48449, %load48450
-  %bool48452 = zext i1 %cmp48451 to i32
-  %cond48453 = icmp ne i32 %bool48452, 0
-  br i1 %cond48453, label %for.body8075, label %for.end8077
+for.cond8077:                                     ; preds = %for.step8079, %entry
+  %load48453 = load i32, ptr %i, align 4
+  %load48454 = load i32, ptr %__for_end_i8081, align 4
+  %cmp48455 = icmp slt i32 %load48453, %load48454
+  %bool48456 = zext i1 %cmp48455 to i32
+  %cond48457 = icmp ne i32 %bool48456, 0
+  br i1 %cond48457, label %for.body8078, label %for.end8080
 
-for.body8075:                                     ; preds = %for.cond8074
-  %load48454 = load ptr, ptr %text, align 8
-  %load48455 = load i32, ptr %i, align 4
-  %sidx48456 = getelementptr i8, ptr %load48454, i32 %load48455
-  %sbyte48457 = load i8, ptr %sidx48456, align 1
-  %schar48458 = zext i8 %sbyte48457 to i32
-  %load48459 = load i8, ptr %needle, align 1
-  %zext48460 = zext i8 %load48459 to i32
-  %cmp48461 = icmp eq i32 %schar48458, %zext48460
-  %bool48462 = zext i1 %cmp48461 to i32
-  %cond48463 = icmp ne i32 %bool48462, 0
-  br i1 %cond48463, label %if.then8079, label %if.else8080
+for.body8078:                                     ; preds = %for.cond8077
+  %load48458 = load ptr, ptr %text, align 8
+  %load48459 = load i32, ptr %i, align 4
+  %sidx48460 = getelementptr i8, ptr %load48458, i32 %load48459
+  %sbyte48461 = load i8, ptr %sidx48460, align 1
+  %schar48462 = zext i8 %sbyte48461 to i32
+  %load48463 = load i8, ptr %needle, align 1
+  %zext48464 = zext i8 %load48463 to i32
+  %cmp48465 = icmp eq i32 %schar48462, %zext48464
+  %bool48466 = zext i1 %cmp48465 to i32
+  %cond48467 = icmp ne i32 %bool48466, 0
+  br i1 %cond48467, label %if.then8082, label %if.else8083
 
-for.step8076:                                     ; preds = %if.end8081
-  %load48465 = load i32, ptr %i, align 4
-  %add48466 = add i32 %load48465, 1
-  store i32 %add48466, ptr %i, align 4
-  br label %for.cond8074
+for.step8079:                                     ; preds = %if.end8084
+  %load48469 = load i32, ptr %i, align 4
+  %add48470 = add i32 %load48469, 1
+  store i32 %add48470, ptr %i, align 4
+  br label %for.cond8077
 
-for.end8077:                                      ; preds = %for.cond8074
-  %load48467 = load i32, ptr %found, align 4
-  ret i32 %load48467
+for.end8080:                                      ; preds = %for.cond8077
+  %load48471 = load i32, ptr %found, align 4
+  ret i32 %load48471
 
-if.then8079:                                      ; preds = %for.body8075
-  %load48464 = load i32, ptr %i, align 4
-  store i32 %load48464, ptr %found, align 4
-  br label %if.end8081
+if.then8082:                                      ; preds = %for.body8078
+  %load48468 = load i32, ptr %i, align 4
+  store i32 %load48468, ptr %found, align 4
+  br label %if.end8084
 
-if.else8080:                                      ; preds = %for.body8075
-  br label %if.end8081
+if.else8083:                                      ; preds = %for.body8078
+  br label %if.end8084
 
-if.end8081:                                       ; preds = %if.else8080, %if.then8079
-  br label %for.step8076
+if.end8084:                                       ; preds = %if.else8083, %if.then8082
+  br label %for.step8079
 }
 
 define ptr @slice_string(ptr %0, i32 %1, i32 %2) {
@@ -92758,119 +92803,119 @@ entry:
   %end = alloca i32, align 4
   store i32 %2, ptr %end, align 4
   %out = alloca ptr, align 8
-  store ptr @.strlit48468, ptr %out, align 8
-  %load48469 = load i32, ptr %start, align 4
-  %load48470 = load i32, ptr %end, align 4
+  store ptr @.strlit48472, ptr %out, align 8
+  %load48473 = load i32, ptr %start, align 4
+  %load48474 = load i32, ptr %end, align 4
   %i = alloca i32, align 4
-  store i32 %load48469, ptr %i, align 4
-  %__for_end_i8086 = alloca i32, align 4
-  store i32 %load48470, ptr %__for_end_i8086, align 4
-  br label %for.cond8082
+  store i32 %load48473, ptr %i, align 4
+  %__for_end_i8089 = alloca i32, align 4
+  store i32 %load48474, ptr %__for_end_i8089, align 4
+  br label %for.cond8085
 
-for.cond8082:                                     ; preds = %for.step8084, %entry
-  %load48471 = load i32, ptr %i, align 4
-  %load48472 = load i32, ptr %__for_end_i8086, align 4
-  %cmp48473 = icmp slt i32 %load48471, %load48472
-  %bool48474 = zext i1 %cmp48473 to i32
-  %cond48475 = icmp ne i32 %bool48474, 0
-  br i1 %cond48475, label %for.body8083, label %for.end8085
+for.cond8085:                                     ; preds = %for.step8087, %entry
+  %load48475 = load i32, ptr %i, align 4
+  %load48476 = load i32, ptr %__for_end_i8089, align 4
+  %cmp48477 = icmp slt i32 %load48475, %load48476
+  %bool48478 = zext i1 %cmp48477 to i32
+  %cond48479 = icmp ne i32 %bool48478, 0
+  br i1 %cond48479, label %for.body8086, label %for.end8088
 
-for.body8083:                                     ; preds = %for.cond8082
-  %load48476 = load ptr, ptr %out, align 8
-  %load48477 = load ptr, ptr %text, align 8
-  %load48478 = load i32, ptr %i, align 4
-  %sidx48479 = getelementptr i8, ptr %load48477, i32 %load48478
-  %sbyte48480 = load i8, ptr %sidx48479, align 1
-  %schar48481 = zext i8 %sbyte48480 to i32
-  %call48482 = call ptr @char_string(i32 %schar48481)
-  %call48483 = call ptr @vix_string_concat(ptr %load48476, ptr %call48482)
-  store ptr %call48483, ptr %out, align 8
-  br label %for.step8084
+for.body8086:                                     ; preds = %for.cond8085
+  %load48480 = load ptr, ptr %out, align 8
+  %load48481 = load ptr, ptr %text, align 8
+  %load48482 = load i32, ptr %i, align 4
+  %sidx48483 = getelementptr i8, ptr %load48481, i32 %load48482
+  %sbyte48484 = load i8, ptr %sidx48483, align 1
+  %schar48485 = zext i8 %sbyte48484 to i32
+  %call48486 = call ptr @char_string(i32 %schar48485)
+  %call48487 = call ptr @vix_string_concat(ptr %load48480, ptr %call48486)
+  store ptr %call48487, ptr %out, align 8
+  br label %for.step8087
 
-for.step8084:                                     ; preds = %for.body8083
-  %load48484 = load i32, ptr %i, align 4
-  %add48485 = add i32 %load48484, 1
-  store i32 %add48485, ptr %i, align 4
-  br label %for.cond8082
+for.step8087:                                     ; preds = %for.body8086
+  %load48488 = load i32, ptr %i, align 4
+  %add48489 = add i32 %load48488, 1
+  store i32 %add48489, ptr %i, align 4
+  br label %for.cond8085
 
-for.end8085:                                      ; preds = %for.cond8082
-  %load48486 = load ptr, ptr %out, align 8
-  ret ptr %load48486
+for.end8088:                                      ; preds = %for.cond8085
+  %load48490 = load ptr, ptr %out, align 8
+  ret ptr %load48490
 }
 
 define ptr @dirname(ptr %0) {
 entry:
   %path = alloca ptr, align 8
   store ptr %0, ptr %path, align 8
-  %load48487 = load ptr, ptr %path, align 8
-  %call48488 = call i32 @find_last_char(ptr %load48487, i8 47)
+  %load48491 = load ptr, ptr %path, align 8
+  %call48492 = call i32 @find_last_char(ptr %load48491, i8 47)
   %slash = alloca i32, align 4
-  store i32 %call48488, ptr %slash, align 4
-  %load48489 = load i32, ptr %slash, align 4
-  %cmp48490 = icmp slt i32 %load48489, 0
-  %bool48491 = zext i1 %cmp48490 to i32
-  %cond48492 = icmp ne i32 %bool48491, 0
-  br i1 %cond48492, label %if.then8087, label %if.else8088
+  store i32 %call48492, ptr %slash, align 4
+  %load48493 = load i32, ptr %slash, align 4
+  %cmp48494 = icmp slt i32 %load48493, 0
+  %bool48495 = zext i1 %cmp48494 to i32
+  %cond48496 = icmp ne i32 %bool48495, 0
+  br i1 %cond48496, label %if.then8090, label %if.else8091
 
-if.then8087:                                      ; preds = %entry
-  ret ptr @.strlit48493
+if.then8090:                                      ; preds = %entry
+  ret ptr @.strlit48497
 
-if.else8088:                                      ; preds = %entry
-  br label %if.end8089
-
-if.end8089:                                       ; preds = %if.else8088
-  %load48494 = load i32, ptr %slash, align 4
-  %cmp48495 = icmp eq i32 %load48494, 0
-  %bool48496 = zext i1 %cmp48495 to i32
-  %cond48497 = icmp ne i32 %bool48496, 0
-  br i1 %cond48497, label %if.then8090, label %if.else8091
-
-if.then8090:                                      ; preds = %if.end8089
-  ret ptr @.strlit48498
-
-if.else8091:                                      ; preds = %if.end8089
+if.else8091:                                      ; preds = %entry
   br label %if.end8092
 
 if.end8092:                                       ; preds = %if.else8091
-  %load48499 = load ptr, ptr %path, align 8
-  %load48500 = load i32, ptr %slash, align 4
-  %call48501 = call ptr @slice_string(ptr %load48499, i32 0, i32 %load48500)
-  ret ptr %call48501
+  %load48498 = load i32, ptr %slash, align 4
+  %cmp48499 = icmp eq i32 %load48498, 0
+  %bool48500 = zext i1 %cmp48499 to i32
+  %cond48501 = icmp ne i32 %bool48500, 0
+  br i1 %cond48501, label %if.then8093, label %if.else8094
+
+if.then8093:                                      ; preds = %if.end8092
+  ret ptr @.strlit48502
+
+if.else8094:                                      ; preds = %if.end8092
+  br label %if.end8095
+
+if.end8095:                                       ; preds = %if.else8094
+  %load48503 = load ptr, ptr %path, align 8
+  %load48504 = load i32, ptr %slash, align 4
+  %call48505 = call ptr @slice_string(ptr %load48503, i32 0, i32 %load48504)
+  ret ptr %call48505
 }
 
 define ptr @runtime_object_path(ptr %0) {
 entry:
   %compiler_path = alloca ptr, align 8
   store ptr %0, ptr %compiler_path, align 8
-  %load48502 = load ptr, ptr %compiler_path, align 8
-  %call48503 = call ptr @vix_compiler_runtime_object_path(ptr %load48502)
-  ret ptr %call48503
+  %load48506 = load ptr, ptr %compiler_path, align 8
+  %call48507 = call ptr @vix_compiler_runtime_object_path(ptr %load48506)
+  ret ptr %call48507
 }
 
 define i32 @shell_command(ptr %0) {
 entry:
   %command = alloca ptr, align 8
   store ptr %0, ptr %command, align 8
-  %load48504 = load ptr, ptr %command, align 8
-  %call48505 = call i32 @system(ptr %load48504)
-  ret i32 %call48505
+  %load48508 = load ptr, ptr %command, align 8
+  %call48509 = call i32 @system(ptr %load48508)
+  ret i32 %call48509
 }
 
 define i32 @delete_file(ptr %0) {
 entry:
   %path = alloca ptr, align 8
   store ptr %0, ptr %path, align 8
-  %load48506 = load ptr, ptr %path, align 8
-  %call48507 = call i32 @remove(ptr %load48506)
-  ret i32 %call48507
+  %load48510 = load ptr, ptr %path, align 8
+  %call48511 = call i32 @remove(ptr %load48510)
+  ret i32 %call48511
 }
 
 define void @diag_print(ptr %0) {
 entry:
   %text = alloca ptr, align 8
   store ptr %0, ptr %text, align 8
-  %load48508 = load ptr, ptr %text, align 8
-  call void @vix_print_stderr(ptr %load48508)
+  %load48512 = load ptr, ptr %text, align 8
+  call void @vix_print_stderr(ptr %load48512)
   ret void
 }
 
@@ -92878,8 +92923,8 @@ define void @info_print(ptr %0) {
 entry:
   %text = alloca ptr, align 8
   store ptr %0, ptr %text, align 8
-  %load48509 = load ptr, ptr %text, align 8
-  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48509)
+  %load48513 = load ptr, ptr %text, align 8
+  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48513)
   ret void
 }
 
@@ -92889,27 +92934,27 @@ entry:
   store ptr %0, ptr %filename, align 8
   %output = alloca ptr, align 8
   store ptr %1, ptr %output, align 8
-  %load48510 = load ptr, ptr %output, align 8
-  %strcmp48512 = call i32 @strcmp(ptr %load48510, ptr @.strlit48511)
-  %cmp48513 = icmp eq i32 %strcmp48512, 0
-  %bool48514 = zext i1 %cmp48513 to i32
-  %cmp48515 = icmp eq i32 %bool48514, 0
-  %bool48516 = zext i1 %cmp48515 to i32
-  %cond48517 = icmp ne i32 %bool48516, 0
-  br i1 %cond48517, label %if.then8093, label %if.else8094
+  %load48514 = load ptr, ptr %output, align 8
+  %strcmp48516 = call i32 @strcmp(ptr %load48514, ptr @.strlit48515)
+  %cmp48517 = icmp eq i32 %strcmp48516, 0
+  %bool48518 = zext i1 %cmp48517 to i32
+  %cmp48519 = icmp eq i32 %bool48518, 0
+  %bool48520 = zext i1 %cmp48519 to i32
+  %cond48521 = icmp ne i32 %bool48520, 0
+  br i1 %cond48521, label %if.then8096, label %if.else8097
 
-if.then8093:                                      ; preds = %entry
-  %load48518 = load ptr, ptr %output, align 8
-  ret ptr %load48518
+if.then8096:                                      ; preds = %entry
+  %load48522 = load ptr, ptr %output, align 8
+  ret ptr %load48522
 
-if.else8094:                                      ; preds = %entry
-  br label %if.end8095
+if.else8097:                                      ; preds = %entry
+  br label %if.end8098
 
-if.end8095:                                       ; preds = %if.else8094
-  %load48519 = load ptr, ptr %filename, align 8
-  %call48520 = call ptr @strip_vix_ext(ptr %load48519)
-  %call48522 = call ptr @vix_string_concat(ptr %call48520, ptr @.strlit48521)
-  ret ptr %call48522
+if.end8098:                                       ; preds = %if.else8097
+  %load48523 = load ptr, ptr %filename, align 8
+  %call48524 = call ptr @strip_vix_ext(ptr %load48523)
+  %call48526 = call ptr @vix_string_concat(ptr %call48524, ptr @.strlit48525)
+  ret ptr %call48526
 }
 
 define ptr @artifact_output_path(ptr %0, ptr %1, ptr %2) {
@@ -92920,95 +92965,158 @@ entry:
   store ptr %1, ptr %output, align 8
   %emit = alloca ptr, align 8
   store ptr %2, ptr %emit, align 8
-  %load48523 = load ptr, ptr %output, align 8
-  %strcmp48525 = call i32 @strcmp(ptr %load48523, ptr @.strlit48524)
-  %cmp48526 = icmp eq i32 %strcmp48525, 0
-  %bool48527 = zext i1 %cmp48526 to i32
-  %cmp48528 = icmp eq i32 %bool48527, 0
-  %bool48529 = zext i1 %cmp48528 to i32
-  %cond48530 = icmp ne i32 %bool48529, 0
-  br i1 %cond48530, label %if.then8096, label %if.else8097
+  %load48527 = load ptr, ptr %output, align 8
+  %strcmp48529 = call i32 @strcmp(ptr %load48527, ptr @.strlit48528)
+  %cmp48530 = icmp eq i32 %strcmp48529, 0
+  %bool48531 = zext i1 %cmp48530 to i32
+  %cmp48532 = icmp eq i32 %bool48531, 0
+  %bool48533 = zext i1 %cmp48532 to i32
+  %cond48534 = icmp ne i32 %bool48533, 0
+  br i1 %cond48534, label %if.then8099, label %if.else8100
 
-if.then8096:                                      ; preds = %entry
-  %load48531 = load ptr, ptr %output, align 8
-  ret ptr %load48531
+if.then8099:                                      ; preds = %entry
+  %load48535 = load ptr, ptr %output, align 8
+  ret ptr %load48535
 
-if.else8097:                                      ; preds = %entry
-  br label %if.end8098
-
-if.end8098:                                       ; preds = %if.else8097
-  %load48532 = load ptr, ptr %filename, align 8
-  %call48533 = call ptr @strip_vix_ext(ptr %load48532)
-  %base = alloca ptr, align 8
-  store ptr %call48533, ptr %base, align 8
-  %load48534 = load ptr, ptr %emit, align 8
-  %strcmp48536 = call i32 @strcmp(ptr %load48534, ptr @.strlit48535)
-  %cmp48537 = icmp eq i32 %strcmp48536, 0
-  %bool48538 = zext i1 %cmp48537 to i32
-  %cond48539 = icmp ne i32 %bool48538, 0
-  br i1 %cond48539, label %if.then8099, label %if.else8100
-
-if.then8099:                                      ; preds = %if.end8098
-  %load48540 = load ptr, ptr %base, align 8
-  ret ptr %load48540
-
-if.else8100:                                      ; preds = %if.end8098
+if.else8100:                                      ; preds = %entry
   br label %if.end8101
 
 if.end8101:                                       ; preds = %if.else8100
-  %load48541 = load ptr, ptr %emit, align 8
-  %strcmp48543 = call i32 @strcmp(ptr %load48541, ptr @.strlit48542)
-  %cmp48544 = icmp eq i32 %strcmp48543, 0
-  %bool48545 = zext i1 %cmp48544 to i32
-  %cond48546 = icmp ne i32 %bool48545, 0
-  br i1 %cond48546, label %if.then8102, label %if.else8103
+  %load48536 = load ptr, ptr %filename, align 8
+  %call48537 = call ptr @strip_vix_ext(ptr %load48536)
+  %base = alloca ptr, align 8
+  store ptr %call48537, ptr %base, align 8
+  %load48538 = load ptr, ptr %emit, align 8
+  %strcmp48540 = call i32 @strcmp(ptr %load48538, ptr @.strlit48539)
+  %cmp48541 = icmp eq i32 %strcmp48540, 0
+  %bool48542 = zext i1 %cmp48541 to i32
+  %cond48543 = icmp ne i32 %bool48542, 0
+  br i1 %cond48543, label %if.then8102, label %if.else8103
 
 if.then8102:                                      ; preds = %if.end8101
-  %load48547 = load ptr, ptr %base, align 8
-  %call48549 = call ptr @vix_string_concat(ptr %load48547, ptr @.strlit48548)
-  ret ptr %call48549
+  %load48544 = load ptr, ptr %base, align 8
+  ret ptr %load48544
 
 if.else8103:                                      ; preds = %if.end8101
   br label %if.end8104
 
 if.end8104:                                       ; preds = %if.else8103
-  %load48550 = load ptr, ptr %base, align 8
-  %call48552 = call ptr @vix_string_concat(ptr %load48550, ptr @.strlit48551)
-  ret ptr %call48552
+  %load48545 = load ptr, ptr %emit, align 8
+  %strcmp48547 = call i32 @strcmp(ptr %load48545, ptr @.strlit48546)
+  %cmp48548 = icmp eq i32 %strcmp48547, 0
+  %bool48549 = zext i1 %cmp48548 to i32
+  %cond48550 = icmp ne i32 %bool48549, 0
+  br i1 %cond48550, label %if.then8105, label %if.else8106
+
+if.then8105:                                      ; preds = %if.end8104
+  %load48551 = load ptr, ptr %base, align 8
+  %call48553 = call ptr @vix_string_concat(ptr %load48551, ptr @.strlit48552)
+  ret ptr %call48553
+
+if.else8106:                                      ; preds = %if.end8104
+  br label %if.end8107
+
+if.end8107:                                       ; preds = %if.else8106
+  %load48554 = load ptr, ptr %base, align 8
+  %call48556 = call ptr @vix_string_concat(ptr %load48554, ptr @.strlit48555)
+  ret ptr %call48556
+}
+
+define i32 @opt_level_arg(ptr %0) {
+entry:
+  %arg = alloca ptr, align 8
+  store ptr %0, ptr %arg, align 8
+  %load48557 = load ptr, ptr %arg, align 8
+  %strcmp48559 = call i32 @strcmp(ptr %load48557, ptr @.strlit48558)
+  %cmp48560 = icmp eq i32 %strcmp48559, 0
+  %bool48561 = zext i1 %cmp48560 to i32
+  %cond48562 = icmp ne i32 %bool48561, 0
+  br i1 %cond48562, label %if.then8108, label %if.else8109
+
+if.then8108:                                      ; preds = %entry
+  ret i32 0
+
+if.else8109:                                      ; preds = %entry
+  br label %if.end8110
+
+if.end8110:                                       ; preds = %if.else8109
+  %load48563 = load ptr, ptr %arg, align 8
+  %strcmp48565 = call i32 @strcmp(ptr %load48563, ptr @.strlit48564)
+  %cmp48566 = icmp eq i32 %strcmp48565, 0
+  %bool48567 = zext i1 %cmp48566 to i32
+  %cond48568 = icmp ne i32 %bool48567, 0
+  br i1 %cond48568, label %if.then8111, label %if.else8112
+
+if.then8111:                                      ; preds = %if.end8110
+  ret i32 1
+
+if.else8112:                                      ; preds = %if.end8110
+  br label %if.end8113
+
+if.end8113:                                       ; preds = %if.else8112
+  %load48569 = load ptr, ptr %arg, align 8
+  %strcmp48571 = call i32 @strcmp(ptr %load48569, ptr @.strlit48570)
+  %cmp48572 = icmp eq i32 %strcmp48571, 0
+  %bool48573 = zext i1 %cmp48572 to i32
+  %cond48574 = icmp ne i32 %bool48573, 0
+  br i1 %cond48574, label %if.then8114, label %if.else8115
+
+if.then8114:                                      ; preds = %if.end8113
+  ret i32 2
+
+if.else8115:                                      ; preds = %if.end8113
+  br label %if.end8116
+
+if.end8116:                                       ; preds = %if.else8115
+  %load48575 = load ptr, ptr %arg, align 8
+  %strcmp48577 = call i32 @strcmp(ptr %load48575, ptr @.strlit48576)
+  %cmp48578 = icmp eq i32 %strcmp48577, 0
+  %bool48579 = zext i1 %cmp48578 to i32
+  %cond48580 = icmp ne i32 %bool48579, 0
+  br i1 %cond48580, label %if.then8117, label %if.else8118
+
+if.then8117:                                      ; preds = %if.end8116
+  ret i32 3
+
+if.else8118:                                      ; preds = %if.end8116
+  br label %if.end8119
+
+if.end8119:                                       ; preds = %if.else8118
+  ret i32 -1
 }
 
 define i32 @print_help() {
 entry:
-  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48553)
-  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48554)
-  %2 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48555)
-  %3 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48556)
-  %4 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48557)
-  %5 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48558)
-  %6 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48559)
-  %7 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48560)
-  %8 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48561)
-  %9 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48562)
-  %10 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48563)
-  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48564)
-  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48565)
-  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48566)
-  %14 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48567)
-  %15 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48568)
-  %16 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48569)
-  %17 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48570)
-  %18 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48571)
-  %19 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48572)
-  %20 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48573)
-  %21 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48574)
-  %22 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48575)
-  %23 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48576)
+  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48582)
+  %1 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48583)
+  %2 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48584)
+  %3 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48585)
+  %4 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48586)
+  %5 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48587)
+  %6 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48588)
+  %7 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48589)
+  %8 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48590)
+  %9 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48591)
+  %10 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48592)
+  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48593)
+  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48594)
+  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48595)
+  %14 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48596)
+  %15 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48597)
+  %16 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48598)
+  %17 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48599)
+  %18 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48600)
+  %19 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48601)
+  %20 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48602)
+  %21 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48603)
+  %22 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48604)
+  %23 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48605)
   ret i32 0
 }
 
 define i32 @print_version() {
 entry:
-  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48577)
+  %0 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr @.strlit48606)
   ret i32 0
 }
 
@@ -93016,29 +93124,29 @@ define ptr @source_file_arg(ptr %0) {
 entry:
   %arg = alloca ptr, align 8
   store ptr %0, ptr %arg, align 8
-  %load48578 = load ptr, ptr %arg, align 8
-  %call48580 = call i32 @string_ends_with(ptr %load48578, ptr @.strlit48579)
-  %matchres48581 = alloca ptr, align 8
-  br label %match.test8106
+  %load48607 = load ptr, ptr %arg, align 8
+  %call48609 = call i32 @string_ends_with(ptr %load48607, ptr @.strlit48608)
+  %matchres48610 = alloca ptr, align 8
+  br label %match.test8121
 
-match.end8105:                                    ; preds = %match.test8108, %match.body8107
-  %matchval48586 = load ptr, ptr %matchres48581, align 8
-  ret ptr %matchval48586
+match.end8120:                                    ; preds = %match.test8123, %match.body8122
+  %matchval48615 = load ptr, ptr %matchres48610, align 8
+  ret ptr %matchval48615
 
-match.test8106:                                   ; preds = %entry
-  %cmp48582 = icmp eq i32 %call48580, 1
-  %bool48583 = zext i1 %cmp48582 to i32
-  %cond48584 = icmp ne i32 %bool48583, 0
-  br i1 %cond48584, label %match.body8107, label %match.test8108
+match.test8121:                                   ; preds = %entry
+  %cmp48611 = icmp eq i32 %call48609, 1
+  %bool48612 = zext i1 %cmp48611 to i32
+  %cond48613 = icmp ne i32 %bool48612, 0
+  br i1 %cond48613, label %match.body8122, label %match.test8123
 
-match.body8107:                                   ; preds = %match.test8106
-  %load48585 = load ptr, ptr %arg, align 8
-  store ptr %load48585, ptr %matchres48581, align 8
-  br label %match.end8105
+match.body8122:                                   ; preds = %match.test8121
+  %load48614 = load ptr, ptr %arg, align 8
+  store ptr %load48614, ptr %matchres48610, align 8
+  br label %match.end8120
 
-match.test8108:                                   ; preds = %match.test8106
-  store ptr null, ptr %matchres48581, align 8
-  br label %match.end8105
+match.test8123:                                   ; preds = %match.test8121
+  store ptr null, ptr %matchres48610, align 8
+  br label %match.end8120
 }
 
 define ptr @mode_success() {
@@ -93058,78 +93166,78 @@ entry:
 
 define ptr @host_target_triple() {
 entry:
-  %call48591 = call ptr @LLVMGetDefaultTargetTriple()
+  %call48620 = call ptr @LLVMGetDefaultTargetTriple()
   %triple = alloca ptr, align 8
-  store ptr %call48591, ptr %triple, align 8
-  %load48592 = load ptr, ptr %triple, align 8
-  %cmp48593 = icmp eq ptr %load48592, null
-  %bool48594 = zext i1 %cmp48593 to i32
-  %cond48595 = icmp ne i32 %bool48594, 0
-  br i1 %cond48595, label %or.true, label %or.rhs
+  store ptr %call48620, ptr %triple, align 8
+  %load48621 = load ptr, ptr %triple, align 8
+  %cmp48622 = icmp eq ptr %load48621, null
+  %bool48623 = zext i1 %cmp48622 to i32
+  %cond48624 = icmp ne i32 %bool48623, 0
+  br i1 %cond48624, label %or.true, label %or.rhs
 
-if.then8109:                                      ; preds = %or.merge
-  ret ptr @.strlit48604
+if.then8124:                                      ; preds = %or.merge
+  ret ptr @.strlit48633
 
-if.else8110:                                      ; preds = %or.merge
-  br label %if.end8111
+if.else8125:                                      ; preds = %or.merge
+  br label %if.end8126
 
-if.end8111:                                       ; preds = %if.else8110
-  %load48605 = load ptr, ptr %triple, align 8
-  ret ptr %load48605
+if.end8126:                                       ; preds = %if.else8125
+  %load48634 = load ptr, ptr %triple, align 8
+  ret ptr %load48634
 
 or.true:                                          ; preds = %or.rhs, %entry
   br label %or.merge
 
 or.rhs:                                           ; preds = %entry
-  %load48596 = load ptr, ptr %triple, align 8
-  %strcmp48598 = call i32 @strcmp(ptr %load48596, ptr @.strlit48597)
-  %cmp48599 = icmp eq i32 %strcmp48598, 0
-  %bool48600 = zext i1 %cmp48599 to i32
-  %cond48601 = icmp ne i32 %bool48600, 0
-  br i1 %cond48601, label %or.true, label %or.merge
+  %load48625 = load ptr, ptr %triple, align 8
+  %strcmp48627 = call i32 @strcmp(ptr %load48625, ptr @.strlit48626)
+  %cmp48628 = icmp eq i32 %strcmp48627, 0
+  %bool48629 = zext i1 %cmp48628 to i32
+  %cond48630 = icmp ne i32 %bool48629, 0
+  br i1 %cond48630, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval48602 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond48603 = icmp ne i32 %orval48602, 0
-  br i1 %cond48603, label %if.then8109, label %if.else8110
+or.merge:                                         ; preds = %or.rhs, %or.true
+  %orval48631 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond48632 = icmp ne i32 %orval48631, 0
+  br i1 %cond48632, label %if.then8124, label %if.else8125
 }
 
 define i32 @self_backend_target_supported(ptr %0) {
 entry:
   %target_triple = alloca ptr, align 8
   store ptr %0, ptr %target_triple, align 8
-  %load48606 = load ptr, ptr %target_triple, align 8
-  %strcmp48608 = call i32 @strcmp(ptr %load48606, ptr @.strlit48607)
-  %cmp48609 = icmp eq i32 %strcmp48608, 0
-  %bool48610 = zext i1 %cmp48609 to i32
-  %cond48611 = icmp ne i32 %bool48610, 0
-  br i1 %cond48611, label %if.then8112, label %if.else8113
+  %load48635 = load ptr, ptr %target_triple, align 8
+  %strcmp48637 = call i32 @strcmp(ptr %load48635, ptr @.strlit48636)
+  %cmp48638 = icmp eq i32 %strcmp48637, 0
+  %bool48639 = zext i1 %cmp48638 to i32
+  %cond48640 = icmp ne i32 %bool48639, 0
+  br i1 %cond48640, label %if.then8127, label %if.else8128
 
-if.then8112:                                      ; preds = %entry
+if.then8127:                                      ; preds = %entry
   ret i32 1
 
-if.else8113:                                      ; preds = %entry
-  br label %if.end8114
+if.else8128:                                      ; preds = %entry
+  br label %if.end8129
 
-if.end8114:                                       ; preds = %if.else8113
-  %load48612 = load ptr, ptr %target_triple, align 8
-  %call48614 = call i32 @str_starts_with(ptr %load48612, ptr @.strlit48613)
-  %cmp48615 = icmp eq i32 %call48614, 1
-  %bool48616 = zext i1 %cmp48615 to i32
-  %cond48617 = icmp ne i32 %bool48616, 0
-  br i1 %cond48617, label %if.then8115, label %if.else8116
+if.end8129:                                       ; preds = %if.else8128
+  %load48641 = load ptr, ptr %target_triple, align 8
+  %call48643 = call i32 @str_starts_with(ptr %load48641, ptr @.strlit48642)
+  %cmp48644 = icmp eq i32 %call48643, 1
+  %bool48645 = zext i1 %cmp48644 to i32
+  %cond48646 = icmp ne i32 %bool48645, 0
+  br i1 %cond48646, label %if.then8130, label %if.else8131
 
-if.then8115:                                      ; preds = %if.end8114
+if.then8130:                                      ; preds = %if.end8129
   ret i32 1
 
-if.else8116:                                      ; preds = %if.end8114
-  br label %if.end8117
+if.else8131:                                      ; preds = %if.end8129
+  br label %if.end8132
 
-if.end8117:                                       ; preds = %if.else8116
+if.end8132:                                       ; preds = %if.else8131
   ret i32 0
 }
 
-define ptr @run_mode(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, ptr %8, i32 %9) {
+define ptr @run_mode(ptr %0, ptr %1, ptr %2, ptr %3, ptr %4, ptr %5, ptr %6, ptr %7, ptr %8, i32 %9, i32 %10) {
 entry:
   %mode = alloca ptr, align 8
   store ptr %0, ptr %mode, align 8
@@ -93151,1023 +93259,1115 @@ entry:
   store ptr %8, ptr %backend, align 8
   %optimize_mir = alloca i32, align 4
   store i32 %9, ptr %optimize_mir, align 4
-  %load48618 = load ptr, ptr %src, align 8
-  %call48619 = call i32 @vix_api_source_has_no_std(ptr %load48618)
+  %opt_level = alloca i32, align 4
+  store i32 %10, ptr %opt_level, align 4
+  %load48647 = load ptr, ptr %src, align 8
+  %call48648 = call i32 @vix_api_source_has_no_std(ptr %load48647)
   %no_std = alloca i32, align 4
-  store i32 %call48619, ptr %no_std, align 4
-  %load48620 = load ptr, ptr %mode, align 8
-  br label %match.test8119
+  store i32 %call48648, ptr %no_std, align 4
+  %load48649 = load ptr, ptr %mode, align 8
+  br label %match.test8134
 
-match.end8118:                                    ; preds = %match.test8123
-  %load48638 = load ptr, ptr %src, align 8
-  %load48639 = load ptr, ptr %filename, align 8
-  %call48640 = call %AstProgram @parse_program(ptr %load48638, ptr %load48639)
+match.end8133:                                    ; preds = %match.test8138
+  %load48667 = load ptr, ptr %src, align 8
+  %load48668 = load ptr, ptr %filename, align 8
+  %call48669 = call %AstProgram @parse_program(ptr %load48667, ptr %load48668)
   %program = alloca %AstProgram, align 8
-  store %AstProgram %call48640, ptr %program, align 8
-  %load48641 = load ptr, ptr %mode, align 8
-  br label %match.test8125
+  store %AstProgram %call48669, ptr %program, align 8
+  %load48670 = load ptr, ptr %mode, align 8
+  br label %match.test8140
 
-match.test8119:                                   ; preds = %entry
-  %strcmp48622 = call i32 @strcmp(ptr %load48620, ptr @.strlit48621)
-  %cmp48623 = icmp eq i32 %strcmp48622, 0
-  %bool48624 = zext i1 %cmp48623 to i32
-  %cond48625 = icmp ne i32 %bool48624, 0
-  br i1 %cond48625, label %match.body8120, label %match.test8121
+match.test8134:                                   ; preds = %entry
+  %strcmp48651 = call i32 @strcmp(ptr %load48649, ptr @.strlit48650)
+  %cmp48652 = icmp eq i32 %strcmp48651, 0
+  %bool48653 = zext i1 %cmp48652 to i32
+  %cond48654 = icmp ne i32 %bool48653, 0
+  br i1 %cond48654, label %match.body8135, label %match.test8136
 
-match.body8120:                                   ; preds = %match.test8119
-  %load48626 = load ptr, ptr %src, align 8
-  %call48627 = call ptr @tokenize_debug(ptr %load48626)
-  call void @info_print(ptr %call48627)
-  %call48628 = call ptr @mode_success()
-  ret ptr %call48628
+match.body8135:                                   ; preds = %match.test8134
+  %load48655 = load ptr, ptr %src, align 8
+  %call48656 = call ptr @tokenize_debug(ptr %load48655)
+  call void @info_print(ptr %call48656)
+  %call48657 = call ptr @mode_success()
+  ret ptr %call48657
 
-match.test8121:                                   ; preds = %match.test8119
-  %strcmp48630 = call i32 @strcmp(ptr %load48620, ptr @.strlit48629)
-  %cmp48631 = icmp eq i32 %strcmp48630, 0
-  %bool48632 = zext i1 %cmp48631 to i32
-  %cond48633 = icmp ne i32 %bool48632, 0
-  br i1 %cond48633, label %match.body8122, label %match.test8123
+match.test8136:                                   ; preds = %match.test8134
+  %strcmp48659 = call i32 @strcmp(ptr %load48649, ptr @.strlit48658)
+  %cmp48660 = icmp eq i32 %strcmp48659, 0
+  %bool48661 = zext i1 %cmp48660 to i32
+  %cond48662 = icmp ne i32 %bool48661, 0
+  br i1 %cond48662, label %match.body8137, label %match.test8138
 
-match.body8122:                                   ; preds = %match.test8121
-  %load48634 = load ptr, ptr %src, align 8
-  %load48635 = load ptr, ptr %filename, align 8
-  %call48636 = call ptr @parse_program_stats(ptr %load48634, ptr %load48635)
-  call void @info_print(ptr %call48636)
-  %call48637 = call ptr @mode_success()
-  ret ptr %call48637
+match.body8137:                                   ; preds = %match.test8136
+  %load48663 = load ptr, ptr %src, align 8
+  %load48664 = load ptr, ptr %filename, align 8
+  %call48665 = call ptr @parse_program_stats(ptr %load48663, ptr %load48664)
+  call void @info_print(ptr %call48665)
+  %call48666 = call ptr @mode_success()
+  ret ptr %call48666
 
-match.test8123:                                   ; preds = %match.test8121
-  br label %match.end8118
+match.test8138:                                   ; preds = %match.test8136
+  br label %match.end8133
 
-match.end8124:                                    ; preds = %match.test8137
-  %load48687 = load %AstProgram, ptr %program, align 8
-  %extract48688 = extractvalue %AstProgram %load48687, 8
-  %cmp48689 = icmp eq i32 %extract48688, 0
-  %bool48690 = zext i1 %cmp48689 to i32
-  %cond48691 = icmp ne i32 %bool48690, 0
-  br i1 %cond48691, label %if.then8141, label %if.else8142
-
-match.test8125:                                   ; preds = %match.end8118
-  %strcmp48643 = call i32 @strcmp(ptr %load48641, ptr @.strlit48642)
-  %cmp48644 = icmp eq i32 %strcmp48643, 0
-  %bool48645 = zext i1 %cmp48644 to i32
-  %cond48646 = icmp ne i32 %bool48645, 0
-  br i1 %cond48646, label %match.body8126, label %match.test8127
-
-match.body8126:                                   ; preds = %match.test8125
-  %load48647 = load %AstProgram, ptr %program, align 8
-  %extract48648 = extractvalue %AstProgram %load48647, 8
-  %cmp48649 = icmp eq i32 %extract48648, 0
-  %bool48650 = zext i1 %cmp48649 to i32
-  %cond48651 = icmp ne i32 %bool48650, 0
-  br i1 %cond48651, label %if.then8128, label %if.else8129
-
-match.test8127:                                   ; preds = %match.test8125
-  %strcmp48658 = call i32 @strcmp(ptr %load48641, ptr @.strlit48657)
-  %cmp48659 = icmp eq i32 %strcmp48658, 0
-  %bool48660 = zext i1 %cmp48659 to i32
-  %cond48661 = icmp ne i32 %bool48660, 0
-  br i1 %cond48661, label %match.body8131, label %match.test8132
-
-if.then8128:                                      ; preds = %match.body8126
-  %load48652 = load %AstProgram, ptr %program, align 8
-  %extract48653 = extractvalue %AstProgram %load48652, 9
-  call void @info_print(ptr %extract48653)
-  br label %if.end8130
-
-if.else8129:                                      ; preds = %match.body8126
-  %load48654 = load %AstProgram, ptr %program, align 8
-  %call48655 = call ptr @ast_program_debug(%AstProgram %load48654)
-  call void @info_print(ptr %call48655)
-  br label %if.end8130
-
-if.end8130:                                       ; preds = %if.else8129, %if.then8128
-  %call48656 = call ptr @mode_success()
-  ret ptr %call48656
-
-match.body8131:                                   ; preds = %match.test8127
-  %load48662 = load %AstProgram, ptr %program, align 8
-  %extract48663 = extractvalue %AstProgram %load48662, 8
-  %cmp48664 = icmp eq i32 %extract48663, 0
-  %bool48665 = zext i1 %cmp48664 to i32
-  %cond48666 = icmp ne i32 %bool48665, 0
-  br i1 %cond48666, label %if.then8133, label %if.else8134
-
-match.test8132:                                   ; preds = %match.test8127
-  %strcmp48673 = call i32 @strcmp(ptr %load48641, ptr @.strlit48672)
-  %cmp48674 = icmp eq i32 %strcmp48673, 0
-  %bool48675 = zext i1 %cmp48674 to i32
-  %cond48676 = icmp ne i32 %bool48675, 0
-  br i1 %cond48676, label %match.body8136, label %match.test8137
-
-if.then8133:                                      ; preds = %match.body8131
-  %load48667 = load %AstProgram, ptr %program, align 8
-  %extract48668 = extractvalue %AstProgram %load48667, 9
-  call void @info_print(ptr %extract48668)
-  br label %if.end8135
-
-if.else8134:                                      ; preds = %match.body8131
-  %load48669 = load %AstProgram, ptr %program, align 8
-  %call48670 = call ptr @ast(%AstProgram %load48669)
-  call void @info_print(ptr %call48670)
-  br label %if.end8135
-
-if.end8135:                                       ; preds = %if.else8134, %if.then8133
-  %call48671 = call ptr @mode_success()
-  ret ptr %call48671
-
-match.body8136:                                   ; preds = %match.test8132
-  %load48677 = load %AstProgram, ptr %program, align 8
-  %extract48678 = extractvalue %AstProgram %load48677, 8
-  %cmp48679 = icmp eq i32 %extract48678, 0
-  %bool48680 = zext i1 %cmp48679 to i32
-  %cond48681 = icmp ne i32 %bool48680, 0
-  br i1 %cond48681, label %if.then8138, label %if.else8139
-
-match.test8137:                                   ; preds = %match.test8132
-  br label %match.end8124
-
-if.then8138:                                      ; preds = %match.body8136
-  %load48682 = load %AstProgram, ptr %program, align 8
-  %extract48683 = extractvalue %AstProgram %load48682, 9
-  call void @info_print(ptr %extract48683)
-  br label %if.end8140
-
-if.else8139:                                      ; preds = %match.body8136
-  %load48684 = load %AstProgram, ptr %program, align 8
-  %call48685 = call ptr @ast(%AstProgram %load48684)
-  call void @info_print(ptr %call48685)
-  br label %if.end8140
-
-if.end8140:                                       ; preds = %if.else8139, %if.then8138
-  %call48686 = call ptr @mode_success()
-  ret ptr %call48686
-
-if.then8141:                                      ; preds = %match.end8124
-  %load48692 = load %AstProgram, ptr %program, align 8
-  %extract48693 = extractvalue %AstProgram %load48692, 9
-  call void @diag_print(ptr %extract48693)
-  %call48694 = call ptr @mode_failure()
-  ret ptr %call48694
-
-if.else8142:                                      ; preds = %match.end8124
-  br label %if.end8143
-
-if.end8143:                                       ; preds = %if.else8142
-  %load48695 = load %AstProgram, ptr %program, align 8
-  %call48696 = call %AstProgram @desugar_program(%AstProgram %load48695)
-  %lowered_program = alloca %AstProgram, align 8
-  store %AstProgram %call48696, ptr %lowered_program, align 8
-  %load48697 = load %AstProgram, ptr %lowered_program, align 8
-  %load48698 = load ptr, ptr %src, align 8
-  %load48699 = load ptr, ptr %filename, align 8
-  %call48700 = call %SemanticResult @semantic_check_program(%AstProgram %load48697, ptr %load48698, ptr %load48699)
-  %semantic_result = alloca %SemanticResult, align 8
-  store %SemanticResult %call48700, ptr %semantic_result, align 8
-  %load48701 = load ptr, ptr %mode, align 8
-  br label %match.test8145
-
-match.end8144:                                    ; preds = %match.test8147
-  %load48710 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract48711 = extractvalue %SemanticResult %load48710, 1
-  %cmp48712 = icmp sgt i32 %extract48711, 0
-  %bool48713 = zext i1 %cmp48712 to i32
-  %cond48714 = icmp ne i32 %bool48713, 0
-  br i1 %cond48714, label %if.then8148, label %if.else8149
-
-match.test8145:                                   ; preds = %if.end8143
-  %strcmp48703 = call i32 @strcmp(ptr %load48701, ptr @.strlit48702)
-  %cmp48704 = icmp eq i32 %strcmp48703, 0
-  %bool48705 = zext i1 %cmp48704 to i32
-  %cond48706 = icmp ne i32 %bool48705, 0
-  br i1 %cond48706, label %match.body8146, label %match.test8147
-
-match.body8146:                                   ; preds = %match.test8145
-  %load48707 = load %SemanticResult, ptr %semantic_result, align 8
-  %call48708 = call ptr @semantic_result_debug(%SemanticResult %load48707)
-  call void @info_print(ptr %call48708)
-  %call48709 = call ptr @mode_success()
-  ret ptr %call48709
-
-match.test8147:                                   ; preds = %match.test8145
-  br label %match.end8144
-
-if.then8148:                                      ; preds = %match.end8144
-  %load48715 = load ptr, ptr %mode, align 8
-  br label %match.test8152
-
-if.else8149:                                      ; preds = %match.end8144
-  br label %if.end8150
-
-if.end8150:                                       ; preds = %if.else8149
-  %load48751 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract48752 = extractvalue %SemanticResult %load48751, 3
-  %cmp48753 = icmp sgt i32 %extract48752, 0
-  %bool48754 = zext i1 %cmp48753 to i32
-  %cond48755 = icmp ne i32 %bool48754, 0
-  br i1 %cond48755, label %if.then8163, label %if.else8164
-
-match.end8151:                                    ; preds = %match.test8159
-  %load48748 = load %SemanticResult, ptr %semantic_result, align 8
-  %call48749 = call ptr @semantic_result_debug(%SemanticResult %load48748)
-  call void @diag_print(ptr %call48749)
-  %call48750 = call ptr @mode_failure()
-  ret ptr %call48750
-
-match.test8152:                                   ; preds = %if.then8148
-  %strcmp48717 = call i32 @strcmp(ptr %load48715, ptr @.strlit48716)
-  %cmp48718 = icmp eq i32 %strcmp48717, 0
+match.end8139:                                    ; preds = %match.test8152
+  %load48716 = load %AstProgram, ptr %program, align 8
+  %extract48717 = extractvalue %AstProgram %load48716, 8
+  %cmp48718 = icmp eq i32 %extract48717, 0
   %bool48719 = zext i1 %cmp48718 to i32
   %cond48720 = icmp ne i32 %bool48719, 0
-  br i1 %cond48720, label %match.body8153, label %match.test8154
+  br i1 %cond48720, label %if.then8156, label %if.else8157
 
-match.body8153:                                   ; preds = %match.test8152
-  %load48721 = load %SemanticResult, ptr %semantic_result, align 8
-  %call48722 = call ptr @semantic_result_debug(%SemanticResult %load48721)
-  call void @info_print(ptr %call48722)
-  %load48723 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract48724 = extractvalue %SemanticResult %load48723, 1
-  %load48725 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract48726 = extractvalue %SemanticResult %load48725, 2
-  %cmp48727 = icmp eq i32 %extract48724, %extract48726
-  %bool48728 = zext i1 %cmp48727 to i32
-  %cond48729 = icmp ne i32 %bool48728, 0
-  br i1 %cond48729, label %if.then8155, label %if.else8156
+match.test8140:                                   ; preds = %match.end8133
+  %strcmp48672 = call i32 @strcmp(ptr %load48670, ptr @.strlit48671)
+  %cmp48673 = icmp eq i32 %strcmp48672, 0
+  %bool48674 = zext i1 %cmp48673 to i32
+  %cond48675 = icmp ne i32 %bool48674, 0
+  br i1 %cond48675, label %match.body8141, label %match.test8142
 
-match.test8154:                                   ; preds = %match.test8152
-  %strcmp48733 = call i32 @strcmp(ptr %load48715, ptr @.strlit48732)
-  %cmp48734 = icmp eq i32 %strcmp48733, 0
-  %bool48735 = zext i1 %cmp48734 to i32
-  %cond48736 = icmp ne i32 %bool48735, 0
-  br i1 %cond48736, label %match.body8158, label %match.test8159
+match.body8141:                                   ; preds = %match.test8140
+  %load48676 = load %AstProgram, ptr %program, align 8
+  %extract48677 = extractvalue %AstProgram %load48676, 8
+  %cmp48678 = icmp eq i32 %extract48677, 0
+  %bool48679 = zext i1 %cmp48678 to i32
+  %cond48680 = icmp ne i32 %bool48679, 0
+  br i1 %cond48680, label %if.then8143, label %if.else8144
 
-if.then8155:                                      ; preds = %match.body8153
-  %call48730 = call ptr @mode_success()
-  ret ptr %call48730
+match.test8142:                                   ; preds = %match.test8140
+  %strcmp48687 = call i32 @strcmp(ptr %load48670, ptr @.strlit48686)
+  %cmp48688 = icmp eq i32 %strcmp48687, 0
+  %bool48689 = zext i1 %cmp48688 to i32
+  %cond48690 = icmp ne i32 %bool48689, 0
+  br i1 %cond48690, label %match.body8146, label %match.test8147
 
-if.else8156:                                      ; preds = %match.body8153
-  br label %if.end8157
+if.then8143:                                      ; preds = %match.body8141
+  %load48681 = load %AstProgram, ptr %program, align 8
+  %extract48682 = extractvalue %AstProgram %load48681, 9
+  call void @info_print(ptr %extract48682)
+  br label %if.end8145
 
-if.end8157:                                       ; preds = %if.else8156
-  %call48731 = call ptr @mode_failure()
-  ret ptr %call48731
+if.else8144:                                      ; preds = %match.body8141
+  %load48683 = load %AstProgram, ptr %program, align 8
+  %call48684 = call ptr @ast_program_debug(%AstProgram %load48683)
+  call void @info_print(ptr %call48684)
+  br label %if.end8145
 
-match.body8158:                                   ; preds = %match.test8154
-  %load48737 = load %SemanticResult, ptr %semantic_result, align 8
-  %call48738 = call ptr @semantic_result_debug(%SemanticResult %load48737)
-  call void @info_print(ptr %call48738)
+if.end8145:                                       ; preds = %if.else8144, %if.then8143
+  %call48685 = call ptr @mode_success()
+  ret ptr %call48685
+
+match.body8146:                                   ; preds = %match.test8142
+  %load48691 = load %AstProgram, ptr %program, align 8
+  %extract48692 = extractvalue %AstProgram %load48691, 8
+  %cmp48693 = icmp eq i32 %extract48692, 0
+  %bool48694 = zext i1 %cmp48693 to i32
+  %cond48695 = icmp ne i32 %bool48694, 0
+  br i1 %cond48695, label %if.then8148, label %if.else8149
+
+match.test8147:                                   ; preds = %match.test8142
+  %strcmp48702 = call i32 @strcmp(ptr %load48670, ptr @.strlit48701)
+  %cmp48703 = icmp eq i32 %strcmp48702, 0
+  %bool48704 = zext i1 %cmp48703 to i32
+  %cond48705 = icmp ne i32 %bool48704, 0
+  br i1 %cond48705, label %match.body8151, label %match.test8152
+
+if.then8148:                                      ; preds = %match.body8146
+  %load48696 = load %AstProgram, ptr %program, align 8
+  %extract48697 = extractvalue %AstProgram %load48696, 9
+  call void @info_print(ptr %extract48697)
+  br label %if.end8150
+
+if.else8149:                                      ; preds = %match.body8146
+  %load48698 = load %AstProgram, ptr %program, align 8
+  %call48699 = call ptr @ast(%AstProgram %load48698)
+  call void @info_print(ptr %call48699)
+  br label %if.end8150
+
+if.end8150:                                       ; preds = %if.else8149, %if.then8148
+  %call48700 = call ptr @mode_success()
+  ret ptr %call48700
+
+match.body8151:                                   ; preds = %match.test8147
+  %load48706 = load %AstProgram, ptr %program, align 8
+  %extract48707 = extractvalue %AstProgram %load48706, 8
+  %cmp48708 = icmp eq i32 %extract48707, 0
+  %bool48709 = zext i1 %cmp48708 to i32
+  %cond48710 = icmp ne i32 %bool48709, 0
+  br i1 %cond48710, label %if.then8153, label %if.else8154
+
+match.test8152:                                   ; preds = %match.test8147
+  br label %match.end8139
+
+if.then8153:                                      ; preds = %match.body8151
+  %load48711 = load %AstProgram, ptr %program, align 8
+  %extract48712 = extractvalue %AstProgram %load48711, 9
+  call void @info_print(ptr %extract48712)
+  br label %if.end8155
+
+if.else8154:                                      ; preds = %match.body8151
+  %load48713 = load %AstProgram, ptr %program, align 8
+  %call48714 = call ptr @ast(%AstProgram %load48713)
+  call void @info_print(ptr %call48714)
+  br label %if.end8155
+
+if.end8155:                                       ; preds = %if.else8154, %if.then8153
+  %call48715 = call ptr @mode_success()
+  ret ptr %call48715
+
+if.then8156:                                      ; preds = %match.end8139
+  %load48721 = load %AstProgram, ptr %program, align 8
+  %extract48722 = extractvalue %AstProgram %load48721, 9
+  call void @diag_print(ptr %extract48722)
+  %call48723 = call ptr @mode_failure()
+  ret ptr %call48723
+
+if.else8157:                                      ; preds = %match.end8139
+  br label %if.end8158
+
+if.end8158:                                       ; preds = %if.else8157
+  %load48724 = load %AstProgram, ptr %program, align 8
+  %call48725 = call %AstProgram @desugar_program(%AstProgram %load48724)
+  %lowered_program = alloca %AstProgram, align 8
+  store %AstProgram %call48725, ptr %lowered_program, align 8
+  %load48726 = load %AstProgram, ptr %lowered_program, align 8
+  %load48727 = load ptr, ptr %src, align 8
+  %load48728 = load ptr, ptr %filename, align 8
+  %call48729 = call %SemanticResult @semantic_check_program(%AstProgram %load48726, ptr %load48727, ptr %load48728)
+  %semantic_result = alloca %SemanticResult, align 8
+  store %SemanticResult %call48729, ptr %semantic_result, align 8
+  %load48730 = load ptr, ptr %mode, align 8
+  br label %match.test8160
+
+match.end8159:                                    ; preds = %match.test8162
   %load48739 = load %SemanticResult, ptr %semantic_result, align 8
   %extract48740 = extractvalue %SemanticResult %load48739, 1
-  %load48741 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract48742 = extractvalue %SemanticResult %load48741, 2
-  %cmp48743 = icmp eq i32 %extract48740, %extract48742
-  %bool48744 = zext i1 %cmp48743 to i32
-  %cond48745 = icmp ne i32 %bool48744, 0
-  br i1 %cond48745, label %if.then8160, label %if.else8161
+  %cmp48741 = icmp sgt i32 %extract48740, 0
+  %bool48742 = zext i1 %cmp48741 to i32
+  %cond48743 = icmp ne i32 %bool48742, 0
+  br i1 %cond48743, label %if.then8163, label %if.else8164
 
-match.test8159:                                   ; preds = %match.test8154
-  br label %match.end8151
+match.test8160:                                   ; preds = %if.end8158
+  %strcmp48732 = call i32 @strcmp(ptr %load48730, ptr @.strlit48731)
+  %cmp48733 = icmp eq i32 %strcmp48732, 0
+  %bool48734 = zext i1 %cmp48733 to i32
+  %cond48735 = icmp ne i32 %bool48734, 0
+  br i1 %cond48735, label %match.body8161, label %match.test8162
 
-if.then8160:                                      ; preds = %match.body8158
-  %call48746 = call ptr @mode_success()
-  ret ptr %call48746
+match.body8161:                                   ; preds = %match.test8160
+  %load48736 = load %SemanticResult, ptr %semantic_result, align 8
+  %call48737 = call ptr @semantic_result_debug(%SemanticResult %load48736)
+  call void @info_print(ptr %call48737)
+  %call48738 = call ptr @mode_success()
+  ret ptr %call48738
 
-if.else8161:                                      ; preds = %match.body8158
-  br label %if.end8162
+match.test8162:                                   ; preds = %match.test8160
+  br label %match.end8159
 
-if.end8162:                                       ; preds = %if.else8161
-  %call48747 = call ptr @mode_failure()
-  ret ptr %call48747
-
-if.then8163:                                      ; preds = %if.end8150
-  %load48756 = load %SemanticResult, ptr %semantic_result, align 8
-  %call48757 = call ptr @semantic_result_debug(%SemanticResult %load48756)
-  call void @diag_print(ptr %call48757)
-  br label %if.end8165
-
-if.else8164:                                      ; preds = %if.end8150
-  br label %if.end8165
-
-if.end8165:                                       ; preds = %if.else8164, %if.then8163
-  %load48758 = load %SemanticResult, ptr %semantic_result, align 8
-  %extract48759 = extractvalue %SemanticResult %load48758, 5
-  %infer_result = alloca %TypeInferResult, align 8
-  store %TypeInferResult %extract48759, ptr %infer_result, align 8
-  %load48760 = load ptr, ptr %mode, align 8
+if.then8163:                                      ; preds = %match.end8159
+  %load48744 = load ptr, ptr %mode, align 8
   br label %match.test8167
 
-match.end8166:                                    ; preds = %match.test8171
-  %load48781 = load %TypeInferResult, ptr %infer_result, align 8
-  %extract48782 = extractvalue %TypeInferResult %load48781, 0
-  %cmp48783 = icmp eq i32 %extract48782, 0
-  %bool48784 = zext i1 %cmp48783 to i32
-  %cond48785 = icmp ne i32 %bool48784, 0
-  br i1 %cond48785, label %if.then8172, label %if.else8173
+if.else8164:                                      ; preds = %match.end8159
+  br label %if.end8165
 
-match.test8167:                                   ; preds = %if.end8165
-  %strcmp48762 = call i32 @strcmp(ptr %load48760, ptr @.strlit48761)
+if.end8165:                                       ; preds = %if.else8164
+  %load48780 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract48781 = extractvalue %SemanticResult %load48780, 3
+  %cmp48782 = icmp sgt i32 %extract48781, 0
+  %bool48783 = zext i1 %cmp48782 to i32
+  %cond48784 = icmp ne i32 %bool48783, 0
+  br i1 %cond48784, label %if.then8178, label %if.else8179
+
+match.end8166:                                    ; preds = %match.test8174
+  %load48777 = load %SemanticResult, ptr %semantic_result, align 8
+  %call48778 = call ptr @semantic_result_debug(%SemanticResult %load48777)
+  call void @diag_print(ptr %call48778)
+  %call48779 = call ptr @mode_failure()
+  ret ptr %call48779
+
+match.test8167:                                   ; preds = %if.then8163
+  %strcmp48746 = call i32 @strcmp(ptr %load48744, ptr @.strlit48745)
+  %cmp48747 = icmp eq i32 %strcmp48746, 0
+  %bool48748 = zext i1 %cmp48747 to i32
+  %cond48749 = icmp ne i32 %bool48748, 0
+  br i1 %cond48749, label %match.body8168, label %match.test8169
+
+match.body8168:                                   ; preds = %match.test8167
+  %load48750 = load %SemanticResult, ptr %semantic_result, align 8
+  %call48751 = call ptr @semantic_result_debug(%SemanticResult %load48750)
+  call void @info_print(ptr %call48751)
+  %load48752 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract48753 = extractvalue %SemanticResult %load48752, 1
+  %load48754 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract48755 = extractvalue %SemanticResult %load48754, 2
+  %cmp48756 = icmp eq i32 %extract48753, %extract48755
+  %bool48757 = zext i1 %cmp48756 to i32
+  %cond48758 = icmp ne i32 %bool48757, 0
+  br i1 %cond48758, label %if.then8170, label %if.else8171
+
+match.test8169:                                   ; preds = %match.test8167
+  %strcmp48762 = call i32 @strcmp(ptr %load48744, ptr @.strlit48761)
   %cmp48763 = icmp eq i32 %strcmp48762, 0
   %bool48764 = zext i1 %cmp48763 to i32
   %cond48765 = icmp ne i32 %bool48764, 0
-  br i1 %cond48765, label %match.body8168, label %match.test8169
+  br i1 %cond48765, label %match.body8173, label %match.test8174
 
-match.body8168:                                   ; preds = %match.test8167
-  %load48766 = load %TypeInferResult, ptr %infer_result, align 8
-  %load48767 = load ptr, ptr %src, align 8
-  %load48768 = load ptr, ptr %filename, align 8
-  %call48769 = call ptr @typeck_result_debug(%TypeInferResult %load48766, ptr %load48767, ptr %load48768)
-  call void @info_print(ptr %call48769)
-  %call48770 = call ptr @mode_success()
-  ret ptr %call48770
+if.then8170:                                      ; preds = %match.body8168
+  %call48759 = call ptr @mode_success()
+  ret ptr %call48759
 
-match.test8169:                                   ; preds = %match.test8167
-  %strcmp48772 = call i32 @strcmp(ptr %load48760, ptr @.strlit48771)
-  %cmp48773 = icmp eq i32 %strcmp48772, 0
-  %bool48774 = zext i1 %cmp48773 to i32
-  %cond48775 = icmp ne i32 %bool48774, 0
-  br i1 %cond48775, label %match.body8170, label %match.test8171
+if.else8171:                                      ; preds = %match.body8168
+  br label %if.end8172
 
-match.body8170:                                   ; preds = %match.test8169
-  %load48776 = load %TypeInferResult, ptr %infer_result, align 8
-  %load48777 = load ptr, ptr %src, align 8
-  %load48778 = load ptr, ptr %filename, align 8
-  %call48779 = call ptr @typeck_result_debug(%TypeInferResult %load48776, ptr %load48777, ptr %load48778)
-  call void @info_print(ptr %call48779)
-  %call48780 = call ptr @mode_success()
-  ret ptr %call48780
+if.end8172:                                       ; preds = %if.else8171
+  %call48760 = call ptr @mode_failure()
+  ret ptr %call48760
 
-match.test8171:                                   ; preds = %match.test8169
+match.body8173:                                   ; preds = %match.test8169
+  %load48766 = load %SemanticResult, ptr %semantic_result, align 8
+  %call48767 = call ptr @semantic_result_debug(%SemanticResult %load48766)
+  call void @info_print(ptr %call48767)
+  %load48768 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract48769 = extractvalue %SemanticResult %load48768, 1
+  %load48770 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract48771 = extractvalue %SemanticResult %load48770, 2
+  %cmp48772 = icmp eq i32 %extract48769, %extract48771
+  %bool48773 = zext i1 %cmp48772 to i32
+  %cond48774 = icmp ne i32 %bool48773, 0
+  br i1 %cond48774, label %if.then8175, label %if.else8176
+
+match.test8174:                                   ; preds = %match.test8169
   br label %match.end8166
 
-if.then8172:                                      ; preds = %match.end8166
-  %load48786 = load %TypeInferResult, ptr %infer_result, align 8
-  %load48787 = load ptr, ptr %src, align 8
-  %load48788 = load ptr, ptr %filename, align 8
-  %call48789 = call ptr @typeck_result_debug(%TypeInferResult %load48786, ptr %load48787, ptr %load48788)
-  call void @diag_print(ptr %call48789)
-  %call48790 = call ptr @mode_failure()
-  ret ptr %call48790
+if.then8175:                                      ; preds = %match.body8173
+  %call48775 = call ptr @mode_success()
+  ret ptr %call48775
 
-if.else8173:                                      ; preds = %match.end8166
-  br label %if.end8174
-
-if.end8174:                                       ; preds = %if.else8173
-  %load48791 = load ptr, ptr %mode, align 8
-  %strcmp48793 = call i32 @strcmp(ptr %load48791, ptr @.strlit48792)
-  %cmp48794 = icmp eq i32 %strcmp48793, 0
-  %bool48795 = zext i1 %cmp48794 to i32
-  %cond48796 = icmp ne i32 %bool48795, 0
-  br i1 %cond48796, label %if.then8175, label %if.else8176
-
-if.then8175:                                      ; preds = %if.end8174
-  %load48797 = load %AstProgram, ptr %lowered_program, align 8
-  %load48798 = load ptr, ptr %target_triple, align 8
-  %call48799 = call ptr @codegen_program_target(%AstProgram %load48797, ptr %load48798)
-  %ir = alloca ptr, align 8
-  store ptr %call48799, ptr %ir, align 8
-  %load48800 = load ptr, ptr %ir, align 8
-  call void @info_print(ptr %load48800)
-  %call48801 = call ptr @mode_success()
-  ret ptr %call48801
-
-if.else8176:                                      ; preds = %if.end8174
+if.else8176:                                      ; preds = %match.body8173
   br label %if.end8177
 
 if.end8177:                                       ; preds = %if.else8176
-  %load48802 = load ptr, ptr %mode, align 8
-  br label %match.test8179
+  %call48776 = call ptr @mode_failure()
+  ret ptr %call48776
 
-match.end8178:                                    ; preds = %match.test8186
-  %load48840 = load ptr, ptr %mode, align 8
-  br label %match.test8191
+if.then8178:                                      ; preds = %if.end8165
+  %load48785 = load %SemanticResult, ptr %semantic_result, align 8
+  %call48786 = call ptr @semantic_result_debug(%SemanticResult %load48785)
+  call void @diag_print(ptr %call48786)
+  br label %if.end8180
 
-match.test8179:                                   ; preds = %if.end8177
-  %strcmp48804 = call i32 @strcmp(ptr %load48802, ptr @.strlit48803)
-  %cmp48805 = icmp eq i32 %strcmp48804, 0
-  %bool48806 = zext i1 %cmp48805 to i32
-  %cond48807 = icmp ne i32 %bool48806, 0
-  br i1 %cond48807, label %match.body8180, label %match.test8181
+if.else8179:                                      ; preds = %if.end8165
+  br label %if.end8180
 
-match.body8180:                                   ; preds = %match.test8179
-  %load48808 = load %AstProgram, ptr %lowered_program, align 8
-  %call48809 = call ptr @mir_program(%AstProgram %load48808)
-  %mir = alloca ptr, align 8
-  store ptr %call48809, ptr %mir, align 8
-  %ifexpr48810 = alloca ptr, align 8
-  %load48811 = load i32, ptr %optimize_mir, align 4
-  %cmp48812 = icmp eq i32 %load48811, 1
+if.end8180:                                       ; preds = %if.else8179, %if.then8178
+  %load48787 = load %SemanticResult, ptr %semantic_result, align 8
+  %extract48788 = extractvalue %SemanticResult %load48787, 5
+  %infer_result = alloca %TypeInferResult, align 8
+  store %TypeInferResult %extract48788, ptr %infer_result, align 8
+  %load48789 = load ptr, ptr %mode, align 8
+  br label %match.test8182
+
+match.end8181:                                    ; preds = %match.test8186
+  %load48810 = load %TypeInferResult, ptr %infer_result, align 8
+  %extract48811 = extractvalue %TypeInferResult %load48810, 0
+  %cmp48812 = icmp eq i32 %extract48811, 0
   %bool48813 = zext i1 %cmp48812 to i32
   %cond48814 = icmp ne i32 %bool48813, 0
-  br i1 %cond48814, label %ifexpr.then8182, label %ifexpr.else8183
+  br i1 %cond48814, label %if.then8187, label %if.else8188
 
-match.test8181:                                   ; preds = %match.test8179
-  %strcmp48821 = call i32 @strcmp(ptr %load48802, ptr @.strlit48820)
-  %cmp48822 = icmp eq i32 %strcmp48821, 0
-  %bool48823 = zext i1 %cmp48822 to i32
-  %cond48824 = icmp ne i32 %bool48823, 0
-  br i1 %cond48824, label %match.body8185, label %match.test8186
+match.test8182:                                   ; preds = %if.end8180
+  %strcmp48791 = call i32 @strcmp(ptr %load48789, ptr @.strlit48790)
+  %cmp48792 = icmp eq i32 %strcmp48791, 0
+  %bool48793 = zext i1 %cmp48792 to i32
+  %cond48794 = icmp ne i32 %bool48793, 0
+  br i1 %cond48794, label %match.body8183, label %match.test8184
 
-ifexpr.then8182:                                  ; preds = %match.body8180
-  %load48815 = load ptr, ptr %mir, align 8
-  %call48816 = call ptr @mir_opt_program(ptr %load48815)
-  store ptr %call48816, ptr %ifexpr48810, align 8
-  br label %ifexpr.end8184
+match.body8183:                                   ; preds = %match.test8182
+  %load48795 = load %TypeInferResult, ptr %infer_result, align 8
+  %load48796 = load ptr, ptr %src, align 8
+  %load48797 = load ptr, ptr %filename, align 8
+  %call48798 = call ptr @typeck_result_debug(%TypeInferResult %load48795, ptr %load48796, ptr %load48797)
+  call void @info_print(ptr %call48798)
+  %call48799 = call ptr @mode_success()
+  ret ptr %call48799
 
-ifexpr.else8183:                                  ; preds = %match.body8180
-  %load48817 = load ptr, ptr %mir, align 8
-  store ptr %load48817, ptr %ifexpr48810, align 8
-  br label %ifexpr.end8184
+match.test8184:                                   ; preds = %match.test8182
+  %strcmp48801 = call i32 @strcmp(ptr %load48789, ptr @.strlit48800)
+  %cmp48802 = icmp eq i32 %strcmp48801, 0
+  %bool48803 = zext i1 %cmp48802 to i32
+  %cond48804 = icmp ne i32 %bool48803, 0
+  br i1 %cond48804, label %match.body8185, label %match.test8186
 
-ifexpr.end8184:                                   ; preds = %ifexpr.else8183, %ifexpr.then8182
-  %ifexprval48818 = load ptr, ptr %ifexpr48810, align 8
-  call void @info_print(ptr %ifexprval48818)
-  %call48819 = call ptr @mode_success()
+match.body8185:                                   ; preds = %match.test8184
+  %load48805 = load %TypeInferResult, ptr %infer_result, align 8
+  %load48806 = load ptr, ptr %src, align 8
+  %load48807 = load ptr, ptr %filename, align 8
+  %call48808 = call ptr @typeck_result_debug(%TypeInferResult %load48805, ptr %load48806, ptr %load48807)
+  call void @info_print(ptr %call48808)
+  %call48809 = call ptr @mode_success()
+  ret ptr %call48809
+
+match.test8186:                                   ; preds = %match.test8184
+  br label %match.end8181
+
+if.then8187:                                      ; preds = %match.end8181
+  %load48815 = load %TypeInferResult, ptr %infer_result, align 8
+  %load48816 = load ptr, ptr %src, align 8
+  %load48817 = load ptr, ptr %filename, align 8
+  %call48818 = call ptr @typeck_result_debug(%TypeInferResult %load48815, ptr %load48816, ptr %load48817)
+  call void @diag_print(ptr %call48818)
+  %call48819 = call ptr @mode_failure()
   ret ptr %call48819
 
-match.body8185:                                   ; preds = %match.test8181
-  %load48825 = load %AstProgram, ptr %lowered_program, align 8
-  %call48826 = call ptr @mir_program(%AstProgram %load48825)
-  %raw_mir = alloca ptr, align 8
-  store ptr %call48826, ptr %raw_mir, align 8
-  %ifexpr48827 = alloca ptr, align 8
-  %load48828 = load i32, ptr %optimize_mir, align 4
-  %cmp48829 = icmp eq i32 %load48828, 1
-  %bool48830 = zext i1 %cmp48829 to i32
-  %cond48831 = icmp ne i32 %bool48830, 0
-  br i1 %cond48831, label %ifexpr.then8187, label %ifexpr.else8188
+if.else8188:                                      ; preds = %match.end8181
+  br label %if.end8189
 
-match.test8186:                                   ; preds = %match.test8181
-  br label %match.end8178
+if.end8189:                                       ; preds = %if.else8188
+  %load48820 = load ptr, ptr %mode, align 8
+  %strcmp48822 = call i32 @strcmp(ptr %load48820, ptr @.strlit48821)
+  %cmp48823 = icmp eq i32 %strcmp48822, 0
+  %bool48824 = zext i1 %cmp48823 to i32
+  %cond48825 = icmp ne i32 %bool48824, 0
+  br i1 %cond48825, label %if.then8190, label %if.else8191
 
-ifexpr.then8187:                                  ; preds = %match.body8185
-  %load48832 = load ptr, ptr %raw_mir, align 8
-  %call48833 = call ptr @mir_opt_program(ptr %load48832)
-  store ptr %call48833, ptr %ifexpr48827, align 8
-  br label %ifexpr.end8189
+if.then8190:                                      ; preds = %if.end8189
+  %load48826 = load %AstProgram, ptr %lowered_program, align 8
+  %load48827 = load ptr, ptr %target_triple, align 8
+  %call48828 = call ptr @codegen_program_target(%AstProgram %load48826, ptr %load48827)
+  %ir = alloca ptr, align 8
+  store ptr %call48828, ptr %ir, align 8
+  %load48829 = load ptr, ptr %ir, align 8
+  call void @info_print(ptr %load48829)
+  %call48830 = call ptr @mode_success()
+  ret ptr %call48830
 
-ifexpr.else8188:                                  ; preds = %match.body8185
-  %load48834 = load ptr, ptr %raw_mir, align 8
-  store ptr %load48834, ptr %ifexpr48827, align 8
-  br label %ifexpr.end8189
+if.else8191:                                      ; preds = %if.end8189
+  br label %if.end8192
 
-ifexpr.end8189:                                   ; preds = %ifexpr.else8188, %ifexpr.then8187
-  %ifexprval48835 = load ptr, ptr %ifexpr48827, align 8
-  %mir1 = alloca ptr, align 8
-  store ptr %ifexprval48835, ptr %mir1, align 8
-  %load48836 = load ptr, ptr %mir1, align 8
-  %call48837 = call ptr @mir2asm_debug(ptr %load48836)
-  %asm = alloca ptr, align 8
-  store ptr %call48837, ptr %asm, align 8
-  %load48838 = load ptr, ptr %asm, align 8
-  call void @info_print(ptr %load48838)
-  %call48839 = call ptr @mode_success()
-  ret ptr %call48839
+if.end8192:                                       ; preds = %if.else8191
+  %load48831 = load ptr, ptr %mode, align 8
+  br label %match.test8194
 
-match.end8190:                                    ; preds = %match.test8193
-  %load48847 = load ptr, ptr %backend, align 8
-  %strcmp48849 = call i32 @strcmp(ptr %load48847, ptr @.strlit48848)
-  %cmp48850 = icmp eq i32 %strcmp48849, 0
-  %bool48851 = zext i1 %cmp48850 to i32
-  %cond48852 = icmp ne i32 %bool48851, 0
-  br i1 %cond48852, label %and.rhs, label %and.false
+match.end8193:                                    ; preds = %match.test8201
+  %load48869 = load ptr, ptr %mode, align 8
+  br label %match.test8206
 
-match.test8191:                                   ; preds = %match.end8178
-  %strcmp48842 = call i32 @strcmp(ptr %load48840, ptr @.strlit48841)
-  %cmp48843 = icmp eq i32 %strcmp48842, 0
-  %bool48844 = zext i1 %cmp48843 to i32
-  %cond48845 = icmp ne i32 %bool48844, 0
-  br i1 %cond48845, label %match.body8192, label %match.test8193
+match.test8194:                                   ; preds = %if.end8192
+  %strcmp48833 = call i32 @strcmp(ptr %load48831, ptr @.strlit48832)
+  %cmp48834 = icmp eq i32 %strcmp48833, 0
+  %bool48835 = zext i1 %cmp48834 to i32
+  %cond48836 = icmp ne i32 %bool48835, 0
+  br i1 %cond48836, label %match.body8195, label %match.test8196
 
-match.body8192:                                   ; preds = %match.test8191
-  %call48846 = call ptr @mode_success()
-  ret ptr %call48846
+match.body8195:                                   ; preds = %match.test8194
+  %load48837 = load %AstProgram, ptr %lowered_program, align 8
+  %call48838 = call ptr @mir_program(%AstProgram %load48837)
+  %mir = alloca ptr, align 8
+  store ptr %call48838, ptr %mir, align 8
+  %ifexpr48839 = alloca ptr, align 8
+  %load48840 = load i32, ptr %optimize_mir, align 4
+  %cmp48841 = icmp eq i32 %load48840, 1
+  %bool48842 = zext i1 %cmp48841 to i32
+  %cond48843 = icmp ne i32 %bool48842, 0
+  br i1 %cond48843, label %ifexpr.then8197, label %ifexpr.else8198
 
-match.test8193:                                   ; preds = %match.test8191
-  br label %match.end8190
+match.test8196:                                   ; preds = %match.test8194
+  %strcmp48850 = call i32 @strcmp(ptr %load48831, ptr @.strlit48849)
+  %cmp48851 = icmp eq i32 %strcmp48850, 0
+  %bool48852 = zext i1 %cmp48851 to i32
+  %cond48853 = icmp ne i32 %bool48852, 0
+  br i1 %cond48853, label %match.body8200, label %match.test8201
 
-if.then8194:                                      ; preds = %and.merge4
-  %load48873 = load %AstProgram, ptr %lowered_program, align 8
-  %call48874 = call ptr @mir_program(%AstProgram %load48873)
-  %raw_mir5 = alloca ptr, align 8
-  store ptr %call48874, ptr %raw_mir5, align 8
-  %ifexpr48875 = alloca ptr, align 8
-  %load48876 = load i32, ptr %optimize_mir, align 4
-  %cmp48877 = icmp eq i32 %load48876, 1
-  %bool48878 = zext i1 %cmp48877 to i32
-  %cond48879 = icmp ne i32 %bool48878, 0
-  br i1 %cond48879, label %ifexpr.then8197, label %ifexpr.else8198
-
-if.else8195:                                      ; preds = %and.merge4
-  br label %if.end8196
-
-if.end8196:                                       ; preds = %if.else8195
-  %load48990 = load %AstProgram, ptr %lowered_program, align 8
-  %load48991 = load ptr, ptr %target_triple, align 8
-  %call48992 = call ptr @codegen_program_target(%AstProgram %load48990, ptr %load48991)
-  %ir8 = alloca ptr, align 8
-  store ptr %call48992, ptr %ir8, align 8
-  %load48993 = load ptr, ptr %emit, align 8
-  %strcmp48995 = call i32 @strcmp(ptr %load48993, ptr @.strlit48994)
-  %cmp48996 = icmp eq i32 %strcmp48995, 0
-  %bool48997 = zext i1 %cmp48996 to i32
-  %cond48998 = icmp ne i32 %bool48997, 0
-  br i1 %cond48998, label %if.then8224, label %if.else8225
-
-and.rhs:                                          ; preds = %match.end8190
-  %load48853 = load ptr, ptr %emit, align 8
-  %strcmp48855 = call i32 @strcmp(ptr %load48853, ptr @.strlit48854)
-  %cmp48856 = icmp eq i32 %strcmp48855, 0
-  %bool48857 = zext i1 %cmp48856 to i32
-  %cmp48858 = icmp eq i32 %bool48857, 0
-  %bool48859 = zext i1 %cmp48858 to i32
-  %cond48860 = icmp ne i32 %bool48859, 0
-  br i1 %cond48860, label %and.merge, label %and.false
-
-and.false:                                        ; preds = %and.rhs, %match.end8190
-  br label %and.merge
-
-and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval48861 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond48862 = icmp ne i32 %andval48861, 0
-  br i1 %cond48862, label %and.rhs2, label %and.false3
-
-and.rhs2:                                         ; preds = %and.merge
-  %load48863 = load ptr, ptr %emit, align 8
-  %strcmp48865 = call i32 @strcmp(ptr %load48863, ptr @.strlit48864)
-  %cmp48866 = icmp eq i32 %strcmp48865, 0
-  %bool48867 = zext i1 %cmp48866 to i32
-  %cmp48868 = icmp eq i32 %bool48867, 0
-  %bool48869 = zext i1 %cmp48868 to i32
-  %cond48870 = icmp ne i32 %bool48869, 0
-  br i1 %cond48870, label %and.merge4, label %and.false3
-
-and.false3:                                       ; preds = %and.rhs2, %and.merge
-  br label %and.merge4
-
-and.merge4:                                       ; preds = %and.false3, %and.rhs2
-  %andval48871 = phi i32 [ 1, %and.rhs2 ], [ 0, %and.false3 ]
-  %cond48872 = icmp ne i32 %andval48871, 0
-  br i1 %cond48872, label %if.then8194, label %if.else8195
-
-ifexpr.then8197:                                  ; preds = %if.then8194
-  %load48880 = load ptr, ptr %raw_mir5, align 8
-  %call48881 = call ptr @mir_opt_program(ptr %load48880)
-  store ptr %call48881, ptr %ifexpr48875, align 8
+ifexpr.then8197:                                  ; preds = %match.body8195
+  %load48844 = load ptr, ptr %mir, align 8
+  %call48845 = call ptr @mir_opt_program(ptr %load48844)
+  store ptr %call48845, ptr %ifexpr48839, align 8
   br label %ifexpr.end8199
 
-ifexpr.else8198:                                  ; preds = %if.then8194
-  %load48882 = load ptr, ptr %raw_mir5, align 8
-  store ptr %load48882, ptr %ifexpr48875, align 8
+ifexpr.else8198:                                  ; preds = %match.body8195
+  %load48846 = load ptr, ptr %mir, align 8
+  store ptr %load48846, ptr %ifexpr48839, align 8
   br label %ifexpr.end8199
 
 ifexpr.end8199:                                   ; preds = %ifexpr.else8198, %ifexpr.then8197
-  %ifexprval48883 = load ptr, ptr %ifexpr48875, align 8
-  %mir6 = alloca ptr, align 8
-  store ptr %ifexprval48883, ptr %mir6, align 8
-  %load48884 = load ptr, ptr %mir6, align 8
-  %call48885 = call ptr @mir2asm(ptr %load48884)
-  %asm7 = alloca ptr, align 8
-  store ptr %call48885, ptr %asm7, align 8
-  %load48886 = load ptr, ptr %filename, align 8
-  %load48887 = load ptr, ptr %output, align 8
-  %load48888 = load ptr, ptr %emit, align 8
-  %call48889 = call ptr @artifact_output_path(ptr %load48886, ptr %load48887, ptr %load48888)
-  %artifact_path = alloca ptr, align 8
-  store ptr %call48889, ptr %artifact_path, align 8
-  %load48890 = load ptr, ptr %emit, align 8
-  %strcmp48892 = call i32 @strcmp(ptr %load48890, ptr @.strlit48891)
-  %cmp48893 = icmp eq i32 %strcmp48892, 0
-  %bool48894 = zext i1 %cmp48893 to i32
-  %cond48895 = icmp ne i32 %bool48894, 0
-  br i1 %cond48895, label %if.then8200, label %if.else8201
+  %ifexprval48847 = load ptr, ptr %ifexpr48839, align 8
+  call void @info_print(ptr %ifexprval48847)
+  %call48848 = call ptr @mode_success()
+  ret ptr %call48848
 
-if.then8200:                                      ; preds = %ifexpr.end8199
-  %load48896 = load ptr, ptr %artifact_path, align 8
-  %load48897 = load ptr, ptr %asm7, align 8
-  %call48898 = call i32 @write_text_file(ptr %load48896, ptr %load48897)
-  %cmp48899 = icmp ne i32 %call48898, 0
-  %bool48900 = zext i1 %cmp48899 to i32
-  %cond48901 = icmp ne i32 %bool48900, 0
-  br i1 %cond48901, label %if.then8203, label %if.else8204
+match.body8200:                                   ; preds = %match.test8196
+  %load48854 = load %AstProgram, ptr %lowered_program, align 8
+  %call48855 = call ptr @mir_program(%AstProgram %load48854)
+  %raw_mir = alloca ptr, align 8
+  store ptr %call48855, ptr %raw_mir, align 8
+  %ifexpr48856 = alloca ptr, align 8
+  %load48857 = load i32, ptr %optimize_mir, align 4
+  %cmp48858 = icmp eq i32 %load48857, 1
+  %bool48859 = zext i1 %cmp48858 to i32
+  %cond48860 = icmp ne i32 %bool48859, 0
+  br i1 %cond48860, label %ifexpr.then8202, label %ifexpr.else8203
 
-if.else8201:                                      ; preds = %ifexpr.end8199
-  br label %if.end8202
+match.test8201:                                   ; preds = %match.test8196
+  br label %match.end8193
 
-if.end8202:                                       ; preds = %if.else8201
-  %load48905 = load ptr, ptr %artifact_path, align 8
-  %call48907 = call ptr @vix_string_concat(ptr %load48905, ptr @.strlit48906)
-  %asm_path = alloca ptr, align 8
-  store ptr %call48907, ptr %asm_path, align 8
-  %ifexpr48908 = alloca ptr, align 8
-  %load48909 = load ptr, ptr %emit, align 8
-  %strcmp48911 = call i32 @strcmp(ptr %load48909, ptr @.strlit48910)
-  %cmp48912 = icmp eq i32 %strcmp48911, 0
-  %bool48913 = zext i1 %cmp48912 to i32
-  %cond48914 = icmp ne i32 %bool48913, 0
-  br i1 %cond48914, label %ifexpr.then8206, label %ifexpr.else8207
+ifexpr.then8202:                                  ; preds = %match.body8200
+  %load48861 = load ptr, ptr %raw_mir, align 8
+  %call48862 = call ptr @mir_opt_program(ptr %load48861)
+  store ptr %call48862, ptr %ifexpr48856, align 8
+  br label %ifexpr.end8204
 
-if.then8203:                                      ; preds = %if.then8200
-  %call48902 = call ptr @mode_failure()
-  ret ptr %call48902
+ifexpr.else8203:                                  ; preds = %match.body8200
+  %load48863 = load ptr, ptr %raw_mir, align 8
+  store ptr %load48863, ptr %ifexpr48856, align 8
+  br label %ifexpr.end8204
 
-if.else8204:                                      ; preds = %if.then8200
-  br label %if.end8205
+ifexpr.end8204:                                   ; preds = %ifexpr.else8203, %ifexpr.then8202
+  %ifexprval48864 = load ptr, ptr %ifexpr48856, align 8
+  %mir1 = alloca ptr, align 8
+  store ptr %ifexprval48864, ptr %mir1, align 8
+  %load48865 = load ptr, ptr %mir1, align 8
+  %call48866 = call ptr @mir2asm_debug(ptr %load48865)
+  %asm = alloca ptr, align 8
+  store ptr %call48866, ptr %asm, align 8
+  %load48867 = load ptr, ptr %asm, align 8
+  call void @info_print(ptr %load48867)
+  %call48868 = call ptr @mode_success()
+  ret ptr %call48868
 
-if.end8205:                                       ; preds = %if.else8204
-  %load48903 = load ptr, ptr %artifact_path, align 8
-  %10 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48903)
-  %call48904 = call ptr @mode_success()
-  ret ptr %call48904
+match.end8205:                                    ; preds = %match.test8208
+  %load48876 = load ptr, ptr %backend, align 8
+  %strcmp48878 = call i32 @strcmp(ptr %load48876, ptr @.strlit48877)
+  %cmp48879 = icmp eq i32 %strcmp48878, 0
+  %bool48880 = zext i1 %cmp48879 to i32
+  %cond48881 = icmp ne i32 %bool48880, 0
+  br i1 %cond48881, label %and.rhs, label %and.false
 
-ifexpr.then8206:                                  ; preds = %if.end8202
-  %load48915 = load ptr, ptr %artifact_path, align 8
-  store ptr %load48915, ptr %ifexpr48908, align 8
-  br label %ifexpr.end8208
+match.test8206:                                   ; preds = %match.end8193
+  %strcmp48871 = call i32 @strcmp(ptr %load48869, ptr @.strlit48870)
+  %cmp48872 = icmp eq i32 %strcmp48871, 0
+  %bool48873 = zext i1 %cmp48872 to i32
+  %cond48874 = icmp ne i32 %bool48873, 0
+  br i1 %cond48874, label %match.body8207, label %match.test8208
 
-ifexpr.else8207:                                  ; preds = %if.end8202
-  %load48916 = load ptr, ptr %artifact_path, align 8
-  %call48918 = call ptr @vix_string_concat(ptr %load48916, ptr @.strlit48917)
-  store ptr %call48918, ptr %ifexpr48908, align 8
-  br label %ifexpr.end8208
+match.body8207:                                   ; preds = %match.test8206
+  %call48875 = call ptr @mode_success()
+  ret ptr %call48875
 
-ifexpr.end8208:                                   ; preds = %ifexpr.else8207, %ifexpr.then8206
-  %ifexprval48919 = load ptr, ptr %ifexpr48908, align 8
-  %obj_path = alloca ptr, align 8
-  store ptr %ifexprval48919, ptr %obj_path, align 8
-  %load48920 = load ptr, ptr %asm_path, align 8
-  %load48921 = load ptr, ptr %asm7, align 8
-  %call48922 = call i32 @write_text_file(ptr %load48920, ptr %load48921)
-  %load48924 = load ptr, ptr %asm_path, align 8
-  %call48925 = call ptr @vix_string_concat(ptr @.strlit48923, ptr %load48924)
-  %call48927 = call ptr @vix_string_concat(ptr %call48925, ptr @.strlit48926)
-  %load48928 = load ptr, ptr %obj_path, align 8
-  %call48929 = call ptr @vix_string_concat(ptr %call48927, ptr %load48928)
-  %call48930 = call i32 @shell_command(ptr %call48929)
-  %asm_result = alloca i32, align 4
-  store i32 %call48930, ptr %asm_result, align 4
-  %load48931 = load ptr, ptr %asm_path, align 8
-  %call48932 = call i32 @delete_file(ptr %load48931)
-  %load48933 = load i32, ptr %asm_result, align 4
-  %cmp48934 = icmp ne i32 %load48933, 0
-  %bool48935 = zext i1 %cmp48934 to i32
-  %cond48936 = icmp ne i32 %bool48935, 0
-  br i1 %cond48936, label %if.then8209, label %if.else8210
+match.test8208:                                   ; preds = %match.test8206
+  br label %match.end8205
 
-if.then8209:                                      ; preds = %ifexpr.end8208
-  %load48938 = load ptr, ptr %obj_path, align 8
-  %call48939 = call ptr @vix_string_concat(ptr @.strlit48937, ptr %load48938)
-  %call48941 = call ptr @vix_string_concat(ptr %call48939, ptr @.strlit48940)
-  call void @diag_print(ptr %call48941)
-  %call48942 = call ptr @mode_failure()
-  ret ptr %call48942
+if.then8209:                                      ; preds = %and.merge4
+  %load48902 = load %AstProgram, ptr %lowered_program, align 8
+  %call48903 = call ptr @mir_program(%AstProgram %load48902)
+  %raw_mir5 = alloca ptr, align 8
+  store ptr %call48903, ptr %raw_mir5, align 8
+  %ifexpr48904 = alloca ptr, align 8
+  %load48905 = load i32, ptr %optimize_mir, align 4
+  %cmp48906 = icmp eq i32 %load48905, 1
+  %bool48907 = zext i1 %cmp48906 to i32
+  %cond48908 = icmp ne i32 %bool48907, 0
+  br i1 %cond48908, label %ifexpr.then8212, label %ifexpr.else8213
 
-if.else8210:                                      ; preds = %ifexpr.end8208
+if.else8210:                                      ; preds = %and.merge4
   br label %if.end8211
 
 if.end8211:                                       ; preds = %if.else8210
-  %load48943 = load ptr, ptr %emit, align 8
-  %strcmp48945 = call i32 @strcmp(ptr %load48943, ptr @.strlit48944)
-  %cmp48946 = icmp eq i32 %strcmp48945, 0
-  %bool48947 = zext i1 %cmp48946 to i32
-  %cond48948 = icmp ne i32 %bool48947, 0
-  br i1 %cond48948, label %if.then8212, label %if.else8213
-
-if.then8212:                                      ; preds = %if.end8211
-  %load48949 = load ptr, ptr %obj_path, align 8
-  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48949)
-  %call48950 = call ptr @mode_success()
-  ret ptr %call48950
-
-if.else8213:                                      ; preds = %if.end8211
-  br label %if.end8214
-
-if.end8214:                                       ; preds = %if.else8213
-  %ifexpr48951 = alloca i32, align 4
-  %load48952 = load i32, ptr %no_std, align 4
-  %cmp48953 = icmp eq i32 %load48952, 1
-  %bool48954 = zext i1 %cmp48953 to i32
-  %cond48955 = icmp ne i32 %bool48954, 0
-  br i1 %cond48955, label %ifexpr.then8215, label %ifexpr.else8216
-
-ifexpr.then8215:                                  ; preds = %if.end8214
-  %load48956 = load ptr, ptr %obj_path, align 8
-  %load48957 = load ptr, ptr %artifact_path, align 8
-  %load48958 = load ptr, ptr %link_args, align 8
-  %call48959 = call i32 @linker_link_executable_nostd(ptr %load48956, ptr %load48957, ptr %load48958)
-  store i32 %call48959, ptr %ifexpr48951, align 4
-  br label %ifexpr.end8217
-
-ifexpr.else8216:                                  ; preds = %if.end8214
-  %load48960 = load ptr, ptr %obj_path, align 8
-  %load48961 = load ptr, ptr %runtime_object, align 8
-  %load48962 = load ptr, ptr %artifact_path, align 8
-  %load48963 = load ptr, ptr %link_args, align 8
-  %call48964 = call i32 @linker_link_executable_std(ptr %load48960, ptr %load48961, ptr %load48962, ptr %load48963)
-  store i32 %call48964, ptr %ifexpr48951, align 4
-  br label %ifexpr.end8217
-
-ifexpr.end8217:                                   ; preds = %ifexpr.else8216, %ifexpr.then8215
-  %ifexprval48965 = load i32, ptr %ifexpr48951, align 4
-  %link_result = alloca i32, align 4
-  store i32 %ifexprval48965, ptr %link_result, align 4
-  %load48966 = load ptr, ptr %obj_path, align 8
-  %call48967 = call i32 @delete_file(ptr %load48966)
-  %load48968 = load i32, ptr %link_result, align 4
-  %cmp48969 = icmp ne i32 %load48968, 0
-  %bool48970 = zext i1 %cmp48969 to i32
-  %cond48971 = icmp ne i32 %bool48970, 0
-  br i1 %cond48971, label %if.then8218, label %if.else8219
-
-if.then8218:                                      ; preds = %ifexpr.end8217
-  %call48972 = call ptr @linker_last_error()
-  %link_err = alloca ptr, align 8
-  store ptr %call48972, ptr %link_err, align 8
-  %load48973 = load ptr, ptr %link_err, align 8
-  %strcmp48975 = call i32 @strcmp(ptr %load48973, ptr @.strlit48974)
-  %cmp48976 = icmp eq i32 %strcmp48975, 0
-  %bool48977 = zext i1 %cmp48976 to i32
-  %cmp48978 = icmp eq i32 %bool48977, 0
-  %bool48979 = zext i1 %cmp48978 to i32
-  %cond48980 = icmp ne i32 %bool48979, 0
-  br i1 %cond48980, label %if.then8221, label %if.else8222
-
-if.else8219:                                      ; preds = %ifexpr.end8217
-  br label %if.end8220
-
-if.end8220:                                       ; preds = %if.else8219
-  %load48988 = load ptr, ptr %artifact_path, align 8
-  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48988)
-  %call48989 = call ptr @mode_success()
-  ret ptr %call48989
-
-if.then8221:                                      ; preds = %if.then8218
-  %load48981 = load ptr, ptr %link_err, align 8
-  call void @diag_print(ptr %load48981)
-  br label %if.end8223
-
-if.else8222:                                      ; preds = %if.then8218
-  br label %if.end8223
-
-if.end8223:                                       ; preds = %if.else8222, %if.then8221
-  %load48983 = load ptr, ptr %artifact_path, align 8
-  %call48984 = call ptr @vix_string_concat(ptr @.strlit48982, ptr %load48983)
-  %call48986 = call ptr @vix_string_concat(ptr %call48984, ptr @.strlit48985)
-  call void @diag_print(ptr %call48986)
-  %call48987 = call ptr @mode_failure()
-  ret ptr %call48987
-
-if.then8224:                                      ; preds = %if.end8196
-  %load48999 = load ptr, ptr %ir8, align 8
-  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48999)
-  %call49000 = call ptr @mode_continue()
-  ret ptr %call49000
-
-if.else8225:                                      ; preds = %if.end8196
-  br label %if.end8226
-
-if.end8226:                                       ; preds = %if.else8225
-  %artifact_path9 = alloca ptr, align 8
-  store ptr @.strlit49001, ptr %artifact_path9, align 8
-  %ir_path = alloca ptr, align 8
-  store ptr @.strlit49002, ptr %ir_path, align 8
-  %load49003 = load ptr, ptr %emit, align 8
-  %strcmp49005 = call i32 @strcmp(ptr %load49003, ptr @.strlit49004)
-  %cmp49006 = icmp eq i32 %strcmp49005, 0
-  %bool49007 = zext i1 %cmp49006 to i32
-  %cond49008 = icmp ne i32 %bool49007, 0
-  br i1 %cond49008, label %if.then8227, label %if.else8228
-
-if.then8227:                                      ; preds = %if.end8226
-  %load49009 = load ptr, ptr %filename, align 8
-  %load49010 = load ptr, ptr %output, align 8
-  %call49011 = call ptr @ir_output_path(ptr %load49009, ptr %load49010)
-  store ptr %call49011, ptr %ir_path, align 8
-  br label %if.end8229
-
-if.else8228:                                      ; preds = %if.end8226
-  %load49012 = load ptr, ptr %filename, align 8
-  %load49013 = load ptr, ptr %output, align 8
-  %load49014 = load ptr, ptr %emit, align 8
-  %call49015 = call ptr @artifact_output_path(ptr %load49012, ptr %load49013, ptr %load49014)
-  store ptr %call49015, ptr %artifact_path9, align 8
-  %load49016 = load ptr, ptr %artifact_path9, align 8
-  %call49018 = call ptr @vix_string_concat(ptr %load49016, ptr @.strlit49017)
-  store ptr %call49018, ptr %ir_path, align 8
-  br label %if.end8229
-
-if.end8229:                                       ; preds = %if.else8228, %if.then8227
-  %load49019 = load ptr, ptr %ir_path, align 8
-  %load49020 = load ptr, ptr %ir8, align 8
-  %call49021 = call i32 @write_text_file(ptr %load49019, ptr %load49020)
+  %load49019 = load %AstProgram, ptr %lowered_program, align 8
+  %load49020 = load ptr, ptr %target_triple, align 8
+  %call49021 = call ptr @codegen_program_target(%AstProgram %load49019, ptr %load49020)
+  %ir8 = alloca ptr, align 8
+  store ptr %call49021, ptr %ir8, align 8
   %load49022 = load ptr, ptr %emit, align 8
   %strcmp49024 = call i32 @strcmp(ptr %load49022, ptr @.strlit49023)
   %cmp49025 = icmp eq i32 %strcmp49024, 0
   %bool49026 = zext i1 %cmp49025 to i32
   %cond49027 = icmp ne i32 %bool49026, 0
-  br i1 %cond49027, label %if.then8230, label %if.else8231
+  br i1 %cond49027, label %if.then8239, label %if.else8240
 
-if.then8230:                                      ; preds = %if.end8229
-  %load49028 = load ptr, ptr %ir_path, align 8
+and.rhs:                                          ; preds = %match.end8205
+  %load48882 = load ptr, ptr %emit, align 8
+  %strcmp48884 = call i32 @strcmp(ptr %load48882, ptr @.strlit48883)
+  %cmp48885 = icmp eq i32 %strcmp48884, 0
+  %bool48886 = zext i1 %cmp48885 to i32
+  %cmp48887 = icmp eq i32 %bool48886, 0
+  %bool48888 = zext i1 %cmp48887 to i32
+  %cond48889 = icmp ne i32 %bool48888, 0
+  br i1 %cond48889, label %and.merge, label %and.false
+
+and.false:                                        ; preds = %and.rhs, %match.end8205
+  br label %and.merge
+
+and.merge:                                        ; preds = %and.false, %and.rhs
+  %andval48890 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond48891 = icmp ne i32 %andval48890, 0
+  br i1 %cond48891, label %and.rhs2, label %and.false3
+
+and.rhs2:                                         ; preds = %and.merge
+  %load48892 = load ptr, ptr %emit, align 8
+  %strcmp48894 = call i32 @strcmp(ptr %load48892, ptr @.strlit48893)
+  %cmp48895 = icmp eq i32 %strcmp48894, 0
+  %bool48896 = zext i1 %cmp48895 to i32
+  %cmp48897 = icmp eq i32 %bool48896, 0
+  %bool48898 = zext i1 %cmp48897 to i32
+  %cond48899 = icmp ne i32 %bool48898, 0
+  br i1 %cond48899, label %and.merge4, label %and.false3
+
+and.false3:                                       ; preds = %and.rhs2, %and.merge
+  br label %and.merge4
+
+and.merge4:                                       ; preds = %and.false3, %and.rhs2
+  %andval48900 = phi i32 [ 1, %and.rhs2 ], [ 0, %and.false3 ]
+  %cond48901 = icmp ne i32 %andval48900, 0
+  br i1 %cond48901, label %if.then8209, label %if.else8210
+
+ifexpr.then8212:                                  ; preds = %if.then8209
+  %load48909 = load ptr, ptr %raw_mir5, align 8
+  %call48910 = call ptr @mir_opt_program(ptr %load48909)
+  store ptr %call48910, ptr %ifexpr48904, align 8
+  br label %ifexpr.end8214
+
+ifexpr.else8213:                                  ; preds = %if.then8209
+  %load48911 = load ptr, ptr %raw_mir5, align 8
+  store ptr %load48911, ptr %ifexpr48904, align 8
+  br label %ifexpr.end8214
+
+ifexpr.end8214:                                   ; preds = %ifexpr.else8213, %ifexpr.then8212
+  %ifexprval48912 = load ptr, ptr %ifexpr48904, align 8
+  %mir6 = alloca ptr, align 8
+  store ptr %ifexprval48912, ptr %mir6, align 8
+  %load48913 = load ptr, ptr %mir6, align 8
+  %call48914 = call ptr @mir2asm(ptr %load48913)
+  %asm7 = alloca ptr, align 8
+  store ptr %call48914, ptr %asm7, align 8
+  %load48915 = load ptr, ptr %filename, align 8
+  %load48916 = load ptr, ptr %output, align 8
+  %load48917 = load ptr, ptr %emit, align 8
+  %call48918 = call ptr @artifact_output_path(ptr %load48915, ptr %load48916, ptr %load48917)
+  %artifact_path = alloca ptr, align 8
+  store ptr %call48918, ptr %artifact_path, align 8
+  %load48919 = load ptr, ptr %emit, align 8
+  %strcmp48921 = call i32 @strcmp(ptr %load48919, ptr @.strlit48920)
+  %cmp48922 = icmp eq i32 %strcmp48921, 0
+  %bool48923 = zext i1 %cmp48922 to i32
+  %cond48924 = icmp ne i32 %bool48923, 0
+  br i1 %cond48924, label %if.then8215, label %if.else8216
+
+if.then8215:                                      ; preds = %ifexpr.end8214
+  %load48925 = load ptr, ptr %artifact_path, align 8
+  %load48926 = load ptr, ptr %asm7, align 8
+  %call48927 = call i32 @write_text_file(ptr %load48925, ptr %load48926)
+  %cmp48928 = icmp ne i32 %call48927, 0
+  %bool48929 = zext i1 %cmp48928 to i32
+  %cond48930 = icmp ne i32 %bool48929, 0
+  br i1 %cond48930, label %if.then8218, label %if.else8219
+
+if.else8216:                                      ; preds = %ifexpr.end8214
+  br label %if.end8217
+
+if.end8217:                                       ; preds = %if.else8216
+  %load48934 = load ptr, ptr %artifact_path, align 8
+  %call48936 = call ptr @vix_string_concat(ptr %load48934, ptr @.strlit48935)
+  %asm_path = alloca ptr, align 8
+  store ptr %call48936, ptr %asm_path, align 8
+  %ifexpr48937 = alloca ptr, align 8
+  %load48938 = load ptr, ptr %emit, align 8
+  %strcmp48940 = call i32 @strcmp(ptr %load48938, ptr @.strlit48939)
+  %cmp48941 = icmp eq i32 %strcmp48940, 0
+  %bool48942 = zext i1 %cmp48941 to i32
+  %cond48943 = icmp ne i32 %bool48942, 0
+  br i1 %cond48943, label %ifexpr.then8221, label %ifexpr.else8222
+
+if.then8218:                                      ; preds = %if.then8215
+  %call48931 = call ptr @mode_failure()
+  ret ptr %call48931
+
+if.else8219:                                      ; preds = %if.then8215
+  br label %if.end8220
+
+if.end8220:                                       ; preds = %if.else8219
+  %load48932 = load ptr, ptr %artifact_path, align 8
+  %11 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48932)
+  %call48933 = call ptr @mode_success()
+  ret ptr %call48933
+
+ifexpr.then8221:                                  ; preds = %if.end8217
+  %load48944 = load ptr, ptr %artifact_path, align 8
+  store ptr %load48944, ptr %ifexpr48937, align 8
+  br label %ifexpr.end8223
+
+ifexpr.else8222:                                  ; preds = %if.end8217
+  %load48945 = load ptr, ptr %artifact_path, align 8
+  %call48947 = call ptr @vix_string_concat(ptr %load48945, ptr @.strlit48946)
+  store ptr %call48947, ptr %ifexpr48937, align 8
+  br label %ifexpr.end8223
+
+ifexpr.end8223:                                   ; preds = %ifexpr.else8222, %ifexpr.then8221
+  %ifexprval48948 = load ptr, ptr %ifexpr48937, align 8
+  %obj_path = alloca ptr, align 8
+  store ptr %ifexprval48948, ptr %obj_path, align 8
+  %load48949 = load ptr, ptr %asm_path, align 8
+  %load48950 = load ptr, ptr %asm7, align 8
+  %call48951 = call i32 @write_text_file(ptr %load48949, ptr %load48950)
+  %load48953 = load ptr, ptr %asm_path, align 8
+  %call48954 = call ptr @vix_string_concat(ptr @.strlit48952, ptr %load48953)
+  %call48956 = call ptr @vix_string_concat(ptr %call48954, ptr @.strlit48955)
+  %load48957 = load ptr, ptr %obj_path, align 8
+  %call48958 = call ptr @vix_string_concat(ptr %call48956, ptr %load48957)
+  %call48959 = call i32 @shell_command(ptr %call48958)
+  %asm_result = alloca i32, align 4
+  store i32 %call48959, ptr %asm_result, align 4
+  %load48960 = load ptr, ptr %asm_path, align 8
+  %call48961 = call i32 @delete_file(ptr %load48960)
+  %load48962 = load i32, ptr %asm_result, align 4
+  %cmp48963 = icmp ne i32 %load48962, 0
+  %bool48964 = zext i1 %cmp48963 to i32
+  %cond48965 = icmp ne i32 %bool48964, 0
+  br i1 %cond48965, label %if.then8224, label %if.else8225
+
+if.then8224:                                      ; preds = %ifexpr.end8223
+  %load48967 = load ptr, ptr %obj_path, align 8
+  %call48968 = call ptr @vix_string_concat(ptr @.strlit48966, ptr %load48967)
+  %call48970 = call ptr @vix_string_concat(ptr %call48968, ptr @.strlit48969)
+  call void @diag_print(ptr %call48970)
+  %call48971 = call ptr @mode_failure()
+  ret ptr %call48971
+
+if.else8225:                                      ; preds = %ifexpr.end8223
+  br label %if.end8226
+
+if.end8226:                                       ; preds = %if.else8225
+  %load48972 = load ptr, ptr %emit, align 8
+  %strcmp48974 = call i32 @strcmp(ptr %load48972, ptr @.strlit48973)
+  %cmp48975 = icmp eq i32 %strcmp48974, 0
+  %bool48976 = zext i1 %cmp48975 to i32
+  %cond48977 = icmp ne i32 %bool48976, 0
+  br i1 %cond48977, label %if.then8227, label %if.else8228
+
+if.then8227:                                      ; preds = %if.end8226
+  %load48978 = load ptr, ptr %obj_path, align 8
+  %12 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load48978)
+  %call48979 = call ptr @mode_success()
+  ret ptr %call48979
+
+if.else8228:                                      ; preds = %if.end8226
+  br label %if.end8229
+
+if.end8229:                                       ; preds = %if.else8228
+  %ifexpr48980 = alloca i32, align 4
+  %load48981 = load i32, ptr %no_std, align 4
+  %cmp48982 = icmp eq i32 %load48981, 1
+  %bool48983 = zext i1 %cmp48982 to i32
+  %cond48984 = icmp ne i32 %bool48983, 0
+  br i1 %cond48984, label %ifexpr.then8230, label %ifexpr.else8231
+
+ifexpr.then8230:                                  ; preds = %if.end8229
+  %load48985 = load ptr, ptr %obj_path, align 8
+  %load48986 = load ptr, ptr %artifact_path, align 8
+  %load48987 = load ptr, ptr %link_args, align 8
+  %call48988 = call i32 @linker_link_executable_nostd(ptr %load48985, ptr %load48986, ptr %load48987)
+  store i32 %call48988, ptr %ifexpr48980, align 4
+  br label %ifexpr.end8232
+
+ifexpr.else8231:                                  ; preds = %if.end8229
+  %load48989 = load ptr, ptr %obj_path, align 8
+  %load48990 = load ptr, ptr %runtime_object, align 8
+  %load48991 = load ptr, ptr %artifact_path, align 8
+  %load48992 = load ptr, ptr %link_args, align 8
+  %call48993 = call i32 @linker_link_executable_std(ptr %load48989, ptr %load48990, ptr %load48991, ptr %load48992)
+  store i32 %call48993, ptr %ifexpr48980, align 4
+  br label %ifexpr.end8232
+
+ifexpr.end8232:                                   ; preds = %ifexpr.else8231, %ifexpr.then8230
+  %ifexprval48994 = load i32, ptr %ifexpr48980, align 4
+  %link_result = alloca i32, align 4
+  store i32 %ifexprval48994, ptr %link_result, align 4
+  %load48995 = load ptr, ptr %obj_path, align 8
+  %call48996 = call i32 @delete_file(ptr %load48995)
+  %load48997 = load i32, ptr %link_result, align 4
+  %cmp48998 = icmp ne i32 %load48997, 0
+  %bool48999 = zext i1 %cmp48998 to i32
+  %cond49000 = icmp ne i32 %bool48999, 0
+  br i1 %cond49000, label %if.then8233, label %if.else8234
+
+if.then8233:                                      ; preds = %ifexpr.end8232
+  %call49001 = call ptr @linker_last_error()
+  %link_err = alloca ptr, align 8
+  store ptr %call49001, ptr %link_err, align 8
+  %load49002 = load ptr, ptr %link_err, align 8
+  %strcmp49004 = call i32 @strcmp(ptr %load49002, ptr @.strlit49003)
+  %cmp49005 = icmp eq i32 %strcmp49004, 0
+  %bool49006 = zext i1 %cmp49005 to i32
+  %cmp49007 = icmp eq i32 %bool49006, 0
+  %bool49008 = zext i1 %cmp49007 to i32
+  %cond49009 = icmp ne i32 %bool49008, 0
+  br i1 %cond49009, label %if.then8236, label %if.else8237
+
+if.else8234:                                      ; preds = %ifexpr.end8232
+  br label %if.end8235
+
+if.end8235:                                       ; preds = %if.else8234
+  %load49017 = load ptr, ptr %artifact_path, align 8
+  %13 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load49017)
+  %call49018 = call ptr @mode_success()
+  ret ptr %call49018
+
+if.then8236:                                      ; preds = %if.then8233
+  %load49010 = load ptr, ptr %link_err, align 8
+  call void @diag_print(ptr %load49010)
+  br label %if.end8238
+
+if.else8237:                                      ; preds = %if.then8233
+  br label %if.end8238
+
+if.end8238:                                       ; preds = %if.else8237, %if.then8236
+  %load49012 = load ptr, ptr %artifact_path, align 8
+  %call49013 = call ptr @vix_string_concat(ptr @.strlit49011, ptr %load49012)
+  %call49015 = call ptr @vix_string_concat(ptr %call49013, ptr @.strlit49014)
+  call void @diag_print(ptr %call49015)
+  %call49016 = call ptr @mode_failure()
+  ret ptr %call49016
+
+if.then8239:                                      ; preds = %if.end8211
+  %load49028 = load ptr, ptr %ir8, align 8
   %14 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load49028)
-  %call49029 = call ptr @mode_success()
+  %call49029 = call ptr @mode_continue()
   ret ptr %call49029
 
-if.else8231:                                      ; preds = %if.end8229
-  br label %if.end8232
-
-if.end8232:                                       ; preds = %if.else8231
-  %load49030 = load ptr, ptr %artifact_path9, align 8
-  %strcmp49032 = call i32 @strcmp(ptr %load49030, ptr @.strlit49031)
-  %cmp49033 = icmp eq i32 %strcmp49032, 0
-  %bool49034 = zext i1 %cmp49033 to i32
-  %cond49035 = icmp ne i32 %bool49034, 0
-  br i1 %cond49035, label %if.then8233, label %if.else8234
-
-if.then8233:                                      ; preds = %if.end8232
-  %load49036 = load ptr, ptr %filename, align 8
-  %load49037 = load ptr, ptr %output, align 8
-  %load49038 = load ptr, ptr %emit, align 8
-  %call49039 = call ptr @artifact_output_path(ptr %load49036, ptr %load49037, ptr %load49038)
-  store ptr %call49039, ptr %artifact_path9, align 8
-  br label %if.end8235
-
-if.else8234:                                      ; preds = %if.end8232
-  br label %if.end8235
-
-if.end8235:                                       ; preds = %if.else8234, %if.then8233
-  %build_result = alloca i32, align 4
-  store i32 0, ptr %build_result, align 4
-  %load49040 = load ptr, ptr %emit, align 8
-  %strcmp49042 = call i32 @strcmp(ptr %load49040, ptr @.strlit49041)
-  %cmp49043 = icmp eq i32 %strcmp49042, 0
-  %bool49044 = zext i1 %cmp49043 to i32
-  %cond49045 = icmp ne i32 %bool49044, 0
-  br i1 %cond49045, label %if.then8236, label %if.else8237
-
-if.then8236:                                      ; preds = %if.end8235
-  %load49046 = load ptr, ptr %ir_path, align 8
-  %load49047 = load ptr, ptr %artifact_path9, align 8
-  %load49048 = load ptr, ptr %target_triple, align 8
-  %call49049 = call i32 @llc_compile_asm(ptr %load49046, ptr %load49047, ptr %load49048)
-  store i32 %call49049, ptr %build_result, align 4
-  br label %if.end8238
-
-if.else8237:                                      ; preds = %if.end8235
-  %load49050 = load ptr, ptr %emit, align 8
-  %strcmp49052 = call i32 @strcmp(ptr %load49050, ptr @.strlit49051)
-  %cmp49053 = icmp eq i32 %strcmp49052, 0
-  %bool49054 = zext i1 %cmp49053 to i32
-  %cond49055 = icmp ne i32 %bool49054, 0
-  br i1 %cond49055, label %if.then8239, label %if.else8240
-
-if.end8238:                                       ; preds = %if.end8241, %if.then8236
-  %load49088 = load ptr, ptr %emit, align 8
-  %strcmp49090 = call i32 @strcmp(ptr %load49088, ptr @.strlit49089)
-  %cmp49091 = icmp eq i32 %strcmp49090, 0
-  %bool49092 = zext i1 %cmp49091 to i32
-  %cmp49093 = icmp eq i32 %bool49092, 0
-  %bool49094 = zext i1 %cmp49093 to i32
-  %cond49095 = icmp ne i32 %bool49094, 0
-  br i1 %cond49095, label %if.then8248, label %if.else8249
-
-if.then8239:                                      ; preds = %if.else8237
-  %load49056 = load ptr, ptr %ir_path, align 8
-  %load49057 = load ptr, ptr %artifact_path9, align 8
-  %load49058 = load ptr, ptr %target_triple, align 8
-  %call49059 = call i32 @llc_compile_object(ptr %load49056, ptr %load49057, ptr %load49058)
-  store i32 %call49059, ptr %build_result, align 4
+if.else8240:                                      ; preds = %if.end8211
   br label %if.end8241
 
-if.else8240:                                      ; preds = %if.else8237
-  %load49060 = load ptr, ptr %artifact_path9, align 8
-  %call49062 = call ptr @vix_string_concat(ptr %load49060, ptr @.strlit49061)
-  %obj_path10 = alloca ptr, align 8
-  store ptr %call49062, ptr %obj_path10, align 8
+if.end8241:                                       ; preds = %if.else8240
+  %artifact_path9 = alloca ptr, align 8
+  store ptr @.strlit49030, ptr %artifact_path9, align 8
+  %raw_ir_path = alloca ptr, align 8
+  store ptr @.strlit49031, ptr %raw_ir_path, align 8
+  %ir_path = alloca ptr, align 8
+  store ptr @.strlit49032, ptr %ir_path, align 8
+  %load49033 = load ptr, ptr %emit, align 8
+  %strcmp49035 = call i32 @strcmp(ptr %load49033, ptr @.strlit49034)
+  %cmp49036 = icmp eq i32 %strcmp49035, 0
+  %bool49037 = zext i1 %cmp49036 to i32
+  %cond49038 = icmp ne i32 %bool49037, 0
+  br i1 %cond49038, label %if.then8242, label %if.else8243
+
+if.then8242:                                      ; preds = %if.end8241
+  %load49039 = load ptr, ptr %filename, align 8
+  %load49040 = load ptr, ptr %output, align 8
+  %call49041 = call ptr @ir_output_path(ptr %load49039, ptr %load49040)
+  store ptr %call49041, ptr %ir_path, align 8
+  %load49042 = load ptr, ptr %ir_path, align 8
+  %call49044 = call ptr @vix_string_concat(ptr %load49042, ptr @.strlit49043)
+  store ptr %call49044, ptr %raw_ir_path, align 8
+  br label %if.end8244
+
+if.else8243:                                      ; preds = %if.end8241
+  %load49045 = load ptr, ptr %filename, align 8
+  %load49046 = load ptr, ptr %output, align 8
+  %load49047 = load ptr, ptr %emit, align 8
+  %call49048 = call ptr @artifact_output_path(ptr %load49045, ptr %load49046, ptr %load49047)
+  store ptr %call49048, ptr %artifact_path9, align 8
+  %load49049 = load ptr, ptr %artifact_path9, align 8
+  %call49051 = call ptr @vix_string_concat(ptr %load49049, ptr @.strlit49050)
+  store ptr %call49051, ptr %raw_ir_path, align 8
+  %load49052 = load ptr, ptr %artifact_path9, align 8
+  %call49054 = call ptr @vix_string_concat(ptr %load49052, ptr @.strlit49053)
+  store ptr %call49054, ptr %ir_path, align 8
+  br label %if.end8244
+
+if.end8244:                                       ; preds = %if.else8243, %if.then8242
+  %load49055 = load ptr, ptr %raw_ir_path, align 8
+  %load49056 = load ptr, ptr %ir8, align 8
+  %call49057 = call i32 @write_text_file(ptr %load49055, ptr %load49056)
+  %cmp49058 = icmp ne i32 %call49057, 0
+  %bool49059 = zext i1 %cmp49058 to i32
+  %cond49060 = icmp ne i32 %bool49059, 0
+  br i1 %cond49060, label %if.then8245, label %if.else8246
+
+if.then8245:                                      ; preds = %if.end8244
+  %call49061 = call ptr @mode_failure()
+  ret ptr %call49061
+
+if.else8246:                                      ; preds = %if.end8244
+  br label %if.end8247
+
+if.end8247:                                       ; preds = %if.else8246
+  %load49062 = load ptr, ptr %raw_ir_path, align 8
   %load49063 = load ptr, ptr %ir_path, align 8
-  %load49064 = load ptr, ptr %obj_path10, align 8
-  %load49065 = load ptr, ptr %target_triple, align 8
-  %call49066 = call i32 @llc_compile_object(ptr %load49063, ptr %load49064, ptr %load49065)
-  store i32 %call49066, ptr %build_result, align 4
-  %load49067 = load i32, ptr %build_result, align 4
-  %cmp49068 = icmp eq i32 %load49067, 0
-  %bool49069 = zext i1 %cmp49068 to i32
-  %cond49070 = icmp ne i32 %bool49069, 0
-  br i1 %cond49070, label %if.then8242, label %if.else8243
+  %load49064 = load ptr, ptr %target_triple, align 8
+  %load49065 = load i32, ptr %opt_level, align 4
+  %call49066 = call i32 @passes_optimize_ir(ptr %load49062, ptr %load49063, ptr %load49064, i32 %load49065)
+  %pass_result = alloca i32, align 4
+  store i32 %call49066, ptr %pass_result, align 4
+  %load49067 = load ptr, ptr %raw_ir_path, align 8
+  %call49068 = call i32 @delete_file(ptr %load49067)
+  %load49069 = load i32, ptr %pass_result, align 4
+  %cmp49070 = icmp ne i32 %load49069, 0
+  %bool49071 = zext i1 %cmp49070 to i32
+  %cond49072 = icmp ne i32 %bool49071, 0
+  br i1 %cond49072, label %if.then8248, label %if.else8249
 
-if.end8241:                                       ; preds = %if.end8244, %if.then8239
-  br label %if.end8238
+if.then8248:                                      ; preds = %if.end8247
+  %call49073 = call ptr @passes_last_error()
+  %pass_err = alloca ptr, align 8
+  store ptr %call49073, ptr %pass_err, align 8
+  %load49074 = load ptr, ptr %pass_err, align 8
+  %strcmp49076 = call i32 @strcmp(ptr %load49074, ptr @.strlit49075)
+  %cmp49077 = icmp eq i32 %strcmp49076, 0
+  %bool49078 = zext i1 %cmp49077 to i32
+  %cmp49079 = icmp eq i32 %bool49078, 0
+  %bool49080 = zext i1 %cmp49079 to i32
+  %cond49081 = icmp ne i32 %bool49080, 0
+  br i1 %cond49081, label %if.then8251, label %if.else8252
 
-if.then8242:                                      ; preds = %if.else8240
-  %ifexpr49071 = alloca i32, align 4
-  %load49072 = load i32, ptr %no_std, align 4
-  %cmp49073 = icmp eq i32 %load49072, 1
-  %bool49074 = zext i1 %cmp49073 to i32
-  %cond49075 = icmp ne i32 %bool49074, 0
-  br i1 %cond49075, label %ifexpr.then8245, label %ifexpr.else8246
-
-if.else8243:                                      ; preds = %if.else8240
-  br label %if.end8244
-
-if.end8244:                                       ; preds = %if.else8243, %ifexpr.end8247
-  %load49086 = load ptr, ptr %obj_path10, align 8
-  %call49087 = call i32 @delete_file(ptr %load49086)
-  br label %if.end8241
-
-ifexpr.then8245:                                  ; preds = %if.then8242
-  %load49076 = load ptr, ptr %obj_path10, align 8
-  %load49077 = load ptr, ptr %artifact_path9, align 8
-  %load49078 = load ptr, ptr %link_args, align 8
-  %call49079 = call i32 @linker_link_executable_nostd(ptr %load49076, ptr %load49077, ptr %load49078)
-  store i32 %call49079, ptr %ifexpr49071, align 4
-  br label %ifexpr.end8247
-
-ifexpr.else8246:                                  ; preds = %if.then8242
-  %load49080 = load ptr, ptr %obj_path10, align 8
-  %load49081 = load ptr, ptr %runtime_object, align 8
-  %load49082 = load ptr, ptr %artifact_path9, align 8
-  %load49083 = load ptr, ptr %link_args, align 8
-  %call49084 = call i32 @linker_link_executable_std(ptr %load49080, ptr %load49081, ptr %load49082, ptr %load49083)
-  store i32 %call49084, ptr %ifexpr49071, align 4
-  br label %ifexpr.end8247
-
-ifexpr.end8247:                                   ; preds = %ifexpr.else8246, %ifexpr.then8245
-  %ifexprval49085 = load i32, ptr %ifexpr49071, align 4
-  store i32 %ifexprval49085, ptr %build_result, align 4
-  br label %if.end8244
-
-if.then8248:                                      ; preds = %if.end8238
-  %load49096 = load ptr, ptr %ir_path, align 8
-  %call49097 = call i32 @delete_file(ptr %load49096)
+if.else8249:                                      ; preds = %if.end8247
   br label %if.end8250
 
-if.else8249:                                      ; preds = %if.end8238
-  br label %if.end8250
+if.end8250:                                       ; preds = %if.else8249
+  %load49089 = load ptr, ptr %emit, align 8
+  %strcmp49091 = call i32 @strcmp(ptr %load49089, ptr @.strlit49090)
+  %cmp49092 = icmp eq i32 %strcmp49091, 0
+  %bool49093 = zext i1 %cmp49092 to i32
+  %cond49094 = icmp ne i32 %bool49093, 0
+  br i1 %cond49094, label %if.then8254, label %if.else8255
 
-if.end8250:                                       ; preds = %if.else8249, %if.then8248
-  %load49098 = load i32, ptr %build_result, align 4
-  %cmp49099 = icmp ne i32 %load49098, 0
-  %bool49100 = zext i1 %cmp49099 to i32
-  %cond49101 = icmp ne i32 %bool49100, 0
-  br i1 %cond49101, label %if.then8251, label %if.else8252
-
-if.then8251:                                      ; preds = %if.end8250
-  %call49102 = call ptr @llc_last_error()
-  %llc_err = alloca ptr, align 8
-  store ptr %call49102, ptr %llc_err, align 8
-  %call49103 = call ptr @linker_last_error()
-  %link_err11 = alloca ptr, align 8
-  store ptr %call49103, ptr %link_err11, align 8
-  %load49104 = load ptr, ptr %llc_err, align 8
-  %strcmp49106 = call i32 @strcmp(ptr %load49104, ptr @.strlit49105)
-  %cmp49107 = icmp eq i32 %strcmp49106, 0
-  %bool49108 = zext i1 %cmp49107 to i32
-  %cmp49109 = icmp eq i32 %bool49108, 0
-  %bool49110 = zext i1 %cmp49109 to i32
-  %cond49111 = icmp ne i32 %bool49110, 0
-  br i1 %cond49111, label %if.then8254, label %if.else8255
-
-if.else8252:                                      ; preds = %if.end8250
+if.then8251:                                      ; preds = %if.then8248
+  %load49082 = load ptr, ptr %pass_err, align 8
+  call void @diag_print(ptr %load49082)
   br label %if.end8253
 
-if.end8253:                                       ; preds = %if.else8252
-  %load49128 = load ptr, ptr %artifact_path9, align 8
-  %15 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load49128)
-  %call49129 = call ptr @mode_success()
-  ret ptr %call49129
+if.else8252:                                      ; preds = %if.then8248
+  br label %if.end8253
 
-if.then8254:                                      ; preds = %if.then8251
-  %load49112 = load ptr, ptr %llc_err, align 8
-  call void @diag_print(ptr %load49112)
+if.end8253:                                       ; preds = %if.else8252, %if.then8251
+  %load49084 = load ptr, ptr %ir_path, align 8
+  %call49085 = call ptr @vix_string_concat(ptr @.strlit49083, ptr %load49084)
+  %call49087 = call ptr @vix_string_concat(ptr %call49085, ptr @.strlit49086)
+  call void @diag_print(ptr %call49087)
+  %call49088 = call ptr @mode_failure()
+  ret ptr %call49088
+
+if.then8254:                                      ; preds = %if.end8250
+  %load49095 = load ptr, ptr %ir_path, align 8
+  %15 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load49095)
+  %call49096 = call ptr @mode_success()
+  ret ptr %call49096
+
+if.else8255:                                      ; preds = %if.end8250
   br label %if.end8256
 
-if.else8255:                                      ; preds = %if.then8251
-  br label %if.end8256
-
-if.end8256:                                       ; preds = %if.else8255, %if.then8254
-  %load49113 = load ptr, ptr %link_err11, align 8
-  %strcmp49115 = call i32 @strcmp(ptr %load49113, ptr @.strlit49114)
-  %cmp49116 = icmp eq i32 %strcmp49115, 0
-  %bool49117 = zext i1 %cmp49116 to i32
-  %cmp49118 = icmp eq i32 %bool49117, 0
-  %bool49119 = zext i1 %cmp49118 to i32
-  %cond49120 = icmp ne i32 %bool49119, 0
-  br i1 %cond49120, label %if.then8257, label %if.else8258
+if.end8256:                                       ; preds = %if.else8255
+  %load49097 = load ptr, ptr %artifact_path9, align 8
+  %strcmp49099 = call i32 @strcmp(ptr %load49097, ptr @.strlit49098)
+  %cmp49100 = icmp eq i32 %strcmp49099, 0
+  %bool49101 = zext i1 %cmp49100 to i32
+  %cond49102 = icmp ne i32 %bool49101, 0
+  br i1 %cond49102, label %if.then8257, label %if.else8258
 
 if.then8257:                                      ; preds = %if.end8256
-  %load49121 = load ptr, ptr %link_err11, align 8
-  call void @diag_print(ptr %load49121)
+  %load49103 = load ptr, ptr %filename, align 8
+  %load49104 = load ptr, ptr %output, align 8
+  %load49105 = load ptr, ptr %emit, align 8
+  %call49106 = call ptr @artifact_output_path(ptr %load49103, ptr %load49104, ptr %load49105)
+  store ptr %call49106, ptr %artifact_path9, align 8
   br label %if.end8259
 
 if.else8258:                                      ; preds = %if.end8256
   br label %if.end8259
 
 if.end8259:                                       ; preds = %if.else8258, %if.then8257
-  %load49123 = load ptr, ptr %artifact_path9, align 8
-  %call49124 = call ptr @vix_string_concat(ptr @.strlit49122, ptr %load49123)
-  %call49126 = call ptr @vix_string_concat(ptr %call49124, ptr @.strlit49125)
-  call void @diag_print(ptr %call49126)
-  %call49127 = call ptr @mode_failure()
-  ret ptr %call49127
+  %build_result = alloca i32, align 4
+  store i32 0, ptr %build_result, align 4
+  %load49107 = load ptr, ptr %emit, align 8
+  %strcmp49109 = call i32 @strcmp(ptr %load49107, ptr @.strlit49108)
+  %cmp49110 = icmp eq i32 %strcmp49109, 0
+  %bool49111 = zext i1 %cmp49110 to i32
+  %cond49112 = icmp ne i32 %bool49111, 0
+  br i1 %cond49112, label %if.then8260, label %if.else8261
+
+if.then8260:                                      ; preds = %if.end8259
+  %load49113 = load ptr, ptr %ir_path, align 8
+  %load49114 = load ptr, ptr %artifact_path9, align 8
+  %load49115 = load ptr, ptr %target_triple, align 8
+  %call49116 = call i32 @llc_compile_asm(ptr %load49113, ptr %load49114, ptr %load49115)
+  store i32 %call49116, ptr %build_result, align 4
+  br label %if.end8262
+
+if.else8261:                                      ; preds = %if.end8259
+  %load49117 = load ptr, ptr %emit, align 8
+  %strcmp49119 = call i32 @strcmp(ptr %load49117, ptr @.strlit49118)
+  %cmp49120 = icmp eq i32 %strcmp49119, 0
+  %bool49121 = zext i1 %cmp49120 to i32
+  %cond49122 = icmp ne i32 %bool49121, 0
+  br i1 %cond49122, label %if.then8263, label %if.else8264
+
+if.end8262:                                       ; preds = %if.end8265, %if.then8260
+  %load49155 = load ptr, ptr %emit, align 8
+  %strcmp49157 = call i32 @strcmp(ptr %load49155, ptr @.strlit49156)
+  %cmp49158 = icmp eq i32 %strcmp49157, 0
+  %bool49159 = zext i1 %cmp49158 to i32
+  %cmp49160 = icmp eq i32 %bool49159, 0
+  %bool49161 = zext i1 %cmp49160 to i32
+  %cond49162 = icmp ne i32 %bool49161, 0
+  br i1 %cond49162, label %if.then8272, label %if.else8273
+
+if.then8263:                                      ; preds = %if.else8261
+  %load49123 = load ptr, ptr %ir_path, align 8
+  %load49124 = load ptr, ptr %artifact_path9, align 8
+  %load49125 = load ptr, ptr %target_triple, align 8
+  %call49126 = call i32 @llc_compile_object(ptr %load49123, ptr %load49124, ptr %load49125)
+  store i32 %call49126, ptr %build_result, align 4
+  br label %if.end8265
+
+if.else8264:                                      ; preds = %if.else8261
+  %load49127 = load ptr, ptr %artifact_path9, align 8
+  %call49129 = call ptr @vix_string_concat(ptr %load49127, ptr @.strlit49128)
+  %obj_path10 = alloca ptr, align 8
+  store ptr %call49129, ptr %obj_path10, align 8
+  %load49130 = load ptr, ptr %ir_path, align 8
+  %load49131 = load ptr, ptr %obj_path10, align 8
+  %load49132 = load ptr, ptr %target_triple, align 8
+  %call49133 = call i32 @llc_compile_object(ptr %load49130, ptr %load49131, ptr %load49132)
+  store i32 %call49133, ptr %build_result, align 4
+  %load49134 = load i32, ptr %build_result, align 4
+  %cmp49135 = icmp eq i32 %load49134, 0
+  %bool49136 = zext i1 %cmp49135 to i32
+  %cond49137 = icmp ne i32 %bool49136, 0
+  br i1 %cond49137, label %if.then8266, label %if.else8267
+
+if.end8265:                                       ; preds = %if.end8268, %if.then8263
+  br label %if.end8262
+
+if.then8266:                                      ; preds = %if.else8264
+  %ifexpr49138 = alloca i32, align 4
+  %load49139 = load i32, ptr %no_std, align 4
+  %cmp49140 = icmp eq i32 %load49139, 1
+  %bool49141 = zext i1 %cmp49140 to i32
+  %cond49142 = icmp ne i32 %bool49141, 0
+  br i1 %cond49142, label %ifexpr.then8269, label %ifexpr.else8270
+
+if.else8267:                                      ; preds = %if.else8264
+  br label %if.end8268
+
+if.end8268:                                       ; preds = %ifexpr.end8271, %if.else8267
+  %load49153 = load ptr, ptr %obj_path10, align 8
+  %call49154 = call i32 @delete_file(ptr %load49153)
+  br label %if.end8265
+
+ifexpr.then8269:                                  ; preds = %if.then8266
+  %load49143 = load ptr, ptr %obj_path10, align 8
+  %load49144 = load ptr, ptr %artifact_path9, align 8
+  %load49145 = load ptr, ptr %link_args, align 8
+  %call49146 = call i32 @linker_link_executable_nostd(ptr %load49143, ptr %load49144, ptr %load49145)
+  store i32 %call49146, ptr %ifexpr49138, align 4
+  br label %ifexpr.end8271
+
+ifexpr.else8270:                                  ; preds = %if.then8266
+  %load49147 = load ptr, ptr %obj_path10, align 8
+  %load49148 = load ptr, ptr %runtime_object, align 8
+  %load49149 = load ptr, ptr %artifact_path9, align 8
+  %load49150 = load ptr, ptr %link_args, align 8
+  %call49151 = call i32 @linker_link_executable_std(ptr %load49147, ptr %load49148, ptr %load49149, ptr %load49150)
+  store i32 %call49151, ptr %ifexpr49138, align 4
+  br label %ifexpr.end8271
+
+ifexpr.end8271:                                   ; preds = %ifexpr.else8270, %ifexpr.then8269
+  %ifexprval49152 = load i32, ptr %ifexpr49138, align 4
+  store i32 %ifexprval49152, ptr %build_result, align 4
+  br label %if.end8268
+
+if.then8272:                                      ; preds = %if.end8262
+  %load49163 = load ptr, ptr %ir_path, align 8
+  %call49164 = call i32 @delete_file(ptr %load49163)
+  br label %if.end8274
+
+if.else8273:                                      ; preds = %if.end8262
+  br label %if.end8274
+
+if.end8274:                                       ; preds = %if.else8273, %if.then8272
+  %load49165 = load i32, ptr %build_result, align 4
+  %cmp49166 = icmp ne i32 %load49165, 0
+  %bool49167 = zext i1 %cmp49166 to i32
+  %cond49168 = icmp ne i32 %bool49167, 0
+  br i1 %cond49168, label %if.then8275, label %if.else8276
+
+if.then8275:                                      ; preds = %if.end8274
+  %call49169 = call ptr @llc_last_error()
+  %llc_err = alloca ptr, align 8
+  store ptr %call49169, ptr %llc_err, align 8
+  %call49170 = call ptr @linker_last_error()
+  %link_err11 = alloca ptr, align 8
+  store ptr %call49170, ptr %link_err11, align 8
+  %call49171 = call ptr @passes_last_error()
+  %pass_err12 = alloca ptr, align 8
+  store ptr %call49171, ptr %pass_err12, align 8
+  %load49172 = load ptr, ptr %pass_err12, align 8
+  %strcmp49174 = call i32 @strcmp(ptr %load49172, ptr @.strlit49173)
+  %cmp49175 = icmp eq i32 %strcmp49174, 0
+  %bool49176 = zext i1 %cmp49175 to i32
+  %cmp49177 = icmp eq i32 %bool49176, 0
+  %bool49178 = zext i1 %cmp49177 to i32
+  %cond49179 = icmp ne i32 %bool49178, 0
+  br i1 %cond49179, label %if.then8278, label %if.else8279
+
+if.else8276:                                      ; preds = %if.end8274
+  br label %if.end8277
+
+if.end8277:                                       ; preds = %if.else8276
+  %load49205 = load ptr, ptr %artifact_path9, align 8
+  %16 = call i32 (ptr, ...) @printf(ptr @.fmt.string, ptr %load49205)
+  %call49206 = call ptr @mode_success()
+  ret ptr %call49206
+
+if.then8278:                                      ; preds = %if.then8275
+  %load49180 = load ptr, ptr %pass_err12, align 8
+  call void @diag_print(ptr %load49180)
+  br label %if.end8280
+
+if.else8279:                                      ; preds = %if.then8275
+  br label %if.end8280
+
+if.end8280:                                       ; preds = %if.else8279, %if.then8278
+  %load49181 = load ptr, ptr %llc_err, align 8
+  %strcmp49183 = call i32 @strcmp(ptr %load49181, ptr @.strlit49182)
+  %cmp49184 = icmp eq i32 %strcmp49183, 0
+  %bool49185 = zext i1 %cmp49184 to i32
+  %cmp49186 = icmp eq i32 %bool49185, 0
+  %bool49187 = zext i1 %cmp49186 to i32
+  %cond49188 = icmp ne i32 %bool49187, 0
+  br i1 %cond49188, label %if.then8281, label %if.else8282
+
+if.then8281:                                      ; preds = %if.end8280
+  %load49189 = load ptr, ptr %llc_err, align 8
+  call void @diag_print(ptr %load49189)
+  br label %if.end8283
+
+if.else8282:                                      ; preds = %if.end8280
+  br label %if.end8283
+
+if.end8283:                                       ; preds = %if.else8282, %if.then8281
+  %load49190 = load ptr, ptr %link_err11, align 8
+  %strcmp49192 = call i32 @strcmp(ptr %load49190, ptr @.strlit49191)
+  %cmp49193 = icmp eq i32 %strcmp49192, 0
+  %bool49194 = zext i1 %cmp49193 to i32
+  %cmp49195 = icmp eq i32 %bool49194, 0
+  %bool49196 = zext i1 %cmp49195 to i32
+  %cond49197 = icmp ne i32 %bool49196, 0
+  br i1 %cond49197, label %if.then8284, label %if.else8285
+
+if.then8284:                                      ; preds = %if.end8283
+  %load49198 = load ptr, ptr %link_err11, align 8
+  call void @diag_print(ptr %load49198)
+  br label %if.end8286
+
+if.else8285:                                      ; preds = %if.end8283
+  br label %if.end8286
+
+if.end8286:                                       ; preds = %if.else8285, %if.then8284
+  %load49200 = load ptr, ptr %artifact_path9, align 8
+  %call49201 = call ptr @vix_string_concat(ptr @.strlit49199, ptr %load49200)
+  %call49203 = call ptr @vix_string_concat(ptr %call49201, ptr @.strlit49202)
+  call void @diag_print(ptr %call49203)
+  %call49204 = call ptr @mode_failure()
+  ret ptr %call49204
 }
 
 define i32 @write_text_file(ptr %0, ptr %1) {
@@ -94176,32 +94376,32 @@ entry:
   store ptr %0, ptr %path, align 8
   %content = alloca ptr, align 8
   store ptr %1, ptr %content, align 8
-  %load49130 = load ptr, ptr %path, align 8
-  %call49132 = call ptr @fopen(ptr %load49130, ptr @.strlit49131)
+  %load49207 = load ptr, ptr %path, align 8
+  %call49209 = call ptr @fopen(ptr %load49207, ptr @.strlit49208)
   %file = alloca ptr, align 8
-  store ptr %call49132, ptr %file, align 8
-  %load49133 = load ptr, ptr %file, align 8
-  %cmp49134 = icmp eq ptr %load49133, null
-  %bool49135 = zext i1 %cmp49134 to i32
-  %cond49136 = icmp ne i32 %bool49135, 0
-  br i1 %cond49136, label %if.then8260, label %if.else8261
+  store ptr %call49209, ptr %file, align 8
+  %load49210 = load ptr, ptr %file, align 8
+  %cmp49211 = icmp eq ptr %load49210, null
+  %bool49212 = zext i1 %cmp49211 to i32
+  %cond49213 = icmp ne i32 %bool49212, 0
+  br i1 %cond49213, label %if.then8287, label %if.else8288
 
-if.then8260:                                      ; preds = %entry
-  %load49138 = load ptr, ptr %path, align 8
-  %call49139 = call ptr @vix_string_concat(ptr @.strlit49137, ptr %load49138)
-  %call49141 = call ptr @vix_string_concat(ptr %call49139, ptr @.strlit49140)
-  call void @diag_print(ptr %call49141)
+if.then8287:                                      ; preds = %entry
+  %load49215 = load ptr, ptr %path, align 8
+  %call49216 = call ptr @vix_string_concat(ptr @.strlit49214, ptr %load49215)
+  %call49218 = call ptr @vix_string_concat(ptr %call49216, ptr @.strlit49217)
+  call void @diag_print(ptr %call49218)
   ret i32 1
 
-if.else8261:                                      ; preds = %entry
-  br label %if.end8262
+if.else8288:                                      ; preds = %entry
+  br label %if.end8289
 
-if.end8262:                                       ; preds = %if.else8261
-  %load49142 = load ptr, ptr %content, align 8
-  %load49143 = load ptr, ptr %file, align 8
-  %call49144 = call i32 @fputs(ptr %load49142, ptr %load49143)
-  %load49145 = load ptr, ptr %file, align 8
-  %call49146 = call i32 @fclose(ptr %load49145)
+if.end8289:                                       ; preds = %if.else8288
+  %load49219 = load ptr, ptr %content, align 8
+  %load49220 = load ptr, ptr %file, align 8
+  %call49221 = call i32 @fputs(ptr %load49219, ptr %load49220)
+  %load49222 = load ptr, ptr %file, align 8
+  %call49223 = call i32 @fclose(ptr %load49222)
   ret i32 0
 }
 
@@ -94209,50 +94409,50 @@ define ptr @read_source_file(ptr %0) {
 entry:
   %path = alloca ptr, align 8
   store ptr %0, ptr %path, align 8
-  %load49147 = load ptr, ptr %path, align 8
-  %call49149 = call ptr @fopen(ptr %load49147, ptr @.strlit49148)
+  %load49224 = load ptr, ptr %path, align 8
+  %call49226 = call ptr @fopen(ptr %load49224, ptr @.strlit49225)
   %file = alloca ptr, align 8
-  store ptr %call49149, ptr %file, align 8
-  %load49150 = load ptr, ptr %file, align 8
-  %cmp49151 = icmp eq ptr %load49150, null
-  %bool49152 = zext i1 %cmp49151 to i32
-  %cond49153 = icmp ne i32 %bool49152, 0
-  br i1 %cond49153, label %if.then8263, label %if.else8264
+  store ptr %call49226, ptr %file, align 8
+  %load49227 = load ptr, ptr %file, align 8
+  %cmp49228 = icmp eq ptr %load49227, null
+  %bool49229 = zext i1 %cmp49228 to i32
+  %cond49230 = icmp ne i32 %bool49229, 0
+  br i1 %cond49230, label %if.then8290, label %if.else8291
 
-if.then8263:                                      ; preds = %entry
-  ret ptr @.strlit49154
+if.then8290:                                      ; preds = %entry
+  ret ptr @.strlit49231
 
-if.else8264:                                      ; preds = %entry
-  br label %if.end8265
+if.else8291:                                      ; preds = %entry
+  br label %if.end8292
 
-if.end8265:                                       ; preds = %if.else8264
-  %load49155 = load ptr, ptr %file, align 8
-  %call49156 = call i32 @fseek(ptr %load49155, i64 0, i32 2)
-  %load49157 = load ptr, ptr %file, align 8
-  %call49158 = call i64 @ftell(ptr %load49157)
+if.end8292:                                       ; preds = %if.else8291
+  %load49232 = load ptr, ptr %file, align 8
+  %call49233 = call i32 @fseek(ptr %load49232, i64 0, i32 2)
+  %load49234 = load ptr, ptr %file, align 8
+  %call49235 = call i64 @ftell(ptr %load49234)
   %size = alloca i64, align 8
-  store i64 %call49158, ptr %size, align 4
-  %load49159 = load ptr, ptr %file, align 8
-  %call49160 = call i32 @fseek(ptr %load49159, i64 0, i32 0)
-  %load49161 = load i64, ptr %size, align 4
-  %add49162 = add i64 %load49161, 1
-  %call49163 = call ptr @malloc(i64 %add49162)
+  store i64 %call49235, ptr %size, align 4
+  %load49236 = load ptr, ptr %file, align 8
+  %call49237 = call i32 @fseek(ptr %load49236, i64 0, i32 0)
+  %load49238 = load i64, ptr %size, align 4
+  %add49239 = add i64 %load49238, 1
+  %call49240 = call ptr @malloc(i64 %add49239)
   %buf = alloca ptr, align 8
-  store ptr %call49163, ptr %buf, align 8
-  %load49164 = load ptr, ptr %buf, align 8
-  %load49165 = load i64, ptr %size, align 4
-  %load49166 = load ptr, ptr %file, align 8
-  %call49167 = call i64 @fread(ptr %load49164, i64 1, i64 %load49165, ptr %load49166)
+  store ptr %call49240, ptr %buf, align 8
+  %load49241 = load ptr, ptr %buf, align 8
+  %load49242 = load i64, ptr %size, align 4
+  %load49243 = load ptr, ptr %file, align 8
+  %call49244 = call i64 @fread(ptr %load49241, i64 1, i64 %load49242, ptr %load49243)
   %n = alloca i64, align 8
-  store i64 %call49167, ptr %n, align 4
-  %load49168 = load ptr, ptr %buf, align 8
-  %load49169 = load i64, ptr %n, align 4
-  %storeidx49171 = getelementptr i8, ptr %load49168, i64 %load49169
-  store i8 0, ptr %storeidx49171, align 1
-  %load49172 = load ptr, ptr %file, align 8
-  %call49173 = call i32 @fclose(ptr %load49172)
-  %load49174 = load ptr, ptr %buf, align 8
-  ret ptr %load49174
+  store i64 %call49244, ptr %n, align 4
+  %load49245 = load ptr, ptr %buf, align 8
+  %load49246 = load i64, ptr %n, align 4
+  %storeidx49248 = getelementptr i8, ptr %load49245, i64 %load49246
+  store i8 0, ptr %storeidx49248, align 1
+  %load49249 = load ptr, ptr %file, align 8
+  %call49250 = call i32 @fclose(ptr %load49249)
+  %load49251 = load ptr, ptr %buf, align 8
+  ret ptr %load49251
 }
 
 define i32 @main(i32 %0, ptr %1) {
@@ -94262,917 +94462,969 @@ entry:
   %argv = alloca ptr, align 8
   store ptr %1, ptr %argv, align 8
   %src = alloca ptr, align 8
-  store ptr @.strlit49175, ptr %src, align 8
+  store ptr @.strlit49252, ptr %src, align 8
   %mode = alloca ptr, align 8
-  store ptr @.strlit49176, ptr %mode, align 8
+  store ptr @.strlit49253, ptr %mode, align 8
   %filename = alloca ptr, align 8
-  store ptr @.strlit49177, ptr %filename, align 8
+  store ptr @.strlit49254, ptr %filename, align 8
   %want_help = alloca i32, align 4
   store i32 0, ptr %want_help, align 4
   %want_version = alloca i32, align 4
   store i32 0, ptr %want_version, align 4
   %emit = alloca ptr, align 8
-  store ptr @.strlit49178, ptr %emit, align 8
+  store ptr @.strlit49255, ptr %emit, align 8
   %output = alloca ptr, align 8
-  store ptr @.strlit49179, ptr %output, align 8
+  store ptr @.strlit49256, ptr %output, align 8
   %has_input = alloca i32, align 4
   store i32 0, ptr %has_input, align 4
   %link_args = alloca ptr, align 8
-  store ptr @.strlit49180, ptr %link_args, align 8
-  %call49181 = call ptr @host_target_triple()
+  store ptr @.strlit49257, ptr %link_args, align 8
+  %call49258 = call ptr @host_target_triple()
   %target_triple = alloca ptr, align 8
-  store ptr %call49181, ptr %target_triple, align 8
+  store ptr %call49258, ptr %target_triple, align 8
   %backend = alloca ptr, align 8
-  store ptr @.strlit49182, ptr %backend, align 8
+  store ptr @.strlit49259, ptr %backend, align 8
   %optimize_mir = alloca i32, align 4
   store i32 0, ptr %optimize_mir, align 4
+  %opt_level = alloca i32, align 4
+  store i32 0, ptr %opt_level, align 4
   %i = alloca i32, align 4
   store i32 1, ptr %i, align 4
-  br label %while.cond8266
+  br label %while.cond8293
 
-while.cond8266:                                   ; preds = %if.end8271, %entry
-  %load49183 = load i32, ptr %i, align 4
-  %load49184 = load i32, ptr %argc, align 4
-  %cmp49185 = icmp slt i32 %load49183, %load49184
-  %bool49186 = zext i1 %cmp49185 to i32
-  %cond49187 = icmp ne i32 %bool49186, 0
-  br i1 %cond49187, label %while.body8267, label %while.end8268
+while.cond8293:                                   ; preds = %if.end8298, %entry
+  %load49260 = load i32, ptr %i, align 4
+  %load49261 = load i32, ptr %argc, align 4
+  %cmp49262 = icmp slt i32 %load49260, %load49261
+  %bool49263 = zext i1 %cmp49262 to i32
+  %cond49264 = icmp ne i32 %bool49263, 0
+  br i1 %cond49264, label %while.body8294, label %while.end8295
 
-while.body8267:                                   ; preds = %while.cond8266
-  %load49188 = load ptr, ptr %argv, align 8
-  %load49189 = load i32, ptr %i, align 4
-  %idx49190 = getelementptr ptr, ptr %load49188, i32 %load49189
-  %loadidx49191 = load ptr, ptr %idx49190, align 8
+while.body8294:                                   ; preds = %while.cond8293
+  %load49265 = load ptr, ptr %argv, align 8
+  %load49266 = load i32, ptr %i, align 4
+  %idx49267 = getelementptr ptr, ptr %load49265, i32 %load49266
+  %loadidx49268 = load ptr, ptr %idx49267, align 8
   %arg = alloca ptr, align 8
-  store ptr %loadidx49191, ptr %arg, align 8
-  %load49192 = load ptr, ptr %arg, align 8
-  %strcmp49194 = call i32 @strcmp(ptr %load49192, ptr @.strlit49193)
-  %cmp49195 = icmp eq i32 %strcmp49194, 0
-  %bool49196 = zext i1 %cmp49195 to i32
-  %cond49197 = icmp ne i32 %bool49196, 0
-  br i1 %cond49197, label %or.true, label %or.rhs
+  store ptr %loadidx49268, ptr %arg, align 8
+  %load49269 = load ptr, ptr %arg, align 8
+  %strcmp49271 = call i32 @strcmp(ptr %load49269, ptr @.strlit49270)
+  %cmp49272 = icmp eq i32 %strcmp49271, 0
+  %bool49273 = zext i1 %cmp49272 to i32
+  %cond49274 = icmp ne i32 %bool49273, 0
+  br i1 %cond49274, label %or.true, label %or.rhs
 
-while.end8268:                                    ; preds = %while.cond8266
-  %load49527 = load i32, ptr %want_help, align 4
-  %cmp49528 = icmp eq i32 %load49527, 1
-  %bool49529 = zext i1 %cmp49528 to i32
-  %cond49530 = icmp ne i32 %bool49529, 0
-  br i1 %cond49530, label %if.then8374, label %if.else8375
+while.end8295:                                    ; preds = %while.cond8293
+  %load49625 = load i32, ptr %want_help, align 4
+  %cmp49626 = icmp eq i32 %load49625, 1
+  %bool49627 = zext i1 %cmp49626 to i32
+  %cond49628 = icmp ne i32 %bool49627, 0
+  br i1 %cond49628, label %if.then8410, label %if.else8411
 
-if.then8269:                                      ; preds = %or.merge
+if.then8296:                                      ; preds = %or.merge
   store i32 1, ptr %want_help, align 4
-  br label %if.end8271
+  br label %if.end8298
 
-if.else8270:                                      ; preds = %or.merge
-  %load49206 = load ptr, ptr %arg, align 8
-  %strcmp49208 = call i32 @strcmp(ptr %load49206, ptr @.strlit49207)
-  %cmp49209 = icmp eq i32 %strcmp49208, 0
-  %bool49210 = zext i1 %cmp49209 to i32
-  %cond49211 = icmp ne i32 %bool49210, 0
-  br i1 %cond49211, label %or.true1, label %or.rhs2
+if.else8297:                                      ; preds = %or.merge
+  %load49283 = load ptr, ptr %arg, align 8
+  %strcmp49285 = call i32 @strcmp(ptr %load49283, ptr @.strlit49284)
+  %cmp49286 = icmp eq i32 %strcmp49285, 0
+  %bool49287 = zext i1 %cmp49286 to i32
+  %cond49288 = icmp ne i32 %bool49287, 0
+  br i1 %cond49288, label %or.true1, label %or.rhs2
 
-if.end8271:                                       ; preds = %if.end8274, %if.then8269
-  %load49525 = load i32, ptr %i, align 4
-  %add49526 = add i32 %load49525, 1
-  store i32 %add49526, ptr %i, align 4
-  br label %while.cond8266
+if.end8298:                                       ; preds = %if.end8301, %if.then8296
+  %load49623 = load i32, ptr %i, align 4
+  %add49624 = add i32 %load49623, 1
+  store i32 %add49624, ptr %i, align 4
+  br label %while.cond8293
 
-or.true:                                          ; preds = %or.rhs, %while.body8267
+or.true:                                          ; preds = %or.rhs, %while.body8294
   br label %or.merge
 
-or.rhs:                                           ; preds = %while.body8267
-  %load49198 = load ptr, ptr %arg, align 8
-  %strcmp49200 = call i32 @strcmp(ptr %load49198, ptr @.strlit49199)
-  %cmp49201 = icmp eq i32 %strcmp49200, 0
-  %bool49202 = zext i1 %cmp49201 to i32
-  %cond49203 = icmp ne i32 %bool49202, 0
-  br i1 %cond49203, label %or.true, label %or.merge
+or.rhs:                                           ; preds = %while.body8294
+  %load49275 = load ptr, ptr %arg, align 8
+  %strcmp49277 = call i32 @strcmp(ptr %load49275, ptr @.strlit49276)
+  %cmp49278 = icmp eq i32 %strcmp49277, 0
+  %bool49279 = zext i1 %cmp49278 to i32
+  %cond49280 = icmp ne i32 %bool49279, 0
+  br i1 %cond49280, label %or.true, label %or.merge
 
-or.merge:                                         ; preds = %or.true, %or.rhs
-  %orval49204 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
-  %cond49205 = icmp ne i32 %orval49204, 0
-  br i1 %cond49205, label %if.then8269, label %if.else8270
+or.merge:                                         ; preds = %or.rhs, %or.true
+  %orval49281 = phi i32 [ 1, %or.true ], [ 0, %or.rhs ]
+  %cond49282 = icmp ne i32 %orval49281, 0
+  br i1 %cond49282, label %if.then8296, label %if.else8297
 
-if.then8272:                                      ; preds = %or.merge3
+if.then8299:                                      ; preds = %or.merge3
   store i32 1, ptr %want_version, align 4
-  br label %if.end8274
+  br label %if.end8301
 
-if.else8273:                                      ; preds = %or.merge3
-  %load49220 = load ptr, ptr %arg, align 8
-  %strcmp49222 = call i32 @strcmp(ptr %load49220, ptr @.strlit49221)
-  %cmp49223 = icmp eq i32 %strcmp49222, 0
-  %bool49224 = zext i1 %cmp49223 to i32
-  %cond49225 = icmp ne i32 %bool49224, 0
-  br i1 %cond49225, label %if.then8275, label %if.else8276
+if.else8300:                                      ; preds = %or.merge3
+  %load49297 = load ptr, ptr %arg, align 8
+  %strcmp49299 = call i32 @strcmp(ptr %load49297, ptr @.strlit49298)
+  %cmp49300 = icmp eq i32 %strcmp49299, 0
+  %bool49301 = zext i1 %cmp49300 to i32
+  %cond49302 = icmp ne i32 %bool49301, 0
+  br i1 %cond49302, label %if.then8302, label %if.else8303
 
-if.end8274:                                       ; preds = %if.end8277, %if.then8272
-  br label %if.end8271
+if.end8301:                                       ; preds = %if.end8304, %if.then8299
+  br label %if.end8298
 
-or.true1:                                         ; preds = %or.rhs2, %if.else8270
+or.true1:                                         ; preds = %or.rhs2, %if.else8297
   br label %or.merge3
 
-or.rhs2:                                          ; preds = %if.else8270
-  %load49212 = load ptr, ptr %arg, align 8
-  %strcmp49214 = call i32 @strcmp(ptr %load49212, ptr @.strlit49213)
-  %cmp49215 = icmp eq i32 %strcmp49214, 0
-  %bool49216 = zext i1 %cmp49215 to i32
-  %cond49217 = icmp ne i32 %bool49216, 0
-  br i1 %cond49217, label %or.true1, label %or.merge3
+or.rhs2:                                          ; preds = %if.else8297
+  %load49289 = load ptr, ptr %arg, align 8
+  %strcmp49291 = call i32 @strcmp(ptr %load49289, ptr @.strlit49290)
+  %cmp49292 = icmp eq i32 %strcmp49291, 0
+  %bool49293 = zext i1 %cmp49292 to i32
+  %cond49294 = icmp ne i32 %bool49293, 0
+  br i1 %cond49294, label %or.true1, label %or.merge3
 
-or.merge3:                                        ; preds = %or.true1, %or.rhs2
-  %orval49218 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
-  %cond49219 = icmp ne i32 %orval49218, 0
-  br i1 %cond49219, label %if.then8272, label %if.else8273
+or.merge3:                                        ; preds = %or.rhs2, %or.true1
+  %orval49295 = phi i32 [ 1, %or.true1 ], [ 0, %or.rhs2 ]
+  %cond49296 = icmp ne i32 %orval49295, 0
+  br i1 %cond49296, label %if.then8299, label %if.else8300
 
-if.then8275:                                      ; preds = %if.else8273
-  %load49226 = load i32, ptr %i, align 4
-  %add49227 = add i32 %load49226, 1
-  %load49228 = load i32, ptr %argc, align 4
-  %cmp49229 = icmp slt i32 %add49227, %load49228
-  %bool49230 = zext i1 %cmp49229 to i32
-  %cond49231 = icmp ne i32 %bool49230, 0
-  br i1 %cond49231, label %if.then8278, label %if.else8279
+if.then8302:                                      ; preds = %if.else8300
+  %load49303 = load i32, ptr %i, align 4
+  %add49304 = add i32 %load49303, 1
+  %load49305 = load i32, ptr %argc, align 4
+  %cmp49306 = icmp slt i32 %add49304, %load49305
+  %bool49307 = zext i1 %cmp49306 to i32
+  %cond49308 = icmp ne i32 %bool49307, 0
+  br i1 %cond49308, label %if.then8305, label %if.else8306
 
-if.else8276:                                      ; preds = %if.else8273
-  %load49239 = load ptr, ptr %arg, align 8
-  %strcmp49241 = call i32 @strcmp(ptr %load49239, ptr @.strlit49240)
-  %cmp49242 = icmp eq i32 %strcmp49241, 0
-  %bool49243 = zext i1 %cmp49242 to i32
-  %cond49244 = icmp ne i32 %bool49243, 0
-  br i1 %cond49244, label %if.then8281, label %if.else8282
+if.else8303:                                      ; preds = %if.else8300
+  %load49316 = load ptr, ptr %arg, align 8
+  %strcmp49318 = call i32 @strcmp(ptr %load49316, ptr @.strlit49317)
+  %cmp49319 = icmp eq i32 %strcmp49318, 0
+  %bool49320 = zext i1 %cmp49319 to i32
+  %cond49321 = icmp ne i32 %bool49320, 0
+  br i1 %cond49321, label %if.then8308, label %if.else8309
 
-if.end8277:                                       ; preds = %if.end8283, %if.end8280
-  br label %if.end8274
+if.end8304:                                       ; preds = %if.end8310, %if.end8307
+  br label %if.end8301
 
-if.then8278:                                      ; preds = %if.then8275
-  %load49232 = load i32, ptr %i, align 4
-  %add49233 = add i32 %load49232, 1
-  store i32 %add49233, ptr %i, align 4
-  %load49234 = load ptr, ptr %argv, align 8
-  %load49235 = load i32, ptr %i, align 4
-  %idx49236 = getelementptr ptr, ptr %load49234, i32 %load49235
-  %loadidx49237 = load ptr, ptr %idx49236, align 8
-  store ptr %loadidx49237, ptr %output, align 8
-  br label %if.end8280
+if.then8305:                                      ; preds = %if.then8302
+  %load49309 = load i32, ptr %i, align 4
+  %add49310 = add i32 %load49309, 1
+  store i32 %add49310, ptr %i, align 4
+  %load49311 = load ptr, ptr %argv, align 8
+  %load49312 = load i32, ptr %i, align 4
+  %idx49313 = getelementptr ptr, ptr %load49311, i32 %load49312
+  %loadidx49314 = load ptr, ptr %idx49313, align 8
+  store ptr %loadidx49314, ptr %output, align 8
+  br label %if.end8307
 
-if.else8279:                                      ; preds = %if.then8275
-  call void @diag_print(ptr @.strlit49238)
+if.else8306:                                      ; preds = %if.then8302
+  call void @diag_print(ptr @.strlit49315)
   ret i32 1
 
-if.end8280:                                       ; preds = %if.then8278
-  br label %if.end8277
+if.end8307:                                       ; preds = %if.then8305
+  br label %if.end8304
 
-if.then8281:                                      ; preds = %if.else8276
-  store ptr @.strlit49245, ptr %emit, align 8
-  %load49246 = load i32, ptr %i, align 4
-  %add49247 = add i32 %load49246, 1
-  %load49248 = load i32, ptr %argc, align 4
-  %cmp49249 = icmp slt i32 %add49247, %load49248
-  %bool49250 = zext i1 %cmp49249 to i32
-  %cond49251 = icmp ne i32 %bool49250, 0
-  br i1 %cond49251, label %if.then8284, label %if.else8285
+if.then8308:                                      ; preds = %if.else8303
+  store ptr @.strlit49322, ptr %emit, align 8
+  %load49323 = load i32, ptr %i, align 4
+  %add49324 = add i32 %load49323, 1
+  %load49325 = load i32, ptr %argc, align 4
+  %cmp49326 = icmp slt i32 %add49324, %load49325
+  %bool49327 = zext i1 %cmp49326 to i32
+  %cond49328 = icmp ne i32 %bool49327, 0
+  br i1 %cond49328, label %if.then8311, label %if.else8312
 
-if.else8282:                                      ; preds = %if.else8276
-  %load49274 = load ptr, ptr %arg, align 8
-  %strcmp49276 = call i32 @strcmp(ptr %load49274, ptr @.strlit49275)
-  %cmp49277 = icmp eq i32 %strcmp49276, 0
-  %bool49278 = zext i1 %cmp49277 to i32
-  %cond49279 = icmp ne i32 %bool49278, 0
-  br i1 %cond49279, label %if.then8290, label %if.else8291
+if.else8309:                                      ; preds = %if.else8303
+  %load49351 = load ptr, ptr %arg, align 8
+  %strcmp49353 = call i32 @strcmp(ptr %load49351, ptr @.strlit49352)
+  %cmp49354 = icmp eq i32 %strcmp49353, 0
+  %bool49355 = zext i1 %cmp49354 to i32
+  %cond49356 = icmp ne i32 %bool49355, 0
+  br i1 %cond49356, label %if.then8317, label %if.else8318
 
-if.end8283:                                       ; preds = %if.end8292, %if.end8286
-  br label %if.end8277
+if.end8310:                                       ; preds = %if.end8319, %if.end8313
+  br label %if.end8304
 
-if.then8284:                                      ; preds = %if.then8281
-  %load49252 = load ptr, ptr %argv, align 8
-  %load49253 = load i32, ptr %i, align 4
-  %add49254 = add i32 %load49253, 1
-  %idx49255 = getelementptr ptr, ptr %load49252, i32 %add49254
-  %loadidx49256 = load ptr, ptr %idx49255, align 8
+if.then8311:                                      ; preds = %if.then8308
+  %load49329 = load ptr, ptr %argv, align 8
+  %load49330 = load i32, ptr %i, align 4
+  %add49331 = add i32 %load49330, 1
+  %idx49332 = getelementptr ptr, ptr %load49329, i32 %add49331
+  %loadidx49333 = load ptr, ptr %idx49332, align 8
   %next = alloca ptr, align 8
-  store ptr %loadidx49256, ptr %next, align 8
-  %load49257 = load ptr, ptr %next, align 8
-  %call49259 = call i32 @string_ends_with(ptr %load49257, ptr @.strlit49258)
-  %cmp49260 = icmp eq i32 %call49259, 0
-  %bool49261 = zext i1 %cmp49260 to i32
-  %cond49262 = icmp ne i32 %bool49261, 0
-  br i1 %cond49262, label %and.rhs, label %and.false
+  store ptr %loadidx49333, ptr %next, align 8
+  %load49334 = load ptr, ptr %next, align 8
+  %call49336 = call i32 @string_ends_with(ptr %load49334, ptr @.strlit49335)
+  %cmp49337 = icmp eq i32 %call49336, 0
+  %bool49338 = zext i1 %cmp49337 to i32
+  %cond49339 = icmp ne i32 %bool49338, 0
+  br i1 %cond49339, label %and.rhs, label %and.false
 
-if.else8285:                                      ; preds = %if.then8281
-  br label %if.end8286
+if.else8312:                                      ; preds = %if.then8308
+  br label %if.end8313
 
-if.end8286:                                       ; preds = %if.else8285, %if.end8289
-  br label %if.end8283
+if.end8313:                                       ; preds = %if.end8316, %if.else8312
+  br label %if.end8310
 
-if.then8287:                                      ; preds = %and.merge
-  %load49271 = load ptr, ptr %next, align 8
-  store ptr %load49271, ptr %output, align 8
-  %load49272 = load i32, ptr %i, align 4
-  %add49273 = add i32 %load49272, 1
-  store i32 %add49273, ptr %i, align 4
-  br label %if.end8289
+if.then8314:                                      ; preds = %and.merge
+  %load49348 = load ptr, ptr %next, align 8
+  store ptr %load49348, ptr %output, align 8
+  %load49349 = load i32, ptr %i, align 4
+  %add49350 = add i32 %load49349, 1
+  store i32 %add49350, ptr %i, align 4
+  br label %if.end8316
 
-if.else8288:                                      ; preds = %and.merge
-  br label %if.end8289
+if.else8315:                                      ; preds = %and.merge
+  br label %if.end8316
 
-if.end8289:                                       ; preds = %if.else8288, %if.then8287
-  br label %if.end8286
+if.end8316:                                       ; preds = %if.else8315, %if.then8314
+  br label %if.end8313
 
-and.rhs:                                          ; preds = %if.then8284
-  %load49263 = load ptr, ptr %next, align 8
-  %call49265 = call i32 @string_ends_with(ptr %load49263, ptr @.strlit49264)
-  %cmp49266 = icmp eq i32 %call49265, 1
-  %bool49267 = zext i1 %cmp49266 to i32
-  %cond49268 = icmp ne i32 %bool49267, 0
-  br i1 %cond49268, label %and.merge, label %and.false
+and.rhs:                                          ; preds = %if.then8311
+  %load49340 = load ptr, ptr %next, align 8
+  %call49342 = call i32 @string_ends_with(ptr %load49340, ptr @.strlit49341)
+  %cmp49343 = icmp eq i32 %call49342, 1
+  %bool49344 = zext i1 %cmp49343 to i32
+  %cond49345 = icmp ne i32 %bool49344, 0
+  br i1 %cond49345, label %and.merge, label %and.false
 
-and.false:                                        ; preds = %and.rhs, %if.then8284
+and.false:                                        ; preds = %and.rhs, %if.then8311
   br label %and.merge
 
 and.merge:                                        ; preds = %and.false, %and.rhs
-  %andval49269 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
-  %cond49270 = icmp ne i32 %andval49269, 0
-  br i1 %cond49270, label %if.then8287, label %if.else8288
+  %andval49346 = phi i32 [ 1, %and.rhs ], [ 0, %and.false ]
+  %cond49347 = icmp ne i32 %andval49346, 0
+  br i1 %cond49347, label %if.then8314, label %if.else8315
 
-if.then8290:                                      ; preds = %if.else8282
-  store ptr @.strlit49280, ptr %emit, align 8
-  br label %if.end8292
+if.then8317:                                      ; preds = %if.else8309
+  store ptr @.strlit49357, ptr %emit, align 8
+  br label %if.end8319
 
-if.else8291:                                      ; preds = %if.else8282
-  %load49281 = load ptr, ptr %arg, align 8
-  %strcmp49283 = call i32 @strcmp(ptr %load49281, ptr @.strlit49282)
-  %cmp49284 = icmp eq i32 %strcmp49283, 0
-  %bool49285 = zext i1 %cmp49284 to i32
-  %cond49286 = icmp ne i32 %bool49285, 0
-  br i1 %cond49286, label %if.then8293, label %if.else8294
+if.else8318:                                      ; preds = %if.else8309
+  %load49358 = load ptr, ptr %arg, align 8
+  %call49360 = call i32 @str_starts_with(ptr %load49358, ptr @.strlit49359)
+  %cmp49361 = icmp eq i32 %call49360, 1
+  %bool49362 = zext i1 %cmp49361 to i32
+  %cond49363 = icmp ne i32 %bool49362, 0
+  br i1 %cond49363, label %if.then8320, label %if.else8321
 
-if.end8292:                                       ; preds = %if.end8295, %if.then8290
-  br label %if.end8283
-
-if.then8293:                                      ; preds = %if.else8291
-  store i32 1, ptr %optimize_mir, align 4
-  br label %if.end8295
-
-if.else8294:                                      ; preds = %if.else8291
-  %load49287 = load ptr, ptr %arg, align 8
-  %strcmp49289 = call i32 @strcmp(ptr %load49287, ptr @.strlit49288)
-  %cmp49290 = icmp eq i32 %strcmp49289, 0
-  %bool49291 = zext i1 %cmp49290 to i32
-  %cond49292 = icmp ne i32 %bool49291, 0
-  br i1 %cond49292, label %if.then8296, label %if.else8297
-
-if.end8295:                                       ; preds = %if.end8298, %if.then8293
-  br label %if.end8292
-
-if.then8296:                                      ; preds = %if.else8294
-  store ptr @.strlit49293, ptr %emit, align 8
-  br label %if.end8298
-
-if.else8297:                                      ; preds = %if.else8294
-  %load49294 = load ptr, ptr %arg, align 8
-  %call49296 = call i32 @str_starts_with(ptr %load49294, ptr @.strlit49295)
-  %cmp49297 = icmp eq i32 %call49296, 1
-  %bool49298 = zext i1 %cmp49297 to i32
-  %cond49299 = icmp ne i32 %bool49298, 0
-  br i1 %cond49299, label %if.then8299, label %if.else8300
-
-if.end8298:                                       ; preds = %if.end8301, %if.then8296
-  br label %if.end8295
-
-if.then8299:                                      ; preds = %if.else8297
-  %load49300 = load ptr, ptr %arg, align 8
-  %load49301 = load ptr, ptr %arg, align 8
-  %strlen49302 = call i32 @strlen(ptr %load49301)
-  %call49303 = call ptr @slice_string(ptr %load49300, i32 8, i32 %strlen49302)
-  %debug_mode = alloca ptr, align 8
-  store ptr %call49303, ptr %debug_mode, align 8
-  %load49304 = load ptr, ptr %debug_mode, align 8
-  %strcmp49306 = call i32 @strcmp(ptr %load49304, ptr @.strlit49305)
-  %cmp49307 = icmp eq i32 %strcmp49306, 0
-  %bool49308 = zext i1 %cmp49307 to i32
-  %cond49309 = icmp ne i32 %bool49308, 0
-  br i1 %cond49309, label %if.then8302, label %if.else8303
-
-if.else8300:                                      ; preds = %if.else8297
-  %load49330 = load ptr, ptr %arg, align 8
-  %strcmp49332 = call i32 @strcmp(ptr %load49330, ptr @.strlit49331)
-  %cmp49333 = icmp eq i32 %strcmp49332, 0
-  %bool49334 = zext i1 %cmp49333 to i32
-  %cond49335 = icmp ne i32 %bool49334, 0
-  br i1 %cond49335, label %if.then8311, label %if.else8312
-
-if.end8301:                                       ; preds = %if.end8313, %if.end8304
-  br label %if.end8298
-
-if.then8302:                                      ; preds = %if.then8299
-  store ptr @.strlit49310, ptr %mode, align 8
-  br label %if.end8304
-
-if.else8303:                                      ; preds = %if.then8299
-  %load49311 = load ptr, ptr %debug_mode, align 8
-  %strcmp49313 = call i32 @strcmp(ptr %load49311, ptr @.strlit49312)
-  %cmp49314 = icmp eq i32 %strcmp49313, 0
-  %bool49315 = zext i1 %cmp49314 to i32
-  %cond49316 = icmp ne i32 %bool49315, 0
-  br i1 %cond49316, label %if.then8305, label %if.else8306
-
-if.end8304:                                       ; preds = %if.end8307, %if.then8302
-  br label %if.end8301
-
-if.then8305:                                      ; preds = %if.else8303
-  store ptr @.strlit49317, ptr %mode, align 8
-  br label %if.end8307
-
-if.else8306:                                      ; preds = %if.else8303
-  %load49318 = load ptr, ptr %debug_mode, align 8
-  %strcmp49320 = call i32 @strcmp(ptr %load49318, ptr @.strlit49319)
-  %cmp49321 = icmp eq i32 %strcmp49320, 0
-  %bool49322 = zext i1 %cmp49321 to i32
-  %cond49323 = icmp ne i32 %bool49322, 0
-  br i1 %cond49323, label %if.then8308, label %if.else8309
-
-if.end8307:                                       ; preds = %if.end8310, %if.then8305
-  br label %if.end8304
-
-if.then8308:                                      ; preds = %if.else8306
-  store ptr @.strlit49324, ptr %mode, align 8
+if.end8319:                                       ; preds = %if.end8322, %if.then8317
   br label %if.end8310
 
-if.else8309:                                      ; preds = %if.else8306
-  %load49326 = load ptr, ptr %debug_mode, align 8
-  %call49327 = call ptr @vix_string_concat(ptr @.strlit49325, ptr %load49326)
-  %call49329 = call ptr @vix_string_concat(ptr %call49327, ptr @.strlit49328)
-  call void @diag_print(ptr %call49329)
+if.then8320:                                      ; preds = %if.else8318
+  %load49364 = load ptr, ptr %arg, align 8
+  %call49365 = call i32 @opt_level_arg(ptr %load49364)
+  store i32 %call49365, ptr %opt_level, align 4
+  %load49366 = load i32, ptr %opt_level, align 4
+  %cmp49367 = icmp slt i32 %load49366, 0
+  %bool49368 = zext i1 %cmp49367 to i32
+  %cond49369 = icmp ne i32 %bool49368, 0
+  br i1 %cond49369, label %if.then8323, label %if.else8324
+
+if.else8321:                                      ; preds = %if.else8318
+  %load49371 = load ptr, ptr %arg, align 8
+  %strcmp49373 = call i32 @strcmp(ptr %load49371, ptr @.strlit49372)
+  %cmp49374 = icmp eq i32 %strcmp49373, 0
+  %bool49375 = zext i1 %cmp49374 to i32
+  %cond49376 = icmp ne i32 %bool49375, 0
+  br i1 %cond49376, label %if.then8326, label %if.else8327
+
+if.end8322:                                       ; preds = %if.end8328, %if.end8325
+  br label %if.end8319
+
+if.then8323:                                      ; preds = %if.then8320
+  call void @diag_print(ptr @.strlit49370)
   ret i32 1
 
-if.end8310:                                       ; preds = %if.then8308
-  br label %if.end8307
+if.else8324:                                      ; preds = %if.then8320
+  br label %if.end8325
 
-if.then8311:                                      ; preds = %if.else8300
-  %load49336 = load i32, ptr %i, align 4
-  %add49337 = add i32 %load49336, 1
-  %load49338 = load i32, ptr %argc, align 4
-  %cmp49339 = icmp slt i32 %add49337, %load49338
-  %bool49340 = zext i1 %cmp49339 to i32
-  %cond49341 = icmp ne i32 %bool49340, 0
-  br i1 %cond49341, label %if.then8314, label %if.else8315
-
-if.else8312:                                      ; preds = %if.else8300
-  %load49349 = load ptr, ptr %arg, align 8
-  %strcmp49351 = call i32 @strcmp(ptr %load49349, ptr @.strlit49350)
-  %cmp49352 = icmp eq i32 %strcmp49351, 0
-  %bool49353 = zext i1 %cmp49352 to i32
-  %cond49354 = icmp ne i32 %bool49353, 0
-  br i1 %cond49354, label %if.then8317, label %if.else8318
-
-if.end8313:                                       ; preds = %if.end8319, %if.end8316
-  br label %if.end8301
-
-if.then8314:                                      ; preds = %if.then8311
-  %load49342 = load i32, ptr %i, align 4
-  %add49343 = add i32 %load49342, 1
-  store i32 %add49343, ptr %i, align 4
-  %load49344 = load ptr, ptr %argv, align 8
-  %load49345 = load i32, ptr %i, align 4
-  %idx49346 = getelementptr ptr, ptr %load49344, i32 %load49345
-  %loadidx49347 = load ptr, ptr %idx49346, align 8
-  store ptr %loadidx49347, ptr %target_triple, align 8
-  br label %if.end8316
-
-if.else8315:                                      ; preds = %if.then8311
-  call void @diag_print(ptr @.strlit49348)
-  ret i32 1
-
-if.end8316:                                       ; preds = %if.then8314
-  br label %if.end8313
-
-if.then8317:                                      ; preds = %if.else8312
-  %load49355 = load i32, ptr %i, align 4
-  %add49356 = add i32 %load49355, 1
-  %load49357 = load i32, ptr %argc, align 4
-  %cmp49358 = icmp slt i32 %add49356, %load49357
-  %bool49359 = zext i1 %cmp49358 to i32
-  %cond49360 = icmp ne i32 %bool49359, 0
-  br i1 %cond49360, label %if.then8320, label %if.else8321
-
-if.else8318:                                      ; preds = %if.else8312
-  %load49368 = load ptr, ptr %arg, align 8
-  %strcmp49370 = call i32 @strcmp(ptr %load49368, ptr @.strlit49369)
-  %cmp49371 = icmp eq i32 %strcmp49370, 0
-  %bool49372 = zext i1 %cmp49371 to i32
-  %cond49373 = icmp ne i32 %bool49372, 0
-  br i1 %cond49373, label %if.then8323, label %if.else8324
-
-if.end8319:                                       ; preds = %if.end8325, %if.end8322
-  br label %if.end8313
-
-if.then8320:                                      ; preds = %if.then8317
-  %load49361 = load i32, ptr %i, align 4
-  %add49362 = add i32 %load49361, 1
-  store i32 %add49362, ptr %i, align 4
-  %load49363 = load ptr, ptr %argv, align 8
-  %load49364 = load i32, ptr %i, align 4
-  %idx49365 = getelementptr ptr, ptr %load49363, i32 %load49364
-  %loadidx49366 = load ptr, ptr %idx49365, align 8
-  store ptr %loadidx49366, ptr %backend, align 8
+if.end8325:                                       ; preds = %if.else8324
   br label %if.end8322
 
-if.else8321:                                      ; preds = %if.then8317
-  call void @diag_print(ptr @.strlit49367)
-  ret i32 1
-
-if.end8322:                                       ; preds = %if.then8320
-  br label %if.end8319
-
-if.then8323:                                      ; preds = %if.else8318
-  store ptr @.strlit49374, ptr %backend, align 8
-  br label %if.end8325
-
-if.else8324:                                      ; preds = %if.else8318
-  %load49375 = load ptr, ptr %arg, align 8
-  %strcmp49377 = call i32 @strcmp(ptr %load49375, ptr @.strlit49376)
-  %cmp49378 = icmp eq i32 %strcmp49377, 0
-  %bool49379 = zext i1 %cmp49378 to i32
-  %cond49380 = icmp ne i32 %bool49379, 0
-  br i1 %cond49380, label %if.then8326, label %if.else8327
-
-if.end8325:                                       ; preds = %if.end8328, %if.then8323
-  br label %if.end8319
-
-if.then8326:                                      ; preds = %if.else8324
-  store ptr @.strlit49381, ptr %backend, align 8
+if.then8326:                                      ; preds = %if.else8321
+  store ptr @.strlit49377, ptr %emit, align 8
   br label %if.end8328
 
-if.else8327:                                      ; preds = %if.else8324
-  %load49382 = load ptr, ptr %arg, align 8
-  %strcmp49384 = call i32 @strcmp(ptr %load49382, ptr @.strlit49383)
-  %cmp49385 = icmp eq i32 %strcmp49384, 0
-  %bool49386 = zext i1 %cmp49385 to i32
-  %cond49387 = icmp ne i32 %bool49386, 0
-  br i1 %cond49387, label %or.true4, label %or.rhs5
+if.else8327:                                      ; preds = %if.else8321
+  %load49378 = load ptr, ptr %arg, align 8
+  %call49380 = call i32 @str_starts_with(ptr %load49378, ptr @.strlit49379)
+  %cmp49381 = icmp eq i32 %call49380, 1
+  %bool49382 = zext i1 %cmp49381 to i32
+  %cond49383 = icmp ne i32 %bool49382, 0
+  br i1 %cond49383, label %if.then8329, label %if.else8330
 
 if.end8328:                                       ; preds = %if.end8331, %if.then8326
-  br label %if.end8325
+  br label %if.end8322
 
-if.then8329:                                      ; preds = %or.merge6
-  %load49396 = load i32, ptr %i, align 4
-  %add49397 = add i32 %load49396, 1
-  %load49398 = load i32, ptr %argc, align 4
-  %cmp49399 = icmp slt i32 %add49397, %load49398
-  %bool49400 = zext i1 %cmp49399 to i32
-  %cond49401 = icmp ne i32 %bool49400, 0
-  br i1 %cond49401, label %if.then8332, label %if.else8333
-
-if.else8330:                                      ; preds = %or.merge6
-  %load49419 = load ptr, ptr %arg, align 8
-  %call49421 = call i32 @str_starts_with(ptr %load49419, ptr @.strlit49420)
-  %cmp49422 = icmp eq i32 %call49421, 1
-  %bool49423 = zext i1 %cmp49422 to i32
-  %cond49424 = icmp ne i32 %bool49423, 0
-  br i1 %cond49424, label %or.true7, label %or.rhs8
-
-if.end8331:                                       ; preds = %if.end8337, %if.end8334
-  br label %if.end8328
-
-or.true4:                                         ; preds = %or.rhs5, %if.else8327
-  br label %or.merge6
-
-or.rhs5:                                          ; preds = %if.else8327
-  %load49388 = load ptr, ptr %arg, align 8
+if.then8329:                                      ; preds = %if.else8327
+  %load49384 = load ptr, ptr %arg, align 8
+  %load49385 = load ptr, ptr %arg, align 8
+  %strlen49386 = call i32 @strlen(ptr %load49385)
+  %call49387 = call ptr @slice_string(ptr %load49384, i32 8, i32 %strlen49386)
+  %debug_mode = alloca ptr, align 8
+  store ptr %call49387, ptr %debug_mode, align 8
+  %load49388 = load ptr, ptr %debug_mode, align 8
   %strcmp49390 = call i32 @strcmp(ptr %load49388, ptr @.strlit49389)
   %cmp49391 = icmp eq i32 %strcmp49390, 0
   %bool49392 = zext i1 %cmp49391 to i32
   %cond49393 = icmp ne i32 %bool49392, 0
-  br i1 %cond49393, label %or.true4, label %or.merge6
+  br i1 %cond49393, label %if.then8332, label %if.else8333
 
-or.merge6:                                        ; preds = %or.true4, %or.rhs5
-  %orval49394 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
-  %cond49395 = icmp ne i32 %orval49394, 0
-  br i1 %cond49395, label %if.then8329, label %if.else8330
+if.else8330:                                      ; preds = %if.else8327
+  %load49414 = load ptr, ptr %arg, align 8
+  %strcmp49416 = call i32 @strcmp(ptr %load49414, ptr @.strlit49415)
+  %cmp49417 = icmp eq i32 %strcmp49416, 0
+  %bool49418 = zext i1 %cmp49417 to i32
+  %cond49419 = icmp ne i32 %bool49418, 0
+  br i1 %cond49419, label %if.then8341, label %if.else8342
+
+if.end8331:                                       ; preds = %if.end8343, %if.end8334
+  br label %if.end8328
 
 if.then8332:                                      ; preds = %if.then8329
-  %load49402 = load i32, ptr %i, align 4
-  %add49403 = add i32 %load49402, 1
-  store i32 %add49403, ptr %i, align 4
-  %load49404 = load ptr, ptr %link_args, align 8
-  %call49406 = call ptr @vix_string_concat(ptr %load49404, ptr @.strlit49405)
-  %load49407 = load ptr, ptr %arg, align 8
-  %call49408 = call ptr @vix_string_concat(ptr %call49406, ptr %load49407)
-  %load49409 = load ptr, ptr %argv, align 8
-  %load49410 = load i32, ptr %i, align 4
-  %idx49411 = getelementptr ptr, ptr %load49409, i32 %load49410
-  %loadidx49412 = load ptr, ptr %idx49411, align 8
-  %call49413 = call ptr @vix_string_concat(ptr %call49408, ptr %loadidx49412)
-  store ptr %call49413, ptr %link_args, align 8
+  store ptr @.strlit49394, ptr %mode, align 8
   br label %if.end8334
 
 if.else8333:                                      ; preds = %if.then8329
-  %load49415 = load ptr, ptr %arg, align 8
-  %call49416 = call ptr @vix_string_concat(ptr @.strlit49414, ptr %load49415)
-  %call49418 = call ptr @vix_string_concat(ptr %call49416, ptr @.strlit49417)
-  call void @diag_print(ptr %call49418)
-  ret i32 1
+  %load49395 = load ptr, ptr %debug_mode, align 8
+  %strcmp49397 = call i32 @strcmp(ptr %load49395, ptr @.strlit49396)
+  %cmp49398 = icmp eq i32 %strcmp49397, 0
+  %bool49399 = zext i1 %cmp49398 to i32
+  %cond49400 = icmp ne i32 %bool49399, 0
+  br i1 %cond49400, label %if.then8335, label %if.else8336
 
-if.end8334:                                       ; preds = %if.then8332
+if.end8334:                                       ; preds = %if.end8337, %if.then8332
   br label %if.end8331
 
-if.then8335:                                      ; preds = %or.merge9
-  %load49433 = load ptr, ptr %link_args, align 8
-  %call49435 = call ptr @vix_string_concat(ptr %load49433, ptr @.strlit49434)
-  %load49436 = load ptr, ptr %arg, align 8
-  %call49437 = call ptr @vix_string_concat(ptr %call49435, ptr %load49436)
-  store ptr %call49437, ptr %link_args, align 8
+if.then8335:                                      ; preds = %if.else8333
+  store ptr @.strlit49401, ptr %mode, align 8
   br label %if.end8337
 
-if.else8336:                                      ; preds = %or.merge9
-  %load49438 = load ptr, ptr %arg, align 8
-  %call49440 = call i32 @string_ends_with(ptr %load49438, ptr @.strlit49439)
-  %cmp49441 = icmp eq i32 %call49440, 1
-  %bool49442 = zext i1 %cmp49441 to i32
-  %cond49443 = icmp ne i32 %bool49442, 0
-  br i1 %cond49443, label %if.then8338, label %if.else8339
+if.else8336:                                      ; preds = %if.else8333
+  %load49402 = load ptr, ptr %debug_mode, align 8
+  %strcmp49404 = call i32 @strcmp(ptr %load49402, ptr @.strlit49403)
+  %cmp49405 = icmp eq i32 %strcmp49404, 0
+  %bool49406 = zext i1 %cmp49405 to i32
+  %cond49407 = icmp ne i32 %bool49406, 0
+  br i1 %cond49407, label %if.then8338, label %if.else8339
 
 if.end8337:                                       ; preds = %if.end8340, %if.then8335
-  br label %if.end8331
-
-or.true7:                                         ; preds = %or.rhs8, %if.else8330
-  br label %or.merge9
-
-or.rhs8:                                          ; preds = %if.else8330
-  %load49425 = load ptr, ptr %arg, align 8
-  %call49427 = call i32 @str_starts_with(ptr %load49425, ptr @.strlit49426)
-  %cmp49428 = icmp eq i32 %call49427, 1
-  %bool49429 = zext i1 %cmp49428 to i32
-  %cond49430 = icmp ne i32 %bool49429, 0
-  br i1 %cond49430, label %or.true7, label %or.merge9
-
-or.merge9:                                        ; preds = %or.true7, %or.rhs8
-  %orval49431 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
-  %cond49432 = icmp ne i32 %orval49431, 0
-  br i1 %cond49432, label %if.then8335, label %if.else8336
+  br label %if.end8334
 
 if.then8338:                                      ; preds = %if.else8336
-  %load49444 = load ptr, ptr %link_args, align 8
-  %call49446 = call ptr @vix_string_concat(ptr %load49444, ptr @.strlit49445)
-  %load49447 = load ptr, ptr %arg, align 8
-  %call49448 = call ptr @vix_string_concat(ptr %call49446, ptr %load49447)
-  store ptr %call49448, ptr %link_args, align 8
+  store ptr @.strlit49408, ptr %mode, align 8
   br label %if.end8340
 
 if.else8339:                                      ; preds = %if.else8336
-  %load49449 = load ptr, ptr %arg, align 8
-  %call49450 = call %CompilerModeResult @compiler_mode(ptr %load49449)
-  %extract49451 = extractvalue %CompilerModeResult %call49450, 0
-  %cmp49452 = icmp eq i32 %extract49451, 0
-  %bool49453 = zext i1 %cmp49452 to i32
-  %cond49454 = icmp ne i32 %bool49453, 0
-  br i1 %cond49454, label %if.then8341, label %if.else8342
+  %load49410 = load ptr, ptr %debug_mode, align 8
+  %call49411 = call ptr @vix_string_concat(ptr @.strlit49409, ptr %load49410)
+  %call49413 = call ptr @vix_string_concat(ptr %call49411, ptr @.strlit49412)
+  call void @diag_print(ptr %call49413)
+  ret i32 1
 
-if.end8340:                                       ; preds = %if.end8343, %if.then8338
+if.end8340:                                       ; preds = %if.then8338
   br label %if.end8337
 
-if.then8341:                                      ; preds = %if.else8339
-  %load49455 = load ptr, ptr %arg, align 8
-  %call49456 = call %CompilerModeResult @compiler_mode(ptr %load49455)
-  %extract49457 = extractvalue %CompilerModeResult %call49456, 2
-  %next_mode = alloca ptr, align 8
-  store ptr %extract49457, ptr %next_mode, align 8
-  %load49458 = load ptr, ptr %next_mode, align 8
+if.then8341:                                      ; preds = %if.else8330
+  %load49420 = load i32, ptr %i, align 4
+  %add49421 = add i32 %load49420, 1
+  %load49422 = load i32, ptr %argc, align 4
+  %cmp49423 = icmp slt i32 %add49421, %load49422
+  %bool49424 = zext i1 %cmp49423 to i32
+  %cond49425 = icmp ne i32 %bool49424, 0
+  br i1 %cond49425, label %if.then8344, label %if.else8345
+
+if.else8342:                                      ; preds = %if.else8330
+  %load49433 = load ptr, ptr %arg, align 8
+  %strcmp49435 = call i32 @strcmp(ptr %load49433, ptr @.strlit49434)
+  %cmp49436 = icmp eq i32 %strcmp49435, 0
+  %bool49437 = zext i1 %cmp49436 to i32
+  %cond49438 = icmp ne i32 %bool49437, 0
+  br i1 %cond49438, label %if.then8347, label %if.else8348
+
+if.end8343:                                       ; preds = %if.end8349, %if.end8346
+  br label %if.end8331
+
+if.then8344:                                      ; preds = %if.then8341
+  %load49426 = load i32, ptr %i, align 4
+  %add49427 = add i32 %load49426, 1
+  store i32 %add49427, ptr %i, align 4
+  %load49428 = load ptr, ptr %argv, align 8
+  %load49429 = load i32, ptr %i, align 4
+  %idx49430 = getelementptr ptr, ptr %load49428, i32 %load49429
+  %loadidx49431 = load ptr, ptr %idx49430, align 8
+  store ptr %loadidx49431, ptr %target_triple, align 8
+  br label %if.end8346
+
+if.else8345:                                      ; preds = %if.then8341
+  call void @diag_print(ptr @.strlit49432)
+  ret i32 1
+
+if.end8346:                                       ; preds = %if.then8344
+  br label %if.end8343
+
+if.then8347:                                      ; preds = %if.else8342
+  %load49439 = load i32, ptr %i, align 4
+  %add49440 = add i32 %load49439, 1
+  %load49441 = load i32, ptr %argc, align 4
+  %cmp49442 = icmp slt i32 %add49440, %load49441
+  %bool49443 = zext i1 %cmp49442 to i32
+  %cond49444 = icmp ne i32 %bool49443, 0
+  br i1 %cond49444, label %if.then8350, label %if.else8351
+
+if.else8348:                                      ; preds = %if.else8342
+  %load49465 = load ptr, ptr %arg, align 8
+  %strcmp49467 = call i32 @strcmp(ptr %load49465, ptr @.strlit49466)
+  %cmp49468 = icmp eq i32 %strcmp49467, 0
+  %bool49469 = zext i1 %cmp49468 to i32
+  %cond49470 = icmp ne i32 %bool49469, 0
+  br i1 %cond49470, label %if.then8359, label %if.else8360
+
+if.end8349:                                       ; preds = %if.end8361, %if.end8352
+  br label %if.end8343
+
+if.then8350:                                      ; preds = %if.then8347
+  %load49445 = load i32, ptr %i, align 4
+  %add49446 = add i32 %load49445, 1
+  store i32 %add49446, ptr %i, align 4
+  %load49447 = load ptr, ptr %argv, align 8
+  %load49448 = load i32, ptr %i, align 4
+  %idx49449 = getelementptr ptr, ptr %load49447, i32 %load49448
+  %loadidx49450 = load ptr, ptr %idx49449, align 8
+  store ptr %loadidx49450, ptr %backend, align 8
+  %load49451 = load ptr, ptr %backend, align 8
+  %strcmp49453 = call i32 @strcmp(ptr %load49451, ptr @.strlit49452)
+  %cmp49454 = icmp eq i32 %strcmp49453, 0
+  %bool49455 = zext i1 %cmp49454 to i32
+  %cond49456 = icmp ne i32 %bool49455, 0
+  br i1 %cond49456, label %if.then8353, label %if.else8354
+
+if.else8351:                                      ; preds = %if.then8347
+  call void @diag_print(ptr @.strlit49464)
+  ret i32 1
+
+if.end8352:                                       ; preds = %if.end8355
+  br label %if.end8349
+
+if.then8353:                                      ; preds = %if.then8350
+  store ptr @.strlit49457, ptr %backend, align 8
+  store i32 1, ptr %optimize_mir, align 4
+  br label %if.end8355
+
+if.else8354:                                      ; preds = %if.then8350
+  %load49458 = load ptr, ptr %backend, align 8
   %strcmp49460 = call i32 @strcmp(ptr %load49458, ptr @.strlit49459)
   %cmp49461 = icmp eq i32 %strcmp49460, 0
   %bool49462 = zext i1 %cmp49461 to i32
   %cond49463 = icmp ne i32 %bool49462, 0
-  br i1 %cond49463, label %if.then8344, label %if.else8345
-
-if.else8342:                                      ; preds = %if.else8339
-  %load49498 = load ptr, ptr %arg, align 8
-  %call49499 = call %CompilerModeResult @compiler_mode(ptr %load49498)
-  %extract49500 = extractvalue %CompilerModeResult %call49499, 0
-  %cmp49501 = icmp eq i32 %extract49500, 1
-  %bool49502 = zext i1 %cmp49501 to i32
-  %cond49503 = icmp ne i32 %bool49502, 0
-  br i1 %cond49503, label %if.then8362, label %if.else8363
-
-if.end8343:                                       ; preds = %if.end8364, %if.end8346
-  br label %if.end8340
-
-if.then8344:                                      ; preds = %if.then8341
-  store i32 1, ptr %want_help, align 4
-  br label %if.end8346
-
-if.else8345:                                      ; preds = %if.then8341
-  %load49464 = load ptr, ptr %next_mode, align 8
-  %strcmp49466 = call i32 @strcmp(ptr %load49464, ptr @.strlit49465)
-  %cmp49467 = icmp eq i32 %strcmp49466, 0
-  %bool49468 = zext i1 %cmp49467 to i32
-  %cond49469 = icmp ne i32 %bool49468, 0
-  br i1 %cond49469, label %if.then8347, label %if.else8348
-
-if.end8346:                                       ; preds = %if.end8349, %if.then8344
-  br label %if.end8343
-
-if.then8347:                                      ; preds = %if.else8345
-  store i32 1, ptr %want_version, align 4
-  br label %if.end8349
-
-if.else8348:                                      ; preds = %if.else8345
-  %load49470 = load ptr, ptr %next_mode, align 8
-  %strcmp49472 = call i32 @strcmp(ptr %load49470, ptr @.strlit49471)
-  %cmp49473 = icmp eq i32 %strcmp49472, 0
-  %bool49474 = zext i1 %cmp49473 to i32
-  %cond49475 = icmp ne i32 %bool49474, 0
-  br i1 %cond49475, label %if.then8350, label %if.else8351
-
-if.end8349:                                       ; preds = %if.end8352, %if.then8347
-  br label %if.end8346
-
-if.then8350:                                      ; preds = %if.else8348
-  store ptr @.strlit49476, ptr %emit, align 8
-  br label %if.end8352
-
-if.else8351:                                      ; preds = %if.else8348
-  %load49477 = load ptr, ptr %next_mode, align 8
-  %strcmp49479 = call i32 @strcmp(ptr %load49477, ptr @.strlit49478)
-  %cmp49480 = icmp eq i32 %strcmp49479, 0
-  %bool49481 = zext i1 %cmp49480 to i32
-  %cond49482 = icmp ne i32 %bool49481, 0
-  br i1 %cond49482, label %if.then8353, label %if.else8354
-
-if.end8352:                                       ; preds = %if.end8355, %if.then8350
-  br label %if.end8349
-
-if.then8353:                                      ; preds = %if.else8351
-  store ptr @.strlit49483, ptr %emit, align 8
-  br label %if.end8355
-
-if.else8354:                                      ; preds = %if.else8351
-  %load49484 = load ptr, ptr %next_mode, align 8
-  %strcmp49486 = call i32 @strcmp(ptr %load49484, ptr @.strlit49485)
-  %cmp49487 = icmp eq i32 %strcmp49486, 0
-  %bool49488 = zext i1 %cmp49487 to i32
-  %cond49489 = icmp ne i32 %bool49488, 0
-  br i1 %cond49489, label %if.then8356, label %if.else8357
+  br i1 %cond49463, label %if.then8356, label %if.else8357
 
 if.end8355:                                       ; preds = %if.end8358, %if.then8353
   br label %if.end8352
 
 if.then8356:                                      ; preds = %if.else8354
-  store ptr @.strlit49490, ptr %emit, align 8
+  store i32 0, ptr %optimize_mir, align 4
   br label %if.end8358
 
 if.else8357:                                      ; preds = %if.else8354
-  %load49491 = load ptr, ptr %next_mode, align 8
-  %strcmp49493 = call i32 @strcmp(ptr %load49491, ptr @.strlit49492)
-  %cmp49494 = icmp eq i32 %strcmp49493, 0
-  %bool49495 = zext i1 %cmp49494 to i32
-  %cond49496 = icmp ne i32 %bool49495, 0
-  br i1 %cond49496, label %if.then8359, label %if.else8360
-
-if.end8358:                                       ; preds = %if.end8361, %if.then8356
-  br label %if.end8355
-
-if.then8359:                                      ; preds = %if.else8357
-  store i32 1, ptr %optimize_mir, align 4
-  br label %if.end8361
-
-if.else8360:                                      ; preds = %if.else8357
-  %load49497 = load ptr, ptr %next_mode, align 8
-  store ptr %load49497, ptr %mode, align 8
-  br label %if.end8361
-
-if.end8361:                                       ; preds = %if.else8360, %if.then8359
   br label %if.end8358
 
-if.then8362:                                      ; preds = %if.else8342
-  %load49504 = load ptr, ptr %arg, align 8
-  %call49505 = call ptr @source_file_arg(ptr %load49504)
-  br label %match.test8366
+if.end8358:                                       ; preds = %if.else8357, %if.then8356
+  br label %if.end8355
 
-if.else8363:                                      ; preds = %if.else8342
+if.then8359:                                      ; preds = %if.else8348
+  store ptr @.strlit49471, ptr %backend, align 8
+  br label %if.end8361
+
+if.else8360:                                      ; preds = %if.else8348
+  %load49472 = load ptr, ptr %arg, align 8
+  %strcmp49474 = call i32 @strcmp(ptr %load49472, ptr @.strlit49473)
+  %cmp49475 = icmp eq i32 %strcmp49474, 0
+  %bool49476 = zext i1 %cmp49475 to i32
+  %cond49477 = icmp ne i32 %bool49476, 0
+  br i1 %cond49477, label %if.then8362, label %if.else8363
+
+if.end8361:                                       ; preds = %if.end8364, %if.then8359
+  br label %if.end8349
+
+if.then8362:                                      ; preds = %if.else8360
+  store ptr @.strlit49478, ptr %backend, align 8
+  store i32 1, ptr %optimize_mir, align 4
   br label %if.end8364
 
-if.end8364:                                       ; preds = %if.else8363, %match.end8365
-  br label %if.end8343
+if.else8363:                                      ; preds = %if.else8360
+  %load49479 = load ptr, ptr %arg, align 8
+  %strcmp49481 = call i32 @strcmp(ptr %load49479, ptr @.strlit49480)
+  %cmp49482 = icmp eq i32 %strcmp49481, 0
+  %bool49483 = zext i1 %cmp49482 to i32
+  %cond49484 = icmp ne i32 %bool49483, 0
+  br i1 %cond49484, label %if.then8365, label %if.else8366
 
-match.end8365:                                    ; preds = %match.test8373, %if.end8371
+if.end8364:                                       ; preds = %if.end8367, %if.then8362
+  br label %if.end8361
+
+if.then8365:                                      ; preds = %if.else8363
+  store ptr @.strlit49485, ptr %backend, align 8
+  store i32 0, ptr %optimize_mir, align 4
+  br label %if.end8367
+
+if.else8366:                                      ; preds = %if.else8363
+  %load49486 = load ptr, ptr %arg, align 8
+  %strcmp49488 = call i32 @strcmp(ptr %load49486, ptr @.strlit49487)
+  %cmp49489 = icmp eq i32 %strcmp49488, 0
+  %bool49490 = zext i1 %cmp49489 to i32
+  %cond49491 = icmp ne i32 %bool49490, 0
+  br i1 %cond49491, label %or.true4, label %or.rhs5
+
+if.end8367:                                       ; preds = %if.end8370, %if.then8365
   br label %if.end8364
 
-match.test8366:                                   ; preds = %if.then8362
-  %cmp49506 = icmp ne ptr %call49505, null
-  %bool49507 = zext i1 %cmp49506 to i32
-  %cond49508 = icmp ne i32 %bool49507, 0
-  br i1 %cond49508, label %match.body8367, label %match.test8368
+if.then8368:                                      ; preds = %or.merge6
+  %load49500 = load i32, ptr %i, align 4
+  %add49501 = add i32 %load49500, 1
+  %load49502 = load i32, ptr %argc, align 4
+  %cmp49503 = icmp slt i32 %add49501, %load49502
+  %bool49504 = zext i1 %cmp49503 to i32
+  %cond49505 = icmp ne i32 %bool49504, 0
+  br i1 %cond49505, label %if.then8371, label %if.else8372
 
-match.body8367:                                   ; preds = %match.test8366
-  %path = alloca ptr, align 8
-  store ptr %call49505, ptr %path, align 8
-  %load49509 = load i32, ptr %has_input, align 4
-  %cmp49510 = icmp eq i32 %load49509, 1
-  %bool49511 = zext i1 %cmp49510 to i32
-  %cond49512 = icmp ne i32 %bool49511, 0
-  br i1 %cond49512, label %if.then8369, label %if.else8370
+if.else8369:                                      ; preds = %or.merge6
+  %load49523 = load ptr, ptr %arg, align 8
+  %call49525 = call i32 @str_starts_with(ptr %load49523, ptr @.strlit49524)
+  %cmp49526 = icmp eq i32 %call49525, 1
+  %bool49527 = zext i1 %cmp49526 to i32
+  %cond49528 = icmp ne i32 %bool49527, 0
+  br i1 %cond49528, label %or.true7, label %or.rhs8
 
-match.test8368:                                   ; preds = %match.test8366
-  %cmp49517 = icmp eq ptr %call49505, null
-  %bool49518 = zext i1 %cmp49517 to i32
-  %cond49519 = icmp ne i32 %bool49518, 0
-  br i1 %cond49519, label %match.body8372, label %match.test8373
+if.end8370:                                       ; preds = %if.end8376, %if.end8373
+  br label %if.end8367
 
-if.then8369:                                      ; preds = %match.body8367
-  call void @diag_print(ptr @.strlit49513)
+or.true4:                                         ; preds = %or.rhs5, %if.else8366
+  br label %or.merge6
+
+or.rhs5:                                          ; preds = %if.else8366
+  %load49492 = load ptr, ptr %arg, align 8
+  %strcmp49494 = call i32 @strcmp(ptr %load49492, ptr @.strlit49493)
+  %cmp49495 = icmp eq i32 %strcmp49494, 0
+  %bool49496 = zext i1 %cmp49495 to i32
+  %cond49497 = icmp ne i32 %bool49496, 0
+  br i1 %cond49497, label %or.true4, label %or.merge6
+
+or.merge6:                                        ; preds = %or.rhs5, %or.true4
+  %orval49498 = phi i32 [ 1, %or.true4 ], [ 0, %or.rhs5 ]
+  %cond49499 = icmp ne i32 %orval49498, 0
+  br i1 %cond49499, label %if.then8368, label %if.else8369
+
+if.then8371:                                      ; preds = %if.then8368
+  %load49506 = load i32, ptr %i, align 4
+  %add49507 = add i32 %load49506, 1
+  store i32 %add49507, ptr %i, align 4
+  %load49508 = load ptr, ptr %link_args, align 8
+  %call49510 = call ptr @vix_string_concat(ptr %load49508, ptr @.strlit49509)
+  %load49511 = load ptr, ptr %arg, align 8
+  %call49512 = call ptr @vix_string_concat(ptr %call49510, ptr %load49511)
+  %load49513 = load ptr, ptr %argv, align 8
+  %load49514 = load i32, ptr %i, align 4
+  %idx49515 = getelementptr ptr, ptr %load49513, i32 %load49514
+  %loadidx49516 = load ptr, ptr %idx49515, align 8
+  %call49517 = call ptr @vix_string_concat(ptr %call49512, ptr %loadidx49516)
+  store ptr %call49517, ptr %link_args, align 8
+  br label %if.end8373
+
+if.else8372:                                      ; preds = %if.then8368
+  %load49519 = load ptr, ptr %arg, align 8
+  %call49520 = call ptr @vix_string_concat(ptr @.strlit49518, ptr %load49519)
+  %call49522 = call ptr @vix_string_concat(ptr %call49520, ptr @.strlit49521)
+  call void @diag_print(ptr %call49522)
   ret i32 1
 
-if.else8370:                                      ; preds = %match.body8367
-  br label %if.end8371
+if.end8373:                                       ; preds = %if.then8371
+  br label %if.end8370
 
-if.end8371:                                       ; preds = %if.else8370
-  %load49514 = load ptr, ptr %path, align 8
-  %call49515 = call ptr @read_source_file(ptr %load49514)
-  store ptr %call49515, ptr %src, align 8
-  %load49516 = load ptr, ptr %path, align 8
-  store ptr %load49516, ptr %filename, align 8
-  store i32 1, ptr %has_input, align 4
-  br label %match.end8365
-
-match.body8372:                                   ; preds = %match.test8368
-  %load49521 = load ptr, ptr %arg, align 8
-  %call49522 = call ptr @vix_string_concat(ptr @.strlit49520, ptr %load49521)
-  %call49524 = call ptr @vix_string_concat(ptr %call49522, ptr @.strlit49523)
-  call void @diag_print(ptr %call49524)
-  ret i32 1
-
-match.test8373:                                   ; preds = %match.test8368
-  br label %match.end8365
-
-if.then8374:                                      ; preds = %while.end8268
-  %call49531 = call i32 @print_help()
-  ret i32 %call49531
-
-if.else8375:                                      ; preds = %while.end8268
+if.then8374:                                      ; preds = %or.merge9
+  %load49537 = load ptr, ptr %link_args, align 8
+  %call49539 = call ptr @vix_string_concat(ptr %load49537, ptr @.strlit49538)
+  %load49540 = load ptr, ptr %arg, align 8
+  %call49541 = call ptr @vix_string_concat(ptr %call49539, ptr %load49540)
+  store ptr %call49541, ptr %link_args, align 8
   br label %if.end8376
 
-if.end8376:                                       ; preds = %if.else8375
-  %load49532 = load i32, ptr %want_version, align 4
-  %cmp49533 = icmp eq i32 %load49532, 1
-  %bool49534 = zext i1 %cmp49533 to i32
-  %cond49535 = icmp ne i32 %bool49534, 0
-  br i1 %cond49535, label %if.then8377, label %if.else8378
+if.else8375:                                      ; preds = %or.merge9
+  %load49542 = load ptr, ptr %arg, align 8
+  %call49544 = call i32 @string_ends_with(ptr %load49542, ptr @.strlit49543)
+  %cmp49545 = icmp eq i32 %call49544, 1
+  %bool49546 = zext i1 %cmp49545 to i32
+  %cond49547 = icmp ne i32 %bool49546, 0
+  br i1 %cond49547, label %if.then8377, label %if.else8378
 
-if.then8377:                                      ; preds = %if.end8376
-  %call49536 = call i32 @print_version()
-  ret i32 %call49536
+if.end8376:                                       ; preds = %if.end8379, %if.then8374
+  br label %if.end8370
 
-if.else8378:                                      ; preds = %if.end8376
+or.true7:                                         ; preds = %or.rhs8, %if.else8369
+  br label %or.merge9
+
+or.rhs8:                                          ; preds = %if.else8369
+  %load49529 = load ptr, ptr %arg, align 8
+  %call49531 = call i32 @str_starts_with(ptr %load49529, ptr @.strlit49530)
+  %cmp49532 = icmp eq i32 %call49531, 1
+  %bool49533 = zext i1 %cmp49532 to i32
+  %cond49534 = icmp ne i32 %bool49533, 0
+  br i1 %cond49534, label %or.true7, label %or.merge9
+
+or.merge9:                                        ; preds = %or.rhs8, %or.true7
+  %orval49535 = phi i32 [ 1, %or.true7 ], [ 0, %or.rhs8 ]
+  %cond49536 = icmp ne i32 %orval49535, 0
+  br i1 %cond49536, label %if.then8374, label %if.else8375
+
+if.then8377:                                      ; preds = %if.else8375
+  %load49548 = load ptr, ptr %link_args, align 8
+  %call49550 = call ptr @vix_string_concat(ptr %load49548, ptr @.strlit49549)
+  %load49551 = load ptr, ptr %arg, align 8
+  %call49552 = call ptr @vix_string_concat(ptr %call49550, ptr %load49551)
+  store ptr %call49552, ptr %link_args, align 8
   br label %if.end8379
 
-if.end8379:                                       ; preds = %if.else8378
-  %load49537 = load i32, ptr %has_input, align 4
-  %cmp49538 = icmp eq i32 %load49537, 0
-  %bool49539 = zext i1 %cmp49538 to i32
-  %cond49540 = icmp ne i32 %bool49539, 0
-  br i1 %cond49540, label %if.then8380, label %if.else8381
+if.else8378:                                      ; preds = %if.else8375
+  %load49553 = load ptr, ptr %arg, align 8
+  %call49554 = call %CompilerModeResult @compiler_mode(ptr %load49553)
+  %extract49555 = extractvalue %CompilerModeResult %call49554, 0
+  %cmp49556 = icmp eq i32 %extract49555, 0
+  %bool49557 = zext i1 %cmp49556 to i32
+  %cond49558 = icmp ne i32 %bool49557, 0
+  br i1 %cond49558, label %if.then8380, label %if.else8381
 
-if.then8380:                                      ; preds = %if.end8379
-  call void @diag_print(ptr @.strlit49541)
-  call void @diag_print(ptr @.strlit49542)
-  ret i32 1
+if.end8379:                                       ; preds = %if.end8382, %if.then8377
+  br label %if.end8376
 
-if.else8381:                                      ; preds = %if.end8379
-  br label %if.end8382
-
-if.end8382:                                       ; preds = %if.else8381
-  %load49543 = load ptr, ptr %src, align 8
-  %strcmp49545 = call i32 @strcmp(ptr %load49543, ptr @.strlit49544)
-  %cmp49546 = icmp eq i32 %strcmp49545, 0
-  %bool49547 = zext i1 %cmp49546 to i32
-  %cond49548 = icmp ne i32 %bool49547, 0
-  br i1 %cond49548, label %if.then8383, label %if.else8384
-
-if.then8383:                                      ; preds = %if.end8382
-  %load49550 = load ptr, ptr %filename, align 8
-  %call49551 = call ptr @vix_string_concat(ptr @.strlit49549, ptr %load49550)
-  %call49553 = call ptr @vix_string_concat(ptr %call49551, ptr @.strlit49552)
-  call void @diag_print(ptr %call49553)
-  ret i32 1
-
-if.else8384:                                      ; preds = %if.end8382
-  br label %if.end8385
-
-if.end8385:                                       ; preds = %if.else8384
-  %load49554 = load ptr, ptr %backend, align 8
-  %strcmp49556 = call i32 @strcmp(ptr %load49554, ptr @.strlit49555)
-  %cmp49557 = icmp eq i32 %strcmp49556, 0
-  %bool49558 = zext i1 %cmp49557 to i32
-  %cmp49559 = icmp eq i32 %bool49558, 0
-  %bool49560 = zext i1 %cmp49559 to i32
-  %cond49561 = icmp ne i32 %bool49560, 0
-  br i1 %cond49561, label %and.rhs10, label %and.false11
-
-if.then8386:                                      ; preds = %and.merge12
-  %load49573 = load ptr, ptr %backend, align 8
-  %call49574 = call ptr @vix_string_concat(ptr @.strlit49572, ptr %load49573)
-  %call49576 = call ptr @vix_string_concat(ptr %call49574, ptr @.strlit49575)
-  call void @diag_print(ptr %call49576)
-  ret i32 1
-
-if.else8387:                                      ; preds = %and.merge12
-  br label %if.end8388
-
-if.end8388:                                       ; preds = %if.else8387
-  %load49577 = load ptr, ptr %backend, align 8
-  %strcmp49579 = call i32 @strcmp(ptr %load49577, ptr @.strlit49578)
-  %cmp49580 = icmp eq i32 %strcmp49579, 0
-  %bool49581 = zext i1 %cmp49580 to i32
-  %cond49582 = icmp ne i32 %bool49581, 0
-  br i1 %cond49582, label %and.rhs13, label %and.false14
-
-and.rhs10:                                        ; preds = %if.end8385
-  %load49562 = load ptr, ptr %backend, align 8
+if.then8380:                                      ; preds = %if.else8378
+  %load49559 = load ptr, ptr %arg, align 8
+  %call49560 = call %CompilerModeResult @compiler_mode(ptr %load49559)
+  %extract49561 = extractvalue %CompilerModeResult %call49560, 2
+  %next_mode = alloca ptr, align 8
+  store ptr %extract49561, ptr %next_mode, align 8
+  %load49562 = load ptr, ptr %next_mode, align 8
   %strcmp49564 = call i32 @strcmp(ptr %load49562, ptr @.strlit49563)
   %cmp49565 = icmp eq i32 %strcmp49564, 0
   %bool49566 = zext i1 %cmp49565 to i32
-  %cmp49567 = icmp eq i32 %bool49566, 0
-  %bool49568 = zext i1 %cmp49567 to i32
-  %cond49569 = icmp ne i32 %bool49568, 0
-  br i1 %cond49569, label %and.merge12, label %and.false11
+  %cond49567 = icmp ne i32 %bool49566, 0
+  br i1 %cond49567, label %if.then8383, label %if.else8384
 
-and.false11:                                      ; preds = %and.rhs10, %if.end8385
+if.else8381:                                      ; preds = %if.else8378
+  %load49596 = load ptr, ptr %arg, align 8
+  %call49597 = call %CompilerModeResult @compiler_mode(ptr %load49596)
+  %extract49598 = extractvalue %CompilerModeResult %call49597, 0
+  %cmp49599 = icmp eq i32 %extract49598, 1
+  %bool49600 = zext i1 %cmp49599 to i32
+  %cond49601 = icmp ne i32 %bool49600, 0
+  br i1 %cond49601, label %if.then8398, label %if.else8399
+
+if.end8382:                                       ; preds = %if.end8400, %if.end8385
+  br label %if.end8379
+
+if.then8383:                                      ; preds = %if.then8380
+  store i32 1, ptr %want_help, align 4
+  br label %if.end8385
+
+if.else8384:                                      ; preds = %if.then8380
+  %load49568 = load ptr, ptr %next_mode, align 8
+  %strcmp49570 = call i32 @strcmp(ptr %load49568, ptr @.strlit49569)
+  %cmp49571 = icmp eq i32 %strcmp49570, 0
+  %bool49572 = zext i1 %cmp49571 to i32
+  %cond49573 = icmp ne i32 %bool49572, 0
+  br i1 %cond49573, label %if.then8386, label %if.else8387
+
+if.end8385:                                       ; preds = %if.end8388, %if.then8383
+  br label %if.end8382
+
+if.then8386:                                      ; preds = %if.else8384
+  store i32 1, ptr %want_version, align 4
+  br label %if.end8388
+
+if.else8387:                                      ; preds = %if.else8384
+  %load49574 = load ptr, ptr %next_mode, align 8
+  %strcmp49576 = call i32 @strcmp(ptr %load49574, ptr @.strlit49575)
+  %cmp49577 = icmp eq i32 %strcmp49576, 0
+  %bool49578 = zext i1 %cmp49577 to i32
+  %cond49579 = icmp ne i32 %bool49578, 0
+  br i1 %cond49579, label %if.then8389, label %if.else8390
+
+if.end8388:                                       ; preds = %if.end8391, %if.then8386
+  br label %if.end8385
+
+if.then8389:                                      ; preds = %if.else8387
+  store ptr @.strlit49580, ptr %emit, align 8
+  br label %if.end8391
+
+if.else8390:                                      ; preds = %if.else8387
+  %load49581 = load ptr, ptr %next_mode, align 8
+  %strcmp49583 = call i32 @strcmp(ptr %load49581, ptr @.strlit49582)
+  %cmp49584 = icmp eq i32 %strcmp49583, 0
+  %bool49585 = zext i1 %cmp49584 to i32
+  %cond49586 = icmp ne i32 %bool49585, 0
+  br i1 %cond49586, label %if.then8392, label %if.else8393
+
+if.end8391:                                       ; preds = %if.end8394, %if.then8389
+  br label %if.end8388
+
+if.then8392:                                      ; preds = %if.else8390
+  store ptr @.strlit49587, ptr %emit, align 8
+  br label %if.end8394
+
+if.else8393:                                      ; preds = %if.else8390
+  %load49588 = load ptr, ptr %next_mode, align 8
+  %strcmp49590 = call i32 @strcmp(ptr %load49588, ptr @.strlit49589)
+  %cmp49591 = icmp eq i32 %strcmp49590, 0
+  %bool49592 = zext i1 %cmp49591 to i32
+  %cond49593 = icmp ne i32 %bool49592, 0
+  br i1 %cond49593, label %if.then8395, label %if.else8396
+
+if.end8394:                                       ; preds = %if.end8397, %if.then8392
+  br label %if.end8391
+
+if.then8395:                                      ; preds = %if.else8393
+  store ptr @.strlit49594, ptr %emit, align 8
+  br label %if.end8397
+
+if.else8396:                                      ; preds = %if.else8393
+  %load49595 = load ptr, ptr %next_mode, align 8
+  store ptr %load49595, ptr %mode, align 8
+  br label %if.end8397
+
+if.end8397:                                       ; preds = %if.else8396, %if.then8395
+  br label %if.end8394
+
+if.then8398:                                      ; preds = %if.else8381
+  %load49602 = load ptr, ptr %arg, align 8
+  %call49603 = call ptr @source_file_arg(ptr %load49602)
+  br label %match.test8402
+
+if.else8399:                                      ; preds = %if.else8381
+  br label %if.end8400
+
+if.end8400:                                       ; preds = %match.end8401, %if.else8399
+  br label %if.end8382
+
+match.end8401:                                    ; preds = %match.test8409, %if.end8407
+  br label %if.end8400
+
+match.test8402:                                   ; preds = %if.then8398
+  %cmp49604 = icmp ne ptr %call49603, null
+  %bool49605 = zext i1 %cmp49604 to i32
+  %cond49606 = icmp ne i32 %bool49605, 0
+  br i1 %cond49606, label %match.body8403, label %match.test8404
+
+match.body8403:                                   ; preds = %match.test8402
+  %path = alloca ptr, align 8
+  store ptr %call49603, ptr %path, align 8
+  %load49607 = load i32, ptr %has_input, align 4
+  %cmp49608 = icmp eq i32 %load49607, 1
+  %bool49609 = zext i1 %cmp49608 to i32
+  %cond49610 = icmp ne i32 %bool49609, 0
+  br i1 %cond49610, label %if.then8405, label %if.else8406
+
+match.test8404:                                   ; preds = %match.test8402
+  %cmp49615 = icmp eq ptr %call49603, null
+  %bool49616 = zext i1 %cmp49615 to i32
+  %cond49617 = icmp ne i32 %bool49616, 0
+  br i1 %cond49617, label %match.body8408, label %match.test8409
+
+if.then8405:                                      ; preds = %match.body8403
+  call void @diag_print(ptr @.strlit49611)
+  ret i32 1
+
+if.else8406:                                      ; preds = %match.body8403
+  br label %if.end8407
+
+if.end8407:                                       ; preds = %if.else8406
+  %load49612 = load ptr, ptr %path, align 8
+  %call49613 = call ptr @read_source_file(ptr %load49612)
+  store ptr %call49613, ptr %src, align 8
+  %load49614 = load ptr, ptr %path, align 8
+  store ptr %load49614, ptr %filename, align 8
+  store i32 1, ptr %has_input, align 4
+  br label %match.end8401
+
+match.body8408:                                   ; preds = %match.test8404
+  %load49619 = load ptr, ptr %arg, align 8
+  %call49620 = call ptr @vix_string_concat(ptr @.strlit49618, ptr %load49619)
+  %call49622 = call ptr @vix_string_concat(ptr %call49620, ptr @.strlit49621)
+  call void @diag_print(ptr %call49622)
+  ret i32 1
+
+match.test8409:                                   ; preds = %match.test8404
+  br label %match.end8401
+
+if.then8410:                                      ; preds = %while.end8295
+  %call49629 = call i32 @print_help()
+  ret i32 %call49629
+
+if.else8411:                                      ; preds = %while.end8295
+  br label %if.end8412
+
+if.end8412:                                       ; preds = %if.else8411
+  %load49630 = load i32, ptr %want_version, align 4
+  %cmp49631 = icmp eq i32 %load49630, 1
+  %bool49632 = zext i1 %cmp49631 to i32
+  %cond49633 = icmp ne i32 %bool49632, 0
+  br i1 %cond49633, label %if.then8413, label %if.else8414
+
+if.then8413:                                      ; preds = %if.end8412
+  %call49634 = call i32 @print_version()
+  ret i32 %call49634
+
+if.else8414:                                      ; preds = %if.end8412
+  br label %if.end8415
+
+if.end8415:                                       ; preds = %if.else8414
+  %load49635 = load i32, ptr %has_input, align 4
+  %cmp49636 = icmp eq i32 %load49635, 0
+  %bool49637 = zext i1 %cmp49636 to i32
+  %cond49638 = icmp ne i32 %bool49637, 0
+  br i1 %cond49638, label %if.then8416, label %if.else8417
+
+if.then8416:                                      ; preds = %if.end8415
+  call void @diag_print(ptr @.strlit49639)
+  call void @diag_print(ptr @.strlit49640)
+  ret i32 1
+
+if.else8417:                                      ; preds = %if.end8415
+  br label %if.end8418
+
+if.end8418:                                       ; preds = %if.else8417
+  %load49641 = load ptr, ptr %src, align 8
+  %strcmp49643 = call i32 @strcmp(ptr %load49641, ptr @.strlit49642)
+  %cmp49644 = icmp eq i32 %strcmp49643, 0
+  %bool49645 = zext i1 %cmp49644 to i32
+  %cond49646 = icmp ne i32 %bool49645, 0
+  br i1 %cond49646, label %if.then8419, label %if.else8420
+
+if.then8419:                                      ; preds = %if.end8418
+  %load49648 = load ptr, ptr %filename, align 8
+  %call49649 = call ptr @vix_string_concat(ptr @.strlit49647, ptr %load49648)
+  %call49651 = call ptr @vix_string_concat(ptr %call49649, ptr @.strlit49650)
+  call void @diag_print(ptr %call49651)
+  ret i32 1
+
+if.else8420:                                      ; preds = %if.end8418
+  br label %if.end8421
+
+if.end8421:                                       ; preds = %if.else8420
+  %load49652 = load ptr, ptr %backend, align 8
+  %strcmp49654 = call i32 @strcmp(ptr %load49652, ptr @.strlit49653)
+  %cmp49655 = icmp eq i32 %strcmp49654, 0
+  %bool49656 = zext i1 %cmp49655 to i32
+  %cmp49657 = icmp eq i32 %bool49656, 0
+  %bool49658 = zext i1 %cmp49657 to i32
+  %cond49659 = icmp ne i32 %bool49658, 0
+  br i1 %cond49659, label %and.rhs10, label %and.false11
+
+if.then8422:                                      ; preds = %and.merge12
+  %load49671 = load ptr, ptr %backend, align 8
+  %call49672 = call ptr @vix_string_concat(ptr @.strlit49670, ptr %load49671)
+  %call49674 = call ptr @vix_string_concat(ptr %call49672, ptr @.strlit49673)
+  call void @diag_print(ptr %call49674)
+  ret i32 1
+
+if.else8423:                                      ; preds = %and.merge12
+  br label %if.end8424
+
+if.end8424:                                       ; preds = %if.else8423
+  %load49675 = load ptr, ptr %backend, align 8
+  %strcmp49677 = call i32 @strcmp(ptr %load49675, ptr @.strlit49676)
+  %cmp49678 = icmp eq i32 %strcmp49677, 0
+  %bool49679 = zext i1 %cmp49678 to i32
+  %cond49680 = icmp ne i32 %bool49679, 0
+  br i1 %cond49680, label %and.rhs13, label %and.false14
+
+and.rhs10:                                        ; preds = %if.end8421
+  %load49660 = load ptr, ptr %backend, align 8
+  %strcmp49662 = call i32 @strcmp(ptr %load49660, ptr @.strlit49661)
+  %cmp49663 = icmp eq i32 %strcmp49662, 0
+  %bool49664 = zext i1 %cmp49663 to i32
+  %cmp49665 = icmp eq i32 %bool49664, 0
+  %bool49666 = zext i1 %cmp49665 to i32
+  %cond49667 = icmp ne i32 %bool49666, 0
+  br i1 %cond49667, label %and.merge12, label %and.false11
+
+and.false11:                                      ; preds = %and.rhs10, %if.end8421
   br label %and.merge12
 
 and.merge12:                                      ; preds = %and.false11, %and.rhs10
-  %andval49570 = phi i32 [ 1, %and.rhs10 ], [ 0, %and.false11 ]
-  %cond49571 = icmp ne i32 %andval49570, 0
-  br i1 %cond49571, label %if.then8386, label %if.else8387
+  %andval49668 = phi i32 [ 1, %and.rhs10 ], [ 0, %and.false11 ]
+  %cond49669 = icmp ne i32 %andval49668, 0
+  br i1 %cond49669, label %if.then8422, label %if.else8423
 
-if.then8389:                                      ; preds = %and.merge15
-  %load49591 = load ptr, ptr %target_triple, align 8
-  %call49592 = call ptr @vix_string_concat(ptr @.strlit49590, ptr %load49591)
-  %call49594 = call ptr @vix_string_concat(ptr %call49592, ptr @.strlit49593)
-  call void @diag_print(ptr %call49594)
+if.then8425:                                      ; preds = %and.merge15
+  %load49689 = load ptr, ptr %target_triple, align 8
+  %call49690 = call ptr @vix_string_concat(ptr @.strlit49688, ptr %load49689)
+  %call49692 = call ptr @vix_string_concat(ptr %call49690, ptr @.strlit49691)
+  call void @diag_print(ptr %call49692)
   ret i32 1
 
-if.else8390:                                      ; preds = %and.merge15
-  br label %if.end8391
+if.else8426:                                      ; preds = %and.merge15
+  br label %if.end8427
 
-if.end8391:                                       ; preds = %if.else8390
-  %load49595 = load ptr, ptr %mode, align 8
-  %load49596 = load ptr, ptr %src, align 8
-  %load49597 = load ptr, ptr %filename, align 8
-  %load49598 = load ptr, ptr %emit, align 8
-  %load49599 = load ptr, ptr %output, align 8
-  %load49600 = load ptr, ptr %argv, align 8
-  %idx49601 = getelementptr ptr, ptr %load49600, i32 0
-  %loadidx49602 = load ptr, ptr %idx49601, align 8
-  %call49603 = call ptr @runtime_object_path(ptr %loadidx49602)
-  %load49604 = load ptr, ptr %link_args, align 8
-  %load49605 = load ptr, ptr %target_triple, align 8
-  %load49606 = load ptr, ptr %backend, align 8
-  %load49607 = load i32, ptr %optimize_mir, align 4
-  %call49608 = call ptr @run_mode(ptr %load49595, ptr %load49596, ptr %load49597, ptr %load49598, ptr %load49599, ptr %call49603, ptr %load49604, ptr %load49605, ptr %load49606, i32 %load49607)
-  br label %match.test8393
+if.end8427:                                       ; preds = %if.else8426
+  %load49693 = load ptr, ptr %mode, align 8
+  %load49694 = load ptr, ptr %src, align 8
+  %load49695 = load ptr, ptr %filename, align 8
+  %load49696 = load ptr, ptr %emit, align 8
+  %load49697 = load ptr, ptr %output, align 8
+  %load49698 = load ptr, ptr %argv, align 8
+  %idx49699 = getelementptr ptr, ptr %load49698, i32 0
+  %loadidx49700 = load ptr, ptr %idx49699, align 8
+  %call49701 = call ptr @runtime_object_path(ptr %loadidx49700)
+  %load49702 = load ptr, ptr %link_args, align 8
+  %load49703 = load ptr, ptr %target_triple, align 8
+  %load49704 = load ptr, ptr %backend, align 8
+  %load49705 = load i32, ptr %optimize_mir, align 4
+  %load49706 = load i32, ptr %opt_level, align 4
+  %call49707 = call ptr @run_mode(ptr %load49693, ptr %load49694, ptr %load49695, ptr %load49696, ptr %load49697, ptr %call49701, ptr %load49702, ptr %load49703, ptr %load49704, i32 %load49705, i32 %load49706)
+  br label %match.test8429
 
-and.rhs13:                                        ; preds = %if.end8388
-  %load49583 = load ptr, ptr %target_triple, align 8
-  %call49584 = call i32 @self_backend_target_supported(ptr %load49583)
-  %cmp49585 = icmp eq i32 %call49584, 0
-  %bool49586 = zext i1 %cmp49585 to i32
-  %cond49587 = icmp ne i32 %bool49586, 0
-  br i1 %cond49587, label %and.merge15, label %and.false14
+and.rhs13:                                        ; preds = %if.end8424
+  %load49681 = load ptr, ptr %target_triple, align 8
+  %call49682 = call i32 @self_backend_target_supported(ptr %load49681)
+  %cmp49683 = icmp eq i32 %call49682, 0
+  %bool49684 = zext i1 %cmp49683 to i32
+  %cond49685 = icmp ne i32 %bool49684, 0
+  br i1 %cond49685, label %and.merge15, label %and.false14
 
-and.false14:                                      ; preds = %and.rhs13, %if.end8388
+and.false14:                                      ; preds = %and.rhs13, %if.end8424
   br label %and.merge15
 
 and.merge15:                                      ; preds = %and.false14, %and.rhs13
-  %andval49588 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
-  %cond49589 = icmp ne i32 %andval49588, 0
-  br i1 %cond49589, label %if.then8389, label %if.else8390
+  %andval49686 = phi i32 [ 1, %and.rhs13 ], [ 0, %and.false14 ]
+  %cond49687 = icmp ne i32 %andval49686, 0
+  br i1 %cond49687, label %if.then8425, label %if.else8426
 
-match.end8392:                                    ; preds = %match.test8397
+match.end8428:                                    ; preds = %match.test8433
   ret i32 0
 
-match.test8393:                                   ; preds = %if.end8391
-  %cmp49609 = icmp ne ptr %call49608, null
-  %bool49610 = zext i1 %cmp49609 to i32
-  %cond49611 = icmp ne i32 %bool49610, 0
-  br i1 %cond49611, label %match.body8394, label %match.test8395
+match.test8429:                                   ; preds = %if.end8427
+  %cmp49708 = icmp ne ptr %call49707, null
+  %bool49709 = zext i1 %cmp49708 to i32
+  %cond49710 = icmp ne i32 %bool49709, 0
+  br i1 %cond49710, label %match.body8430, label %match.test8431
 
-match.body8394:                                   ; preds = %match.test8393
-  %ptrtoint49612 = ptrtoint ptr %call49608 to i64
-  %sub49613 = sub i64 %ptrtoint49612, 1
+match.body8430:                                   ; preds = %match.test8429
+  %ptrtoint49711 = ptrtoint ptr %call49707 to i64
+  %sub49712 = sub i64 %ptrtoint49711, 1
   %code = alloca i32, align 4
-  store i64 %sub49613, ptr %code, align 4
-  %load49614 = load i32, ptr %code, align 4
-  ret i32 %load49614
+  store i64 %sub49712, ptr %code, align 4
+  %load49713 = load i32, ptr %code, align 4
+  ret i32 %load49713
 
-match.test8395:                                   ; preds = %match.test8393
-  %cmp49615 = icmp eq ptr %call49608, null
-  %bool49616 = zext i1 %cmp49615 to i32
-  %cond49617 = icmp ne i32 %bool49616, 0
-  br i1 %cond49617, label %match.body8396, label %match.test8397
+match.test8431:                                   ; preds = %match.test8429
+  %cmp49714 = icmp eq ptr %call49707, null
+  %bool49715 = zext i1 %cmp49714 to i32
+  %cond49716 = icmp ne i32 %bool49715, 0
+  br i1 %cond49716, label %match.body8432, label %match.test8433
 
-match.body8396:                                   ; preds = %match.test8395
+match.body8432:                                   ; preds = %match.test8431
   ret i32 0
 
-match.test8397:                                   ; preds = %match.test8395
-  br label %match.end8392
+match.test8433:                                   ; preds = %match.test8431
+  br label %match.end8428
 }

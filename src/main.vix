@@ -11,6 +11,7 @@ import "mir/mir2asm/mod.vix"
 import "error.vix"
 import "backend/llc.vix"
 import "backend/linker.vix"
+import "backend/passes.vix"
 
 extern "C"
 {
@@ -49,7 +50,7 @@ fn compiler_mode(arg: string): CompilerModeResult
 {
     if (arg == "-h" or arg == "--help") { return CompilerModeName("--help") }
     if (arg == "-v" or arg == "--version") { return CompilerModeName("--version") }
-    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S" or arg == "-opt") { return CompilerModeName(arg) }
+    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
     return CompilerModeUnknown
 }
 
@@ -136,6 +137,15 @@ fn artifact_output_path(filename: string, output: string, emit: string): string
     return base + ".o"
 }
 
+fn opt_level_arg(arg: string): i32
+{
+    if (arg == "-opt=l0") { return 0 }
+    if (arg == "-opt=l1") { return 1 }
+    if (arg == "-opt=l2") { return 2 }
+    if (arg == "-opt=l3") { return 3 }
+    return -1
+}
+
 fn print_help(): i32
 {
     print("OVERVIEW: Vix Compiler LLVM Bootstrap")
@@ -147,9 +157,9 @@ fn print_help(): i32
     print("  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)")
     print("  -S                     Emit assembly to <file> (default: <input>.s)")
     print("  -obj                   Emit object file (default: <input>.o)")
-    print("  -opt                   Optimize MIR before self-backend codegen/debug output")
+    print("  -opt=lN                Optimize LLVM IR with level N (0..3; default: l0)")
     print("  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)")
-    print("  --backend <llvm|self>  Select codegen backend (default: llvm)")
+    print("  --backend <llvm|self|self-opt>  Select codegen backend (default: llvm)")
     print("  -l<lib>, -l <lib>      Link executable with a system library")
     print("  -L<dir>, -L <dir>      Add a system library search path")
     print("  --check                Syntax & type check only")
@@ -197,7 +207,7 @@ fn self_backend_target_supported(target_triple: string): i32
     return 0
 }
 
-fn run_mode(mode: string, src: string, filename: string, emit: string, output: string, runtime_object: string, link_args: string, target_triple: string, backend: string, optimize_mir: i32): ?i32
+fn run_mode(mode: string, src: string, filename: string, emit: string, output: string, runtime_object: string, link_args: string, target_triple: string, backend: string, optimize_mir: i32, opt_level: i32): ?i32
 {
     let no_std = vix_api_source_has_no_std(src)
 
@@ -376,17 +386,29 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         return mode_continue()
     }
     let mut artifact_path = ""
+    let mut raw_ir_path = ""
     let mut ir_path = ""
     if (emit == "ir")
     {
         ir_path = ir_output_path(filename, output)
+        raw_ir_path = ir_path + ".tmp.raw.ll"
     }
     else
     {
         artifact_path = artifact_output_path(filename, output, emit)
+        raw_ir_path = artifact_path + ".tmp.raw.ll"
         ir_path = artifact_path + ".tmp.ll"
     }
-    write_text_file(ir_path, ir)
+    if (write_text_file(raw_ir_path, ir) != 0) { return mode_failure() }
+    let pass_result = passes_optimize_ir(raw_ir_path, ir_path, target_triple, opt_level)
+    delete_file(raw_ir_path)
+    if (pass_result != 0)
+    {
+        let pass_err = passes_last_error()
+        if (pass_err != "") { diag_print(pass_err) }
+        diag_print("vixc: error: failed to optimize LLVM IR '" + ir_path + "'")
+        return mode_failure()
+    }
     if (emit == "ir")
     {
         print(ir_path)
@@ -424,6 +446,8 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     {
         let llc_err = llc_last_error()
         let link_err = linker_last_error()
+        let pass_err = passes_last_error()
+        if (pass_err != "") { diag_print(pass_err) }
         if (llc_err != "") { diag_print(llc_err) }
         if (link_err != "") { diag_print(link_err) }
         diag_print("vixc: error: failed to build '" + artifact_path + "'")
@@ -477,6 +501,7 @@ fn main(argc: i32, argv: &string): i32
     let mut target_triple = host_target_triple()
     let mut backend = "llvm"
     let mut optimize_mir = 0
+    let mut opt_level = 0
 
     let mut i = 1
     while (i < argc)
@@ -520,9 +545,14 @@ fn main(argc: i32, argv: &string): i32
         {
             emit = "-obj"
         }
-        elif (arg == "-opt")
+        elif (str_starts_with(arg, "-opt=") == 1)
         {
-            optimize_mir = 1
+            opt_level = opt_level_arg(arg)
+            if (opt_level < 0)
+            {
+                diag_print("vixc: error: expected '-opt=lN' where N is 0, 1, 2, or 3")
+                return 1
+            }
         }
         elif (arg == "-S")
         {
@@ -559,6 +589,15 @@ fn main(argc: i32, argv: &string): i32
             {
                 i += 1
                 backend = argv[i]
+                if (backend == "self-opt")
+                {
+                    backend = "self"
+                    optimize_mir = 1
+                }
+                elif (backend == "llvm")
+                {
+                    optimize_mir = 0
+                }
             }
             else
             {
@@ -570,9 +609,15 @@ fn main(argc: i32, argv: &string): i32
         {
             backend = "self"
         }
+        elif (arg == "--backend=self-opt")
+        {
+            backend = "self"
+            optimize_mir = 1
+        }
         elif (arg == "--backend=llvm")
         {
             backend = "llvm"
+            optimize_mir = 0
         }
         elif (arg == "-l" or arg == "-L")
         {
@@ -605,7 +650,6 @@ fn main(argc: i32, argv: &string): i32
                     elif (next_mode == "-ll") { emit = "ir" }
                     elif (next_mode == "-obj") { emit = "-obj" }
                     elif (next_mode == "-S") { emit = "asm" }
-                    elif (next_mode == "-opt") { optimize_mir = 1 }
                     else { mode = next_mode }
                 }
                 CompilerModeUnknown -> match source_file_arg(arg)
@@ -658,7 +702,7 @@ fn main(argc: i32, argv: &string): i32
         return 1
     }
 
-    match run_mode(mode, src, filename, emit, output, runtime_object_path(argv[0]), link_args, target_triple, backend, optimize_mir)
+    match run_mode(mode, src, filename, emit, output, runtime_object_path(argv[0]), link_args, target_triple, backend, optimize_mir, opt_level)
     {
         Some(code) -> return code
         None -> return 0

@@ -18,6 +18,10 @@ extern int vix_llc_compile_ir_to_asm(const char *input_path,
 extern const char *vix_llc_last_error(void);
 extern int vix_lld_link_elf(const char *args_text);
 extern const char *vix_lld_last_error(void);
+extern int vix_passes_optimize_ir(const char *input_path,
+                                  const char *output_path,
+                                  const char *target_triple, int opt_level);
+extern const char *vix_passes_last_error(void);
 
 static const char *readable_file(const char *path) {
   if (path && access(path, R_OK) == 0)
@@ -103,6 +107,14 @@ int vix_api_llc_compile_asm(const char *input_path, const char *output_path,
 }
 
 const char *vix_api_llc_error(void) { return vix_llc_last_error(); }
+
+int vix_api_optimize_ir(const char *input_path, const char *output_path,
+                        const char *target_triple, int opt_level) {
+  return vix_passes_optimize_ir(input_path, output_path, target_triple,
+                                opt_level);
+}
+
+const char *vix_api_passes_error(void) { return vix_passes_last_error(); }
 
 int vix_api_source_has_no_std(const char *src) {
   if (!src)

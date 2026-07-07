@@ -19,7 +19,8 @@ VIXC_OBJ := $(BUILD_DIR)/vixc.o
 API_OBJ := $(BUILD_DIR)/api.o
 LLC_OBJ := $(BUILD_DIR)/Llc.o
 LINKER_OBJ := $(BUILD_DIR)/Linker.o
-LLVM_API_OBJS := $(API_OBJ) $(LLC_OBJ) $(LINKER_OBJ)
+PASSES_OBJ := $(BUILD_DIR)/Passes.o
+LLVM_API_OBJS := $(API_OBJ) $(LLC_OBJ) $(LINKER_OBJ) $(PASSES_OBJ)
 
 VIX_SOURCES := $(shell find $(SRC_DIR) -type f -name '*.vix')
 
@@ -40,6 +41,9 @@ $(LLC_OBJ): lib/llvm/Llc.cpp | $(BUILD_DIR)
 	$(CXX) -c $< -o $@ $(LLVM_CXXFLAGS) -Wno-deprecated-declarations
 
 $(LINKER_OBJ): lib/llvm/Linker.cpp | $(BUILD_DIR)
+	$(CXX) -c $< -o $@ $(LLVM_CXXFLAGS) -Wno-deprecated-declarations
+
+$(PASSES_OBJ): lib/llvm/Passes.cpp | $(BUILD_DIR)
 	$(CXX) -c $< -o $@ $(LLVM_CXXFLAGS) -Wno-deprecated-declarations
 
 $(RUNTIME_OBJ): $(SRC_DIR)/runtime.c | $(RUNTIME_DIR)
