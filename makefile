@@ -3,7 +3,7 @@ LLVM_CXXFLAGS := $(shell llvm-config --cxxflags)
 LLVM_LDFLAGS := $(shell llvm-config --ldflags --libs all)
 LLD_LIBS := -llldELF -llldCommon
 
-GCC ?= gcc
+GCC ?= clang 
 CXX ?= clang++
 CLANG ?= clang
 VIXC ?= ./seed/vixc

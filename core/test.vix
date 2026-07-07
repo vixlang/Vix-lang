@@ -1,33 +1,15 @@
-extern "C"
-{
-	fn syscall(num: i64, a: i64, b: ptr, c: i64): i64
-	fn printf(fmt:string , ...): i32
-}
-
-pub fn puts(s: string): i32
-{
-	let len = s.length + 1
-	syscall(1, 1, s, len)
-	return 0
-}
-
-
-macro $println(fmt: expr, $(args: expr)*)
-{
-    let _ = printf($fmt, $(args),*)
-    let _ = printf("\n")
-
-}
+import "io.vix"
 fn main(): i32
 {
-	let msg = "hello from self\n"
-	syscall(1, 1, msg, 16)
-	puts("Hello world\n")
-	let a = 10
-	for(i in 1 .. 10)
-	{
-		$println("%d\n",a)
-	}
-	$println("Hello %d",a)
-	return 0
+    let a = readln("Input Your Name: ")
+    $println("Hello,%s",a)
+    for(i in 1 .. 10)
+    {
+        $println("%d",i)
+    }
+    return 0
+}
+macro $Build()
+{
+    ;
 }

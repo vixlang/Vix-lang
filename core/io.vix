@@ -1,7 +1,7 @@
 extern "C"
 {
 	fn printf(fmt:string , ...): i32
-        fn syscall(num: i64, a: i64, b: ptr, c: i64): i64
+    fn syscall(num: i64, a: i64, b: ptr, c: i64): i64
 }
 
 pub fn io_stdout(buf: string, len: i64): i64
@@ -29,8 +29,8 @@ pub fn readln(s:string): string
 	}
 }
 
-macro $println(fmt: expr, $(args: expr)*)
+pub macro $println(fmt: expr, $(args: expr)*)
 {
-        let _ = printf($fmt, $(args),*)
+    let _ = printf($fmt, $(args),*)
 	let _ = printf("\n")
 }
