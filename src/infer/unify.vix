@@ -1,0 +1,188 @@
+#[no_main]
+
+import "../type/ty.vix"
+import "../type/subst.vix"
+import "../util/pos.vix"
+import "constraint.vix"
+import "error.vix"
+
+pub type UnifyResult = struct {
+    ok: i32,
+    subst: Subst,
+    error: InferError
+}
+
+pub fn unify_ok(subst: Subst): UnifyResult
+{
+    return UnifyResult{ ok: 1, subst: subst, error: infer_error_ok() }
+}
+
+pub fn unify_fail(error: InferError): UnifyResult
+{
+    return UnifyResult{ ok: 0, subst: subst_empty(), error: error }
+}
+
+pub fn unify_bind(store: &TyStore, subst: &Subst, var_id: i32, ty: Ty, pos: SourcePos): UnifyResult
+{
+    let applied = subst_apply_ty(store, subst, ty)
+    match applied
+    {
+        TyVar(other_id) -> {
+            if (other_id == var_id) { return unify_ok(subst_clone(subst)) }
+        }
+        _ -> {}
+    }
+    if (ty_occurs(store, var_id, applied) == 1)
+    {
+        return unify_fail(infer_error_occurs(store, var_id, applied, pos))
+    }
+    subst_extend(subst, var_id, applied)
+    return unify_ok(subst_clone(subst))
+}
+
+pub fn unify_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: SourcePos): UnifyResult
+{
+    let a = subst_apply_ty(store, subst, left)
+    let b = subst_apply_ty(store, subst, right)
+    match a
+    {
+        TyError -> return unify_ok(subst_clone(subst))
+        TyUnknown -> return unify_ok(subst_clone(subst))
+        TyVar(id) -> return unify_bind(store, subst, id, b, pos)
+        TyPrim(ap) -> {
+            match b
+            {
+                TyError -> return unify_ok(subst_clone(subst))
+                TyUnknown -> return unify_ok(subst_clone(subst))
+                TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
+                TyPrim(bp) -> {
+                    if (ty_prim_can_assign(ap, bp) == 1) { return unify_ok(subst_clone(subst)) }
+                    return unify_fail(infer_error_mismatch(store, a, b, pos))
+                }
+                TyArray(bi) -> {
+                    if (ap == ty_prim_ptr()) { return unify_ok(subst_clone(subst)) }
+                    if (ap == ty_prim_string()) { return unify_ok(subst_clone(subst)) }
+                    return unify_fail(infer_error_mismatch(store, a, b, pos))
+                }
+                _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
+            }
+        }
+        TyFun(ai) -> {
+            match b
+            {
+                TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
+                TyFun(bi) -> {
+                    let af = store.funs[ai]
+                    let bf = store.funs[bi]
+                    if (af.is_var_arg == 1)
+                    {
+                        if (bf.params.length < af.params.length)
+                        {
+                            return unify_fail(infer_error_arity(af.params.length, bf.params.length, pos))
+                        }
+                    }
+                    elif (bf.is_var_arg == 1)
+                    {
+                        if (af.params.length < bf.params.length)
+                        {
+                            return unify_fail(infer_error_arity(bf.params.length, af.params.length, pos))
+                        }
+                    }
+                    elif (af.params.length != bf.params.length)
+                    {
+                        return unify_fail(infer_error_arity(af.params.length, bf.params.length, pos))
+                    }
+                    let param_count = if (af.params.length < bf.params.length) { af.params.length } else { bf.params.length }
+                    for (i in 0 .. param_count)
+                    {
+                        let r = unify_ty(store, subst, af.params[i], bf.params[i], pos)
+                        if (r.ok == 0) { return r }
+                    }
+                    return unify_ty(store, subst, af.ret, bf.ret, pos)
+                }
+                _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
+            }
+        }
+        TyTuple(ai) -> {
+            match b
+            {
+                TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
+                TyTuple(bi) -> {
+                    let at = store.tuples[ai]
+                    let bt = store.tuples[bi]
+                    if (at.elems.length != bt.elems.length)
+                    {
+                        return unify_fail(infer_error_arity(at.elems.length, bt.elems.length, pos))
+                    }
+                    for (i in 0 .. at.elems.length)
+                    {
+                        let r = unify_ty(store, subst, at.elems[i], bt.elems[i], pos)
+                        if (r.ok == 0) { return r }
+                    }
+                    return unify_ok(subst_clone(subst))
+                }
+                _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
+            }
+        }
+        TyArray(ai) -> {
+            match b
+            {
+                TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
+                TyArray(bi) -> return unify_ty(store, subst, store.arrays[ai].elem, store.arrays[bi].elem, pos)
+                _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
+            }
+        }
+        TyPtr(ai) -> {
+            match b
+            {
+                TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
+                TyArray(bi) -> return unify_ok(subst_clone(subst))
+                TyPtr(bi) -> return unify_ty(store, subst, store.ptrs[ai].elem, store.ptrs[bi].elem, pos)
+                TyPrim(code) -> {
+                    if (code == ty_prim_ptr()) { return unify_ok(subst_clone(subst)) }
+                    if (ty_prim_is_integer(code) == 1) { return unify_ok(subst_clone(subst)) }
+                    return unify_fail(infer_error_mismatch(store, a, b, pos))
+                }
+                _ -> return unify_ty(store, subst, store.ptrs[ai].elem, b, pos)
+            }
+        }
+        TyAdt(ai) -> {
+            match b
+            {
+                TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
+                TyAdt(bi) -> {
+                    let aa = store.adts[ai]
+                    let ba = store.adts[bi]
+                    if (aa.name != ba.name or aa.args.length != ba.args.length)
+                    {
+                        return unify_fail(infer_error_mismatch(store, a, b, pos))
+                    }
+                    for (i in 0 .. aa.args.length)
+                    {
+                        let r = unify_ty(store, subst, aa.args[i], ba.args[i], pos)
+                        if (r.ok == 0) { return r }
+                    }
+                    return unify_ok(subst_clone(subst))
+                }
+                _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
+            }
+        }
+    }
+}
+
+pub fn unify_constraints(store: &TyStore, constraints: &ConstraintStore): UnifyResult
+{
+    let subst = subst_empty()
+    for (i in 0 .. constraints.constraints.length)
+    {
+        match constraints.constraints[i]
+        {
+            ConstraintEq(idx) -> {
+                let data = constraints.eqs[idx]
+                let r = unify_ty(store, &subst, data.left, data.right, data.pos)
+                if (r.ok == 0) { return r }
+            }
+        }
+    }
+    return unify_ok(subst)
+}

@@ -1,0 +1,57 @@
+#[no_main]
+
+import "ty.vix"
+import "subst.vix"
+import "../util/fresh.vix"
+
+pub type Scheme = struct {
+    vars: [i32],
+    ty: Ty
+}
+
+pub fn scheme_mono(ty: Ty): Scheme
+{
+    return Scheme{ vars: [], ty: ty }
+}
+
+pub fn scheme_forall(vars: [i32], ty: Ty): Scheme
+{
+    return Scheme{ vars: vars, ty: ty }
+}
+
+pub fn scheme_free_vars(store: &TyStore, scheme: Scheme): [i32]
+{
+    let vars = ty_free_vars(store, scheme.ty)
+    let mut out: [i32] = []
+    for (i in 0 .. vars.length)
+    {
+        if (ty_array_contains_i32(scheme.vars, vars[i]) == 0)
+        {
+            out = ty_array_append_unique_i32(out, vars[i])
+        }
+    }
+    return out
+}
+
+pub fn scheme_apply(store: &TyStore, subst: &Subst, scheme: Scheme): Scheme
+{
+    let filtered = subst_empty()
+    for (i in 0 .. subst.bindings.length)
+    {
+        if (ty_array_contains_i32(scheme.vars, subst.bindings[i].var_id) == 0)
+        {
+            subst_extend(&filtered, subst.bindings[i].var_id, subst.bindings[i].ty)
+        }
+    }
+    return Scheme{ vars: scheme.vars, ty: subst_apply_ty(store, &filtered, scheme.ty) }
+}
+
+pub fn scheme_instantiate(store: &TyStore, fresh: &Fresh, scheme: Scheme): Ty
+{
+    let subst = subst_empty()
+    for (i in 0 .. scheme.vars.length)
+    {
+        subst_extend(&subst, scheme.vars[i], ty_fresh_var(fresh))
+    }
+    return subst_apply_ty(store, &subst, scheme.ty)
+}

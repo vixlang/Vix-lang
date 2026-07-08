@@ -1,0 +1,142 @@
+#[no_main]
+
+import "ty.vix"
+
+pub type TyBinding = struct {
+    var_id: i32,
+    ty: Ty
+}
+
+pub type Subst = struct {
+    bindings: [TyBinding]
+}
+
+pub fn subst_empty(): Subst
+{
+    return Subst{ bindings: [] }
+}
+
+pub fn subst_clone(subst: &Subst): Subst
+{
+    let mut bindings: [TyBinding] = []
+    for (i in 0 .. subst.bindings.length)
+    {
+        bindings.push(subst.bindings[i])
+    }
+    return Subst{ bindings: bindings }
+}
+
+pub fn subst_single(var_id: i32, ty: Ty): Subst
+{
+    return Subst{ bindings: [TyBinding{ var_id: var_id, ty: ty }] }
+}
+
+pub fn subst_lookup(subst: &Subst, var_id: i32): Ty
+{
+    for (i in 0 .. subst.bindings.length)
+    {
+        if (subst.bindings[i].var_id == var_id) { return subst.bindings[i].ty }
+    }
+    return TyVar(var_id)
+}
+
+pub fn subst_has(subst: &Subst, var_id: i32): i32
+{
+    for (i in 0 .. subst.bindings.length)
+    {
+        if (subst.bindings[i].var_id == var_id) { return 1 }
+    }
+    return 0
+}
+
+pub fn subst_extend(subst: &Subst, var_id: i32, ty: Ty)
+{
+    for (i in 0 .. subst.bindings.length)
+    {
+        if (subst.bindings[i].var_id == var_id)
+        {
+            subst.bindings[i].ty = ty
+            return
+        }
+    }
+    subst.bindings.push(TyBinding{ var_id: var_id, ty: ty })
+}
+
+pub fn subst_apply_ty(store: &TyStore, subst: &Subst, ty: Ty): Ty
+{
+    if (subst.bindings.length == 0) { return ty }
+    let free_vars = ty_free_vars(store, ty)
+    if (free_vars.length == 0) { return ty }
+    match ty
+    {
+        TyVar(id) -> {
+            let mapped = subst_lookup(subst, id)
+            match mapped
+            {
+                TyVar(id2) -> {
+                    if (id2 == id) { return mapped }
+                    return subst_apply_ty(store, subst, mapped)
+                }
+                _ -> { return subst_apply_ty(store, subst, mapped) }
+            }
+        }
+        TyFun(idx) -> {
+            let data = store.funs[idx]
+            let mut params: [Ty] = []
+            for (i in 0 .. data.params.length)
+            {
+                params.push(subst_apply_ty(store, subst, data.params[i]))
+            }
+            return ty_fun_vararg(store, params, subst_apply_ty(store, subst, data.ret), data.is_var_arg)
+        }
+        TyTuple(idx) -> {
+            let data = store.tuples[idx]
+            let mut elems: [Ty] = []
+            for (i in 0 .. data.elems.length)
+            {
+                elems.push(subst_apply_ty(store, subst, data.elems[i]))
+            }
+            return ty_tuple(store, elems)
+        }
+        TyArray(idx) -> { return ty_array(store, subst_apply_ty(store, subst, store.arrays[idx].elem)) }
+        TyPtr(idx) -> { return ty_ptr(store, subst_apply_ty(store, subst, store.ptrs[idx].elem)) }
+        TyAdt(idx) -> {
+            let data = store.adts[idx]
+            let mut args: [Ty] = []
+            for (i in 0 .. data.args.length)
+            {
+                args.push(subst_apply_ty(store, subst, data.args[i]))
+            }
+            return ty_adt(store, data.name, args)
+        }
+        _ -> {}
+    }
+    return ty
+}
+
+pub fn subst_apply_vars(subst: &Subst, vars: [i32]): [i32]
+{
+    let mut out: [i32] = []
+    for (i in 0 .. vars.length)
+    {
+        if (subst_has(subst, vars[i]) == 0 and ty_array_contains_i32(out, vars[i]) == 0)
+        {
+            out.push(vars[i])
+        }
+    }
+    return out
+}
+
+pub fn subst_compose(store: &TyStore, newer: &Subst, older: &Subst): Subst
+{
+    let out = subst_empty()
+    for (i in 0 .. older.bindings.length)
+    {
+        subst_extend(&out, older.bindings[i].var_id, subst_apply_ty(store, newer, older.bindings[i].ty))
+    }
+    for (j in 0 .. newer.bindings.length)
+    {
+        subst_extend(&out, newer.bindings[j].var_id, newer.bindings[j].ty)
+    }
+    return out
+}

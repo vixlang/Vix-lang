@@ -1,0 +1,42 @@
+#[no_main]
+
+import "../type/ty.vix"
+import "../util/pos.vix"
+
+pub type Constraint = ConstraintEq(i32)
+
+pub type ConstraintEqData = struct {
+    left: Ty,
+    right: Ty,
+    pos: SourcePos,
+    reason: string
+}
+
+pub type ConstraintStore = struct {
+    eqs: [ConstraintEqData],
+    constraints: [Constraint]
+}
+
+pub fn constraint_store_new(): ConstraintStore
+{
+    return ConstraintStore{ eqs: [], constraints: [] }
+}
+
+pub fn constraint_eq(store: &ConstraintStore, left: Ty, right: Ty, pos: SourcePos, reason: string): Constraint
+{
+    let idx = store.eqs.length
+    store.eqs.push(ConstraintEqData{ left: left, right: right, pos: pos, reason: reason })
+    let c = ConstraintEq(idx)
+    store.constraints.push(c)
+    return c
+}
+
+pub fn constraint_store_add_eq(store: &ConstraintStore, left: Ty, right: Ty, pos: SourcePos, reason: string)
+{
+    constraint_eq(store, left, right, pos, reason)
+}
+
+pub fn constraint_count(store: &ConstraintStore): i32
+{
+    return store.constraints.length
+}

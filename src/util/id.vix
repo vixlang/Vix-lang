@@ -1,0 +1,16 @@
+#[no_main]
+
+pub type TypeVarId = struct {
+    value: i32
+}
+
+pub fn type_var_id(value: i32): TypeVarId
+{
+    return TypeVarId{ value: value }
+}
+
+pub fn type_var_eq(left: TypeVarId, right: TypeVarId): i32
+{
+    if (left.value == right.value) { return 1 }
+    return 0
+}

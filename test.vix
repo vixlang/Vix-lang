@@ -9,7 +9,7 @@ fn fib(n:i64): i32
         return fib(n - 1) + fib(n - 2)
     }
 }
-fn main(): i32
+pub fn main(): i32
 {
     print(fib(40))
     return 0

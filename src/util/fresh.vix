@@ -1,0 +1,22 @@
+#[no_main]
+
+pub type Fresh = struct {
+    next_type_var: i32
+}
+
+pub fn fresh_new(): Fresh
+{
+    return Fresh{ next_type_var: 0 }
+}
+
+pub fn fresh_from(next_type_var: i32): Fresh
+{
+    return Fresh{ next_type_var: next_type_var }
+}
+
+pub fn fresh_tyvar_id(fresh: &Fresh): i32
+{
+    let id = fresh.next_type_var
+    fresh.next_type_var += 1
+    return id
+}
