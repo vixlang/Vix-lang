@@ -821,6 +821,10 @@ pub fn llvm_cast_value(b: &LlvmBuilder, value: ptr, from_ty: string, to_ty: stri
     {
         return vix_LLVMBuildZExt(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "zext"))
     }
+    if ((to_ty == "i32" or to_ty == "u32") and (from_ty == "i64" or from_ty == "u64" or from_ty == "usize"))
+    {
+        return vix_LLVMBuildTrunc(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "trunc"))
+    }
     if ((to_ty == "i8" or to_ty == "u8" or to_ty == "char") and (from_ty == "i32" or from_ty == "u32" or from_ty == "i64" or from_ty == "u64" or from_ty == "usize"))
     {
         return vix_LLVMBuildTrunc(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "trunc"))

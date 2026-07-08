@@ -1,0 +1,2 @@
+//example for vix compile time
+comptime fn fib()
