@@ -1,5 +1,16 @@
+fn fib(n:i64): i32
+{
+    if (n<=1)
+    {
+        return n 
+    }
+    else 
+    {
+        return fib(n - 1) + fib(n - 2)
+    }
+}
 fn main(): i32
 {
-    let a = 10
+    print(fib(40))
     return 0
 }

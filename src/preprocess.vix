@@ -584,15 +584,18 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
             if (path != "")
             {
                 let resolved = resolve_import_path(filename, path)
-                if (import_set_contains(imports, resolved) == 0)
+                let mut actual = resolved
+                let mut content = read_file_content(actual)
+                if (content == "" and path != resolved)
                 {
-                    import_set_add(imports, resolved)
-                    let content = read_file_content(resolved)
-                    if (content != "")
-                    {
-                        let processed = preprocess_source_with_macros(content, resolved, imports, macros)
-                        out = out + processed + "\n"
-                    }
+                    actual = path
+                    content = read_file_content(actual)
+                }
+                if (content != "" and import_set_contains(imports, actual) == 0)
+                {
+                    import_set_add(imports, actual)
+                    let processed = preprocess_source_with_macros(content, actual, imports, macros)
+                    out = out + processed + "\n"
                 }
             }
             i = import_end

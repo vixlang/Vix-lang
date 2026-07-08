@@ -85,7 +85,13 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
         return type_numeric_result(left_ty, right_ty)
     }
     if (expr.tag == "call") { return get_function_return_type(expr.text) }
-    if (expr.tag == "array_literal") { return "[i32]" }
+    if (expr.tag == "array_literal")
+    {
+        if (expr.args.length == 0) { return "[i32]" }
+        let elem_expr = expr_store_get(es, expr.args[0])
+        let elem_ty = codegen_expr_type(b, es, elem_expr)
+        return "[" + elem_ty + "]"
+    }
     if (expr.tag == "block_expr")
     {
         if (expr.right_idx >= 0) { return codegen_expr_type(b, es, expr_store_get(es, expr.right_idx)) }

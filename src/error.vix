@@ -196,6 +196,12 @@ pub fn source_get_line(src: string, target_line: i32): string
         if (src[i] == 10)
         {
             current += 1
+            if (current == target_line)
+            {
+                line_start = i + 1
+                found = 1
+                break
+            }
         }
         i += 1
     }

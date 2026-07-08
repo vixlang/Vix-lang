@@ -9,13 +9,19 @@ pub type SemanticResult = struct {
     error_count: i32,
     type_error_count: i32,
     warning_count: i32,
+    emit_warnings: i32,
     diagnostics: [string],
     type_result: TypeInferResult
 }
 
 pub fn semantic_result_new(): SemanticResult
 {
-    return SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, diagnostics: [], type_result: typeinfer_ok("unknown") }
+    return semantic_result_new_with_warnings(1)
+}
+
+pub fn semantic_result_new_with_warnings(emit_warnings: i32): SemanticResult
+{
+    return SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, emit_warnings: emit_warnings, diagnostics: [], type_result: typeinfer_ok("unknown") }
 }
 
 pub fn semantic_add_error(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, func_name: string)
@@ -52,12 +58,14 @@ pub fn semantic_add_error_loc(result: &SemanticResult, source: string, filename:
 
 pub fn semantic_add_warning(result: &SemanticResult, filename: string, error_type: string, message: string)
 {
+    if (result.emit_warnings == 0) { return }
     result.diagnostics.push(format_diagnostic_no_loc(diag_warning_level(), error_type, message, filename))
     result.warning_count += 1
 }
 
 pub fn semantic_add_warning_loc(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, line: i32, col: i32, length: i32)
 {
+    if (result.emit_warnings == 0) { return }
     if (line > 0)
     {
         result.diagnostics.push(format_diagnostic(source, filename, diag_warning_level(), error_type, message, line, col, length))
@@ -709,7 +717,12 @@ pub fn semantic_check_main(funcs: [AstFunction], result: &SemanticResult, filena
 
 pub fn semantic_check_program(program: AstProgram, source: string, filename: string): SemanticResult
 {
-    let mut result = semantic_result_new()
+    return semantic_check_program_with_warnings(program, source, filename, 1)
+}
+
+pub fn semantic_check_program_with_warnings(program: AstProgram, source: string, filename: string, emit_warnings: i32): SemanticResult
+{
+    let mut result = semantic_result_new_with_warnings(emit_warnings)
     if (program.ok == 0)
     {
         return result

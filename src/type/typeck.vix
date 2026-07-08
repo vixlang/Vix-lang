@@ -597,8 +597,10 @@ pub fn infer_binop_expr_type(env: &SymbolTable, funcs: &FunctionSymbols, structs
     let mut out_ty = "unknown"
     if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=")
     {
-        let ptr_int_compare_ok = if ((left_ty == "ptr" and type_is_integer(right_ty) == 1) or (right_ty == "ptr" and type_is_integer(left_ty) == 1)) { 1 } else { 0 }
-        let ptr_string_compare_ok = if ((left_ty == "ptr" and right_ty == "string") or (right_ty == "ptr" and left_ty == "string")) { 1 } else { 0 }
+        let left_ptr_like = if (left_ty == "ptr" or is_ptr_to_struct_typeinfer(left_ty) == 1) { 1 } else { 0 }
+        let right_ptr_like = if (right_ty == "ptr" or is_ptr_to_struct_typeinfer(right_ty) == 1) { 1 } else { 0 }
+        let ptr_int_compare_ok = if ((left_ptr_like == 1 and type_is_integer(right_ty) == 1) or (right_ptr_like == 1 and type_is_integer(left_ty) == 1)) { 1 } else { 0 }
+        let ptr_string_compare_ok = if ((left_ptr_like == 1 and right_ty == "string") or (right_ptr_like == 1 and left_ty == "string")) { 1 } else { 0 }
         let string_int_compare_ok = if ((left_ty == "string" and type_is_integer(right_ty) == 1) or (right_ty == "string" and type_is_integer(left_ty) == 1)) { 1 } else { 0 }
         if (ptr_int_compare_ok == 0 and ptr_string_compare_ok == 0 and string_int_compare_ok == 0 and left_ty != right_ty and left_ty != "unknown" and right_ty != "unknown" and (type_is_numeric(left_ty) == 0 or type_is_numeric(right_ty) == 0))
         {

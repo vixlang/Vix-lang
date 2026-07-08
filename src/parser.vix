@@ -281,15 +281,16 @@ pub fn parse_unary(parser: &Parser): i32
     {
         return parse_postfix(parser)
     }
+    if (parser_text(parser) == "ref" or parser_text(parser) == "&")
+    {
+        let line = parser_line(parser)
+        let col = parser_col(parser)
+        parser_advance(parser)
+        let name = parser_text(parser)
+        if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
+        return parser_expr_at(parser, ast_expr_addr(parser.expr_store, name), line, col)
+    }
     return match parser_text(parser) {
-        "ref" | "&" -> {
-            let line = parser_line(parser)
-            let col = parser_col(parser)
-            parser_advance(parser)
-            let name = parser_text(parser)
-            if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
-            parser_expr_at(parser, ast_expr_addr(parser.expr_store, name), line, col)
-        }
         "@" -> {
             let line = parser_line(parser)
             let col = parser_col(parser)
@@ -1724,14 +1725,20 @@ pub fn parse_program_stats_source(src: string, filename: string, imports: &Impor
         if (import_end > i)
         {
             let path = extract_import_path(src, i)
-            if (path != "" and import_set_contains(imports, path) == 0)
+            if (path != "")
             {
-                import_set_add(imports, path)
                 let resolved = resolve_import_path(filename, path)
-                let content = read_file_content(resolved)
-                if (content != "")
+                let mut actual = resolved
+                let mut content = read_file_content(actual)
+                if (content == "" and path != resolved)
                 {
-                    let child = parse_program_stats_source(content, path, imports)
+                    actual = path
+                    content = read_file_content(actual)
+                }
+                if (content != "" and import_set_contains(imports, actual) == 0)
+                {
+                    import_set_add(imports, actual)
+                    let child = parse_program_stats_source(content, actual, imports)
                 }
             }
             i = import_end

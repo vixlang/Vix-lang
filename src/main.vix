@@ -261,7 +261,8 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
 
     let lowered_program = desugar_program(program)
 
-    let semantic_result = semantic_check_program(lowered_program, src, filename)
+    let emit_semantic_warnings = if (mode == "codegen") { 0 } else { 1 }
+    let semantic_result = semantic_check_program_with_warnings(lowered_program, src, filename, emit_semantic_warnings)
     match mode
     {
         "--semantic" -> {
