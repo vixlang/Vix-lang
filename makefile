@@ -54,7 +54,7 @@ $(VIXC):
 	@exit 1
 
 $(VIXC_OBJ): $(VIX_SOURCES) $(VIXC) | $(BUILD_DIR)
-	$(VIXC) $(SRC_DIR)/main.vix -obj -o $@
+	ulimit -s 65536 && $(VIXC) $(SRC_DIR)/main.vix -obj -o $@
 
 $(TARGET): $(VIXC_OBJ) $(HELPER_OBJ) $(RUNTIME_OBJ) $(LLVM_API_OBJS) | $(BUILD_DIR)
 	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(LLD_LIBS)

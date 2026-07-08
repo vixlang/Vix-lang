@@ -5,6 +5,9 @@ import "error.vix"
 import "backend/llc.vix"
 import "backend/linker.vix"
 import "backend/passes.vix"
+import "mir/mir.vix"
+import "mir/opt.vix"
+import "mir/mir2asm/mod.vix"
 
 extern "C"
 {
@@ -313,12 +316,16 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     match mode
     {
         "debug_mir" -> {
-            diag_print("vixc: error: MIR debug output is unavailable in this bootstrap build")
-            return mode_failure()
+            let mir = mir_program(lowered_program)
+            info_print(if (optimize_mir == 1) { mir_opt_program(mir) } else { mir })
+            return mode_success()
         }
         "debug_asm" -> {
-            diag_print("vixc: error: asm debug output is unavailable in this bootstrap build")
-            return mode_failure()
+            let raw_mir = mir_program(lowered_program)
+            let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
+            let asm = mir2asm_debug(mir)
+            info_print(asm)
+            return mode_success()
         }
         _ -> {}
     }
@@ -331,8 +338,42 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
 
     if (backend == "self" and emit != "ir" and emit != "stdout")
     {
-        diag_print("vixc: error: self backend is unavailable in this bootstrap build")
-        return mode_failure()
+        let raw_mir = mir_program(lowered_program)
+        let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
+        let asm = mir2asm(mir)
+        let artifact_path = artifact_output_path(filename, output, emit)
+        if (emit == "asm")
+        {
+            if (write_text_file(artifact_path, asm) != 0) { return mode_failure() }
+            print(artifact_path)
+            return mode_success()
+        }
+        let asm_path = artifact_path + ".tmp.asm"
+        let obj_path = if (emit == "-obj") { artifact_path } else { artifact_path + ".tmp.o" }
+        write_text_file(asm_path, asm)
+        let asm_result = shell_command("nasm -f elf64 " + asm_path + " -o " + obj_path)
+        delete_file(asm_path)
+        if (asm_result != 0)
+        {
+            diag_print("vixc: error: failed to assemble '" + obj_path + "'")
+            return mode_failure()
+        }
+        if (emit == "-obj")
+        {
+            print(obj_path)
+            return mode_success()
+        }
+        let link_result = if (no_std == 1) { linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
+        delete_file(obj_path)
+        if (link_result != 0)
+        {
+            let link_err = linker_last_error()
+            if (link_err != "") { diag_print(link_err) }
+            diag_print("vixc: error: failed to link '" + artifact_path + "'")
+            return mode_failure()
+        }
+        print(artifact_path)
+        return mode_success()
     }
 
     let ir = codegen_program_target(lowered_program, target_triple)

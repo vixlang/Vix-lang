@@ -6,7 +6,7 @@ set -e
 echo "rm build and runtime bin files..."
 cd src
 echo "build seed comiler"
-../build/vixc main.vix -ll
+ulimit -s 65536 && ../build/vixc main.vix -ll
 mv main.ll ../seed/
 cd ..
 cd seed
