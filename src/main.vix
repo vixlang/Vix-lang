@@ -166,6 +166,7 @@ fn print_help(): i32
     print("  --typeinfer            Print type inference result to stdout")
     print("  --semantic             Print semantic analysis to stdout")
     print("  --debug=<mir|asm|llvm> Print selected intermediate output to stdout")
+    print("  --explan=ERRORCODE     Explain a compiler error code, for example E3001")
     print("  -v, --version          Display compiler version information")
     print("  -h, --help             Display this help message")
     return 0
@@ -174,6 +175,18 @@ fn print_help(): i32
 fn print_version(): i32
 {
     print("vixc 0.4.5 (bootstrap)")
+    return 0
+}
+
+fn print_error_explanation(code: string): i32
+{
+    let explanation = error_explanation(code)
+    if (explanation == "")
+    {
+        diag_print("vixc: error: unknown error code '" + code + "'")
+        return 1
+    }
+    print(explanation)
     return 0
 }
 
@@ -491,6 +504,7 @@ fn main(argc: i32, argv: &string): i32
     let mut filename = ""
     let mut want_help = 0
     let mut want_version = 0
+    let mut explain_code = ""
     let mut emit = "exe"
     let mut output = ""
     let mut has_input = 0
@@ -511,6 +525,15 @@ fn main(argc: i32, argv: &string): i32
         elif (arg == "-v" or arg == "--version")
         {
             want_version = 1
+        }
+        elif (str_starts_with(arg, "--explan=") == 1)
+        {
+            explain_code = slice_string(arg, 9, arg.length)
+            if (explain_code == "")
+            {
+                diag_print("vixc: error: '--explan=' requires an error code")
+                return 1
+            }
         }
         elif (arg == "-o")
         {
@@ -673,6 +696,7 @@ fn main(argc: i32, argv: &string): i32
 
     if (want_help == 1) { return print_help() }
     if (want_version == 1) { return print_version() }
+    if (explain_code != "") { return print_error_explanation(explain_code) }
 
     if (has_input == 0)
     {

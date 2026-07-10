@@ -151,6 +151,63 @@ pub fn error_code_for_type(error_type: string, message: string): string
     }
 }
 
+pub fn error_explanation(code: string): string
+{
+    return match code
+    {
+        "E0000" -> "E0000: unknown diagnostic\n\nThe compiler emitted a diagnostic that does not match a known error category.\n\nHow to fix: read the full diagnostic message and source location; if this appears for a common error, report it so the compiler can assign a specific code."
+        "E1000" -> "E1000: parse error\n\nThe source text is not valid Vix syntax.\n\nHow to fix: check the token and source location shown in the diagnostic, then correct the surrounding syntax."
+        "E1001" -> "E1001: expected token\n\nThe parser expected a specific token, such as a delimiter, operator, or keyword, but found something else.\n\nHow to fix: add the missing token or remove the unexpected text near the reported location."
+        "E1002" -> "E1002: unexpected token or statement\n\nThe parser found a token or statement that is not valid in the current grammar position.\n\nHow to fix: move the statement to a valid position, correct the expression syntax, or remove the extra token."
+        "E1003" -> "E1003: invalid conditional branch\n\nAn elif/else-style branch was found where the parser expected an if or elif form.\n\nHow to fix: check the if/elif/else chain and make sure each branch uses the correct keyword and block structure."
+        "E1004" -> "E1004: empty source\n\nThe input file has no source code for the compiler to parse.\n\nHow to fix: add Vix declarations, or pass the intended non-empty input file."
+        "E1005" -> "E1005: expected function\n\nThe parser expected a function declaration at this point in the file.\n\nHow to fix: start the declaration with fn, or move unsupported top-level code inside a function."
+        "E2000" -> "E2000: name error\n\nName resolution failed, but the exact case does not have a more specific code.\n\nHow to fix: check symbol spelling, declaration order, duplicates, and scope."
+        "E2001" -> "E2001: undefined symbol\n\nA variable, value, or type name was used but no matching symbol is visible in scope.\n\nHow to fix: declare the symbol before use, import it if needed, or correct the spelling."
+        "E2002" -> "E2002: duplicate symbol\n\nTwo symbols with the same name were declared in a scope where only one is allowed.\n\nHow to fix: rename one declaration or remove the duplicate."
+        "E2003" -> "E2003: undefined function\n\nA function call refers to a function that the compiler cannot find.\n\nHow to fix: define the function, import it, or correct the function name."
+        "E2004" -> "E2004: duplicate function\n\nMore than one function with the same name was declared.\n\nHow to fix: rename or remove one function declaration."
+        "E2006" -> "E2006: duplicate struct\n\nMore than one struct with the same name was declared.\n\nHow to fix: rename or remove one struct declaration."
+        "E2007" -> "E2007: duplicate parameter\n\nA function parameter name is repeated.\n\nHow to fix: give each parameter a unique name."
+        "E2008" -> "E2008: duplicate field\n\nA struct contains multiple fields with the same name.\n\nHow to fix: give each field a unique name."
+        "E2009" -> "E2009: invalid for iterator\n\nThe for-loop iterator conflicts with an existing binding or is otherwise invalid.\n\nHow to fix: rename the iterator or adjust the surrounding scope."
+        "E2010" -> "E2010: invalid function name usage\n\nA function name is being used in a way that name resolution rejects.\n\nHow to fix: check whether you intended to call the function, declare a value, or use a different name."
+        "E3000" -> "E3000: type error\n\nType checking failed, but the exact case does not have a more specific code.\n\nHow to fix: compare the expected and actual types in the diagnostic and adjust annotations, expressions, or conversions."
+        "E3001" -> "E3001: invalid initialization\n\nA value cannot be used to initialize the target binding or storage location.\n\nHow to fix: make the initializer type match the declared type, or change the declaration type."
+        "E3002" -> "E3002: invalid assignment\n\nThe assigned value type does not match the destination type.\n\nHow to fix: assign a compatible value or change the destination type."
+        "E3003" -> "E3003: invalid dereference\n\nThe code tries to dereference a value that is not a pointer-like value.\n\nHow to fix: dereference only pointer values, or remove the dereference operator."
+        "E3004" -> "E3004: invalid store target\n\nThe code tries to store through a value that cannot be written through.\n\nHow to fix: store through a mutable pointer-like value or assign to a mutable binding instead."
+        "E3005" -> "E3005: unknown field\n\nA field access names a field that does not exist on the target struct type.\n\nHow to fix: correct the field name or use a value with the expected struct type."
+        "E3006" -> "E3006: unknown struct\n\nA struct type name was used but no matching struct declaration exists.\n\nHow to fix: declare the struct, import it if needed, or correct the type name."
+        "E3007" -> "E3007: invalid index target\n\nThe code indexes a value whose type does not support indexing.\n\nHow to fix: index only arrays or other indexable values."
+        "E3008" -> "E3008: invalid operator operands\n\nAn operator was applied to operand types it does not support.\n\nHow to fix: use operands of compatible types or choose the correct operator."
+        "E3010" -> "E3010: mixed addition operands\n\nThe + operator was used with incompatible operand categories.\n\nHow to fix: make both operands numeric, or both operands valid for string concatenation if supported."
+        "E3011" -> "E3011: invalid comparison\n\nThe compared values have incompatible types.\n\nHow to fix: compare values of compatible types."
+        "E3012" -> "E3012: invalid return type\n\nA returned value does not match the function or match-expression return type.\n\nHow to fix: return the expected type or change the declared return type."
+        "E3013" -> "E3013: assignment to immutable or invalid field\n\nThe code assigns to an immutable binding or to a field that cannot be assigned.\n\nHow to fix: declare the binding mutable when mutation is intended, or assign to a mutable valid target."
+        "E3014" -> "E3014: non-integer index\n\nAn index expression uses a non-integer index value.\n\nHow to fix: use an integer index."
+        "E3015" -> "E3015: invalid store value\n\nThe stored value is incompatible with the destination.\n\nHow to fix: store a value whose type matches the pointed-to or target type."
+        "E3016" -> "E3016: non-bool condition\n\nAn if or while condition is not bool.\n\nHow to fix: use a boolean expression as the condition."
+        "E3017" -> "E3017: invalid for range bound\n\nA for-range start or end expression is not an integer.\n\nHow to fix: use integer expressions for range bounds."
+        "E3018" -> "E3018: invalid match pattern type\n\nA match pattern type is incompatible with the matched value.\n\nHow to fix: make each pattern match the scrutinee type."
+        "E3019" -> "E3019: break or continue outside loop\n\nA break or continue statement appears outside a loop.\n\nHow to fix: move it inside a loop or replace it with appropriate control flow."
+        "E3020" -> "E3020: invalid function call\n\nA function call has incompatible argument types or arity.\n\nHow to fix: pass the expected number and types of arguments."
+        "E3021" -> "E3021: invalid struct initializer\n\nA struct initializer does not match the struct definition.\n\nHow to fix: use valid field names and values for the target struct."
+        "E3022" -> "E3022: missing struct field\n\nA struct initializer omits a required field.\n\nHow to fix: add the missing field initializer."
+        "E3023" -> "E3023: duplicate initializer field\n\nA struct initializer sets the same field more than once.\n\nHow to fix: keep only one initializer for each field."
+        "E3024" -> "E3024: inconsistent array element type\n\nArray elements have incompatible types.\n\nHow to fix: make all elements match the expected array element type."
+        "E3025" -> "E3025: invalid array push\n\nA push operation uses an invalid receiver or value type.\n\nHow to fix: call push on an array-like value with an element of the correct type."
+        "E4000" -> "E4000: semantic error\n\nSemantic analysis failed, but the exact case does not have a more specific code.\n\nHow to fix: read the diagnostic and correct the program-level rule violation."
+        "E4001" -> "E4001: missing main function\n\nThe program has no main function where one is required.\n\nHow to fix: define fn main with the expected signature."
+        "E4002" -> "E4002: invalid main function\n\nThe main function exists but does not satisfy entry-point requirements.\n\nHow to fix: adjust main to the required parameters and return type."
+        "W4000" -> "W4000: semantic warning\n\nThe compiler found a semantic issue that does not stop compilation.\n\nHow to fix: read the warning and simplify or correct the code if appropriate."
+        "W4001" -> "W4001: unused variable\n\nA variable is declared but never used.\n\nHow to fix: remove it, use it, or rename it according to the project's convention for intentionally unused bindings."
+        "W4002" -> "W4002: missing main function warning\n\nThe current mode allowed compilation to continue, but no main function was found.\n\nHow to fix: add main when building an executable."
+        "W4003" -> "W4003: invalid main function warning\n\nThe current mode allowed compilation to continue, but main does not look like a valid entry point.\n\nHow to fix: adjust main to the required signature before building an executable."
+        _ -> ""
+    }
+}
+
 pub fn diag_error_level(): i32 { return 0 }
 pub fn diag_warning_level(): i32 { return 1 }
 

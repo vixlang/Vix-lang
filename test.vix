@@ -1,16 +1,20 @@
-fn fib(n:i64): i32
+extern "C"
 {
-    if (n<=1)
-    {
-        return n 
-    }
-    else 
-    {
-        return fib(n - 1) + fib(n - 2)
-    }
+    fn printf(fmt:string , ...): i32
 }
-pub fn main(): i32
+fn find(name: string): ?i32
 {
-    print(fib(40))
+    if (name == "key") { return Some(42) }
+    return None
+}
+
+fn main(): i32
+{
+    match find("key")
+    {
+        Some(v) -> printf("found: %d\n", v)
+        None    -> print("not found\n")
+    }
     return 0
 }
+
