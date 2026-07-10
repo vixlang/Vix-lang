@@ -1,0 +1,23 @@
+fn accept_i32(value: ?i32): i32
+{
+    match value
+    {
+        Some(_) -> 1
+        None -> 2
+    }
+}
+
+fn accept_string(value: ?string): i32
+{
+    match value
+    {
+        Some(_) -> 3
+        None -> 4
+    }
+}
+
+fn main(): i32
+{
+    let empty = None
+    return accept_i32(empty) + accept_string(empty)
+}

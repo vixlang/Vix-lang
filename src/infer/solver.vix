@@ -1,6 +1,6 @@
 #[no_main]
 
-import "env.vix"
+import "gen.vix"
 import "unify.vix"
 
 pub type InferValue = struct {
@@ -193,17 +193,22 @@ pub fn hm_add_adt_ctors(env: &TypeEnv, store: &TyStore, fresh: &Fresh, adts: [As
     }
 }
 
-pub fn hm_add_functions(env: &TypeEnv, store: &TyStore, functions: [AstFunction])
+pub fn hm_add_functions(env: &TypeEnv, store: &TyStore, fresh: &Fresh, functions: [AstFunction])
 {
     for (i in 0 .. functions.length)
     {
+        let mut vars: [i32] = []
+        for (t in 0 .. functions[i].type_params.length)
+        {
+            vars.push(fresh_tyvar_id(fresh))
+        }
         let mut params: [Ty] = []
         for (p in 0 .. functions[i].param_types.length)
         {
-            params.push(ty_from_text(store, functions[i].param_types[p]))
+            params.push(hm_type_param_ty(store, functions[i].type_params, vars, functions[i].param_types[p]))
         }
-        let ret = ty_from_text(store, functions[i].ret_ty)
-        type_env_set(env, functions[i].name, scheme_mono(ty_fun_vararg(store, params, ret, functions[i].is_var_arg)))
+        let ret = hm_type_param_ty(store, functions[i].type_params, vars, functions[i].ret_ty)
+        type_env_set(env, functions[i].name, scheme_forall(vars, ty_fun_vararg(store, params, ret, functions[i].is_var_arg)))
     }
 }
 
@@ -494,7 +499,7 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 if (u.ok == 0) { return u }
                 final_ty = subst_apply_ty(store, subst, declared)
             }
-            type_env_extend(env, stmt.assign_name, scheme_mono(final_ty))
+            type_env_extend(env, stmt.assign_name, hm_generalize_let(store, env, subst, final_ty))
             infer_value_ok(TyPrim(ty_prim_void()))
         }
         "assign" -> {
@@ -592,12 +597,17 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
 pub fn hm_check_function(func: AstFunction, base_env: &TypeEnv, store: &TyStore, fresh: &Fresh, structs: [AstStructDecl], es: &ExprStore, ss: &StmtStore): HmCheckResult
 {
     let env = type_env_clone(base_env)
+    let mut vars: [i32] = []
+    for (t in 0 .. func.type_params.length)
+    {
+        vars.push(fresh_tyvar_id(fresh))
+    }
     for (i in 0 .. func.param_names.length)
     {
-        type_env_extend(&env, func.param_names[i], scheme_mono(ty_from_text(store, func.param_types[i])))
+        type_env_extend(&env, func.param_names[i], scheme_mono(hm_type_param_ty(store, func.type_params, vars, func.param_types[i])))
     }
     let subst = subst_empty()
-    let ret_ty = ty_from_text(store, func.ret_ty)
+    let ret_ty = hm_type_param_ty(store, func.type_params, vars, func.ret_ty)
     let r = hm_infer_stmt(&env, store, fresh, &subst, structs, es, ss, func.body_idx, ret_ty)
     if (r.ok == 0) { return hm_fail(r.error, func.name) }
     return hm_ok(func.ret_ty)
@@ -613,8 +623,8 @@ pub fn hm_check_program(program: AstProgram): HmCheckResult
     let fresh = fresh_new()
     let env = type_env_new()
     hm_add_adt_ctors(&env, &store, &fresh, program.adts)
-    hm_add_functions(&env, &store, program.extern_functions)
-    hm_add_functions(&env, &store, program.functions)
+    hm_add_functions(&env, &store, &fresh, program.extern_functions)
+    hm_add_functions(&env, &store, &fresh, program.functions)
     let expr_store = program.expr_store
     let stmt_store = program.store
     for (i in 0 .. program.functions.length)

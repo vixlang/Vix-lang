@@ -167,6 +167,15 @@ pub fn desugar_has_function(functions: [AstFunction], name: string): i32
     return 0
 }
 
+pub fn desugar_has_generic_function(functions: [AstFunction]): i32
+{
+    for (i in 0 .. functions.length)
+    {
+        if (functions[i].type_params.length > 0) { return 1 }
+    }
+    return 0
+}
+
 pub fn desugar_expr_uses_result_ctor(es: &ExprStore, idx: i32): i32
 {
     if (idx < 0) { return 0 }
@@ -260,7 +269,7 @@ pub fn desugar_expr(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: 
         {
             args.push(desugar_expr(adts, es, store, expr.args[i]))
         }
-        return ast_expr_call(es, expr.text, args)
+        return ast_expr_call_generic(es, expr.text, expr.type_args, args)
     }
     if (expr.tag == "index")
     {
@@ -645,6 +654,220 @@ pub fn desugar_stmt_env(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, i
     }
 }
 
+pub type GenericSpecializations = struct {
+    keys: [string],
+    functions: [AstFunction]
+}
+
+pub type GenericProgramParts = struct {
+    functions: [AstFunction],
+    globals: [AstStmt]
+}
+
+pub fn generic_specializations_new(): GenericSpecializations
+{
+    return GenericSpecializations{ keys: [], functions: [] }
+}
+
+pub fn generic_find_function(functions: [AstFunction], name: string): i32
+{
+    for (i in 0 .. functions.length)
+    {
+        if (functions[i].name == name) { return i }
+    }
+    return -1
+}
+
+pub fn generic_find_key(specs: &GenericSpecializations, key: string): i32
+{
+    for (i in 0 .. specs.keys.length)
+    {
+        if (specs.keys[i] == key) { return i }
+    }
+    return -1
+}
+
+pub fn generic_is_type_name_char(ch: i8): i32
+{
+    if (ch >= 'a' and ch <= 'z') { return 1 }
+    if (ch >= 'A' and ch <= 'Z') { return 1 }
+    if (ch >= '0' and ch <= '9') { return 1 }
+    if (ch == '_') { return 1 }
+    return 0
+}
+
+pub fn generic_substitute_type(text: string, params: [string], args: [string]): string
+{
+    let mut out = ""
+    let mut token = ""
+    for (i in 0 .. text.length)
+    {
+        if (generic_is_type_name_char(text[i]) == 1)
+        {
+            token = token + ast_char_string(text[i])
+        }
+        else
+        {
+            let mut replacement = token
+            for (p in 0 .. params.length)
+            {
+                if (token == params[p] and p < args.length) { replacement = args[p] }
+            }
+            out = out + replacement + ast_char_string(text[i])
+            token = ""
+        }
+    }
+    let mut replacement2 = token
+    for (q in 0 .. params.length)
+    {
+        if (token == params[q] and q < args.length) { replacement2 = args[q] }
+    }
+    return out + replacement2
+}
+
+pub fn generic_mangle_type(text: string): string
+{
+    let mut out = ""
+    for (i in 0 .. text.length)
+    {
+        if (generic_is_type_name_char(text[i]) == 1) { out = out + ast_char_string(text[i]) }
+        else { out = out + "_" }
+    }
+    return out
+}
+
+pub fn generic_instance_name(name: string, args: [string]): string
+{
+    let mut out = name
+    for (i in 0 .. args.length)
+    {
+        out = out + "__" + generic_mangle_type(args[i])
+    }
+    return out
+}
+
+pub fn generic_clone_expr(functions: [AstFunction], es: &ExprStore, store: &StmtStore, specs: &GenericSpecializations, params: [string], substitutions: [string], idx: i32): i32
+{
+    if (idx < 0) { return idx }
+    let mut out = expr_store_get(es, idx)
+    out.left_idx = generic_clone_expr(functions, es, store, specs, params, substitutions, out.left_idx)
+    out.right_idx = generic_clone_expr(functions, es, store, specs, params, substitutions, out.right_idx)
+    let mut args: [i32] = []
+    for (i in 0 .. out.args.length)
+    {
+        args.push(generic_clone_expr(functions, es, store, specs, params, substitutions, out.args[i]))
+    }
+    out.args = args
+    if (out.tag == "struct_literal")
+    {
+        out.text = generic_substitute_type(out.text, params, substitutions)
+    }
+    if (out.tag == "call")
+    {
+        let mut type_args: [string] = []
+        for (j in 0 .. out.type_args.length)
+        {
+            type_args.push(generic_substitute_type(out.type_args[j], params, substitutions))
+        }
+        let function_idx = generic_find_function(functions, out.text)
+        if (function_idx >= 0 and functions[function_idx].type_params.length > 0 and type_args.length > 0)
+        {
+            out.text = generic_specialize_function(functions, es, store, specs, function_idx, type_args)
+            out.type_args = []
+        }
+        else
+        {
+            out.type_args = type_args
+        }
+    }
+    return expr_store_add(es, out)
+}
+
+pub fn generic_clone_stmt(functions: [AstFunction], es: &ExprStore, store: &StmtStore, specs: &GenericSpecializations, params: [string], substitutions: [string], idx: i32): i32
+{
+    if (idx < 0) { return idx }
+    let mut out = stmt_store_get(store, idx)
+    out.value_idx = generic_clone_expr(functions, es, store, specs, params, substitutions, out.value_idx)
+    if (out.tag == "if")
+    {
+        out.assign_idx = generic_clone_stmt(functions, es, store, specs, params, substitutions, out.assign_idx)
+    }
+    else
+    {
+        out.assign_idx = generic_clone_expr(functions, es, store, specs, params, substitutions, out.assign_idx)
+    }
+    out.print_idx = generic_clone_expr(functions, es, store, specs, params, substitutions, out.print_idx)
+    if (out.tag == "store_index")
+    {
+        out.direct_ret = generic_clone_expr(functions, es, store, specs, params, substitutions, out.direct_ret)
+    }
+    out.body_idx = generic_clone_stmt(functions, es, store, specs, params, substitutions, out.body_idx)
+    if (out.tag == "let")
+    {
+        out.type_text = generic_substitute_type(out.type_text, params, substitutions)
+    }
+    let mut children: [i32] = []
+    for (i in 0 .. out.stmt_indices.length)
+    {
+        children.push(generic_clone_stmt(functions, es, store, specs, params, substitutions, out.stmt_indices[i]))
+    }
+    out.stmt_indices = children
+    let mut patterns: [i32] = []
+    for (j in 0 .. out.match_pattern_indices.length)
+    {
+        patterns.push(generic_clone_expr(functions, es, store, specs, params, substitutions, out.match_pattern_indices[j]))
+    }
+    out.match_pattern_indices = patterns
+    let mut bodies: [i32] = []
+    for (k in 0 .. out.match_body_indices.length)
+    {
+        bodies.push(generic_clone_stmt(functions, es, store, specs, params, substitutions, out.match_body_indices[k]))
+    }
+    out.match_body_indices = bodies
+    return stmt_store_add(store, out)
+}
+
+pub fn generic_specialize_function(functions: [AstFunction], es: &ExprStore, store: &StmtStore, specs: &GenericSpecializations, function_idx: i32, args: [string]): string
+{
+    let template = functions[function_idx]
+    let name = generic_instance_name(template.name, args)
+    if (generic_find_key(specs, name) >= 0) { return name }
+    specs.keys.push(name)
+    let mut param_types: [string] = []
+    for (i in 0 .. template.param_types.length)
+    {
+        param_types.push(generic_substitute_type(template.param_types[i], template.type_params, args))
+    }
+    let body_idx = generic_clone_stmt(functions, es, store, specs, template.type_params, args, template.body_idx)
+    specs.functions.push(ast_function_with_loc(ast_function_generic_full_vararg(name, generic_substitute_type(template.ret_ty, template.type_params, args), body_idx, template.param_names, param_types, [], template.is_var_arg), template.line, template.col))
+    return name
+}
+
+pub fn generic_monomorphize_program(functions: [AstFunction], globals: [AstStmt], es: &ExprStore, store: &StmtStore): GenericProgramParts
+{
+    let specs = generic_specializations_new()
+    let mut rewritten_globals: [AstStmt] = []
+    for (g in 0 .. globals.length)
+    {
+        let idx = generic_clone_stmt(functions, es, store, &specs, [], [], g)
+        rewritten_globals.push(stmt_store_get(store, idx))
+    }
+    let mut rewritten_functions: [AstFunction] = []
+    for (i in 0 .. functions.length)
+    {
+        if (functions[i].type_params.length == 0)
+        {
+            let body_idx = generic_clone_stmt(functions, es, store, &specs, [], [], functions[i].body_idx)
+            rewritten_functions.push(ast_function_with_loc(ast_function_generic_full_vararg(functions[i].name, functions[i].ret_ty, body_idx, functions[i].param_names, functions[i].param_types, [], functions[i].is_var_arg), functions[i].line, functions[i].col))
+        }
+    }
+    for (j in 0 .. specs.functions.length)
+    {
+        rewritten_functions.push(specs.functions[j])
+    }
+    return GenericProgramParts{ functions: rewritten_functions, globals: rewritten_globals }
+}
+
 pub fn desugar_function(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, func: AstFunction): AstFunction
 {
     return desugar_function_with_globals(adts, es, store, [], func)
@@ -690,9 +913,11 @@ pub fn desugar_function_with_globals(adts: [AstAdtDecl], es: &ExprStore, store: 
 pub fn desugar_program(program: AstProgram): AstProgram
 {
     if (program.ok == 0) { return program }
-    if (program.adts.length == 0 and program.globals.length == 0) { return program }
+    let has_generic_functions = desugar_has_generic_function(program.functions)
+    if (program.adts.length == 0 and program.globals.length == 0 and has_generic_functions == 0) { return program }
     let es = program.expr_store
     let store = program.store
+    let generic_parts = if (has_generic_functions == 1) { generic_monomorphize_program(program.functions, program.globals, &es, &store) } else { GenericProgramParts{ functions: program.functions, globals: program.globals } }
     let mut structs: [AstStructDecl] = []
     let mut functions: [AstFunction] = []
     let mut extern_functions: [AstFunction] = []
@@ -712,9 +937,9 @@ pub fn desugar_program(program: AstProgram): AstProgram
     {
         extern_functions.push(desugar_function(program.adts, &es, &store, program.extern_functions[k]))
     }
-    for (m in 0 .. program.functions.length)
+    for (m in 0 .. generic_parts.functions.length)
     {
-        functions.push(desugar_function_with_globals(program.adts, &es, &store, program.globals, program.functions[m]))
+        functions.push(desugar_function_with_globals(program.adts, &es, &store, generic_parts.globals, generic_parts.functions[m]))
     }
     return ast_program_ok_functions_with_externs_globals_structs_and_adts(functions, extern_functions, [], structs, program.adts, es, store)
 }

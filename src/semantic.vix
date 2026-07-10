@@ -283,6 +283,71 @@ pub fn semantic_find_struct(structs: [AstStructDecl], name: string): i32
     return -1
 }
 
+pub fn semantic_find_adt_variant(adts: [AstAdtDecl], name: string): i32
+{
+    for (i in 0 .. adts.length)
+    {
+        for (j in 0 .. adts[i].variant_names.length)
+        {
+            if (adts[i].variant_names[j] == name) { return i }
+        }
+    }
+    return -1
+}
+
+pub fn semantic_check_generic_call(program: AstProgram, expr: AstExpr, result: &SemanticResult, source: string, filename: string, func_name: string)
+{
+    let function_idx = semantic_find_function(program.functions, expr.text)
+    if (function_idx < 0) { return }
+    let function = program.functions[function_idx]
+    if (function.type_params.length == 0)
+    {
+        if (expr.type_args.length > 0)
+        {
+            semantic_add_error_loc(result, source, filename, "TypeError", "function '" + expr.text + "' is not generic", func_name, expr.line, expr.col, diag_strlen(expr.text))
+        }
+        return
+    }
+    if (expr.type_args.length != function.type_params.length)
+    {
+        semantic_add_error_loc(result, source, filename, "TypeError", "generic function '" + expr.text + "' requires " + ast_i32(function.type_params.length) + " type arguments", func_name, expr.line, expr.col, diag_strlen(expr.text))
+    }
+}
+
+pub fn semantic_match_check_exhaustive(program: AstProgram, patterns: [i32], result: &SemanticResult, source: string, filename: string, func_name: string, line: i32, col: i32)
+{
+    let es = program.expr_store
+    let mut adt_idx = -1
+    for (i in 0 .. patterns.length)
+    {
+        if (patterns[i] < 0) { return }
+        let pattern = expr_store_get(&es, patterns[i])
+        let candidate = semantic_find_adt_variant(program.adts, pattern.text)
+        if (candidate >= 0 and adt_idx < 0) { adt_idx = candidate }
+    }
+    if (adt_idx < 0) { return }
+    let decl = program.adts[adt_idx]
+    let mut missing = ""
+    for (v in 0 .. decl.variant_names.length)
+    {
+        let mut found = 0
+        for (p in 0 .. patterns.length)
+        {
+            let pattern2 = expr_store_get(&es, patterns[p])
+            if (pattern2.text == decl.variant_names[v]) { found = 1 }
+        }
+        if (found == 0)
+        {
+            if (missing != "") { missing = missing + ", " }
+            missing = missing + decl.variant_names[v]
+        }
+    }
+    if (missing != "")
+    {
+        semantic_add_error_loc(result, source, filename, "SemanticError", "non-exhaustive match for '" + decl.name + "': missing " + missing, func_name, line, col, 5)
+    }
+}
+
 pub fn semantic_struct_find_field(decl: AstStructDecl, field_name: string): i32
 {
     for (i in 0 .. decl.field_names.length)
@@ -338,8 +403,11 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
     match expr.tag
     {
         "ident" -> {
-            semantic_scope_require(scope, result, source, filename, func_name, expr.text, expr.line, expr.col)
-            semantic_scope_mark_used(scope, expr.text)
+            if (semantic_find_adt_variant(program.adts, expr.text) < 0)
+            {
+                semantic_scope_require(scope, result, source, filename, func_name, expr.text, expr.line, expr.col)
+                semantic_scope_mark_used(scope, expr.text)
+            }
         }
         "addr" -> {
             semantic_scope_require(scope, result, source, filename, func_name, expr.text, expr.line, expr.col)
@@ -359,10 +427,11 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             }
         }
         "call" -> {
-            if (semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0)
+            if (semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0)
             {
                 semantic_add_error_loc(result, source, filename, "NameError", "undefined function '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(expr.text))
             }
+            semantic_check_generic_call(program, expr, result, source, filename, func_name)
             for (i in 0 .. expr.args.length)
             {
                 semantic_check_expr(scope, program, expr.args[i], result, source, filename, func_name)
@@ -401,6 +470,12 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
         "match_expr" -> {
             semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
             let num_arms = expr.args.length / 2
+            let mut patterns: [i32] = []
+            for (m in 0 .. num_arms)
+            {
+                patterns.push(expr.args[m * 2])
+            }
+            semantic_match_check_exhaustive(program, patterns, result, source, filename, func_name, expr.line, expr.col)
             for (i in 0 .. num_arms)
             {
                 let pattern_idx = expr.args[i * 2]
@@ -452,6 +527,18 @@ pub fn semantic_check_match_pattern(scope: &SemanticScope, program: AstProgram, 
             return
         }
     }
+    if (expr.tag == "call" and semantic_find_adt_variant(program.adts, expr.text) >= 0)
+    {
+        for (i in 0 .. expr.args.length)
+        {
+            let arg = expr_store_get(&expr_store, expr.args[i])
+            if (arg.tag != "ident")
+            {
+                semantic_check_match_pattern(scope, program, expr.args[i], result, source, filename, func_name)
+            }
+        }
+        return
+    }
     semantic_check_expr(scope, program, idx, result, source, filename, func_name)
 }
 
@@ -466,6 +553,17 @@ pub fn semantic_declare_match_binding(scope: &SemanticScope, program: AstProgram
         if (bind_expr.tag == "ident" and bind_expr.text != "_")
         {
             let __decl = semantic_scope_declare(scope, result, source, filename, func_name, bind_expr.text, bind_expr.line, bind_expr.col)
+        }
+    }
+    if (pattern_expr.tag == "call" and semantic_find_adt_variant(program.adts, pattern_expr.text) >= 0)
+    {
+        for (i in 0 .. pattern_expr.args.length)
+        {
+            let bind_expr2 = expr_store_get(&expr_store, pattern_expr.args[i])
+            if (bind_expr2.tag == "ident" and bind_expr2.text != "_")
+            {
+                let __decl2 = semantic_scope_declare(scope, result, source, filename, func_name, bind_expr2.text, bind_expr2.line, bind_expr2.col)
+            }
         }
     }
 }
@@ -551,6 +649,7 @@ pub fn semantic_check_stmt(scope: &SemanticScope, program: AstProgram, stmt_idx:
         }
         "match" -> {
             semantic_check_expr(scope, program, stmt.value_idx, result, source, filename, func_name)
+            semantic_match_check_exhaustive(program, stmt.match_pattern_indices, result, source, filename, func_name, stmt.line, stmt.col)
             for (i in 0 .. stmt.match_pattern_indices.length)
             {
                 let pattern_idx = stmt.match_pattern_indices[i]
@@ -607,6 +706,7 @@ pub fn semantic_check_function_body(func: AstFunction, program: AstProgram, resu
 pub fn semantic_function_signature_equal(a: AstFunction, b: AstFunction): i32
 {
     if (a.ret_ty != b.ret_ty) { return 0 }
+    if (a.type_params.length != b.type_params.length) { return 0 }
     if (a.param_types.length != b.param_types.length) { return 0 }
     if (a.is_var_arg != b.is_var_arg) { return 0 }
     for (i in 0 .. a.param_types.length)

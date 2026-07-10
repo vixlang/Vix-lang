@@ -1,0 +1,12 @@
+#[no_main]
+
+import "env.vix"
+
+// Both the environment and binding type must include constraints collected
+// while inferring the initializer before quantifying its free variables.
+pub fn hm_generalize_let(store: &TyStore, env: &TypeEnv, subst: &Subst, ty: Ty): Scheme
+{
+    let applied_env = type_env_apply(store, env, subst)
+    let applied_ty = subst_apply_ty(store, subst, ty)
+    return type_env_generalize(store, &applied_env, applied_ty)
+}

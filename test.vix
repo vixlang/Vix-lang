@@ -1,20 +1,15 @@
-extern "C"
-{
-    fn printf(fmt:string , ...): i32
-}
-fn find(name: string): ?i32
-{
-    if (name == "key") { return Some(42) }
-    return None
-}
+type Color =
+         Red
+        | Blue
+        | Yellow
 
 fn main(): i32
 {
-    match find("key")
+    let c = Red
+    match c
     {
-        Some(v) -> printf("found: %d\n", v)
-        None    -> print("not found\n")
+        Red -> 1
+        Blue -> 2
     }
     return 0
 }
-

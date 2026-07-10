@@ -268,10 +268,8 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         return mode_failure()
     }
 
-    let lowered_program = desugar_program(program)
-
     let emit_semantic_warnings = if (mode == "codegen") { 0 } else { 1 }
-    let semantic_result = semantic_check_program_with_warnings(lowered_program, src, filename, emit_semantic_warnings)
+    let semantic_result = semantic_check_program_with_warnings(program, src, filename, emit_semantic_warnings)
     match mode
     {
         "--semantic" -> {
@@ -318,6 +316,8 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         diag_print(typeck_result_debug(infer_result, src, filename))
         return mode_failure()
     }
+
+    let lowered_program = desugar_program(program)
 
     if (mode == "debug_llvm")
     {

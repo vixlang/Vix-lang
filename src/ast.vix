@@ -19,6 +19,14 @@ pub fn ast_f64(n: f64): string
     return buf
 }
 
+pub fn ast_char_string(ch: i8): string
+{
+    let text: string = malloc(2)
+    text[0] = ch
+    text[1] = 0
+    return text
+}
+
 pub type AstExpr = struct {
     tag: string,
     text: string,
@@ -28,6 +36,7 @@ pub type AstExpr = struct {
     right_idx: i32,
     args: [i32],
     field_names: [string],
+    type_args: [string],
     option_has_value: i32,
     option_value: string,
     line: i32,
@@ -134,6 +143,7 @@ pub type AstFunction = struct {
     body_idx: i32,
     param_names: [string],
     param_types: [string],
+    type_params: [string],
     is_var_arg: i32,
     line: i32,
     col: i32
@@ -175,92 +185,97 @@ macro ast_default_loc_fields() {
 
 pub fn ast_expr_int(store: &ExprStore, value: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "int", text: "", int_value: value, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "int", text: "", int_value: value, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_bool(store: &ExprStore, value: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "bool", text: "", int_value: value, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "bool", text: "", int_value: value, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_float(store: &ExprStore, value: f64): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "float", text: "", int_value: 0, float_value: value, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "float", text: "", int_value: 0, float_value: value, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_string(store: &ExprStore, text: string): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "string", text: text, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "string", text: text, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_identifier(store: &ExprStore, text: string): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "ident", text: text, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "ident", text: text, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_binop(store: &ExprStore, op: string, left: i32, right: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "binop", text: op, int_value: 0, float_value: 0.0, left_idx: left, right_idx: right, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "binop", text: op, int_value: 0, float_value: 0.0, left_idx: left, right_idx: right, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_unaryop(store: &ExprStore, op: string, operand: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "unaryop", text: op, int_value: 0, float_value: 0.0, left_idx: operand, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "unaryop", text: op, int_value: 0, float_value: 0.0, left_idx: operand, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_call(store: &ExprStore, name: string, args: [i32]): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "call", text: name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: args, field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return ast_expr_call_generic(store, name, [], args)
+}
+
+pub fn ast_expr_call_generic(store: &ExprStore, name: string, type_args: [string], args: [i32]): i32
+{
+    return expr_store_add(store, AstExpr{ tag: "call", text: name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: args, field_names: [], type_args: type_args, option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_index(store: &ExprStore, base_idx: i32, index_idx: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "index", text: "", int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: index_idx, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "index", text: "", int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: index_idx, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_addr(store: &ExprStore, name: string): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "addr", text: name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "addr", text: name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_deref(store: &ExprStore, operand: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "deref", text: "", int_value: 0, float_value: 0.0, left_idx: operand, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "deref", text: "", int_value: 0, float_value: 0.0, left_idx: operand, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_field(store: &ExprStore, base_idx: i32, field_name: string): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "field", text: field_name, int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "field", text: field_name, int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_struct_literal(store: &ExprStore, type_name: string, field_names: [string], field_values: [i32]): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "struct_literal", text: type_name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: field_values, field_names: field_names, option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "struct_literal", text: type_name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: field_values, field_names: field_names, type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_some_string(store: &ExprStore, value: string): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "option", text: "", int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 1, option_value: value, $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "option", text: "", int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 1, option_value: value, $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_some(store: &ExprStore, value_idx: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "option", text: "", int_value: 0, float_value: 0.0, left_idx: value_idx, right_idx: -1, args: [], field_names: [], option_has_value: 1, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "option", text: "", int_value: 0, float_value: 0.0, left_idx: value_idx, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 1, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_none(store: &ExprStore): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "option", text: "", int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "option", text: "", int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_array(store: &ExprStore, elements: [i32]): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "array_literal", text: "", int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: elements, field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "array_literal", text: "", int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: elements, field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_method_call(store: &ExprStore, base_idx: i32, method: string, args: [i32]): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "method_call", text: method, int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: -1, args: args, field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "method_call", text: method, int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: -1, args: args, field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_match(store: &ExprStore, subject_idx: i32, patterns: [i32], bodies: [i32]): i32
@@ -289,22 +304,22 @@ pub fn ast_expr_match(store: &ExprStore, subject_idx: i32, patterns: [i32], bodi
             merged.push(-1)
         }
     }
-    return expr_store_add(store, AstExpr{ tag: "match_expr", text: "", int_value: 0, float_value: 0.0, left_idx: subject_idx, right_idx: -1, args: merged, field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "match_expr", text: "", int_value: 0, float_value: 0.0, left_idx: subject_idx, right_idx: -1, args: merged, field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_if(store: &ExprStore, cond_idx: i32, then_idx: i32, else_idx: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "if_expr", text: "", int_value: 0, float_value: 0.0, left_idx: cond_idx, right_idx: then_idx, args: [else_idx], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "if_expr", text: "", int_value: 0, float_value: 0.0, left_idx: cond_idx, right_idx: then_idx, args: [else_idx], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_block(store: &ExprStore, stmt_idx: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "block_expr", text: "", int_value: 0, float_value: 0.0, left_idx: stmt_idx, right_idx: -1, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "block_expr", text: "", int_value: 0, float_value: 0.0, left_idx: stmt_idx, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_block_value(store: &ExprStore, stmt_idx: i32, value_idx: i32): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "block_expr", text: "", int_value: 0, float_value: 0.0, left_idx: stmt_idx, right_idx: value_idx, args: [], field_names: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+    return expr_store_add(store, AstExpr{ tag: "block_expr", text: "", int_value: 0, float_value: 0.0, left_idx: stmt_idx, right_idx: value_idx, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_option_has_value(store: &ExprStore, idx: i32): i32
@@ -427,22 +442,27 @@ pub fn ast_stmt_if(store: &StmtStore, cond_idx: i32, then_idx: i32, else_idx: i3
 
 pub fn ast_function(name: string, ret_ty: string, body_idx: i32): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: [], param_types: [], is_var_arg: 0, $ast_default_loc_fields() }
+    return ast_function_generic_full_vararg(name, ret_ty, body_idx, [], [], [], 0)
 }
 
 pub fn ast_function_full(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string]): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, is_var_arg: 0, $ast_default_loc_fields() }
+    return ast_function_generic_full_vararg(name, ret_ty, body_idx, param_names, param_types, [], 0)
 }
 
 pub fn ast_function_full_vararg(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], is_var_arg: i32): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, is_var_arg: is_var_arg, $ast_default_loc_fields() }
+    return ast_function_generic_full_vararg(name, ret_ty, body_idx, param_names, param_types, [], is_var_arg)
+}
+
+pub fn ast_function_generic_full_vararg(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], is_var_arg: i32): AstFunction
+{
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, $ast_default_loc_fields() }
 }
 
 pub fn ast_function_with_loc(func: AstFunction, line: i32, col: i32): AstFunction
 {
-    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, is_var_arg: func.is_var_arg, line: line, col: col }
+    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, type_params: func.type_params, is_var_arg: func.is_var_arg, line: line, col: col }
 }
 
 pub fn ast_program_ok(function: AstFunction, expr_store: ExprStore, store: StmtStore): AstProgram

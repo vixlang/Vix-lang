@@ -331,6 +331,45 @@ pub fn parse_postfix_from(parser: &Parser, expr_idx: i32): i32
     return parse_postfix_continue(parser, expr_idx)
 }
 
+pub fn parser_generic_call_ahead(parser: &Parser): i32
+{
+    let mut pos = parser.pos
+    if (stream_text_at(parser.stream, pos) == ":") { pos += 1 }
+    if (stream_text_at(parser.stream, pos) != "[") { return 0 }
+    let mut depth = 0
+    while (pos < stream_len(parser.stream))
+    {
+        let text = stream_text_at(parser.stream, pos)
+        if (text == "[") { depth += 1 }
+        elif (text == "]")
+        {
+            depth -= 1
+            if (depth == 0)
+            {
+                return if (stream_text_at(parser.stream, pos + 1) == "(") { 1 } else { 0 }
+            }
+        }
+        pos += 1
+    }
+    return 0
+}
+
+pub fn parse_generic_call_type_args(parser: &Parser): [string]
+{
+    if (parser_text(parser) == ":") { parser_advance(parser) }
+    parser_expect_text(parser, "[")
+    let mut args: [string] = []
+    while (parser_text(parser) != "]" and parser_at_end(parser) == 0)
+    {
+        args.push(parse_type_text(parser))
+        if (parser.ok == 0) { return args }
+        if (parser_text(parser) != ",") { break }
+        parser_advance(parser)
+    }
+    parser_expect_text(parser, "]")
+    return args
+}
+
 pub fn parse_postfix_continue(parser: &Parser, expr_idx: i32): i32
 {
     let mut expr = expr_idx
@@ -644,6 +683,28 @@ pub fn parse_primary(parser: &Parser): i32
         {
             return parser_expr_at(parser, ast_expr_none(parser.expr_store), line, col)
         }
+        if (parser_generic_call_ahead(parser) == 1)
+        {
+            let type_args = parse_generic_call_type_args(parser)
+            if (parser.ok == 0) { return -1 }
+            parser_expect_text(parser, "(")
+            if (parser.ok == 0) { return -1 }
+            let mut args: [i32] = []
+            if (parser_text(parser) != ")")
+            {
+                args.push(parse_expression(parser))
+                if (parser.ok == 0) { return -1 }
+                while (parser_text(parser) == ",")
+                {
+                    parser_advance(parser)
+                    args.push(parse_expression(parser))
+                    if (parser.ok == 0) { return -1 }
+                }
+            }
+            parser_expect_text(parser, ")")
+            if (parser.ok == 0) { return -1 }
+            return parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, args), line, col)
+        }
         if (parser_text(parser) == "{")
         {
             parser_advance(parser)
@@ -768,6 +829,30 @@ pub fn parse_statement_ident(parser: &Parser): i32
     let col = parser_col(parser)
     let name = parser_text(parser)
     parser_advance(parser)
+    if (parser_generic_call_ahead(parser) == 1)
+    {
+        let type_args = parse_generic_call_type_args(parser)
+        if (parser.ok == 0) { return -1 }
+        parser_expect_text(parser, "(")
+        if (parser.ok == 0) { return -1 }
+        let mut args: [i32] = []
+        if (parser_text(parser) != ")")
+        {
+            args.push(parse_expression(parser))
+            if (parser.ok == 0) { return -1 }
+            while (parser_text(parser) == ",")
+            {
+                parser_advance(parser)
+                args.push(parse_expression(parser))
+                if (parser.ok == 0) { return -1 }
+            }
+        }
+        parser_expect_text(parser, ")")
+        if (parser.ok == 0) { return -1 }
+        parser_accept_text(parser, ";")
+        let call_idx = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, args), line, col)
+        return parser_stmt_at(parser, ast_stmt_expr(parser.store, call_idx), line, col)
+    }
     let op = parser_text(parser)
     if (op == ".")
     {
@@ -1271,9 +1356,9 @@ pub fn parse_type_text(parser: &Parser): string
         return "unknown"
     }
     parser_advance(parser)
-    if (parser_text(parser) == ":")
+    if (parser_text(parser) == ":" or parser_text(parser) == "[")
     {
-        parser_advance(parser)
+        if (parser_text(parser) == ":") { parser_advance(parser) }
         parser_expect_text(parser, "[")
         if (parser.ok == 0) { return ty }
         let mut out = ty + ":["
@@ -1314,6 +1399,8 @@ pub fn parse_function(parser: &Parser): AstFunction
     if (parser_expect_text(parser, "fn") == 0) { return ast_function("main", "i32", -1) }
     let name = parser_text(parser)
     if (parser_expect_kind(parser, tk_ident()) == 0) { return ast_function("main", "i32", -1) }
+    let type_params = parse_type_params_after_name(parser)
+    if (parser.ok == 0) { return ast_function("main", "i32", -1) }
     if (parser_expect_text(parser, "(") == 0) { return ast_function("main", "i32", -1) }
 
     let mut param_names: [string] = []
@@ -1352,7 +1439,7 @@ pub fn parse_function(parser: &Parser): AstFunction
     {
         body_idx = ast_stmt_return(parser.store, parser.expr_store, 0)
     }
-    return ast_function_with_loc(ast_function_full(name, ret_ty, body_idx, param_names, param_types), line, col)
+    return ast_function_with_loc(ast_function_generic_full_vararg(name, ret_ty, body_idx, param_names, param_types, type_params, 0), line, col)
 }
 
 pub fn parse_function_params_and_return(parser: &Parser, name: string): AstFunction
@@ -1488,22 +1575,23 @@ pub fn parse_type_params_after_name(parser: &Parser): [string]
     if (parser_text(parser) == ":")
     {
         parser_advance(parser)
-        parser_expect_text(parser, "[")
-        if (parser.ok == 0) { return params }
-        while (parser_text(parser) != "]" and parser_at_end(parser) == 0)
-        {
-            if (parser_text(parser) == ",")
-            {
-                parser_advance(parser)
-                continue
-            }
-            let param = parser_text(parser)
-            if (parser_expect_kind(parser, tk_ident()) == 0) { return params }
-            params.push(param)
-            parser_accept_text(parser, ",")
-        }
-        parser_expect_text(parser, "]")
     }
+    elif (parser_text(parser) != "[") { return params }
+    parser_expect_text(parser, "[")
+    if (parser.ok == 0) { return params }
+    while (parser_text(parser) != "]" and parser_at_end(parser) == 0)
+    {
+        if (parser_text(parser) == ",")
+        {
+            parser_advance(parser)
+            continue
+        }
+        let param = parser_text(parser)
+        if (parser_expect_kind(parser, tk_ident()) == 0) { return params }
+        params.push(param)
+        parser_accept_text(parser, ",")
+    }
+    parser_expect_text(parser, "]")
     return params
 }
 
