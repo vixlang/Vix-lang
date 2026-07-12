@@ -1,0 +1,16 @@
+/* File-level block comment. */
+fn main(): i32
+{
+    let first = 20 /* inline block comment */ + 1
+    let second = first
+        /* A multiline comment is whitespace and preserves newline handling. */
+        + 21
+    let third = 40 /* A newline inside a comment must not end this expression.
+                      The following operator still belongs to the expression. */
+        + 2
+    /*
+       Comments may span several lines and contain ordinary / and * bytes.
+    */
+    if (second == 42 and third == 42) { return 0 }
+    return 1
+}

@@ -61,6 +61,30 @@ pub fn hm_unify(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: Source
     return infer_value_ok(subst_apply_ty(store, subst, left))
 }
 
+pub fn hm_numeric_result_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty): Ty
+{
+    let a = subst_apply_ty(store, subst, left)
+    let b = subst_apply_ty(store, subst, right)
+    match a
+    {
+        TyPrim(ap) -> {
+            match b
+            {
+                TyPrim(bp) -> {
+                    if (ty_prim_is_numeric(ap) == 0 or ty_prim_is_numeric(bp) == 0) { return TyUnknown }
+                    if (ap == ty_prim_f64() or bp == ty_prim_f64()) { return TyPrim(ty_prim_f64()) }
+                    if (ap == ty_prim_f32() or bp == ty_prim_f32()) { return TyPrim(ty_prim_f32()) }
+                    if (ty_prim_is_int64(ap) == 1 or ty_prim_is_int64(bp) == 1) { return TyPrim(ty_prim_i64()) }
+                    return TyPrim(ty_prim_i32())
+                }
+                _ -> {}
+            }
+        }
+        _ -> {}
+    }
+    return TyUnknown
+}
+
 pub fn hm_struct_field_type(store: &TyStore, structs: [AstStructDecl], struct_name: string, field_name: string): Ty
 {
     for (i in 0 .. structs.length)
@@ -310,10 +334,14 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (l.ok == 0) { return l }
             let r = hm_infer_expr(env, store, fresh, subst, structs, es, ss, expr.right_idx)
             if (r.ok == 0) { return r }
+            let numeric_ty = hm_numeric_result_ty(store, subst, l.ty, r.ty)
             if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == ">" or expr.text == "<=" or expr.text == ">=")
             {
-                let u = hm_unify(store, subst, l.ty, r.ty, pos)
-                if (u.ok == 0) { return u }
+                if (ty_is_unknown(numeric_ty) == 1)
+                {
+                    let u = hm_unify(store, subst, l.ty, r.ty, pos)
+                    if (u.ok == 0) { return u }
+                }
                 return infer_value_ok(TyPrim(ty_prim_bool()))
             }
             if (expr.text == "and" or expr.text == "or")
@@ -324,6 +352,7 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 if (u2.ok == 0) { return u2 }
                 return infer_value_ok(TyPrim(ty_prim_bool()))
             }
+            if (ty_is_unknown(numeric_ty) == 0) { return infer_value_ok(numeric_ty) }
             let u3 = hm_unify(store, subst, l.ty, r.ty, pos)
             if (u3.ok == 0) { return u3 }
             infer_value_ok(subst_apply_ty(store, subst, l.ty))

@@ -52,6 +52,7 @@ extern "C"
     fn vix_LLVMBuildFSub(builder: ptr, left: ptr, right: ptr, name: string): ptr
     fn vix_LLVMBuildFMul(builder: ptr, left: ptr, right: ptr, name: string): ptr
     fn vix_LLVMBuildFDiv(builder: ptr, left: ptr, right: ptr, name: string): ptr
+    fn vix_LLVMBuildFRem(builder: ptr, left: ptr, right: ptr, name: string): ptr
     fn vix_LLVMBuildNeg(builder: ptr, val: ptr, name: string): ptr
     fn vix_LLVMBuildFNeg(builder: ptr, val: ptr, name: string): ptr
     fn vix_LLVMBuildRet(builder: ptr, val: ptr): ptr
@@ -70,6 +71,9 @@ extern "C"
     fn vix_LLVMSizeOf(ty: ptr): ptr
     fn vix_LLVMBuildIntToPtr(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
     fn vix_LLVMBuildSIToFP(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
+    fn vix_LLVMBuildUIToFP(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
+    fn vix_LLVMBuildFPToSI(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
+    fn vix_LLVMBuildFPToUI(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
     fn vix_LLVMBuildFPExt(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
     fn vix_LLVMBuildFPTrunc(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
     fn vix_LLVMBuildBitCast(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
@@ -736,6 +740,11 @@ pub fn llvm_build_mod_value(b: &LlvmBuilder, left: ptr, right: ptr): ptr
     return vix_LLVMBuildSRem(b.builder, left, right, llvm_temp(b, "mod"))
 }
 
+pub fn llvm_build_fmod_value(b: &LlvmBuilder, left: ptr, right: ptr): ptr
+{
+    return vix_LLVMBuildFRem(b.builder, left, right, llvm_temp(b, "fmod"))
+}
+
 pub fn llvm_build_and_value(b: &LlvmBuilder, left: ptr, right: ptr): ptr
 {
     return vix_LLVMBuildAnd(b.builder, left, right, llvm_temp(b, "and"))
@@ -801,9 +810,21 @@ pub fn llvm_build_fcmp_value(b: &LlvmBuilder, op: i32, left: ptr, right: ptr): p
 pub fn llvm_cast_value(b: &LlvmBuilder, value: ptr, from_ty: string, to_ty: string): ptr
 {
     if (from_ty == to_ty) { return value }
-    if ((to_ty == "f32" or to_ty == "f64") and (from_ty == "i32" or from_ty == "i64"))
+    if ((to_ty == "f32" or to_ty == "f64") and (from_ty == "u8" or from_ty == "u16" or from_ty == "u32" or from_ty == "u64" or from_ty == "usize" or from_ty == "char"))
+    {
+        return vix_LLVMBuildUIToFP(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "uitofp"))
+    }
+    if ((to_ty == "f32" or to_ty == "f64") and (from_ty == "i8" or from_ty == "i16" or from_ty == "i32" or from_ty == "i64"))
     {
         return vix_LLVMBuildSIToFP(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "sitofp"))
+    }
+    if ((from_ty == "f32" or from_ty == "f64") and (to_ty == "u8" or to_ty == "u16" or to_ty == "u32" or to_ty == "u64" or to_ty == "usize" or to_ty == "char"))
+    {
+        return vix_LLVMBuildFPToUI(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "fptoui"))
+    }
+    if ((from_ty == "f32" or from_ty == "f64") and (to_ty == "i8" or to_ty == "i16" or to_ty == "i32" or to_ty == "i64"))
+    {
+        return vix_LLVMBuildFPToSI(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "fptosi"))
     }
     if (to_ty == "f64" and from_ty == "f32")
     {

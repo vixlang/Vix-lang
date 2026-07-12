@@ -1,0 +1,295 @@
+import "ast.vix"
+
+fn json_ast_escape(text: string): string
+{
+    let size = text.length
+    let out: string = malloc(size + size + size + size + size + size + 1)
+    let hex = "0123456789abcdef"
+    let mut pos = 0
+    for (i in 0 .. text.length)
+    {
+        let ch = text[i]
+        if (ch == '"' or ch == 92)
+        {
+            out[pos] = 92
+            out[pos + 1] = ch
+            pos += 2
+        }
+        elif (ch == 8 or ch == 9 or ch == 10 or ch == 12 or ch == 13)
+        {
+            out[pos] = 92
+            out[pos + 1] = match ch { 8 -> 'b' 9 -> 't' 10 -> 'n' 12 -> 'f' _ -> 'r' }
+            pos += 2
+        }
+        elif (ch >= 0 and ch < 32)
+        {
+            out[pos] = 92
+            out[pos + 1] = 'u'
+            out[pos + 2] = '0'
+            out[pos + 3] = '0'
+            out[pos + 4] = hex[ch / 16]
+            out[pos + 5] = hex[ch % 16]
+            pos += 6
+        }
+        else
+        {
+            out[pos] = ch
+            pos += 1
+        }
+    }
+    out[pos] = 0
+    return out
+}
+
+fn json_ast_quote(text: string): string
+{
+    return "\"" + json_ast_escape(text) + "\""
+}
+
+fn json_ast_bool(value: i32): string
+{
+    return if (value == 1) { "true" } else { "false" }
+}
+
+fn json_ast_loc(line: i32, col: i32): string
+{
+    return "\"location\":{\"line\":" + ast_i32(line) + ",\"column\":" + ast_i32(col) + "}"
+}
+
+fn json_ast_string_array(values: [string]): string
+{
+    let mut out = "["
+    for (i in 0 .. values.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_quote(values[i])
+    }
+    return out + "]"
+}
+
+fn json_ast_expr_array(es: &ExprStore, store: &StmtStore, indices: [i32]): string
+{
+    let mut out = "["
+    for (i in 0 .. indices.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_expr(es, store, indices[i])
+    }
+    return out + "]"
+}
+
+fn json_ast_struct_fields(es: &ExprStore, store: &StmtStore, expr: AstExpr): string
+{
+    let mut out = "["
+    for (i in 0 .. expr.field_names.length)
+    {
+        if (i > 0) { out = out + "," }
+        let value = if (i < expr.args.length) { json_ast_expr(es, store, expr.args[i]) } else { "null" }
+        out = out + "{\"name\":" + json_ast_quote(expr.field_names[i]) + ",\"value\":" + value + "}"
+    }
+    return out + "]"
+}
+
+pub fn json_ast_expr(es: &ExprStore, store: &StmtStore, idx: i32): string
+{
+    if (idx < 0) { return "null" }
+    let expr = expr_store_get(es, idx)
+    let loc = json_ast_loc(expr.line, expr.col)
+    return match expr.tag
+    {
+        "int" -> "{\"type\":\"IntegerLiteral\",\"value\":" + ast_i32(expr.int_value) + "," + loc + "}"
+        "bool" -> "{\"type\":\"BooleanLiteral\",\"value\":" + json_ast_bool(expr.int_value) + "," + loc + "}"
+        "float" -> "{\"type\":\"FloatLiteral\",\"value\":" + ast_f64(expr.float_value) + "," + loc + "}"
+        "string" -> "{\"type\":\"StringLiteral\",\"value\":" + json_ast_quote(expr.text) + "," + loc + "}"
+        "ident" -> "{\"type\":\"Identifier\",\"name\":" + json_ast_quote(expr.text) + "," + loc + "}"
+        "binop" -> "{\"type\":\"BinaryExpression\",\"operator\":" + json_ast_quote(expr.text) + ",\"left\":" + json_ast_expr(es, store, expr.left_idx) + ",\"right\":" + json_ast_expr(es, store, expr.right_idx) + "," + loc + "}"
+        "unaryop" -> "{\"type\":\"UnaryExpression\",\"operator\":" + json_ast_quote(expr.text) + ",\"operand\":" + json_ast_expr(es, store, expr.left_idx) + "," + loc + "}"
+        "call" -> "{\"type\":\"CallExpression\",\"callee\":" + json_ast_quote(expr.text) + ",\"typeArguments\":" + json_ast_string_array(expr.type_args) + ",\"arguments\":" + json_ast_expr_array(es, store, expr.args) + "," + loc + "}"
+        "index" -> "{\"type\":\"IndexExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"index\":" + json_ast_expr(es, store, expr.right_idx) + "," + loc + "}"
+        "addr" -> "{\"type\":\"AddressOfExpression\",\"name\":" + json_ast_quote(expr.text) + "," + loc + "}"
+        "deref" -> "{\"type\":\"DerefExpression\",\"operand\":" + json_ast_expr(es, store, expr.left_idx) + "," + loc + "}"
+        "field" -> "{\"type\":\"FieldExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"field\":" + json_ast_quote(expr.text) + "," + loc + "}"
+        "struct_literal" -> "{\"type\":\"StructLiteral\",\"name\":" + json_ast_quote(expr.text) + ",\"fields\":" + json_ast_struct_fields(es, store, expr) + "," + loc + "}"
+        "option" -> {
+            let mut value = "null"
+            if (expr.option_has_value == 1)
+            {
+                value = if (expr.left_idx >= 0) { json_ast_expr(es, store, expr.left_idx) } else { json_ast_quote(expr.option_value) }
+            }
+            "{\"type\":\"OptionExpression\",\"hasValue\":" + json_ast_bool(expr.option_has_value) + ",\"value\":" + value + "," + loc + "}"
+        }
+        "array_literal" -> "{\"type\":\"ArrayLiteral\",\"elements\":" + json_ast_expr_array(es, store, expr.args) + "," + loc + "}"
+        "method_call" -> "{\"type\":\"MethodCallExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"method\":" + json_ast_quote(expr.text) + ",\"arguments\":" + json_ast_expr_array(es, store, expr.args) + "," + loc + "}"
+        "match_expr" -> {
+            let mut arms = "["
+            let mut first = 1
+            let mut i = 0
+            while (i + 1 < expr.args.length)
+            {
+                if (first == 0) { arms = arms + "," }
+                let pattern = if (expr.args[i] < 0) { "{\"type\":\"Wildcard\"}" } else { json_ast_expr(es, store, expr.args[i]) }
+                arms = arms + "{\"pattern\":" + pattern + ",\"body\":" + json_ast_expr(es, store, expr.args[i + 1]) + "}"
+                first = 0
+                i += 2
+            }
+            arms = arms + "]"
+            "{\"type\":\"MatchExpression\",\"subject\":" + json_ast_expr(es, store, expr.left_idx) + ",\"arms\":" + arms + "," + loc + "}"
+        }
+        "if_expr" -> {
+            let otherwise = if (expr.args.length > 0) { json_ast_expr(es, store, expr.args[0]) } else { "null" }
+            "{\"type\":\"IfExpression\",\"condition\":" + json_ast_expr(es, store, expr.left_idx) + ",\"then\":" + json_ast_expr(es, store, expr.right_idx) + ",\"else\":" + otherwise + "," + loc + "}"
+        }
+        "block_expr" -> "{\"type\":\"BlockExpression\",\"body\":" + json_ast_stmt(es, store, expr.left_idx) + ",\"value\":" + json_ast_expr(es, store, expr.right_idx) + "," + loc + "}"
+        _ -> "{\"type\":\"UnknownExpression\",\"tag\":" + json_ast_quote(expr.tag) + "," + loc + "}"
+    }
+}
+
+fn json_ast_stmt_indices(es: &ExprStore, store: &StmtStore, indices: [i32]): string
+{
+    let mut out = "["
+    for (i in 0 .. indices.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_stmt(es, store, indices[i])
+    }
+    return out + "]"
+}
+
+fn json_ast_block_body(es: &ExprStore, store: &StmtStore, stmt: AstStmt): string
+{
+    if (stmt.stmt_indices.length > 0) { return json_ast_stmt_indices(es, store, stmt.stmt_indices) }
+    let mut out = "["
+    for (i in 0 .. stmt.block_count)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_stmt(es, store, stmt.block_start + i)
+    }
+    return out + "]"
+}
+
+fn json_ast_match_arms(es: &ExprStore, store: &StmtStore, stmt: AstStmt): string
+{
+    let mut out = "["
+    for (i in 0 .. stmt.match_pattern_indices.length)
+    {
+        if (i > 0) { out = out + "," }
+        let pattern = if (stmt.match_pattern_indices[i] < 0) { "{\"type\":\"Wildcard\"}" } else { json_ast_expr(es, store, stmt.match_pattern_indices[i]) }
+        let body = if (i < stmt.match_body_indices.length) { json_ast_stmt(es, store, stmt.match_body_indices[i]) } else { "null" }
+        out = out + "{\"pattern\":" + pattern + ",\"body\":" + body + "}"
+    }
+    return out + "]"
+}
+
+pub fn json_ast_stmt(es: &ExprStore, store: &StmtStore, idx: i32): string
+{
+    if (idx < 0) { return "null" }
+    let stmt = stmt_store_get(store, idx)
+    let loc = json_ast_loc(stmt.line, stmt.col)
+    return match stmt.tag
+    {
+        "return" -> "{\"type\":\"ReturnStatement\",\"value\":" + ast_i32(stmt.direct_ret) + "," + loc + "}"
+        "return_expr" -> "{\"type\":\"ReturnStatement\",\"value\":" + json_ast_expr(es, store, stmt.value_idx) + "," + loc + "}"
+        "let" -> "{\"type\":\"LetStatement\",\"name\":" + json_ast_quote(stmt.assign_name) + ",\"mutable\":" + json_ast_bool(stmt.is_mut) + ",\"declaredType\":" + (if (stmt.type_text == "") { "null" } else { json_ast_quote(stmt.type_text) }) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + loc + "}"
+        "assign" -> "{\"type\":\"AssignStatement\",\"name\":" + json_ast_quote(stmt.assign_name) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + loc + "}"
+        "field_assign" -> "{\"type\":\"FieldAssignStatement\",\"base\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"field\":" + json_ast_quote(stmt.assign_name) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + loc + "}"
+        "store_deref" -> "{\"type\":\"DerefAssignStatement\",\"pointer\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + loc + "}"
+        "store_index" -> "{\"type\":\"IndexAssignStatement\",\"base\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"index\":" + json_ast_expr(es, store, stmt.direct_ret) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + loc + "}"
+        "print" -> "{\"type\":\"PrintStatement\",\"value\":" + json_ast_expr(es, store, stmt.print_idx) + "," + loc + "}"
+        "expr" -> "{\"type\":\"ExpressionStatement\",\"expression\":" + json_ast_expr(es, store, stmt.value_idx) + "," + loc + "}"
+        "block" -> "{\"type\":\"BlockStatement\",\"body\":" + json_ast_block_body(es, store, stmt) + "," + loc + "}"
+        "while" -> "{\"type\":\"WhileStatement\",\"condition\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"body\":" + json_ast_stmt(es, store, stmt.body_idx) + "," + loc + "}"
+        "for_range" -> "{\"type\":\"ForRangeStatement\",\"iterator\":" + json_ast_quote(stmt.assign_name) + ",\"start\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"end\":" + json_ast_expr(es, store, stmt.assign_idx) + ",\"body\":" + json_ast_stmt(es, store, stmt.body_idx) + "," + loc + "}"
+        "break" -> "{\"type\":\"BreakStatement\"," + loc + "}"
+        "continue" -> "{\"type\":\"ContinueStatement\"," + loc + "}"
+        "if" -> "{\"type\":\"IfStatement\",\"condition\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"then\":" + json_ast_stmt(es, store, stmt.body_idx) + ",\"else\":" + json_ast_stmt(es, store, stmt.assign_idx) + "," + loc + "}"
+        "if_eq_return" -> "{\"type\":\"IfEqReturnStatement\",\"conditionLeft\":" + json_ast_quote(stmt.cond_left) + ",\"conditionRight\":" + json_ast_quote(stmt.cond_right) + ",\"thenReturn\":" + ast_i32(stmt.then_ret) + ",\"elseReturn\":" + ast_i32(stmt.else_ret) + "," + loc + "}"
+        "match" -> "{\"type\":\"MatchStatement\",\"subject\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"arms\":" + json_ast_match_arms(es, store, stmt) + "," + loc + "}"
+        "match_option_string" -> "{\"type\":\"MatchOptionStringStatement\",\"bind\":" + json_ast_quote(stmt.match_bind) + ",\"optionValue\":" + json_ast_quote(stmt.match_option_value) + ",\"compareRight\":" + json_ast_quote(stmt.match_compare_right) + ",\"someThenReturn\":" + ast_i32(stmt.match_some_then_ret) + ",\"someElseReturn\":" + ast_i32(stmt.match_some_else_ret) + ",\"noneReturn\":" + ast_i32(stmt.match_none_ret) + "," + loc + "}"
+        _ -> "{\"type\":\"UnknownStatement\",\"tag\":" + json_ast_quote(stmt.tag) + "," + loc + "}"
+    }
+}
+
+fn json_ast_params(func: AstFunction): string
+{
+    let mut out = "["
+    for (i in 0 .. func.param_names.length)
+    {
+        if (i > 0) { out = out + "," }
+        let ty = if (i < func.param_types.length) { func.param_types[i] } else { "" }
+        out = out + "{\"name\":" + json_ast_quote(func.param_names[i]) + ",\"type\":" + json_ast_quote(ty) + "}"
+    }
+    return out + "]"
+}
+
+fn json_ast_function(func: AstFunction, es: &ExprStore, store: &StmtStore): string
+{
+    return "{\"type\":\"FunctionDeclaration\",\"name\":" + json_ast_quote(func.name) + ",\"returnType\":" + json_ast_quote(func.ret_ty) + ",\"typeParameters\":" + json_ast_string_array(func.type_params) + ",\"parameters\":" + json_ast_params(func) + ",\"varargs\":" + json_ast_bool(func.is_var_arg) + ",\"body\":" + json_ast_stmt(es, store, func.body_idx) + "," + json_ast_loc(func.line, func.col) + "}"
+}
+
+fn json_ast_struct(decl: AstStructDecl): string
+{
+    let mut fields = "["
+    for (i in 0 .. decl.field_names.length)
+    {
+        if (i > 0) { fields = fields + "," }
+        let ty = if (i < decl.field_types.length) { decl.field_types[i] } else { "" }
+        fields = fields + "{\"name\":" + json_ast_quote(decl.field_names[i]) + ",\"type\":" + json_ast_quote(ty) + "}"
+    }
+    return "{\"type\":\"StructDeclaration\",\"name\":" + json_ast_quote(decl.name) + ",\"fields\":" + fields + "]," + json_ast_loc(decl.line, decl.col) + "}"
+}
+
+fn json_ast_adt(decl: AstAdtDecl): string
+{
+    let mut variants = "["
+    for (i in 0 .. decl.variant_names.length)
+    {
+        if (i > 0) { variants = variants + "," }
+        let payload = if (i < decl.variant_payload_types.length and decl.variant_payload_types[i] != "") { json_ast_quote(decl.variant_payload_types[i]) } else { "null" }
+        variants = variants + "{\"name\":" + json_ast_quote(decl.variant_names[i]) + ",\"payloadType\":" + payload + "}"
+    }
+    return "{\"type\":\"AdtDeclaration\",\"name\":" + json_ast_quote(decl.name) + ",\"typeParameters\":" + json_ast_string_array(decl.type_params) + ",\"variants\":" + variants + "]," + json_ast_loc(decl.line, decl.col) + "}"
+}
+
+fn json_ast_global(stmt: AstStmt, es: &ExprStore, store: &StmtStore): string
+{
+    return "{\"type\":\"GlobalDeclaration\",\"name\":" + json_ast_quote(stmt.assign_name) + ",\"mutable\":" + json_ast_bool(stmt.is_mut) + ",\"declaredType\":" + (if (stmt.type_text == "") { "null" } else { json_ast_quote(stmt.type_text) }) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + json_ast_loc(stmt.line, stmt.col) + "}"
+}
+
+pub fn json_ast(program: AstProgram): string
+{
+    if (program.ok == 0)
+    {
+        return "{\"type\":\"ParseError\",\"message\":" + json_ast_quote(program.error) + "}"
+    }
+    let mut out = "{\"type\":\"Program\",\"globals\":["
+    for (i in 0 .. program.globals.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_global(program.globals[i], program.expr_store, program.store)
+    }
+    out = out + "],\"structs\":["
+    for (i in 0 .. program.structs.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_struct(program.structs[i])
+    }
+    out = out + "],\"adts\":["
+    for (i in 0 .. program.adts.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_adt(program.adts[i])
+    }
+    out = out + "],\"externs\":["
+    for (i in 0 .. program.extern_functions.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_function(program.extern_functions[i], program.expr_store, program.store)
+    }
+    out = out + "],\"functions\":["
+    for (i in 0 .. program.functions.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + json_ast_function(program.functions[i], program.expr_store, program.store)
+    }
+    return out + "]}"
+}

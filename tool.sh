@@ -53,3 +53,6 @@ mv "$normalized_ir" "$root/seed/vixc.ll"
 rm -f "$bootstrap_log"
 trap - EXIT HUP INT TERM
 echo "refresh-seed: updated seed/vixc.ll using $compiler"
+git add .
+git commit -m "$1"
+git push

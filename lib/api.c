@@ -173,6 +173,7 @@ int vix_api_link_executable(const char *object_path, const char *runtime_object,
     char *crtend = find_in_gcc_dir("crtendS.o");
     char *crtn = find_first_file(crtn_paths);
     append_opt_path(args, sizeof(args), "-dynamic-linker", interp);
+    append_arg(args, sizeof(args), "-lm");
     append_arg(args, sizeof(args), "-lc");
     append_arg(args, sizeof(args), crtend);
     append_arg(args, sizeof(args), crtn);

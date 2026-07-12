@@ -132,13 +132,13 @@ pub fn codegen_field_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &S
     if (base_ty == "string" and expr.text == "length")
     {
         let base = codegen_expr_value_typed(b, es, store, base_expr, "string")
-        return llvm_build_strlen(b, base)
+        return llvm_cast_value(b, llvm_build_strlen(b, base), "i32", expected_ty)
     }
     if (expr.text == "length")
     {
         let base = codegen_expr_value_typed(b, es, store, base_expr, "ptr")
         let args = [base]
-        return llvm_build_call_value(b, "vix_array_len", args)
+        return llvm_cast_value(b, llvm_build_call_value(b, "vix_array_len", args), "i32", expected_ty)
     }
     let struct_ty = type_text_base_name_builder(strip_ptr_prefix(base_ty))
     let field_index = get_struct_field_index(struct_ty, expr.text)
@@ -257,7 +257,11 @@ pub fn codegen_binop_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &S
         if (codegen_type_is_float(result_ty) == 1) { return llvm_build_fdiv_value(b, left, right) }
         return llvm_build_div_value(b, left, right)
     }
-    if (expr.text == "%") { return llvm_build_mod_value(b, left, right) }
+    if (expr.text == "%")
+    {
+        if (codegen_type_is_float(result_ty) == 1) { return llvm_build_fmod_value(b, left, right) }
+        return llvm_build_mod_value(b, left, right)
+    }
     if (expr.text == "&") { return llvm_build_and_value(b, left, right) }
     if (expr.text == "|") { return llvm_build_or_value(b, left, right) }
     if (expr.text == "<<") { return llvm_build_shl_value(b, left, right) }

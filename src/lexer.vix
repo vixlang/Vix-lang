@@ -153,6 +153,15 @@ pub fn next_non_space_char(src: string, pos: i32): ?i8
         {
             while (i < src.length and src[i] != 10) { i += 1 }
         }
+        elif (src[i] == '/' and i + 1 < src.length and src[i + 1] == '*')
+        {
+            i += 2
+            while (i + 1 < src.length and (src[i] != '*' or src[i + 1] != '/'))
+            {
+                i += 1
+            }
+            if (i + 1 < src.length) { i += 2 }
+        }
         else
         {
             return Some(src[i])
@@ -229,6 +238,39 @@ pub fn tokenize(src: string): TokenStream
                             {
                                 pos += 1
                                 column += 1
+                            }
+                        }
+                        elif (pos + 1 < src.length and src[pos + 1] == '*')
+                        {
+                            pos += 2
+                            column += 2
+                            let mut comment_had_newline = 0
+                            while (pos + 1 < src.length and (src[pos] != '*' or src[pos + 1] != '/'))
+                            {
+                                if (src[pos] == 10)
+                                {
+                                    comment_had_newline = 1
+                                    line += 1
+                                    column = 1
+                                }
+                                elif (src[pos] == 9)
+                                {
+                                    column = ((column - 1) / 8 + 1) * 8 + 1
+                                }
+                                else
+                                {
+                                    column += 1
+                                }
+                                pos += 1
+                            }
+                            if (pos + 1 < src.length)
+                            {
+                                pos += 2
+                                column += 2
+                            }
+                            if (comment_had_newline == 1 and newline_should_insert_semicolon(src, pos, &stream) == 1)
+                            {
+                                stream_push(&stream, tk_symbol(), ";", 0, line, column)
                             }
                         }
                         else

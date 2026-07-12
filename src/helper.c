@@ -749,6 +749,11 @@ LLVMValueRef vix_LLVMBuildFDiv(LLVMBuilderRef builder, LLVMValueRef l,
   return LLVMBuildFDiv(builder, l, r, name);
 }
 
+LLVMValueRef vix_LLVMBuildFRem(LLVMBuilderRef builder, LLVMValueRef l,
+                               LLVMValueRef r, const char *name) {
+  return LLVMBuildFRem(builder, l, r, name);
+}
+
 LLVMValueRef vix_LLVMBuildNeg(LLVMBuilderRef builder, LLVMValueRef val,
                               const char *name) {
   return LLVMBuildNeg(builder, val, name);
@@ -806,6 +811,21 @@ LLVMValueRef vix_LLVMBuildIntToPtr(LLVMBuilderRef builder, LLVMValueRef val,
 LLVMValueRef vix_LLVMBuildSIToFP(LLVMBuilderRef builder, LLVMValueRef val,
                                  LLVMTypeRef dest_ty, const char *name) {
   return LLVMBuildSIToFP(builder, val, dest_ty, name);
+}
+
+LLVMValueRef vix_LLVMBuildUIToFP(LLVMBuilderRef builder, LLVMValueRef val,
+                                 LLVMTypeRef dest_ty, const char *name) {
+  return LLVMBuildUIToFP(builder, val, dest_ty, name);
+}
+
+LLVMValueRef vix_LLVMBuildFPToSI(LLVMBuilderRef builder, LLVMValueRef val,
+                                 LLVMTypeRef dest_ty, const char *name) {
+  return LLVMBuildFPToSI(builder, val, dest_ty, name);
+}
+
+LLVMValueRef vix_LLVMBuildFPToUI(LLVMBuilderRef builder, LLVMValueRef val,
+                                 LLVMTypeRef dest_ty, const char *name) {
+  return LLVMBuildFPToUI(builder, val, dest_ty, name);
 }
 
 LLVMValueRef vix_LLVMBuildFPExt(LLVMBuilderRef builder, LLVMValueRef val,

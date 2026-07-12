@@ -1,0 +1,19 @@
+extern "C"
+{
+    fn malloc(size: usize): ptr
+}
+
+fn main(): i32
+{
+    let mut values: [i32] = []
+    values.push(7)
+    let allocation = malloc(values.length * 80)
+    if (allocation == 0) { return 1 }
+
+    let digit = 7
+    let fraction = 0.1
+    let value = digit * fraction
+    let remainder = 12.0 % 10
+    if (value > 0.69 and value < 0.71 and remainder == 2.0) { return 0 }
+    return 2
+}

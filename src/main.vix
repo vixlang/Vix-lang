@@ -1,4 +1,5 @@
 import "parser.vix"
+import "json_ast.vix"
 import "desugar.vix"
 import "codegen.vix"
 import "error.vix"
@@ -46,7 +47,7 @@ fn compiler_mode(arg: string): CompilerModeResult
 {
     if (arg == "-h" or arg == "--help") { return CompilerModeName("--help") }
     if (arg == "-v" or arg == "--version") { return CompilerModeName("--version") }
-    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
+    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--ast-json" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
     return CompilerModeUnknown
 }
 
@@ -163,6 +164,7 @@ fn print_help(): i32
     print("  --parse-stats          Print lightweight parser input statistics")
     print("  --parser               Print parse tree to stdout")
     print("  --ast / -ast                 Print AST to stdout")
+    print("  --ast-json                   Print JSON AST to stdout")
     print("  --typeinfer            Print type inference result to stdout")
     print("  --semantic             Print semantic analysis to stdout")
     print("  --debug=<mir|asm|llvm> Print selected intermediate output to stdout")
@@ -257,6 +259,10 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             {
                 info_print(ast(program))
             }
+            return mode_success()
+        }
+        "--ast-json" -> {
+            info_print(json_ast(program))
             return mode_success()
         }
         _ -> {}

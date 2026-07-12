@@ -1,15 +1,50 @@
-type Color =
-         Red
-        | Blue
-        | Yellow
+/* End-to-end executable tests for the core JSON module. */
+import "core/json.vix"
 
 fn main(): i32
 {
-    let c = Red
-    match c
-    {
-        Red -> 1
-        Blue -> 2
-    }
+    /* JSON null. */
+    let null_result = parse("null")
+    if (null_result.ok != 1 or null_result.value.tag != 0) { return 1 }
+    printf("null: null (tag=%d, ok=%d)\n", null_result.value.tag, null_result.ok)
+
+    /* JSON booleans. */
+    let true_result = parse("true")
+    if (true_result.ok != 1 or true_result.value.tag != 1 or get_bool(true_result.value) != 1) { return 2 }
+    printf("boolean: true (tag=%d, value=%d)\n", true_result.value.tag, get_bool(true_result.value))
+
+    let false_result = parse("false")
+    if (false_result.ok != 1 or false_result.value.tag != 1 or get_bool(false_result.value) != 0) { return 3 }
+    printf("boolean: false (tag=%d, value=%d)\n", false_result.value.tag, get_bool(false_result.value))
+
+    /* JSON number with fraction and exponent. */
+    let number_result = parse("-12.5e2")
+    if (number_result.ok != 1 or number_result.value.tag != 2 or get_number(number_result.value) != -1250.0) { return 4 }
+    let number_buf = malloc(64)
+    num_to_str(get_number(number_result.value), number_buf)
+    printf("number: %s (tag=%d)\n", number_buf, number_result.value.tag)
+    free(number_buf)
+
+    /* JSON string with an escaped newline. Parsed strings are caller-owned. */
+    let string_result = parse("\"hello\\njson\"")
+    if (string_result.ok != 1 or string_result.value.tag != 3 or strcmp(get_string(string_result.value), "hello\njson") != 0) { return 5 }
+    printf("string: \"%s\" (tag=%d)\n", get_string(string_result.value), string_result.value.tag)
+    free(get_string(string_result.value))
+
+    /* Compound JSON values. */
+    let array_result = parse("[null, true, 3]")
+    if (array_result.ok != 1 or array_result.value.tag != 4 or array_result.value.arr_len != 3) { return 6 }
+    printf("array: [null, true, 3] (tag=%d, length=%d)\n", array_result.value.tag, array_result.value.arr_len)
+
+    let object_result = parse("{\"name\": \"vix\", \"ok\": true}")
+    if (object_result.ok != 1 or object_result.value.tag != 5 or object_result.value.obj_len != 2) { return 7 }
+    printf("object: {name: \"vix\", ok: true} (tag=%d, fields=%d)\n", object_result.value.tag, object_result.value.obj_len)
+
+    /* Invalid input must report failure rather than produce a value. */
+    let invalid_result = parse("?")
+    if (invalid_result.ok != 0) { return 8 }
+    printf("invalid: parse failed as expected (ok=%d)\n", invalid_result.ok)
+
+    printf("json parser tests passed\n")
     return 0
 }
