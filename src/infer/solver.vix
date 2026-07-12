@@ -158,6 +158,56 @@ pub fn hm_infer_pattern(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &S
         }
         return infer_value_ok(subst_apply_ty(store, subst, expected))
     }
+    if (pattern.tag == "call")
+    {
+        let callee = hm_infer_ident(env, store, fresh, pattern.text, pos)
+        if (callee.ok == 0) { return callee }
+        let ctor_ty = subst_apply_ty(store, subst, callee.ty)
+        let mut param_tys: [Ty] = []
+        let mut result_ty = ctor_ty
+        match ctor_ty
+        {
+            TyFun(fn_idx) -> {
+                let fn_ty = store.funs[fn_idx]
+                for (i in 0 .. fn_ty.params.length)
+                {
+                    param_tys.push(fn_ty.params[i])
+                }
+                result_ty = fn_ty.ret
+            }
+            _ -> {}
+        }
+        let mut is_adt_ctor = 0
+        match subst_apply_ty(store, subst, result_ty)
+        {
+            TyAdt(idx) -> { is_adt_ctor = 1 }
+            _ -> {}
+        }
+        if (is_adt_ctor == 1)
+        {
+            if (param_tys.length != pattern.args.length)
+            {
+                return infer_value_fail(infer_error_arity(param_tys.length, pattern.args.length, pos))
+            }
+            let u = hm_unify(store, subst, subject_ty, result_ty, pos)
+            if (u.ok == 0) { return u }
+            for (i in 0 .. pattern.args.length)
+            {
+                let arg = expr_store_get(es, pattern.args[i])
+                let param_ty = subst_apply_ty(store, subst, param_tys[i])
+                if (arg.tag == "ident" and arg.text != "_")
+                {
+                    type_env_extend(env, arg.text, scheme_mono(param_ty))
+                }
+                elif (arg.tag != "ident")
+                {
+                    let nested = hm_infer_pattern(env, store, fresh, subst, structs, es, ss, pattern.args[i], param_ty, pos)
+                    if (nested.ok == 0) { return nested }
+                }
+            }
+            return infer_value_ok(subst_apply_ty(store, subst, result_ty))
+        }
+    }
     let pat = hm_infer_expr(env, store, fresh, subst, structs, es, ss, pattern_idx)
     if (pat.ok == 0) { return pat }
     return hm_unify(store, subst, subject_ty, pat.ty, pos)

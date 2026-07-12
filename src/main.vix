@@ -144,7 +144,7 @@ fn opt_level_arg(arg: string): i32
 
 fn print_help(): i32
 {
-    print("OVERVIEW: Vix Compiler LLVM Bootstrap")
+    print("OVERVIEW: Vix Compiler LLVM Bootstrap v0.4.6")
     print("")
     print("USAGE: vixc [options] <input.vix>")
     print("")
@@ -174,7 +174,7 @@ fn print_help(): i32
 
 fn print_version(): i32
 {
-    print("vixc 0.4.5 (bootstrap)")
+    print("vixc 0.4.6 (bootstrap)")
     return 0
 }
 
