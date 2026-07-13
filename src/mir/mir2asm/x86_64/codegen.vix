@@ -35,8 +35,20 @@ pub fn mir2asm_begin_function(b: &MirAsm, line: string)
     mir2asm_line(b, b.fn_name + ":")
     mir2asm_line(b, "    push rbp")
     mir2asm_line(b, "    mov rbp, rsp")
-    b.frame_patch_index = b.out.length
-    mir2asm_line(b, "    sub rsp, 0")
+    b.frame_patch_index = -1
+    b.sink.frame_patch_offset = 0
+    if (b.sink.streaming == 1)
+    {
+        let patch_line_offset = ftell(b.sink.output_file)
+        if (patch_line_offset < 0) { b.sink.write_failed = 1 }
+        else { b.sink.frame_patch_offset = patch_line_offset + 13 }
+        mir2asm_line(b, "    sub rsp, 0000000000000000")
+    }
+    else
+    {
+        b.frame_patch_index = b.out.length
+        mir2asm_line(b, "    sub rsp, 0")
+    }
     let rp = mir2asm_find(line, ')', lp)
     let mut pos = lp + 1
     let mut arg = if (b.fn_sret == 1) { 1 } else { 0 }
@@ -105,9 +117,13 @@ pub fn mir2asm_end_function(b: &MirAsm)
 {
     if (b.in_fn == 0) { return }
     mir2asm_pending_load_clear(b)
-    if (b.frame_patch_index >= 0)
+    let frame_size = mir2asm_align_to(b.stack_next, 16)
+    if (b.sink.streaming == 1)
     {
-        let frame_size = mir2asm_align_to(b.stack_next, 16)
+        mir2asm_patch_frame_size(b, frame_size)
+    }
+    elif (b.frame_patch_index >= 0)
+    {
         b.out[b.frame_patch_index] = "    sub rsp, " + i32_to_str(frame_size)
     }
     mir2asm_line(b, b.ret_label + ":")
@@ -1029,7 +1045,8 @@ pub fn mir2asm_emit_instruction(b: &MirAsm, line: string)
             let true_label = mir2asm_trim(mir2asm_after(mir2asm_trim(mir2asm_slice(line, c1 + 1, c2)), 6))
             let false_label = mir2asm_trim(mir2asm_after(mir2asm_trim(mir2asm_after(line, c2 + 1)), 6))
             mir2asm_pending_load_materialize(b)
-            mir2asm_line(b, "    cmp " + mir2asm_operand_typed(b, cond, "i32") + ", 0")
+            mir2asm_emit_load_int_reg(b, "eax", cond, "i32")
+            mir2asm_line(b, "    cmp eax, 0")
             mir2asm_line(b, "    je " + mir2asm_label(b, false_label))
             mir2asm_line(b, "    jmp " + mir2asm_label(b, true_label))
         }

@@ -1,8 +1,16 @@
 #[no_main]
 
+pub type MirAsmSink = struct {
+    data: [string],
+    streaming: i32,
+    output_file: ptr,
+    write_failed: i32,
+    frame_patch_offset: i64
+}
+
 pub type MirAsm = struct {
     out: [string],
-    data: [string],
+    sink: MirAsmSink,
     string_values: [string],
     string_labels: [string],
     string_counter: i32,
@@ -37,5 +45,16 @@ pub type MirAsm = struct {
 
 pub fn mir2asm_new(): MirAsm
 {
-    return MirAsm{ out: ["default rel", "section .text"], data: [], string_values: [], string_labels: [], string_counter: 0, names: [], offsets: [], is_addr: [], slot_tys: [], stack_next: 0, in_fn: 0, fn_name: "", fn_ret_ty: "", fn_sret: 0, ret_label: "", frame_patch_index: -1, param_names: [], param_tys: [], param_regs: [], struct_names: [], struct_field_counts: [], struct_sizes: [], struct_field_tys: [], struct_field_offsets: [], extern_names: [], debug_mir_comments: 0, pending_load_active: 0, pending_load_dest: "", pending_load_addr: "", pending_load_src_ty: "", pending_load_dest_ty: "", pending_load_direct_offset: 0 }
+    let frame_patch_offset: i64 = 0
+    let sink = MirAsmSink{ data: [], streaming: 0, output_file: nil, write_failed: 0, frame_patch_offset: frame_patch_offset }
+    return MirAsm{ out: ["default rel", "section .text"], sink: sink, string_values: [], string_labels: [], string_counter: 0, names: [], offsets: [], is_addr: [], slot_tys: [], stack_next: 0, in_fn: 0, fn_name: "", fn_ret_ty: "", fn_sret: 0, ret_label: "", frame_patch_index: -1, param_names: [], param_tys: [], param_regs: [], struct_names: [], struct_field_counts: [], struct_sizes: [], struct_field_tys: [], struct_field_offsets: [], extern_names: [], debug_mir_comments: 0, pending_load_active: 0, pending_load_dest: "", pending_load_addr: "", pending_load_src_ty: "", pending_load_dest_ty: "", pending_load_direct_offset: 0 }
+}
+
+pub fn mir2asm_new_stream(output_file: ptr): MirAsm
+{
+    let mut b = mir2asm_new()
+    b.out = []
+    b.sink.streaming = 1
+    b.sink.output_file = output_file
+    return b
 }

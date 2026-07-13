@@ -352,11 +352,18 @@ pub fn remove_trailing_macro_separator(text: string): string
 
 pub fn skip_macro_definition(src: string, start: i32, macros: &MacroSet): i32
 {
-    if (text_at(src, start, "macro") == 0) { return -1 }
-    if (start > 0 and is_macro_ident_char(src[start - 1]) == 1) { return -1 }
-    if (start + 5 < src.length and is_macro_ident_char(src[start + 5]) == 1) { return -1 }
+    let mut macro_start = start
+    if (text_at(src, start, "pub") == 1)
+    {
+        if (start > 0 and is_macro_ident_char(src[start - 1]) == 1) { return -1 }
+        if (start + 3 < src.length and is_macro_ident_char(src[start + 3]) == 1) { return -1 }
+        macro_start = skip_spaces(src, start + 3)
+    }
+    if (text_at(src, macro_start, "macro") == 0) { return -1 }
+    if (macro_start > 0 and is_macro_ident_char(src[macro_start - 1]) == 1) { return -1 }
+    if (macro_start + 5 < src.length and is_macro_ident_char(src[macro_start + 5]) == 1) { return -1 }
 
-    let mut i = skip_spaces(src, start + 5)
+    let mut i = skip_spaces(src, macro_start + 5)
     if (i < src.length and src[i] == '$') { i += 1 }
     let name_start = i
     while (i < src.length and is_macro_ident_char(src[i]) == 1) { i += 1 }

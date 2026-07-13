@@ -12,12 +12,7 @@ import "mir/mir2asm/mod.vix"
 
 extern "C"
 {
-    fn fopen(filename: ptr, mode: ptr): ptr
-    fn fclose(file: ptr): i32
-    fn fread(buf: ptr, size: i64, count: i64, file: ptr): i64
     fn fputs(s: string, file: ptr): i32
-    fn fseek(file: ptr, offset: i64, whence: i32): i32
-    fn ftell(file: ptr): i64
     fn system(command: ptr): i32
     fn remove(filename: ptr): i32
     fn vix_print_stderr(s: string)
@@ -359,17 +354,24 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     {
         let raw_mir = mir_program(lowered_program)
         let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
-        let asm = mir2asm(mir)
         let artifact_path = artifact_output_path(filename, output, emit)
         if (emit == "asm")
         {
-            if (write_text_file(artifact_path, asm) != 0) { return mode_failure() }
+            if (mir2asm_write_file(mir, artifact_path) != 0)
+            {
+                diag_print("vixc: error: cannot write file '" + artifact_path + "'")
+                return mode_failure()
+            }
             print(artifact_path)
             return mode_success()
         }
         let asm_path = artifact_path + ".tmp.asm"
         let obj_path = if (emit == "-obj") { artifact_path } else { artifact_path + ".tmp.o" }
-        write_text_file(asm_path, asm)
+        if (mir2asm_write_file(mir, asm_path) != 0)
+        {
+            diag_print("vixc: error: cannot write file '" + asm_path + "'")
+            return mode_failure()
+        }
         let asm_result = shell_command("nasm -f elf64 " + asm_path + " -o " + obj_path)
         delete_file(asm_path)
         if (asm_result != 0)

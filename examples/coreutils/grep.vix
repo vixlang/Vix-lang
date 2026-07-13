@@ -135,7 +135,7 @@ fn grep(pattern: ptr, text: ptr): i32
     return matches
 }
 
-fn main(argc: i32, argv: ptr): i32
+fn main(argc: i32, argv: &string): i32
 {
     if (argc < 3)
     {
@@ -154,5 +154,6 @@ fn main(argc: i32, argv: ptr): i32
     {
         return 0
     }
+    printf("not found %s in file %s\n",argv[1],argv[2])
     return 1
 }

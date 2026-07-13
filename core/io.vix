@@ -34,3 +34,9 @@ pub macro $println(fmt: expr, $(args: expr)*)
     let _ = printf($fmt, $(args),*)
 	let _ = printf("\n")
 }
+
+pub fn panic(msg:string): void
+{
+    $println("%s\n")
+    while(true) {}
+}

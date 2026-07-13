@@ -3,6 +3,10 @@ import "types.vix"
 
 extern "C"
 {
+    fn fputs(text: string, file: ptr): i32
+    fn fseek(file: ptr, offset: i64, whence: i32): i32
+    fn ftell(file: ptr): i64
+    fn vix_asm_write_line(file: ptr, text: string): i32
     fn vix_join_lines(lines: [string]): string
     fn vix_substr(text: string, start: i32, end: i32): string
     fn vix_trim_ascii(text: string): string
@@ -102,12 +106,44 @@ pub fn mir2asm_rhs(line: string): string
 
 pub fn mir2asm_line(b: &MirAsm, text: string)
 {
+    if (b.sink.streaming == 1)
+    {
+        if (b.sink.output_file == nil or vix_asm_write_line(b.sink.output_file, text) != 0) { b.sink.write_failed = 1 }
+        return
+    }
     b.out.push(text)
 }
 
 pub fn mir2asm_data_line(b: &MirAsm, text: string)
 {
-    b.data.push(text)
+    if (b.sink.streaming == 1)
+    {
+        mir2asm_line(b, "section .data")
+        mir2asm_line(b, text)
+        mir2asm_line(b, "section .text")
+        return
+    }
+    b.sink.data.push(text)
+}
+
+pub fn mir2asm_frame_size_field(frame_size: i32): string
+{
+    let mut text = i32_to_str(frame_size)
+    while (text.length < 16) { text = text + " " }
+    return text
+}
+
+pub fn mir2asm_patch_frame_size(b: &MirAsm, frame_size: i32)
+{
+    if (b.sink.streaming == 0 or b.sink.output_file == nil or b.sink.frame_patch_offset <= 0) { return }
+    let end_offset = ftell(b.sink.output_file)
+    if (end_offset < 0 or fseek(b.sink.output_file, b.sink.frame_patch_offset, 0) != 0)
+    {
+        b.sink.write_failed = 1
+        return
+    }
+    if (fputs(mir2asm_frame_size_field(frame_size), b.sink.output_file) < 0) { b.sink.write_failed = 1 }
+    if (fseek(b.sink.output_file, end_offset, 0) != 0) { b.sink.write_failed = 1 }
 }
 
 pub fn mir2asm_comment_text(text: string): string

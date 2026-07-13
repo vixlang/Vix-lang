@@ -609,9 +609,27 @@ pub fn mir_binop_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: 
     if (expr.text == "and" or expr.text == "or")
     {
         let left = mir_truthy(b, mir_expr_value_typed(b, es, store, expr_store_get(es, expr.left_idx), "bool"))
+        let slot = mir_temp(b)
+        mir_inst(b, slot + " = alloca i1")
+        let short_label = mir_label(b, "logic.short")
+        let right_label = mir_label(b, "logic.right")
+        let end_label = mir_label(b, "logic.end")
+        if (expr.text == "and") { mir_emit_term(b, "br_cond " + left.name + ", label " + right_label + ", label " + short_label) }
+        else { mir_emit_term(b, "br_cond " + left.name + ", label " + short_label + ", label " + right_label) }
+        mir_block(b, short_label)
+        let short_value = if (expr.text == "and") { "0" } else { "1" }
+        mir_inst(b, "store i1 " + short_value + ", " + slot)
+        mir_emit_term(b, "br label " + end_label)
+        mir_block(b, right_label)
         let right = mir_truthy(b, mir_expr_value_typed(b, es, store, expr_store_get(es, expr.right_idx), "bool"))
+        if (mir_block_is_open(b) == 1)
+        {
+            mir_inst(b, "store i1 " + right.name + ", " + slot)
+            mir_emit_term(b, "br label " + end_label)
+        }
+        mir_block(b, end_label)
         let out = mir_temp(b)
-        mir_inst(b, out + " = " + expr.text + " i1 " + left.name + ", " + right.name)
+        mir_inst(b, out + " = load i1, " + slot)
         return MirValue{ name: out, ty: "bool" }
     }
     let left_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
@@ -651,7 +669,10 @@ pub fn mir_binop_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: 
         mir_inst(b, out + " = icmp " + cmp + " i32 " + cmp_val + ", 0")
         return MirValue{ name: out, ty: "bool" }
     }
-    let result_ty = if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=") { type_numeric_result(left_ty, right_ty) } elif (expected_ty != "" and type_is_numeric(expected_ty) == 1) { expected_ty } else { type_numeric_result(left_ty, right_ty) }
+    let mut pointer_cmp_ty = ""
+    if (mir_type_is_pointer_like(left_ty) == 1) { pointer_cmp_ty = left_ty }
+    elif (mir_type_is_pointer_like(right_ty) == 1) { pointer_cmp_ty = right_ty }
+    let result_ty = if ((expr.text == "==" or expr.text == "!=") and pointer_cmp_ty != "") { pointer_cmp_ty } elif (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=") { type_numeric_result(left_ty, right_ty) } elif (expected_ty != "" and type_is_numeric(expected_ty) == 1) { expected_ty } else { type_numeric_result(left_ty, right_ty) }
     let left = mir_expr_value_typed(b, es, store, expr_store_get(es, expr.left_idx), result_ty)
     let right = mir_expr_value_typed(b, es, store, expr_store_get(es, expr.right_idx), result_ty)
     let out = mir_temp(b)

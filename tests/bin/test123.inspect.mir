@@ -1,0 +1,112 @@
+mir_module vixc0 {
+    type @ImportedExpr = { i32, i32, ptr, ptr, f64 }
+    extern_vararg fn @printf(ptr): i32
+    extern fn @calloc(usize, usize): ptr
+    extern fn @strcmp(ptr, ptr): i32
+    extern fn @strlen(ptr): i32
+    extern fn @vix_array_len(ptr): i32
+    extern fn @vix_array_push_i32(ptr, i32): ptr
+    extern fn @vix_array_push_ptr(ptr, ptr): ptr
+    extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr
+    extern fn @vix_string_concat(ptr, ptr): ptr
+
+fn @ImportedNum(%value: i32): @ImportedExpr {
+
+    block %entry:
+        %value_addr = alloca i32
+        store i32 %value, %value_addr
+        %t0 = const @ImportedExpr undef
+        %t1 = insertvalue @ImportedExpr %t0, 0, [0]
+        %t2 = load i32, %value_addr
+        %t3 = insertvalue @ImportedExpr %t1, %t2, [1]
+        %t4 = const ptr ""
+        %t5 = insertvalue @ImportedExpr %t3, %t4, [2]
+        %t6 = insertvalue @ImportedExpr %t5, 0, [3]
+        %t7 = insertvalue @ImportedExpr %t6, 6.95293e-310, [4]
+        ret @ImportedExpr %t7
+}
+
+
+fn @ImportedNil(): @ImportedExpr {
+
+    block %entry:
+        %t0 = const @ImportedExpr undef
+        %t1 = insertvalue @ImportedExpr %t0, 1, [0]
+        %t2 = insertvalue @ImportedExpr %t1, 0, [1]
+        %t3 = const ptr ""
+        %t4 = insertvalue @ImportedExpr %t2, %t3, [2]
+        %t5 = insertvalue @ImportedExpr %t4, 0, [3]
+        %t6 = insertvalue @ImportedExpr %t5, 6.95293e-310, [4]
+        ret @ImportedExpr %t6
+}
+
+
+fn @eval(%e: @ImportedExpr): i32 {
+
+    block %entry:
+        %e_addr = alloca @ImportedExpr
+        store @ImportedExpr %e, %e_addr
+        %t0 = load @ImportedExpr, %e_addr
+        %t1 = extractvalue @ImportedExpr %t0, [0]
+        %t2 = icmp eq i32 %t1, 0
+        br_cond %t2, label %if.then0, label %if.else1
+
+    block %if.then0:
+        %n_addr = alloca i32
+        %t3 = load @ImportedExpr, %e_addr
+        %t4 = extractvalue @ImportedExpr %t3, [1]
+        store i32 %t4, %n_addr
+        %t5 = load i32, %n_addr
+        ret i32 %t5
+
+    block %if.else1:
+        %t6 = load @ImportedExpr, %e_addr
+        %t7 = extractvalue @ImportedExpr %t6, [0]
+        %t8 = icmp eq i32 %t7, 1
+        br_cond %t8, label %if.then3, label %if.else4
+
+    block %if.then3:
+        ret i32 0
+
+    block %if.else4:
+        br label %if.end5
+
+    block %if.end5:
+        br label %if.end2
+
+    block %if.end2:
+        ret i32 0
+}
+
+
+fn @main(): i32 {
+
+    block %entry:
+        %x_addr = alloca @ImportedExpr
+        %t0 = const @ImportedExpr undef
+        %t1 = insertvalue @ImportedExpr %t0, 0, [0]
+        %t2 = insertvalue @ImportedExpr %t1, 42, [1]
+        %t3 = const ptr ""
+        %t4 = insertvalue @ImportedExpr %t2, %t3, [2]
+        %t5 = insertvalue @ImportedExpr %t4, 0, [3]
+        %t6 = insertvalue @ImportedExpr %t5, 6.95293e-310, [4]
+        store @ImportedExpr %t6, %x_addr
+        %y_addr = alloca @ImportedExpr
+        %t7 = const @ImportedExpr undef
+        %t8 = insertvalue @ImportedExpr %t7, 1, [0]
+        %t9 = insertvalue @ImportedExpr %t8, 0, [1]
+        %t10 = const ptr ""
+        %t11 = insertvalue @ImportedExpr %t9, %t10, [2]
+        %t12 = insertvalue @ImportedExpr %t11, 0, [3]
+        %t13 = insertvalue @ImportedExpr %t12, 6.95293e-310, [4]
+        store @ImportedExpr %t13, %y_addr
+        %t14 = load @ImportedExpr, %x_addr
+        %t15 = call @eval(@ImportedExpr %t14): i32
+        %t16 = load @ImportedExpr, %y_addr
+        %t17 = call @eval(@ImportedExpr %t16): i32
+        %t18 = add i32 %t15, %t17
+        ret i32 %t18
+}
+
+}
+

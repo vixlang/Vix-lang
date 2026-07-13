@@ -7,6 +7,14 @@
 #include <stdio.h>
 #include <unistd.h>
 
+int vix_asm_write_line(void *file, const char *text) {
+  if (file == NULL || text == NULL)
+    return -1;
+  if (fputs_unlocked(text, (FILE *)file) == EOF)
+    return -1;
+  return fputc_unlocked('\n', (FILE *)file) == EOF ? -1 : 0;
+}
+
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif

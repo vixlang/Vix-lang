@@ -7,9 +7,7 @@ fn main(): i32
     {
         $println("%d",i)
     }
+    panic("ERROR")
     return 0
 }
-macro $Build()
-{
-    ;
-}
+
