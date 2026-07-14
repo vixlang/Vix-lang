@@ -20,11 +20,6 @@ pub fn mir2asm_cx(ty: string): string
     return "ecx"
 }
 
-pub fn mir2asm_arg_reg(index: i32): string
-{
-    return mir2asm_arg_reg_typed(index, "i32")
-}
-
 pub fn mir2asm_arg_reg_typed(index: i32, ty: string): string
 {
     if (mir2asm_type_is_float(ty) == 1)
@@ -74,4 +69,23 @@ pub fn mir2asm_arg_reg_typed(index: i32, ty: string): string
         5 -> "r9d"
         _ -> "eax"
     }
+}
+
+pub fn mir2asm_callee_reg_typed(reg: string, ty: string): string
+{
+    if (ty == "i8" or ty == "u8" or ty == "char")
+    {
+        if (reg == "r12") { return "r12b" }
+        if (reg == "r13") { return "r13b" }
+        if (reg == "r14") { return "r14b" }
+        return "r15b"
+    }
+    if (mir2asm_type_is_64(ty) == 0)
+    {
+        if (reg == "r12") { return "r12d" }
+        if (reg == "r13") { return "r13d" }
+        if (reg == "r14") { return "r14d" }
+        return "r15d"
+    }
+    return reg
 }

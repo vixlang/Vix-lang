@@ -1,0 +1,160 @@
+#[no_main]
+
+pub type MachineLirValue = struct {
+    name: string,
+    ty: string,
+    start: i32,
+    end: i32,
+    phys_reg: string,
+    spilled: i32
+}
+
+pub type MachineLirFunction = struct {
+    name: string,
+    values: [MachineLirValue],
+    used_callee_regs: i32,
+    frame_names: [string],
+    frame_offsets: [i32],
+    frame_is_addr: [i32],
+    frame_tys: [string],
+    frame_size: i32,
+    frame_ready: i32
+}
+
+pub type MachineLirModule = struct {
+    machine: MachineModule,
+    functions: [MachineLirFunction]
+}
+
+pub fn machine_lir_is_register_type(ty: string): i32
+{
+    if (ty == "i1" or ty == "i8" or ty == "i16" or ty == "i32" or ty == "i64") { return 1 }
+    if (ty == "u8" or ty == "u16" or ty == "u32" or ty == "u64" or ty == "usize") { return 1 }
+    return 0
+}
+
+pub fn machine_lir_value_used_by(inst: MachineInst, name: string): i32
+{
+    for (i in 0 .. inst.operands.length)
+    {
+        if (inst.operands[i] == name) { return 1 }
+    }
+    return 0
+}
+
+pub fn machine_lir_build_function(f: MachineFunction): MachineLirFunction
+{
+    let mut lir = MachineLirFunction{ name: f.name, values: [], used_callee_regs: 0, frame_names: [], frame_offsets: [], frame_is_addr: [], frame_tys: [], frame_size: 0, frame_ready: 0 }
+    let mut position = 0
+    for (bi in 0 .. f.blocks.length)
+    {
+        for (ii in 0 .. f.blocks[bi].insts.length)
+        {
+            let inst = f.blocks[bi].insts[ii]
+            if (inst.opcode == "load" and inst.dest != "" and machine_lir_is_register_type(inst.ty) == 1)
+            {
+                lir.values.push(MachineLirValue{ name: inst.dest, ty: inst.ty, start: position, end: position, phys_reg: "", spilled: 0 })
+            }
+            position += 1
+        }
+    }
+    position = 0
+    for (bi2 in 0 .. f.blocks.length)
+    {
+        for (ii2 in 0 .. f.blocks[bi2].insts.length)
+        {
+            let inst2 = f.blocks[bi2].insts[ii2]
+            for (vi in 0 .. lir.values.length)
+            {
+                if (machine_lir_value_used_by(inst2, lir.values[vi].name) == 1 and position > lir.values[vi].end)
+                {
+                    lir.values[vi].end = position
+                }
+            }
+            position += 1
+        }
+    }
+    return lir
+}
+
+pub fn machine_lir_reg(index: i32): string
+{
+    return match index {
+        0 -> "r12"
+        1 -> "r13"
+        2 -> "r14"
+        _ -> "r15"
+    }
+}
+
+pub fn machine_lir_linear_scan(lir: &MachineLirFunction)
+{
+    for (i in 0 .. lir.values.length)
+    {
+        let mut assigned = ""
+        for (ri in 0 .. 4)
+        {
+            let reg = machine_lir_reg(ri)
+            let mut free = 1
+            for (previous in 0 .. i)
+            {
+                let old = lir.values[previous]
+                if (old.spilled == 0 and old.phys_reg == reg and old.end >= lir.values[i].start) { free = 0 }
+            }
+            if (assigned == "" and free == 1) { assigned = reg }
+        }
+        lir.values[i].phys_reg = assigned
+        lir.values[i].spilled = if (assigned == "") { 1 } else { 0 }
+    }
+    let mut used = 0
+    for (i2 in 0 .. lir.values.length)
+    {
+        if (lir.values[i2].spilled == 0 and lir.values[i2].phys_reg != "") { used = 1 }
+    }
+    lir.used_callee_regs = if (used == 1) { 4 } else { 0 }
+}
+
+pub fn machine_lir_build(module: MachineModule): MachineLirModule
+{
+    let mut out = MachineLirModule{ machine: module, functions: [] }
+    for (i in 0 .. module.functions.length)
+    {
+        let mut f = machine_lir_build_function(module.functions[i])
+        machine_lir_linear_scan(&f)
+        out.functions.push(f)
+    }
+    return out
+}
+
+pub fn mir2lir(mir: string): MachineLirModule
+{
+    return machine_lir_build(machine_parse(mir))
+}
+
+pub fn machine_lir_finish_frame(lir: &MachineLirFunction, names: [string], offsets: [i32], is_addr: [i32], tys: [string], frame_size: i32)
+{
+    lir.frame_names = names
+    lir.frame_offsets = offsets
+    lir.frame_is_addr = is_addr
+    lir.frame_tys = tys
+    lir.frame_size = frame_size
+    lir.frame_ready = 1
+}
+
+pub fn machine_lir_debug(lir: MachineLirModule): string
+{
+    let mut out = "machine_lir {\n"
+    for (fi in 0 .. lir.functions.length)
+    {
+        let f = lir.functions[fi]
+        out = out + "  fn @" + f.name + " frame=" + if (f.frame_ready == 1) { i32_to_str(f.frame_size) } else { "pending" } + " {\n"
+        for (vi in 0 .. f.values.length)
+        {
+            let v = f.values[vi]
+            let location = if (v.spilled == 1 or v.phys_reg == "") { "spill" } else { v.phys_reg }
+            out = out + "    vreg " + v.name + ": " + v.ty + " [" + i32_to_str(v.start) + "," + i32_to_str(v.end) + "] -> " + location + "\n"
+        }
+        out = out + "  }\n"
+    }
+    return out + "}\n"
+}

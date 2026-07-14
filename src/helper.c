@@ -146,6 +146,290 @@ char *vix_trim_ascii(const char *text) {
   return vix_substr(text, start, end);
 }
 
+typedef struct {
+  char *text;
+  int alive;
+} MirOptLine;
+
+static int mir_name_char(char c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+         (c >= '0' && c <= '9') || c == '_' || c == '.' || c == '%' ||
+         c == '@';
+}
+
+static const char *mir_skip_space(const char *s) {
+  while (*s == ' ' || *s == '\t' || *s == '\r')
+    s++;
+  return s;
+}
+
+static int mir_starts(const char *s, const char *prefix) {
+  s = mir_skip_space(s);
+  return strncmp(s, prefix, strlen(prefix)) == 0;
+}
+
+static char *mir_trim_copy(const char *begin, const char *end) {
+  while (begin < end && (*begin == ' ' || *begin == '\t' || *begin == '\r'))
+    begin++;
+  while (end > begin &&
+         (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r'))
+    end--;
+  size_t n = (size_t)(end - begin);
+  char *out = malloc(n + 1);
+  if (!out)
+    return NULL;
+  memcpy(out, begin, n);
+  out[n] = '\0';
+  return out;
+}
+
+static char *mir_range_copy(const char *begin, const char *end) {
+  size_t n = (size_t)(end - begin);
+  char *out = malloc(n + 1);
+  if (!out)
+    return NULL;
+  memcpy(out, begin, n);
+  out[n] = '\0';
+  return out;
+}
+
+static int mir_token_at(const char *s, size_t pos, const char *name) {
+  size_t n = strlen(name);
+  if (strncmp(s + pos, name, n) != 0)
+    return 0;
+  if (pos && mir_name_char(s[pos - 1]))
+    return 0;
+  return !mir_name_char(s[pos + n]);
+}
+
+static int mir_contains_token(const char *s, const char *name) {
+  int quoted = 0, escaped = 0;
+  for (size_t i = 0; s[i]; i++) {
+    if (quoted) {
+      if (escaped)
+        escaped = 0;
+      else if (s[i] == '\\')
+        escaped = 1;
+      else if (s[i] == '"')
+        quoted = 0;
+    } else if (s[i] == '"') {
+      quoted = 1;
+    } else if (mir_token_at(s, i, name)) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static char *mir_replace_token(const char *s, const char *name,
+                               const char *value) {
+  size_t cap = strlen(s) + 1, len = 0, nn = strlen(name), vn = strlen(value);
+  char *out = malloc(cap);
+  int quoted = 0, escaped = 0;
+  if (!out)
+    return NULL;
+  for (size_t i = 0; s[i];) {
+    int replace = !quoted && mir_token_at(s, i, name);
+    size_t add = replace ? vn : 1;
+    if (len + add + 1 > cap) {
+      cap = (len + add + 1) * 2;
+      out = realloc(out, cap);
+      if (!out)
+        return NULL;
+    }
+    if (replace) {
+      memcpy(out + len, value, vn);
+      len += vn;
+      i += nn;
+      continue;
+    }
+    char c = s[i++];
+    out[len++] = c;
+    if (quoted) {
+      if (escaped)
+        escaped = 0;
+      else if (c == '\\')
+        escaped = 1;
+      else if (c == '"')
+        quoted = 0;
+    } else if (c == '"') {
+      quoted = 1;
+    }
+  }
+  out[len] = '\0';
+  return out;
+}
+
+static char *mir_assignment_dest(const char *line) {
+  const char *eq = strchr(line, '=');
+  return eq ? mir_trim_copy(line, eq) : NULL;
+}
+
+static const char *mir_assignment_uses(const char *line) {
+  const char *eq = strchr(line, '=');
+  return eq ? eq + 1 : line;
+}
+
+static int mir_integer_type(const char *ty) {
+  return !strcmp(ty, "i1") || !strcmp(ty, "i8") || !strcmp(ty, "i16") ||
+         !strcmp(ty, "i32") || !strcmp(ty, "i64") || !strcmp(ty, "u8") ||
+         !strcmp(ty, "u16") || !strcmp(ty, "u32") || !strcmp(ty, "u64") ||
+         !strcmp(ty, "usize");
+}
+
+static char *mir_alias_value(const char *line) {
+  const char *rhs = mir_skip_space(mir_assignment_uses(line));
+  char ty[32], value[128], extra[2];
+  if (!strncmp(rhs, "copy ", 5) &&
+      sscanf(rhs + 5, "%31s %127s %1s", ty, value, extra) == 2)
+    return strdup(value);
+  if (!strncmp(rhs, "const ", 6) &&
+      sscanf(rhs + 6, "%31s %127s %1s", ty, value, extra) == 2 &&
+      mir_integer_type(ty))
+    return strdup(value);
+  return NULL;
+}
+
+static void mir_fold_branch(MirOptLine *line) {
+  const char *s = mir_skip_space(line->text);
+  if (strncmp(s, "br_cond ", 8) != 0)
+    return;
+  const char *c1 = strchr(s + 8, ',');
+  const char *c2 = c1 ? strchr(c1 + 1, ',') : NULL;
+  if (!c1 || !c2)
+    return;
+  char *cond = mir_trim_copy(s + 8, c1);
+  int take_true = cond && (!strcmp(cond, "1") || !strcmp(cond, "true"));
+  int constant = take_true || (cond && (!strcmp(cond, "0") || !strcmp(cond, "false")));
+  free(cond);
+  if (!constant)
+    return;
+  const char *part = take_true ? c1 + 1 : c2 + 1;
+  const char *part_end = take_true ? c2 : s + strlen(s);
+  char *label = mir_trim_copy(part, part_end);
+  if (!label || strncmp(label, "label ", 6) != 0) {
+    free(label);
+    return;
+  }
+  size_t indent = (size_t)(s - line->text), n = indent + 9 + strlen(label + 6) + 1;
+  char *out = malloc(n);
+  memcpy(out, line->text, indent);
+  snprintf(out + indent, n - indent, "br label %s", label + 6);
+  free(label);
+  free(line->text);
+  line->text = out;
+}
+
+static void mir_opt_function(MirOptLine *lines, size_t begin, size_t end) {
+  size_t cap = end - begin + 1, aliases = 0;
+  char **names = calloc(cap, sizeof(char *));
+  char **values = calloc(cap, sizeof(char *));
+  for (size_t i = begin; i < end; i++) {
+    const char *eq = strchr(lines[i].text, '=');
+    size_t prefix = eq ? (size_t)(eq + 1 - lines[i].text) : 0;
+    char *rewritten = strdup(lines[i].text);
+    for (size_t a = 0; a < aliases; a++) {
+      char *tail = mir_replace_token(rewritten + prefix, names[a], values[a]);
+      char *next = malloc(prefix + strlen(tail) + 1);
+      memcpy(next, rewritten, prefix);
+      strcpy(next + prefix, tail);
+      free(tail);
+      free(rewritten);
+      rewritten = next;
+    }
+    free(lines[i].text);
+    lines[i].text = rewritten;
+    char *dest = mir_assignment_dest(rewritten);
+    char *value = dest ? mir_alias_value(rewritten) : NULL;
+    if (dest && value) {
+      names[aliases] = dest;
+      values[aliases++] = value;
+    } else {
+      free(dest);
+      free(value);
+    }
+    mir_fold_branch(&lines[i]);
+  }
+  int changed = 1;
+  while (changed) {
+    changed = 0;
+    for (size_t i = begin; i < end; i++) {
+      if (!lines[i].alive)
+        continue;
+      char *dest = mir_assignment_dest(lines[i].text);
+      const char *rhs = mir_skip_space(mir_assignment_uses(lines[i].text));
+      if (!dest || !strncmp(rhs, "call ", 5) || !strncmp(rhs, "syscall ", 8)) {
+        free(dest);
+        continue;
+      }
+      int used = 0;
+      for (size_t j = begin; j < end && !used; j++)
+        if (i != j && lines[j].alive)
+          used = mir_contains_token(mir_assignment_uses(lines[j].text), dest);
+      if (!used) {
+        lines[i].alive = 0;
+        changed = 1;
+      }
+      free(dest);
+    }
+  }
+  for (size_t a = 0; a < aliases; a++) {
+    free(names[a]);
+    free(values[a]);
+  }
+  free(names);
+  free(values);
+}
+
+char *vix_mir_opt_scalar(const char *text) {
+  if (!text)
+    return strdup("");
+  size_t count = 1;
+  for (const char *p = text; *p; p++)
+    if (*p == '\n')
+      count++;
+  MirOptLine *lines = calloc(count, sizeof(MirOptLine));
+  size_t used = 0;
+  const char *start = text;
+  for (const char *p = text;; p++) {
+    if (*p == '\n' || *p == '\0') {
+      lines[used].text = mir_range_copy(start, p);
+      lines[used++].alive = 1;
+      start = p + 1;
+      if (*p == '\0')
+        break;
+    }
+  }
+  size_t fn_begin = 0;
+  int in_fn = 0;
+  for (size_t i = 0; i < used; i++) {
+    if (!in_fn && mir_starts(lines[i].text, "fn @")) {
+      in_fn = 1;
+      fn_begin = i;
+    } else if (in_fn && !strcmp(mir_skip_space(lines[i].text), "}")) {
+      mir_opt_function(lines, fn_begin, i + 1);
+      in_fn = 0;
+    }
+  }
+  size_t total = 1;
+  for (size_t i = 0; i < used; i++)
+    if (lines[i].alive)
+      total += strlen(lines[i].text) + 1;
+  char *out = malloc(total), *dst = out;
+  for (size_t i = 0; i < used; i++) {
+    if (lines[i].alive) {
+      size_t n = strlen(lines[i].text);
+      memcpy(dst, lines[i].text, n);
+      dst += n;
+      *dst++ = '\n';
+    }
+    free(lines[i].text);
+  }
+  *dst = '\0';
+  free(lines);
+  return out;
+}
+
 char *vix_clean_symbol_name(const char *name) {
   if (!name)
     return vix_substr("", 0, 0);

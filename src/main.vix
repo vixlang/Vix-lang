@@ -8,7 +8,7 @@ import "backend/linker.vix"
 import "backend/passes.vix"
 import "mir/mir.vix"
 import "mir/opt.vix"
-import "mir/mir2asm/mod.vix"
+import "mir/lir2asm/mod.vix"
 
 extern "C"
 {
@@ -151,7 +151,7 @@ fn print_help(): i32
     print("  -obj                   Emit object file (default: <input>.o)")
     print("  -opt=lN                Optimize LLVM IR with level N (0..3; default: l0)")
     print("  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)")
-    print("  --backend <llvm|self|self-opt>  Select codegen backend (default: llvm)")
+    print("  --backend <llvm|self|self-opt|self-lir>  Select codegen backend (default: llvm)")
     print("  -l<lib>, -l <lib>      Link executable with a system library")
     print("  -L<dir>, -L <dir>      Add a system library search path")
     print("  --check                Syntax & type check only")
@@ -162,7 +162,7 @@ fn print_help(): i32
     print("  --ast-json                   Print JSON AST to stdout")
     print("  --typeinfer            Print type inference result to stdout")
     print("  --semantic             Print semantic analysis to stdout")
-    print("  --debug=<mir|asm|llvm> Print selected intermediate output to stdout")
+    print("  --debug=<mir|lir|asm|llvm> Print selected intermediate output to stdout")
     print("  --explan=ERRORCODE     Explain a compiler error code, for example E3001")
     print("  -v, --version          Display compiler version information")
     print("  -h, --help             Display this help message")
@@ -334,10 +334,16 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             info_print(if (optimize_mir == 1) { mir_opt_program(mir) } else { mir })
             return mode_success()
         }
+        "debug_lir" -> {
+            let raw_mir = mir_program(lowered_program)
+            let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
+            info_print(lir2asm_debug_lir(mir))
+            return mode_success()
+        }
         "debug_asm" -> {
             let raw_mir = mir_program(lowered_program)
             let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
-            let asm = mir2asm_debug(mir)
+            let asm = if (backend == "self-lir") { lir2asm_debug(mir) } else { mir2asm_debug(mir) }
             info_print(asm)
             return mode_success()
         }
@@ -350,14 +356,15 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         _ -> {}
     }
 
-    if (backend == "self" and emit != "ir" and emit != "stdout")
+    if ((backend == "self" or backend == "self-lir") and emit != "ir" and emit != "stdout")
     {
         let raw_mir = mir_program(lowered_program)
         let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
         let artifact_path = artifact_output_path(filename, output, emit)
         if (emit == "asm")
         {
-            if (mir2asm_write_file(mir, artifact_path) != 0)
+            let write_result = if (backend == "self-lir") { lir2asm_write_file(mir, artifact_path) } else { mir2asm_write_file(mir, artifact_path) }
+            if (write_result != 0)
             {
                 diag_print("vixc: error: cannot write file '" + artifact_path + "'")
                 return mode_failure()
@@ -367,7 +374,8 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         }
         let asm_path = artifact_path + ".tmp.asm"
         let obj_path = if (emit == "-obj") { artifact_path } else { artifact_path + ".tmp.o" }
-        if (mir2asm_write_file(mir, asm_path) != 0)
+        let write_result2 = if (backend == "self-lir") { lir2asm_write_file(mir, asm_path) } else { mir2asm_write_file(mir, asm_path) }
+        if (write_result2 != 0)
         {
             diag_print("vixc: error: cannot write file '" + asm_path + "'")
             return mode_failure()
@@ -590,6 +598,7 @@ fn main(argc: i32, argv: &string): i32
         {
             let debug_mode = slice_string(arg, 8, arg.length)
             if (debug_mode == "mir") { mode = "debug_mir" }
+            elif (debug_mode == "lir") { mode = "debug_lir" }
             elif (debug_mode == "asm") { mode = "debug_asm" }
             elif (debug_mode == "llvm") { mode = "debug_llvm" }
             else
@@ -641,6 +650,10 @@ fn main(argc: i32, argv: &string): i32
         {
             backend = "self"
             optimize_mir = 1
+        }
+        elif (arg == "--backend=self-lir")
+        {
+            backend = "self-lir"
         }
         elif (arg == "--backend=llvm")
         {
@@ -719,13 +732,13 @@ fn main(argc: i32, argv: &string): i32
         return 1
     }
 
-    if (backend != "llvm" and backend != "self")
+    if (backend != "llvm" and backend != "self" and backend != "self-lir")
     {
         diag_print("vixc: error: unknown backend '" + backend + "'")
         return 1
     }
 
-    if (backend == "self" and self_backend_target_supported(target_triple) == 0)
+    if ((backend == "self" or backend == "self-lir") and self_backend_target_supported(target_triple) == 0)
     {
         diag_print("vixc: error: self backend only supports x86_64 targets, got '" + target_triple + "'")
         return 1

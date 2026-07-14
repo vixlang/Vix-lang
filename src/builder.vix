@@ -1,5 +1,12 @@
 #[no_main]
 
+pub fn vararg_promoted_type(ty: string): string
+{
+    if (ty == "f32") { return "f64" }
+    if (ty == "bool" or ty == "i8" or ty == "u8" or ty == "char") { return "i32" }
+    return ty
+}
+
 extern "C"
 {
     fn malloc(size: usize): string

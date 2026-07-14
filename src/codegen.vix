@@ -23,13 +23,6 @@ pub fn codegen_type_is_float(ty: string): i32
     return 0
 }
 
-pub fn codegen_vararg_promoted_type(ty: string): string
-{
-    if (ty == "f32") { return "f64" }
-    if (ty == "bool" or ty == "i8" or ty == "u8" or ty == "char") { return "i32" }
-    return ty
-}
-
 pub fn codegen_type_is_pointer_like(ty: string): i32
 {
     if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or type_text_is_option(ty) == 1) { return 1 }
@@ -426,7 +419,7 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
         for (i in 0 .. expr.args.length)
         {
             let arg_expr = expr_store_get(es, expr.args[i])
-            let expected_arg_ty = if (i < fixed_param_count) { get_function_param_type(expr.text, i) } else { codegen_vararg_promoted_type(codegen_expr_type(b, es, arg_expr)) }
+            let expected_arg_ty = if (i < fixed_param_count) { get_function_param_type(expr.text, i) } else { vararg_promoted_type(codegen_expr_type(b, es, arg_expr)) }
             let arg = codegen_expr_value_typed(b, es, store, arg_expr, expected_arg_ty)
             args.push(arg)
         }

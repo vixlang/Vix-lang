@@ -3,9 +3,6 @@ import "types.vix"
 
 extern "C"
 {
-    fn fputs(text: string, file: ptr): i32
-    fn fseek(file: ptr, offset: i64, whence: i32): i32
-    fn ftell(file: ptr): i64
     fn vix_asm_write_line(file: ptr, text: string): i32
     fn vix_join_lines(lines: [string]): string
     fn vix_substr(text: string, start: i32, end: i32): string
@@ -104,14 +101,48 @@ pub fn mir2asm_rhs(line: string): string
     return mir2asm_trim(mir2asm_after(line, eq + 1))
 }
 
+pub fn mir2asm_contains(text: string, needle: string): i32
+{
+    if (needle == "" or text.length < needle.length) { return 0 }
+    for (i in 0 .. text.length - needle.length + 1)
+    {
+        let mut matches = 1
+        for (j in 0 .. needle.length)
+        {
+            if (text[i + j] != needle[j]) { matches = 0 }
+        }
+        if (matches == 1) { return 1 }
+    }
+    return 0
+}
+
+pub fn mir2asm_is_reverse_stack_move(previous: string, current: string): i32
+{
+    let prev = mir2asm_trim(previous)
+    let next = mir2asm_trim(current)
+    if (mir2asm_starts_with(prev, "mov ") == 0 or mir2asm_starts_with(next, "mov ") == 0) { return 0 }
+    let pc = mir2asm_find(prev, ',', 4)
+    let nc = mir2asm_find(next, ',', 4)
+    if (pc < 0 or nc < 0) { return 0 }
+    let pd = mir2asm_trim(mir2asm_slice(prev, 4, pc))
+    let ps = mir2asm_trim(mir2asm_after(prev, pc + 1))
+    let nd = mir2asm_trim(mir2asm_slice(next, 4, nc))
+    let ns = mir2asm_trim(mir2asm_after(next, nc + 1))
+    if (pd != ns or ps != nd) { return 0 }
+    if (mir2asm_contains(pd, "[rbp") == 0 and mir2asm_contains(ps, "[rbp") == 0) { return 0 }
+    return 1
+}
+
 pub fn mir2asm_line(b: &MirAsm, text: string)
 {
+    if (b.sink.discard_output == 1) { return }
+    if (mir2asm_is_reverse_stack_move(b.last_asm_line, text) == 1) { return }
     if (b.sink.streaming == 1)
     {
         if (b.sink.output_file == nil or vix_asm_write_line(b.sink.output_file, text) != 0) { b.sink.write_failed = 1 }
-        return
     }
-    b.out.push(text)
+    else { b.out.push(text) }
+    b.last_asm_line = text
 }
 
 pub fn mir2asm_data_line(b: &MirAsm, text: string)
@@ -124,26 +155,6 @@ pub fn mir2asm_data_line(b: &MirAsm, text: string)
         return
     }
     b.sink.data.push(text)
-}
-
-pub fn mir2asm_frame_size_field(frame_size: i32): string
-{
-    let mut text = i32_to_str(frame_size)
-    while (text.length < 16) { text = text + " " }
-    return text
-}
-
-pub fn mir2asm_patch_frame_size(b: &MirAsm, frame_size: i32)
-{
-    if (b.sink.streaming == 0 or b.sink.output_file == nil or b.sink.frame_patch_offset <= 0) { return }
-    let end_offset = ftell(b.sink.output_file)
-    if (end_offset < 0 or fseek(b.sink.output_file, b.sink.frame_patch_offset, 0) != 0)
-    {
-        b.sink.write_failed = 1
-        return
-    }
-    if (fputs(mir2asm_frame_size_field(frame_size), b.sink.output_file) < 0) { b.sink.write_failed = 1 }
-    if (fseek(b.sink.output_file, end_offset, 0) != 0) { b.sink.write_failed = 1 }
 }
 
 pub fn mir2asm_comment_text(text: string): string

@@ -1,0 +1,231 @@
+#[no_main]
+import "target.vix"
+
+pub type MachineInst = struct {
+    opcode: string,
+    dest: string,
+    ty: string,
+    operands: [string],
+    text: string,
+    line_no: i32
+}
+
+pub type MachineBlock = struct {
+    name: string,
+    insts: [MachineInst]
+}
+
+pub type MachineFunction = struct {
+    name: string,
+    ret_ty: string,
+    header: string,
+    line_no: i32,
+    blocks: [MachineBlock]
+}
+
+pub type MachineModule = struct {
+    top_items: [MachineInst],
+    functions: [MachineFunction]
+}
+
+pub fn machine_empty_inst(): MachineInst
+{
+    return MachineInst{ opcode: "", dest: "", ty: "", operands: [], text: "", line_no: 0 }
+}
+
+pub fn machine_empty_function(): MachineFunction
+{
+    return MachineFunction{ name: "", ret_ty: "void", header: "", line_no: 0, blocks: [] }
+}
+
+pub fn machine_first_word(text: string): string
+{
+    let sp = mir2asm_find(text, ' ', 0)
+    if (sp < 0) { return text }
+    return mir2asm_slice(text, 0, sp)
+}
+
+pub fn machine_is_name_char(c: i8): i32
+{
+    if (c >= 'a' and c <= 'z') { return 1 }
+    if (c >= 'A' and c <= 'Z') { return 1 }
+    if (c >= '0' and c <= '9') { return 1 }
+    if (c == '_' or c == '.' or c == '%' or c == '@') { return 1 }
+    return 0
+}
+
+pub fn machine_type_after_opcode(rhs: string, opcode: string): string
+{
+    let rest = mir2asm_trim(mir2asm_after(rhs, opcode.length))
+    let word = machine_first_word(rest)
+    if (word.length > 0 and word[word.length - 1] == ',') { return mir2asm_slice(word, 0, word.length - 1) }
+    return word
+}
+
+pub fn machine_result_type(rhs: string, opcode: string): string
+{
+    if (opcode == "icmp" or opcode == "fcmp") { return "i32" }
+    if (opcode == "gep" or opcode == "offset" or opcode == "global_addr") { return "ptr" }
+    if (opcode == "call")
+    {
+        let lp = mir2asm_find(rhs, '(', 0)
+        let rp = mir2asm_find_matching_paren(rhs, lp)
+        let colon = mir2asm_find(rhs, ':', rp)
+        if (colon >= 0) { return mir2asm_trim(mir2asm_after(rhs, colon + 1)) }
+        return "i32"
+    }
+    if (opcode == "zext" or opcode == "sext" or opcode == "trunc" or opcode == "fptrunc" or opcode == "fpext" or opcode == "fptoui" or opcode == "fptosi" or opcode == "uitofp" or opcode == "sitofp" or opcode == "ptrtoint" or opcode == "inttoptr" or opcode == "bitcast")
+    {
+        let mut to_pos = -1
+        if (rhs.length < 4) { return "" }
+        for (i in 0 .. rhs.length - 3)
+        {
+            if (rhs[i] == ' ' and rhs[i + 1] == 't' and rhs[i + 2] == 'o' and rhs[i + 3] == ' ') { to_pos = i }
+        }
+        if (to_pos >= 0) { return mir2asm_trim(mir2asm_after(rhs, to_pos + 4)) }
+    }
+    return machine_type_after_opcode(rhs, opcode)
+}
+
+pub fn machine_collect_operands(line: string, dest: string): [string]
+{
+    let mut out: [string] = []
+    let mut i = 0
+    let mut in_string = 0
+    let mut escaped = 0
+    while (i < line.length)
+    {
+        if (in_string == 1)
+        {
+            if (escaped == 1) { escaped = 0 }
+            elif (line[i] == 92) { escaped = 1 }
+            elif (line[i] == '"') { in_string = 0 }
+            i += 1
+        }
+        elif (line[i] == '"')
+        {
+            in_string = 1
+            i += 1
+        }
+        elif (line[i] == '%' or line[i] == '@')
+        {
+            let start = i
+            i += 1
+            while (i < line.length and machine_is_name_char(line[i]) == 1) { i += 1 }
+            let name = mir2asm_slice(line, start, i)
+            if (name != dest) { out.push(name) }
+        }
+        else { i += 1 }
+    }
+    return out
+}
+
+pub fn machine_parse_inst(line: string, line_no: i32): MachineInst
+{
+    let mut inst = machine_empty_inst()
+    inst.text = line
+    inst.line_no = line_no
+    inst.dest = mir2asm_dest(line)
+    let rhs = mir2asm_rhs(line)
+    inst.opcode = machine_first_word(rhs)
+    if (mir2asm_starts_with(line, "ret void") == 1) { inst.opcode = "ret_void" }
+    elif (mir2asm_starts_with(line, "ret ") == 1) { inst.opcode = "ret" }
+    elif (mir2asm_starts_with(line, "br label ") == 1) { inst.opcode = "br" }
+    elif (mir2asm_starts_with(line, "br_cond ") == 1) { inst.opcode = "br_cond" }
+    elif (mir2asm_starts_with(line, "store ") == 1) { inst.opcode = "store" }
+    elif (mir2asm_starts_with(line, "call ") == 1) { inst.opcode = "call" }
+    if (inst.dest != "") { inst.ty = machine_result_type(rhs, inst.opcode) }
+    inst.operands = machine_collect_operands(line, inst.dest)
+    return inst
+}
+
+pub fn machine_parse_function_header(line: string, line_no: i32): MachineFunction
+{
+    let mut f = machine_empty_function()
+    f.header = line
+    f.line_no = line_no
+    let at = mir2asm_find(line, '@', 0)
+    let lp = mir2asm_find(line, '(', at)
+    let rp = mir2asm_find_matching_paren(line, lp)
+    if (at >= 0 and lp > at) { f.name = mir2asm_clean_name(mir2asm_slice(line, at, lp)) }
+    let colon = mir2asm_find(line, ':', rp)
+    let brace = mir2asm_find(line, '{', rp)
+    if (colon >= 0)
+    {
+        let end = if (brace > colon) { brace } else { line.length }
+        f.ret_ty = mir2asm_trim(mir2asm_slice(line, colon + 1, end))
+    }
+    return f
+}
+
+pub fn machine_parse(mir: string): MachineModule
+{
+    let mut module = MachineModule{ top_items: [], functions: [] }
+    let mut current_fn = machine_empty_function()
+    let mut current_block = MachineBlock{ name: "", insts: [] }
+    let mut in_fn = 0
+    let mut have_block = 0
+    let mut start = 0
+    let mut in_string = 0
+    let mut escaped = 0
+    let mut line_no = 1
+    let mut i = 0
+    while (i <= mir.length)
+    {
+        let at_end = if (i == mir.length) { 1 } else { 0 }
+        if (at_end == 0)
+        {
+            if (escaped == 1) { escaped = 0 }
+            elif (mir[i] == 92 and in_string == 1) { escaped = 1 }
+            elif (mir[i] == '"') { in_string = if (in_string == 0) { 1 } else { 0 } }
+        }
+        if (at_end == 1 or (mir[i] == '\n' and in_string == 0))
+        {
+            let line = mir2asm_trim(mir2asm_slice(mir, start, i))
+            if (in_fn == 0 and mir2asm_starts_with(line, "fn @") == 1)
+            {
+                current_fn = machine_parse_function_header(line, line_no)
+                current_block = MachineBlock{ name: "", insts: [] }
+                in_fn = 1
+                have_block = 0
+            }
+            elif (in_fn == 1 and mir2asm_starts_with(line, "block ") == 1)
+            {
+                if (have_block == 1) { current_fn.blocks.push(current_block) }
+                let mut end3 = line.length
+                if (end3 > 0 and line[end3 - 1] == ':') { end3 -= 1 }
+                current_block = MachineBlock{ name: mir2asm_trim(mir2asm_slice(line, 6, end3)), insts: [] }
+                have_block = 1
+            }
+            elif (in_fn == 1 and line == "}")
+            {
+                if (have_block == 1) { current_fn.blocks.push(current_block) }
+                module.functions.push(current_fn)
+                in_fn = 0
+                have_block = 0
+            }
+            elif (in_fn == 1 and line != "" and line != "{")
+            {
+                if (have_block == 0)
+                {
+                    current_block = MachineBlock{ name: "%entry", insts: [] }
+                    have_block = 1
+                }
+                current_block.insts.push(machine_parse_inst(line, line_no))
+            }
+            elif (in_fn == 0 and line != "")
+            {
+                module.top_items.push(machine_parse_inst(line, line_no))
+            }
+            start = i + 1
+            line_no += 1
+        }
+        i += 1
+    }
+    if (in_fn == 1)
+    {
+        if (have_block == 1) { current_fn.blocks.push(current_block) }
+        module.functions.push(current_fn)
+    }
+    return module
+}

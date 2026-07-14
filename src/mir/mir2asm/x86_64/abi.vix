@@ -11,8 +11,3 @@ pub fn mir2asm_syscall_reg(index: i32): string
     if (index == 6) { return "r9" }
     return "rax"
 }
-
-pub fn mir2asm_call_arg_reg(index: i32): string
-{
-    return mir2asm_arg_reg_typed(index, "i32")
-}

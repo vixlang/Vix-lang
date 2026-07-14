@@ -5,7 +5,7 @@ pub type MirAsmSink = struct {
     streaming: i32,
     output_file: ptr,
     write_failed: i32,
-    frame_patch_offset: i64
+    discard_output: i32
 }
 
 pub type MirAsm = struct {
@@ -24,7 +24,8 @@ pub type MirAsm = struct {
     fn_ret_ty: string,
     fn_sret: i32,
     ret_label: string,
-    frame_patch_index: i32,
+    layout_ready: i32,
+    planned_frame_size: i32,
     param_names: [string],
     param_tys: [string],
     param_regs: [string],
@@ -35,19 +36,17 @@ pub type MirAsm = struct {
     struct_field_offsets: [i32],
     extern_names: [string],
     debug_mir_comments: i32,
-    pending_load_active: i32,
-    pending_load_dest: string,
-    pending_load_addr: string,
-    pending_load_src_ty: string,
-    pending_load_dest_ty: string,
-    pending_load_direct_offset: i32
+    lir_names: [string],
+    lir_tys: [string],
+    lir_regs: [string],
+    lir_used_callee_regs: i32,
+    last_asm_line: string
 }
 
 pub fn mir2asm_new(): MirAsm
 {
-    let frame_patch_offset: i64 = 0
-    let sink = MirAsmSink{ data: [], streaming: 0, output_file: nil, write_failed: 0, frame_patch_offset: frame_patch_offset }
-    return MirAsm{ out: ["default rel", "section .text"], sink: sink, string_values: [], string_labels: [], string_counter: 0, names: [], offsets: [], is_addr: [], slot_tys: [], stack_next: 0, in_fn: 0, fn_name: "", fn_ret_ty: "", fn_sret: 0, ret_label: "", frame_patch_index: -1, param_names: [], param_tys: [], param_regs: [], struct_names: [], struct_field_counts: [], struct_sizes: [], struct_field_tys: [], struct_field_offsets: [], extern_names: [], debug_mir_comments: 0, pending_load_active: 0, pending_load_dest: "", pending_load_addr: "", pending_load_src_ty: "", pending_load_dest_ty: "", pending_load_direct_offset: 0 }
+    let sink = MirAsmSink{ data: [], streaming: 0, output_file: nil, write_failed: 0, discard_output: 0 }
+    return MirAsm{ out: ["default rel", "section .text"], sink: sink, string_values: [], string_labels: [], string_counter: 0, names: [], offsets: [], is_addr: [], slot_tys: [], stack_next: 0, in_fn: 0, fn_name: "", fn_ret_ty: "", fn_sret: 0, ret_label: "", layout_ready: 0, planned_frame_size: 0, param_names: [], param_tys: [], param_regs: [], struct_names: [], struct_field_counts: [], struct_sizes: [], struct_field_tys: [], struct_field_offsets: [], extern_names: [], debug_mir_comments: 0, lir_names: [], lir_tys: [], lir_regs: [], lir_used_callee_regs: 0, last_asm_line: "" }
 }
 
 pub fn mir2asm_new_stream(output_file: ptr): MirAsm

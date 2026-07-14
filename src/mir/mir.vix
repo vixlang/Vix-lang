@@ -220,6 +220,11 @@ pub fn mir_cast_if_needed(b: &MirBuilder, value: MirValue, to_ty: string): MirVa
     let from_mir = mir_type(value.ty)
     let to_mir = mir_type(to_ty)
     let out = mir_temp(b)
+    if ((value.ty == "bool" or type_is_small_int(value.ty) == 1) and to_ty == "i32")
+    {
+        mir_inst(b, out + " = zext " + from_mir + " " + value.name + " to i32")
+        return MirValue{ name: out, ty: to_ty }
+    }
     if ((value.ty == "i32" or value.ty == "bool") and (to_ty == "i64" or to_ty == "usize" or to_ty == "u64"))
     {
         mir_inst(b, out + " = zext " + from_mir + " " + value.name + " to " + to_mir)
@@ -290,18 +295,6 @@ pub fn mir_array_push_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, a
     mir_inst(b, "store " + mir_type(elem_ty) + " " + val.name + ", " + slot)
     mir_inst(b, out + " = call @vix_array_push_bytes(ptr " + arr.name + ", ptr " + slot + ", usize sizeof(" + mir_type(elem_ty) + ")): ptr")
     return MirValue{ name: out, ty: "ptr" }
-}
-
-pub fn mir_type_size_hint(ty: string): i32
-{
-    return match ty {
-        "i8" | "u8" | "char" | "bool" -> 1
-        "f64" | "i64" | "u64" | "usize" | "ptr" | "string" -> 8
-        _ -> {
-            if (is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1) { return 8 }
-            4
-        }
-    }
 }
 
 pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr, expected_ty: string): MirValue
@@ -439,7 +432,8 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
         let mut args_text = ""
         for (i in 0 .. expr.args.length)
         {
-            let arg_ty = if (i < get_function_param_count(expr.text)) { get_function_param_type(expr.text, i) } else { mir_expr_type(es, expr_store_get(es, expr.args[i])) }
+            let raw_arg_ty = mir_expr_type(es, expr_store_get(es, expr.args[i]))
+            let arg_ty = if (i < get_function_param_count(expr.text)) { get_function_param_type(expr.text, i) } else { vararg_promoted_type(raw_arg_ty) }
             let arg_expr = expr_store_get(es, expr.args[i])
             let val = if (is_ptr_to_struct(arg_ty) == 1 and arg_expr.tag == "field") { mir_field_address(b, es, store, arg_expr) } else { mir_expr_value_typed(b, es, store, arg_expr, arg_ty) }
             if (i > 0) { args_text = args_text + ", " }
@@ -750,11 +744,12 @@ pub fn mir_stmt(b: &MirBuilder, es: &ExprStore, store: &StmtStore, stmt_idx: i32
         "print" -> {
             let expr = expr_store_get(es, stmt.print_idx)
             let ty = mir_expr_type(es, expr)
-            let val = mir_expr_value_typed(b, es, store, expr, ty)
+            let promoted_ty = vararg_promoted_type(ty)
+            let val = mir_expr_value_typed(b, es, store, expr, promoted_ty)
             let fmt_text = if (ty == "i64" or ty == "u64" or ty == "usize") { "%ld\\n" } elif (ty == "f32" or ty == "f64") { "%f\\n" } elif (ty == "string") { "%s\\n" } else { "%d\\n" }
             let fmt = mir_temp(b)
             mir_inst(b, fmt + " = const ptr \"" + fmt_text + "\"")
-            mir_inst(b, "call @printf(ptr " + fmt + ", " + mir_type(ty) + " " + val.name + "): i32")
+            mir_inst(b, "call @printf(ptr " + fmt + ", " + mir_type(promoted_ty) + " " + val.name + "): i32")
         }
         "expr" -> {
             let ignored = mir_expr_value(b, es, store, expr_store_get(es, stmt.value_idx))

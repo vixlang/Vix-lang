@@ -1,11 +1,6 @@
 #[no_main]
 import "x86_64/mod.vix"
 
-pub fn mir2asm(mir: string): string
-{
-    return mir2asm_x86_64(mir)
-}
-
 pub fn mir2asm_debug(mir: string): string
 {
     return mir2asm_x86_64_debug(mir, 1)

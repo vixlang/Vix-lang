@@ -1,0 +1,19 @@
+#[no_main]
+import "../mir2asm/mod.vix"
+import "../lir/mod.vix"
+import "x86_64/mod.vix"
+
+pub fn lir2asm_debug(mir: string): string
+{
+    return lir2asm_x86_64_debug(mir2lir(mir), 1)
+}
+
+pub fn lir2asm_debug_lir(mir: string): string
+{
+    return lir2asm_x86_64_debug_lir(mir2lir(mir))
+}
+
+pub fn lir2asm_write_file(mir: string, path: string): i32
+{
+    return lir2asm_x86_64_write(mir2lir(mir), path)
+}

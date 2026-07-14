@@ -5,6 +5,7 @@ extern "C"
     fn vix_join_lines(lines: [string]): string
     fn vix_substr(text: string, start: i32, end: i32): string
     fn vix_trim_ascii(text: string): string
+    fn vix_mir_opt_scalar(text: string): string
 }
 
 pub fn mir_opt_starts_with(text: string, prefix: string): i32
@@ -77,8 +78,27 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
     if (name == "") { return text }
     let mut out = ""
     let mut i = 0
+    let mut in_string = 0
+    let mut escaped = 0
     while (i < text.length)
     {
+        if (in_string == 1)
+        {
+            let c = text[i]
+            out = out + char_string(c)
+            if (escaped == 1) { escaped = 0 }
+            elif (c == 92) { escaped = 1 }
+            elif (c == '"') { in_string = 0 }
+            i += 1
+            continue
+        }
+        if (text[i] == '"')
+        {
+            out = out + char_string(text[i])
+            in_string = 1
+            i += 1
+            continue
+        }
         let mut ok = 0
         if (i + name.length <= text.length)
         {
@@ -121,15 +141,6 @@ pub fn mir_opt_rhs(line: string): string
     let eq = mir_opt_find(line, '=', 0)
     if (eq < 0) { return line }
     return mir_opt_trim(mir_opt_after(line, eq + 1))
-}
-
-pub fn mir_opt_slot_index(slots: [string], slot: string): i32
-{
-    for (i in 0 .. slots.length)
-    {
-        if (slots[i] == slot) { return i }
-    }
-    return -1
 }
 
 pub fn mir_opt_parse_load_addr(rhs: string): string
@@ -373,22 +384,6 @@ pub fn mir_opt_promote_single_store_allocas(lines: [string]): [string]
     return out
 }
 
-pub fn mir_opt_empty_block_successor(lines: [string], index: i32): string
-{
-    let block = mir_opt_trim(lines[index])
-    if (mir_opt_is_block(block) == 0 or mir_opt_block_name(block) == "%entry") { return "" }
-    let mut i = index + 1
-    while (i < lines.length)
-    {
-        let line = mir_opt_trim(lines[i])
-        if (line == "") {}
-        elif (mir_opt_is_block(line) == 1) { return mir_opt_block_name(line) }
-        else { return "" }
-        i += 1
-    }
-    return ""
-}
-
 pub fn mir_opt_empty_block_index(blocks: [string], block: string): i32
 {
     for (i in 0 .. blocks.length)
@@ -396,43 +391,6 @@ pub fn mir_opt_empty_block_index(blocks: [string], block: string): i32
         if (blocks[i] == block) { return i }
     }
     return -1
-}
-
-pub fn mir_opt_remove_empty_blocks_in_function(lines: [string]): [string]
-{
-    let mut blocks: [string] = []
-    let mut successors: [string] = []
-    for (i in 0 .. lines.length)
-    {
-        let line = mir_opt_trim(lines[i])
-        if (mir_opt_is_block(line) == 1)
-        {
-            let next = mir_opt_empty_block_successor(lines, i)
-            if (next != "")
-            {
-                blocks.push(mir_opt_block_name(line))
-                successors.push(next)
-            }
-        }
-    }
-    if (blocks.length == 0) { return lines }
-
-    let mut out: [string] = []
-    for (i in 0 .. lines.length)
-    {
-        let line = mir_opt_trim(lines[i])
-        if (mir_opt_is_block(line) == 1 and mir_opt_empty_block_index(blocks, mir_opt_block_name(line)) >= 0)
-        {
-            continue
-        }
-        let mut rewritten = lines[i]
-        for (j in 0 .. blocks.length)
-        {
-            rewritten = mir_opt_replace_name(rewritten, blocks[j], successors[j])
-        }
-        out.push(rewritten)
-    }
-    return out
 }
 
 pub fn mir_opt_next_block_after_empty(lines: [string], index: i32): string
@@ -510,8 +468,7 @@ pub fn mir_opt_promote_functions(lines: [string]): [string]
             if (line == "}")
             {
                 let promoted = mir_opt_promote_single_store_allocas(fn_lines)
-                let no_empty = mir_opt_remove_empty_blocks_in_function(promoted)
-                for (j in 0 .. no_empty.length) { out.push(no_empty[j]) }
+                for (j in 0 .. promoted.length) { out.push(promoted[j]) }
                 in_fn = 0
             }
         }
@@ -523,8 +480,7 @@ pub fn mir_opt_promote_functions(lines: [string]): [string]
     if (in_fn == 1)
     {
         let promoted2 = mir_opt_promote_single_store_allocas(fn_lines)
-        let no_empty2 = mir_opt_remove_empty_blocks_in_function(promoted2)
-        for (j in 0 .. no_empty2.length) { out.push(no_empty2[j]) }
+        for (j in 0 .. promoted2.length) { out.push(promoted2[j]) }
     }
     return out
 }
@@ -533,7 +489,8 @@ pub fn mir_opt_program(mir: string): string
 {
     let lines = mir_opt_split_lines(mir)
     let promoted_lines = mir_opt_promote_functions(lines)
-    let live_lines = mir_opt_remove_unreachable(promoted_lines)
+    let scalar_lines = mir_opt_split_lines(vix_mir_opt_scalar(vix_join_lines(promoted_lines)))
+    let live_lines = mir_opt_remove_unreachable(scalar_lines)
     let no_empty_lines = mir_opt_remove_empty_blocks(live_lines)
     let compact_lines = mir_opt_remove_fallthrough_branches(no_empty_lines)
     return vix_join_lines(compact_lines)

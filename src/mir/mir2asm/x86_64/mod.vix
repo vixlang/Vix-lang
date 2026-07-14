@@ -9,11 +9,6 @@ extern "C"
     fn fclose(file: ptr): i32
 }
 
-pub fn mir2asm_x86_64(mir: string): string
-{
-    return mir2asm_x86_64_debug(mir, 0)
-}
-
 pub fn mir2asm_x86_64_debug(mir: string, debug_mir_comments: i32): string
 {
     let mut b = mir2asm_new()
@@ -26,40 +21,68 @@ pub fn mir2asm_x86_64_debug(mir: string, debug_mir_comments: i32): string
 
 pub fn mir2asm_x86_64_emit(mir: string, b: &MirAsm)
 {
-    let mut start = 0
-    let mut in_string = 0
-    let mut escaped = 0
-    let mut line_no = 1
-    for (i in 0 .. mir.length)
+    let module = machine_parse(mir)
+    mir2asm_emit_machine_items(module, b)
+    for (fi in 0 .. module.functions.length)
     {
-        if (escaped == 1)
+        mir2asm_emit_direct_machine_function(b, module.functions[fi])
+    }
+}
+
+pub fn mir2asm_emit_machine_items(module: MachineModule, b: &MirAsm)
+{
+    for (ti in 0 .. module.top_items.length)
+    {
+        let item = module.top_items[ti]
+        mir2asm_mir_comment(b, item.text, item.line_no)
+        mir2asm_emit_instruction(b, item.text)
+    }
+}
+
+pub fn mir2asm_emit_machine_body(b: &MirAsm, f: MachineFunction, comments: i32)
+{
+    if (comments == 1) { mir2asm_mir_comment(b, f.header, f.line_no) }
+    mir2asm_begin_function(b, f.header)
+    for (bi in 0 .. f.blocks.length)
+    {
+        let block_line = "block " + f.blocks[bi].name + ":"
+        if (comments == 1) { mir2asm_mir_comment(b, block_line, f.line_no) }
+        mir2asm_emit_instruction(b, block_line)
+        for (ii in 0 .. f.blocks[bi].insts.length)
         {
-            escaped = 0
-        }
-        elif (mir[i] == 92 and in_string == 1)
-        {
-            escaped = 1
-        }
-        elif (mir[i] == '"')
-        {
-            in_string = if (in_string == 0) { 1 } else { 0 }
-        }
-        if (mir[i] == '\n' and in_string == 0)
-        {
-            let line = mir2asm_trim(mir2asm_slice(mir, start, i))
-            mir2asm_mir_comment(b, line, line_no)
-            mir2asm_emit_instruction(b, line)
-            start = i + 1
-            line_no += 1
+            let inst = f.blocks[bi].insts[ii]
+            if (comments == 1) { mir2asm_mir_comment(b, inst.text, inst.line_no) }
+            mir2asm_emit_instruction(b, inst.text)
         }
     }
-    if (start < mir.length)
-    {
-        let line = mir2asm_trim(mir2asm_after(mir, start))
-        mir2asm_mir_comment(b, line, line_no)
-        mir2asm_emit_instruction(b, line)
-    }
-    if (b.in_fn == 1) { mir2asm_end_function(b) }
+    mir2asm_end_function(b)
+}
+
+pub fn mir2asm_emit_direct_machine_function(b: &MirAsm, f: MachineFunction)
+{
+    let mut planner = mir2asm_new()
+    planner.sink.discard_output = 1
+    planner.struct_names = b.struct_names
+    planner.struct_field_counts = b.struct_field_counts
+    planner.struct_sizes = b.struct_sizes
+    planner.struct_field_tys = b.struct_field_tys
+    planner.struct_field_offsets = b.struct_field_offsets
+    mir2asm_emit_machine_body(&planner, f, 0)
+    b.names = planner.names
+    b.offsets = planner.offsets
+    b.is_addr = planner.is_addr
+    b.slot_tys = planner.slot_tys
+    b.stack_next = mir2asm_align_to(planner.stack_next, 16)
+    b.param_names = planner.param_names
+    b.param_tys = planner.param_tys
+    b.param_regs = planner.param_regs
+    b.layout_ready = 1
+    b.planned_frame_size = b.stack_next
+    b.lir_names = []
+    b.lir_tys = []
+    b.lir_regs = []
+    b.lir_used_callee_regs = 0
+    mir2asm_emit_machine_body(b, f, b.debug_mir_comments)
 }
 
 pub fn mir2asm_x86_64_write(mir: string, path: string): i32

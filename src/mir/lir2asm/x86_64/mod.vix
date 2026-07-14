@@ -1,0 +1,97 @@
+#[no_main]
+
+pub fn lir2asm_x86_64_emit(lir: MachineLirModule, b: &MirAsm)
+{
+    let module = lir.machine
+    mir2asm_emit_machine_items(module, b)
+    for (fi in 0 .. module.functions.length) { lir2asm_emit_function(b, module.functions[fi], lir.functions[fi]) }
+}
+
+pub fn lir2asm_install(b: &MirAsm, lir: MachineLirFunction)
+{
+    b.lir_names = []
+    b.lir_tys = []
+    b.lir_regs = []
+    for (i in 0 .. lir.values.length)
+    {
+        if (lir.values[i].spilled == 0 and lir.values[i].phys_reg != "")
+        {
+            b.lir_names.push(mir2asm_clean_name(lir.values[i].name))
+            b.lir_tys.push(lir.values[i].ty)
+            b.lir_regs.push(lir.values[i].phys_reg)
+        }
+    }
+    b.lir_used_callee_regs = lir.used_callee_regs
+}
+
+pub fn lir2asm_plan(b: &MirAsm, f: MachineFunction, lir: MachineLirFunction): MirAsm
+{
+    let mut p = mir2asm_new()
+    p.sink.discard_output = 1
+    p.struct_names = b.struct_names
+    p.struct_field_counts = b.struct_field_counts
+    p.struct_sizes = b.struct_sizes
+    p.struct_field_tys = b.struct_field_tys
+    p.struct_field_offsets = b.struct_field_offsets
+    lir2asm_install(&p, lir)
+    mir2asm_emit_machine_body(&p, f, 0)
+    return p
+}
+
+pub fn lir2asm_emit_function(b: &MirAsm, f: MachineFunction, lir: MachineLirFunction)
+{
+    let p = lir2asm_plan(b, f, lir)
+    let mut laid = lir
+    machine_lir_finish_frame(&laid, p.names, p.offsets, p.is_addr, p.slot_tys, mir2asm_align_to(p.stack_next, 16))
+    b.names = laid.frame_names
+    b.offsets = laid.frame_offsets
+    b.is_addr = laid.frame_is_addr
+    b.slot_tys = laid.frame_tys
+    b.stack_next = laid.frame_size
+    b.param_names = p.param_names
+    b.param_tys = p.param_tys
+    b.param_regs = p.param_regs
+    b.layout_ready = 1
+    b.planned_frame_size = laid.frame_size
+    lir2asm_install(b, laid)
+    mir2asm_emit_machine_body(b, f, b.debug_mir_comments)
+}
+
+pub fn lir2asm_x86_64_debug_lir(input: MachineLirModule): string
+{
+    let mut lir = input
+    let module = lir.machine
+    let mut metadata = mir2asm_new()
+    metadata.sink.discard_output = 1
+    mir2asm_emit_machine_items(module, &metadata)
+    for (fi in 0 .. module.functions.length)
+    {
+        let p = lir2asm_plan(&metadata, module.functions[fi], lir.functions[fi])
+        let mut laid = lir.functions[fi]
+        machine_lir_finish_frame(&laid, p.names, p.offsets, p.is_addr, p.slot_tys, mir2asm_align_to(p.stack_next, 16))
+        lir.functions[fi] = laid
+    }
+    return machine_lir_debug(lir)
+}
+
+pub fn lir2asm_x86_64_debug(lir: MachineLirModule, comments: i32): string
+{
+    let mut b = mir2asm_new()
+    b.debug_mir_comments = comments
+    lir2asm_x86_64_emit(lir, &b)
+    let text = vix_join_lines(b.out)
+    if (b.sink.data.length > 0) { return text + "section .data\n" + vix_join_lines(b.sink.data) }
+    return text
+}
+
+pub fn lir2asm_x86_64_write(lir: MachineLirModule, path: string): i32
+{
+    let file = fopen(path, "w")
+    if (file == nil) { return 1 }
+    let mut b = mir2asm_new_stream(file)
+    mir2asm_line(&b, "default rel")
+    mir2asm_line(&b, "section .text")
+    lir2asm_x86_64_emit(lir, &b)
+    if (fclose(file) != 0) { b.sink.write_failed = 1 }
+    return b.sink.write_failed
+}
