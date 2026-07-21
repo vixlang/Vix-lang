@@ -170,9 +170,14 @@ pub fn machine_parse(mir: string): MachineModule
     let mut escaped = 0
     let mut line_no = 1
     let mut i = 0
-    while (i <= mir.length)
+    let mir_len = mir.length
+    let mut at_end = 0
+    let mut line = ""
+    let mut block_end = 0
+    while (i <= mir_len)
     {
-        let at_end = if (i == mir.length) { 1 } else { 0 }
+        at_end = 0
+        if (i == mir_len) { at_end = 1 }
         if (at_end == 0)
         {
             if (escaped == 1) { escaped = 0 }
@@ -181,7 +186,7 @@ pub fn machine_parse(mir: string): MachineModule
         }
         if (at_end == 1 or (mir[i] == '\n' and in_string == 0))
         {
-            let line = mir2asm_trim(mir2asm_slice(mir, start, i))
+            line = mir2asm_trim(mir2asm_slice(mir, start, i))
             if (in_fn == 0 and mir2asm_starts_with(line, "fn @") == 1)
             {
                 current_fn = machine_parse_function_header(line, line_no)
@@ -192,9 +197,9 @@ pub fn machine_parse(mir: string): MachineModule
             elif (in_fn == 1 and mir2asm_starts_with(line, "block ") == 1)
             {
                 if (have_block == 1) { current_fn.blocks.push(current_block) }
-                let mut end3 = line.length
-                if (end3 > 0 and line[end3 - 1] == ':') { end3 -= 1 }
-                current_block = MachineBlock{ name: mir2asm_trim(mir2asm_slice(line, 6, end3)), insts: [] }
+                block_end = line.length
+                if (block_end > 0 and line[block_end - 1] == ':') { block_end -= 1 }
+                current_block = MachineBlock{ name: mir2asm_trim(mir2asm_slice(line, 6, block_end)), insts: [] }
                 have_block = 1
             }
             elif (in_fn == 1 and line == "}")

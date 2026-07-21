@@ -31,6 +31,17 @@ pub fn mir2asm_x86_64_emit(mir: string, b: &MirAsm)
 
 pub fn mir2asm_emit_machine_items(module: MachineModule, b: &MirAsm)
 {
+    for (pass in 0 .. module.top_items.length)
+    {
+        for (ti in 0 .. module.top_items.length)
+        {
+            let text = module.top_items[ti].text
+            if (mir2asm_starts_with(text, "type @") == 1 and mir2asm_type_decl_ready(b, text) == 1)
+            {
+                mir2asm_parse_type_decl(b, text)
+            }
+        }
+    }
     for (ti in 0 .. module.top_items.length)
     {
         let item = module.top_items[ti]
