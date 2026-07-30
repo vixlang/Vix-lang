@@ -706,6 +706,29 @@ pub fn hm_check_program(program: AstProgram): HmCheckResult
     hm_add_functions(&env, &store, &fresh, program.functions)
     let expr_store = program.expr_store
     let stmt_store = program.store
+    let global_subst = subst_empty()
+    for (i in 0 .. program.globals.length)
+    {
+        let global = program.globals[i]
+        let value = hm_infer_expr(&env, &store, &fresh, &global_subst, program.structs, &expr_store, &stmt_store, global.assign_idx)
+        if (value.ok == 0) { return hm_fail(value.error, "") }
+        let mut global_ty = subst_apply_ty(&store, &global_subst, value.ty)
+        if (global.type_text != "")
+        {
+            let declared = ty_from_text(&store, global.type_text)
+            let unified = hm_unify(&store, &global_subst, declared, global_ty, pos_at(global.line, global.col))
+            if (unified.ok == 0) { return hm_fail(unified.error, "") }
+            global_ty = subst_apply_ty(&store, &global_subst, declared)
+        }
+        if (global.is_mut == 1)
+        {
+            type_env_extend(&env, global.assign_name, scheme_mono(global_ty))
+        }
+        else
+        {
+            type_env_extend(&env, global.assign_name, hm_generalize_let(&store, &env, &global_subst, global_ty))
+        }
+    }
     for (i in 0 .. program.functions.length)
     {
         let r = hm_check_function(program.functions[i], &env, &store, &fresh, program.structs, &expr_store, &stmt_store)

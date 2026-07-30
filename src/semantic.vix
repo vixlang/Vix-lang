@@ -696,6 +696,10 @@ pub fn semantic_check_block_stmt_in_current_scope(scope: &SemanticScope, program
 pub fn semantic_check_function_body(func: AstFunction, program: AstProgram, result: &SemanticResult, source: string, filename: string)
 {
     let scope = semantic_scope_new()
+    for (i in 0 .. program.globals.length)
+    {
+        semantic_scope_declare_existing(&scope, program.globals[i].assign_name)
+    }
     for (i in 0 .. func.param_names.length)
     {
         semantic_scope_declare_existing(&scope, func.param_names[i])

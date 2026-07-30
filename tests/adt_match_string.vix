@@ -1,0 +1,15 @@
+type Kind = IntKind | StringKind
+
+fn kind_name(kind: Kind): string
+{
+    return match kind {
+        IntKind -> "i32"
+        StringKind -> "string"
+    }
+}
+
+fn main(): i32
+{
+    if (kind_name(IntKind) == "i32" and kind_name(StringKind) == "string") { return 0 }
+    return 1
+}

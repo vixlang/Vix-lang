@@ -1,0 +1,8 @@
+let mut counter: i32 = 40
+
+fn main(): i32
+{
+    counter += 2
+    if (counter == 42) { return 0 }
+    return 1
+}

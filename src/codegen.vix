@@ -38,6 +38,32 @@ pub fn codegen_expected_type_accepts_null(ty: string): i32
     return 0
 }
 
+pub fn codegen_type_is_adt_layout(ty: string): i32
+{
+    if (type_is_struct(ty) == 0) { return 0 }
+    if (get_struct_field_index(ty, "tag") < 0) { return 0 }
+    if (get_struct_field_index(ty, "payload_i32") < 0) { return 0 }
+    if (get_struct_field_index(ty, "payload_string") < 0) { return 0 }
+    if (get_struct_field_index(ty, "payload_ptr") < 0) { return 0 }
+    if (get_struct_field_index(ty, "payload_f64") < 0) { return 0 }
+    return 1
+}
+
+pub fn codegen_adt_eq_value(b: &LlvmBuilder, ty: string, left: ptr, right: ptr): ptr
+{
+    let tag_idx = get_struct_field_index(ty, "tag")
+    let i32_idx = get_struct_field_index(ty, "payload_i32")
+    let string_idx = get_struct_field_index(ty, "payload_string")
+    let ptr_idx = get_struct_field_index(ty, "payload_ptr")
+    let f64_idx = get_struct_field_index(ty, "payload_f64")
+    let tag_eq = llvm_build_icmp_value(b, 32, llvm_extract_value(b, left, tag_idx), llvm_extract_value(b, right, tag_idx))
+    let i32_eq = llvm_build_icmp_value(b, 32, llvm_extract_value(b, left, i32_idx), llvm_extract_value(b, right, i32_idx))
+    let string_eq = llvm_build_string_eq_value(b, llvm_extract_value(b, left, string_idx), llvm_extract_value(b, right, string_idx))
+    let ptr_eq = llvm_build_icmp_value(b, 32, llvm_extract_value(b, left, ptr_idx), llvm_extract_value(b, right, ptr_idx))
+    let f64_eq = llvm_build_fcmp_value(b, 1, llvm_extract_value(b, left, f64_idx), llvm_extract_value(b, right, f64_idx))
+    return llvm_build_and_value(b, llvm_build_and_value(b, tag_eq, i32_eq), llvm_build_and_value(b, string_eq, llvm_build_and_value(b, ptr_eq, f64_eq)))
+}
+
 pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
 {
     if (expr.tag == "int") { return "i32" }
@@ -268,12 +294,14 @@ pub fn codegen_binop_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &S
     if (expr.text == ">>") { return llvm_build_ashr_value(b, left, right) }
     if (expr.text == "==")
     {
+        if (left_ty == right_ty and codegen_type_is_adt_layout(left_ty) == 1) { return codegen_adt_eq_value(b, left_ty, left, right) }
         if (result_ty == "string") { return llvm_build_string_eq_value(b, left, right) }
         if (codegen_type_is_float(result_ty) == 1) { return llvm_build_fcmp_value(b, 1, left, right) }
         return llvm_build_icmp_value(b, 32, left, right)
     }
     if (expr.text == "!=")
     {
+        if (left_ty == right_ty and codegen_type_is_adt_layout(left_ty) == 1) { return llvm_build_not_value(b, codegen_adt_eq_value(b, left_ty, left, right)) }
         if (result_ty == "string") { return llvm_build_not_value(b, llvm_build_string_eq_value(b, left, right)) }
         if (codegen_type_is_float(result_ty) == 1) { return llvm_build_fcmp_value(b, 6, left, right) }
         return llvm_build_icmp_value(b, 33, left, right)
@@ -612,6 +640,10 @@ pub fn codegen_match_compare(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore,
     if (subject_ty == "f32" or subject_ty == "f64")
     {
         return llvm_build_fcmp_value(b, 1, subject_val, pattern_val)
+    }
+    if (codegen_type_is_adt_layout(subject_ty) == 1)
+    {
+        return codegen_adt_eq_value(b, subject_ty, subject_val, pattern_val)
     }
     return llvm_build_icmp_value(b, 32, subject_val, pattern_val)
 }

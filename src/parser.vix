@@ -1754,11 +1754,6 @@ pub fn parse_program(src: string, filename: string): AstProgram
             let global_idx = parse_statement(&parser)
             if (parser.ok == 0) { return ast_program_err(parser.error) }
             let global_stmt = stmt_store_get(parser.store, global_idx)
-            if (global_stmt.is_mut == 1)
-            {
-                parser_fail(&parser, "top-level let must be immutable")
-                return ast_program_err(parser.error)
-            }
             globals.push(global_stmt)
         }
         elif (parser_text(&parser) == "fn" or parser_text(&parser) == "pub")

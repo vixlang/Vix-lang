@@ -512,7 +512,7 @@ pub fn desugar_global_let(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore,
     let inferred_ty = desugar_expr_adt_type(adts, es, stmt.assign_idx, stmt.type_text)
     let declared_ty = if (stmt.type_text != "") { stmt.type_text } else { inferred_ty }
     let expr_idx = desugar_expr_expected(adts, es, store, stmt.assign_idx, declared_ty)
-    return ast_stmt_let_typed_mut(store, stmt.assign_name, declared_ty, expr_idx, 0)
+    return ast_stmt_let_typed_mut(store, stmt.assign_name, declared_ty, expr_idx, stmt.is_mut)
 }
 
 pub fn desugar_stmt_env(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: i32, names: [string], types: [string]): i32

@@ -1,0 +1,12 @@
+type Value = Empty | Number(i32) | Text(string)
+
+fn main(): i32
+{
+    let a = Number(7)
+    let b = Number(7)
+    let c = Number(8)
+    let d = Text("vix")
+    let e = Text("vix")
+    if (a == b and a != c and d == e and Empty == Empty) { return 0 }
+    return 1
+}
