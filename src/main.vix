@@ -1,4 +1,5 @@
 import "parser.vix"
+import "module.vix"
 import "json_ast.vix"
 import "desugar.vix"
 import "codegen.vix"

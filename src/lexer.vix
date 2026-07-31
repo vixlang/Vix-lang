@@ -194,7 +194,7 @@ pub fn is_keyword(text: string): i32
 {
     match text {
         "fn" | "return" | "let" | "mut" | "if" | "elif" | "else" | "while" | "for" | "in" -> { return 1 }
-        "match" | "struct" | "type" | "pub" | "import" | "extern" | "break" | "continue" -> { return 1 }
+        "match" | "struct" | "type" | "pub" | "import" | "extern" | "break" | "continue" | "mod" | "as" -> { return 1 }
         "i32" | "i64" | "i8" | "f32" | "f64" | "string" | "void" | "nil" | "true" | "false" -> { return 1 }
         "and" | "or" | "print" -> { return 1 }
         _ -> { return 0 }
@@ -459,7 +459,7 @@ pub fn tokenize(src: string): TokenStream
                                     '*' -> {
                                         if (next == '*') { symbol = "**" }
                                     }
-                                    '.' -> {
+                                     '.' -> {
                                         if (next == '.' and pos + 2 < src.length and src[pos + 2] == '.')
                                         {
                                             symbol = "..."
@@ -468,6 +468,9 @@ pub fn tokenize(src: string): TokenStream
                                         {
                                             symbol = ".."
                                         }
+                                    }
+                                    ':' -> {
+                                        if (next == ':') { symbol = "::" }
                                     }
                                     _ -> {}
                                 }

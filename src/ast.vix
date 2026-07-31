@@ -166,6 +166,24 @@ pub type AstAdtDecl = struct {
     col: i32
 }
 
+// Module declaration: `mod math` or `pub mod math`
+pub type AstModDecl = struct {
+    name: string,
+    is_pub: i32,
+    line: i32,
+    col: i32
+}
+
+// Import declaration: `import math::add as plus`
+// path holds each segment, e.g. ["math","add"]
+// alias holds the optional alias, e.g. "plus" (empty if none)
+pub type AstImportDecl = struct {
+    path: [string],
+    alias: string,
+    line: i32,
+    col: i32
+}
+
 pub type AstProgram = struct {
     function: AstFunction,
     functions: [AstFunction],
@@ -173,6 +191,8 @@ pub type AstProgram = struct {
     globals: [AstStmt],
     structs: [AstStructDecl],
     adts: [AstAdtDecl],
+    mod_decls: [AstModDecl],
+    import_decls: [AstImportDecl],
     expr_store: ExprStore,
     store: StmtStore,
     ok: i32,
@@ -468,7 +488,7 @@ pub fn ast_function_with_loc(func: AstFunction, line: i32, col: i32): AstFunctio
 pub fn ast_program_ok(function: AstFunction, expr_store: ExprStore, store: StmtStore): AstProgram
 {
     let entry = ast_function_with_loc(function, function.line, function.col)
-    return AstProgram{ function: entry, functions: [function], extern_functions: [], globals: [], structs: [], adts: [], expr_store: expr_store, store: store, ok: 1, error: "" }
+    return AstProgram{ function: entry, functions: [function], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store, store: store, ok: 1, error: "" }
 }
 
 pub fn ast_program_ok_functions(functions: [AstFunction], expr_store: ExprStore, store: StmtStore): AstProgram
@@ -493,6 +513,11 @@ pub fn ast_program_ok_functions_with_externs_structs_and_adts(functions: [AstFun
 
 pub fn ast_program_ok_functions_with_externs_globals_structs_and_adts(functions: [AstFunction], extern_functions: [AstFunction], globals: [AstStmt], structs: [AstStructDecl], adts: [AstAdtDecl], expr_store: ExprStore, store: StmtStore): AstProgram
 {
+    return ast_program_full(functions, extern_functions, globals, structs, adts, [], [], expr_store, store)
+}
+
+pub fn ast_program_full(functions: [AstFunction], extern_functions: [AstFunction], globals: [AstStmt], structs: [AstStructDecl], adts: [AstAdtDecl], mod_decls: [AstModDecl], import_decls: [AstImportDecl], expr_store: ExprStore, store: StmtStore): AstProgram
+{
     let mut entry = ast_function("main", "i32", -1)
     if (functions.length > 0)
     {
@@ -505,12 +530,12 @@ pub fn ast_program_ok_functions_with_externs_globals_structs_and_adts(functions:
             }
         }
     }
-    return AstProgram{ function: entry, functions: functions, extern_functions: extern_functions, globals: globals, structs: structs, adts: adts, expr_store: expr_store, store: store, ok: 1, error: "" }
+    return AstProgram{ function: entry, functions: functions, extern_functions: extern_functions, globals: globals, structs: structs, adts: adts, mod_decls: mod_decls, import_decls: import_decls, expr_store: expr_store, store: store, ok: 1, error: "" }
 }
 
 pub fn ast_program_err(message: string): AstProgram
 {
-    return AstProgram{ function: ast_function("main", "i32", -1), functions: [], extern_functions: [], globals: [], structs: [], adts: [], expr_store: expr_store_new(), store: stmt_store_new(), ok: 0, error: message }
+    return AstProgram{ function: ast_function("main", "i32", -1), functions: [], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store_new(), store: stmt_store_new(), ok: 0, error: message }
 }
 
 pub fn ast_expr_debug(store: &ExprStore, idx: i32): string

@@ -2,6 +2,7 @@
 import "ast.vix"
 import "builder.vix"
 import "semantic.vix"
+import "module.vix"
 
 extern "C"
 {
@@ -451,7 +452,8 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
             let arg = codegen_expr_value_typed(b, es, store, arg_expr, expected_arg_ty)
             args.push(arg)
         }
-        let call_val = llvm_build_call_value(b, expr.text, args)
+        let llvm_fn_name = mangle_flat_name(expr.text)
+        let call_val = llvm_build_call_value(b, llvm_fn_name, args)
         return llvm_cast_value(b, call_val, get_function_return_type(expr.text), expected_ty)
     }
     if (expr.tag == "array_literal")
@@ -1039,7 +1041,8 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
     register_function_sig_vararg("vix_array_push_bytes", "ptr", ["ptr", "ptr", "usize"], 0)
     for (i in 0 .. program.functions.length)
     {
-        llvm_emit_function_header_with_params(b, program.functions[i].name, program.functions[i].ret_ty, program.functions[i].param_names, program.functions[i].param_types)
+        let fn_llvm_name = mangle_flat_name(program.functions[i].name)
+        llvm_emit_function_header_with_params(b, fn_llvm_name, program.functions[i].ret_ty, program.functions[i].param_names, program.functions[i].param_types)
         set_var(b, "__return", b.current_fn)
         set_var_type(b, "__return", program.functions[i].ret_ty)
         codegen_stmt(b, program.expr_store, program.store, program.functions[i].body_idx, if (program.functions[i].ret_ty == "void") { 1 } else { 0 })

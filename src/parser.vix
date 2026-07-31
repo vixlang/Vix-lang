@@ -586,6 +586,49 @@ pub fn parse_block_expression(parser: &Parser): i32
             {
                 is_stmt_start = 0
             }
+            if (next_text == "::")
+            {
+                // scan past the full module path to find what follows
+                let mut scan_pos = parser.pos + 2
+                while (scan_pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, scan_pos + 1) == "::")
+                {
+                    scan_pos += 2
+                }
+                let mut after_path = ""
+                if (scan_pos + 1 < stream_len(parser.stream))
+                {
+                    after_path = stream_text_at(parser.stream, scan_pos + 1)
+                }
+                if (after_path == "(")
+                {
+                    let mut scan_pos2 = scan_pos + 2
+                    let mut paren_depth2 = 1
+                    while (scan_pos2 < stream_len(parser.stream) and paren_depth2 > 0)
+                    {
+                        let scan_text2 = stream_text_at(parser.stream, scan_pos2)
+                        if (scan_text2 == "(") { paren_depth2 += 1 }
+                        elif (scan_text2 == ")") { paren_depth2 -= 1 }
+                        scan_pos2 += 1
+                    }
+                    let mut after_call2 = ""
+                    if (scan_pos2 < stream_len(parser.stream))
+                    {
+                        after_call2 = stream_text_at(parser.stream, scan_pos2)
+                    }
+                    if (after_call2 == "+" or after_call2 == "-" or after_call2 == "*" or after_call2 == "/" or after_call2 == "==" or after_call2 == "!=" or after_call2 == "<" or after_call2 == "<=" or after_call2 == ">" or after_call2 == ">=" or after_call2 == "and" or after_call2 == "or")
+                    {
+                        is_stmt_start = 0
+                    }
+                    elif (scan_pos2 >= stream_len(parser.stream) or (after_call2 != "}" and after_call2 != "else"))
+                    {
+                        is_stmt_start = 1
+                    }
+                }
+                elif (after_path == "=" or after_path == "+=" or after_path == "-=")
+                {
+                    is_stmt_start = 1
+                }
+            }
             if (next_text == "(")
             {
                 let mut scan_pos = parser.pos + 2
@@ -677,8 +720,23 @@ pub fn parse_primary(parser: &Parser): i32
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
-        let name = parser_text(parser)
+        let mut name = parser_text(parser)
         parser_advance(parser)
+        // collect module path segments: a::b::c -> "a::b::c"
+        while (parser_text(parser) == "::")
+        {
+            parser_advance(parser)
+            match parser_kind(parser) {
+                1 -> {  // tk_ident
+                    name = name + "::" + parser_text(parser)
+                    parser_advance(parser)
+                }
+                _ -> {
+                    parser_fail(parser, "expected identifier after '::', got '" + parser_text(parser) + "'")
+                    return -1
+                }
+            }
+        }
         if (name == "None")
         {
             return parser_expr_at(parser, ast_expr_none(parser.expr_store), line, col)
@@ -719,8 +777,12 @@ pub fn parse_primary(parser: &Parser): i32
                 }
                 let field_name = parser_text(parser)
                 if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
-                parser_expect_text(parser, ":")
-                if (parser.ok == 0) { return -1 }
+                if (parser_text(parser) != ":" and parser_text(parser) != "=")
+                {
+                    parser_fail(parser, "expected ':' or '=' in struct field initializer, got '" + parser_text(parser) + "'")
+                    return -1
+                }
+                parser_advance(parser)
                 let field_value = parse_expression(parser)
                 if (parser.ok == 0) { return -1 }
                 field_names.push(field_name)
@@ -827,8 +889,23 @@ pub fn parse_statement_ident(parser: &Parser): i32
     }
     let line = parser_line(parser)
     let col = parser_col(parser)
-    let name = parser_text(parser)
+    let mut name = parser_text(parser)
     parser_advance(parser)
+    // collect module path segments: math::add -> "math::add"
+    while (parser_text(parser) == "::")
+    {
+        parser_advance(parser)
+        match parser_kind(parser) {
+            1 -> {
+                name = name + "::" + parser_text(parser)
+                parser_advance(parser)
+            }
+            _ -> {
+                parser_fail(parser, "expected identifier after '::', got '" + parser_text(parser) + "'")
+                return -1
+            }
+        }
+    }
     if (parser_generic_call_ahead(parser) == 1)
     {
         let type_args = parse_generic_call_type_args(parser)
@@ -1349,13 +1426,20 @@ pub fn parse_type_text(parser: &Parser): string
         if (parser.ok == 0) { return "unknown" }
         return "Option[" + inner + "]"
     }
-    let ty = parser_text(parser)
+    let mut ty = parser_text(parser)
     if (parser_kind(parser) != tk_ident() and parser_kind(parser) != tk_keyword())
     {
         parser_fail(parser, "expected type name, got '" + ty + "'")
         return "unknown"
     }
     parser_advance(parser)
+    // collect module path segments: math::Vector
+    while (parser_text(parser) == "::" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
+    {
+        parser_advance(parser)
+        ty = ty + "::" + parser_text(parser)
+        parser_advance(parser)
+    }
     if (parser_text(parser) == ":" or parser_text(parser) == "[")
     {
         if (parser_text(parser) == ":") { parser_advance(parser) }
@@ -1693,6 +1777,87 @@ pub fn parse_builtin_result_decl(): AstAdtDecl
     return AstAdtDecl{ name: "Result", type_params: [], variant_names: ["Ok", "Err"], variant_payload_types: ["i32", "string"], line: 0, col: 0 }
 }
 
+// Parse a module path: ident (:: ident)*  -> returns ["math", "add"]
+// Keywords are accepted as segment names (e.g. `utils::string::trim`)
+pub fn parse_module_path(parser: &Parser): [string]
+{
+    let mut segments: [string] = []
+    let first = parser_text(parser)
+    if (parser_kind(parser) != tk_ident() and parser_kind(parser) != tk_keyword())
+    {
+        parser_fail(parser, "expected module name, got '" + first + "'")
+        return segments
+    }
+    parser_advance(parser)
+    segments.push(first)
+    while (parser_text(parser) == "::")
+    {
+        parser_advance(parser)
+        let seg = parser_text(parser)
+        if (parser_kind(parser) != tk_ident() and parser_kind(parser) != tk_keyword())
+        {
+            parser_fail(parser, "expected identifier after '::', got '" + seg + "'")
+            return segments
+        }
+        parser_advance(parser)
+        segments.push(seg)
+    }
+    return segments
+}
+
+// `mod math` or `pub mod math`
+pub fn parse_mod_decl(parser: &Parser): AstModDecl
+{
+    let line = parser_line(parser)
+    let col  = parser_col(parser)
+    let mut is_pub = 0
+    if (parser_text(parser) == "pub")
+    {
+        is_pub = 1
+        parser_advance(parser)
+    }
+    if (parser_expect_text(parser, "mod") == 0)
+    {
+        return AstModDecl{ name: "", is_pub: 0, line: line, col: col }
+    }
+    let name = parser_text(parser)
+    if (parser_expect_kind(parser, tk_ident()) == 0)
+    {
+        return AstModDecl{ name: "", is_pub: 0, line: line, col: col }
+    }
+    parser_accept_text(parser, ";")
+    return AstModDecl{ name: name, is_pub: is_pub, line: line, col: col }
+}
+
+// `import math` or `import math::add` or `import math::add as plus`
+// Note: `import "file.vix"` (quoted) is handled by the preprocessor, not here.
+pub fn parse_import_decl(parser: &Parser): AstImportDecl
+{
+    let line = parser_line(parser)
+    let col  = parser_col(parser)
+    if (parser_expect_text(parser, "import") == 0)
+    {
+        return AstImportDecl{ path: [], alias: "", line: line, col: col }
+    }
+    let path = parse_module_path(parser)
+    if (parser.ok == 0)
+    {
+        return AstImportDecl{ path: [], alias: "", line: line, col: col }
+    }
+    let mut alias = ""
+    if (parser_text(parser) == "as")
+    {
+        parser_advance(parser)
+        alias = parser_text(parser)
+        if (parser_expect_kind(parser, tk_ident()) == 0)
+        {
+            return AstImportDecl{ path: [], alias: "", line: line, col: col }
+        }
+    }
+    parser_accept_text(parser, ";")
+    return AstImportDecl{ path: path, alias: alias, line: line, col: col }
+}
+
 pub fn parse_program(src: string, filename: string): AstProgram
 {
     let mut imports = import_set_new()
@@ -1707,13 +1872,31 @@ pub fn parse_program(src: string, filename: string): AstProgram
     let mut globals: [AstStmt] = []
     let mut structs: [AstStructDecl] = []
     let mut adts: [AstAdtDecl] = []
+    let mut mod_decls: [AstModDecl] = []
+    let mut import_decls: [AstImportDecl] = []
 
     while (parser_at_end(&parser) == 0)
     {
         while (parser_text(&parser) == ";") { parser_advance(&parser) }
         if (parser_at_end(&parser) == 1) { break }
         let before_pos = parser.pos
-        if (parser_text(&parser) == "extern")
+
+        // `mod math` or `pub mod math`
+        let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, parser.pos + 1) == "mod"
+        if (parser_text(&parser) == "mod" or is_pub_mod == 1)
+        {
+            let mdecl = parse_mod_decl(&parser)
+            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            mod_decls.push(mdecl)
+        }
+        // `import ident...`  (quoted import "file.vix" is consumed by preprocessor)
+        elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
+        {
+            let idecl = parse_import_decl(&parser)
+            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            import_decls.push(idecl)
+        }
+        elif (parser_text(&parser) == "extern")
         {
             parser_expect_text(&parser, "extern")
             if (parser.ok == 0) { return ast_program_err(parser.error) }
@@ -1781,7 +1964,7 @@ pub fn parse_program(src: string, filename: string): AstProgram
     {
         adts.push(parse_builtin_result_decl())
     }
-    return ast_program_ok_functions_with_externs_globals_structs_and_adts(functions, extern_functions, globals, structs, adts, parser.expr_store, parser.store)
+    return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store)
 }
 
 pub fn parse_program_stats(src: string, filename: string): string

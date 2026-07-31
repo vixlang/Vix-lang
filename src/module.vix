@@ -1,0 +1,463 @@
+#[no_main]
+import "ast.vix"
+import "lexer.vix"
+import "preprocess.vix"
+
+// ---------------------------------------------------------------------------
+// ModuleId
+// ---------------------------------------------------------------------------
+
+pub type ModuleId = struct {
+    id:             i32,
+    qualified_name: string,
+    source_path:    string
+}
+
+pub fn module_id_new(id: i32, qualified_name: string, source_path: string): ModuleId
+{
+    return ModuleId{ id: id, qualified_name: qualified_name, source_path: source_path }
+}
+
+// ---------------------------------------------------------------------------
+// Module  –  one node in the graph
+// ---------------------------------------------------------------------------
+
+pub type Module = struct {
+    id:              ModuleId,
+    parent_id:       i32,
+    child_ids:       [i32],
+    source_path:     string,
+    public_symbols:  [string],
+    private_symbols: [string],
+    import_paths:    [string],
+    import_aliases:  [string],
+    is_pub:          i32
+}
+
+pub fn module_new(id: ModuleId, parent_id: i32, source_path: string, is_pub: i32): Module
+{
+    return Module{
+        id:              id,
+        parent_id:       parent_id,
+        child_ids:       [],
+        source_path:     source_path,
+        public_symbols:  [],
+        private_symbols: [],
+        import_paths:    [],
+        import_aliases:  [],
+        is_pub:          is_pub
+    }
+}
+
+// ---------------------------------------------------------------------------
+// ModuleGraph
+// ---------------------------------------------------------------------------
+
+pub type ModuleGraph = struct {
+    modules:  [Module],
+    errors:   [string],
+    ok:       i32,
+    next_id:  i32
+}
+
+pub fn module_graph_new(): ModuleGraph
+{
+    return ModuleGraph{ modules: [], errors: [], ok: 1, next_id: 0 }
+}
+
+pub fn module_graph_find_by_path(g: &ModuleGraph, path: string): i32
+{
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].source_path == path) { return i }
+    }
+    return -1
+}
+
+pub fn module_graph_find_by_qname(g: &ModuleGraph, qname: string): i32
+{
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].id.qualified_name == qname) { return i }
+    }
+    return -1
+}
+
+pub fn module_graph_debug(g: &ModuleGraph): string
+{
+    let mut out = "ModuleGraph(ok=" + ast_i32(g.ok) + ", modules=" + ast_i32(g.modules.length) + ")\n"
+    for (i in 0 .. g.modules.length)
+    {
+        let m = g.modules[i]
+        out = out + "  [" + ast_i32(m.id.id) + "] " + m.id.qualified_name + " -> " + m.source_path + "\n"
+        if (m.child_ids.length > 0)
+        {
+            out = out + "     children:"
+            for (j in 0 .. m.child_ids.length)
+            {
+                out = out + " " + ast_i32(m.child_ids[j])
+            }
+            out = out + "\n"
+        }
+    }
+    for (i in 0 .. g.errors.length)
+    {
+        out = out + "  ERR: " + g.errors[i] + "\n"
+    }
+    return out
+}
+
+// ---------------------------------------------------------------------------
+// ModuleLoader  –  wraps graph + DFS visit stack
+// ---------------------------------------------------------------------------
+
+pub type ModuleLoader = struct {
+    graph:       ModuleGraph,
+    visit_stack: [string]
+}
+
+pub fn module_loader_new(): ModuleLoader
+{
+    return ModuleLoader{ graph: module_graph_new(), visit_stack: [] }
+}
+
+// Helpers that operate on &ModuleLoader so we never need &loader.graph
+
+pub fn ml_add_error(loader: &ModuleLoader, msg: string)
+{
+    loader.graph.errors.push(msg)
+    loader.graph.ok = 0
+}
+
+pub fn ml_alloc_id(loader: &ModuleLoader): i32
+{
+    let id = loader.graph.next_id
+    loader.graph.next_id += 1
+    return id
+}
+
+pub fn ml_add_module(loader: &ModuleLoader, m: Module): i32
+{
+    let idx = loader.graph.modules.length
+    loader.graph.modules.push(m)
+    return idx
+}
+
+pub fn ml_find_by_qname(loader: &ModuleLoader, qname: string): i32
+{
+    return module_graph_find_by_qname(loader.graph, qname)
+}
+
+pub fn ml_on_stack(loader: &ModuleLoader, qname: string): i32
+{
+    for (i in 0 .. loader.visit_stack.length)
+    {
+        if (loader.visit_stack[i] == qname) { return 1 }
+    }
+    return 0
+}
+
+pub fn ml_pop_stack(loader: &ModuleLoader, qname: string)
+{
+    let mut ns: [string] = []
+    for (i in 0 .. loader.visit_stack.length)
+    {
+        if (loader.visit_stack[i] != qname) { ns.push(loader.visit_stack[i]) }
+    }
+    loader.visit_stack = ns
+}
+
+// ---------------------------------------------------------------------------
+// Path utilities
+// ---------------------------------------------------------------------------
+
+pub fn ml_join_dir(dir: string, name: string): string
+{
+    if (dir == "" or dir == ".") { return name }
+    if (dir[dir.length - 1] == '/') { return dir + name }
+    return dir + "/" + name
+}
+
+pub fn ml_dirname(path: string): string
+{
+    let mut last = -1
+    for (i in 0 .. path.length)
+    {
+        if (path[i] == '/') { last = i }
+    }
+    if (last < 0) { return "." }
+    let mut out = ""
+    for (i in 0 .. last) { out = out + char_string(path[i]) }
+    return out
+}
+
+// Locate source file for `name` under `base_dir`.
+// Returns the file path, "" if not found, or "AMBIGUOUS:..." if both exist.
+pub fn ml_locate(base_dir: string, name: string): string
+{
+    let file_path = ml_join_dir(base_dir, name + ".vix")
+    let dir_path  = ml_join_dir(ml_join_dir(base_dir, name), "mod.vix")
+    let fc = read_file_content(file_path)
+    let dc = read_file_content(dir_path)
+    let fe = if (fc != "") { 1 } else { 0 }
+    let de = if (dc != "") { 1 } else { 0 }
+    if (fe == 1 and de == 1)
+    {
+        return "AMBIGUOUS:" + file_path + ":" + dir_path
+    }
+    if (fe == 1) { return file_path }
+    if (de == 1) { return dir_path  }
+    return ""
+}
+
+// ---------------------------------------------------------------------------
+// Scan child mods  (token-level, no full parse)
+// ---------------------------------------------------------------------------
+
+pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, src_path: string)
+{
+    let stream = tokenize(src)
+    let len    = stream_len(stream)
+    let mut i  = 0
+    while (i < len)
+    {
+        let text = stream_text_at(stream, i)
+        let mut is_pub = 0
+        let mut at     = i
+        if (text == "pub" and i + 1 < len and stream_text_at(stream, i + 1) == "mod")
+        {
+            is_pub = 1
+            at     = i + 1
+        }
+        elif (text != "mod")
+        {
+            i += 1
+            continue
+        }
+        if (at + 1 < len and stream_kind_at(stream, at + 1) == tk_ident())
+        {
+            let name = stream_text_at(stream, at + 1)
+            ml_load_module(loader, parent_idx, name, is_pub, src_path)
+            i = at + 2
+        }
+        else
+        {
+            i += 1
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Core loader
+// ---------------------------------------------------------------------------
+
+pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_pub: i32, parent_path: string)
+{
+    let parent_qname = if (parent_idx < 0)
+    {
+        "root"
+    }
+    else
+    {
+        loader.graph.modules[parent_idx].id.qualified_name
+    }
+    let qname    = parent_qname + "::" + name
+    let base_dir = ml_dirname(parent_path)
+
+    // cycle check
+    if (ml_on_stack(loader, qname) == 1)
+    {
+        ml_add_error(loader, "error: circular dependency: '" + qname + "' is already being loaded")
+        return
+    }
+
+    // already loaded
+    let existing = ml_find_by_qname(loader, qname)
+    if (existing >= 0)
+    {
+        if (parent_idx >= 0)
+        {
+            loader.graph.modules[parent_idx].child_ids.push(existing)
+        }
+        return
+    }
+
+    // locate file
+    let located = ml_locate(base_dir, name)
+    if (located == "")
+    {
+        ml_add_error(loader,
+            "error: module not found: '" + qname + "'\n" +
+            "  tried: " + ml_join_dir(base_dir, name + ".vix") + "\n" +
+            "  tried: " + ml_join_dir(ml_join_dir(base_dir, name), "mod.vix"))
+        return
+    }
+    if (located.length >= 9 and located[0] == 'A' and located[1] == 'M' and located[2] == 'B')
+    {
+        ml_add_error(loader,
+            "error: ambiguous module '" + qname + "': " + located)
+        return
+    }
+
+    // read source
+    let src = read_file_content(located)
+    if (src == "")
+    {
+        ml_add_error(loader, "error: cannot read: '" + located + "'")
+        return
+    }
+
+    // register node
+    let new_id  = ml_alloc_id(loader)
+    let mid     = module_id_new(new_id, qname, located)
+    let m       = module_new(mid, parent_idx, located, is_pub)
+    let mod_idx = ml_add_module(loader, m)
+
+    if (parent_idx >= 0)
+    {
+        loader.graph.modules[parent_idx].child_ids.push(mod_idx)
+    }
+
+    // DFS push
+    loader.visit_stack.push(qname)
+
+    // recurse
+    ml_scan_child_mods(loader, mod_idx, src, located)
+
+    // DFS pop
+    ml_pop_stack(loader, qname)
+}
+
+// ---------------------------------------------------------------------------
+// Public entry point
+// ---------------------------------------------------------------------------
+
+pub fn module_graph_build(entry_src_path: string): ModuleGraph
+{
+    let mut loader = module_loader_new()
+
+    let root_src = read_file_content(entry_src_path)
+    if (root_src == "")
+    {
+        ml_add_error(loader, "error: cannot read entry file: '" + entry_src_path + "'")
+        return loader.graph
+    }
+
+    let root_id  = ml_alloc_id(loader)
+    let root_mid = module_id_new(root_id, "root", entry_src_path)
+    let root_m   = module_new(root_mid, -1, entry_src_path, 1)
+    let root_idx = ml_add_module(loader, root_m)
+
+    loader.visit_stack.push("root")
+    ml_scan_child_mods(loader, root_idx, root_src, entry_src_path)
+    ml_pop_stack(loader, "root")
+
+    return loader.graph
+}
+
+// ---------------------------------------------------------------------------
+// LLVM name mangling
+//
+//   math::add         ->  _V4math3add
+//   utils::str::trim  ->  _V5utils3str4trim
+//   root-level name   ->  unchanged (no mangling)
+// ---------------------------------------------------------------------------
+
+pub fn mangle_name(qualified_module: string, sym: string): string
+{
+    let mut out = "_V"
+    let mut seg = ""
+    let mut i   = 0
+    while (i <= qualified_module.length)
+    {
+        let at_end = if (i == qualified_module.length) { 1 } else { 0 }
+        let at_sep = if (at_end == 0 and i + 1 < qualified_module.length
+                        and qualified_module[i] == ':' and qualified_module[i + 1] == ':')
+        {
+            1
+        }
+        else
+        {
+            0
+        }
+        if (at_end == 1 or at_sep == 1)
+        {
+            if (seg != "")
+            {
+                out = out + ast_i32(seg.length) + seg
+            }
+            seg = ""
+            i = if (at_sep == 1) { i + 2 } else { i + 1 }
+        }
+        else
+        {
+            seg = seg + char_string(qualified_module[i])
+            i += 1
+        }
+    }
+    out = out + ast_i32(sym.length) + sym
+    return out
+}
+
+// Given a call name like "math::add", split it and mangle it.
+// Root-level names (no "::") are returned unchanged.
+pub fn mangle_flat_name(flat: string): string
+{
+    let mut last_sep = -1
+    let mut i = 0
+    while (i + 1 < flat.length)
+    {
+        if (flat[i] == ':' and flat[i + 1] == ':') { last_sep = i }
+        i += 1
+    }
+    if (last_sep < 0) { return flat }
+    let mut mod_path = ""
+    for (j in 0 .. last_sep)               { mod_path = mod_path + char_string(flat[j]) }
+    let mut sym      = ""
+    for (j in last_sep + 2 .. flat.length) { sym = sym + char_string(flat[j]) }
+    return mangle_name(mod_path, sym)
+}
+
+// ---------------------------------------------------------------------------
+// Import / symbol resolution helpers
+// ---------------------------------------------------------------------------
+
+// Collect all public function/type names declared in a program.
+pub fn module_collect_public_symbols(m: &Module, prog: AstProgram)
+{
+    for (i in 0 .. prog.functions.length)
+    {
+        m.public_symbols.push(prog.functions[i].name)
+    }
+    for (i in 0 .. prog.structs.length)
+    {
+        m.public_symbols.push(prog.structs[i].name)
+    }
+    for (i in 0 .. prog.adts.length)
+    {
+        m.public_symbols.push(prog.adts[i].name)
+    }
+}
+
+// Resolve an import declaration path to a qualified name string.
+// e.g. ["math", "add"] -> "math::add"
+pub fn import_path_to_qname(path: [string]): string
+{
+    let mut out = ""
+    for (i in 0 .. path.length)
+    {
+        if (i > 0) { out = out + "::" }
+        out = out + path[i]
+    }
+    return out
+}
+
+// Check whether `name` is a duplicate in `names`.
+pub fn symbol_is_duplicate(names: [string], name: string): i32
+{
+    for (i in 0 .. names.length)
+    {
+        if (names[i] == name) { return 1 }
+    }
+    return 0
+}

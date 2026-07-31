@@ -175,3 +175,121 @@ pub fn symtable_is_mutable(table: &SymbolTable, name: string): i32
     symtable_fail(table, "undefined symbol in mutable lookup '" + name + "'")
     return 0
 }
+
+// ---------------------------------------------------------------------------
+// ModuleSymTable  –  cross-module symbol registry
+//
+// Stores every publicly visible symbol as a qualified name.
+// e.g.  "math::add"  ->  type "fn(i32,i32):i32"
+//       "math::Point" ->  type "struct"
+//
+// Import aliases are stored as (local_name -> qualified_name) pairs so that
+// `plus(1,2)` resolves to `math::add(1,2)` after `import math::add as plus`.
+// ---------------------------------------------------------------------------
+
+pub type ModuleSymTable = struct {
+    qnames:    [string],    // "math::add"
+    sym_types: [string],    // "fn" | "struct" | "adt" | "var"
+    is_pub:    [i32],       // 1 = exported
+
+    // alias table:  local_name -> qname
+    alias_local:  [string],
+    alias_qname:  [string]
+}
+
+pub fn modsym_new(): ModuleSymTable
+{
+    return ModuleSymTable{
+        qnames:       [],
+        sym_types:    [],
+        is_pub:       [],
+        alias_local:  [],
+        alias_qname:  []
+    }
+}
+
+// Register a qualified symbol.
+pub fn modsym_register(ms: &ModuleSymTable, qname: string, sym_type: string, is_pub: i32)
+{
+    // deduplicate
+    for (i in 0 .. ms.qnames.length)
+    {
+        if (ms.qnames[i] == qname) { return }
+    }
+    ms.qnames.push(qname)
+    ms.sym_types.push(sym_type)
+    ms.is_pub.push(is_pub)
+}
+
+// Register an alias:  `import math::add as plus`
+pub fn modsym_add_alias(ms: &ModuleSymTable, local_name: string, qname: string)
+{
+    for (i in 0 .. ms.alias_local.length)
+    {
+        if (ms.alias_local[i] == local_name) { return }
+    }
+    ms.alias_local.push(local_name)
+    ms.alias_qname.push(qname)
+}
+
+// Resolve a name (possibly an alias) to its canonical qualified name.
+// Returns "" if not found.
+pub fn modsym_resolve(ms: &ModuleSymTable, name: string): string
+{
+    // check alias table first
+    for (i in 0 .. ms.alias_local.length)
+    {
+        if (ms.alias_local[i] == name) { return ms.alias_qname[i] }
+    }
+    // direct lookup
+    for (i in 0 .. ms.qnames.length)
+    {
+        if (ms.qnames[i] == name) { return name }
+    }
+    return ""
+}
+
+// Look up type string for a qualified name (or alias).
+pub fn modsym_type_of(ms: &ModuleSymTable, name: string): string
+{
+    let qname = modsym_resolve(ms, name)
+    if (qname == "") { return "" }
+    for (i in 0 .. ms.qnames.length)
+    {
+        if (ms.qnames[i] == qname) { return ms.sym_types[i] }
+    }
+    return ""
+}
+
+// Check visibility: returns 1 if the symbol is public.
+pub fn modsym_is_pub(ms: &ModuleSymTable, qname: string): i32
+{
+    for (i in 0 .. ms.qnames.length)
+    {
+        if (ms.qnames[i] == qname) { return ms.is_pub[i] }
+    }
+    return 0
+}
+
+// Populate the module symbol table from an AstProgram under `module_prefix`.
+// e.g. module_prefix = "math"  -> registers "math::add", "math::Point", …
+pub fn modsym_populate_from_program(ms: &ModuleSymTable, prog: AstProgram, module_prefix: string)
+{
+    let prefix = if (module_prefix == "" or module_prefix == "root") { "" } else { module_prefix + "::" }
+    for (i in 0 .. prog.functions.length)
+    {
+        modsym_register(ms, prefix + prog.functions[i].name, "fn", 1)
+    }
+    for (i in 0 .. prog.extern_functions.length)
+    {
+        modsym_register(ms, prefix + prog.extern_functions[i].name, "fn", 1)
+    }
+    for (i in 0 .. prog.structs.length)
+    {
+        modsym_register(ms, prefix + prog.structs[i].name, "struct", 1)
+    }
+    for (i in 0 .. prog.adts.length)
+    {
+        modsym_register(ms, prefix + prog.adts[i].name, "adt", 1)
+    }
+}
