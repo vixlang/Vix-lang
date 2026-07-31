@@ -19,7 +19,7 @@ int vix_asm_write_line(void *file, const char *text) {
 #define PATH_MAX 4096
 #endif
 
-#define MAX_VARS 1024
+#define MAX_VARS 4096
 #define MAX_FIELDS 32
 #define NAME_SIZE 64
 #define TYPE_SIZE 64
@@ -808,8 +808,10 @@ void vix_register_function_sig_vararg(const char *name, const char *return_type,
     }
   }
   if (idx < 0) {
-    if (func_count >= MAX_VARS)
+    if (func_count >= MAX_VARS) {
+      fprintf(stderr, "vixc: internal error: function table overflow (>%d) registering '%s'\n", MAX_VARS, name);
       return;
+    }
     idx = func_count++;
   }
   strncpy(funcs[idx].name, name, NAME_SIZE - 1);

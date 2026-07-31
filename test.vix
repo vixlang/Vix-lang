@@ -1,5 +1,4 @@
 fn main(): i32
 {
-    print(a)
     return 0
 }
