@@ -2,6 +2,7 @@
 import "ast.vix"
 import "lexer.vix"
 import "preprocess.vix"
+import "parser.vix"
 
 // ---------------------------------------------------------------------------
 // ModuleId
@@ -460,4 +461,247 @@ pub fn symbol_is_duplicate(names: [string], name: string): i32
         if (names[i] == name) { return 1 }
     }
     return 0
+}
+
+// ---------------------------------------------------------------------------
+// Multi-file compilation: AST merging
+// ---------------------------------------------------------------------------
+
+// Strip "root::" prefix from qualified module name
+// "root::math" -> "math", "root::math::utils" -> "math::utils", "root" -> ""
+fn module_strip_root_prefix(qname: string): string
+{
+    if (qname == "root") { return "" }
+    if (qname.length > 6 and qname[0] == 'r' and qname[1] == 'o' and qname[2] == 'o' and qname[3] == 't' and qname[4] == ':' and qname[5] == ':')
+    {
+        let mut out = ""
+        for (i in 6 .. qname.length)
+        {
+            out = out + char_string(qname[i])
+        }
+        return out
+    }
+    return qname
+}
+
+// Merge all exprs from src into dst, remapping indices by expr_off/stmt_off
+fn module_merge_exprs(src_es: ExprStore, dst_es: &ExprStore, expr_off: i32, stmt_off: i32)
+{
+    for (i in 0 .. src_es.exprs.length)
+    {
+        dst_es.exprs.push(src_es.exprs[i])
+        let di = dst_es.exprs.length - 1
+        let tag = src_es.exprs[i].tag
+        
+        if (tag == "block_expr")
+        {
+            if (dst_es.exprs[di].left_idx >= 0) { dst_es.exprs[di].left_idx = dst_es.exprs[di].left_idx + stmt_off }
+            if (dst_es.exprs[di].right_idx >= 0) { dst_es.exprs[di].right_idx = dst_es.exprs[di].right_idx + expr_off }
+        }
+        elif (tag == "match_expr")
+        {
+            if (dst_es.exprs[di].left_idx >= 0) { dst_es.exprs[di].left_idx = dst_es.exprs[di].left_idx + expr_off }
+            let mut j = 0
+            while (j + 1 < dst_es.exprs[di].args.length)
+            {
+                if (dst_es.exprs[di].args[j] >= 0) { dst_es.exprs[di].args[j] = dst_es.exprs[di].args[j] + expr_off }
+                if (dst_es.exprs[di].args[j + 1] >= 0) { dst_es.exprs[di].args[j + 1] = dst_es.exprs[di].args[j + 1] + expr_off }
+                j += 2
+            }
+        }
+        else
+        {
+            if (dst_es.exprs[di].left_idx >= 0) { dst_es.exprs[di].left_idx = dst_es.exprs[di].left_idx + expr_off }
+            if (dst_es.exprs[di].right_idx >= 0) { dst_es.exprs[di].right_idx = dst_es.exprs[di].right_idx + expr_off }
+            for (j in 0 .. dst_es.exprs[di].args.length)
+            {
+                if (dst_es.exprs[di].args[j] >= 0) { dst_es.exprs[di].args[j] = dst_es.exprs[di].args[j] + expr_off }
+            }
+        }
+    }
+}
+
+// Merge all stmts from src into dst, remapping indices
+fn module_merge_stmts(src_store: StmtStore, dst_store: &StmtStore, expr_off: i32, stmt_off: i32)
+{
+    for (i in 0 .. src_store.stmts.length)
+    {
+        dst_store.stmts.push(src_store.stmts[i])
+        let di = dst_store.stmts.length - 1
+        let tag = src_store.stmts[i].tag
+
+        // value_idx: ExprStore for these tags
+        if (tag == "return_expr" or tag == "expr" or tag == "print" or tag == "match_option_string"
+            or tag == "while" or tag == "for_range" or tag == "if" or tag == "match"
+            or tag == "field_assign" or tag == "store_deref" or tag == "store_index")
+        {
+            if (dst_store.stmts[di].value_idx >= 0) { dst_store.stmts[di].value_idx = dst_store.stmts[di].value_idx + expr_off }
+        }
+
+        // assign_idx: ExprStore for these tags
+        if (tag == "let" or tag == "assign" or tag == "field_assign"
+            or tag == "store_deref" or tag == "store_index" or tag == "for_range")
+        {
+            if (dst_store.stmts[di].assign_idx >= 0) { dst_store.stmts[di].assign_idx = dst_store.stmts[di].assign_idx + expr_off }
+        }
+
+        // assign_idx: StmtStore for "if" else-branch
+        if (tag == "if")
+        {
+            if (dst_store.stmts[di].assign_idx >= 0) { dst_store.stmts[di].assign_idx = dst_store.stmts[di].assign_idx + stmt_off }
+        }
+
+        // body_idx: StmtStore for while/for_range/if
+        if (tag == "while" or tag == "for_range" or tag == "if")
+        {
+            if (dst_store.stmts[di].body_idx >= 0) { dst_store.stmts[di].body_idx = dst_store.stmts[di].body_idx + stmt_off }
+        }
+
+        // print_idx: ExprStore for print
+        if (tag == "print")
+        {
+            if (dst_store.stmts[di].print_idx >= 0) { dst_store.stmts[di].print_idx = dst_store.stmts[di].print_idx + expr_off }
+        }
+
+        // direct_ret: repurposed as ExprStore index only in store_index
+        if (tag == "store_index")
+        {
+            if (dst_store.stmts[di].direct_ret >= 0) { dst_store.stmts[di].direct_ret = dst_store.stmts[di].direct_ret + expr_off }
+        }
+
+        // block: stmt_indices and legacy block_start are StmtStore
+        if (tag == "block")
+        {
+            if (dst_store.stmts[di].block_start >= 0) { dst_store.stmts[di].block_start = dst_store.stmts[di].block_start + stmt_off }
+            for (j in 0 .. dst_store.stmts[di].stmt_indices.length)
+            {
+                if (dst_store.stmts[di].stmt_indices[j] >= 0) { dst_store.stmts[di].stmt_indices[j] = dst_store.stmts[di].stmt_indices[j] + stmt_off }
+            }
+        }
+
+        // match: pattern indices are ExprStore, body indices are StmtStore
+        if (tag == "match")
+        {
+            for (j in 0 .. dst_store.stmts[di].match_pattern_indices.length)
+            {
+                if (dst_store.stmts[di].match_pattern_indices[j] >= 0) { dst_store.stmts[di].match_pattern_indices[j] = dst_store.stmts[di].match_pattern_indices[j] + expr_off }
+            }
+            for (j in 0 .. dst_store.stmts[di].match_body_indices.length)
+            {
+                if (dst_store.stmts[di].match_body_indices[j] >= 0) { dst_store.stmts[di].match_body_indices[j] = dst_store.stmts[di].match_body_indices[j] + stmt_off }
+            }
+            for (j in 0 .. dst_store.stmts[di].match_arms.length)
+            {
+                if (dst_store.stmts[di].match_arms[j].pattern_idx >= 0) { dst_store.stmts[di].match_arms[j].pattern_idx = dst_store.stmts[di].match_arms[j].pattern_idx + expr_off }
+                if (dst_store.stmts[di].match_arms[j].body_idx >= 0) { dst_store.stmts[di].match_arms[j].body_idx = dst_store.stmts[di].match_arms[j].body_idx + stmt_off }
+            }
+        }
+    }
+}
+
+// Load and merge all modules in the graph into a single AstProgram
+pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgram
+{
+    if (g.ok == 0 or g.modules.length == 0)
+    {
+        return root_program
+    }
+    
+    if (g.modules.length == 1)
+    {
+        return root_program
+    }
+    
+    let mut merged_fns: [AstFunction] = []
+    let mut merged_externs: [AstFunction] = []
+    let mut merged_globals: [AstStmt] = []
+    let mut merged_structs: [AstStructDecl] = []
+    let mut merged_adts: [AstAdtDecl] = []
+    let mut merged_es = expr_store_new()
+    let mut merged_store = stmt_store_new()
+    
+    module_merge_exprs(root_program.expr_store, merged_es, 0, 0)
+    module_merge_stmts(root_program.store, merged_store, 0, 0)
+    
+    for (i in 0 .. root_program.functions.length)
+    {
+        merged_fns.push(root_program.functions[i])
+    }
+    for (i in 0 .. root_program.extern_functions.length)
+    {
+        merged_externs.push(root_program.extern_functions[i])
+    }
+    for (i in 0 .. root_program.globals.length)
+    {
+        merged_globals.push(root_program.globals[i])
+    }
+    for (i in 0 .. root_program.structs.length)
+    {
+        merged_structs.push(root_program.structs[i])
+    }
+    for (i in 0 .. root_program.adts.length)
+    {
+        merged_adts.push(root_program.adts[i])
+    }
+    
+    for (mi in 1 .. g.modules.length)
+    {
+        let mnode = g.modules[mi]
+        let src = read_file_content(mnode.source_path)
+        if (src == "") { continue }
+        
+        let prog = parse_program(src, mnode.source_path)
+        if (prog.ok == 0) { continue }
+        
+        let prefix = module_strip_root_prefix(mnode.id.qualified_name)
+        let expr_off = merged_es.exprs.length
+        let stmt_off = merged_store.stmts.length
+        
+        module_merge_exprs(prog.expr_store, merged_es, expr_off, stmt_off)
+        module_merge_stmts(prog.store, merged_store, expr_off, stmt_off)
+        
+        for (i in 0 .. prog.functions.length)
+        {
+            let f = prog.functions[i]
+            let new_body_idx = if (f.body_idx >= 0) { f.body_idx + stmt_off } else { f.body_idx }
+            let new_name = if (prefix == "") { f.name } else { prefix + "::" + f.name }
+            merged_fns.push(AstFunction{
+                name: new_name,
+                ret_ty: f.ret_ty,
+                body_idx: new_body_idx,
+                param_names: f.param_names,
+                param_types: f.param_types,
+                type_params: f.type_params,
+                is_var_arg: f.is_var_arg,
+                line: f.line,
+                col: f.col
+            })
+        }
+        
+        for (i in 0 .. prog.extern_functions.length)
+        {
+            let already_have = 0
+            for (j in 0 .. merged_externs.length)
+            {
+                if (merged_externs[j].name == prog.extern_functions[i].name) { already_have = 1 }
+            }
+            if (already_have == 0)
+            {
+                merged_externs.push(prog.extern_functions[i])
+            }
+        }
+        
+        for (i in 0 .. prog.structs.length)
+        {
+            // 保持结构体本地名称不变：函数体内仍用 Counter，非 counter::Counter
+            merged_structs.push(prog.structs[i])
+        }
+        
+        for (i in 0 .. prog.adts.length)
+        {
+            merged_adts.push(prog.adts[i])
+        }
+    }
+    
+    return ast_program_full(merged_fns, merged_externs, merged_globals, merged_structs, merged_adts, [], [], merged_es, merged_store)
 }

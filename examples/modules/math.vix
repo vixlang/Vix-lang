@@ -1,0 +1,23 @@
+// math.vix — arithmetic module
+// 声明为模块文件，供主程序通过 mod math 引入
+
+pub fn add(a: i32, b: i32): i32
+{
+    return a + b
+}
+
+pub fn sub(a: i32, b: i32): i32
+{
+    return a - b
+}
+
+pub fn mul(a: i32, b: i32): i32
+{
+    return a * b
+}
+
+pub fn abs_val(n: i32): i32
+{
+    if (n < 0) { return 0 - n }
+    return n
+}

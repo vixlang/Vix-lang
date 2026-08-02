@@ -1,0 +1,35 @@
+// alias_example.vix — import … as 别名语法示例
+// 演示：as 关键字声明本地别名（别名解析正在开发中）
+//
+// 编译：
+//   vixc examples/modules/alias_example.vix --backend=self -o alias_example
+//   ./alias_example     # exit code: 0
+
+mod math
+
+// import … as 语法已可正确解析，别名调用支持正在完善中
+// 当前推荐使用限定名调用：module::function()
+import math::add as plus
+import math::sub as minus
+import math::mul as times
+import math::abs_val as abs_i
+
+fn main(): i32
+{
+    // 限定名调用（当前推荐方式）
+    let a = math::add(10, 3)     // 13
+    let b = math::mul(4, 5)      // 20
+    let c = math::sub(b, a)      // 7
+    let d = math::abs_val(0 - 6) // 6
+
+    print(a)  // 13
+    print(b)  // 20
+    print(c)  // 7
+    print(d)  // 6
+
+    // TODO: 别名调用将在后续版本中启用
+    // let a2 = plus(10, 3)   // 等价于 math::add(10, 3)
+    // let b2 = times(4, 5)   // 等价于 math::mul(4, 5)
+
+    return 0
+}

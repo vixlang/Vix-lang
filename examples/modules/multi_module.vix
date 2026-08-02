@@ -1,0 +1,41 @@
+// multi_module.vix — 多模块示例
+// 演示：同时声明多个模块并分别调用
+//
+// 文件结构：
+//   multi_module.vix   ← 入口
+//   math.vix           ← 数学模块
+//   counter.vix        ← 计数器模块（含结构体）
+//
+// 编译：
+//   vixc examples/modules/multi_module.vix --backend=self -o multi_module
+//   ./multi_module      # exit code: 0，打印运行结果
+
+mod math
+mod counter
+
+import math::add
+import math::mul
+import math::abs_val
+import counter::counter_new
+import counter::counter_inc
+import counter::counter_get
+
+fn main(): i32
+{
+    // 使用 math 模块
+    let sum  = math::add(10, 5)      // 15
+    let prod = math::mul(3, 7)       // 21
+    let neg  = math::abs_val(0 - 8)  // 8
+
+    print(math::add(sum, prod))  // 36
+
+    // 使用 counter 模块（结构体）
+    let mut c = counter::counter_new(3)
+    counter::counter_inc(c)  // value = 3
+    counter::counter_inc(c)  // value = 6
+    counter::counter_inc(c)  // value = 9
+
+    print(counter::counter_get(c))  // 9
+
+    return 0
+}

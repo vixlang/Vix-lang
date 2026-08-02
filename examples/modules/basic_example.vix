@@ -1,0 +1,23 @@
+// basic_example.vix — 基础模块示例
+// 演示：声明模块、导入符号、限定名调用
+//
+// 文件结构：
+//   basic_example.vix   ← 入口
+//   math.vix            ← math 模块（加减乘/绝对值）
+//
+// 编译：
+//   vixc examples/modules/basic_example.vix --backend=self -o basic_example
+//   ./basic_example     # exit code: 17
+
+mod math
+
+import math::add
+import math::mul
+
+fn main(): i32
+{
+    // 使用限定名调用
+    let a = math::add(3, 4)   // 7
+    let b = math::mul(2, 5)   // 10
+    return a + b               // 17
+}

@@ -1,0 +1,11 @@
+mod math
+
+import math::add
+import math::mul
+
+fn main(): i32
+{
+    let a = math::add(3, 4)
+    let b = math::mul(2, 5)
+    return a + b
+}

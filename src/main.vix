@@ -43,7 +43,7 @@ fn compiler_mode(arg: string): CompilerModeResult
 {
     if (arg == "-h" or arg == "--help") { return CompilerModeName("--help") }
     if (arg == "-v" or arg == "--version") { return CompilerModeName("--version") }
-    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--ast-json" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
+    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--ast-json" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "--module-graph" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
     return CompilerModeUnknown
 }
 
@@ -164,6 +164,7 @@ fn print_help(): i32
     print("  --typeinfer            Print type inference result to stdout")
     print("  --semantic             Print semantic analysis to stdout")
     print("  --debug=<mir|lir|asm|llvm> Print selected intermediate output to stdout")
+    print("  --module-graph         Print the module dependency graph and exit")
     print("  --explan=ERRORCODE     Explain a compiler error code, for example E3001")
     print("  -v, --version          Display compiler version information")
     print("  -h, --help             Display this help message")
@@ -291,6 +292,11 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             info_print(parse_program_stats(src, filename))
             return mode_success()
         }
+        "--module-graph" -> {
+            let g = module_graph_build(filename)
+            info_print(module_graph_debug(g))
+            return mode_success()
+        }
         _ -> {}
     }
 
@@ -333,8 +339,21 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         return mode_failure()
     }
 
+    // Multi-file: build module graph and merge all modules into one AstProgram
+    let mut merged_program = program
+    if (program.mod_decls.length > 0)
+    {
+        let g = module_graph_build(filename)
+        if (g.ok == 0)
+        {
+            diag_print(module_graph_debug(g))
+            return mode_failure()
+        }
+        merged_program = module_graph_load_all(g, program)
+    }
+
     let emit_semantic_warnings = if (mode == "codegen") { 0 } else { 1 }
-    let semantic_result = semantic_check_program_with_warnings(program, src, filename, emit_semantic_warnings)
+    let semantic_result = semantic_check_program_with_warnings(merged_program, src, filename, emit_semantic_warnings)
     match mode
     {
         "--semantic" -> {
@@ -382,7 +401,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         return mode_failure()
     }
 
-    let lowered_program = desugar_program(program)
+    let lowered_program = desugar_program(merged_program)
 
     if (mode == "debug_llvm")
     {

@@ -1,0 +1,19 @@
+// string_helpers.vix — 字符串工具函数
+// 作为 utils 子模块的一部分
+
+pub fn length(s: string): i32
+{
+    return s.length
+}
+
+pub fn is_empty(s: string): i32
+{
+    if (s.length == 0) { return 1 }
+    return 0
+}
+
+pub fn first_char(s: string): i8
+{
+    if (s.length > 0) { return s[0] }
+    return 0
+}

@@ -1,0 +1,11 @@
+// utils/mod.vix — utils 模块入口
+// 演示：目录作为模块（通过 mod.vix）
+
+pub mod string_helpers
+
+pub fn greet(name: string): i32
+{
+    print("Hello, ")
+    print(name)
+    return 0
+}

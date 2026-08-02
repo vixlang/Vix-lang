@@ -1,0 +1,6 @@
+mod greet
+
+fn main(): i32
+{
+    return greet::hello()
+}

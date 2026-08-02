@@ -1,0 +1,31 @@
+// nested_module.vix — 嵌套模块示例
+// 演示：utils/mod.vix 作为目录模块，包含子模块 string_helpers
+//
+// 文件结构：
+//   nested_module.vix           ← 入口
+//   utils/mod.vix               ← utils 模块入口
+//   utils/string_helpers.vix    ← utils 的子模块
+//
+// 编译：
+//   vixc examples/modules/nested_module.vix --backend=self -o nested_module
+//   ./nested_module     # exit code: 5
+
+mod utils
+
+import utils::greet
+import utils::string_helpers::length
+import utils::string_helpers::is_empty
+
+fn main(): i32
+{
+    utils::greet("Vix")
+    
+    let msg = "hello"
+    let len = utils::string_helpers::length(msg)
+    print(len)  // 5
+    
+    let empty = utils::string_helpers::is_empty("")
+    print(empty)  // 1
+    
+    return len  // 5
+}

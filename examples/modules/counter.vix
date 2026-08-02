@@ -1,0 +1,32 @@
+// counter.vix — 计数器模块
+// 演示模块中定义结构体和操作函数
+
+pub type Counter = struct {
+    value: i32,
+    step:  i32
+}
+
+pub fn counter_new(step: i32): Counter
+{
+    return Counter{ value: 0, step: step }
+}
+
+pub fn counter_inc(c: &Counter)
+{
+    c.value = c.value + c.step
+}
+
+pub fn counter_dec(c: &Counter)
+{
+    c.value = c.value - c.step
+}
+
+pub fn counter_reset(c: &Counter)
+{
+    c.value = 0
+}
+
+pub fn counter_get(c: &Counter): i32
+{
+    return c.value
+}
