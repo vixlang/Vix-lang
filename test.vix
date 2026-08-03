@@ -1,4 +1,20 @@
+extern "C"
+{
+    fn printf(fmt:string,...): i32
+}
+fn id:[T](value: T): T
+{
+    return value
+}
+
 fn main(): i32
 {
+    let number = id:[i32](42)
+    let flag = id:[bool](true)
+    if (flag)
+    {
+        return number
+    }
+    printf("%d",number)
     return 0
 }

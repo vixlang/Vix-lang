@@ -1,4 +1,4 @@
-fn id[T](value: T): T
+fn id:[T](value: T): T
 {
     return value
 }
