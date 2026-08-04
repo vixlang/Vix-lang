@@ -403,6 +403,21 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (ubase.ok == 0) { return ubase }
             infer_value_ok(subst_apply_ty(store, subst, elem))
         }
+        "slice" -> {
+            let base = hm_infer_expr(env, store, fresh, subst, structs, es, ss, expr.left_idx)
+            if (base.ok == 0) { return base }
+            let start = hm_infer_expr(env, store, fresh, subst, structs, es, ss, expr.right_idx)
+            if (start.ok == 0) { return start }
+            let finish = hm_infer_expr(env, store, fresh, subst, structs, es, ss, expr.args[0])
+            if (finish.ok == 0) { return finish }
+            let u1 = hm_unify(store, subst, start.ty, TyPrim(ty_prim_i32()), pos)
+            if (u1.ok == 0) { return u1 }
+            let u2 = hm_unify(store, subst, finish.ty, TyPrim(ty_prim_i32()), pos)
+            if (u2.ok == 0) { return u2 }
+            let ubase = hm_unify(store, subst, base.ty, TyPrim(ty_prim_string()), pos)
+            if (ubase.ok == 0) { return ubase }
+            infer_value_ok(TyPrim(ty_prim_string()))
+        }
         "addr" -> {
             let v = hm_infer_ident(env, store, fresh, expr.text, pos)
             if (v.ok == 0) { return v }

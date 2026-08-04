@@ -93,6 +93,10 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
         let base_ty = codegen_expr_type(b, es, expr_store_get(es, expr.left_idx))
         return type_text_index_element(base_ty)
     }
+    if (expr.tag == "slice")
+    {
+        return codegen_expr_type(b, es, expr_store_get(es, expr.left_idx))
+    }
     if (expr.tag == "unaryop")
     {
         if (expr.text == "!") { return "bool" }
@@ -438,6 +442,14 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
         let indices = [index]
         let slot = vix_LLVMBuildGEP2(b.builder, element_ty, base, indices, 1, llvm_temp(b, "idx"))
         return vix_LLVMBuildLoad2(b.builder, element_ty, slot, llvm_temp(b, "loadidx"))
+    }
+    if (expr.tag == "slice")
+    {
+        let base_expr = expr_store_get(es, expr.left_idx)
+        let base = codegen_expr_value_typed(b, es, store, base_expr, "string")
+        let start = codegen_expr_value_typed(b, es, store, expr_store_get(es, expr.right_idx), "i32")
+        let end = codegen_expr_value_typed(b, es, store, expr_store_get(es, expr.args[0]), "i32")
+        return llvm_build_call_value(b, "vix_string_slice", [base, start, end])
     }
     if (expr.tag == "binop") { return codegen_binop_expr_value_typed(b, es, store, expr, expected_ty) }
     if (expr.tag == "unaryop") { return codegen_unary_expr_value_typed(b, es, store, expr) }
@@ -1035,6 +1047,7 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
         register_function_sig(program.functions[i].name, program.functions[i].ret_ty, program.functions[i].param_types)
     }
     register_function_sig_vararg("vix_string_concat", "string", ["string", "string"], 0)
+    register_function_sig_vararg("vix_string_slice", "string", ["string", "i32", "i32"], 0)
     register_function_sig_vararg("vix_array_len", "i32", ["ptr"], 0)
     register_function_sig_vararg("vix_array_push_i32", "ptr", ["ptr", "i32"], 0)
     register_function_sig_vararg("vix_array_push_ptr", "ptr", ["ptr", "ptr"], 0)

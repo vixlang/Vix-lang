@@ -117,6 +117,7 @@ macro mir_register_builtin_function_sigs() {
     register_function_sig_vararg("vix_array_push_ptr", "ptr", ["ptr", "ptr"], 0)
     register_function_sig_vararg("vix_array_push_bytes", "ptr", ["ptr", "ptr", "usize"], 0)
     register_function_sig_vararg("vix_string_concat", "string", ["string", "string"], 0)
+    register_function_sig_vararg("vix_string_slice", "string", ["string", "i32", "i32"], 0)
 }
 
 pub fn mir_register_program(program: AstProgram)
@@ -176,6 +177,7 @@ pub fn mir_expr_type(es: &ExprStore, expr: AstExpr): string
             let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
             type_text_index_element(base_ty)
         }
+        "slice" -> mir_expr_type(es, expr_store_get(es, expr.left_idx))
         "unaryop" -> {
             if (expr.text == "!") { return "bool" }
             mir_expr_type(es, expr_store_get(es, expr.left_idx))
@@ -396,6 +398,16 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
         let out = mir_temp(b)
         mir_inst(b, out + " = load " + mir_type(elem_ty) + ", " + slot)
         return mir_cast_if_needed(b, MirValue{ name: out, ty: elem_ty }, expected_ty)
+    }
+    if (expr.tag == "slice")
+    {
+        let base_expr = expr_store_get(es, expr.left_idx)
+        let base = mir_expr_value_typed(b, es, store, base_expr, "ptr")
+        let start = mir_expr_value_typed(b, es, store, expr_store_get(es, expr.right_idx), "i32")
+        let finish = mir_expr_value_typed(b, es, store, expr_store_get(es, expr.args[0]), "i32")
+        let out = mir_temp(b)
+        mir_inst(b, out + " = call @vix_string_slice(ptr " + base.name + ", i32 " + start.name + ", i32 " + finish.name + "): ptr")
+        return MirValue{ name: out, ty: "string" }
     }
     if (expr.tag == "unaryop")
     {
@@ -1060,6 +1072,7 @@ pub fn mir_program(program: AstProgram): string
     out.push("    extern fn @vix_array_push_ptr(ptr, ptr): ptr")
     out.push("    extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr")
     out.push("    extern fn @vix_string_concat(ptr, ptr): ptr")
+    out.push("    extern fn @vix_string_slice(ptr, i32, i32): ptr")
     for (i in 0 .. program.functions.length)
     {
         out.push("")

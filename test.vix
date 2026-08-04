@@ -1,20 +1,102 @@
-extern "C"
+fn contains_char(s: string, c: i8): i32
 {
-    fn printf(fmt:string,...): i32
+    for (i in 0 .. s.length)
+    {
+        if (s[i] == c)
+        {
+            return 1
+        }
+    }
+    return 0
 }
-fn id:[T](value: T): T
+
+fn find_first_not_of(s: string, chars: string): i32
 {
-    return value
+    for (i in 0 .. s.length)
+    {
+        if (!contains_char(chars, s[i]))
+        {
+            return i
+        }
+    }
+    return -1
+}
+
+fn find_last_not_of(s: string, chars: string): i32
+{
+    let mut i = s.length - 1
+
+    while (i >= 0)
+    {
+        if (!contains_char(chars, s[i]))
+        {
+            return i + 1
+        }
+        i -= 1
+    }
+    return -1
+}
+
+fn trim(s: string): string
+{
+    let mut start = 0
+    while (start < s.length and contains_char(" ", s[start]))
+    {
+        start += 1
+    }
+
+    let mut end = s.length
+    while (end > start and contains_char(" ", s[end - 1]))
+    {
+        end -= 1
+    }
+
+    if (start == end)
+    {
+        return ""
+    }
+
+    return s[start..end]
+}
+
+fn uppercase(s: string): string
+{
+    return s
+}
+
+fn split(s: string, delimiter: string): [string]
+{
+    let mut result: [string] = []
+    let mut start = 0
+    let separator = delimiter[0]
+
+    for (i in 0 .. s.length)
+    {
+        if (s[i] == separator)
+        {
+            result.push(s[start..i])
+            start = i + 1
+        }
+    }
+
+    result.push(s[start .. s.length])
+
+    return result
 }
 
 fn main(): i32
 {
-    let number = id:[i32](42)
-    let flag = id:[bool](true)
-    if (flag)
+
+    let result =
+        "  hello vix  "
+        |> trim
+        |> uppercase
+        |> split(" ")
+
+    for (item in result)
     {
-        return number
+        print(item)
     }
-    printf("%d",number)
     return 0
+
 }

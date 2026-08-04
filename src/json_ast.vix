@@ -106,6 +106,7 @@ pub fn json_ast_expr(es: &ExprStore, store: &StmtStore, idx: i32): string
         "unaryop" -> "{\"type\":\"UnaryExpression\",\"operator\":" + json_ast_quote(expr.text) + ",\"operand\":" + json_ast_expr(es, store, expr.left_idx) + "," + loc + "}"
         "call" -> "{\"type\":\"CallExpression\",\"callee\":" + json_ast_quote(expr.text) + ",\"typeArguments\":" + json_ast_string_array(expr.type_args) + ",\"arguments\":" + json_ast_expr_array(es, store, expr.args) + "," + loc + "}"
         "index" -> "{\"type\":\"IndexExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"index\":" + json_ast_expr(es, store, expr.right_idx) + "," + loc + "}"
+        "slice" -> "{\"type\":\"SliceExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"start\":" + json_ast_expr(es, store, expr.right_idx) + ",\"end\":" + json_ast_expr(es, store, expr.args[0]) + "," + loc + "}"
         "addr" -> "{\"type\":\"AddressOfExpression\",\"name\":" + json_ast_quote(expr.text) + "," + loc + "}"
         "deref" -> "{\"type\":\"DerefExpression\",\"operand\":" + json_ast_expr(es, store, expr.left_idx) + "," + loc + "}"
         "field" -> "{\"type\":\"FieldExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"field\":" + json_ast_quote(expr.text) + "," + loc + "}"

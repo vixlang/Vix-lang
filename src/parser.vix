@@ -140,7 +140,33 @@ pub fn parser_expect_kind(parser: &Parser, kind: i32): i32
 
 pub fn parse_expression(parser: &Parser): i32
 {
-    return parse_logical_or(parser)
+    let mut left = parse_logical_or(parser)
+    if (parser.ok == 0) { return -1 }
+    while (parser_text(parser) == "|>")
+    {
+        let line = parser_line(parser)
+        let col = parser_col(parser)
+        parser_advance(parser)
+        let right = parse_postfix(parser)
+        if (parser.ok == 0) { return -1 }
+        let target = expr_store_get(parser.expr_store, right)
+        if (target.tag == "call")
+        {
+            let mut args: [i32] = [left]
+            for (i in 0 .. target.args.length) { args.push(target.args[i]) }
+            left = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, target.text, target.type_args, args), line, col)
+        }
+        elif (target.tag == "ident")
+        {
+            left = parser_expr_at(parser, ast_expr_call(parser.expr_store, target.text, [left]), line, col)
+        }
+        else
+        {
+            parser_fail(parser, "pipeline target must be a function call or identifier")
+            return -1
+        }
+    }
+    return left
 }
 
 pub fn parse_logical_or(parser: &Parser): i32
@@ -382,6 +408,16 @@ pub fn parse_postfix_continue(parser: &Parser, expr_idx: i32): i32
             parser_advance(parser)
             let index_idx = parse_expression(parser)
             if (parser.ok == 0) { return -1 }
+            if (parser_text(parser) == "..")
+            {
+                parser_advance(parser)
+                let end_idx = parse_expression(parser)
+                if (parser.ok == 0) { return -1 }
+                parser_expect_text(parser, "]")
+                if (parser.ok == 0) { return -1 }
+                expr = parser_expr_at(parser, ast_expr_slice(parser.expr_store, expr, index_idx, end_idx), line, col)
+                continue
+            }
             parser_expect_text(parser, "]")
             if (parser.ok == 0) { return -1 }
             expr = parser_expr_at(parser, ast_expr_index(parser.expr_store, expr, index_idx), line, col)
@@ -1128,6 +1164,30 @@ pub fn parse_for_statement(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     let start_idx = parse_expression(parser)
     if (parser.ok == 0) { return -1 }
+    if (parser_text(parser) == ")")
+    {
+        parser_advance(parser)
+        let body_idx = parse_block_statement(parser)
+        if (parser.ok == 0) { return -1 }
+        let synthetic = "__for_each_i" + ast_i32(parser.store.stmts.length)
+        let zero_idx = ast_expr_int(parser.expr_store, 0)
+        let length_idx = ast_expr_field(parser.expr_store, start_idx, "length")
+        let iter_idx = ast_expr_identifier(parser.expr_store, synthetic)
+        let item_idx = ast_expr_index(parser.expr_store, start_idx, iter_idx)
+        let bind_idx = ast_stmt_let_typed_mut(parser.store, name, "", item_idx, 0)
+        let body = stmt_store_get(parser.store, body_idx)
+        let mut body_indices: [i32] = [bind_idx]
+        if (body.stmt_indices.length > 0)
+        {
+            for (i in 0 .. body.stmt_indices.length) { body_indices.push(body.stmt_indices[i]) }
+        }
+        else
+        {
+            for (i in 0 .. body.block_count) { body_indices.push(body.block_start + i) }
+        }
+        let combined_body = ast_stmt_block_indices(parser.store, body_indices)
+        return parser_stmt_at(parser, ast_stmt_for_range(parser.store, synthetic, zero_idx, length_idx, combined_body), name_line, name_col)
+    }
     parser_expect_text(parser, "..")
     if (parser.ok == 0) { return -1 }
     let end_idx = parse_expression(parser)

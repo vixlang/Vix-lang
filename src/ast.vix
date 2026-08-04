@@ -253,6 +253,11 @@ pub fn ast_expr_index(store: &ExprStore, base_idx: i32, index_idx: i32): i32
     return expr_store_add(store, AstExpr{ tag: "index", text: "", int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: index_idx, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
 }
 
+pub fn ast_expr_slice(store: &ExprStore, base_idx: i32, start_idx: i32, end_idx: i32): i32
+{
+    return expr_store_add(store, AstExpr{ tag: "slice", text: "", int_value: 0, float_value: 0.0, left_idx: base_idx, right_idx: start_idx, args: [end_idx], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+}
+
 pub fn ast_expr_addr(store: &ExprStore, name: string): i32
 {
     return expr_store_add(store, AstExpr{ tag: "addr", text: name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
@@ -553,6 +558,7 @@ pub fn ast_expr_debug(store: &ExprStore, idx: i32): string
         "unaryop" -> "(" + expr.text + ast_expr_debug(store, expr.left_idx) + ")"
         "call" -> expr.text + "(...)"
         "index" -> ast_expr_debug(store, expr.left_idx) + "[" + ast_expr_debug(store, expr.right_idx) + "]"
+        "slice" -> ast_expr_debug(store, expr.left_idx) + "[" + ast_expr_debug(store, expr.right_idx) + ".." + ast_expr_debug(store, expr.args[0]) + "]"
         "addr" -> "&" + expr.text
         "deref" -> "@" + ast_expr_debug(store, expr.left_idx)
         "field" -> ast_expr_debug(store, expr.left_idx) + "." + expr.text

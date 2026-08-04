@@ -103,3 +103,24 @@ void *vix_string_concat(const char *a, const char *b) {
   result[len_a + len_b] = '\0';
   return result;
 }
+
+char *vix_string_slice(const char *s, int start, int end) {
+  if (s == NULL)
+    s = "";
+  size_t length = strlen(s);
+  if (start < 0)
+    start = 0;
+  if (end < start)
+    end = start;
+  if ((size_t)start > length)
+    start = (int)length;
+  if ((size_t)end > length)
+    end = (int)length;
+  size_t count = (size_t)(end - start);
+  char *result = (char *)malloc(count + 1);
+  if (result == NULL)
+    return NULL;
+  memcpy(result, s + start, count);
+  result[count] = '\0';
+  return result;
+}

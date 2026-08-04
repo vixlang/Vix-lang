@@ -472,6 +472,9 @@ pub fn tokenize(src: string): TokenStream
                                     ':' -> {
                                         if (next == ':') { symbol = "::" }
                                     }
+                                    '|' -> {
+                                        if (next == '>') { symbol = "|>" }
+                                    }
                                     _ -> {}
                                 }
                                 symbol_len = symbol.length

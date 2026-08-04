@@ -1,0 +1,9 @@
+let adults = users.filter(.age >= 18)
+let names  = users.map(.name)
+let admin  = users.find(.role == "admin")
+
+
+let adults = users.filter(fn(user)
+{
+    return user.age >= 18
+})

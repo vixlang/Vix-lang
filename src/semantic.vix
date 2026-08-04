@@ -441,6 +441,11 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
             semantic_check_expr(scope, program, expr.right_idx, result, source, filename, func_name)
         }
+        "slice" -> {
+            semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
+            semantic_check_expr(scope, program, expr.right_idx, result, source, filename, func_name)
+            semantic_check_expr(scope, program, expr.args[0], result, source, filename, func_name)
+        }
         "unaryop" -> {
             semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
         }

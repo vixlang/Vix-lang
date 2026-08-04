@@ -275,6 +275,10 @@ pub fn desugar_expr(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: 
     {
         return ast_expr_index(es, desugar_expr(adts, es, store, expr.left_idx), desugar_expr(adts, es, store, expr.right_idx))
     }
+    if (expr.tag == "slice")
+    {
+        return ast_expr_slice(es, desugar_expr(adts, es, store, expr.left_idx), desugar_expr(adts, es, store, expr.right_idx), desugar_expr(adts, es, store, expr.args[0]))
+    }
     if (expr.tag == "field")
     {
         return ast_expr_field(es, desugar_expr(adts, es, store, expr.left_idx), expr.text)
