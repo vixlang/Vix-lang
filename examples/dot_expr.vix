@@ -1,9 +1,19 @@
-let adults = users.filter(.age >= 18)
-let names  = users.map(.name)
-let admin  = users.find(.role == "admin")
-
-
-let adults = users.filter(fn(user)
+type User = struct
 {
-    return user.age >= 18
-})
+    name: string,
+    age: i32,
+    role: string
+}
+
+
+fn main(): i32
+{
+    let users = [
+    User{name="a", age=20, role="admin"},
+    User{name="b", age=15, role="user"},
+    User{name="c", age=25, role="user"}]
+
+    let adults = users.filter(.age >= 18)
+    let names  = users.map(.name)
+    let admin  = users.find(.role == "admin")
+}
