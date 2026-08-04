@@ -1,0 +1,14 @@
+fn read_at(base: ptr, offset: i32): i32 {
+    return @(base + offset)
+}
+
+fn main(): i32 {
+    let mut values = [11, 22, 33, 44, 55]
+    let base = ref values
+    let p1 = base + 1
+    let p2 = p1 + 1
+    @p2 = @p2 + 100
+    let reverse = read_at(base, 2) + read_at(p2, -2)
+    let edge = @(base + 4)
+    return reverse + edge
+}

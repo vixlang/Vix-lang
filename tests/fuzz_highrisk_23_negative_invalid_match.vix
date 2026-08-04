@@ -1,0 +1,8 @@
+type Choice = Left(i32) | Right(string)
+
+fn main(): i32 {
+    let x = Left(3) : Choice
+    match x {
+        Left(v) -> return v
+    }
+}

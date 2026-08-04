@@ -1,0 +1,6 @@
+type Node:[T] = struct { value: T, next: Node:[T] }
+
+fn main(): i32 {
+    let x = Node:[i32]{ value: 1, next: Node:[i32]{ value: 2, next: x } }
+    return x.value
+}

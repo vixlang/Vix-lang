@@ -414,6 +414,8 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (u1.ok == 0) { return u1 }
             let u2 = hm_unify(store, subst, finish.ty, TyPrim(ty_prim_i32()), pos)
             if (u2.ok == 0) { return u2 }
+            let base_ty = subst_apply_ty(store, subst, base.ty)
+            if (ty_is_array(base_ty) == 1) { return infer_value_ok(base_ty) }
             let ubase = hm_unify(store, subst, base.ty, TyPrim(ty_prim_string()), pos)
             if (ubase.ok == 0) { return ubase }
             infer_value_ok(TyPrim(ty_prim_string()))

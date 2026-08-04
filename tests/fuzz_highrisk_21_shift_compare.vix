@@ -1,0 +1,16 @@
+fn fold(x: i32): i32 {
+    let a = x << 1
+    let b = a >> 2
+    let c = (b <= x) == true
+    let d = (x != 0) and (a >= b)
+    if (c and d) { return a + b }
+    return a - b
+}
+
+fn main(): i32 {
+    let mut total = 0
+    for (i in -32 .. 33) {
+        total = total + fold(i)
+    }
+    return total
+}

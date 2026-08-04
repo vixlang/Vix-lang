@@ -1,0 +1,15 @@
+macro $field(name: ident) {
+    fn $name(x: i32): i32 { return x + 3 }
+}
+macro $apply[items: expr*] { [$(items),*] }
+
+$field(f0)
+$field(f1)
+$field(f2)
+
+fn main(): i32 {
+    let mut total = 0
+    let xs = $apply[f0(1), f1(2), f2(3)]
+    for (i in 0 .. xs.length) { total = total + xs[i] }
+    return total
+}

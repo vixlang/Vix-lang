@@ -1,0 +1,15 @@
+let mut values: [i32] = []
+
+fn append_many(): i32 {
+    for (i in 0 .. 128) {
+        values.push(i * 3 - 17)
+    }
+    return values.length
+}
+
+fn main(): i32 {
+    let before = append_many()
+    values.push(999)
+    values.push(-999)
+    return before + values[0] + values[127] + values[128] + values[129]
+}

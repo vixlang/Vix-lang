@@ -1,0 +1,20 @@
+type Point = struct { x: i32, y: i32 }
+type Bucket = struct { points: [Point], count: i32 }
+
+fn total(b: &Bucket): i32 {
+    let mut out = 0
+    for (i in 0 .. b.points.length) { out = out + b.points[i].x + b.points[i].y }
+    return out + b.count
+}
+
+fn main(): i32 {
+    let mut b = Bucket{ points: [], count: 0 }
+    for (i in 0 .. 24) {
+        b.points.push(Point{ x: i, y: i * i })
+        b.count = b.count + 1
+    }
+    let mut p = b.points[17]
+    p.x = p.x + 1000
+    b.points[17] = p
+    return total(&b)
+}

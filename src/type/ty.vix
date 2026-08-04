@@ -247,6 +247,16 @@ pub fn ty_is_var(ty: Ty): i32
     return 0
 }
 
+pub fn ty_is_array(ty: Ty): i32
+{
+    match ty
+    {
+        TyArray(_) -> { return 1 }
+        _ -> {}
+    }
+    return 0
+}
+
 pub fn ty_var_id_or(ty: Ty, fallback: i32): i32
 {
     match ty

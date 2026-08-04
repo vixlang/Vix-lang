@@ -1,0 +1,14 @@
+extern "C" {
+    fn printf(format: ptr, ...): i32
+}
+
+type Payload = struct { x: i32, y: i32 }
+type Result = Ok(i32) | Fail(string)
+
+fn main(): i32 {
+    let p = Payload{ x: 1, y: 2 }
+    let r = Ok(7)
+    let xs = [1, 2, 3]
+    let a = printf("%d %d %d\n", p.x, r, xs[0])
+    return a
+}

@@ -1,0 +1,17 @@
+type Box = struct { data: [i32], text: string }
+
+fn inspect(x: &Box): i32 {
+    return x.data[0] + x.data[1]
+}
+
+fn consume(x: Box): i32 { return x.data[0] }
+
+fn main(): i32 {
+    let mut b = Box{ data: [9, 8, 7], text: "borrow-move" }
+    let r = &b
+    let before = inspect(r)
+    let alias = r
+    let observed = inspect(alias)
+    let moved = consume(b)
+    return before + observed + moved
+}

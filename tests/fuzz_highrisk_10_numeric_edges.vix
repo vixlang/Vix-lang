@@ -1,0 +1,12 @@
+fn main(): i32 {
+    let a: i32 = -2147483648
+    let b: i32 = 2147483647
+    let z = 0
+    let q = a / -1
+    let r = b + 1
+    let s = a - 1
+    let t = (1 << 31) >> 31
+    let u = (z == 0 and true) or false
+    if (u and (q == a or r == s)) { return t + 1 }
+    return q + r + s + t
+}

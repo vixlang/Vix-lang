@@ -1158,7 +1158,7 @@ pub fn mir2asm_emit_call(b: &MirAsm, dest: string, rhs: string)
             let mut pass_stack_addr = 0
             if (val_idx >= 0 and (arg_ty == "ptr" or mir2asm_starts_with(arg_ty, "ptr:") == 1))
             {
-                if (b.is_addr[val_idx] == 1) { pass_stack_addr = 1 }
+                if (b.is_addr[val_idx] == 1 and b.slot_tys[val_idx] != arg_ty) { pass_stack_addr = 1 }
                 elif (arg_ty == "ptr" and mir2asm_type_is_struct_value(b, b.slot_tys[val_idx]) == 1) { pass_stack_addr = 1 }
                 elif (mir2asm_starts_with(arg_ty, "ptr:") == 1 and mir2asm_type_is_struct_value(b, b.slot_tys[val_idx]) == 1) { pass_stack_addr = 1 }
             }

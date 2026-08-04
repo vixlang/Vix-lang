@@ -1,0 +1,10 @@
+fn inc(x: i32): i32 { return x + 1 }
+fn twice(x: i32): i32 { return x * 2 }
+
+fn apply(f: ptr, x: i32): i32 { return f(x) }
+
+fn main(): i32 {
+    let a = apply(inc, 4)
+    let b = apply(twice, a)
+    return apply(inc, b) + apply(twice, b)
+}

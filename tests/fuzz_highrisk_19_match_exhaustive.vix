@@ -1,0 +1,20 @@
+type State = Init | Ready | Running(i32) | Failed(string) | Done
+
+fn weight(s: State): i32 {
+    match s {
+        Init -> { return 1 }
+        Ready -> { return 2 }
+        Running(n) -> { return n + 3 }
+        Failed(message) -> { return message.length }
+        Done -> { return 5 }
+    }
+}
+
+fn main(): i32 {
+    let states = [Init, Ready, Running(7), Failed("x"), Done]
+    let mut total = 0
+    for (i in 0 .. states.length) {
+        total = total + weight(states[i])
+    }
+    return total
+}

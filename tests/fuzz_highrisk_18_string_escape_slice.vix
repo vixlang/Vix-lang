@@ -1,0 +1,15 @@
+fn score(s: string): i32 {
+    let mut n = 0
+    for (i in 0 .. s.length) {
+        n = n + s[i]
+    }
+    return n
+}
+
+fn main(): i32 {
+    let s = "\\0\\07\\033\\x41\\n\\t\\\\\\\""
+    let a = s[0..1]
+    let b = s[1..s.length - 1]
+    let c = s[s.length - 1..s.length]
+    return score(a) + score(b) + score(c) + s.length
+}

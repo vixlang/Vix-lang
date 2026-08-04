@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -85,6 +86,38 @@ void *vix_array_push_ptr(void *arr, void *val) {
 
 void *vix_array_push_bytes(void *arr, void *val, size_t elem_size) {
   return vix_array_push_raw(arr, val, elem_size);
+}
+
+void *vix_array_slice_bytes(void *arr, int start, int end, size_t elem_size) {
+  if (arr == NULL || elem_size == 0)
+    return NULL;
+  int length = vix_array_len(arr);
+  if (start < 0) start = 0;
+  if (end < start) end = start;
+  if (start > length) start = length;
+  if (end > length) end = length;
+  size_t count = (size_t)(end - start);
+  if (count == 0 || count > (SIZE_MAX - VIX_ARRAY_HEADER_BYTES) / elem_size)
+    return NULL;
+  size_t total_bytes = VIX_ARRAY_HEADER_BYTES + count * elem_size;
+  int *header = (int *)malloc(total_bytes);
+  if (header == NULL) return NULL;
+  header[0] = (int)count;
+  header[1] = (int)count;
+  memcpy((char *)header + VIX_ARRAY_HEADER_BYTES,
+         (char *)arr + VIX_ARRAY_HEADER_BYTES + (size_t)start * elem_size,
+         count * elem_size);
+  return (char *)header + VIX_ARRAY_HEADER_BYTES;
+}
+
+int vix_safe_sdiv_i32(int left, int right) {
+  if (right == 0 || (left == INT32_MIN && right == -1)) return 0;
+  return left / right;
+}
+
+int vix_safe_srem_i32(int left, int right) {
+  if (right == 0 || (left == INT32_MIN && right == -1)) return 0;
+  return left % right;
 }
 
 void *vix_string_concat(const char *a, const char *b) {

@@ -1,0 +1,16 @@
+type Expr = Num(i32) | Wrap(Expr) | Ref(&Expr) | Empty
+
+fn eval(e: Expr): i32 {
+    match e {
+        Num(n) -> n
+        Wrap(a) -> eval(a) + 1
+        Ref(x) -> eval(@x)
+        Empty -> 0
+    }
+}
+
+fn main(): i32 {
+    let a = Num(17)
+    let b = Wrap(Wrap(Ref(&a)))
+    return eval(b)
+}

@@ -1,0 +1,18 @@
+fn main(): i32 {
+    let mut acc = 0
+    let mut i = 0
+    while (i < 12) {
+        let mut j = 0
+        while (j < 12) {
+            if ((i + j) % 3 == 0) {
+                acc = acc + i * j
+            } else {
+                if (i == 7 and j == 5) { acc = acc + 19 }
+                else { acc = acc - 1 }
+            }
+            j = j + 1
+        }
+        i = i + 1
+    }
+    return acc
+}

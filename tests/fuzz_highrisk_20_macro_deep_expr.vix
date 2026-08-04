@@ -1,0 +1,15 @@
+macro $twice(x: expr) { ($x + $x) }
+macro $four(x: expr) { $twice($twice($x)) }
+macro $eight(x: expr) { $twice($four($x)) }
+macro $make(name: ident) {
+    fn $name(x: i32): i32 { return $eight(x) }
+}
+
+$make(expand_a)
+$make(expand_b)
+
+fn main(): i32 {
+    let a = expand_a(1)
+    let b = expand_b($four(2))
+    return a + b + $eight(3)
+}
