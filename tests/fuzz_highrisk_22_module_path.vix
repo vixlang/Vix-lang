@@ -1,8 +1,0 @@
-import "modules/math.vix"
-
-fn main(): i32 {
-    let a = math::add(3, 4)
-    let b = math::mul(a, 5)
-    let c = math::sub(b, math::add(1, 2))
-    return c
-}

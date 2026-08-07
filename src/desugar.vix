@@ -70,10 +70,15 @@ pub fn desugar_adt_literal(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore
     ]
     if (payload_ty != "" and args.length > 0)
     {
-        let payload_field = desugar_adt_payload_field(concrete_payload_ty)
+        let mut resolved_payload_ty = concrete_payload_ty
+        if ((resolved_payload_ty == "" or desugar_is_type_param(decl, resolved_payload_ty) == 1) and args.length > 0)
+        {
+            resolved_payload_ty = desugar_expr_simple_type(adts, es, args[0])
+        }
+        let resolved_payload_field = desugar_adt_payload_field(resolved_payload_ty)
         for (i in 0 .. field_names.length)
         {
-            if (field_names[i] == payload_field)
+            if (field_names[i] == resolved_payload_field)
             {
                 field_values[i] = desugar_expr(adts, es, store, args[0])
             }
@@ -264,6 +269,11 @@ pub fn desugar_expr(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: 
     }
     if (expr.tag == "call")
     {
+        let variant_decl_idx = desugar_find_variant(adts, expr.text)
+        if (variant_decl_idx >= 0)
+        {
+            return desugar_adt_literal(adts, es, store, expr.text, expr.args, adts[variant_decl_idx].name)
+        }
         let mut args: [i32] = []
         for (i in 0 .. expr.args.length)
         {
@@ -410,20 +420,30 @@ pub fn desugar_expr_simple_type(adts: [AstAdtDecl], es: &ExprStore, idx: i32): s
 
 pub fn desugar_match_body_with_binding(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, subject_idx: i32, subject_ty: string, pattern_idx: i32, body_idx: i32): i32
 {
-    if (pattern_idx < 0) { return desugar_stmt(adts, es, store, body_idx) }
+    if (pattern_idx < 0) { return desugar_match_arm_body(adts, es, store, body_idx) }
     let pattern = expr_store_get(es, pattern_idx)
     if (pattern.tag != "call") { return desugar_stmt(adts, es, store, body_idx) }
     let decl_idx = desugar_find_variant(adts, pattern.text)
-    if (decl_idx < 0 or pattern.args.length == 0) { return desugar_stmt(adts, es, store, body_idx) }
+    if (decl_idx < 0 or pattern.args.length == 0) { return desugar_match_arm_body(adts, es, store, body_idx) }
     let local_idx = desugar_find_variant_local(adts, pattern.text)
     let payload_ty = adts[decl_idx].variant_payload_types[local_idx]
     let payload_param_ty = desugar_resolve_payload_type(adts[decl_idx], subject_ty, payload_ty)
     let bind_expr = expr_store_get(es, pattern.args[0])
-    if (bind_expr.tag != "ident" or bind_expr.text == "_") { return desugar_stmt(adts, es, store, body_idx) }
+    if (bind_expr.tag != "ident" or bind_expr.text == "_") { return desugar_match_arm_body(adts, es, store, body_idx) }
     let field_idx = ast_expr_field(es, subject_idx, desugar_adt_payload_field(payload_param_ty))
     let let_idx = ast_stmt_let_typed(store, bind_expr.text, desugar_adt_storage_type(payload_param_ty), field_idx)
-    let new_body = desugar_stmt(adts, es, store, body_idx)
+    let new_body = desugar_match_arm_body(adts, es, store, body_idx)
     return ast_stmt_block_indices(store, [let_idx, new_body])
+}
+
+pub fn desugar_match_arm_body(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, body_idx: i32): i32
+{
+    let body = stmt_store_get(store, body_idx)
+    if (body.tag == "expr")
+    {
+        return ast_stmt_return_expr(store, desugar_expr(adts, es, store, body.value_idx))
+    }
+    return desugar_stmt(adts, es, store, body_idx)
 }
 
 pub fn desugar_match_stmt_from(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, subject_idx: i32, subject_ty: string, patterns: [i32], bodies: [i32], arm_idx: i32): i32
@@ -432,7 +452,7 @@ pub fn desugar_match_stmt_from(adts: [AstAdtDecl], es: &ExprStore, store: &StmtS
     let pattern_idx = patterns[arm_idx]
     if (pattern_idx < 0)
     {
-        return desugar_stmt(adts, es, store, bodies[arm_idx])
+        return desugar_match_arm_body(adts, es, store, bodies[arm_idx])
     }
     let pattern = expr_store_get(es, pattern_idx)
     if (pattern.tag == "call" or pattern.tag == "ident")
@@ -448,7 +468,7 @@ pub fn desugar_match_stmt_from(adts: [AstAdtDecl], es: &ExprStore, store: &StmtS
         }
     }
     let cond_idx2 = ast_expr_binop(es, "==", subject_idx, desugar_expr(adts, es, store, pattern_idx))
-    let then_idx2 = desugar_stmt(adts, es, store, bodies[arm_idx])
+    let then_idx2 = desugar_match_arm_body(adts, es, store, bodies[arm_idx])
     let else_idx2 = desugar_match_stmt_from(adts, es, store, subject_idx, subject_ty, patterns, bodies, arm_idx + 1)
     return ast_stmt_if(store, cond_idx2, then_idx2, else_idx2)
 }
@@ -882,12 +902,9 @@ pub fn desugar_function_with_globals(adts: [AstAdtDecl], es: &ExprStore, store: 
     let mut param_types: [string] = []
     let mut names: [string] = []
     let mut types: [string] = []
-    let mut prefix_indices: [i32] = []
     for (g in 0 .. globals.length)
     {
         let global_stmt = globals[g]
-        let global_idx = desugar_global_let(adts, es, store, global_stmt)
-        prefix_indices.push(global_idx)
         let mut global_ty = desugar_expr_adt_type(adts, es, global_stmt.assign_idx, global_stmt.type_text)
         if (global_stmt.type_text != "") { global_ty = global_stmt.type_text }
         if (global_ty != "")
@@ -906,11 +923,6 @@ pub fn desugar_function_with_globals(adts: [AstAdtDecl], es: &ExprStore, store: 
         }
     }
     let body_idx = desugar_stmt_env(adts, es, store, func.body_idx, names, types)
-    if (prefix_indices.length > 0)
-    {
-        prefix_indices.push(body_idx)
-        return ast_function_with_loc(ast_function_full_vararg(func.name, func.ret_ty, ast_stmt_block_indices(store, prefix_indices), func.param_names, param_types, func.is_var_arg), func.line, func.col)
-    }
     return ast_function_with_loc(ast_function_full_vararg(func.name, func.ret_ty, body_idx, func.param_names, param_types, func.is_var_arg), func.line, func.col)
 }
 
@@ -945,5 +957,5 @@ pub fn desugar_program(program: AstProgram): AstProgram
     {
         functions.push(desugar_function_with_globals(program.adts, &es, &store, generic_parts.globals, generic_parts.functions[m]))
     }
-    return ast_program_ok_functions_with_externs_globals_structs_and_adts(functions, extern_functions, [], structs, program.adts, es, store)
+    return ast_program_ok_functions_with_externs_globals_structs_and_adts(functions, extern_functions, generic_parts.globals, structs, program.adts, es, store)
 }

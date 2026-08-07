@@ -1,4 +1,5 @@
 type Kind = IntKind | StringKind
+type Post:[T] = Draft(T) | Published(T)
 
 fn kind_name(kind: Kind): string
 {
@@ -8,8 +9,17 @@ fn kind_name(kind: Kind): string
     }
 }
 
+fn post_name(post: Post[string]): string
+{
+    match post
+    {
+        Draft(t) -> "[draft] " + t
+        Published(t) -> "[published] " + t
+    }
+}
+
 fn main(): i32
 {
-    if (kind_name(IntKind) == "i32" and kind_name(StringKind) == "string") { return 0 }
+    if (kind_name(IntKind) == "i32" and kind_name(StringKind) == "string" and post_name(Draft("hello vix")) == "[draft] hello vix") { return 0 }
     return 1
 }
