@@ -1057,6 +1057,20 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
     {
         register_function_sig(program.functions[i].name, program.functions[i].ret_ty, program.functions[i].param_types)
     }
+    for (i in 0 .. program.globals.length)
+    {
+        let global_stmt = program.globals[i]
+        let global_expr = expr_store_get(program.expr_store, global_stmt.assign_idx)
+        let global_ty = if (global_stmt.type_text != "") { global_stmt.type_text } else { codegen_expr_type(b, program.expr_store, global_expr) }
+        if (global_expr.tag == "int" or global_expr.tag == "bool")
+        {
+            llvm_define_global(b, global_stmt.assign_name, global_ty, llvm_const_i32(global_expr.int_value))
+        }
+        elif (global_expr.tag == "string")
+        {
+            llvm_define_global(b, global_stmt.assign_name, global_ty, get_c_string_global(b, ".global." + global_stmt.assign_name, global_expr.text))
+        }
+    }
     register_function_sig_vararg("vix_string_concat", "string", ["string", "string"], 0)
     register_function_sig_vararg("vix_string_slice", "string", ["string", "i32", "i32"], 0)
     register_function_sig_vararg("vix_array_len", "i32", ["ptr"], 0)
@@ -1070,6 +1084,14 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
     {
         let fn_llvm_name = mangle_flat_name(program.functions[i].name)
         llvm_emit_function_header_with_params(b, fn_llvm_name, program.functions[i].ret_ty, program.functions[i].param_names, program.functions[i].param_types)
+        for (g in 0 .. program.globals.length)
+        {
+            let global_stmt = program.globals[g]
+            let global_ty = if (global_stmt.type_text != "") { global_stmt.type_text } else { "i32" }
+            let global_ref = vix_LLVMGetNamedGlobal(b.module, global_stmt.assign_name)
+            set_var(b, global_stmt.assign_name, global_ref)
+            set_var_type(b, global_stmt.assign_name, global_ty)
+        }
         set_var(b, "__return", b.current_fn)
         set_var_type(b, "__return", program.functions[i].ret_ty)
         codegen_stmt(b, program.expr_store, program.store, program.functions[i].body_idx, if (program.functions[i].ret_ty == "void") { 1 } else { 0 })

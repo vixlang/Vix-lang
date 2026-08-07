@@ -1,0 +1,16 @@
+type Post:[T] = Draft(T) | Published(T)
+
+fn show(post: Post[string]): string
+{
+    match post
+    {
+        Draft(t)     -> "[草稿] " + t
+        Published(t) -> "[已发布] " + t
+    }
+}
+
+fn main(): i32
+{
+    print(show(Draft("hello vix::forum")))
+    return 0
+}

@@ -722,6 +722,15 @@ pub fn llvm_define_var(b: &LlvmBuilder, name: string, ty: string, value: ptr)
     vix_LLVMBuildStore(b.builder, value, alloca)
 }
 
+pub fn llvm_define_global(b: &LlvmBuilder, name: string, ty: string, value: ptr)
+{
+    let global = vix_LLVMAddGlobal(b.module, llvm_type_for(ty), name)
+    vix_LLVMSetInitializer(global, value)
+    vix_LLVMSetGlobalConstant(global, 0)
+    set_var(b, name, global)
+    set_var_type(b, name, ty)
+}
+
 pub fn llvm_build_add_value(b: &LlvmBuilder, left: ptr, right: ptr): ptr
 {
     return vix_LLVMBuildAdd(b.builder, left, right, llvm_temp(b, "add"))
