@@ -34,6 +34,8 @@ NAMED_TESTS = {
     "test126.vix": {"exit": 26},
     "test127.vix": {"exit": 36},
     "test128.vix": {"exit": 28},
+    "test401.vix": {"exit": 15},
+    "test402.vix": {"exit": 36},
 }
 
 TESTS = dict(NAMED_TESTS)
@@ -106,6 +108,8 @@ def run_test(root: Path, files_dir: Path, bin_dir: Path, name: str, spec: dict, 
     cmd = [str(compiler), str(source), "-o", str(output)]
     if backend == "self":
         cmd.append("--backend=self")
+    elif backend == "self-lir":
+        cmd.append("--backend=self-lir")
 
     compile_result = run_cmd(cmd, root)
 
@@ -137,13 +141,20 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Vix compiler tests")
     parser.add_argument("--llvm", action="store_true", help="use LLVM backend")
     parser.add_argument("--self", action="store_true", help="use self backend")
+    parser.add_argument("--self-lir", action="store_true", help="use self-lir backend")
     args = parser.parse_args()
 
-    if args.llvm and args.self:
-        print("error: cannot specify both --llvm and --self")
+    selected = sum((args.llvm, args.self, args.self_lir))
+    if selected > 1:
+        print("error: choose only one backend")
         return 1
 
-    backend = "self" if args.self else "llvm"
+    if args.self_lir:
+        backend = "self-lir"
+    elif args.self:
+        backend = "self"
+    else:
+        backend = "llvm"
     backend_name = backend
 
     tests_dir = Path(__file__).resolve().parent
