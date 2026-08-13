@@ -1,0 +1,1053 @@
+.
+├── build
+│   ├── api.o
+│   ├── helper.o
+│   ├── Linker.o
+│   ├── Llc.o
+│   ├── Passes.o
+│   ├── vixc
+│   ├── vixc-bootstrap
+│   ├── vixc-bootstrap.o
+│   └── vixc.o
+├── compile-self-compiler.md
+├── core
+│   ├── io.vix
+│   ├── json.vix
+│   ├── sort.vix
+│   └── test.vix
+├── docs
+│   ├── import-resolution.md
+│   ├── playground-plan.md
+│   ├── RELEASE_v0.2.0.md
+│   ├── RELEASE_v0.2.10.md
+│   ├── RELEASE_v0.2.1.md
+│   ├── RELEASE_v0.2.5.md
+│   ├── RELEASE_v0.2.6.md
+│   ├── RELEASE_v0.2.8.md
+│   ├── RELEASE_v0.2.9.md
+│   ├── RELEASE_v0.3.0.md
+│   ├── RELEASE_v0.3.3-dev.md
+│   ├── RELEASE_v0.3.3.md
+│   ├── RELEASE_v0.4.0-dev.md
+│   ├── RELEASE_v0.4.0.md
+│   ├── RELEASE_v0.4.1.md
+│   ├── RELEASE_V0.4.2.md
+│   ├── RELEASE_V0.4.3.md
+│   └── superpowers
+│       └── plans
+│           └── 2026-07-01-browser-core-wasm-backend.md
+├── docs.md
+├── editor
+│   ├── emacs
+│   │   └── vix-mode.el
+│   ├── nvim
+│   │   ├── ftdetect
+│   │   │   └── vix.lua
+│   │   ├── indent
+│   │   │   └── vix.vim
+│   │   ├── README.md
+│   │   └── syntax
+│   │       └── vix.vim
+│   └── vim
+│       ├── ftdetect
+│       │   └── vix.vim
+│       ├── indent
+│       │   └── vix.vim
+│       └── syntax
+│           └── vix.vim
+├── error_test.vix
+├── examples
+│   ├── adt_import_defs.vix
+│   ├── adt_import_use.vix
+│   ├── adt_pattern.vix
+│   ├── adt_payload.vix
+│   ├── advanced_syntax.vix
+│   ├── and_or.vix
+│   ├── args.vix
+│   ├── arr_loop.vix
+│   ├── arr.vix
+│   ├── brainfuck.vix
+│   ├── comptime.vix
+│   ├── coreutils
+│   │   ├── echo.vix
+│   │   └── grep.vix
+│   ├── dot_expr.vix
+│   ├── ed
+│   │   ├── ed.vix
+│   │   └── test.txt
+│   ├── elfpeek.vix
+│   ├── error_test.vix
+│   ├── extern3.vix
+│   ├── fib.vix
+│   ├── fn2.vix
+│   ├── function_arg.vix
+│   ├── generics2.vix
+│   ├── generics.vix
+│   ├── global.vix
+│   ├── hashmap.vix
+│   ├── hello.vix
+│   ├── hexdump.vix
+│   ├── if.vix
+│   ├── impl2.vix
+│   ├── impl_basic.vix
+│   ├── import_test2.vix
+│   ├── import_test.vix
+│   ├── lambda.vix
+│   ├── lexer.vix
+│   ├── list_op.vix
+│   ├── list.vix
+│   ├── macro.vix
+│   ├── match_3.vix
+│   ├── match_call_expr.vix
+│   ├── match_peek_char.vix
+│   ├── match_strings.vix
+│   ├── modules
+│   │   ├── alias_example.vix
+│   │   ├── basic_example.vix
+│   │   ├── counter.vix
+│   │   ├── math.vix
+│   │   ├── multi_module.vix
+│   │   ├── nested_module.vix
+│   │   ├── README.md
+│   │   └── utils
+│   │       ├── mod.vix
+│   │       └── string_helpers.vix
+│   ├── new_1.vix
+│   ├── nullptr.vix
+│   ├── option.vix
+│   ├── owner.vix
+│   ├── Poem-lang
+│   │   ├── test2.poem
+│   │   ├── test3.poem
+│   │   ├── test4.poem
+│   │   └── test.poem
+│   ├── pointer2.vix
+│   ├── pointer.vix
+│   ├── power.vix
+│   ├── quicksort.vix
+│   ├── result.vix
+│   ├── strcmp.vix
+│   ├── string_arr.vix
+│   ├── string_impl.vix
+│   ├── struct2.vix
+│   ├── swap.vix
+│   ├── symtable.vix
+│   ├── test_for_loop.vix
+│   ├── test.vix
+│   ├── var.vix
+│   └── while_loop_test.vix
+├── greet.vix
+├── images
+│   └── README
+│       └── image.png
+├── lib
+│   ├── api.c
+│   └── llvm
+│       ├── Linker.cpp
+│       ├── Llc.cpp
+│       └── Passes.cpp
+├── main.vix
+├── makefile
+├── README.md
+├── runtime
+│   └── runtime.o
+├── seed
+│   ├── vixc
+│   └── vixc.ll
+├── seed.sh
+├── sorry.md
+├── src
+│   ├── ast.vix
+│   ├── backend
+│   │   ├── linker.vix
+│   │   ├── llc.vix
+│   │   └── passes.vix
+│   ├── builder.vix
+│   ├── codegen.vix
+│   ├── desugar.vix
+│   ├── error.vix
+│   ├── helper.c
+│   ├── infer
+│   │   ├── constraint.vix
+│   │   ├── env.vix
+│   │   ├── error.vix
+│   │   ├── gen.vix
+│   │   ├── solver.vix
+│   │   └── unify.vix
+│   ├── json_ast.vix
+│   ├── lexer.vix
+│   ├── main.vix
+│   ├── mir
+│   │   ├── lir
+│   │   │   └── mod.vix
+│   │   ├── lir2asm
+│   │   │   ├── mod.vix
+│   │   │   └── x86_64
+│   │   │       └── mod.vix
+│   │   ├── mir2asm
+│   │   │   ├── emit.vix
+│   │   │   ├── machine.vix
+│   │   │   ├── mod.vix
+│   │   │   ├── registers.vix
+│   │   │   ├── stack.vix
+│   │   │   ├── target.vix
+│   │   │   ├── types.vix
+│   │   │   └── x86_64
+│   │   │       ├── abi.vix
+│   │   │       ├── codegen.vix
+│   │   │       ├── instructions.vix
+│   │   │       └── mod.vix
+│   │   ├── mir_builder.vix
+│   │   ├── mir.vix
+│   │   ├── opt.vix
+│   │   └── spec.vic
+│   ├── module.vix
+│   ├── parser.vix
+│   ├── preprocess.vix
+│   ├── runtime.c
+│   ├── semantic.vix
+│   ├── snake.vix
+│   ├── symtable.vix
+│   ├── test.vix
+│   ├── type
+│   │   ├── kind.vix
+│   │   ├── scheme.vix
+│   │   ├── subst.vix
+│   │   ├── typeck.vix
+│   │   ├── typeinfer.vix
+│   │   └── ty.vix
+│   └── util
+│       ├── fresh.vix
+│       ├── id.vix
+│       └── pos.vix
+├── std
+│   └── io.vix
+├── test2.vix
+├── test3.vix
+├── tests
+│   ├── adt_equality.vix
+│   ├── adt_match_string.vix
+│   ├── block_comment_regression.vix
+│   ├── files
+│   │   ├── imported_adt.vix
+│   │   ├── macro_test001.vix
+│   │   ├── macro_test002.vix
+│   │   ├── macro_test003.vix
+│   │   ├── macro_test004.vix
+│   │   ├── macro_test005.vix
+│   │   ├── macro_test006.vix
+│   │   ├── macro_test007.vix
+│   │   ├── macro_test008.vix
+│   │   ├── macro_test009.vix
+│   │   ├── macro_test010.vix
+│   │   ├── macro_test011.vix
+│   │   ├── macro_test012.vix
+│   │   ├── macro_test013.vix
+│   │   ├── macro_test014.vix
+│   │   ├── macro_test015.vix
+│   │   ├── macro_test016.vix
+│   │   ├── macro_test017.vix
+│   │   ├── macro_test018.vix
+│   │   ├── macro_test019.vix
+│   │   ├── macro_test020.vix
+│   │   ├── macro_test021.vix
+│   │   ├── macro_test022.vix
+│   │   ├── macro_test023.vix
+│   │   ├── macro_test024.vix
+│   │   ├── macro_test025.vix
+│   │   ├── macro_test026.vix
+│   │   ├── macro_test027.vix
+│   │   ├── macro_test028.vix
+│   │   ├── macro_test029.vix
+│   │   ├── macro_test030.vix
+│   │   ├── macro_test031.vix
+│   │   ├── macro_test032.vix
+│   │   ├── macro_test033.vix
+│   │   ├── macro_test034.vix
+│   │   ├── macro_test035.vix
+│   │   ├── macro_test036.vix
+│   │   ├── macro_test037.vix
+│   │   ├── macro_test038.vix
+│   │   ├── macro_test039.vix
+│   │   ├── macro_test040.vix
+│   │   ├── macro_test041.vix
+│   │   ├── macro_test042.vix
+│   │   ├── macro_test043.vix
+│   │   ├── macro_test044.vix
+│   │   ├── macro_test045.vix
+│   │   ├── macro_test046.vix
+│   │   ├── macro_test047.vix
+│   │   ├── macro_test048.vix
+│   │   ├── macro_test049.vix
+│   │   ├── macro_test050.vix
+│   │   ├── macro_test051.vix
+│   │   ├── macro_test052.vix
+│   │   ├── macro_test053.vix
+│   │   ├── macro_test054.vix
+│   │   ├── macro_test055.vix
+│   │   ├── macro_test056.vix
+│   │   ├── macro_test057.vix
+│   │   ├── macro_test058.vix
+│   │   ├── macro_test059.vix
+│   │   ├── macro_test060.vix
+│   │   ├── macro_test061.vix
+│   │   ├── macro_test062.vix
+│   │   ├── macro_test063.vix
+│   │   ├── macro_test064.vix
+│   │   ├── macro_test065.vix
+│   │   ├── macro_test066.vix
+│   │   ├── macro_test067.vix
+│   │   ├── macro_test068.vix
+│   │   ├── macro_test069.vix
+│   │   ├── macro_test070.vix
+│   │   ├── macro_test071.vix
+│   │   ├── macro_test072.vix
+│   │   ├── macro_test073.vix
+│   │   ├── macro_test074.vix
+│   │   ├── macro_test075.vix
+│   │   ├── macro_test076.vix
+│   │   ├── macro_test077.vix
+│   │   ├── macro_test078.vix
+│   │   ├── macro_test079.vix
+│   │   ├── macro_test080.vix
+│   │   ├── macro_test081.vix
+│   │   ├── macro_test082.vix
+│   │   ├── macro_test083.vix
+│   │   ├── macro_test084.vix
+│   │   ├── macro_test085.vix
+│   │   ├── macro_test086.vix
+│   │   ├── macro_test087.vix
+│   │   ├── macro_test088.vix
+│   │   ├── macro_test089.vix
+│   │   ├── macro_test090.vix
+│   │   ├── macro_test091.vix
+│   │   ├── macro_test092.vix
+│   │   ├── macro_test093.vix
+│   │   ├── macro_test094.vix
+│   │   ├── macro_test095.vix
+│   │   ├── macro_test096.vix
+│   │   ├── macro_test097.vix
+│   │   ├── macro_test098.vix
+│   │   ├── macro_test099.vix
+│   │   ├── macro_test100.vix
+│   │   ├── macro_test101.vix
+│   │   ├── macro_test102.vix
+│   │   ├── macro_test103.vix
+│   │   ├── macro_test104.vix
+│   │   ├── macro_test105.vix
+│   │   ├── macro_test106.vix
+│   │   ├── macro_test107.vix
+│   │   ├── macro_test108.vix
+│   │   ├── macro_test109.vix
+│   │   ├── macro_test110.vix
+│   │   ├── macro_test111.vix
+│   │   ├── macro_test112.vix
+│   │   ├── macro_test113.vix
+│   │   ├── macro_test114.vix
+│   │   ├── macro_test115.vix
+│   │   ├── macro_test116.vix
+│   │   ├── macro_test117.vix
+│   │   ├── macro_test118.vix
+│   │   ├── macro_test119.vix
+│   │   ├── macro_test120.vix
+│   │   ├── macro_test121.vix
+│   │   ├── macro_test122.vix
+│   │   ├── macro_test123.vix
+│   │   ├── macro_test124.vix
+│   │   ├── macro_test125.vix
+│   │   ├── macro_test126.vix
+│   │   ├── macro_test127.vix
+│   │   ├── macro_test128.vix
+│   │   ├── macro_test129.vix
+│   │   ├── macro_test130.vix
+│   │   ├── macro_test131.vix
+│   │   ├── macro_test132.vix
+│   │   ├── macro_test133.vix
+│   │   ├── macro_test134.vix
+│   │   ├── macro_test135.vix
+│   │   ├── macro_test136.vix
+│   │   ├── macro_test137.vix
+│   │   ├── macro_test138.vix
+│   │   ├── macro_test139.vix
+│   │   ├── macro_test140.vix
+│   │   ├── macro_test141.vix
+│   │   ├── macro_test142.vix
+│   │   ├── macro_test143.vix
+│   │   ├── macro_test144.vix
+│   │   ├── macro_test145.vix
+│   │   ├── macro_test146.vix
+│   │   ├── macro_test147.vix
+│   │   ├── macro_test148.vix
+│   │   ├── macro_test149.vix
+│   │   ├── macro_test150.vix
+│   │   ├── macro_test151.vix
+│   │   ├── macro_test152.vix
+│   │   ├── macro_test153.vix
+│   │   ├── macro_test154.vix
+│   │   ├── macro_test155.vix
+│   │   ├── macro_test156.vix
+│   │   ├── macro_test157.vix
+│   │   ├── macro_test158.vix
+│   │   ├── macro_test159.vix
+│   │   ├── macro_test160.vix
+│   │   ├── macro_test161.vix
+│   │   ├── macro_test162.vix
+│   │   ├── macro_test163.vix
+│   │   ├── macro_test164.vix
+│   │   ├── macro_test165.vix
+│   │   ├── macro_test166.vix
+│   │   ├── macro_test167.vix
+│   │   ├── macro_test168.vix
+│   │   ├── macro_test169.vix
+│   │   ├── macro_test170.vix
+│   │   ├── macro_test171.vix
+│   │   ├── macro_test172.vix
+│   │   ├── macro_test173.vix
+│   │   ├── macro_test174.vix
+│   │   ├── macro_test175.vix
+│   │   ├── macro_test176.vix
+│   │   ├── macro_test177.vix
+│   │   ├── macro_test178.vix
+│   │   ├── macro_test179.vix
+│   │   ├── macro_test180.vix
+│   │   ├── macro_test181.vix
+│   │   ├── macro_test182.vix
+│   │   ├── macro_test183.vix
+│   │   ├── macro_test184.vix
+│   │   ├── macro_test185.vix
+│   │   ├── macro_test186.vix
+│   │   ├── macro_test187.vix
+│   │   ├── macro_test188.vix
+│   │   ├── macro_test189.vix
+│   │   ├── macro_test190.vix
+│   │   ├── macro_test191.vix
+│   │   ├── macro_test192.vix
+│   │   ├── macro_test193.vix
+│   │   ├── macro_test194.vix
+│   │   ├── macro_test195.vix
+│   │   ├── macro_test196.vix
+│   │   ├── macro_test197.vix
+│   │   ├── macro_test198.vix
+│   │   ├── macro_test199.vix
+│   │   ├── macro_test200.vix
+│   │   ├── macro_test201.vix
+│   │   ├── macro_test202.vix
+│   │   ├── macro_test203.vix
+│   │   ├── macro_test204.vix
+│   │   ├── macro_test205.vix
+│   │   ├── macro_test206.vix
+│   │   ├── macro_test207.vix
+│   │   ├── macro_test208.vix
+│   │   ├── macro_test209.vix
+│   │   ├── macro_test210.vix
+│   │   ├── macro_test211.vix
+│   │   ├── macro_test212.vix
+│   │   ├── macro_test213.vix
+│   │   ├── macro_test214.vix
+│   │   ├── macro_test215.vix
+│   │   ├── macro_test216.vix
+│   │   ├── macro_test217.vix
+│   │   ├── macro_test218.vix
+│   │   ├── macro_test219.vix
+│   │   ├── macro_test220.vix
+│   │   ├── macro_test221.vix
+│   │   ├── macro_test222.vix
+│   │   ├── macro_test223.vix
+│   │   ├── macro_test224.vix
+│   │   ├── macro_test225.vix
+│   │   ├── macro_test226.vix
+│   │   ├── macro_test227.vix
+│   │   ├── macro_test228.vix
+│   │   ├── macro_test229.vix
+│   │   ├── macro_test230.vix
+│   │   ├── macro_test231.vix
+│   │   ├── macro_test232.vix
+│   │   ├── macro_test233.vix
+│   │   ├── macro_test234.vix
+│   │   ├── macro_test235.vix
+│   │   ├── macro_test236.vix
+│   │   ├── macro_test237.vix
+│   │   ├── macro_test238.vix
+│   │   ├── macro_test239.vix
+│   │   ├── macro_test240.vix
+│   │   ├── macro_test241.vix
+│   │   ├── macro_test242.vix
+│   │   ├── macro_test243.vix
+│   │   ├── macro_test244.vix
+│   │   ├── macro_test245.vix
+│   │   ├── macro_test246.vix
+│   │   ├── macro_test247.vix
+│   │   ├── macro_test248.vix
+│   │   ├── macro_test249.vix
+│   │   ├── macro_test250.vix
+│   │   ├── macro_test251.vix
+│   │   ├── macro_test252.vix
+│   │   ├── macro_test253.vix
+│   │   ├── macro_test254.vix
+│   │   ├── macro_test255.vix
+│   │   ├── macro_test256.vix
+│   │   ├── macro_test257.vix
+│   │   ├── macro_test258.vix
+│   │   ├── macro_test259.vix
+│   │   ├── macro_test260.vix
+│   │   ├── macro_test261.vix
+│   │   ├── macro_test262.vix
+│   │   ├── macro_test263.vix
+│   │   ├── macro_test264.vix
+│   │   ├── macro_test265.vix
+│   │   ├── macro_test266.vix
+│   │   ├── macro_test267.vix
+│   │   ├── macro_test268.vix
+│   │   ├── macro_test269.vix
+│   │   ├── macro_test270.vix
+│   │   ├── macro_test271.vix
+│   │   ├── macro_test272.vix
+│   │   ├── macro_test273.vix
+│   │   ├── macro_test274.vix
+│   │   ├── macro_test275.vix
+│   │   ├── macro_test276.vix
+│   │   ├── macro_test277.vix
+│   │   ├── macro_test278.vix
+│   │   ├── macro_test279.vix
+│   │   ├── macro_test280.vix
+│   │   ├── macro_test281.vix
+│   │   ├── macro_test282.vix
+│   │   ├── macro_test283.vix
+│   │   ├── macro_test284.vix
+│   │   ├── macro_test285.vix
+│   │   ├── macro_test286.vix
+│   │   ├── macro_test287.vix
+│   │   ├── macro_test288.vix
+│   │   ├── macro_test289.vix
+│   │   ├── macro_test290.vix
+│   │   ├── macro_test291.vix
+│   │   ├── macro_test292.vix
+│   │   ├── macro_test293.vix
+│   │   ├── macro_test294.vix
+│   │   ├── macro_test295.vix
+│   │   ├── macro_test296.vix
+│   │   ├── macro_test297.vix
+│   │   ├── macro_test298.vix
+│   │   ├── macro_test299.vix
+│   │   ├── macro_test300.vix
+│   │   ├── macro_test301.vix
+│   │   ├── macro_test302.vix
+│   │   ├── macro_test303.vix
+│   │   ├── macro_test304.vix
+│   │   ├── macro_test305.vix
+│   │   ├── macro_test306.vix
+│   │   ├── macro_test307.vix
+│   │   ├── macro_test308.vix
+│   │   ├── macro_test309.vix
+│   │   ├── macro_test310.vix
+│   │   ├── macro_test311.vix
+│   │   ├── macro_test312.vix
+│   │   ├── macro_test313.vix
+│   │   ├── macro_test314.vix
+│   │   ├── macro_test315.vix
+│   │   ├── macro_test316.vix
+│   │   ├── macro_test317.vix
+│   │   ├── macro_test318.vix
+│   │   ├── macro_test319.vix
+│   │   ├── macro_test320.vix
+│   │   ├── macro_test321.vix
+│   │   ├── macro_test322.vix
+│   │   ├── macro_test323.vix
+│   │   ├── macro_test324.vix
+│   │   ├── macro_test325.vix
+│   │   ├── macro_test326.vix
+│   │   ├── macro_test327.vix
+│   │   ├── macro_test328.vix
+│   │   ├── macro_test329.vix
+│   │   ├── macro_test330.vix
+│   │   ├── macro_test331.vix
+│   │   ├── macro_test332.vix
+│   │   ├── macro_test333.vix
+│   │   ├── macro_test334.vix
+│   │   ├── macro_test335.vix
+│   │   ├── macro_test336.vix
+│   │   ├── macro_test337.vix
+│   │   ├── macro_test338.vix
+│   │   ├── macro_test339.vix
+│   │   ├── macro_test340.vix
+│   │   ├── macro_test341.vix
+│   │   ├── macro_test342.vix
+│   │   ├── macro_test343.vix
+│   │   ├── macro_test344.vix
+│   │   ├── macro_test345.vix
+│   │   ├── macro_test346.vix
+│   │   ├── macro_test347.vix
+│   │   ├── macro_test348.vix
+│   │   ├── macro_test349.vix
+│   │   ├── macro_test350.vix
+│   │   ├── macro_test351.vix
+│   │   ├── macro_test352.vix
+│   │   ├── macro_test353.vix
+│   │   ├── macro_test354.vix
+│   │   ├── macro_test355.vix
+│   │   ├── macro_test356.vix
+│   │   ├── macro_test357.vix
+│   │   ├── macro_test358.vix
+│   │   ├── macro_test359.vix
+│   │   ├── macro_test360.vix
+│   │   ├── macro_test361.vix
+│   │   ├── macro_test362.vix
+│   │   ├── macro_test363.vix
+│   │   ├── macro_test364.vix
+│   │   ├── macro_test365.vix
+│   │   ├── macro_test366.vix
+│   │   ├── macro_test367.vix
+│   │   ├── macro_test368.vix
+│   │   ├── macro_test369.vix
+│   │   ├── macro_test370.vix
+│   │   ├── macro_test371.vix
+│   │   ├── macro_test372.vix
+│   │   ├── macro_test373.vix
+│   │   ├── macro_test374.vix
+│   │   ├── macro_test375.vix
+│   │   ├── macro_test376.vix
+│   │   ├── macro_test377.vix
+│   │   ├── macro_test378.vix
+│   │   ├── macro_test379.vix
+│   │   ├── macro_test380.vix
+│   │   ├── macro_test381.vix
+│   │   ├── macro_test382.vix
+│   │   ├── macro_test383.vix
+│   │   ├── macro_test384.vix
+│   │   ├── macro_test385.vix
+│   │   ├── macro_test386.vix
+│   │   ├── macro_test387.vix
+│   │   ├── macro_test388.vix
+│   │   ├── macro_test389.vix
+│   │   ├── macro_test390.vix
+│   │   ├── macro_test391.vix
+│   │   ├── macro_test392.vix
+│   │   ├── macro_test393.vix
+│   │   ├── macro_test394.vix
+│   │   ├── macro_test395.vix
+│   │   ├── macro_test396.vix
+│   │   ├── macro_test397.vix
+│   │   ├── macro_test398.vix
+│   │   ├── macro_test399.vix
+│   │   ├── macro_test400.vix
+│   │   ├── test100.vix
+│   │   ├── test101.vix
+│   │   ├── test102.vix
+│   │   ├── test103.vix
+│   │   ├── test104.vix
+│   │   ├── test105.vix
+│   │   ├── test106.vix
+│   │   ├── test107.vix
+│   │   ├── test108.vix
+│   │   ├── test109.vix
+│   │   ├── test10.vix
+│   │   ├── test110.vix
+│   │   ├── test111.vix
+│   │   ├── test112.vix
+│   │   ├── test113.vix
+│   │   ├── test114.vix
+│   │   ├── test115.vix
+│   │   ├── test116.vix
+│   │   ├── test117.vix
+│   │   ├── test118.vix
+│   │   ├── test119.vix
+│   │   ├── test11.vix
+│   │   ├── test120.vix
+│   │   ├── test121.vix
+│   │   ├── test122.vix
+│   │   ├── test123.vix
+│   │   ├── test124.vix
+│   │   ├── test125.vix
+│   │   ├── test126.vix
+│   │   ├── test127.vix
+│   │   ├── test128.vix
+│   │   ├── test129.vix
+│   │   ├── test12.vix
+│   │   ├── test130.vix
+│   │   ├── test131.vix
+│   │   ├── test132.vix
+│   │   ├── test133.vix
+│   │   ├── test134.vix
+│   │   ├── test135.vix
+│   │   ├── test136.vix
+│   │   ├── test137.vix
+│   │   ├── test138.vix
+│   │   ├── test139.vix
+│   │   ├── test13.vix
+│   │   ├── test140.vix
+│   │   ├── test141.vix
+│   │   ├── test142.vix
+│   │   ├── test143.vix
+│   │   ├── test144.vix
+│   │   ├── test145.vix
+│   │   ├── test146.vix
+│   │   ├── test147.vix
+│   │   ├── test148.vix
+│   │   ├── test149.vix
+│   │   ├── test14.vix
+│   │   ├── test150.vix
+│   │   ├── test151.vix
+│   │   ├── test152.vix
+│   │   ├── test153.vix
+│   │   ├── test154.vix
+│   │   ├── test155.vix
+│   │   ├── test156.vix
+│   │   ├── test157.vix
+│   │   ├── test158.vix
+│   │   ├── test159.vix
+│   │   ├── test15.vix
+│   │   ├── test160.vix
+│   │   ├── test161.vix
+│   │   ├── test162.vix
+│   │   ├── test163.vix
+│   │   ├── test164.vix
+│   │   ├── test165.vix
+│   │   ├── test166.vix
+│   │   ├── test167.vix
+│   │   ├── test168.vix
+│   │   ├── test169.vix
+│   │   ├── test16.vix
+│   │   ├── test170.vix
+│   │   ├── test171.vix
+│   │   ├── test172.vix
+│   │   ├── test173.vix
+│   │   ├── test174.vix
+│   │   ├── test175.vix
+│   │   ├── test176.vix
+│   │   ├── test177.vix
+│   │   ├── test178.vix
+│   │   ├── test179.vix
+│   │   ├── test17.vix
+│   │   ├── test180.vix
+│   │   ├── test181.vix
+│   │   ├── test182.vix
+│   │   ├── test183.vix
+│   │   ├── test184.vix
+│   │   ├── test185.vix
+│   │   ├── test186.vix
+│   │   ├── test187.vix
+│   │   ├── test188.vix
+│   │   ├── test189.vix
+│   │   ├── test18.vix
+│   │   ├── test190.vix
+│   │   ├── test191.vix
+│   │   ├── test192.vix
+│   │   ├── test193.vix
+│   │   ├── test194.vix
+│   │   ├── test195.vix
+│   │   ├── test196.vix
+│   │   ├── test197.vix
+│   │   ├── test198.vix
+│   │   ├── test199.vix
+│   │   ├── test19.vix
+│   │   ├── test1.vix
+│   │   ├── test200.vix
+│   │   ├── test201.vix
+│   │   ├── test202.vix
+│   │   ├── test203.vix
+│   │   ├── test204.vix
+│   │   ├── test205.vix
+│   │   ├── test206.vix
+│   │   ├── test207.vix
+│   │   ├── test208.vix
+│   │   ├── test209.vix
+│   │   ├── test20.vix
+│   │   ├── test210.vix
+│   │   ├── test211.vix
+│   │   ├── test212.vix
+│   │   ├── test213.vix
+│   │   ├── test214.vix
+│   │   ├── test215.vix
+│   │   ├── test216.vix
+│   │   ├── test217.vix
+│   │   ├── test218.vix
+│   │   ├── test219.vix
+│   │   ├── test21.vix
+│   │   ├── test220.vix
+│   │   ├── test221.vix
+│   │   ├── test222.vix
+│   │   ├── test223.vix
+│   │   ├── test224.vix
+│   │   ├── test225.vix
+│   │   ├── test226.vix
+│   │   ├── test227.vix
+│   │   ├── test228.vix
+│   │   ├── test229.vix
+│   │   ├── test22.vix
+│   │   ├── test230.vix
+│   │   ├── test231.vix
+│   │   ├── test232.vix
+│   │   ├── test233.vix
+│   │   ├── test234.vix
+│   │   ├── test235.vix
+│   │   ├── test236.vix
+│   │   ├── test237.vix
+│   │   ├── test238.vix
+│   │   ├── test239.vix
+│   │   ├── test23.vix
+│   │   ├── test240.vix
+│   │   ├── test241.vix
+│   │   ├── test242.vix
+│   │   ├── test243.vix
+│   │   ├── test244.vix
+│   │   ├── test245.vix
+│   │   ├── test246.vix
+│   │   ├── test247.vix
+│   │   ├── test248.vix
+│   │   ├── test249.vix
+│   │   ├── test24.vix
+│   │   ├── test250.vix
+│   │   ├── test251.vix
+│   │   ├── test252.vix
+│   │   ├── test253.vix
+│   │   ├── test254.vix
+│   │   ├── test255.vix
+│   │   ├── test256.vix
+│   │   ├── test257.vix
+│   │   ├── test258.vix
+│   │   ├── test259.vix
+│   │   ├── test25.vix
+│   │   ├── test260.vix
+│   │   ├── test261.vix
+│   │   ├── test262.vix
+│   │   ├── test263.vix
+│   │   ├── test264.vix
+│   │   ├── test265.vix
+│   │   ├── test266.vix
+│   │   ├── test267.vix
+│   │   ├── test268.vix
+│   │   ├── test269.vix
+│   │   ├── test26.vix
+│   │   ├── test270.vix
+│   │   ├── test271.vix
+│   │   ├── test272.vix
+│   │   ├── test273.vix
+│   │   ├── test274.vix
+│   │   ├── test275.vix
+│   │   ├── test276.vix
+│   │   ├── test277.vix
+│   │   ├── test278.vix
+│   │   ├── test279.vix
+│   │   ├── test27.vix
+│   │   ├── test280.vix
+│   │   ├── test281.vix
+│   │   ├── test282.vix
+│   │   ├── test283.vix
+│   │   ├── test284.vix
+│   │   ├── test285.vix
+│   │   ├── test286.vix
+│   │   ├── test287.vix
+│   │   ├── test288.vix
+│   │   ├── test289.vix
+│   │   ├── test28.vix
+│   │   ├── test290.vix
+│   │   ├── test291.vix
+│   │   ├── test292.vix
+│   │   ├── test293.vix
+│   │   ├── test294.vix
+│   │   ├── test295.vix
+│   │   ├── test296.vix
+│   │   ├── test297.vix
+│   │   ├── test298.vix
+│   │   ├── test299.vix
+│   │   ├── test29.vix
+│   │   ├── test2.vix
+│   │   ├── test300.vix
+│   │   ├── test301.vix
+│   │   ├── test302.vix
+│   │   ├── test303.vix
+│   │   ├── test304.vix
+│   │   ├── test305.vix
+│   │   ├── test306.vix
+│   │   ├── test307.vix
+│   │   ├── test308.vix
+│   │   ├── test309.vix
+│   │   ├── test30.vix
+│   │   ├── test310.vix
+│   │   ├── test311.vix
+│   │   ├── test312.vix
+│   │   ├── test313.vix
+│   │   ├── test314.vix
+│   │   ├── test315.vix
+│   │   ├── test316.vix
+│   │   ├── test317.vix
+│   │   ├── test318.vix
+│   │   ├── test319.vix
+│   │   ├── test31.vix
+│   │   ├── test320.vix
+│   │   ├── test321.vix
+│   │   ├── test322.vix
+│   │   ├── test323.vix
+│   │   ├── test324.vix
+│   │   ├── test325.vix
+│   │   ├── test326.vix
+│   │   ├── test327.vix
+│   │   ├── test328.vix
+│   │   ├── test329.vix
+│   │   ├── test32.vix
+│   │   ├── test330.vix
+│   │   ├── test331.vix
+│   │   ├── test332.vix
+│   │   ├── test333.vix
+│   │   ├── test334.vix
+│   │   ├── test335.vix
+│   │   ├── test336.vix
+│   │   ├── test337.vix
+│   │   ├── test338.vix
+│   │   ├── test339.vix
+│   │   ├── test33.vix
+│   │   ├── test340.vix
+│   │   ├── test341.vix
+│   │   ├── test342.vix
+│   │   ├── test343.vix
+│   │   ├── test344.vix
+│   │   ├── test345.vix
+│   │   ├── test346.vix
+│   │   ├── test347.vix
+│   │   ├── test348.vix
+│   │   ├── test349.vix
+│   │   ├── test34.vix
+│   │   ├── test350.vix
+│   │   ├── test351.vix
+│   │   ├── test352.vix
+│   │   ├── test353.vix
+│   │   ├── test354.vix
+│   │   ├── test355.vix
+│   │   ├── test356.vix
+│   │   ├── test357.vix
+│   │   ├── test358.vix
+│   │   ├── test359.vix
+│   │   ├── test35.vix
+│   │   ├── test360.vix
+│   │   ├── test361.vix
+│   │   ├── test362.vix
+│   │   ├── test363.vix
+│   │   ├── test364.vix
+│   │   ├── test365.vix
+│   │   ├── test366.vix
+│   │   ├── test367.vix
+│   │   ├── test368.vix
+│   │   ├── test369.vix
+│   │   ├── test36.vix
+│   │   ├── test370.vix
+│   │   ├── test371.vix
+│   │   ├── test372.vix
+│   │   ├── test373.vix
+│   │   ├── test374.vix
+│   │   ├── test375.vix
+│   │   ├── test376.vix
+│   │   ├── test377.vix
+│   │   ├── test378.vix
+│   │   ├── test379.vix
+│   │   ├── test37.vix
+│   │   ├── test380.vix
+│   │   ├── test381.vix
+│   │   ├── test382.vix
+│   │   ├── test383.vix
+│   │   ├── test384.vix
+│   │   ├── test385.vix
+│   │   ├── test386.vix
+│   │   ├── test387.vix
+│   │   ├── test388.vix
+│   │   ├── test389.vix
+│   │   ├── test38.vix
+│   │   ├── test390.vix
+│   │   ├── test391.vix
+│   │   ├── test392.vix
+│   │   ├── test393.vix
+│   │   ├── test394.vix
+│   │   ├── test395.vix
+│   │   ├── test396.vix
+│   │   ├── test397.vix
+│   │   ├── test398.vix
+│   │   ├── test399.vix
+│   │   ├── test39.vix
+│   │   ├── test3.vix
+│   │   ├── test400.vix
+│   │   ├── test401.vix
+│   │   ├── test402.vix
+│   │   ├── test40.vix
+│   │   ├── test41.vix
+│   │   ├── test42.vix
+│   │   ├── test43.vix
+│   │   ├── test44.vix
+│   │   ├── test45.vix
+│   │   ├── test46.vix
+│   │   ├── test47.vix
+│   │   ├── test48.vix
+│   │   ├── test49.vix
+│   │   ├── test4.vix
+│   │   ├── test50.vix
+│   │   ├── test51.vix
+│   │   ├── test52.vix
+│   │   ├── test53.vix
+│   │   ├── test54.vix
+│   │   ├── test55.vix
+│   │   ├── test56.vix
+│   │   ├── test57.vix
+│   │   ├── test58.vix
+│   │   ├── test59.vix
+│   │   ├── test5.vix
+│   │   ├── test60.vix
+│   │   ├── test61.vix
+│   │   ├── test62.vix
+│   │   ├── test63.vix
+│   │   ├── test64.vix
+│   │   ├── test65.vix
+│   │   ├── test66.vix
+│   │   ├── test67.vix
+│   │   ├── test68.vix
+│   │   ├── test69.vix
+│   │   ├── test6.vix
+│   │   ├── test70.vix
+│   │   ├── test71.vix
+│   │   ├── test72.vix
+│   │   ├── test73.vix
+│   │   ├── test74.vix
+│   │   ├── test75.vix
+│   │   ├── test76.vix
+│   │   ├── test77.vix
+│   │   ├── test78.vix
+│   │   ├── test79.vix
+│   │   ├── test7.vix
+│   │   ├── test80.vix
+│   │   ├── test81.vix
+│   │   ├── test82.vix
+│   │   ├── test83.vix
+│   │   ├── test84.vix
+│   │   ├── test85.vix
+│   │   ├── test86.vix
+│   │   ├── test87.vix
+│   │   ├── test88.vix
+│   │   ├── test89.vix
+│   │   ├── test8.vix
+│   │   ├── test90.vix
+│   │   ├── test91.vix
+│   │   ├── test92.vix
+│   │   ├── test93.vix
+│   │   ├── test94.vix
+│   │   ├── test95.vix
+│   │   ├── test96.vix
+│   │   ├── test97.vix
+│   │   ├── test98.vix
+│   │   ├── test99.vix
+│   │   └── test9.vix
+│   ├── function_generics.vix
+│   ├── fuzz.py
+│   ├── generate_macro_smoke.py
+│   ├── if_single_statement.vix
+│   ├── let_polymorphism.vix
+│   ├── mixed_numeric_regression.vix
+│   ├── module
+│   │   ├── main.vix
+│   │   ├── math.vix
+│   │   └── README.md
+│   ├── mutable_global.vix
+│   ├── run.py
+│   ├── smoke.py
+│   └── stree.py
+├── test.txt
+├── test.vix
+└── tool.sh
+
+43 directories, 1008 files

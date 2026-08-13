@@ -27,10 +27,10 @@ pub fn str_starts_with(text: string, prefix: string): i32
 {
     let text_len = diag_strlen(text)
     let prefix_len = diag_strlen(prefix)
-    if (text_len < prefix_len) { return 0 }
+    if (text_len < prefix_len) return 0
     for (i in 0 .. prefix_len)
     {
-        if (text[i] != prefix[i]) { return 0 }
+        if (text[i] != prefix[i]) return 0
     }
     return 1
 }
@@ -51,12 +51,12 @@ pub fn str_from(text: string, start: i32): string
 pub fn strip_func_prefix(message: string): string
 {
     let prefix = "in function "
-    if (str_starts_with(message, prefix) == 0) { return message }
+    if (str_starts_with(message, prefix) == 0) return message
     let start = prefix.length
     let mut i = start
     while (i + 1 < message.length)
     {
-        if (message[i] == ':' and message[i + 1] == ' ') { return str_from(message, i + 2) }
+        if (message[i] == ':' and message[i + 1] == ' ') return str_from(message, i + 2)
         i += 1
     }
     return message
@@ -64,89 +64,105 @@ pub fn strip_func_prefix(message: string): string
 
 pub fn parse_error_code(msg: string): string
 {
-    if (str_starts_with(msg, "expected '") == 1) { return "E1001" }
-    if (str_starts_with(msg, "unexpected token") == 1) { return "E1002" }
-    if (str_starts_with(msg, "unexpected statement") == 1) { return "E1002" }
-    if (str_starts_with(msg, "unexpected token after identifier") == 1) { return "E1002" }
-    if (str_starts_with(msg, "expected if or elif") == 1) { return "E1003" }
-    if (str_starts_with(msg, "empty source") == 1) { return "E1004" }
-    if (str_starts_with(msg, "expected function") == 1) { return "E1005" }
+    if (str_starts_with(msg, "expected '") == 1) return "E1001"
+    if (str_starts_with(msg, "unexpected token") == 1) return "E1002"
+    if (str_starts_with(msg, "unexpected statement") == 1) return "E1002"
+    if (str_starts_with(msg, "unexpected token after identifier") == 1) return "E1002"
+    if (str_starts_with(msg, "expected if or elif") == 1) return "E1003"
+    if (str_starts_with(msg, "empty source") == 1) return "E1004"
+    if (str_starts_with(msg, "expected function") == 1) return "E1005"
     return "E1000"
 }
 
 pub fn name_error_code(msg: string): string
 {
-    if (str_starts_with(msg, "undefined symbol '") == 1) { return "E2001" }
-    if (str_starts_with(msg, "duplicate symbol '") == 1) { return "E2002" }
-    if (str_starts_with(msg, "undefined function '") == 1) { return "E2003" }
-    if (str_starts_with(msg, "duplicate function '") == 1) { return "E2004" }
-    if (str_starts_with(msg, "duplicate struct '") == 1) { return "E2006" }
-    if (str_starts_with(msg, "duplicate parameter '") == 1) { return "E2007" }
-    if (str_starts_with(msg, "duplicate field '") == 1) { return "E2008" }
-    if (str_starts_with(msg, "for iterator '") == 1) { return "E2009" }
-    if (str_starts_with(msg, "function '") == 1) { return "E2010" }
+    if (str_starts_with(msg, "undefined symbol '") == 1) return "E2001"
+    if (str_starts_with(msg, "duplicate symbol '") == 1) return "E2002"
+    if (str_starts_with(msg, "undefined function '") == 1) return "E2003"
+    if (str_starts_with(msg, "duplicate function '") == 1) return "E2004"
+    if (str_starts_with(msg, "duplicate struct '") == 1) return "E2006"
+    if (str_starts_with(msg, "duplicate parameter '") == 1) return "E2007"
+    if (str_starts_with(msg, "duplicate field '") == 1) return "E2008"
+    if (str_starts_with(msg, "for iterator '") == 1) return "E2009"
+    if (str_starts_with(msg, "function '") == 1) return "E2010"
     return "E2000"
 }
 
 pub fn type_error_code(msg: string): string
 {
-    if (str_starts_with(msg, "cannot initialize '") == 1) { return "E3001" }
-    if (str_starts_with(msg, "cannot assign to immutable binding '") == 1) { return "E3013" }
-    if (str_starts_with(msg, "cannot assign field '") == 1) { return "E3013" }
-    if (str_starts_with(msg, "cannot assign '") == 1) { return "E3002" }
-    if (str_starts_with(msg, "cannot dereference value of type '") == 1) { return "E3003" }
-    if (str_starts_with(msg, "cannot store through value of type '") == 1) { return "E3004" }
-    if (str_starts_with(msg, "cannot store '") == 1) { return "E3015" }
-    if (str_starts_with(msg, "unknown field '") == 1) { return "E3005" }
-    if (str_starts_with(msg, "unknown struct '") == 1) { return "E3006" }
-    if (str_starts_with(msg, "cannot index value of type '") == 1) { return "E3007" }
-    if (str_starts_with(msg, "index expression expects integer index") == 1) { return "E3014" }
-    if (str_starts_with(msg, "struct '") == 1) { return "E3021" }
-    if (str_starts_with(msg, "missing field '") == 1) { return "E3022" }
-    if (str_starts_with(msg, "duplicate initializer field '") == 1) { return "E3023" }
-    if (str_starts_with(msg, "array element type '") == 1) { return "E3024" }
-    if (str_starts_with(msg, "method 'push'") == 1) { return "E3025" }
-    if (str_starts_with(msg, "cannot compare '") == 1) { return "E3011" }
-    if (str_starts_with(msg, "return value type '") == 1) { return "E3012" }
-    if (str_starts_with(msg, "match pattern type '") == 1) { return "E3018" }
-    if (str_starts_with(msg, "match return value type '") == 1) { return "E3012" }
-    if (str_starts_with(msg, "while condition must be bool") == 1) { return "E3016" }
-    if (str_starts_with(msg, "if condition must be bool") == 1) { return "E3016" }
-    if (str_starts_with(msg, "for range start must be integer") == 1) { return "E3017" }
-    if (str_starts_with(msg, "for range end must be integer") == 1) { return "E3017" }
-    if (str_starts_with(msg, "operator '+' cannot mix") == 1) { return "E3010" }
-    if (str_starts_with(msg, "operator '") == 1) { return "E3008" }
-    if (str_starts_with(msg, "function '") == 1) { return "E3020" }
-    if (str_starts_with(msg, "'break' used outside loop") == 1) { return "E3019" }
-    if (str_starts_with(msg, "'continue' used outside loop") == 1) { return "E3019" }
+    if (str_starts_with(msg, "cannot initialize '") == 1) return "E3001"
+    if (str_starts_with(msg, "cannot assign to immutable binding '") == 1) return "E3013"
+    if (str_starts_with(msg, "cannot assign field '") == 1) return "E3013"
+    if (str_starts_with(msg, "cannot assign '") == 1) return "E3002"
+    if (str_starts_with(msg, "cannot dereference value of type '") == 1) return "E3003"
+    if (str_starts_with(msg, "cannot store through value of type '") == 1) return "E3004"
+    if (str_starts_with(msg, "cannot store '") == 1) return "E3015"
+    if (str_starts_with(msg, "unknown field '") == 1) return "E3005"
+    if (str_starts_with(msg, "unknown struct '") == 1) return "E3006"
+    if (str_starts_with(msg, "cannot index value of type '") == 1) return "E3007"
+    if (str_starts_with(msg, "index expression expects integer index") == 1) return "E3014"
+    if (str_starts_with(msg, "struct '") == 1) return "E3021"
+    if (str_starts_with(msg, "missing field '") == 1) return "E3022"
+    if (str_starts_with(msg, "duplicate initializer field '") == 1) return "E3023"
+    if (str_starts_with(msg, "array element type '") == 1) return "E3024"
+    if (str_starts_with(msg, "method 'push'") == 1) return "E3025"
+    if (str_starts_with(msg, "cannot compare '") == 1) return "E3011"
+    if (str_starts_with(msg, "return value type '") == 1) return "E3012"
+    if (str_starts_with(msg, "match pattern type '") == 1) return "E3018"
+    if (str_starts_with(msg, "match return value type '") == 1) return "E3012"
+    if (str_starts_with(msg, "while condition must be bool") == 1) return "E3016"
+    if (str_starts_with(msg, "if condition must be bool") == 1) return "E3016"
+    if (str_starts_with(msg, "for range start must be integer") == 1) return "E3017"
+    if (str_starts_with(msg, "for range end must be integer") == 1) return "E3017"
+    if (str_starts_with(msg, "operator '+' cannot mix") == 1) return "E3010"
+    if (str_starts_with(msg, "operator '") == 1) return "E3008"
+    if (str_starts_with(msg, "function '") == 1) return "E3020"
+    if (str_starts_with(msg, "'break' used outside loop") == 1) return "E3019"
+    if (str_starts_with(msg, "'continue' used outside loop") == 1) return "E3019"
     return "E3000"
 }
 
 pub fn semantic_error_code(msg: string): string
 {
-    if (str_starts_with(msg, "no 'main' function defined") == 1) { return "E4001" }
-    if (str_starts_with(msg, "entry function 'main'") == 1) { return "E4002" }
+    if (str_starts_with(msg, "no 'main' function defined") == 1) return "E4001"
+    if (str_starts_with(msg, "entry function 'main'") == 1) return "E4002"
     return "E4000"
 }
 
 pub fn semantic_warning_code(msg: string): string
 {
-    if (str_starts_with(msg, "unused variable '") == 1) { return "W4001" }
-    if (str_starts_with(msg, "no 'main' function defined") == 1) { return "W4002" }
-    if (str_starts_with(msg, "entry function 'main'") == 1) { return "W4003" }
+    if (str_starts_with(msg, "unused variable '") == 1) return "W4001"
+    if (str_starts_with(msg, "no 'main' function defined") == 1) return "W4002"
+    if (str_starts_with(msg, "entry function 'main'") == 1) return "W4003"
     return "W4000"
+}
+
+pub type DiagnosticKind = ParseDiagnostic | NameDiagnostic | TypeDiagnostic | SemanticDiagnostic | WarningDiagnostic | UnknownDiagnostic
+
+pub fn diagnostic_kind(error_type: string): DiagnosticKind
+{
+    return match error_type {
+        "ParseError" -> ParseDiagnostic
+        "NameError" -> NameDiagnostic
+        "TypeError" -> TypeDiagnostic
+        "SemanticError" -> SemanticDiagnostic
+        "SemanticWarning" -> WarningDiagnostic
+        _ -> UnknownDiagnostic
+    }
 }
 
 pub fn error_code_for_type(error_type: string, message: string): string
 {
-    let msg = strip_func_prefix(message)
-    return match error_type
-    {
-        "ParseError" -> parse_error_code(msg)
-        "NameError" -> name_error_code(msg)
-        "TypeError" -> type_error_code(msg)
-        "SemanticError" -> semantic_error_code(msg)
-        "SemanticWarning" -> semantic_warning_code(msg)
+    let msg = message
+        |> strip_func_prefix
+    let kind = error_type
+        |> diagnostic_kind
+    return match kind {
+        ParseDiagnostic -> parse_error_code(msg)
+        NameDiagnostic -> name_error_code(msg)
+        TypeDiagnostic -> type_error_code(msg)
+        SemanticDiagnostic -> semantic_error_code(msg)
+        WarningDiagnostic -> semantic_warning_code(msg)
         _ -> "E0000"
     }
 }
@@ -213,7 +229,7 @@ pub fn diag_warning_level(): i32 { return 1 }
 
 pub fn diagnostic_level_is_warning(level: i32): i32
 {
-    if (level == diag_warning_level()) { return 1 }
+    if (level == diag_warning_level()) return 1
     return 0
 }
 
@@ -235,7 +251,7 @@ pub fn diagnostic_new(code: string, level: i32, error_type: string, message: str
 
 pub fn source_get_line(src: string, target_line: i32): string
 {
-    if (target_line <= 0) { return "" }
+    if (target_line <= 0) return ""
     let src_len = diag_strlen(src)
     let mut current = 1
     let mut line_start = 0
@@ -287,7 +303,7 @@ pub fn source_get_line(src: string, target_line: i32): string
         end += 1
     }
     let mut len = end - line_start
-    if (len > 0 and src[end - 1] == 13) { len = len - 1 }
+    if (len > 0 and src[end - 1] == 13) len = len - 1
 
     let buf: string = malloc(len + 1)
     for (line_i in 0 .. len)
@@ -327,14 +343,14 @@ pub fn format_highlighted_line(line: string, col: i32, length: i32, color: strin
 {
     let expanded = expand_tabs(line)
     let line_len = diag_strlen(expanded)
-    let safe_col = if (col <= 0) { 1 } else { col }
-    let safe_len = if (length <= 0) { 1 } else { length }
-    let effective_col = if (safe_col > line_len) { line_len } else { safe_col }
+    let safe_col = if (col <= 0) 1 else col
+    let safe_len = if (length <= 0) 1 else length
+    let effective_col = if (safe_col > line_len) line_len else safe_col
 
     let start = effective_col - 1
     let mut end = start + safe_len
-    if (end > line_len) { end = line_len }
-    if (end < start) { end = start }
+    if (end > line_len) end = line_len
+    if (end < start) end = start
 
     let mut out = ""
     let mut i = 0
@@ -362,12 +378,12 @@ pub fn format_caret_line(line: string, col: i32, length: i32, color: string): st
 {
     let expanded = expand_tabs(line)
     let line_len = diag_strlen(expanded)
-    let safe_col = if (col <= 0) { 1 } else { col }
-    let mut safe_len = if (length <= 0) { 1 } else { length }
-    let effective_col = if (safe_col > line_len) { line_len + 1 } else { safe_col }
+    let safe_col = if (col <= 0) 1 else col
+    let mut safe_len = if (length <= 0) 1 else length
+    let effective_col = if (safe_col > line_len) line_len + 1 else safe_col
     let max_len = line_len - effective_col + 1
-    if (max_len > 0 and safe_len > max_len) { safe_len = max_len }
-    if (safe_len <= 0) { safe_len = 1 }
+    if (max_len > 0 and safe_len > max_len) safe_len = max_len
+    if (safe_len <= 0) safe_len = 1
 
     let mut out = ""
     for (__c in 0 .. effective_col - 1)
@@ -385,7 +401,7 @@ pub fn format_caret_line(line: string, col: i32, length: i32, color: string): st
 
 pub fn line_number_width(line: i32): i32
 {
-    if (line <= 0) { return 1 }
+    if (line <= 0) return 1
     let mut width = 1
     let mut n = line + 1
     while (n >= 10)
@@ -398,7 +414,7 @@ pub fn line_number_width(line: i32): i32
 
 pub fn i32_digit_width(n: i32): i32
 {
-    if (n <= 0) { return 1 }
+    if (n <= 0) return 1
     let mut width = 1
     let mut value = n
     while (value >= 10)
@@ -433,11 +449,11 @@ pub fn line_blank_str(width: i32): string
 
 pub fn show_source_context(src: string, line: i32, col: i32, length: i32, level: i32): string
 {
-    if (line <= 0 or src == "") { return "" }
+    if (line <= 0 or src == "") return ""
 
     let width = line_number_width(line)
     let is_warning = diagnostic_level_is_warning(level)
-    let highlight_color = if (is_warning == 1) { diag_yellow() } else { diag_red() }
+    let highlight_color = if (is_warning == 1) diag_yellow() else diag_red()
     let gutter = diag_dim()
     let reset = diag_reset()
     let mut out = ""
@@ -478,8 +494,8 @@ pub fn show_source_context(src: string, line: i32, col: i32, length: i32, level:
 pub fn format_header(level: i32, error_type: string, message: string): string
 {
     let is_warning = diagnostic_level_is_warning(level)
-    let level_text = if (is_warning == 1) { "warning" } else { "error" }
-    let level_color = if (is_warning == 1) { diag_yellow() } else { diag_red() }
+    let level_text = if (is_warning == 1) "warning" else "error"
+    let level_color = if (is_warning == 1) diag_yellow() else diag_red()
     let type_color = match error_type {
         "ParseError" -> diag_magenta()
         "TypeError" -> diag_blue()

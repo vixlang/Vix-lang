@@ -1,0 +1,55 @@
+type Outcome = Good(i32) | Bad(string)
+
+fn id:[T](value: T): T
+{
+    return value
+}
+
+fn validate(value: i32): Outcome
+{
+    if (value < 0) return Bad("negative")
+    return Good(value)
+}
+
+fn bump(value: i32): i32
+{
+    return value + 1
+}
+
+fn add(value: i32, amount: i32): i32
+{
+    return value + amount
+}
+
+fn keyword_weight(text: string): i32
+{
+    return match text {
+        "if" | "elif" | "else" -> 2
+        "match" | "return" -> 3
+        _ -> 0
+    }
+}
+
+fn classify(outcome: Outcome): i32
+{
+    return match outcome {
+        Good(value) -> value
+        Bad(_) -> 0
+    }
+}
+
+fn main(): i32
+{
+    let value = 21
+        |> id[i32]
+        |> bump
+        |> add(0)
+        |> validate
+        |> classify
+    let mut result = if (value == 22 and keyword_weight("else") == 2 and keyword_weight("return") == 3) 1 else 0
+    if (result == 1) result += 2
+    elif (result == 0) result = 9
+    else result = 8
+    if (result == 3) return 0
+    return 1
+}

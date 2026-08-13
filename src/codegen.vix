@@ -74,6 +74,11 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
     if (expr.tag == "float") { return "f64" }
     if (expr.tag == "bool") { return "bool" }
     if (expr.tag == "string") { return "string" }
+    if (expr.tag == "option")
+    {
+        if (expr.option_has_value == 0 or expr.left_idx < 0) { return "Option[unknown]" }
+        return "Option[" + codegen_expr_type(b, es, expr_store_get(es, expr.left_idx)) + "]"
+    }
     if (expr.tag == "ident") { return get_var_type(b, expr.text) }
     if (expr.tag == "addr") { return "ptr" }
     if (expr.tag == "deref")
@@ -586,6 +591,7 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
 
                 llvm_position_at_end(b, body_block)
                 codegen_bind_option_pattern(b, es, pattern_idx, subject_val, subject_ty)
+                codegen_bind_adt_pattern(b, es, pattern_idx, subject_val, subject_ty)
                 let body_expr = expr_store_get(es, body_idx)
                 let val = codegen_expr_value_typed(b, es, store, body_expr, result_ty)
                 vix_LLVMBuildStore(b.builder, val, result_alloca)
@@ -657,6 +663,18 @@ pub fn codegen_match_compare(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore,
         }
         return llvm_build_icmp_value(b, 33, subject_val, llvm_const_null_ptr())
     }
+    if (codegen_type_is_adt_layout(subject_ty) == 1 and pattern_expr.tag == "struct_literal")
+    {
+        let tag_idx = get_struct_field_index(subject_ty, "tag")
+        for (i in 0 .. pattern_expr.field_names.length)
+        {
+            if (pattern_expr.field_names[i] == "tag")
+            {
+                let pattern_tag = codegen_expr_value_typed(b, es, store, expr_store_get(es, pattern_expr.args[i]), "i32")
+                return llvm_build_icmp_value(b, 32, llvm_extract_value(b, subject_val, tag_idx), pattern_tag)
+            }
+        }
+    }
     let pattern_val = codegen_expr_value_typed(b, es, store, pattern_expr, subject_ty)
     if (subject_ty == "string")
     {
@@ -692,6 +710,27 @@ pub fn codegen_bind_option_pattern(b: &LlvmBuilder, es: &ExprStore, pattern_idx:
         }
     }
     llvm_define_var(b, bind_expr.text, inner_ty, bind_val)
+}
+
+pub fn codegen_bind_adt_pattern(b: &LlvmBuilder, es: &ExprStore, pattern_idx: i32, subject_val: ptr, subject_ty: string)
+{
+    if (codegen_type_is_adt_layout(subject_ty) == 0 or pattern_idx < 0) { return }
+    let pattern_expr = expr_store_get(es, pattern_idx)
+    if (pattern_expr.tag != "struct_literal") { return }
+    for (i in 0 .. pattern_expr.field_names.length)
+    {
+        let field_name = pattern_expr.field_names[i]
+        if (field_name != "tag")
+        {
+            let bind_expr = expr_store_get(es, pattern_expr.args[i])
+            if (bind_expr.tag == "ident" and bind_expr.text != "_")
+            {
+                let field_idx = get_struct_field_index(subject_ty, field_name)
+                let field_ty = get_struct_field_type(subject_ty, field_name)
+                llvm_define_var(b, bind_expr.text, field_ty, llvm_extract_value(b, subject_val, field_idx))
+            }
+        }
+    }
 }
 
 pub fn codegen_field_address(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr): ptr
@@ -972,11 +1011,12 @@ pub fn codegen_stmt_in_loop(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, 
                     let body_block = llvm_append_block(b, llvm_label_name(b, "match.body"))
                     let after_test = llvm_append_block(b, llvm_label_name(b, "match.test"))
                     let cmp = codegen_match_compare(b, es, store, subject_val, subject_ty, stmt.match_pattern_indices[i])
-	                    let cmp_i1 = llvm_build_truthy_typed_i1(b, cmp, "bool")
-	                    vix_LLVMBuildCondBr(b.builder, cmp_i1, body_block, after_test)
-	                    llvm_position_at_end(b, body_block)
-	                    codegen_bind_option_pattern(b, es, stmt.match_pattern_indices[i], subject_val, subject_ty)
-	                    codegen_match_statement_body(b, es, store, stmt.match_body_indices[i], break_block, continue_block, return_is_void)
+                    let cmp_i1 = llvm_build_truthy_typed_i1(b, cmp, "bool")
+                    vix_LLVMBuildCondBr(b.builder, cmp_i1, body_block, after_test)
+                    llvm_position_at_end(b, body_block)
+                    codegen_bind_option_pattern(b, es, stmt.match_pattern_indices[i], subject_val, subject_ty)
+                    codegen_bind_adt_pattern(b, es, stmt.match_pattern_indices[i], subject_val, subject_ty)
+                    codegen_match_statement_body(b, es, store, stmt.match_body_indices[i], break_block, continue_block, return_is_void)
                     if (llvm_current_block_terminated(b) == 0)
                     {
                         llvm_emit_jmp_block(b, end_block)

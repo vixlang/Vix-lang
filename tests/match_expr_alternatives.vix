@@ -1,0 +1,14 @@
+fn classify(value: string): i32
+{
+    return match value {
+        "if" | "else" | "match" -> 1
+        "i32" | "string" -> 2
+        _ -> 0
+    }
+}
+
+fn main(): i32
+{
+    if (classify("else") == 1 and classify("string") == 2 and classify("other") == 0) return 0
+    return 1
+}

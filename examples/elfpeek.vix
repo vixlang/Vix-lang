@@ -65,48 +65,56 @@ fn print_u64le_hex(buf: string, off: i32)
 
 fn elf_type_name(t: i32): ptr
 {
-    if (t == 0) { return "NONE" }
-    if (t == 1) { return "REL" }
-    if (t == 2) { return "EXEC" }
-    if (t == 3) { return "DYN" }
-    if (t == 4) { return "CORE" }
-    return "UNKNOWN"
+    return match t {
+        0 -> "NONE"
+        1 -> "REL"
+        2 -> "EXEC"
+        3 -> "DYN"
+        4 -> "CORE"
+        _ -> "UNKNOWN"
+    }
 }
 
 fn machine_name(m: i32): ptr
 {
-    if (m == 3) { return "x86" }
-    if (m == 40) { return "ARM" }
-    if (m == 62) { return "x86-64" }
-    if (m == 183) { return "AArch64" }
-    if (m == 243) { return "RISC-V" }
-    return "unknown"
+    return match m {
+        3 -> "x86"
+        40 -> "ARM"
+        62 -> "x86-64"
+        183 -> "AArch64"
+        243 -> "RISC-V"
+        _ -> "unknown"
+    }
 }
 
 fn ph_type_name(t: i32): ptr
 {
-    if (t == 0) { return "NULL" }
-    if (t == 1) { return "LOAD" }
-    if (t == 2) { return "DYNAMIC" }
-    if (t == 3) { return "INTERP" }
-    if (t == 4) { return "NOTE" }
-    if (t == 5) { return "SHLIB" }
-    if (t == 6) { return "PHDR" }
-    if (t == 7) { return "TLS" }
-    return "OTHER"
+    return match t {
+        0 -> "NULL"
+        1 -> "LOAD"
+        2 -> "DYNAMIC"
+        3 -> "INTERP"
+        4 -> "NOTE"
+        5 -> "SHLIB"
+        6 -> "PHDR"
+        7 -> "TLS"
+        _ -> "OTHER"
+    }
 }
 
 fn sh_type_name(t: i32): ptr
 {
-    if (t == 0) { return "NULL" }
-    if (t == 1) { return "PROGBITS" }
-    if (t == 2) { return "SYMTAB" }
-    if (t == 3) { return "STRTAB" }
-    if (t == 4) { return "RELA" }
-    if (t == 8) { return "NOBITS" }
-    if (t == 9) { return "REL" }
-    if (t == 11) { return "DYNSYM" }
-    return "OTHER"
+    return match t {
+        0 -> "NULL"
+        1 -> "PROGBITS"
+        2 -> "SYMTAB"
+        3 -> "STRTAB"
+        4 -> "RELA"
+        8 -> "NOBITS"
+        9 -> "REL"
+        11 -> "DYNSYM"
+        _ -> "OTHER"
+    }
 }
 
 fn print_cstr_at(buf: string, off: i32)

@@ -73,49 +73,65 @@ pub fn ty_prim_never(): i32 { return 17 }
 
 pub fn ty_prim_is_int64(code: i32): i32
 {
-    if (code == ty_prim_i64() or code == ty_prim_u64() or code == ty_prim_usize()) { return 1 }
-    return 0
+    return match code {
+        2 -> 1
+        4 -> 1
+        9 -> 1
+        _ -> 0
+    }
 }
 
 pub fn ty_prim_is_int32(code: i32): i32
 {
-    if (code == ty_prim_i32() or code == ty_prim_u32()) { return 1 }
-    return 0
+    return match code {
+        1 -> 1
+        3 -> 1
+        _ -> 0
+    }
 }
 
 pub fn ty_prim_is_small_int(code: i32): i32
 {
-    if (code == ty_prim_i8() or code == ty_prim_u8() or code == ty_prim_i16() or code == ty_prim_u16() or code == ty_prim_char()) { return 1 }
-    return 0
+    return match code {
+        5 -> 1
+        6 -> 1
+        7 -> 1
+        8 -> 1
+        14 -> 1
+        _ -> 0
+    }
 }
 
 pub fn ty_prim_is_integer(code: i32): i32
 {
-    if (ty_prim_is_int64(code) == 1 or ty_prim_is_int32(code) == 1 or ty_prim_is_small_int(code) == 1) { return 1 }
+    if (ty_prim_is_int64(code) == 1 or ty_prim_is_int32(code) == 1 or ty_prim_is_small_int(code) == 1) return 1
     return 0
 }
 
 pub fn ty_prim_is_float(code: i32): i32
 {
-    if (code == ty_prim_f32() or code == ty_prim_f64()) { return 1 }
-    return 0
+    return match code {
+        10 -> 1
+        11 -> 1
+        _ -> 0
+    }
 }
 
 pub fn ty_prim_is_numeric(code: i32): i32
 {
-    if (ty_prim_is_integer(code) == 1 or ty_prim_is_float(code) == 1) { return 1 }
+    if (ty_prim_is_integer(code) == 1 or ty_prim_is_float(code) == 1) return 1
     return 0
 }
 
 pub fn ty_prim_can_assign(target_code: i32, value_code: i32): i32
 {
-    if (target_code == value_code) { return 1 }
-    if (target_code == ty_prim_ptr() and value_code == ty_prim_string()) { return 1 }
-    if (target_code == ty_prim_ptr() and ty_prim_is_integer(value_code) == 1) { return 1 }
-    if (target_code == ty_prim_string() and ty_prim_is_integer(value_code) == 1) { return 1 }
-    if (target_code == ty_prim_bool() and ty_prim_is_integer(value_code) == 1) { return 1 }
-    if (ty_prim_is_integer(target_code) == 1 and ty_prim_is_integer(value_code) == 1) { return 1 }
-    if (ty_prim_is_float(target_code) == 1 and ty_prim_is_numeric(value_code) == 1) { return 1 }
+    if (target_code == value_code) return 1
+    if (target_code == ty_prim_ptr() and value_code == ty_prim_string()) return 1
+    if (target_code == ty_prim_ptr() and ty_prim_is_integer(value_code) == 1) return 1
+    if (target_code == ty_prim_string() and ty_prim_is_integer(value_code) == 1) return 1
+    if (target_code == ty_prim_bool() and ty_prim_is_integer(value_code) == 1) return 1
+    if (ty_prim_is_integer(target_code) == 1 and ty_prim_is_integer(value_code) == 1) return 1
+    if (ty_prim_is_float(target_code) == 1 and ty_prim_is_numeric(value_code) == 1) return 1
     return 0
 }
 
@@ -176,102 +192,96 @@ pub fn ty_adt(store: &TyStore, name: string, args: [Ty]): Ty
 
 pub fn ty_prim_name(code: i32): string
 {
-    if (code == ty_prim_i32()) { return "i32" }
-    if (code == ty_prim_i64()) { return "i64" }
-    if (code == ty_prim_u32()) { return "u32" }
-    if (code == ty_prim_u64()) { return "u64" }
-    if (code == ty_prim_i16()) { return "i16" }
-    if (code == ty_prim_u16()) { return "u16" }
-    if (code == ty_prim_i8()) { return "i8" }
-    if (code == ty_prim_u8()) { return "u8" }
-    if (code == ty_prim_usize()) { return "usize" }
-    if (code == ty_prim_f32()) { return "f32" }
-    if (code == ty_prim_f64()) { return "f64" }
-    if (code == ty_prim_bool()) { return "bool" }
-    if (code == ty_prim_string()) { return "string" }
-    if (code == ty_prim_char()) { return "char" }
-    if (code == ty_prim_void()) { return "void" }
-    if (code == ty_prim_ptr()) { return "ptr" }
-    if (code == ty_prim_never()) { return "never" }
-    return "unknown"
+    return match code {
+        1 -> "i32"
+        2 -> "i64"
+        3 -> "u32"
+        4 -> "u64"
+        5 -> "i16"
+        6 -> "u16"
+        7 -> "i8"
+        8 -> "u8"
+        9 -> "usize"
+        10 -> "f32"
+        11 -> "f64"
+        12 -> "bool"
+        13 -> "string"
+        14 -> "char"
+        15 -> "void"
+        16 -> "ptr"
+        17 -> "never"
+        _ -> "unknown"
+    }
 }
 
 pub fn ty_prim_from_name(name: string): Ty
 {
-    if (name == "i32") { return TyPrim(ty_prim_i32()) }
-    if (name == "i64") { return TyPrim(ty_prim_i64()) }
-    if (name == "u32") { return TyPrim(ty_prim_u32()) }
-    if (name == "u64") { return TyPrim(ty_prim_u64()) }
-    if (name == "i16") { return TyPrim(ty_prim_i16()) }
-    if (name == "u16") { return TyPrim(ty_prim_u16()) }
-    if (name == "i8") { return TyPrim(ty_prim_i8()) }
-    if (name == "u8") { return TyPrim(ty_prim_u8()) }
-    if (name == "usize") { return TyPrim(ty_prim_usize()) }
-    if (name == "f32") { return TyPrim(ty_prim_f32()) }
-    if (name == "f64") { return TyPrim(ty_prim_f64()) }
-    if (name == "bool") { return TyPrim(ty_prim_bool()) }
-    if (name == "string") { return TyPrim(ty_prim_string()) }
-    if (name == "char") { return TyPrim(ty_prim_char()) }
-    if (name == "void") { return TyPrim(ty_prim_void()) }
-    if (name == "ptr") { return TyPrim(ty_prim_ptr()) }
-    return TyUnknown
+    return match name {
+        "i32" -> TyPrim(ty_prim_i32())
+        "i64" -> TyPrim(ty_prim_i64())
+        "u32" -> TyPrim(ty_prim_u32())
+        "u64" -> TyPrim(ty_prim_u64())
+        "i16" -> TyPrim(ty_prim_i16())
+        "u16" -> TyPrim(ty_prim_u16())
+        "i8" -> TyPrim(ty_prim_i8())
+        "u8" -> TyPrim(ty_prim_u8())
+        "usize" -> TyPrim(ty_prim_usize())
+        "f32" -> TyPrim(ty_prim_f32())
+        "f64" -> TyPrim(ty_prim_f64())
+        "bool" -> TyPrim(ty_prim_bool())
+        "string" -> TyPrim(ty_prim_string())
+        "char" -> TyPrim(ty_prim_char())
+        "void" -> TyPrim(ty_prim_void())
+        "ptr" -> TyPrim(ty_prim_ptr())
+        _ -> TyUnknown
+    }
 }
 
 pub fn ty_is_unknown(ty: Ty): i32
 {
-    match ty
-    {
-        TyUnknown -> { return 1 }
-        _ -> {}
+    return match ty {
+        TyUnknown -> 1
+        _ -> 0
     }
-    return 0
 }
 
 pub fn ty_is_error(ty: Ty): i32
 {
-    match ty
-    {
-        TyError -> { return 1 }
-        _ -> {}
+    return match ty {
+        TyError -> 1
+        _ -> 0
     }
-    return 0
 }
 
 pub fn ty_is_var(ty: Ty): i32
 {
-    match ty
-    {
-        TyVar(id) -> { return 1 }
-        _ -> {}
+    return match ty {
+        TyVar(_) -> 1
+        _ -> 0
     }
-    return 0
 }
 
 pub fn ty_is_array(ty: Ty): i32
 {
-    match ty
-    {
-        TyArray(_) -> { return 1 }
-        _ -> {}
+    return match ty {
+        TyArray(_) -> 1
+        _ -> 0
     }
-    return 0
 }
 
 pub fn ty_var_id_or(ty: Ty, fallback: i32): i32
 {
-    match ty
-    {
-        TyVar(id) -> { return id }
-        _ -> {}
+    return match ty {
+        TyVar(id) -> id
+        _ -> fallback
     }
-    return fallback
 }
 
 pub fn ty_array_contains_i32(xs: [i32], value: i32): i32
 {
     for (i in 0 .. xs.length)
     {
-        if (xs[i] == value) { return 1 }
+        if (xs[i] == value) return 1
     }
     return 0
 }
@@ -280,7 +290,7 @@ pub fn ty_array_append_unique_i32(xs: [i32], value: i32): [i32]
 {
     for (i in 0 .. xs.length)
     {
-        if (xs[i] == value) { return xs }
+        if (xs[i] == value) return xs
     }
     xs.push(value)
     return xs
@@ -354,14 +364,14 @@ pub fn ty_occurs(store: &TyStore, var_id: i32, ty: Ty): i32
     match ty
     {
         TyVar(id) -> {
-            if (id == var_id) { return 1 }
+            if (id == var_id) return 1
             return 0
         }
         TyFun(idx) -> {
             let data = store.funs[idx]
             for (i in 0 .. data.params.length)
             {
-                if (ty_occurs(store, var_id, data.params[i]) == 1) { return 1 }
+                if (ty_occurs(store, var_id, data.params[i]) == 1) return 1
             }
             return ty_occurs(store, var_id, data.ret)
         }
@@ -369,7 +379,7 @@ pub fn ty_occurs(store: &TyStore, var_id: i32, ty: Ty): i32
             let data = store.tuples[idx]
             for (i in 0 .. data.elems.length)
             {
-                if (ty_occurs(store, var_id, data.elems[i]) == 1) { return 1 }
+                if (ty_occurs(store, var_id, data.elems[i]) == 1) return 1
             }
             return 0
         }
@@ -379,7 +389,7 @@ pub fn ty_occurs(store: &TyStore, var_id: i32, ty: Ty): i32
             let data = store.adts[idx]
             for (i in 0 .. data.args.length)
             {
-                if (ty_occurs(store, var_id, data.args[i]) == 1) { return 1 }
+                if (ty_occurs(store, var_id, data.args[i]) == 1) return 1
             }
             return 0
         }
@@ -398,7 +408,7 @@ pub fn ty_eq(store: &TyStore, left: Ty, right: Ty): i32
             match right
             {
                 TyVar(b) -> {
-                    if (a == b) { return 1 }
+                    if (a == b) return 1
                     return 0
                 }
                 _ -> {}
@@ -409,7 +419,7 @@ pub fn ty_eq(store: &TyStore, left: Ty, right: Ty): i32
             match right
             {
                 TyPrim(b) -> {
-                    if (a == b) { return 1 }
+                    if (a == b) return 1
                     return 0
                 }
                 _ -> {}
@@ -422,10 +432,10 @@ pub fn ty_eq(store: &TyStore, left: Ty, right: Ty): i32
                 TyFun(bidx) -> {
                     let a = store.funs[aidx]
                     let b = store.funs[bidx]
-                    if (a.params.length != b.params.length) { return 0 }
+                    if (a.params.length != b.params.length) return 0
                     for (i in 0 .. a.params.length)
                     {
-                        if (ty_eq(store, a.params[i], b.params[i]) == 0) { return 0 }
+                        if (ty_eq(store, a.params[i], b.params[i]) == 0) return 0
                     }
                     return ty_eq(store, a.ret, b.ret)
                 }
@@ -439,10 +449,10 @@ pub fn ty_eq(store: &TyStore, left: Ty, right: Ty): i32
                 TyTuple(bidx) -> {
                     let a = store.tuples[aidx]
                     let b = store.tuples[bidx]
-                    if (a.elems.length != b.elems.length) { return 0 }
+                    if (a.elems.length != b.elems.length) return 0
                     for (i in 0 .. a.elems.length)
                     {
-                        if (ty_eq(store, a.elems[i], b.elems[i]) == 0) { return 0 }
+                        if (ty_eq(store, a.elems[i], b.elems[i]) == 0) return 0
                     }
                     return 1
                 }
@@ -472,10 +482,10 @@ pub fn ty_eq(store: &TyStore, left: Ty, right: Ty): i32
                 TyAdt(bidx) -> {
                     let a = store.adts[aidx]
                     let b = store.adts[bidx]
-                    if (a.name != b.name or a.args.length != b.args.length) { return 0 }
+                    if (a.name != b.name or a.args.length != b.args.length) return 0
                     for (i in 0 .. a.args.length)
                     {
-                        if (ty_eq(store, a.args[i], b.args[i]) == 0) { return 0 }
+                        if (ty_eq(store, a.args[i], b.args[i]) == 0) return 0
                     }
                     return 1
                 }
@@ -500,7 +510,7 @@ pub fn ty_to_string(store: &TyStore, ty: Ty): string
             let mut out = "("
             for (i in 0 .. data.params.length)
             {
-                if (i > 0) { out = out + ", " }
+                if (i > 0) out = out + ", "
                 out = out + ty_to_string(store, data.params[i])
             }
             out = out + ") -> " + ty_to_string(store, data.ret)
@@ -511,7 +521,7 @@ pub fn ty_to_string(store: &TyStore, ty: Ty): string
             let mut out = "("
             for (i in 0 .. data.elems.length)
             {
-                if (i > 0) { out = out + ", " }
+                if (i > 0) out = out + ", "
                 out = out + ty_to_string(store, data.elems[i])
             }
             return out + ")"
@@ -520,11 +530,11 @@ pub fn ty_to_string(store: &TyStore, ty: Ty): string
         TyPtr(idx) -> { return "ptr:" + ty_to_string(store, store.ptrs[idx].elem) }
         TyAdt(idx) -> {
             let data = store.adts[idx]
-            if (data.args.length == 0) { return data.name }
+            if (data.args.length == 0) return data.name
             let mut out = data.name + ":["
             for (i in 0 .. data.args.length)
             {
-                if (i > 0) { out = out + ", " }
+                if (i > 0) out = out + ", "
                 out = out + ty_to_string(store, data.args[i])
             }
             return out + "]"
@@ -535,9 +545,10 @@ pub fn ty_to_string(store: &TyStore, ty: Ty): string
 
 pub fn ty_from_text(store: &TyStore, text: string): Ty
 {
-    let prim = ty_prim_from_name(text)
-    if (ty_is_unknown(prim) == 0) { return prim }
-    if (text == "unknown" or text == "") { return TyUnknown }
+    let prim = text
+        |> ty_prim_from_name
+    if (ty_is_unknown(prim) == 0) return prim
+    if (text == "unknown" or text == "") return TyUnknown
     if (text.length > 1 and text[0] == '&')
     {
         return ty_ptr(store, ty_from_text(store, ty_slice(text, 1, text.length)))
@@ -562,20 +573,20 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
     if (generic_open > 0)
     {
         let mut base_end = generic_open
-        if (base_end > 0 and text[base_end - 1] == ':') { base_end -= 1 }
+        if (base_end > 0 and text[base_end - 1] == ':') base_end -= 1
         let base = ty_slice(text, 0, base_end)
         let mut args: [Ty] = []
         let mut start = generic_open + 1
         let mut depth = 0
         for (i in generic_open + 1 .. text.length)
         {
-            if (text[i] == '[') { depth += 1 }
+            if (text[i] == '[') depth += 1
             elif (text[i] == ']')
             {
                 if (depth == 0)
                 {
                     let arg = ty_trim(ty_slice(text, start, i))
-                    if (arg != "") { args.push(ty_from_text(store, arg)) }
+                    if (arg != "") args.push(ty_from_text(store, arg))
                     return ty_adt(store, base, args)
                 }
                 depth -= 1
@@ -583,7 +594,7 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
             elif (text[i] == ',' and depth == 0)
             {
                 let arg2 = ty_trim(ty_slice(text, start, i))
-                if (arg2 != "") { args.push(ty_from_text(store, arg2)) }
+                if (arg2 != "") args.push(ty_from_text(store, arg2))
                 start = i + 1
             }
         }
@@ -594,7 +605,7 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
         let mut inner = ""
         for (i in 1 .. text.length - 1)
         {
-            if (text[i] == '*') { return ty_array(store, ty_from_text(store, inner)) }
+            if (text[i] == '*') return ty_array(store, ty_from_text(store, inner))
             let s: string = malloc(2)
             s[0] = text[i]
             s[1] = 0
@@ -609,7 +620,7 @@ pub fn ty_find_char(text: string, needle: i8): i32
 {
     for (i in 0 .. text.length)
     {
-        if (text[i] == needle) { return i }
+        if (text[i] == needle) return i
     }
     return -1
 }
@@ -638,12 +649,12 @@ pub fn ty_trim(text: string): string
     let mut end = text.length
     while (start < end)
     {
-        if (text[start] != ' ') { break }
+        if (text[start] != ' ') break
         start += 1
     }
     while (end > start)
     {
-        if (text[end - 1] != ' ') { break }
+        if (text[end - 1] != ' ') break
         end -= 1
     }
     return ty_slice(text, start, end)

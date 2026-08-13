@@ -13,6 +13,9 @@ pub fn fresh_from(next_type_var: i32): Fresh
 {
     return Fresh{ next_type_var: next_type_var }
 }
+//{
+//    return Fresh{ next_type_var: next_type_var }
+//}
 
 pub fn fresh_tyvar_id(fresh: &Fresh): i32
 {

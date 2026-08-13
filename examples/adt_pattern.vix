@@ -1,43 +1,41 @@
-fn safe_divide(a: i32, b: i32)
+type Division = Quotient(i32) | DivisionByZero
+
+fn divide(a: i32, b: i32): Division
 {
-    if (b == 0)
-    {
-        let result = Err("cannot divide by zero")
-        match result
-        {
-            Ok(v) -> { print(v) }
-            Err(e) -> { print(-1) }
-        }
-    } 
-    else
-    {
-        let result = Ok(a / b)
-        match result
-        {
-            Ok(v) -> { print(v) }
-            Err(e) -> { print(-1) }
-        }
+    if (b == 0) return DivisionByZero
+    return Quotient(a / b)
+}
+
+fn print_division(result: Division)
+{
+    match result {
+        Quotient(value) -> print(value)
+        DivisionByZero -> print(-1)
     }
 }
 
-fn main(): i32 
+fn safe_divide(a: i32, b: i32)
+{
+    print_division(divide(a, b))
+}
+
+fn main(): i32
 {
     let x = Some(42)
     match x {
-        Some(v) -> { print(v) }
-        None -> { print(0) }
+        Some(value) -> print(value)
+        None -> print(0)
     }
 
     let y = None
-    match y
-    {
-        Some(v) -> { print(v) }
-        None -> { print(0) }
+    match y {
+        Some(value) -> print(value)
+        None -> print(0)
     }
+
     print("---")
     safe_divide(10, 2)
     safe_divide(10, 0)
     safe_divide(100, 7)
-
     return 0
 }

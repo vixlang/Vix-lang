@@ -147,8 +147,20 @@ pub fn parse_expression(parser: &Parser): i32
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
-        let right = parse_postfix(parser)
-        if (parser.ok == 0) { return -1 }
+        let mut right = -1
+        if (parser_kind(parser) == tk_ident() and stream_text_at(parser.stream, parser.pos + 1) == "[")
+        {
+            let name = parser_text(parser)
+            parser_advance(parser)
+            let type_args = parse_generic_call_type_args(parser)
+            if (parser.ok == 0) { return -1 }
+            right = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, []), line, col)
+        }
+        else
+        {
+            right = parse_postfix(parser)
+            if (parser.ok == 0) { return -1 }
+        }
         let target = expr_store_get(parser.expr_store, right)
         if (target.tag == "call")
         {
@@ -496,7 +508,8 @@ pub fn parse_match_expr(parser: &Parser): i32
     {
         while (parser_text(parser) == ";") { parser_advance(parser) }
         if (parser_text(parser) == "}" or parser_at_end(parser) == 1) { break }
-        
+
+        let arm_start = patterns.length
         if (parser_text(parser) == "_")
         {
             parser_advance(parser)
@@ -523,25 +536,26 @@ pub fn parse_match_expr(parser: &Parser): i32
                 if (parser.ok == 0) { return -1 }
                 patterns.push(pat_idx)
             }
-            bodies.push(-1)
         }
-        
+
         parser_expect_text(parser, "->")
         if (parser.ok == 0) { return -1 }
-        
+
+        let mut body_idx = -1
         if (parser_text(parser) == "{")
         {
-            let body_idx = parse_block_expression(parser)
-            if (parser.ok == 0) { return -1 }
-            bodies.push(body_idx)
+            body_idx = parse_block_expression(parser)
         }
         else
         {
-            let body_idx = parse_expression(parser)
-            if (parser.ok == 0) { return -1 }
+            body_idx = parse_expression(parser)
+        }
+        if (parser.ok == 0) { return -1 }
+        for (__pattern in arm_start .. patterns.length)
+        {
             bodies.push(body_idx)
         }
-        
+
         parser_accept_text(parser, ",")
     }
     
@@ -1105,6 +1119,19 @@ pub fn parse_block_statement(parser: &Parser): i32
     return parser_stmt_at(parser, ast_stmt_block_indices(parser.store, indices), line, col)
 }
 
+pub fn parse_if_statement_body(parser: &Parser): i32
+{
+    if (parser_text(parser) == "{")
+    {
+        return parse_block_statement(parser)
+    }
+    let line = parser_line(parser)
+    let col = parser_col(parser)
+    let stmt_idx = parse_statement(parser)
+    if (parser.ok == 0) { return -1 }
+    return parser_stmt_at(parser, ast_stmt_block_indices(parser.store, [stmt_idx]), line, col)
+}
+
 pub fn parse_if_rest(parser: &Parser): i32
 {
     while (parser_text(parser) == ";")
@@ -1114,7 +1141,7 @@ pub fn parse_if_rest(parser: &Parser): i32
     if (parser_text(parser) == "else")
     {
         parser_advance(parser)
-        let else_idx = parse_block_statement(parser)
+        let else_idx = parse_if_statement_body(parser)
         if (parser.ok == 0) { return -1 }
         return else_idx
     }
@@ -1142,7 +1169,7 @@ pub fn parse_if_statement(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     parser_expect_text(parser, ")")
     if (parser.ok == 0) { return -1 }
-    let then_idx = parse_block_statement(parser)
+    let then_idx = parse_if_statement_body(parser)
     if (parser.ok == 0) { return -1 }
     let else_idx = parse_if_rest(parser)
     if (parser.ok == 0) { return -1 }

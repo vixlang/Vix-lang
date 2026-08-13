@@ -1,0 +1,9 @@
+fn main(): i32
+{
+    let mut value = 0
+    if (1 == 1) value = 40
+    if (value == 40) value += 1
+    elif (value == 0) value = 2
+    else value = 3
+    return if (value == 41) value + 1 else 1
+}

@@ -1,0 +1,30 @@
+fn option_score(value: ?i32): i32
+{
+    return match value {
+        Some(number) -> number
+        None -> 0
+    }
+}
+
+fn array_score(values: [i32]): i32
+{
+    let mut total = 0
+    for (i in 0 .. values.length)
+    {
+        if (i == 0) total += values[i]
+        elif (i == 1) total += values[i]
+        else total += values[i]
+    }
+    return total
+}
+
+fn main(): i32
+{
+    let mut values: [i32] = []
+    values.push(4)
+    values.push(5)
+    let selected = Some(array_score(values))
+    let score = selected
+        |> option_score
+    return if (score == 9) 0 else 1
+}

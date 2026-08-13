@@ -1,0 +1,17 @@
+type Ty = TyUnknown | TyPrim(i32)
+
+fn ty_from_name(name: string): Ty
+{
+    return match name {
+        "i32" -> TyPrim(1)
+        _ -> TyUnknown
+    }
+}
+
+fn main(): i32
+{
+    return match ty_from_name("i32") {
+        TyPrim(value) -> value
+        TyUnknown -> 0
+    }
+}

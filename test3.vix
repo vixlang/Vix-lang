@@ -5,9 +5,7 @@ extern "C"
 
 fn main(argc:i32,argv:&string): i32
 {
-
-	let x = 10
-		|> printf("x = %d \n",_)
+    printf("argc = %d \n", argc)
 		
 	return 0
 }

@@ -1,0 +1,24 @@
+type NumberResult = Valid(i32) | Invalid(string)
+
+fn double(value: i32): i32
+{
+    return value * 2
+}
+
+fn validate(value: i32): NumberResult
+{
+    if (value < 0) return Invalid("negative number")
+    return Valid(value)
+}
+
+fn main(): i32
+{
+    let result = 21 |> double |> validate
+    let mut output = 1
+
+    match result {
+        Valid(value) -> output = value
+        Invalid(_) -> output = 1
+    }
+    return output
+}

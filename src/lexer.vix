@@ -109,19 +109,19 @@ pub fn peek_char(src: string, pos: i32): ?i8
 }
 pub fn is_alpha(c: i8): i32
 {
-    if ((c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or c == '_') { return 1 }
+    if ((c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or c == '_') return 1
     return 0
 }
 
 pub fn is_digit(c: i8): i32
 {
-    if (c >= '0' and c <= '9') { return 1 }
+    if (c >= '0' and c <= '9') return 1
     return 0
 }
 
 pub fn is_ident(c: i8): i32
 {
-    if (is_alpha(c) == 1 or is_digit(c) == 1) { return 1 }
+    if (is_alpha(c) == 1 or is_digit(c) == 1) return 1
     return 0
 }
 
@@ -135,8 +135,8 @@ pub fn char_string(c: i8): string
 
 pub fn token_can_end_statement(kind: i32, text: string): i32
 {
-    if (kind == tk_ident() or kind == tk_number() or kind == tk_float() or kind == tk_string() or kind == tk_bool()) { return 1 }
-    if (text == ")" or text == "]" or text == "}" or text == "break" or text == "continue" or text == "return") { return 1 }
+    if (kind == tk_ident() or kind == tk_number() or kind == tk_float() or kind == tk_string() or kind == tk_bool()) return 1
+    if (text == ")" or text == "]" or text == "}" or text == "break" or text == "continue" or text == "return") return 1
     return 0
 }
 
@@ -160,7 +160,7 @@ pub fn next_non_space_char(src: string, pos: i32): ?i8
             {
                 i += 1
             }
-            if (i + 1 < src.length) { i += 2 }
+            if (i + 1 < src.length) i += 2
         }
         else
         {
@@ -172,9 +172,9 @@ pub fn next_non_space_char(src: string, pos: i32): ?i8
 
 pub fn newline_should_insert_semicolon(src: string, pos: i32, stream: &TokenStream): i32
 {
-    if (stream_len(stream) == 0) { return 0 }
+    if (stream_len(stream) == 0) return 0
     let last = stream_len(stream) - 1
-    if (token_can_end_statement(stream_kind_at(stream, last), stream_text_at(stream, last)) == 0) { return 0 }
+    if (token_can_end_statement(stream_kind_at(stream, last), stream_text_at(stream, last)) == 0) return 0
     return match next_non_space_char(src, pos) {
         Some(c) -> {
             if (c == '}' or c == '"' or is_alpha(c) == 1 or is_digit(c) == 1)
@@ -193,11 +193,11 @@ pub fn newline_should_insert_semicolon(src: string, pos: i32, stream: &TokenStre
 pub fn is_keyword(text: string): i32
 {
     match text {
-        "fn" | "return" | "let" | "mut" | "if" | "elif" | "else" | "while" | "for" | "in" -> { return 1 }
-        "match" | "struct" | "type" | "pub" | "import" | "extern" | "break" | "continue" | "mod" | "as" -> { return 1 }
-        "i32" | "i64" | "i8" | "f32" | "f64" | "string" | "void" | "nil" | "true" | "false" -> { return 1 }
-        "and" | "or" | "print" -> { return 1 }
-        _ -> { return 0 }
+        "fn" | "return" | "let" | "mut" | "if" | "elif" | "else" | "while" | "for" | "in" -> return 1
+        "match" | "struct" | "type" | "pub" | "import" | "extern" | "break" | "continue" | "mod" | "as" -> return 1
+        "i32" | "i64" | "i8" | "f32" | "f64" | "string" | "void" | "nil" | "true" | "false" -> return 1
+        "and" | "or" | "print" -> return 1
+        _ -> return 0
     }
 }
 
@@ -435,29 +435,29 @@ pub fn tokenize(src: string): TokenStream
                                 let next = src[pos + 1]
                                 match c {
                                     '=' -> {
-                                        if (next == '>') { symbol = "=>" }
+                                        if (next == '>') symbol = "=>"
                                         elif (next == '=') { symbol = "==" }
                                     }
                                     '!' -> {
-                                        if (next == '=') { symbol = "!=" }
+                                        if (next == '=') symbol = "!="
                                     }
                                     '<' -> {
-                                        if (next == '=') { symbol = "<=" }
+                                        if (next == '=') symbol = "<="
                                         elif (next == '<') { symbol = "<<" }
                                     }
                                     '>' -> {
-                                        if (next == '=') { symbol = ">=" }
+                                        if (next == '=') symbol = ">="
                                         elif (next == '>') { symbol = ">>" }
                                     }
                                     '+' -> {
-                                        if (next == '=') { symbol = "+=" }
+                                        if (next == '=') symbol = "+="
                                     }
                                     '-' -> {
-                                        if (next == '=') { symbol = "-=" }
+                                        if (next == '=') symbol = "-="
                                         elif (next == '>') { symbol = "->" }
                                     }
                                     '*' -> {
-                                        if (next == '*') { symbol = "**" }
+                                        if (next == '*') symbol = "**"
                                     }
                                      '.' -> {
                                         if (next == '.' and pos + 2 < src.length and src[pos + 2] == '.')
@@ -470,10 +470,10 @@ pub fn tokenize(src: string): TokenStream
                                         }
                                     }
                                     ':' -> {
-                                        if (next == ':') { symbol = "::" }
+                                        if (next == ':') symbol = "::"
                                     }
                                     '|' -> {
-                                        if (next == '>') { symbol = "|>" }
+                                        if (next == '>') symbol = "|>"
                                     }
                                     _ -> {}
                                 }
@@ -496,44 +496,24 @@ pub fn tokenize(src: string): TokenStream
 
 pub fn tokenize_debug(src: string): string
 {
-    let stream = tokenize(src)
+    let stream = src
+        |> tokenize
     let mut out = ""
     for (i in 0 .. stream_len(stream))
     {
         let kind = stream_kind_at(stream, i)
         let text = stream_text_at(stream, i)
-        if (kind == tk_number())
-        {
-            out = out + "Token(kind=number, int=" + i32_to_str(stream_int_at(stream, i)) + ")\n"
+        let rendered = match kind {
+            1 -> "Token(kind=ident, text='" + text + "')\n"
+            2 -> "Token(kind=number, int=" + i32_to_str(stream_int_at(stream, i)) + ")\n"
+            3 -> "Token(kind=keyword, text='" + text + "')\n"
+            4 -> "Token(kind=symbol, text='" + text + "')\n"
+            5 -> "Token(kind=string, text='" + text + "')\n"
+            7 -> "Token(kind=bool, text='" + text + "', value=" + i32_to_str(stream_int_at(stream, i)) + ")\n"
+            8 -> "Token(kind=float, text='" + text + "', value=" + f64_to_str(stream_float_at(stream, i)) + ")\n"
+            _ -> "Token(kind=eof)\n"
         }
-        elif (kind == tk_float())
-        {
-            out = out + "Token(kind=float, text='" + text + "', value=" + f64_to_str(stream_float_at(stream, i)) + ")\n"
-        }
-        elif (kind == tk_bool())
-        {
-            out = out + "Token(kind=bool, text='" + text + "', value=" + i32_to_str(stream_int_at(stream, i)) + ")\n"
-        }
-        elif (kind == tk_ident())
-        {
-            out = out + "Token(kind=ident, text='" + text + "')\n"
-        }
-        elif (kind == tk_keyword())
-        {
-            out = out + "Token(kind=keyword, text='" + text + "')\n"
-        }
-        elif (kind == tk_symbol())
-        {
-            out = out + "Token(kind=symbol, text='" + text + "')\n"
-        }
-        elif (kind == tk_string())
-        {
-            out = out + "Token(kind=string, text='" + text + "')\n"
-        }
-        else
-        {
-            out = out + "Token(kind=eof)\n"
-        }
+        out = out + rendered
     }
     return out
 }

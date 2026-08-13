@@ -9,86 +9,116 @@ extern "C"
 
 pub fn type_is_int64(ty: string): i32
 {
-    if (ty == "i64" or ty == "u64" or ty == "usize") { return 1 }
-    return 0
+    return match ty {
+        "i64" -> 1
+        "u64" -> 1
+        "usize" -> 1
+        _ -> 0
+    }
 }
 
 pub fn type_is_int32(ty: string): i32
 {
-    if (ty == "i32" or ty == "u32") { return 1 }
-    return 0
+    return match ty {
+        "i32" -> 1
+        "u32" -> 1
+        _ -> 0
+    }
 }
 
 pub fn type_is_small_int(ty: string): i32
 {
-    if (ty == "i8" or ty == "u8" or ty == "i16" or ty == "u16" or ty == "char") { return 1 }
-    return 0
+    return match ty {
+        "i8" -> 1
+        "u8" -> 1
+        "i16" -> 1
+        "u16" -> 1
+        "char" -> 1
+        _ -> 0
+    }
 }
 
 pub fn type_is_concrete_int(ty: string): i32
 {
-    if (type_is_int64(ty) == 1 or type_is_int32(ty) == 1) { return 1 }
+    if (type_is_int64(ty) == 1 or type_is_int32(ty) == 1) return 1
     return 0
 }
 
 pub fn type_int_width(ty: string): i32
 {
-    if (type_is_int64(ty) == 1) { return 64 }
-    if (type_is_int32(ty) == 1) { return 32 }
-    if (ty == "i16" or ty == "u16") { return 16 }
-    if (ty == "i8" or ty == "u8" or ty == "char") { return 8 }
-    return 0
+    return match ty {
+        "i64" -> 64
+        "u64" -> 64
+        "usize" -> 64
+        "i32" -> 32
+        "u32" -> 32
+        "i16" -> 16
+        "u16" -> 16
+        "i8" -> 8
+        "u8" -> 8
+        "char" -> 8
+        _ -> 0
+    }
 }
 
 pub fn type_is_float(ty: string): i32
 {
-    if (ty == "f32" or ty == "f64" or ty == "unknown") { return 1 }
-    return 0
+    return match ty {
+        "f32" -> 1
+        "f64" -> 1
+        "unknown" -> 1
+        _ -> 0
+    }
 }
 
 pub fn type_is_integer(ty: string): i32
 {
-    if (type_is_concrete_int(ty) == 1 or type_is_small_int(ty) == 1 or ty == "unknown") { return 1 }
+    if (type_is_concrete_int(ty) == 1 or type_is_small_int(ty) == 1 or ty == "unknown") return 1
     return 0
 }
 
 pub fn type_is_numeric(ty: string): i32
 {
-    if (type_is_integer(ty) == 1 or type_is_float(ty) == 1) { return 1 }
+    if (type_is_integer(ty) == 1 or type_is_float(ty) == 1) return 1
     return 0
 }
 
 pub fn type_is_truthy(ty: string): i32
 {
-    if (ty == "bool" or ty == "i32" or ty == "i64" or ty == "unknown") { return 1 }
-    return 0
+    return match ty {
+        "bool" -> 1
+        "i32" -> 1
+        "i64" -> 1
+        "unknown" -> 1
+        _ -> 0
+    }
 }
 
 pub fn type_numeric_result(left_ty: string, right_ty: string): string
 {
-    if (left_ty == "unknown") { return right_ty }
-    if (right_ty == "unknown") { return left_ty }
-    if (left_ty == "f64" or right_ty == "f64") { return "f64" }
-    if (left_ty == "f32" or right_ty == "f32") { return "f32" }
-    if (type_is_int64(left_ty) == 1 or type_is_int64(right_ty) == 1) { return "i64" }
+    if (left_ty == "unknown") return right_ty
+    if (right_ty == "unknown") return left_ty
+    if (left_ty == "f64" or right_ty == "f64") return "f64"
+    if (left_ty == "f32" or right_ty == "f32") return "f32"
+    if (type_is_int64(left_ty) == 1 or type_is_int64(right_ty) == 1) return "i64"
     return "i32"
 }
 
 pub fn type_is_option_text(ty: string): i32
 {
-    if (ty.length > 7 and ty[0] == 'O' and ty[1] == 'p' and ty[2] == 't' and ty[3] == 'i' and ty[4] == 'o' and ty[5] == 'n' and ty[6] == '[') { return 1 }
+    if (ty.length > 7 and ty[0] == 'O' and ty[1] == 'p' and ty[2] == 't' and ty[3] == 'i' and ty[4] == 'o' and ty[5] == 'n' and ty[6] == '[') return 1
     return 0
 }
 
 pub fn type_is_array_text_semantic(ty: string): i32
 {
-    if (ty.length > 2 and ty[0] == '[') { return 1 }
+    if (ty.length > 2 and ty[0] == '[') return 1
     return 0
 }
 
 pub fn type_option_inner(ty: string): string
 {
-    if (type_is_option_text(ty) == 0) { return "unknown" }
+    if (type_is_option_text(ty) == 0) return "unknown"
     let mut result = ""
     for (i in 7 .. ty.length - 1)
     {
@@ -102,18 +132,18 @@ pub fn type_option_inner(ty: string): string
 
 pub fn type_text_is_array_typeinfer(ty: string): i32
 {
-    if (ty.length > 0 and ty[0] == '[') { return 1 }
+    if (ty.length > 0 and ty[0] == '[') return 1
     return 0
 }
 
 pub fn type_array_element_typeinfer(ty: string): string
 {
-    if (type_text_is_array_typeinfer(ty) == 0 or ty.length <= 2) { return "unknown" }
+    if (type_text_is_array_typeinfer(ty) == 0 or ty.length <= 2) return "unknown"
     let mut result = ""
     let mut end = ty.length - 1
     for (i in 1 .. ty.length - 1)
     {
-        if (ty[i] == '*') { end = i }
+        if (ty[i] == '*') end = i
     }
     for (i in 1 .. end)
     {
@@ -127,13 +157,13 @@ pub fn type_array_element_typeinfer(ty: string): string
 
 pub fn is_ptr_to_struct_semantic(ty: string): i32
 {
-    if (ty.length > 4 and ty[0] == 'p' and ty[1] == 't' and ty[2] == 'r' and ty[3] == ':') { return 1 }
+    if (ty.length > 4 and ty[0] == 'p' and ty[1] == 't' and ty[2] == 'r' and ty[3] == ':') return 1
     return 0
 }
 
 pub fn strip_ptr_prefix_semantic(ty: string): string
 {
-    if (is_ptr_to_struct_semantic(ty) == 0) { return ty }
+    if (is_ptr_to_struct_semantic(ty) == 0) return ty
     let mut result = ""
     for (i in 4 .. ty.length)
     {
@@ -147,45 +177,45 @@ pub fn strip_ptr_prefix_semantic(ty: string): string
 
 pub fn type_can_assign(target_ty: string, value_ty: string): i32
 {
-    if (target_ty == "" or target_ty == "unknown" or value_ty == "unknown") { return 1 }
-    if (target_ty == value_ty) { return 1 }
-    if (ast_type_base_name(target_ty) != "" and ast_type_base_name(target_ty) == ast_type_base_name(value_ty)) { return 1 }
-    if (type_is_array_text_semantic(target_ty) == 1 and value_ty == "[unknown]") { return 1 }
+    if (target_ty == "" or target_ty == "unknown" or value_ty == "unknown") return 1
+    if (target_ty == value_ty) return 1
+    if (ast_type_base_name(target_ty) != "" and ast_type_base_name(target_ty) == ast_type_base_name(value_ty)) return 1
+    if (type_is_array_text_semantic(target_ty) == 1 and value_ty == "[unknown]") return 1
     if (type_is_option_text(target_ty) == 1 and type_is_option_text(value_ty) == 1)
     {
         let target_inner = type_option_inner(target_ty)
         let value_inner = type_option_inner(value_ty)
-        if (value_inner == "unknown") { return 1 }
+        if (value_inner == "unknown") return 1
         return type_can_assign(target_inner, value_inner)
     }
-    if (type_is_integer(target_ty) == 1 and type_is_integer(value_ty) == 1) { return 1 }
-    if ((target_ty == "f32" or target_ty == "f64") and type_is_numeric(value_ty) == 1) { return 1 }
-    if (is_ptr_to_struct_semantic(target_ty) == 1 and value_ty == "ptr") { return 1 }
-    if (is_ptr_to_struct_semantic(target_ty) == 1 and strip_ptr_prefix_semantic(target_ty) == value_ty) { return 1 }
-    if (target_ty == "ptr" and is_ptr_to_struct_semantic(value_ty) == 1) { return 1 }
-    if (target_ty == "ptr" and value_ty == "string") { return 1 }
-    if (target_ty == "string" and value_ty == "ptr") { return 1 }
-    if (target_ty == "ptr" and type_is_array_text_semantic(value_ty) == 1) { return 1 }
+    if (type_is_integer(target_ty) == 1 and type_is_integer(value_ty) == 1) return 1
+    if ((target_ty == "f32" or target_ty == "f64") and type_is_numeric(value_ty) == 1) return 1
+    if (is_ptr_to_struct_semantic(target_ty) == 1 and value_ty == "ptr") return 1
+    if (is_ptr_to_struct_semantic(target_ty) == 1 and strip_ptr_prefix_semantic(target_ty) == value_ty) return 1
+    if (target_ty == "ptr" and is_ptr_to_struct_semantic(value_ty) == 1) return 1
+    if (target_ty == "ptr" and value_ty == "string") return 1
+    if (target_ty == "string" and value_ty == "ptr") return 1
+    if (target_ty == "ptr" and type_is_array_text_semantic(value_ty) == 1) return 1
     if (target_ty == "string" and type_is_array_text_semantic(value_ty) == 1)
     {
         let elem_ty = type_array_element_typeinfer(value_ty)
-        if (elem_ty == "u8" or elem_ty == "i8" or elem_ty == "char") { return 1 }
+        if (elem_ty == "u8" or elem_ty == "i8" or elem_ty == "char") return 1
     }
     return 0
 }
 
 pub fn type_accepts_null_literal(target_ty: string): i32
 {
-    if (target_ty == "ptr" or target_ty == "string") { return 1 }
-    if (type_is_array_text_semantic(target_ty) == 1) { return 1 }
-    if (is_ptr_to_struct_semantic(target_ty) == 1) { return 1 }
+    if (target_ty == "ptr" or target_ty == "string") return 1
+    if (type_is_array_text_semantic(target_ty) == 1) return 1
+    if (is_ptr_to_struct_semantic(target_ty) == 1) return 1
     return 0
 }
 
 pub fn type_can_assign_expr(target_ty: string, value_ty: string, expr: AstExpr): i32
 {
-    if (type_can_assign(target_ty, value_ty) == 1) { return 1 }
-    if (type_accepts_null_literal(target_ty) == 1 and expr.tag == "int" and expr.int_value == 0) { return 1 }
+    if (type_can_assign(target_ty, value_ty) == 1) return 1
+    if (type_accepts_null_literal(target_ty) == 1 and expr.tag == "int" and expr.int_value == 0) return 1
     return 0
 }
 
@@ -196,8 +226,9 @@ pub fn type_category(ty: string): string
         "string" -> "string"
         "ptr" -> "pointer"
         "void" -> "void"
-        "f32" | "f64" -> "float"
-        _ -> if (type_is_integer(ty) == 1) { "integer" } else { "other" }
+        "f32" -> "float"
+        "f64" -> "float"
+        _ -> if (type_is_integer(ty) == 1) "integer" else "other"
     }
 }
 
@@ -225,7 +256,7 @@ pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename:
 {
     if (result.ok == 0)
     {
-        let message = if (result.error_func != "") { "in function " + result.error_func + ": " + result.error } else { result.error }
+        let message = if (result.error_func != "") "in function " + result.error_func + ": " + result.error else result.error
         if (result.line > 0)
         {
             return format_diagnostic(source, filename, diag_error_level(), "TypeError", message, result.line, result.col, result.span_len)
@@ -241,7 +272,8 @@ pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename:
 
 pub fn typeck_check_program(program: AstProgram): TypeInferResult
 {
-    let hm = hm_check_program(program)
+    let hm = program
+        |> hm_check_program
     if (hm.ok == 1)
     {
         return typeinfer_ok(hm.return_type)

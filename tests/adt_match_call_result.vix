@@ -1,0 +1,27 @@
+type DiagnosticKind = ParseDiagnostic | NameDiagnostic | UnknownDiagnostic
+
+fn diagnostic_kind(error_type: string): DiagnosticKind
+{
+    return match error_type {
+        "ParseError" -> ParseDiagnostic
+        "NameError" -> NameDiagnostic
+        _ -> UnknownDiagnostic
+    }
+}
+
+fn diagnostic_code(error_type: string): string
+{
+    let kind = error_type
+        |> diagnostic_kind
+    return match kind {
+        ParseDiagnostic -> "E1000"
+        NameDiagnostic -> "E2000"
+        _ -> "E0000"
+    }
+}
+
+fn main(): i32
+{
+    if (diagnostic_code("ParseError") == "E1000") return 0
+    return 1
+}
