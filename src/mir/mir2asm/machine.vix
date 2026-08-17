@@ -135,7 +135,7 @@ pub fn machine_parse_inst(line: string, line_no: i32): MachineInst
     elif (mir2asm_starts_with(line, "store ") == 1) { inst.opcode = "store" }
     elif (mir2asm_starts_with(line, "call ") == 1) { inst.opcode = "call" }
     if (inst.dest != "") { inst.ty = machine_result_type(rhs, inst.opcode) }
-    inst.operands = machine_collect_operands(line, inst.dest)
+    inst.operands = []
     return inst
 }
 

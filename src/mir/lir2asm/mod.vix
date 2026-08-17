@@ -3,17 +3,53 @@ import "../mir2asm/mod.vix"
 import "../lir/mod.vix"
 import "x86_64/mod.vix"
 
+extern "C" { fn vix_print_stderr(s: string) }
+
+pub fn lir2asm_error_text(lir: MachineLirModule): string
+{
+    return "vixc: error: MIR line " + i32_to_str(lir.error_line) + " in function @" + lir.error_function + ": " + lir.error
+}
+
+pub fn lir2asm_validate(mir: string): string
+{
+    return lir2asm_validate_lir(mir2lir(mir))
+}
+
+pub fn lir2asm_validate_lir(lir: MachineLirModule): string
+{
+    if (lir.error == "") { return "" }
+    return lir2asm_error_text(lir)
+}
+
 pub fn lir2asm_debug(mir: string): string
 {
-    return lir2asm_x86_64_debug(mir2lir(mir), 1)
+    return lir2asm_debug_lir_built(mir2lir(mir))
+}
+
+pub fn lir2asm_debug_lir_built(lir: MachineLirModule): string
+{
+    if (lir.error != "") { return "" }
+    return lir2asm_x86_64_debug(lir, 1)
 }
 
 pub fn lir2asm_debug_lir(mir: string): string
 {
-    return lir2asm_x86_64_debug_lir(mir2lir(mir))
+    return lir2asm_debug_machine_lir(mir2lir(mir))
+}
+
+pub fn lir2asm_debug_machine_lir(lir: MachineLirModule): string
+{
+    if (lir.error != "") { return "" }
+    return lir2asm_x86_64_debug_lir(lir)
 }
 
 pub fn lir2asm_write_file(mir: string, path: string): i32
 {
-    return lir2asm_x86_64_write(mir2lir(mir), path)
+    return lir2asm_write_built(mir2lir(mir), path)
+}
+
+pub fn lir2asm_write_built(lir: MachineLirModule, path: string): i32
+{
+    if (lir.error != "") { vix_print_stderr(lir2asm_error_text(lir)); return 2 }
+    return lir2asm_x86_64_write(lir, path)
 }

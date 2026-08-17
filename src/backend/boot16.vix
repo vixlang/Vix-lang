@@ -1,0 +1,56 @@
+#[no_main]
+
+pub fn boot16_validate_exprs(program: AstProgram): string
+{
+    for (i in 0 .. program.expr_store.exprs.length)
+    {
+        let expr = program.expr_store.exprs[i]
+        if (expr.tag == "call") { return "vixc: error: boot16 does not support function calls" }
+        if (expr.tag == "float") { return "vixc: error: boot16 does not support floating point" }
+        if (expr.tag == "string") { return "vixc: error: boot16 does not support strings" }
+        if (expr.tag == "array") { return "vixc: error: boot16 does not support arrays" }
+    }
+    return ""
+}
+
+pub fn boot16_validate(program: AstProgram, no_std: i32): string
+{
+    if (no_std == 0) { return "vixc: error: boot16 requires #[no_std]" }
+    if (program.extern_functions.length > 0) { return "vixc: error: boot16 does not support extern functions" }
+    if (program.globals.length > 0) { return "vixc: error: boot16 does not support global variables yet" }
+    if (program.structs.length > 0 or program.adts.length > 0) { return "vixc: error: boot16 does not support aggregate types" }
+
+    let expr_error = boot16_validate_exprs(program)
+    if (expr_error != "") { return expr_error }
+
+    if (program.functions.length != 1 or program.functions[0].name != "boot_main")
+    {
+        return "vixc: error: boot16 requires exactly one function named boot_main"
+    }
+
+    let func = program.functions[0]
+    if (func.param_names.length > 0) { return "vixc: error: boot16 boot_main cannot have parameters" }
+    if (func.ret_ty != "i32") { return "vixc: error: boot16 boot_main must return i32" }
+
+    let body = stmt_store_get(program.store, func.body_idx)
+    if (body.tag != "block" or body.stmt_indices.length != 1)
+    {
+        return "vixc: error: boot16 currently supports only 'return <integer>' in boot_main"
+    }
+    let ret = stmt_store_get(program.store, body.stmt_indices[0])
+    if (ret.tag != "return_expr")
+    {
+        return "vixc: error: boot16 currently supports only 'return <integer>' in boot_main"
+    }
+    let value = expr_store_get(program.expr_store, ret.value_idx)
+    if (value.tag != "int")
+    {
+        return "vixc: error: boot16 currently supports only an integer return value"
+    }
+    return ""
+}
+
+pub fn boot16_assembly(): string
+{
+    return "bits 16\norg 0x7c00\n\nboot_entry:\n    cli\n    hlt\n    jmp boot_entry\n\ntimes 510-($-$$) db 0\ndw 0xaa55\n"
+}

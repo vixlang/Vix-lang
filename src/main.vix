@@ -7,6 +7,7 @@ import "error.vix"
 import "backend/llc.vix"
 import "backend/linker.vix"
 import "backend/passes.vix"
+import "backend/boot16.vix"
 import "mir/mir.vix"
 import "mir/opt.vix"
 import "mir/lir2asm/mod.vix"
@@ -127,6 +128,7 @@ fn artifact_output_path(filename: string, output: string, emit: string): string
     let base = strip_vix_ext(filename)
     if (emit == "exe") { return base }
     if (emit == "asm") { return base + ".s" }
+    if (emit == "bin") { return base + ".bin" }
     return base + ".o"
 }
 
@@ -150,8 +152,9 @@ fn print_help(): i32
     print("  -ll [file]             Emit LLVM IR to <file> (default: <input>.ll)")
     print("  -S                     Emit assembly to <file> (default: <input>.s)")
     print("  -obj                   Emit object file (default: <input>.o)")
+    print("  --emit=bin             Emit a flat binary (requires --target=boot16)")
     print("  -opt=lN                Optimize LLVM IR with level N (0..3; default: l0)")
-    print("  --target <triple>      Generate code for target triple (LLVM; self supports x86_64 only)")
+    print("  --target <triple|boot16> Generate code for a target (boot16 emits a BIOS sector)")
     print("  --backend <llvm|self|self-opt|self-lir>  Select codegen backend (default: llvm)")
     print("  -l<lib>, -l <lib>      Link executable with a system library")
     print("  -L<dir>, -L <dir>      Add a system library search path")
@@ -213,12 +216,45 @@ fn self_backend_target_supported(target_triple: string): i32
     return 0
 }
 
+fn run_boot16(program: AstProgram, filename: string, output: string, emit: string): ?i32
+{
+    if (emit != "bin" and emit != "exe")
+    {
+        diag_print("vixc: error: boot16 only supports --emit=bin")
+        return mode_failure()
+    }
+    let artifact_path = artifact_output_path(filename, output, "bin")
+    let asm_path = artifact_path + ".tmp.asm"
+    if (write_text_file(asm_path, boot16_assembly()) != 0) { return mode_failure() }
+    let asm_result = shell_command("nasm -f bin " + asm_path + " -o " + artifact_path)
+    delete_file(asm_path)
+    if (asm_result != 0)
+    {
+        delete_file(artifact_path)
+        diag_print("vixc: error: boot16 failed to assemble flat binary; NASM is required")
+        return mode_failure()
+    }
+    print(artifact_path)
+    return mode_success()
+}
+
 fn run_mode_mir(mode: string, mir: string, filename: string, emit: string, output: string, runtime_object: string, link_args: string, backend: string): ?i32
 {
     if (backend != "self" and backend != "self-lir")
     {
         diag_print("vixc: error: .vic MIR input is not supported with the llvm backend")
         return mode_failure()
+    }
+    if (mode == "debug_lir" or (backend == "self-lir" and mode == "debug_asm"))
+    {
+        if (backend == "self-lir")
+        {
+            let lir = mir2lir(mir)
+            let lir_error = lir2asm_validate_lir(lir)
+            if (lir_error != "") { diag_print(lir_error); return mode_failure() }
+            if (mode == "debug_lir") { info_print(lir2asm_debug_machine_lir(lir)); return mode_success() }
+            info_print(lir2asm_debug_lir_built(lir)); return mode_success()
+        }
     }
     let no_std = vix_api_source_has_no_std(mir)
     match mode
@@ -239,7 +275,7 @@ fn run_mode_mir(mode: string, mir: string, filename: string, emit: string, outpu
         let write_result = if (backend == "self-lir") { lir2asm_write_file(mir, artifact_path) } else { mir2asm_write_file(mir, artifact_path) }
         if (write_result != 0)
         {
-            diag_print("vixc: error: cannot write file '" + artifact_path + "'")
+            if (write_result != 2) { diag_print("vixc: error: cannot write file '" + artifact_path + "'") }
             return mode_failure()
         }
         print(artifact_path)
@@ -250,7 +286,7 @@ fn run_mode_mir(mode: string, mir: string, filename: string, emit: string, outpu
     let write_result2 = if (backend == "self-lir") { lir2asm_write_file(mir, asm_path) } else { mir2asm_write_file(mir, asm_path) }
     if (write_result2 != 0)
     {
-        diag_print("vixc: error: cannot write file '" + asm_path + "'")
+        if (write_result2 != 2) { diag_print("vixc: error: cannot write file '" + asm_path + "'") }
         return mode_failure()
     }
     let asm_result = shell_command("nasm -f elf64 " + asm_path + " -o " + obj_path)
@@ -339,6 +375,18 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         return mode_failure()
     }
 
+    if (target_triple == "boot16")
+    {
+        if (mode != "codegen")
+        {
+            diag_print("vixc: error: boot16 currently supports code generation only")
+            return mode_failure()
+        }
+        let boot_error = boot16_validate(program, no_std)
+        if (boot_error != "") { diag_print(boot_error); return mode_failure() }
+        return run_boot16(program, filename, output, emit)
+    }
+
     // Multi-file: build module graph and merge all modules into one AstProgram
     let mut merged_program = program
     if (program.mod_decls.length > 0)
@@ -420,13 +468,28 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         "debug_lir" -> {
             let raw_mir = mir_program(lowered_program)
             let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
-            info_print(lir2asm_debug_lir(mir))
+            if (backend == "self-lir")
+            {
+                let lir = mir2lir(mir)
+                let lir_error = lir2asm_validate_lir(lir)
+                if (lir_error != "") { diag_print(lir_error); return mode_failure() }
+                info_print(lir2asm_debug_machine_lir(lir))
+            }
+            else { info_print(lir2asm_debug_lir(mir)) }
             return mode_success()
         }
         "debug_asm" -> {
             let raw_mir = mir_program(lowered_program)
             let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
-            let asm = if (backend == "self-lir") { lir2asm_debug(mir) } else { mir2asm_debug(mir) }
+            if (backend == "self-lir")
+            {
+                let lir = mir2lir(mir)
+                let lir_error = lir2asm_validate_lir(lir)
+                if (lir_error != "") { diag_print(lir_error); return mode_failure() }
+                info_print(lir2asm_debug_lir_built(lir))
+                return mode_success()
+            }
+            let asm = mir2asm_debug(mir)
             info_print(asm)
             return mode_success()
         }
@@ -449,7 +512,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             let write_result = if (backend == "self-lir") { lir2asm_write_file(mir, artifact_path) } else { mir2asm_write_file(mir, artifact_path) }
             if (write_result != 0)
             {
-                diag_print("vixc: error: cannot write file '" + artifact_path + "'")
+                if (write_result != 2) { diag_print("vixc: error: cannot write file '" + artifact_path + "'") }
                 return mode_failure()
             }
             print(artifact_path)
@@ -460,7 +523,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         let write_result2 = if (backend == "self-lir") { lir2asm_write_file(mir, asm_path) } else { mir2asm_write_file(mir, asm_path) }
         if (write_result2 != 0)
         {
-            diag_print("vixc: error: cannot write file '" + asm_path + "'")
+            if (write_result2 != 2) { diag_print("vixc: error: cannot write file '" + asm_path + "'") }
             return mode_failure()
         }
         let asm_result = shell_command("nasm -f elf64 " + asm_path + " -o " + obj_path)
@@ -664,6 +727,10 @@ fn main(argc: i32, argv: &string): i32
         {
             emit = "-obj"
         }
+        elif (arg == "--emit=bin")
+        {
+            emit = "bin"
+        }
         elif (str_starts_with(arg, "-opt=") == 1)
         {
             opt_level = opt_level_arg(arg)
@@ -700,6 +767,15 @@ fn main(argc: i32, argv: &string): i32
             else
             {
                 diag_print("vixc: error: '--target' requires an argument")
+                return 1
+            }
+        }
+        elif (str_starts_with(arg, "--target=") == 1)
+        {
+            target_triple = slice_string(arg, 9, arg.length)
+            if (target_triple == "")
+            {
+                diag_print("vixc: error: '--target=' requires an argument")
                 return 1
             }
         }
@@ -817,13 +893,19 @@ fn main(argc: i32, argv: &string): i32
 
     if (string_ends_with(filename, ".vic") == 1 and backend == "llvm") { backend = "self" }
 
+    if (emit == "bin" and target_triple != "boot16")
+    {
+        diag_print("vixc: error: --emit=bin requires --target=boot16")
+        return 1
+    }
+
     if (backend != "llvm" and backend != "self" and backend != "self-lir")
     {
         diag_print("vixc: error: unknown backend '" + backend + "'")
         return 1
     }
 
-    if ((backend == "self" or backend == "self-lir") and self_backend_target_supported(target_triple) == 0)
+    if ((backend == "self" or backend == "self-lir") and target_triple != "boot16" and self_backend_target_supported(target_triple) == 0)
     {
         diag_print("vixc: error: self backend only supports x86_64 targets, got '" + target_triple + "'")
         return 1

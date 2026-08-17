@@ -1,0 +1,6 @@
+#[no_std]
+
+fn boot_main(): i32
+{
+    return 0
+}

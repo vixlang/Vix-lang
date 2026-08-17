@@ -1,0 +1,11 @@
+mir_module vixc0 {
+fn @mixed(%a: i32, %b: f64, %c: i32, %d: f64, %e: i32, %f: f64, %g: i32, %h: f64, %i: i32, %j: f64, %k: i32, %l: f64, %m: i32, %n: f64, %o: i32, %p: f64): i32 {
+    block %entry:
+        ret i32 %o
+}
+fn @main(): i32 {
+    block %entry:
+        %x = call @mixed(i32 1, f64 1.0, i32 2, f64 2.0, i32 3, f64 3.0, i32 4, f64 4.0, i32 5, f64 5.0, i32 6, f64 6.0, i32 7, f64 7.0, i32 8, f64 8.0): i32
+        ret i32 %x
+}
+}

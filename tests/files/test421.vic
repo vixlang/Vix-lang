@@ -1,0 +1,15 @@
+mir_module vixc0 {
+fn @id(%x: i32): i32 {
+    block %entry:
+        ret i32 %x
+}
+fn @main(): i32 {
+    block %entry:
+        %a = alloca i32
+        store i32 7, %a
+        %x = load i32, %a
+        %y = call @id(i32 7): i32
+        %z = add i32 %x, %y
+        ret i32 %z
+}
+}

@@ -571,6 +571,7 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
                 mir_emit_term(b, "br_cond " + cmp.name + ", label " + body_label + ", label " + after_label)
                 mir_block(b, body_label)
                 mir_bind_option_pattern(b, es, subject, pattern_idx)
+                mir_bind_adt_pattern(b, es, subject, pattern_idx)
                 if (body_idx >= 0)
                 {
                     let body_val = mir_expr_value_typed(b, es, store, expr_store_get(es, body_idx), storage_ty)
@@ -951,6 +952,22 @@ pub fn mir_match_compare(b: &MirBuilder, es: &ExprStore, store: &StmtStore, subj
         mir_inst(b, out2 + " = icmp " + pred + " ptr " + subject.name + ", null")
         return MirValue{ name: out2, ty: "bool" }
     }
+    if (type_is_struct(type_text_base_name_builder(subject.ty)) == 1 and pattern_expr.tag == "struct_literal")
+    {
+        let tag_idx = get_struct_field_index(subject.ty, "tag")
+        for (i in 0 .. pattern_expr.field_names.length)
+        {
+            if (pattern_expr.field_names[i] == "tag")
+            {
+                let tag = mir_expr_value_typed(b, es, store, expr_store_get(es, pattern_expr.args[i]), "i32")
+                let extracted = mir_temp(b)
+                mir_inst(b, extracted + " = extractvalue " + mir_type(subject.ty) + " " + subject.name + ", [" + mir_i32(tag_idx) + "]")
+                let out_tag = mir_temp(b)
+                mir_inst(b, out_tag + " = icmp eq i32 " + extracted + ", " + tag.name)
+                return MirValue{ name: out_tag, ty: "bool" }
+            }
+        }
+    }
     let pattern = mir_expr_value_typed(b, es, store, expr_store_get(es, pattern_idx), subject.ty)
     let out = mir_temp(b)
     if (subject.ty == "string")
@@ -989,6 +1006,31 @@ pub fn mir_bind_option_pattern(b: &MirBuilder, es: &ExprStore, subject: MirValue
     mir_inst(b, "store " + mir_type(inner_ty) + " " + bind_val + ", " + mir_var_addr(bind_expr.text))
 }
 
+pub fn mir_bind_adt_pattern(b: &MirBuilder, es: &ExprStore, subject: MirValue, pattern_idx: i32)
+{
+    if (pattern_idx < 0 or type_is_struct(type_text_base_name_builder(subject.ty)) == 0) { return }
+    let pattern = expr_store_get(es, pattern_idx)
+    if (pattern.tag != "struct_literal") { return }
+    for (i in 0 .. pattern.field_names.length)
+    {
+        let field_name = pattern.field_names[i]
+        if (field_name != "tag")
+        {
+            let bind = expr_store_get(es, pattern.args[i])
+            if (bind.tag == "ident" and bind.text != "_")
+            {
+                let field_ty = get_struct_field_type(subject.ty, field_name)
+                let field_idx = get_struct_field_index(subject.ty, field_name)
+                let value = mir_temp(b)
+                mir_inst(b, value + " = extractvalue " + mir_type(subject.ty) + " " + subject.name + ", [" + mir_i32(field_idx) + "]")
+                mir_define_local(bind.text, field_ty)
+                mir_inst(b, mir_var_addr(bind.text) + " = alloca " + mir_type(field_ty))
+                mir_inst(b, "store " + mir_type(field_ty) + " " + value + ", " + mir_var_addr(bind.text))
+            }
+        }
+    }
+}
+
 pub fn mir_match_stmt(b: &MirBuilder, es: &ExprStore, store: &StmtStore, stmt: AstStmt, break_label: string, continue_label: string)
 {
     let subject = mir_expr_value(b, es, store, expr_store_get(es, stmt.value_idx))
@@ -1011,6 +1053,7 @@ pub fn mir_match_stmt(b: &MirBuilder, es: &ExprStore, store: &StmtStore, stmt: A
             mir_emit_term(b, "br_cond " + cmp.name + ", label " + body_label + ", label " + after_label)
             mir_block(b, body_label)
             mir_bind_option_pattern(b, es, subject, stmt.match_pattern_indices[i])
+            mir_bind_adt_pattern(b, es, subject, stmt.match_pattern_indices[i])
             mir_stmt(b, es, store, stmt.match_body_indices[i], break_label, continue_label)
             if (mir_block_is_open(b) == 1) { mir_emit_term(b, "br label " + end_label) }
             next_label = after_label

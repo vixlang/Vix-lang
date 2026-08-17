@@ -20,6 +20,8 @@ RUNTIME_OBJ := $(RUNTIME_DIR)/runtime.o
 VIXC_OBJ := $(BUILD_DIR)/vixc.o
 SELF_STAGE_OBJ := $(BUILD_DIR)/vixc-self.o
 SELF_STAGE_TARGET := $(BUILD_DIR)/vixc-self
+SELF_LIR_STAGE_OBJ := $(BUILD_DIR)/vixc-self-lir.o
+SELF_LIR_STAGE_TARGET := $(BUILD_DIR)/vixc-self-lir
 API_OBJ := $(BUILD_DIR)/api.o
 LLC_OBJ := $(BUILD_DIR)/Llc.o
 LINKER_OBJ := $(BUILD_DIR)/Linker.o
@@ -78,8 +80,16 @@ $(SELF_STAGE_TARGET): $(SELF_STAGE_OBJ) $(COMPILER_SUPPORT_OBJS) | $(BUILD_DIR)
 
 self-stage: $(SELF_STAGE_TARGET)
 
+$(SELF_LIR_STAGE_OBJ): $(VIX_SOURCES) $(TARGET) | $(BUILD_DIR)
+	ulimit -s unlimited && $(TARGET) --backend=self-lir $(SRC_DIR)/main.vix -obj -o $@
+
+$(SELF_LIR_STAGE_TARGET): $(SELF_LIR_STAGE_OBJ) $(COMPILER_SUPPORT_OBJS) | $(BUILD_DIR)
+	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(LLD_LIBS)
+
+self-lir-stage: $(SELF_LIR_STAGE_TARGET)
+
 clean:
-	rm -f $(TARGET) $(BOOTSTRAP_TARGET) $(SELF_STAGE_TARGET) $(HELPER_OBJ) $(RUNTIME_OBJ) $(BOOTSTRAP_OBJ) $(VIXC_OBJ) $(SELF_STAGE_OBJ) $(LLVM_API_OBJS) test test.ll
+	rm -f $(TARGET) $(BOOTSTRAP_TARGET) $(SELF_STAGE_TARGET) $(SELF_LIR_STAGE_TARGET) $(HELPER_OBJ) $(RUNTIME_OBJ) $(BOOTSTRAP_OBJ) $(VIXC_OBJ) $(SELF_STAGE_OBJ) $(SELF_LIR_STAGE_OBJ) $(LLVM_API_OBJS) test test.ll
 
 test: all
 	$(TARGET) ../tests/vixc0/let_and_print.vix -o test
@@ -88,4 +98,4 @@ test: all
 pytest: all
 	python3 -m pytest ../tests/vixc0_tests/*.py
 
-.PHONY: all self-stage clean test pytest
+.PHONY: all self-stage self-lir-stage clean test pytest

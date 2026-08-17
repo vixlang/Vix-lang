@@ -1,0 +1,12 @@
+mir_module vixc0 {
+extern fn @strlen(ptr): i32
+fn @main(): i32 {
+    block %entry:
+        %slot = alloca string
+        %s = const ptr "abc"
+        store string %s, %slot
+        %x = load string, %slot
+        %n = call @strlen(ptr %x): i32
+        ret i32 %n
+}
+}

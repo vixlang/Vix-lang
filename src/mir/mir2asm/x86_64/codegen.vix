@@ -39,12 +39,14 @@ pub fn mir2asm_begin_function(b: &MirAsm, line: string)
     let planned_frame = mir2asm_align_to(b.stack_next, 16)
     b.planned_frame_size = planned_frame
     mir2asm_line(b, "    sub rsp, " + i32_to_str(planned_frame))
-    if (b.lir_used_callee_regs > 0)
+    let callee_count = mir2asm_lir_callee_count(b.lir_used_callee_regs)
+    if (callee_count > 0)
     {
-        mir2asm_line(b, "    push r12")
-        mir2asm_line(b, "    push r13")
-        mir2asm_line(b, "    push r14")
-        mir2asm_line(b, "    push r15")
+        if (callee_count % 2 == 1) { mir2asm_line(b, "    sub rsp, 8") }
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r12") == 1) { mir2asm_line(b, "    push r12") }
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r13") == 1) { mir2asm_line(b, "    push r13") }
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r14") == 1) { mir2asm_line(b, "    push r14") }
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r15") == 1) { mir2asm_line(b, "    push r15") }
     }
     let rp = mir2asm_find(line, ')', lp)
     let mut pos = lp + 1
@@ -118,19 +120,34 @@ pub fn mir2asm_end_function(b: &MirAsm)
     if (b.in_fn == 0) { return }
     let frame_size = mir2asm_align_to(b.stack_next, 16)
     mir2asm_line(b, b.ret_label + ":")
-    if (b.lir_used_callee_regs > 0)
+    let callee_count = mir2asm_lir_callee_count(b.lir_used_callee_regs)
+    if (callee_count > 0)
     {
-        mir2asm_line(b, "    lea rsp, [rbp-" + i32_to_str(frame_size + 32) + "]")
-        mir2asm_line(b, "    pop r15")
-        mir2asm_line(b, "    pop r14")
-        mir2asm_line(b, "    pop r13")
-        mir2asm_line(b, "    pop r12")
+        mir2asm_line(b, "    lea rsp, [rbp-" + i32_to_str(frame_size + callee_count * 8 + if (callee_count % 2 == 1) { 8 } else { 0 }) + "]")
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r15") == 1) { mir2asm_line(b, "    pop r15") }
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r14") == 1) { mir2asm_line(b, "    pop r14") }
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r13") == 1) { mir2asm_line(b, "    pop r13") }
+        if (mir2asm_lir_has_callee(b.lir_used_callee_regs, "r12") == 1) { mir2asm_line(b, "    pop r12") }
+        if (callee_count % 2 == 1) { mir2asm_line(b, "    add rsp, 8") }
     }
     mir2asm_line(b, "    mov rsp, rbp")
     mir2asm_line(b, "    pop rbp")
     mir2asm_line(b, "    ret")
     b.in_fn = 0
     b.layout_ready = 0
+}
+
+pub fn mir2asm_lir_has_callee(mask: i32, reg: string): i32
+{
+    if (reg == "r12") { return if (mask % 2 == 1) { 1 } else { 0 } }
+    if (reg == "r13") { return if ((mask / 2) % 2 == 1) { 1 } else { 0 } }
+    if (reg == "r14") { return if ((mask / 4) % 2 == 1) { 1 } else { 0 } }
+    return if ((mask / 8) % 2 == 1) { 1 } else { 0 }
+}
+
+pub fn mir2asm_lir_callee_count(mask: i32): i32
+{
+    return mir2asm_lir_has_callee(mask, "r12") + mir2asm_lir_has_callee(mask, "r13") + mir2asm_lir_has_callee(mask, "r14") + mir2asm_lir_has_callee(mask, "r15")
 }
 
 pub fn mir2asm_emit_unsupported(b: &MirAsm, line: string)
@@ -1347,6 +1364,15 @@ pub fn mir2asm_emit_instruction(b: &MirAsm, line: string)
             if (mir2asm_type_is_float(ty) == 1)
             {
                 mir2asm_emit_load_float_arg(b, "xmm0", val, ty)
+            }
+            elif (ty == "ptr" or mir2asm_starts_with(ty, "ptr:") == 1)
+            {
+                let ptr_val_idx = mir2asm_find_name(b, val)
+                if (ptr_val_idx >= 0 and b.is_addr[ptr_val_idx] == 1 and b.slot_tys[ptr_val_idx] != "string")
+                {
+                    mir2asm_line(b, "    lea rax, " + mir2asm_mem(b.offsets[ptr_val_idx]))
+                }
+                else { mir2asm_line(b, "    mov rax, " + mir2asm_operand_typed(b, val, ty)) }
             }
             elif (ty == "i8" or ty == "u8" or ty == "char")
             {

@@ -1,0 +1,11 @@
+#[no_std]
+
+fn helper(): i32
+{
+    return 0
+}
+
+fn boot_main(): i32
+{
+    return helper()
+}

@@ -1,0 +1,20 @@
+mir_module vixc0 {
+fn @main(): i32 {
+    block %entry:
+        %a = alloca i32
+        %i = alloca i32
+        store i32 18, %a
+        store i32 0, %i
+        %x = load i32, %a
+        br label %loop
+    block %loop:
+        %n = load i32, %i
+        %c = icmp slt i32 %n, 1
+        br_cond %c, label %body, label %done
+    block %body:
+        store i32 1, %i
+        br label %loop
+    block %done:
+        ret i32 %x
+}
+}

@@ -1,0 +1,19 @@
+mir_module vixc0 {
+fn @sum8f(%a: f64, %b: f64, %c: f64, %d: f64, %e: f64, %f: f64, %g: f64, %h: f64): f64 {
+    block %entry:
+        %x = fadd f64 %a, %b
+        %y = fadd f64 %x, %c
+        %z = fadd f64 %y, %d
+        %q = fadd f64 %z, %e
+        %r = fadd f64 %q, %f
+        %s = fadd f64 %r, %g
+        %t = fadd f64 %s, %h
+        ret f64 %t
+}
+fn @main(): i32 {
+    block %entry:
+        %x = call @sum8f(f64 1.0, f64 2.0, f64 3.0, f64 4.0, f64 5.0, f64 6.0, f64 7.0, f64 8.0): f64
+        %y = fptosi f64 %x to i32
+        ret i32 %y
+}
+}
