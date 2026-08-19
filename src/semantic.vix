@@ -254,7 +254,9 @@ pub fn semantic_scope_require(scope: &SemanticScope, result: &SemanticResult, so
     if (name == "_") { return }
     if (semantic_scope_lookup(scope, name) < 0)
     {
-        semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, diag_strlen(name))
+        let is_lambda = func_name.length >= 9 and func_name[0] == '_' and func_name[1] == '_' and func_name[2] == 'l' and func_name[3] == 'a' and func_name[4] == 'm' and func_name[5] == 'b' and func_name[6] == 'd' and func_name[7] == 'a' and func_name[8] == '_'
+        if (is_lambda) semantic_add_error_loc(result, source, filename, "SemanticError", "capturing lambda is not supported yet: " + name, func_name, line, col, diag_strlen(name))
+        else semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, diag_strlen(name))
     }
 }
 
@@ -403,7 +405,7 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
     match expr.tag
     {
         "ident" -> {
-            if (semantic_find_adt_variant(program.adts, expr.text) < 0)
+            if (semantic_find_adt_variant(program.adts, expr.text) < 0 and semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0)
             {
                 semantic_scope_require(scope, result, source, filename, func_name, expr.text, expr.line, expr.col)
                 semantic_scope_mark_used(scope, expr.text)
@@ -427,16 +429,21 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             }
         }
         "call" -> {
-            if (semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0)
+            if (expr.left_idx >= 0)
+            {
+                semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
+            }
+            elif (semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0 and semantic_scope_lookup(scope, expr.text) < 0)
             {
                 semantic_add_error_loc(result, source, filename, "NameError", "undefined function '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(expr.text))
             }
-            semantic_check_generic_call(program, expr, result, source, filename, func_name)
+            if (expr.left_idx < 0) semantic_check_generic_call(program, expr, result, source, filename, func_name)
             for (i in 0 .. expr.args.length)
             {
                 semantic_check_expr(scope, program, expr.args[i], result, source, filename, func_name)
             }
         }
+        "lambda" -> { }
         "index" -> {
             semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
             semantic_check_expr(scope, program, expr.right_idx, result, source, filename, func_name)

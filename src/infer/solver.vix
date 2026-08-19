@@ -368,8 +368,16 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             }
             infer_value_ok(v.ty)
         }
+        "lambda" -> {
+            let mut params: [Ty] = []
+            for (i in 0 .. expr.type_args.length)
+            {
+                params.push(ty_from_text(store, expr.type_args[i]))
+            }
+            infer_value_ok(ty_fun(store, params, ty_from_text(store, expr.option_value)))
+        }
         "call" -> {
-            let callee = hm_infer_ident(env, store, fresh, expr.text, pos)
+            let callee = if (expr.left_idx >= 0) { hm_infer_expr(env, store, fresh, subst, structs, es, ss, expr.left_idx) } else { hm_infer_ident(env, store, fresh, expr.text, pos) }
             if (callee.ok == 0) { return callee }
             let mut args: [Ty] = []
             for (i in 0 .. expr.args.length)

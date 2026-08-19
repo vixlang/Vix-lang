@@ -12,12 +12,15 @@ pub type Parser = struct {
     expr_store: ExprStore,
     store: StmtStore,
     source: string,
-    filename: string
+    filename: string,
+    current_function: string,
+    lambda_counter: i32,
+    lambda_functions: [AstFunction]
 }
 
 pub fn parser_new(src: string, filename: string): Parser
 {
-    return Parser{ stream: tokenize(src), pos: 0, ok: 1, error: "", expr_store: expr_store_new(), store: stmt_store_new(), source: src, filename: filename }
+    return Parser{ stream: tokenize(src), pos: 0, ok: 1, error: "", expr_store: expr_store_new(), store: stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
 }
 
 pub fn parser_kind(parser: &Parser): i32
@@ -469,9 +472,13 @@ pub fn parse_postfix_continue(parser: &Parser, expr_idx: i32): i32
             {
                 expr = parser_expr_at(parser, ast_expr_method_call(parser.expr_store, func_expr.left_idx, func_expr.text, args), line, col)
             }
-            else
+            elif (func_expr.tag == "ident")
             {
                 expr = parser_expr_at(parser, ast_expr_call(parser.expr_store, func_expr.text, args), line, col)
+            }
+            else
+            {
+                expr = parser_expr_at(parser, ast_expr_call_expr(parser.expr_store, expr, args), line, col)
             }
         }
     }
@@ -765,6 +772,74 @@ pub fn parse_primary(parser: &Parser): i32
         let text = parser_text(parser)
         parser_advance(parser)
         return parser_expr_at(parser, ast_expr_string(parser.expr_store, text), line, col)
+    }
+    if (parser_text(parser) == "fn")
+    {
+        let line = parser_line(parser)
+        let col = parser_col(parser)
+        parser_advance(parser)
+        parser_expect_text(parser, "(")
+        if (parser.ok == 0) return -1
+        let mut param_names: [string] = []
+        let mut param_types: [string] = []
+        if (parser_text(parser) != ")")
+        {
+            let p = parse_param_name(parser)
+            parser_expect_text(parser, ":")
+            let pt = parse_type_text(parser)
+            if (parser.ok == 0) return -1
+            param_names.push(p)
+            param_types.push(pt)
+            while (parser_text(parser) == ",")
+            {
+                parser_advance(parser)
+                let np = parse_param_name(parser)
+                parser_expect_text(parser, ":")
+                let nt = parse_type_text(parser)
+                if (parser.ok == 0) return -1
+                param_names.push(np)
+                param_types.push(nt)
+            }
+        }
+        parser_expect_text(parser, ")")
+        parser_expect_text(parser, ":")
+        let ret_ty = parse_type_text(parser)
+        parser_expect_text(parser, "=>")
+        if (parser.ok == 0) return -1
+        let body_expr = if (parser_text(parser) == "{") parse_block_expression(parser) else parse_expression(parser)
+        if (parser.ok == 0) return -1
+        let fn_name = "__lambda_" + parser.current_function + "_" + ast_i32(parser.lambda_counter)
+        parser.lambda_counter += 1
+        let body_ast = expr_store_get(parser.expr_store, body_expr)
+        let mut body_stmt = -1
+        if (body_ast.tag == "block_expr")
+        {
+            body_stmt = body_ast.left_idx
+            if (body_ast.right_idx >= 0)
+            {
+                let block_stmt = stmt_store_get(parser.store, body_ast.left_idx)
+                let mut indices: [i32] = []
+                if (block_stmt.stmt_indices.length > 0)
+                {
+                    for (i in 0 .. block_stmt.stmt_indices.length)
+                    {
+                        indices.push(block_stmt.stmt_indices[i])
+                    }
+                }
+                else
+                {
+                    for (i in 0 .. block_stmt.block_count)
+                    {
+                        indices.push(block_stmt.block_start + i)
+                    }
+                }
+                indices.push(ast_stmt_return_expr(parser.store, body_ast.right_idx))
+                body_stmt = ast_stmt_block_indices(parser.store, indices)
+            }
+        }
+        else body_stmt = ast_stmt_return_expr(parser.store, body_expr)
+        parser.lambda_functions.push(ast_function_with_loc(ast_function_full(fn_name, ret_ty, body_stmt, param_names, param_types), line, col))
+        return parser_expr_at(parser, ast_expr_lambda(parser.expr_store, fn_name, param_names, param_types, ret_ty, body_expr), line, col)
     }
     if (kind == tk_ident())
     {
@@ -1481,6 +1556,26 @@ pub fn parse_statement(parser: &Parser): i32
 
 pub fn parse_type_text(parser: &Parser): string
 {
+    if (parser_text(parser) == "fn")
+    {
+        parser_advance(parser)
+        parser_expect_text(parser, "(")
+        if (parser.ok == 0) return "unknown"
+        let mut out = "fn("
+        if (parser_text(parser) != ")")
+        {
+            out = out + parse_type_text(parser)
+            while (parser_text(parser) == ",")
+            {
+                parser_advance(parser)
+                out = out + ", " + parse_type_text(parser)
+            }
+        }
+        parser_expect_text(parser, ")")
+        parser_expect_text(parser, ":")
+        if (parser.ok == 0) return "unknown"
+        return out + "): " + parse_type_text(parser)
+    }
     if (parser_text(parser) == "&" or parser_text(parser) == "ref")
     {
         parser_advance(parser)
@@ -1570,6 +1665,7 @@ pub fn parse_function(parser: &Parser): AstFunction
     if (parser_expect_text(parser, "fn") == 0) { return ast_function("main", "i32", -1) }
     let name = parser_text(parser)
     if (parser_expect_kind(parser, tk_ident()) == 0) { return ast_function("main", "i32", -1) }
+    parser.current_function = name
     let type_params = parse_type_params_after_name(parser)
     if (parser.ok == 0) { return ast_function("main", "i32", -1) }
     if (parser_expect_text(parser, "(") == 0) { return ast_function("main", "i32", -1) }
@@ -2050,6 +2146,10 @@ pub fn parse_program(src: string, filename: string): AstProgram
     if (uses_builtin_result == 1 and parse_has_adt_name(adts, "Result") == 0 and parse_has_function_name(functions, "Ok") == 0 and parse_has_function_name(functions, "Err") == 0 and parse_has_function_name(extern_functions, "Ok") == 0 and parse_has_function_name(extern_functions, "Err") == 0)
     {
         adts.push(parse_builtin_result_decl())
+    }
+    for (i in 0 .. parser.lambda_functions.length)
+    {
+        functions.push(parser.lambda_functions[i])
     }
     return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store)
 }

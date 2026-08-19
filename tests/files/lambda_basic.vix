@@ -1,0 +1,4 @@
+fn main(): i32
+{
+    return (fn (x: i32): i32 => x + 1)(2)
+}

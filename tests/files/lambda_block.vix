@@ -1,0 +1,8 @@
+fn main(): i32
+{
+    let double = fn (x: i32): i32 => {
+        let y = x * 2
+        y
+    }
+    return double(21)
+}

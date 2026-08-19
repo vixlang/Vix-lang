@@ -1,11 +1,21 @@
-extern "C"
+
+let inc = fn (x: i32): i32 => x + 1
+
+let add = fn (a: i32, b: i32): i32 => a + b
+
+let twice = fn (x: i32): i32 =>
 {
-	fn printf(fmt:string , ...): i32
+      let y = x * 2
+      y
+}
+fn apply(f: fn(i32): i32, x: i32): i32
+{
+      return f(x)
 }
 
-fn main(argc:i32,argv:&string): i32
+fn main(): i32
 {
-    printf("argc = %d \n", argc)
-		
-	return 0
+    let double = fn (x: i32): i32 => x * 2
+    print(apply(double, 21))
+    return 0
 }

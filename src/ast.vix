@@ -39,6 +39,8 @@ pub type AstExpr = struct {
     type_args: [string],
     option_has_value: i32,
     option_value: string,
+    // For lambda: field_names/ type_args are parameter names/types,
+    // option_value is the explicit return type, left_idx is the body.
     line: i32,
     col: i32
 }
@@ -246,6 +248,16 @@ pub fn ast_expr_call(store: &ExprStore, name: string, args: [i32]): i32
 pub fn ast_expr_call_generic(store: &ExprStore, name: string, type_args: [string], args: [i32]): i32
 {
     return expr_store_add(store, AstExpr{ tag: "call", text: name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: args, field_names: [], type_args: type_args, option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+}
+
+pub fn ast_expr_call_expr(store: &ExprStore, callee_idx: i32, args: [i32]): i32
+{
+    return expr_store_add(store, AstExpr{ tag: "call", text: "", int_value: 0, float_value: 0.0, left_idx: callee_idx, right_idx: -1, args: args, field_names: [], type_args: [], option_has_value: 0, option_value: "", $ast_default_loc_fields() })
+}
+
+pub fn ast_expr_lambda(store: &ExprStore, name: string, param_names: [string], param_types: [string], ret_ty: string, body_idx: i32): i32
+{
+    return expr_store_add(store, AstExpr{ tag: "lambda", text: name, int_value: 0, float_value: 0.0, left_idx: body_idx, right_idx: -1, args: [], field_names: param_names, type_args: param_types, option_has_value: 0, option_value: ret_ty, $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_index(store: &ExprStore, base_idx: i32, index_idx: i32): i32
@@ -556,7 +568,8 @@ pub fn ast_expr_debug(store: &ExprStore, idx: i32): string
         "ident" -> expr.text
         "binop" -> "(" + ast_expr_debug(store, expr.left_idx) + " " + expr.text + " " + ast_expr_debug(store, expr.right_idx) + ")"
         "unaryop" -> "(" + expr.text + ast_expr_debug(store, expr.left_idx) + ")"
-        "call" -> expr.text + "(...)"
+        "call" -> (if (expr.left_idx >= 0) { ast_expr_debug(store, expr.left_idx) } else { expr.text }) + "(...)"
+        "lambda" -> "fn " + expr.text + "(...)"
         "index" -> ast_expr_debug(store, expr.left_idx) + "[" + ast_expr_debug(store, expr.right_idx) + "]"
         "slice" -> ast_expr_debug(store, expr.left_idx) + "[" + ast_expr_debug(store, expr.right_idx) + ".." + ast_expr_debug(store, expr.args[0]) + "]"
         "addr" -> "&" + expr.text
@@ -739,6 +752,7 @@ pub fn expr_tag_to_type(tag: string): string
         "binop" -> "BinaryExpression"
         "unaryop" -> "UnaryExpression"
         "call" -> "CallExpression"
+        "lambda" -> "LambdaExpression"
         "index" -> "IndexExpression"
         "addr" -> "AddressOfExpression"
         "deref" -> "DerefExpression"
@@ -784,12 +798,32 @@ pub fn ast_expr_yaml(store: &ExprStore, idx: i32, depth: i32): string
         "call" ->
         {
             let mut out = indent + "type: CallExpression\n"
-            out = out + indent1 + "name: " + expr.text + "\n"
+            if (expr.left_idx >= 0)
+            {
+                out = out + indent1 + "callee:\n"
+                out = out + ast_expr_yaml(store, expr.left_idx, depth + 2)
+            }
+            else out = out + indent1 + "name: " + expr.text + "\n"
             out = out + indent1 + "arguments:\n"
             for (i in 0 .. expr.args.length)
             {
                 out = out + ast_expr_yaml(store, expr.args[i], depth + 2)
             }
+            out
+        }
+        "lambda" ->
+        {
+            let mut out = indent + "type: LambdaExpression\n"
+            out = out + indent1 + "generated_name: " + expr.text + "\n"
+            out = out + indent1 + "return_type: " + expr.option_value + "\n"
+            out = out + indent1 + "parameters:\n"
+            for (i in 0 .. expr.field_names.length)
+            {
+                out = out + yaml_indent(depth + 2) + "- name: " + expr.field_names[i] + "\n"
+                out = out + yaml_indent(depth + 3) + "type: " + expr.type_args[i] + "\n"
+            }
+            out = out + indent1 + "body:\n"
+            out = out + ast_expr_yaml(store, expr.left_idx, depth + 2)
             out
         }
         "index" ->

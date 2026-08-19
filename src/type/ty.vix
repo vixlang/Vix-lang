@@ -507,13 +507,13 @@ pub fn ty_to_string(store: &TyStore, ty: Ty): string
         TyPrim(code) -> { return ty_prim_name(code) }
         TyFun(idx) -> {
             let data = store.funs[idx]
-            let mut out = "("
+            let mut out = "fn("
             for (i in 0 .. data.params.length)
             {
                 if (i > 0) out = out + ", "
                 out = out + ty_to_string(store, data.params[i])
             }
-            out = out + ") -> " + ty_to_string(store, data.ret)
+            out = out + "): " + ty_to_string(store, data.ret)
             return out
         }
         TyTuple(idx) -> {
@@ -549,6 +549,48 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
         |> ty_prim_from_name
     if (ty_is_unknown(prim) == 0) return prim
     if (text == "unknown" or text == "") return TyUnknown
+    if (text.length >= 5 and text[0] == 'f' and text[1] == 'n' and text[2] == '(')
+    {
+        let mut close = -1
+        let mut depth = 0
+        for (i in 2 .. text.length)
+        {
+            if (text[i] == '(' or text[i] == '[') depth += 1
+            elif (text[i] == ')' or text[i] == ']')
+            {
+                depth -= 1
+                if (text[i] == ')' and depth == 0)
+                {
+                    close = i
+                    break
+                }
+            }
+        }
+        if (close > 0)
+        {
+            let mut params: [Ty] = []
+            let mut start = 3
+            depth = 0
+            for (i in 3 .. close + 1)
+            {
+                let at_end = i == close
+                if (at_end == 0 and (text[i] == '(' or text[i] == '[')) depth += 1
+                elif (at_end == 0 and (text[i] == ')' or text[i] == ']')) depth -= 1
+                if (at_end == 1 or (text[i] == ',' and depth == 0))
+                {
+                    let part = ty_trim(ty_slice(text, start, i))
+                    if (part != "") params.push(ty_from_text(store, part))
+                    start = i + 1
+                }
+            }
+            let mut ret_start = close + 1
+            while (ret_start < text.length and (text[ret_start] == ':' or text[ret_start] == ' '))
+            {
+                ret_start += 1
+            }
+            return ty_fun(store, params, ty_from_text(store, ty_trim(ty_slice(text, ret_start, text.length))))
+        }
+    }
     if (text.length > 1 and text[0] == '&')
     {
         return ty_ptr(store, ty_from_text(store, ty_slice(text, 1, text.length)))

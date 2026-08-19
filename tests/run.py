@@ -57,6 +57,12 @@ NAMED_TESTS = {
     "test422.vic": {"exit": 42},
     "test423.vic": {"exit": 3},
     "test424.vic": {"compile_fail": ["MIR line", "@main", "invalid load type mystery"], "only": ["self-lir"]},
+    "lambda_basic.vix": {"exit": 3, "only": ["llvm"]},
+    "lambda_pass.vix": {"exit": 42, "only": ["llvm"]},
+    "lambda_block.vix": {"exit": 42, "only": ["llvm"]},
+    "lambda_nested_call.vix": {"exit": 8, "only": ["llvm"]},
+    "lambda_capture_fail.vix": {"compile_fail": ["capturing lambda is not supported yet: offset"], "only": ["llvm"]},
+    "lambda_ast.vix": {"exit": 2, "ast_contains": ["\"type\":\"LambdaExpression\""], "only": ["llvm"]},
 }
 
 TESTS = dict(NAMED_TESTS)
@@ -124,6 +130,15 @@ def fail(name: str, message: str, result=None):
 def run_test(root: Path, files_dir: Path, bin_dir: Path, name: str, spec: dict, backend: str, compiler: Path) -> bool:
     source = files_dir / name
     output = bin_dir / name.removesuffix(".vix")
+
+    ast_contains = spec.get("ast_contains")
+    if ast_contains is not None:
+        ast_result = run_cmd([str(compiler), str(source), "--ast-json"], root)
+        if ast_result.returncode != 0:
+            return fail(name, f"AST JSON exited {ast_result.returncode}", ast_result)
+        for text in ast_contains:
+            if text not in ast_result.stdout:
+                return fail(name, f"expected AST JSON containing {text!r}", ast_result)
 
     cmd = [str(compiler), str(source), "-o", str(output)]
     if backend == "self":
@@ -206,7 +221,7 @@ def main() -> int:
 
     bin_dir.mkdir(parents=True, exist_ok=True)
 
-    found = {path.name for pattern in ("test*.vix", "test*.vic") for path in files_dir.glob(pattern)}
+    found = {path.name for pattern in ("test*.vix", "test*.vic", "lambda_*.vix") for path in files_dir.glob(pattern)}
     expected = set(TESTS)
     missing = sorted(expected - found)
     unlisted = sorted(found - expected)

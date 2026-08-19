@@ -1,0 +1,10 @@
+fn apply(f: fn(i32): i32, x: i32): i32
+{
+    return f(x)
+}
+
+fn main(): i32
+{
+    let double = fn (x: i32): i32 => x * 2
+    return apply(double, 21)
+}

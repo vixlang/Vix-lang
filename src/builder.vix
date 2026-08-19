@@ -159,6 +159,12 @@ pub fn get_var(b: &LlvmBuilder, name: string): ptr
     return vix_LLVMGetNamedFunction(b.module, name)
 }
 
+pub fn has_local_var(name: string): i32
+{
+    if (vix_get_var(name) != nil) return 1
+    return 0
+}
+
 pub fn set_var(b: &LlvmBuilder, name: string, value: ptr)
 {
     vix_set_var(name, value)
@@ -247,6 +253,89 @@ pub fn type_text_is_array(ty: string): i32
 {
     if (ty.length > 0 and ty[0] == '[') { return 1 }
     return 0
+}
+
+pub fn type_text_is_function(ty: string): i32
+{
+    if (ty.length >= 4 and ty[0] == 'f' and ty[1] == 'n' and ty[2] == '(') return 1
+    return 0
+}
+
+pub fn type_text_slice(ty: string, start: i32, end: i32): string
+{
+    let mut out = ""
+    for (i in start .. end)
+    {
+        let ch: string = malloc(2)
+        ch[0] = ty[i]
+        ch[1] = 0
+        out = out + ch
+    }
+    return out
+}
+
+pub fn type_text_trim(ty: string): string
+{
+    let mut start = 0
+    let mut end = ty.length
+    while (start < end and ty[start] == ' ')
+    {
+        start += 1
+    }
+    while (end > start and ty[end - 1] == ' ')
+    {
+        end -= 1
+    }
+    return type_text_slice(ty, start, end)
+}
+
+pub fn type_function_close(ty: string): i32
+{
+    let mut depth = 0
+    for (i in 2 .. ty.length)
+    {
+        if (ty[i] == '(' or ty[i] == '[') depth += 1
+        elif (ty[i] == ')' or ty[i] == ']')
+        {
+            depth -= 1
+            if (ty[i] == ')' and depth == 0) return i
+        }
+    }
+    return -1
+}
+
+pub fn type_function_params(ty: string): [string]
+{
+    let mut params: [string] = []
+    let close = type_function_close(ty)
+    if (close < 0) return params
+    let mut start = 3
+    let mut depth = 0
+    for (i in 3 .. close + 1)
+    {
+        let at_end = i == close
+        if (at_end == 0 and (ty[i] == '(' or ty[i] == '[')) depth += 1
+        elif (at_end == 0 and (ty[i] == ')' or ty[i] == ']')) depth -= 1
+        if (at_end == 1 or (ty[i] == ',' and depth == 0))
+        {
+            let param = type_text_trim(type_text_slice(ty, start, i))
+            if (param != "") params.push(param)
+            start = i + 1
+        }
+    }
+    return params
+}
+
+pub fn type_function_return(ty: string): string
+{
+    let close = type_function_close(ty)
+    if (close < 0) return "unknown"
+    let mut start = close + 1
+    while (start < ty.length and (ty[start] == ':' or ty[start] == ' '))
+    {
+        start += 1
+    }
+    return type_text_trim(type_text_slice(ty, start, ty.length))
 }
 
 pub fn type_array_element(ty: string): string
@@ -405,7 +494,7 @@ pub fn llvm_type_for(ty: string): ptr
     if (ty == "i64" or ty == "u64" or ty == "usize") { return LLVMInt64Type() }
     if (ty == "f32") { return LLVMFloatType() }
     if (ty == "f64") { return LLVMDoubleType() }
-    if (ty == "ptr" or ty == "string") { return LLVMPointerType(LLVMInt8Type(), 0) }
+    if (ty == "ptr" or ty == "string" or type_text_is_function(ty) == 1) { return LLVMPointerType(LLVMInt8Type(), 0) }
     return LLVMInt32Type()
 }
 
@@ -941,6 +1030,20 @@ pub fn llvm_build_call_value(b: &LlvmBuilder, func: string, args: [ptr]): ptr
     {
         fn_ref = vix_LLVMAddFunction(b.module, func, fn_ty)
     }
+    let call_name = if (ret_ty == "void") { "" } else { llvm_temp(b, "call") }
+    return vix_LLVMBuildCall2(b.builder, fn_ty, fn_ref, args, args.length, call_name)
+}
+
+pub fn llvm_build_indirect_call_value(b: &LlvmBuilder, fn_ref: ptr, fn_ty_text: string, args: [ptr]): ptr
+{
+    let ret_ty = type_function_return(fn_ty_text)
+    let param_types = type_function_params(fn_ty_text)
+    let mut llvm_param_types: [ptr] = []
+    for (i in 0 .. param_types.length)
+    {
+        llvm_param_types.push(llvm_type_for(param_types[i]))
+    }
+    let fn_ty = vix_LLVMFunctionTypeTypedN(llvm_type_for(ret_ty), llvm_param_types, param_types.length, 0)
     let call_name = if (ret_ty == "void") { "" } else { llvm_temp(b, "call") }
     return vix_LLVMBuildCall2(b.builder, fn_ty, fn_ref, args, args.length, call_name)
 }

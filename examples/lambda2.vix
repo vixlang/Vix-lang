@@ -1,0 +1,22 @@
+fn apply(f: fn(i32): i32, x: i32): i32
+{
+    return f(x)
+}
+
+fn main(): i32
+{
+    let offset = 3
+    let add_offset = fn [offset](x: i32): i32 => x + offset
+
+    let factor = 2
+    let bias = 1
+    let transform = fn [factor, bias](x: i32): i32 => x * factor + bias
+
+    let base = 10
+    let add_to_base = fn [base](x: i32): i32 => {
+        let doubled = x * 2
+        base + doubled
+    }
+
+    return apply(add_offset, 4) + transform(5) + add_to_base(2)
+}
