@@ -778,6 +778,42 @@ pub fn parse_primary(parser: &Parser): i32
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
+        let mut capture_names: [string] = []
+        if (parser_text(parser) == "[")
+        {
+            parser_advance(parser)
+            if (parser_text(parser) != "]")
+            {
+                while (1 == 1)
+                {
+                    if (parser_kind(parser) != tk_ident())
+                    {
+                        parser_fail(parser, "expected capture identifier, got '" + parser_text(parser) + "'")
+                        return -1
+                    }
+                    let capture = parser_text(parser)
+                    for (i in 0 .. capture_names.length)
+                    {
+                        if (capture_names[i] == capture)
+                        {
+                            parser_fail(parser, "duplicate lambda capture '" + capture + "'")
+                            return -1
+                        }
+                    }
+                    capture_names.push(capture)
+                    parser_advance(parser)
+                    if (parser_text(parser) != ",") { break }
+                    parser_advance(parser)
+                    if (parser_text(parser) == "]")
+                    {
+                        parser_fail(parser, "expected capture identifier after ','")
+                        return -1
+                    }
+                }
+            }
+            parser_expect_text(parser, "]")
+            if (parser.ok == 0) return -1
+        }
         parser_expect_text(parser, "(")
         if (parser.ok == 0) return -1
         let mut param_names: [string] = []
@@ -802,6 +838,17 @@ pub fn parse_primary(parser: &Parser): i32
             }
         }
         parser_expect_text(parser, ")")
+        for (i in 0 .. capture_names.length)
+        {
+            for (j in 0 .. param_names.length)
+            {
+                if (capture_names[i] == param_names[j])
+                {
+                    parser_fail(parser, "lambda parameter '" + capture_names[i] + "' cannot be captured")
+                    return -1
+                }
+            }
+        }
         parser_expect_text(parser, ":")
         let ret_ty = parse_type_text(parser)
         parser_expect_text(parser, "=>")
@@ -839,7 +886,7 @@ pub fn parse_primary(parser: &Parser): i32
         }
         else body_stmt = ast_stmt_return_expr(parser.store, body_expr)
         parser.lambda_functions.push(ast_function_with_loc(ast_function_full(fn_name, ret_ty, body_stmt, param_names, param_types), line, col))
-        return parser_expr_at(parser, ast_expr_lambda(parser.expr_store, fn_name, param_names, param_types, ret_ty, body_expr), line, col)
+        return parser_expr_at(parser, ast_expr_lambda_captured(parser.expr_store, fn_name, param_names, param_types, ret_ty, body_expr, capture_names), line, col)
     }
     if (kind == tk_ident())
     {
@@ -2004,7 +2051,11 @@ pub fn parse_mod_decl(parser: &Parser): AstModDecl
         return AstModDecl{ name: "", is_pub: 0, line: line, col: col }
     }
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0)
+    if (parser_kind(parser) == tk_string())
+    {
+        parser_advance(parser)
+    }
+    elif (parser_expect_kind(parser, tk_ident()) == 0)
     {
         return AstModDecl{ name: "", is_pub: 0, line: line, col: col }
     }
@@ -2013,7 +2064,7 @@ pub fn parse_mod_decl(parser: &Parser): AstModDecl
 }
 
 // `import math` or `import math::add` or `import math::add as plus`
-// Note: `import "file.vix"` (quoted) is handled by the preprocessor, not here.
+// Note: quoted imports are legacy preprocessor imports and are ignored in raw mode.
 pub fn parse_import_decl(parser: &Parser): AstImportDecl
 {
     let line = parser_line(parser)
@@ -2041,10 +2092,33 @@ pub fn parse_import_decl(parser: &Parser): AstImportDecl
     return AstImportDecl{ path: path, alias: alias, line: line, col: col }
 }
 
-pub fn parse_program(src: string, filename: string): AstProgram
+fn parse_strip_attr_lines(src: string): string
+{
+    let mut out = ""
+    let mut i = 0
+    while (i < src.length)
+    {
+        if (src[i] == '#' and i + 1 < src.length and src[i + 1] == '[')
+        {
+            i += 2
+            while (i < src.length and src[i] != ']') { i += 1 }
+            if (i < src.length) { i += 1 }
+            while (i < src.length and src[i] != 10) { i += 1 }
+            if (i < src.length) { out = out + char_string(10); i += 1 }
+        }
+        else
+        {
+            out = out + char_string(src[i])
+            i += 1
+        }
+    }
+    return out
+}
+
+pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): AstProgram
 {
     let mut imports = import_set_new()
-    let combined = preprocess_source(src, filename, &imports)
+    let combined = if (do_preprocess == 1) { preprocess_source(src, filename, &imports) } else { preprocess_source_local(src, filename) }
 
     let mut parser = parser_new(combined, filename)
     if (parser_at_end(&parser) == 1) { return ast_program_err("empty source") }
@@ -2072,12 +2146,18 @@ pub fn parse_program(src: string, filename: string): AstProgram
             if (parser.ok == 0) { return ast_program_err(parser.error) }
             mod_decls.push(mdecl)
         }
-        // `import ident...`  (quoted import "file.vix" is consumed by preprocessor)
+        // `import ident...`; quoted imports are legacy no-ops in raw module mode.
         elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
         {
             let idecl = parse_import_decl(&parser)
             if (parser.ok == 0) { return ast_program_err(parser.error) }
             import_decls.push(idecl)
+        }
+        elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
+        {
+            parser_advance(&parser)
+            parser_advance(&parser)
+            parser_accept_text(&parser, ";")
         }
         elif (parser_text(&parser) == "extern")
         {
@@ -2139,7 +2219,7 @@ pub fn parse_program(src: string, filename: string): AstProgram
             return ast_program_err(parser.error)
         }
     }
-    if (functions.length == 0)
+    if (functions.length == 0 and extern_functions.length == 0 and globals.length == 0 and structs.length == 0 and adts.length == 0 and mod_decls.length == 0 and import_decls.length == 0)
     {
         return ast_program_err("expected function")
     }
@@ -2152,6 +2232,16 @@ pub fn parse_program(src: string, filename: string): AstProgram
         functions.push(parser.lambda_functions[i])
     }
     return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store)
+}
+
+pub fn parse_program(src: string, filename: string): AstProgram
+{
+    return parse_program_impl(src, filename, 1)
+}
+
+pub fn parse_program_raw(src: string, filename: string): AstProgram
+{
+    return parse_program_impl(src, filename, 0)
 }
 
 pub fn parse_program_stats(src: string, filename: string): string

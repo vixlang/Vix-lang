@@ -1,0 +1,8 @@
+fn apply(f: fn(i32): i32, x: i32): i32 {
+    return f(x)
+}
+fn main(): i32 {
+    let offset = 40
+    let f = fn [offset](x: i32): i32 => x + offset
+    return apply(f, 2)
+}

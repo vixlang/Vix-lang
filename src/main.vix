@@ -1,16 +1,4 @@
-import "parser.vix"
-import "module.vix"
-import "json_ast.vix"
-import "desugar.vix"
-import "codegen.vix"
-import "error.vix"
-import "backend/llc.vix"
-import "backend/linker.vix"
-import "backend/passes.vix"
-import "backend/boot16.vix"
-import "mir/mir.vix"
-import "mir/opt.vix"
-import "mir/lir2asm/mod.vix"
+mod sys
 
 extern "C"
 {
@@ -42,10 +30,12 @@ type CompilerModeResult = CompilerModeName(string) | CompilerModeUnknown
 
 fn compiler_mode(arg: string): CompilerModeResult
 {
-    if (arg == "-h" or arg == "--help") { return CompilerModeName("--help") }
-    if (arg == "-v" or arg == "--version") { return CompilerModeName("--version") }
-    if (arg == "--lex" or arg == "--parse-stats" or arg == "--parser" or arg == "--ast" or arg == "-ast" or arg == "--ast-json" or arg == "--typeinfer" or arg == "--tyinfer" or arg == "--semantic" or arg == "--check" or arg == "--module-graph" or arg == "-ll" or arg == "-obj" or arg == "-S") { return CompilerModeName(arg) }
-    return CompilerModeUnknown
+    return match arg {
+        "-h" | "--help" -> CompilerModeName("--help")
+        "-v" | "--version" -> CompilerModeName("--version")
+        "--lex" | "--parse-stats" | "--parser" | "--ast" | "-ast" | "--ast-json" | "--typeinfer" | "--tyinfer" | "--semantic" | "--check" | "--module-graph" | "-ll" | "-obj" | "-S" -> CompilerModeName(arg)
+        _ -> CompilerModeUnknown
+    }
 }
 
 fn strip_vix_ext(name: string): string
@@ -86,8 +76,8 @@ fn slice_string(text: string, start: i32, end: i32): string
 fn dirname(path: string): string
 {
     let slash = find_last_char(path, '/')
-    if (slash < 0) { return "." }
-    if (slash == 0) { return "/" }
+    if (slash < 0)  return "."
+    if (slash == 0)  return "/"
     return slice_string(path, 0, slash)
 }
 
@@ -400,7 +390,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         merged_program = module_graph_load_all(g, program)
     }
 
-    let emit_semantic_warnings = if (mode == "codegen") { 0 } else { 1 }
+    let emit_semantic_warnings = if (mode == "codegen" or mode == "debug_mir" or mode == "debug_lir" or mode == "debug_asm" or mode == "debug_llvm" or program.mod_decls.length > 0) { 0 } else { 1 }
     let semantic_result = semantic_check_program_with_warnings(merged_program, src, filename, emit_semantic_warnings)
     match mode
     {

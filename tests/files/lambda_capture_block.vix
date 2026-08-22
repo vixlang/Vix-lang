@@ -1,0 +1,8 @@
+fn main(): i32 {
+    let offset = 4
+    let f = fn [offset](x: i32): i32 => {
+        let y = x * 2
+        return y + offset
+    }
+    return f(5)
+}

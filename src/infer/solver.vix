@@ -710,6 +710,24 @@ pub fn hm_check_function(func: AstFunction, base_env: &TypeEnv, store: &TyStore,
     {
         type_env_extend(&env, func.param_names[i], scheme_mono(hm_type_param_ty(store, func.type_params, vars, func.param_types[i])))
     }
+    // Synthetic lambdas keep their explicit capture names in the lambda AST.
+    // Expose those names as unknown locals so their uses participate in the
+    // normal expression constraints.
+    if (func.name.length >= 9 and func.name[0] == '_' and func.name[1] == '_' and func.name[2] == 'l' and func.name[3] == 'a' and func.name[4] == 'm' and func.name[5] == 'b' and func.name[6] == 'd' and func.name[7] == 'a' and func.name[8] == '_')
+    {
+        for (e in 0 .. es.exprs.length)
+        {
+            let lambda_expr = es.exprs[e]
+            if (lambda_expr.tag == "lambda" and lambda_expr.text == func.name)
+            {
+                for (c in 0 .. lambda_expr.capture_names.length)
+                {
+                    type_env_extend(&env, lambda_expr.capture_names[c], scheme_mono(TyUnknown))
+                }
+                break
+            }
+        }
+    }
     let subst = subst_empty()
     let ret_ty = hm_type_param_ty(store, func.type_params, vars, func.ret_ty)
     let r = hm_infer_stmt(&env, store, fresh, &subst, structs, es, ss, func.body_idx, ret_ty)

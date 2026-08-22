@@ -1,0 +1,8 @@
+fn make(): fn(i32): i32 {
+    let offset = 7
+    return fn [offset](x: i32): i32 => x + offset
+}
+fn main(): i32 {
+    let f = make()
+    return f(2)
+}

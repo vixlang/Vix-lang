@@ -196,6 +196,20 @@ pub fn ml_dirname(path: string): string
 // Returns the file path, "" if not found, or "AMBIGUOUS:..." if both exist.
 pub fn ml_locate(base_dir: string, name: string): string
 {
+    if (name.length >= 4 and name[name.length - 4] == '.' and name[name.length - 3] == 'v' and name[name.length - 2] == 'i' and name[name.length - 1] == 'x')
+    {
+        let direct = ml_join_dir(base_dir, name)
+        if (read_file_content(direct) != "") { return direct }
+        return ""
+    }
+    let has_slash = 0
+    for (i in 0 .. name.length) { if (name[i] == '/') { has_slash = 1 } }
+    if (has_slash == 1)
+    {
+        let direct = ml_join_dir(base_dir, name)
+        if (read_file_content(direct) != "") { return direct }
+        return ""
+    }
     let file_path = ml_join_dir(base_dir, name + ".vix")
     let dir_path  = ml_join_dir(ml_join_dir(base_dir, name), "mod.vix")
     let fc = read_file_content(file_path)
@@ -235,7 +249,7 @@ pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, s
             i += 1
             continue
         }
-        if (at + 1 < len and stream_kind_at(stream, at + 1) == tk_ident())
+        if (at + 1 < len and (stream_kind_at(stream, at + 1) == tk_ident() or stream_kind_at(stream, at + 1) == tk_string()))
         {
             let name = stream_text_at(stream, at + 1)
             ml_load_module(loader, parent_idx, name, is_pub, src_path)
@@ -484,6 +498,15 @@ fn module_strip_root_prefix(qname: string): string
     return qname
 }
 
+// Compiler sources are aggregated below `sys` so their existing unqualified
+// calls remain valid while user-defined modules retain their namespace.
+fn module_is_sys_member(qname: string): i32
+{
+    if (qname.length < 11) { return 0 }
+    if (qname[0] == 'r' and qname[1] == 'o' and qname[2] == 'o' and qname[3] == 't' and qname[4] == ':' and qname[5] == ':' and qname[6] == 's' and qname[7] == 'y' and qname[8] == 's' and qname[9] == ':' and qname[10] == ':') { return 1 }
+    return 0
+}
+
 // Merge all exprs from src into dst, remapping indices by expr_off/stmt_off
 fn module_merge_exprs(src_es: ExprStore, dst_es: &ExprStore, expr_off: i32, stmt_off: i32)
 {
@@ -650,10 +673,10 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
         let src = read_file_content(mnode.source_path)
         if (src == "") { continue }
         
-        let prog = parse_program(src, mnode.source_path)
+        let prog = parse_program_raw(src, mnode.source_path)
         if (prog.ok == 0) { continue }
         
-        let prefix = module_strip_root_prefix(mnode.id.qualified_name)
+        let prefix = if (module_is_sys_member(mnode.id.qualified_name) == 1) { "" } else { module_strip_root_prefix(mnode.id.qualified_name) }
         let expr_off = merged_es.exprs.length
         let stmt_off = merged_store.stmts.length
         

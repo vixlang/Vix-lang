@@ -1,0 +1,4 @@
+fn main(): i32 {
+    let f = fn [missing](x: i32): i32 => x + 1
+    return f(3)
+}

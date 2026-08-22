@@ -624,3 +624,45 @@ pub fn preprocess_source(src: string, filename: string, imports: &ImportSet): st
     let mut macros = macro_set_new()
     return preprocess_source_with_macros(src, filename, imports, &macros)
 }
+
+// Process attributes, local macro declarations, and local macro calls without
+// recursively loading legacy quoted imports. Module graph loading owns that.
+pub fn preprocess_source_local(src: string, filename: string): string
+{
+    let mut macros = macro_set_new()
+    let mut out = ""
+    let mut i = 0
+    let mut segment_start = 0
+    while (i < src.length)
+    {
+        if (src[i] == '#' and i + 1 < src.length and src[i + 1] == '[')
+        {
+            if (segment_start < i) { out = out + slice_text(src, segment_start, i) }
+            i = skip_attr_line(src, i)
+            segment_start = i
+            continue
+        }
+        let macro_end = skip_macro_definition(src, i, &macros)
+        if (macro_end > i)
+        {
+            if (segment_start < i) { out = out + slice_text(src, segment_start, i) }
+            let skipped_start = i
+            i = macro_end
+            while (i < src.length and (src[i] == 10 or src[i] == 13)) { i += 1 }
+            out = out + newline_padding(src, skipped_start, i)
+            segment_start = i
+            continue
+        }
+        let import_end = scan_import_line(src, i)
+        if (import_end > i)
+        {
+            if (segment_start < i) { out = out + slice_text(src, segment_start, i) }
+            i = import_end
+            segment_start = i
+            continue
+        }
+        i += 1
+    }
+    if (segment_start < src.length) { out = out + slice_text(src, segment_start, src.length) }
+    return expand_macros(out, &macros)
+}

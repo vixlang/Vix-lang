@@ -13,7 +13,8 @@ fn main(): i32
     let transform = fn [factor, bias](x: i32): i32 => x * factor + bias
 
     let base = 10
-    let add_to_base = fn [base](x: i32): i32 => {
+    let add_to_base = fn [base](x: i32): i32 =>
+    {
         let doubled = x * 2
         base + doubled
     }

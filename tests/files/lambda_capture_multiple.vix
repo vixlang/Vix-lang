@@ -1,0 +1,6 @@
+fn main(): i32 {
+    let factor = 2
+    let bias = 1
+    let f = fn [factor, bias](x: i32): i32 => x * factor + bias
+    return f(5)
+}

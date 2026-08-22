@@ -61,8 +61,17 @@ NAMED_TESTS = {
     "lambda_pass.vix": {"exit": 42, "only": ["llvm"]},
     "lambda_block.vix": {"exit": 42, "only": ["llvm"]},
     "lambda_nested_call.vix": {"exit": 8, "only": ["llvm"]},
-    "lambda_capture_fail.vix": {"compile_fail": ["capturing lambda is not supported yet: offset"], "only": ["llvm"]},
+    "lambda_capture_fail.vix": {"compile_fail": ["must be explicitly captured"], "only": ["llvm"]},
     "lambda_ast.vix": {"exit": 2, "ast_contains": ["\"type\":\"LambdaExpression\""], "only": ["llvm"]},
+    "lambda_capture_basic.vix": {"exit": 5, "only": ["llvm"]},
+    "lambda_capture_multiple.vix": {"exit": 11, "only": ["llvm"]},
+    "lambda_capture_block.vix": {"exit": 14, "only": ["llvm"]},
+    "lambda_capture_pass.vix": {"exit": 42, "only": ["llvm"]},
+    "lambda_capture_return.vix": {"exit": 9, "only": ["llvm"]},
+    "lambda_capture_missing.vix": {"compile_fail": ["must be explicitly captured"], "only": ["llvm"]},
+    "lambda_capture_unknown.vix": {"compile_fail": ["undefined capture"], "only": ["llvm"]},
+    "lambda_capture_duplicate.vix": {"compile_fail": ["duplicate lambda capture"], "only": ["llvm"]},
+    "lambda2_ast.vix": {"exit": 2, "ast_contains": ["\"type\":\"LambdaExpression\"", "\"captures\":[\"offset\"]"], "only": ["llvm"]},
 }
 
 TESTS = dict(NAMED_TESTS)
@@ -221,7 +230,7 @@ def main() -> int:
 
     bin_dir.mkdir(parents=True, exist_ok=True)
 
-    found = {path.name for pattern in ("test*.vix", "test*.vic", "lambda_*.vix") for path in files_dir.glob(pattern)}
+    found = {path.name for pattern in ("test*.vix", "test*.vic", "lambda_*.vix", "lambda2_ast.vix") for path in files_dir.glob(pattern)}
     expected = set(TESTS)
     missing = sorted(expected - found)
     unlisted = sorted(found - expected)

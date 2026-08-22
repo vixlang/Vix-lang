@@ -33,6 +33,53 @@ pub fn codegen_type_is_pointer_like(ty: string): i32
     return 0
 }
 
+pub fn codegen_is_lambda_name(name: string): i32
+{
+    if (name.length < 9) { return 0 }
+    if (name[0] == '_' and name[1] == '_' and name[2] == 'l' and name[3] == 'a' and name[4] == 'm' and name[5] == 'b' and name[6] == 'd' and name[7] == 'a' and name[8] == '_') { return 1 }
+    return 0
+}
+
+pub fn codegen_lambda_expr_for_name(es: &ExprStore, name: string): AstExpr
+{
+    for (i in 0 .. es.exprs.length)
+    {
+        if (es.exprs[i].tag == "lambda" and es.exprs[i].text == name) { return es.exprs[i] }
+    }
+    // Callers only ask for parser-generated synthetic lambda names.
+    return es.exprs[0]
+}
+
+pub fn codegen_function_value_wrapper_name(name: string): string
+{
+    return "__fn_value_" + mangle_flat_name(name)
+}
+
+// Function values always use { code, env }.  The wrapper lets a named
+// function retain its ordinary ABI while also being passed where a fn value
+// is expected.
+pub fn codegen_emit_function_value_wrapper(b: &LlvmBuilder, func: AstFunction)
+{
+    if (codegen_is_lambda_name(func.name) == 1) { return }
+    let wrapper = codegen_function_value_wrapper_name(func.name)
+    let mut names: [string] = ["__lambda_env"]
+    let mut types: [string] = ["ptr"]
+    for (i in 0 .. func.param_names.length)
+    {
+        names.push(func.param_names[i])
+        types.push(func.param_types[i])
+    }
+    llvm_emit_function_header_with_params(b, wrapper, func.ret_ty, names, types)
+    let mut args: [ptr] = []
+    for (i in 0 .. func.param_names.length)
+    {
+        args.push(llvm_load_var(b, func.param_names[i]))
+    }
+    let value = llvm_build_call_value(b, mangle_flat_name(func.name), args)
+    if (func.ret_ty == "void") { llvm_emit_ret_void(b) } else { llvm_emit_ret_value(b, value) }
+    llvm_emit_end_function(b)
+}
+
 pub fn codegen_expected_type_accepts_null(ty: string): i32
 {
     if (ty == "ptr" or ty == "string") { return 1 }
@@ -416,14 +463,40 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
     if (expr.tag == "ident")
     {
         let var_ty = get_var_type(b, expr.text)
-        if (type_text_is_function(var_ty) == 1 and has_local_var(expr.text) == 0) return vix_LLVMGetNamedFunction(b.module, mangle_flat_name(expr.text))
+        if (type_text_is_function(var_ty) == 1 and has_local_var(expr.text) == 0)
+        {
+            let wrapper = vix_LLVMGetNamedFunction(b.module, codegen_function_value_wrapper_name(expr.text))
+            return llvm_closure_new(b, wrapper, llvm_const_null_ptr())
+        }
         if (type_text_is_ptr_to_array(expected_ty) == 1 and type_text_is_array(var_ty) == 1) { return llvm_load_var(b, expr.text) }
         if (expected_ty == "ptr:" + var_ty) { return llvm_var_address(b, expr.text) }
         if (is_ptr_to_struct(var_ty) == 1 and codegen_type_is_pointer_like(expected_ty) == 1) { return llvm_load_var(b, expr.text) }
         if (vix_is_struct_type(var_ty) == 1 and codegen_type_is_pointer_like(expected_ty) == 1) { return llvm_var_address(b, expr.text) }
         return llvm_cast_value(b, llvm_load_var(b, expr.text), var_ty, expected_ty)
     }
-    if (expr.tag == "lambda") return vix_LLVMGetNamedFunction(b.module, mangle_flat_name(expr.text))
+    if (expr.tag == "lambda")
+    {
+        let mut capture_types: [string] = []
+        for (i in 0 .. expr.capture_names.length)
+        {
+            let inferred_capture_ty = get_var_type(b, expr.capture_names[i])
+            // A captured scalar can temporarily appear as the generic pointer
+            // representation while the enclosing let is being emitted.
+            // Preserve concrete types, and use the language's default integer
+            // type for that unresolved case.
+            capture_types.push(if (inferred_capture_ty == "ptr") { "i32" } else { inferred_capture_ty })
+        }
+        llvm_record_lambda_capture_types(b, expr.text, expr.capture_names, capture_types)
+        let env = llvm_heap_alloc_bytes(b, expr.capture_names.length * 8)
+        for (i in 0 .. expr.capture_names.length)
+        {
+            let capture_ty = capture_types[i]
+            let capture_value = llvm_load_var(b, expr.capture_names[i])
+            let slot = llvm_ptr_offset_i8(b, env, llvm_const_i32(i * 8))
+            llvm_store_typed_pointer(b, slot, llvm_cast_value(b, capture_value, capture_ty, capture_ty))
+        }
+        return llvm_closure_new(b, vix_LLVMGetNamedFunction(b.module, mangle_flat_name(expr.text)), env)
+    }
     if (expr.tag == "string") { return get_c_string_global(b, ".strlit" + llvm_temp(b, ""), expr.text) }
     if (expr.tag == "addr")
     {
@@ -497,7 +570,7 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
             {
                 indirect_args.push(codegen_expr_value_typed(b, es, store, expr_store_get(es, expr.args[i]), param_types[i]))
             }
-            let call_val = llvm_build_indirect_call_value(b, llvm_load_var(b, expr.text), callee_ty, indirect_args)
+            let call_val = llvm_build_closure_call_value(b, llvm_load_var(b, expr.text), callee_ty, indirect_args)
             return llvm_cast_value(b, call_val, type_function_return(callee_ty), expected_ty)
         }
         if (expr.left_idx >= 0)
@@ -511,7 +584,7 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
                 indirect_args.push(codegen_expr_value_typed(b, es, store, expr_store_get(es, expr.args[i]), param_types[i]))
             }
             let callee = codegen_expr_value_typed(b, es, store, callee_expr, callee_ty)
-            let call_val = llvm_build_indirect_call_value(b, callee, callee_ty, indirect_args)
+            let call_val = llvm_build_closure_call_value(b, callee, callee_ty, indirect_args)
             return llvm_cast_value(b, call_val, type_function_return(callee_ty), expected_ty)
         }
         let mut args: [ptr] = []
@@ -1139,7 +1212,20 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
     for (i in 0 .. program.functions.length)
     {
         register_function_sig(program.functions[i].name, program.functions[i].ret_ty, program.functions[i].param_types)
-        llvm_declare_function_with_params(b, mangle_flat_name(program.functions[i].name), program.functions[i].ret_ty, program.functions[i].param_types)
+        let mut emit_param_types = program.functions[i].param_types
+        if (codegen_is_lambda_name(program.functions[i].name) == 1)
+        {
+            let mut with_env: [string] = ["ptr"]
+            for (p in 0 .. emit_param_types.length) { with_env.push(emit_param_types[p]) }
+            emit_param_types = with_env
+        }
+        llvm_declare_function_with_params(b, mangle_flat_name(program.functions[i].name), program.functions[i].ret_ty, emit_param_types)
+        if (codegen_is_lambda_name(program.functions[i].name) == 0)
+        {
+            let mut wrapper_types: [string] = ["ptr"]
+            for (p in 0 .. program.functions[i].param_types.length) { wrapper_types.push(program.functions[i].param_types[p]) }
+            llvm_declare_function_with_params(b, codegen_function_value_wrapper_name(program.functions[i].name), program.functions[i].ret_ty, wrapper_types)
+        }
     }
     for (i in 0 .. program.globals.length)
     {
@@ -1167,7 +1253,21 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
     for (i in 0 .. program.functions.length)
     {
         let fn_llvm_name = mangle_flat_name(program.functions[i].name)
-        llvm_emit_function_header_with_params(b, fn_llvm_name, program.functions[i].ret_ty, program.functions[i].param_names, program.functions[i].param_types)
+        let mut emit_param_names = program.functions[i].param_names
+        let mut emit_param_types = program.functions[i].param_types
+        if (codegen_is_lambda_name(program.functions[i].name) == 1)
+        {
+            let mut names_with_env: [string] = ["__lambda_env"]
+            let mut types_with_env: [string] = ["ptr"]
+            for (p in 0 .. emit_param_names.length)
+            {
+                names_with_env.push(emit_param_names[p])
+                types_with_env.push(emit_param_types[p])
+            }
+            emit_param_names = names_with_env
+            emit_param_types = types_with_env
+        }
+        llvm_emit_function_header_with_params(b, fn_llvm_name, program.functions[i].ret_ty, emit_param_names, emit_param_types)
         for (f in 0 .. program.functions.length)
         {
             let mut fn_ty = "fn("
@@ -1188,6 +1288,18 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
         }
         set_var(b, "__return", b.current_fn)
         set_var_type(b, "__return", program.functions[i].ret_ty)
+        if (codegen_is_lambda_name(program.functions[i].name) == 1)
+        {
+            let lambda_expr = codegen_lambda_expr_for_name(program.expr_store, program.functions[i].name)
+            let env = llvm_load_var(b, "__lambda_env")
+            for (c in 0 .. lambda_expr.capture_names.length)
+            {
+                let capture_ty = "i32"
+                let slot = llvm_ptr_offset_i8(b, env, llvm_const_i32(c * 8))
+                let normalized_capture_ty = if (capture_ty == "ptr") { "i32" } else { capture_ty }
+                llvm_define_var(b, lambda_expr.capture_names[c], normalized_capture_ty, llvm_load_typed_pointer(b, slot, normalized_capture_ty))
+            }
+        }
         codegen_stmt(b, program.expr_store, program.store, program.functions[i].body_idx, if (program.functions[i].ret_ty == "void") { 1 } else { 0 })
         if (llvm_current_block_terminated(b) == 0 and program.functions[i].ret_ty == "void")
         {
@@ -1198,6 +1310,10 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
             llvm_emit_ret_value(b, llvm_zero_value_for(program.functions[i].ret_ty))
         }
         llvm_emit_end_function(b)
+    }
+    for (i in 0 .. program.functions.length)
+    {
+        codegen_emit_function_value_wrapper(b, program.functions[i])
     }
     return llvm_get_code(b)
 }

@@ -98,6 +98,7 @@ pub type SemanticScope = struct {
     names: [string],
     depths: [i32],
     used: [i32],
+    mutable: [i32],
     lines: [i32],
     cols: [i32],
     warn_unused: [i32],
@@ -107,7 +108,7 @@ pub type SemanticScope = struct {
 
 pub fn semantic_scope_new(): SemanticScope
 {
-    return SemanticScope{ names: [], depths: [], used: [], lines: [], cols: [], warn_unused: [], active_len: 0, depth: 0 }
+    return SemanticScope{ names: [], depths: [], used: [], mutable: [], lines: [], cols: [], warn_unused: [], active_len: 0, depth: 0 }
 }
 
 pub fn semantic_scope_push(scope: &SemanticScope)
@@ -138,7 +139,10 @@ pub fn semantic_scope_pop(scope: &SemanticScope, result: &SemanticResult, source
 {
     if (scope.depth > 0)
     {
-        semantic_scope_warn_unused_current(scope, result, source, filename)
+        if (result.error_count == 0)
+        {
+            semantic_scope_warn_unused_current(scope, result, source, filename)
+        }
         let mut keep = scope.active_len
         while (keep > 0)
         {
@@ -196,6 +200,7 @@ pub fn semantic_scope_declare(scope: &SemanticScope, result: &SemanticResult, so
         scope.names[idx] = name
         scope.depths[idx] = scope.depth
         scope.used[idx] = 0
+        scope.mutable[idx] = 0
         scope.lines[idx] = line
         scope.cols[idx] = col
         scope.warn_unused[idx] = if (name == "_") { 0 } else { 1 }
@@ -205,12 +210,19 @@ pub fn semantic_scope_declare(scope: &SemanticScope, result: &SemanticResult, so
         scope.names.push(name)
         scope.depths.push(scope.depth)
         scope.used.push(0)
+        scope.mutable.push(0)
         scope.lines.push(line)
         scope.cols.push(col)
         scope.warn_unused.push(if (name == "_") { 0 } else { 1 })
     }
     scope.active_len += 1
     return 1
+}
+
+pub fn semantic_scope_mark_mutable(scope: &SemanticScope, name: string)
+{
+    let idx = semantic_scope_find_current(scope, name)
+    if (idx >= 0) { scope.mutable[idx] = 1 }
 }
 
 pub fn semantic_scope_declare_existing(scope: &SemanticScope, name: string)
@@ -223,6 +235,7 @@ pub fn semantic_scope_declare_existing(scope: &SemanticScope, name: string)
             scope.names[idx] = name
             scope.depths[idx] = scope.depth
             scope.used[idx] = 0
+            scope.mutable[idx] = 0
             scope.lines[idx] = 0
             scope.cols[idx] = 0
             scope.warn_unused[idx] = 0
@@ -232,6 +245,7 @@ pub fn semantic_scope_declare_existing(scope: &SemanticScope, name: string)
             scope.names.push(name)
             scope.depths.push(scope.depth)
             scope.used.push(0)
+            scope.mutable.push(0)
             scope.lines.push(0)
             scope.cols.push(0)
             scope.warn_unused.push(0)
@@ -255,7 +269,7 @@ pub fn semantic_scope_require(scope: &SemanticScope, result: &SemanticResult, so
     if (semantic_scope_lookup(scope, name) < 0)
     {
         let is_lambda = func_name.length >= 9 and func_name[0] == '_' and func_name[1] == '_' and func_name[2] == 'l' and func_name[3] == 'a' and func_name[4] == 'm' and func_name[5] == 'b' and func_name[6] == 'd' and func_name[7] == 'a' and func_name[8] == '_'
-        if (is_lambda) semantic_add_error_loc(result, source, filename, "SemanticError", "capturing lambda is not supported yet: " + name, func_name, line, col, diag_strlen(name))
+        if (is_lambda) semantic_add_error_loc(result, source, filename, "NameError", "variable `" + name + "` must be explicitly captured", func_name, line, col, diag_strlen(name))
         else semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, diag_strlen(name))
     }
 }
@@ -443,7 +457,25 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
                 semantic_check_expr(scope, program, expr.args[i], result, source, filename, func_name)
             }
         }
-        "lambda" -> { }
+        "lambda" -> {
+            for (i in 0 .. expr.capture_names.length)
+            {
+                let capture = expr.capture_names[i]
+                let capture_idx = semantic_scope_lookup(scope, capture)
+                if (capture_idx >= 0 and scope.mutable[capture_idx] == 1)
+                {
+                    semantic_add_error_loc(result, source, filename, "TypeError", "mutable capture '" + capture + "' is not supported", func_name, expr.line, expr.col, diag_strlen(capture))
+                }
+                elif (capture_idx < 0 and semantic_find_function_any(program.functions, program.extern_functions, capture) < 0 and semantic_find_adt_variant(program.adts, capture) < 0)
+                {
+                    semantic_add_error_loc(result, source, filename, "NameError", "undefined capture '" + capture + "'", func_name, expr.line, expr.col, diag_strlen(capture))
+                }
+                else
+                {
+                    semantic_scope_mark_used(scope, capture)
+                }
+            }
+        }
         "index" -> {
             semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
             semantic_check_expr(scope, program, expr.right_idx, result, source, filename, func_name)
@@ -590,6 +622,7 @@ pub fn semantic_check_stmt(scope: &SemanticScope, program: AstProgram, stmt_idx:
         "let" -> {
             semantic_check_expr(scope, program, stmt.assign_idx, result, source, filename, func_name)
             let __decl = semantic_scope_declare(scope, result, source, filename, func_name, stmt.assign_name, stmt.line, stmt.col)
+            if (stmt.is_mut == 1) { semantic_scope_mark_mutable(scope, stmt.assign_name) }
         }
         "assign" -> {
             semantic_scope_require(scope, result, source, filename, func_name, stmt.assign_name, stmt.line, stmt.col)
@@ -715,6 +748,25 @@ pub fn semantic_check_function_body(func: AstFunction, program: AstProgram, resu
     for (i in 0 .. func.param_names.length)
     {
         semantic_scope_declare_existing(&scope, func.param_names[i])
+    }
+    // Synthetic lambda functions get their explicitly captured names as
+    // read-only locals for semantic checking. The enclosing expression has
+    // already validated that each capture is defined in the outer scope.
+    if (func.name.length >= 9 and func.name[0] == '_' and func.name[1] == '_' and func.name[2] == 'l' and func.name[3] == 'a' and func.name[4] == 'm' and func.name[5] == 'b' and func.name[6] == 'd' and func.name[7] == 'a' and func.name[8] == '_')
+    {
+        let expr_store = program.expr_store
+        for (i in 0 .. expr_store.exprs.length)
+        {
+            let lambda_expr = expr_store.exprs[i]
+            if (lambda_expr.tag == "lambda" and lambda_expr.text == func.name)
+            {
+                for (j in 0 .. lambda_expr.capture_names.length)
+                {
+                    semantic_scope_declare_existing(&scope, lambda_expr.capture_names[j])
+                }
+                break
+            }
+        }
     }
     semantic_check_stmt(&scope, program, func.body_idx, result, source, filename, func.name)
 }

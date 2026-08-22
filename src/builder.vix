@@ -146,7 +146,10 @@ pub type LlvmBuilder = struct {
     malloc_fn: ptr,
     calloc_fn: ptr,
     strcmp_fn: ptr,
-    strlen_fn: ptr
+    strlen_fn: ptr,
+    lambda_capture_names: [string],
+    lambda_capture_types: [string],
+    lambda_capture_starts: [i32]
 }
 
 pub fn get_var(b: &LlvmBuilder, name: string): ptr
@@ -544,7 +547,84 @@ pub fn llvm_new_for_target(target_triple: string): LlvmBuilder
     let strcmp_fn = vix_LLVMAddFunction(module, "strcmp", strcmp_ty)
     let strlen_ty = vix_LLVMFunctionType1(LLVMInt32Type(), LLVMPointerType(LLVMInt8Type(), 0), 0)
     let strlen_fn = vix_LLVMAddFunction(module, "strlen", strlen_ty)
-    return LlvmBuilder{ module: module, builder: builder, current_fn: nil, current_block: nil, temp_counter: 0, label_counter: 0, printf_fn: printf_fn, malloc_fn: malloc_fn, calloc_fn: calloc_fn, strcmp_fn: strcmp_fn, strlen_fn: strlen_fn }
+    return LlvmBuilder{ module: module, builder: builder, current_fn: nil, current_block: nil, temp_counter: 0, label_counter: 0, printf_fn: printf_fn, malloc_fn: malloc_fn, calloc_fn: calloc_fn, strcmp_fn: strcmp_fn, strlen_fn: strlen_fn, lambda_capture_names: [], lambda_capture_types: [], lambda_capture_starts: [] }
+}
+
+pub fn llvm_record_lambda_capture_types(b: &LlvmBuilder, lambda_name: string, names: [string], types: [string])
+{
+    for (i in 0 .. b.lambda_capture_starts.length)
+    {
+        let start = b.lambda_capture_starts[i]
+        if (b.lambda_capture_names[start] == lambda_name) { return }
+    }
+    b.lambda_capture_starts.push(b.lambda_capture_names.length)
+    b.lambda_capture_names.push(lambda_name)
+    b.lambda_capture_types.push("")
+    for (i in 0 .. names.length)
+    {
+        b.lambda_capture_names.push(names[i])
+        b.lambda_capture_types.push(types[i])
+    }
+}
+
+pub fn llvm_lambda_capture_type(b: &LlvmBuilder, lambda_name: string, capture_name: string): string
+{
+    for (i in 0 .. b.lambda_capture_starts.length)
+    {
+        let start = b.lambda_capture_starts[i]
+        if (b.lambda_capture_names[start] == lambda_name)
+        {
+            let mut end = b.lambda_capture_names.length
+            if (i + 1 < b.lambda_capture_starts.length) { end = b.lambda_capture_starts[i + 1] }
+            for (j in (start + 1) .. end)
+            {
+                if (b.lambda_capture_names[j] == capture_name) { return b.lambda_capture_types[j] }
+            }
+        }
+    }
+    return "i32"
+}
+
+pub fn llvm_heap_alloc_bytes(b: &LlvmBuilder, size: i32): ptr
+{
+    let args = [llvm_const_i64(1), llvm_const_i64(size)]
+    return vix_LLVMBuildCall2(b.builder, vix_LLVMFunctionType2(LLVMPointerType(LLVMInt8Type(), 0), LLVMInt64Type(), LLVMInt64Type(), 0), b.calloc_fn, args, 2, llvm_temp(b, "calloc"))
+}
+
+pub fn llvm_closure_new(b: &LlvmBuilder, code: ptr, env: ptr): ptr
+{
+    let closure = llvm_heap_alloc_bytes(b, 16)
+    let code_slot = llvm_ptr_offset_i8(b, closure, llvm_const_i32(0))
+    let env_slot = llvm_ptr_offset_i8(b, closure, llvm_const_i32(8))
+    vix_LLVMBuildStore(b.builder, code, code_slot)
+    vix_LLVMBuildStore(b.builder, env, env_slot)
+    return closure
+}
+
+pub fn llvm_closure_code(b: &LlvmBuilder, closure: ptr): ptr
+{
+    return llvm_load_ptr_pointer(b, llvm_ptr_offset_i8(b, closure, llvm_const_i32(0)))
+}
+
+pub fn llvm_closure_env(b: &LlvmBuilder, closure: ptr): ptr
+{
+    return llvm_load_ptr_pointer(b, llvm_ptr_offset_i8(b, closure, llvm_const_i32(8)))
+}
+
+pub fn llvm_build_closure_call_value(b: &LlvmBuilder, closure: ptr, fn_ty_text: string, args: [ptr]): ptr
+{
+    let ret_ty = type_function_return(fn_ty_text)
+    let param_types = type_function_params(fn_ty_text)
+    let mut llvm_param_types: [ptr] = [LLVMPointerType(LLVMInt8Type(), 0)]
+    let mut call_args: [ptr] = [llvm_closure_env(b, closure)]
+    for (i in 0 .. param_types.length)
+    {
+        llvm_param_types.push(llvm_type_for(param_types[i]))
+        call_args.push(args[i])
+    }
+    let fn_ty = vix_LLVMFunctionTypeTypedN(llvm_type_for(ret_ty), llvm_param_types, llvm_param_types.length, 0)
+    let call_name = if (ret_ty == "void") { "" } else { llvm_temp(b, "call") }
+    return vix_LLVMBuildCall2(b.builder, fn_ty, llvm_closure_code(b, closure), call_args, call_args.length, call_name)
 }
 
 pub fn llvm_get_code(b: &LlvmBuilder): string
