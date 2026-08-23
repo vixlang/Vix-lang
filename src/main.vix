@@ -53,12 +53,12 @@ fn strip_vix_ext(name: string): string
     return name
 }
 
-fn find_last_char(text: string, needle: i8): i32
+fn find_last_char(text: string, needle: i8): ?i32
 {
-    let mut found = -1
+    let mut found: ?i32 = None
     for (i in 0 .. text.length)
     {
-        if (text[i] == needle) { found = i }
+        if (text[i] == needle) { found = Some(i) }
     }
     return found
 }
@@ -75,10 +75,12 @@ fn slice_string(text: string, start: i32, end: i32): string
 
 fn dirname(path: string): string
 {
-    let slash = find_last_char(path, '/')
-    if (slash < 0)  return "."
-    if (slash == 0)  return "/"
-    return slice_string(path, 0, slash)
+    let resolve = fn [path](slash: ?i32): string => match slash {
+        Some(index) -> if (index == 0) "/" else slice_string(path, 0, index)
+        None -> "."
+    }
+    return find_last_char(path, '/')
+        |> resolve
 }
 
 fn runtime_object_path(compiler_path: string): string
@@ -122,13 +124,15 @@ fn artifact_output_path(filename: string, output: string, emit: string): string
     return base + ".o"
 }
 
-fn opt_level_arg(arg: string): i32
+fn opt_level_arg(arg: string): ?i32
 {
-    if (arg == "-opt=l0") { return 0 }
-    if (arg == "-opt=l1") { return 1 }
-    if (arg == "-opt=l2") { return 2 }
-    if (arg == "-opt=l3") { return 3 }
-    return -1
+    return match arg {
+        "-opt=l0" -> Some(0)
+        "-opt=l1" -> Some(1)
+        "-opt=l2" -> Some(2)
+        "-opt=l3" -> Some(3)
+        _ -> None
+    }
 }
 
 fn print_help(): i32
@@ -723,11 +727,13 @@ fn main(argc: i32, argv: &string): i32
         }
         elif (str_starts_with(arg, "-opt=") == 1)
         {
-            opt_level = opt_level_arg(arg)
-            if (opt_level < 0)
+            match opt_level_arg(arg)
             {
-                diag_print("vixc: error: expected '-opt=lN' where N is 0, 1, 2, or 3")
-                return 1
+                Some(level) -> opt_level = level
+                None -> {
+                    diag_print("vixc: error: expected '-opt=lN' where N is 0, 1, 2, or 3")
+                    return 1
+                }
             }
         }
         elif (arg == "-S")

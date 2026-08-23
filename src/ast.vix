@@ -608,19 +608,29 @@ pub fn ast_generic_arg_count(ty: string): i32
     let mut in_args = 0
     let mut count = 0
     let mut has_arg = 0
+    let mut depth = 0
     for (i in 0 .. ty.length)
     {
-        if (ty[i] == '[')
+        if (in_args == 0 and ty[i] == '[')
         {
             in_args = 1
             has_arg = 0
         }
-        elif (ty[i] == ']')
+        elif (in_args == 1 and ty[i] == '[')
         {
-            if (in_args == 1 and has_arg == 1) { count += 1 }
+            depth += 1
+            has_arg = 1
+        }
+        elif (in_args == 1 and ty[i] == ']' and depth > 0)
+        {
+            depth -= 1
+        }
+        elif (in_args == 1 and ty[i] == ']')
+        {
+            if (has_arg == 1) { count += 1 }
             in_args = 0
         }
-        elif (in_args == 1 and ty[i] == ',')
+        elif (in_args == 1 and ty[i] == ',' and depth == 0)
         {
             count += 1
             has_arg = 0
@@ -637,21 +647,32 @@ pub fn ast_generic_arg_at(ty: string, target: i32): string
 {
     let mut in_args = 0
     let mut idx = 0
+    let mut depth = 0
     let mut result = ""
     for (i in 0 .. ty.length)
     {
-        if (ty[i] == '[')
+        if (in_args == 0 and ty[i] == '[')
         {
             in_args = 1
             idx = 0
             result = ""
         }
-        elif (ty[i] == ']')
+        elif (in_args == 1 and ty[i] == '[')
         {
-            if (in_args == 1 and idx == target) { return result }
+            depth += 1
+            if (idx == target) { result = result + "[" }
+        }
+        elif (in_args == 1 and ty[i] == ']' and depth > 0)
+        {
+            depth -= 1
+            if (idx == target) { result = result + "]" }
+        }
+        elif (in_args == 1 and ty[i] == ']')
+        {
+            if (idx == target) { return result }
             in_args = 0
         }
-        elif (in_args == 1 and ty[i] == ',')
+        elif (in_args == 1 and ty[i] == ',' and depth == 0)
         {
             if (idx == target) { return result }
             idx += 1

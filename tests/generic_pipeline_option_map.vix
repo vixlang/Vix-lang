@@ -1,0 +1,26 @@
+fn option_map:[T, U](value: ?T, transform: fn(T): U): ?U
+{
+    return match value {
+        Some(inner) -> Some(transform(inner))
+        None -> None
+    }
+}
+
+fn find(value: i32): ?i32
+{
+    return if (value > 0) Some(value) else None
+}
+
+fn main(): i32
+{
+    let offset = 2
+    let mapped = find(40)
+        |> option_map[i32, i32](
+            fn [offset](value: i32): i32 => value + offset
+        )
+
+    return match mapped {
+        Some(value) -> if (value == 42) 0 else 2
+        None -> 1
+    }
+}

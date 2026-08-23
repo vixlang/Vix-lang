@@ -1,0 +1,10 @@
+fn id:[T](value: T): T
+{
+    return value
+}
+
+fn main(): i32
+{
+    let invalid = id[i32](true)
+    return if (invalid) 0 else 1
+}

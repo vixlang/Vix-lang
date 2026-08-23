@@ -954,7 +954,8 @@ pub fn mir_match_compare(b: &MirBuilder, es: &ExprStore, store: &StmtStore, subj
     }
     if (type_is_struct(type_text_base_name_builder(subject.ty)) == 1 and pattern_expr.tag == "struct_literal")
     {
-        let tag_idx = get_struct_field_index(subject.ty, "tag")
+        let struct_ty = type_text_base_name_builder(subject.ty)
+        let tag_idx = get_struct_field_index(struct_ty, "tag")
         for (i in 0 .. pattern_expr.field_names.length)
         {
             if (pattern_expr.field_names[i] == "tag")
@@ -1011,6 +1012,7 @@ pub fn mir_bind_adt_pattern(b: &MirBuilder, es: &ExprStore, subject: MirValue, p
     if (pattern_idx < 0 or type_is_struct(type_text_base_name_builder(subject.ty)) == 0) { return }
     let pattern = expr_store_get(es, pattern_idx)
     if (pattern.tag != "struct_literal") { return }
+    let struct_ty = type_text_base_name_builder(subject.ty)
     for (i in 0 .. pattern.field_names.length)
     {
         let field_name = pattern.field_names[i]
@@ -1019,8 +1021,8 @@ pub fn mir_bind_adt_pattern(b: &MirBuilder, es: &ExprStore, subject: MirValue, p
             let bind = expr_store_get(es, pattern.args[i])
             if (bind.tag == "ident" and bind.text != "_")
             {
-                let field_ty = get_struct_field_type(subject.ty, field_name)
-                let field_idx = get_struct_field_index(subject.ty, field_name)
+                let field_ty = get_struct_field_type(struct_ty, field_name)
+                let field_idx = get_struct_field_index(struct_ty, field_name)
                 let value = mir_temp(b)
                 mir_inst(b, value + " = extractvalue " + mir_type(subject.ty) + " " + subject.name + ", [" + mir_i32(field_idx) + "]")
                 mir_define_local(bind.text, field_ty)

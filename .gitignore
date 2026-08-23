@@ -1,0 +1,6 @@
+build/compiler_gc.o
+build/vixc-seed.o
+build/vixc-seed-gc
+/test
+/test.vix
+/tests/bin/

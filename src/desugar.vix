@@ -10,15 +10,25 @@ pub fn desugar_adt_payload_field(payload_ty: string): string
 {
     if (payload_ty == "string") { return "payload_string" }
     if (payload_ty == "f32" or payload_ty == "f64") { return "payload_f64" }
-    if (payload_ty == "ptr" or (payload_ty.length > 3 and payload_ty[0] == 'p' and payload_ty[1] == 't' and payload_ty[2] == 'r')) { return "payload_ptr" }
+    if (desugar_adt_payload_is_pointer(payload_ty) == 1) { return "payload_ptr" }
     return "payload_i32"
+}
+
+pub fn desugar_adt_payload_is_pointer(payload_ty: string): i32
+{
+    if (payload_ty == "ptr") { return 1 }
+    if (payload_ty.length > 0 and (payload_ty[0] == '[' or payload_ty[0] == '?')) { return 1 }
+    if (payload_ty.length > 3 and payload_ty[0] == 'p' and payload_ty[1] == 't' and payload_ty[2] == 'r') { return 1 }
+    if (payload_ty.length > 3 and payload_ty[0] == 'f' and payload_ty[1] == 'n' and payload_ty[2] == '(') { return 1 }
+    if (payload_ty.length > 7 and payload_ty[0] == 'O' and payload_ty[1] == 'p' and payload_ty[2] == 't' and payload_ty[3] == 'i' and payload_ty[4] == 'o' and payload_ty[5] == 'n' and payload_ty[6] == '[') { return 1 }
+    return 0
 }
 
 pub fn desugar_adt_storage_type(payload_ty: string): string
 {
     if (payload_ty == "string") { return "string" }
     if (payload_ty == "f32" or payload_ty == "f64") { return "f64" }
-    if (payload_ty == "ptr" or (payload_ty.length > 3 and payload_ty[0] == 'p' and payload_ty[1] == 't' and payload_ty[2] == 'r')) { return "ptr" }
+    if (desugar_adt_payload_is_pointer(payload_ty) == 1) { return payload_ty }
     return "i32"
 }
 
@@ -504,6 +514,31 @@ pub fn desugar_subject_type_from_arrays(names: [string], types: [string], es: &E
     return ""
 }
 
+pub fn desugar_expr_with_env(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, idx: i32, names: [string], types: [string], expected_ty: string): i32
+{
+    if (idx < 0) { return idx }
+    let expr = expr_store_get(es, idx)
+    if (expr.tag == "match_expr")
+    {
+        let subject_ty = desugar_subject_type_from_arrays(names, types, es, expr.left_idx)
+        let mut patterns: [i32] = []
+        let mut bodies: [i32] = []
+        let arm_count = expr.args.length / 2
+        for (i in 0 .. arm_count)
+        {
+            let pattern_idx = expr.args[i * 2]
+            let body_idx = expr.args[i * 2 + 1]
+            if (pattern_idx >= 0 and ast_generic_arg_count(subject_ty) > 0) patterns.push(desugar_expr_expected(adts, es, store, pattern_idx, subject_ty))
+            elif (pattern_idx >= 0) patterns.push(desugar_expr(adts, es, store, pattern_idx))
+            else patterns.push(pattern_idx)
+            bodies.push(desugar_expr_with_env(adts, es, store, body_idx, names, types, expected_ty))
+        }
+        return ast_expr_match(es, desugar_expr_with_env(adts, es, store, expr.left_idx, names, types, subject_ty), patterns, bodies)
+    }
+    if (expected_ty != "") { return desugar_expr_expected(adts, es, store, idx, expected_ty) }
+    return desugar_expr(adts, es, store, idx)
+}
+
 pub fn desugar_match_stmt_with_arrays(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, stmt: AstStmt, names: [string], types: [string]): i32
 {
     let subject_idx = desugar_expr(adts, es, store, stmt.value_idx)
@@ -545,11 +580,11 @@ pub fn desugar_stmt_env(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore, i
     let stmt = stmt_store_get(store, idx)
     return match stmt.tag
     {
-        "return_expr" -> ast_stmt_return_expr(store, desugar_expr(adts, es, store, stmt.value_idx))
+        "return_expr" -> ast_stmt_return_expr(store, desugar_expr_with_env(adts, es, store, stmt.value_idx, names, types, ""))
         "let" -> {
             let inferred_ty = desugar_expr_adt_type(adts, es, stmt.assign_idx, stmt.type_text)
             let declared_ty = if (stmt.type_text != "") { stmt.type_text } else { inferred_ty }
-            let expr_idx = desugar_expr_expected(adts, es, store, stmt.assign_idx, declared_ty)
+            let expr_idx = desugar_expr_with_env(adts, es, store, stmt.assign_idx, names, types, declared_ty)
             ast_stmt_let_typed_mut(store, stmt.assign_name, declared_ty, expr_idx, stmt.is_mut)
         }
         "assign" -> ast_stmt_assign(store, stmt.assign_name, desugar_expr(adts, es, store, stmt.assign_idx))

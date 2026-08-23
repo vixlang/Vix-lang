@@ -28,7 +28,7 @@ pub fn unify_bind(store: &TyStore, subst: &Subst, var_id: i32, ty: Ty, pos: Sour
     match applied
     {
         TyVar(other_id) -> {
-            if (other_id == var_id) { return unify_ok(subst_clone(subst)) }
+            if (other_id == var_id) { return unify_ok(@subst) }
         }
         _ -> {}
     }
@@ -37,7 +37,7 @@ pub fn unify_bind(store: &TyStore, subst: &Subst, var_id: i32, ty: Ty, pos: Sour
         return unify_fail(infer_error_occurs(store, var_id, applied, pos))
     }
     subst_extend(subst, var_id, applied)
-    return unify_ok(subst_clone(subst))
+    return unify_ok(@subst)
 }
 
 pub fn unify_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: SourcePos): UnifyResult
@@ -46,22 +46,22 @@ pub fn unify_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: Source
     let b = subst_apply_ty(store, subst, right)
     match a
     {
-        TyError -> return unify_ok(subst_clone(subst))
-        TyUnknown -> return unify_ok(subst_clone(subst))
+        TyError -> return unify_ok(@subst)
+        TyUnknown -> return unify_ok(@subst)
         TyVar(id) -> return unify_bind(store, subst, id, b, pos)
         TyPrim(ap) -> {
             match b
             {
-                TyError -> return unify_ok(subst_clone(subst))
-                TyUnknown -> return unify_ok(subst_clone(subst))
+                TyError -> return unify_ok(@subst)
+                TyUnknown -> return unify_ok(@subst)
                 TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
                 TyPrim(bp) -> {
-                    if (ty_prim_can_assign(ap, bp) == 1) { return unify_ok(subst_clone(subst)) }
+                    if (ty_prim_can_assign(ap, bp) == 1) { return unify_ok(@subst) }
                     return unify_fail(infer_error_mismatch(store, a, b, pos))
                 }
                 TyArray(bi) -> {
-                    if (ap == ty_prim_ptr()) { return unify_ok(subst_clone(subst)) }
-                    if (ap == ty_prim_string()) { return unify_ok(subst_clone(subst)) }
+                    if (ap == ty_prim_ptr()) { return unify_ok(@subst) }
+                    if (ap == ty_prim_string()) { return unify_ok(@subst) }
                     return unify_fail(infer_error_mismatch(store, a, b, pos))
                 }
                 _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
@@ -119,7 +119,7 @@ pub fn unify_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: Source
                         let r = unify_ty(store, subst, at.elems[i], bt.elems[i], pos)
                         if (r.ok == 0) { return r }
                     }
-                    return unify_ok(subst_clone(subst))
+                    return unify_ok(@subst)
                 }
                 _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
             }
@@ -136,11 +136,11 @@ pub fn unify_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: Source
             match b
             {
                 TyVar(idb) -> return unify_bind(store, subst, idb, a, pos)
-                TyArray(bi) -> return unify_ok(subst_clone(subst))
+                TyArray(bi) -> return unify_ok(@subst)
                 TyPtr(bi) -> return unify_ty(store, subst, store.ptrs[ai].elem, store.ptrs[bi].elem, pos)
                 TyPrim(code) -> {
-                    if (code == ty_prim_ptr()) { return unify_ok(subst_clone(subst)) }
-                    if (ty_prim_is_integer(code) == 1) { return unify_ok(subst_clone(subst)) }
+                    if (code == ty_prim_ptr()) { return unify_ok(@subst) }
+                    if (ty_prim_is_integer(code) == 1) { return unify_ok(@subst) }
                     return unify_fail(infer_error_mismatch(store, a, b, pos))
                 }
                 _ -> return unify_ty(store, subst, store.ptrs[ai].elem, b, pos)
@@ -162,7 +162,7 @@ pub fn unify_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: Source
                         let r = unify_ty(store, subst, aa.args[i], ba.args[i], pos)
                         if (r.ok == 0) { return r }
                     }
-                    return unify_ok(subst_clone(subst))
+                    return unify_ok(@subst)
                 }
                 _ -> return unify_fail(infer_error_mismatch(store, a, b, pos))
             }

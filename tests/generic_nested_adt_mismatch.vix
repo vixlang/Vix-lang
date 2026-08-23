@@ -1,0 +1,7 @@
+type Box:[T] = Boxed(T)
+
+fn main(): i32
+{
+    let boxed: Box:[?i32] = Boxed(Some(true))
+    return 0
+}

@@ -1,0 +1,22 @@
+type Box:[T] = Boxed(T)
+
+fn option_or:[T](value: ?T, fallback: T): T
+{
+    return match value {
+        Some(inner) -> inner
+        None -> fallback
+    }
+}
+
+fn unbox:[T](value: Box:[?T], fallback: T): T
+{
+    return match value {
+        Boxed(inner) -> option_or[T](inner, fallback)
+    }
+}
+
+fn main(): i32
+{
+    let boxed: Box:[?i32] = Boxed(Some(42))
+    return if (unbox[i32](boxed, 1) == 42) 0 else 1
+}

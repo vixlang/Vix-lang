@@ -65,8 +65,7 @@ pub fn subst_extend(subst: &Subst, var_id: i32, ty: Ty)
 pub fn subst_apply_ty(store: &TyStore, subst: &Subst, ty: Ty): Ty
 {
     if (subst.bindings.length == 0) { return ty }
-    let free_vars = ty_free_vars(store, ty)
-    if (free_vars.length == 0) { return ty }
+    if (ty_has_free_vars(store, ty) == 0) { return ty }
     match ty
     {
         TyVar(id) -> {

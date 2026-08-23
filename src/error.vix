@@ -7,6 +7,7 @@ extern "C"
     fn malloc(size: usize): string
     fn snprintf(buf: string, size: usize, fmt: string, ...): i32
     fn vix_diag_strlen(s: string): i32
+    fn vix_source_line_copy(src: string, start: i32, len: i32): string
 }
 
 pub fn diag_red(): string { return "\033[31m" }
@@ -305,13 +306,7 @@ pub fn source_get_line(src: string, target_line: i32): string
     let mut len = end - line_start
     if (len > 0 and src[end - 1] == 13) len = len - 1
 
-    let buf: string = malloc(len + 1)
-    for (line_i in 0 .. len)
-    {
-        buf[line_i] = src[line_start + line_i]
-    }
-    buf[len] = '\0'
-    return buf
+    return vix_source_line_copy(src, line_start, len)
 }
 
 pub fn expand_tabs(line: string): string

@@ -1,0 +1,47 @@
+type Box:[T] = Boxed(T)
+
+fn option_or:[T](value: ?T, fallback: T): T
+{
+    return match value {
+        Some(inner) -> inner
+        None -> fallback
+    }
+}
+
+fn first:[T](values: [T]): T
+{
+    return values[0]
+}
+
+fn deref:[T](value: &T): T
+{
+    return @value
+}
+
+fn apply:[T, U](value: T, transform: fn(T): U): U
+{
+    return transform(value)
+}
+
+fn unbox:[T](value: Box:[?T], fallback: T): T
+{
+    return match value {
+        Boxed(inner) -> option_or[T](inner, fallback)
+    }
+}
+
+fn main(): i32
+{
+    let optional: ?i32 = Some(42)
+    let values: [i32] = [42]
+    let number = 42
+    let offset = 2
+    let transformed = apply[i32, i32](40, fn [offset](value: i32): i32 => value + offset)
+    let positive = apply[i32, bool](42, fn (value: i32): bool => value > 0)
+    if (option_or[i32](optional, 1) != 42) return 1
+    if (first[i32](values) != 42) return 2
+    if (deref[i32](&number) != 42) return 3
+    if (transformed != 42) return 4
+    if (positive == false) return 5
+    return 0
+}

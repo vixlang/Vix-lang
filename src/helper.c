@@ -66,6 +66,17 @@ int vix_diag_strlen(const char *s) {
   return (int)strlen(s);
 }
 
+char *vix_source_line_copy(const char *src, int start, int len) {
+  if (src == NULL || start < 0 || len < 0)
+    return NULL;
+  char *out = (char *)malloc((size_t)len + 1);
+  if (out == NULL)
+    return NULL;
+  memcpy(out, src + start, (size_t)len);
+  out[len] = '\0';
+  return out;
+}
+
 void vix_print_stderr(const char *s) {
   fputs(s, stderr);
 }

@@ -160,39 +160,51 @@ pub fn semantic_scope_pop(scope: &SemanticScope, result: &SemanticResult, source
     }
 }
 
-pub fn semantic_scope_find_current(scope: &SemanticScope, name: string): i32
+pub fn semantic_scope_find_current(scope: &SemanticScope, name: string): ?i32
 {
     for (i in 0 .. scope.active_len)
     {
         if (scope.names[i] == name and scope.depths[i] == scope.depth)
         {
-            return i
+            return Some(i)
         }
     }
-    return -1
+    return None
 }
 
-pub fn semantic_scope_lookup(scope: &SemanticScope, name: string): i32
+pub fn semantic_scope_lookup(scope: &SemanticScope, name: string): ?i32
 {
     let mut i = scope.active_len - 1
     while (i >= 0)
     {
         if (scope.names[i] == name and scope.depths[i] <= scope.depth)
         {
-            return i
+            return Some(i)
         }
         i -= 1
     }
-    return -1
+    return None
+}
+
+pub fn semantic_scope_contains(scope: &SemanticScope, name: string): i32
+{
+    return match semantic_scope_lookup(scope, name)
+    {
+        Some(_) -> 1
+        None -> 0
+    }
 }
 
 pub fn semantic_scope_declare(scope: &SemanticScope, result: &SemanticResult, source: string, filename: string, func_name: string, name: string, line: i32, col: i32): i32
 {
     if (name == "_") { return 1 }
-    if (semantic_scope_find_current(scope, name) >= 0)
+    match semantic_scope_find_current(scope, name)
     {
-        semantic_add_error_loc(result, source, filename, "NameError", "duplicate symbol '" + name + "'", func_name, line, col, diag_strlen(name))
-        return 0
+        Some(_) -> {
+            semantic_add_error_loc(result, source, filename, "NameError", "duplicate symbol '" + name + "'", func_name, line, col, diag_strlen(name))
+            return 0
+        }
+        None -> {}
     }
     let idx = scope.active_len
     if (idx < scope.names.length)
@@ -221,56 +233,65 @@ pub fn semantic_scope_declare(scope: &SemanticScope, result: &SemanticResult, so
 
 pub fn semantic_scope_mark_mutable(scope: &SemanticScope, name: string)
 {
-    let idx = semantic_scope_find_current(scope, name)
-    if (idx >= 0) { scope.mutable[idx] = 1 }
+    match semantic_scope_find_current(scope, name)
+    {
+        Some(idx) -> scope.mutable[idx] = 1
+        None -> {}
+    }
 }
 
 pub fn semantic_scope_declare_existing(scope: &SemanticScope, name: string)
 {
-    if (semantic_scope_find_current(scope, name) < 0)
+    match semantic_scope_find_current(scope, name)
     {
-        let idx = scope.active_len
-        if (idx < scope.names.length)
-        {
-            scope.names[idx] = name
-            scope.depths[idx] = scope.depth
-            scope.used[idx] = 0
-            scope.mutable[idx] = 0
-            scope.lines[idx] = 0
-            scope.cols[idx] = 0
-            scope.warn_unused[idx] = 0
+        Some(_) -> {}
+        None -> {
+            let idx = scope.active_len
+            if (idx < scope.names.length)
+            {
+                scope.names[idx] = name
+                scope.depths[idx] = scope.depth
+                scope.used[idx] = 0
+                scope.mutable[idx] = 0
+                scope.lines[idx] = 0
+                scope.cols[idx] = 0
+                scope.warn_unused[idx] = 0
+            }
+            else
+            {
+                scope.names.push(name)
+                scope.depths.push(scope.depth)
+                scope.used.push(0)
+                scope.mutable.push(0)
+                scope.lines.push(0)
+                scope.cols.push(0)
+                scope.warn_unused.push(0)
+            }
+            scope.active_len += 1
         }
-        else
-        {
-            scope.names.push(name)
-            scope.depths.push(scope.depth)
-            scope.used.push(0)
-            scope.mutable.push(0)
-            scope.lines.push(0)
-            scope.cols.push(0)
-            scope.warn_unused.push(0)
-        }
-        scope.active_len += 1
     }
 }
 
 pub fn semantic_scope_mark_used(scope: &SemanticScope, name: string)
 {
-    let idx = semantic_scope_lookup(scope, name)
-    if (idx >= 0)
+    match semantic_scope_lookup(scope, name)
     {
-        scope.used[idx] = 1
+        Some(idx) -> scope.used[idx] = 1
+        None -> {}
     }
 }
 
 pub fn semantic_scope_require(scope: &SemanticScope, result: &SemanticResult, source: string, filename: string, func_name: string, name: string, line: i32, col: i32)
 {
     if (name == "_") { return }
-    if (semantic_scope_lookup(scope, name) < 0)
+    match semantic_scope_lookup(scope, name)
     {
-        let is_lambda = func_name.length >= 9 and func_name[0] == '_' and func_name[1] == '_' and func_name[2] == 'l' and func_name[3] == 'a' and func_name[4] == 'm' and func_name[5] == 'b' and func_name[6] == 'd' and func_name[7] == 'a' and func_name[8] == '_'
-        if (is_lambda) semantic_add_error_loc(result, source, filename, "NameError", "variable `" + name + "` must be explicitly captured", func_name, line, col, diag_strlen(name))
-        else semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, diag_strlen(name))
+        Some(_) -> {}
+        None -> {
+            let is_lambda = func_name.length >= 9 and func_name[0] == '_' and func_name[1] == '_' and func_name[2] == 'l' and func_name[3] == 'a' and func_name[4] == 'm' and func_name[5] == 'b' and func_name[6] == 'd' and func_name[7] == 'a' and func_name[8] == '_'
+            if (is_lambda) semantic_add_error_loc(result, source, filename, "NameError", "variable `" + name + "` must be explicitly captured", func_name, line, col, diag_strlen(name))
+            else semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, diag_strlen(name))
+        }
     }
 }
 
@@ -447,7 +468,7 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             {
                 semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
             }
-            elif (semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0 and semantic_scope_lookup(scope, expr.text) < 0)
+            elif (semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0 and semantic_scope_contains(scope, expr.text) == 0)
             {
                 semantic_add_error_loc(result, source, filename, "NameError", "undefined function '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(expr.text))
             }
@@ -461,18 +482,28 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             for (i in 0 .. expr.capture_names.length)
             {
                 let capture = expr.capture_names[i]
-                let capture_idx = semantic_scope_lookup(scope, capture)
-                if (capture_idx >= 0 and scope.mutable[capture_idx] == 1)
+                match semantic_scope_lookup(scope, capture)
                 {
-                    semantic_add_error_loc(result, source, filename, "TypeError", "mutable capture '" + capture + "' is not supported", func_name, expr.line, expr.col, diag_strlen(capture))
-                }
-                elif (capture_idx < 0 and semantic_find_function_any(program.functions, program.extern_functions, capture) < 0 and semantic_find_adt_variant(program.adts, capture) < 0)
-                {
-                    semantic_add_error_loc(result, source, filename, "NameError", "undefined capture '" + capture + "'", func_name, expr.line, expr.col, diag_strlen(capture))
-                }
-                else
-                {
-                    semantic_scope_mark_used(scope, capture)
+                    Some(capture_idx) -> {
+                        if (scope.mutable[capture_idx] == 1)
+                        {
+                            semantic_add_error_loc(result, source, filename, "TypeError", "mutable capture '" + capture + "' is not supported", func_name, expr.line, expr.col, diag_strlen(capture))
+                        }
+                        else
+                        {
+                            semantic_scope_mark_used(scope, capture)
+                        }
+                    }
+                    None -> {
+                        if (semantic_find_function_any(program.functions, program.extern_functions, capture) < 0 and semantic_find_adt_variant(program.adts, capture) < 0)
+                        {
+                            semantic_add_error_loc(result, source, filename, "NameError", "undefined capture '" + capture + "'", func_name, expr.line, expr.col, diag_strlen(capture))
+                        }
+                        else
+                        {
+                            semantic_scope_mark_used(scope, capture)
+                        }
+                    }
                 }
             }
         }
@@ -675,7 +706,7 @@ pub fn semantic_check_stmt(scope: &SemanticScope, program: AstProgram, stmt_idx:
         "for_range" -> {
             semantic_check_expr(scope, program, stmt.value_idx, result, source, filename, func_name)
             semantic_check_expr(scope, program, stmt.assign_idx, result, source, filename, func_name)
-            if (semantic_scope_lookup(scope, stmt.assign_name) >= 0)
+            if (semantic_scope_contains(scope, stmt.assign_name) == 1)
             {
                 semantic_add_error_loc(result, source, filename, "NameError", "for iterator '" + stmt.assign_name + "' conflicts with existing symbol", func_name, stmt.line, stmt.col, diag_strlen(stmt.assign_name))
             }

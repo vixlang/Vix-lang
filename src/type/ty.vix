@@ -296,66 +296,96 @@ pub fn ty_array_append_unique_i32(xs: [i32], value: i32): [i32]
     return xs
 }
 
-pub fn ty_free_vars(store: &TyStore, ty: Ty): [i32]
+pub fn ty_collect_free_vars_except(store: &TyStore, ty: Ty, excluded: &[i32], out: &[i32]): i32
 {
-    let mut out: [i32] = []
-    match ty
+    return match ty
     {
-        TyVar(id) -> { out = ty_array_append_unique_i32(out, id) }
+        TyVar(id) -> {
+            let mut blocked = 0
+            for (i in 0 .. excluded.length)
+            {
+                if (excluded[i] == id) { blocked = 1 }
+            }
+            let mut present = 0
+            for (i in 0 .. out.length)
+            {
+                if (out[i] == id) { present = 1 }
+            }
+            if (blocked == 0 and present == 0) { out.push(id) }
+            0
+        }
         TyFun(idx) -> {
             let data = store.funs[idx]
             for (i in 0 .. data.params.length)
             {
-                let child = ty_free_vars(store, data.params[i])
-                for (j in 0 .. child.length)
-                {
-                    out = ty_array_append_unique_i32(out, child[j])
-                }
+                ty_collect_free_vars_except(store, data.params[i], excluded, out)
             }
-            let child_ret = ty_free_vars(store, data.ret)
-            for (k in 0 .. child_ret.length)
-            {
-                out = ty_array_append_unique_i32(out, child_ret[k])
-            }
+            ty_collect_free_vars_except(store, data.ret, excluded, out)
+            0
         }
         TyTuple(idx) -> {
             let data = store.tuples[idx]
             for (i in 0 .. data.elems.length)
             {
-                let child = ty_free_vars(store, data.elems[i])
-                for (j in 0 .. child.length)
-                {
-                    out = ty_array_append_unique_i32(out, child[j])
-                }
+                ty_collect_free_vars_except(store, data.elems[i], excluded, out)
             }
+            0
         }
-        TyArray(idx) -> {
-            let child = ty_free_vars(store, store.arrays[idx].elem)
-            for (j in 0 .. child.length)
-            {
-                out = ty_array_append_unique_i32(out, child[j])
-            }
-        }
-        TyPtr(idx) -> {
-            let child = ty_free_vars(store, store.ptrs[idx].elem)
-            for (j in 0 .. child.length)
-            {
-                out = ty_array_append_unique_i32(out, child[j])
-            }
-        }
+        TyArray(idx) -> ty_collect_free_vars_except(store, store.arrays[idx].elem, excluded, out)
+        TyPtr(idx) -> ty_collect_free_vars_except(store, store.ptrs[idx].elem, excluded, out)
         TyAdt(idx) -> {
             let data = store.adts[idx]
             for (i in 0 .. data.args.length)
             {
-                let child = ty_free_vars(store, data.args[i])
-                for (j in 0 .. child.length)
-                {
-                    out = ty_array_append_unique_i32(out, child[j])
-                }
+                ty_collect_free_vars_except(store, data.args[i], excluded, out)
             }
+            0
         }
-        _ -> {}
+        _ -> 0
     }
+}
+
+pub fn ty_has_free_vars(store: &TyStore, ty: Ty): i32
+{
+    match ty
+    {
+        TyVar(_) -> return 1
+        TyFun(idx) -> {
+            let data = store.funs[idx]
+            for (i in 0 .. data.params.length)
+            {
+                if (ty_has_free_vars(store, data.params[i]) == 1) { return 1 }
+            }
+            return ty_has_free_vars(store, data.ret)
+        }
+        TyTuple(idx) -> {
+            let data = store.tuples[idx]
+            for (i in 0 .. data.elems.length)
+            {
+                if (ty_has_free_vars(store, data.elems[i]) == 1) { return 1 }
+            }
+            return 0
+        }
+        TyArray(idx) -> return ty_has_free_vars(store, store.arrays[idx].elem)
+        TyPtr(idx) -> return ty_has_free_vars(store, store.ptrs[idx].elem)
+        TyAdt(idx) -> {
+            let data = store.adts[idx]
+            for (i in 0 .. data.args.length)
+            {
+                if (ty_has_free_vars(store, data.args[i]) == 1) { return 1 }
+            }
+            return 0
+        }
+        _ -> return 0
+    }
+    return 0
+}
+
+pub fn ty_free_vars(store: &TyStore, ty: Ty): [i32]
+{
+    let excluded: [i32] = []
+    let out: [i32] = []
+    ty_collect_free_vars_except(store, ty, &excluded, &out)
     return out
 }
 
@@ -551,7 +581,7 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
     if (text == "unknown" or text == "") return TyUnknown
     if (text.length >= 5 and text[0] == 'f' and text[1] == 'n' and text[2] == '(')
     {
-        let mut close = -1
+        let mut close: ?i32 = None
         let mut depth = 0
         for (i in 2 .. text.length)
         {
@@ -561,34 +591,37 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
                 depth -= 1
                 if (text[i] == ')' and depth == 0)
                 {
-                    close = i
+                    close = Some(i)
                     break
                 }
             }
         }
-        if (close > 0)
+        match close
         {
-            let mut params: [Ty] = []
-            let mut start = 3
-            depth = 0
-            for (i in 3 .. close + 1)
-            {
-                let at_end = i == close
-                if (at_end == 0 and (text[i] == '(' or text[i] == '[')) depth += 1
-                elif (at_end == 0 and (text[i] == ')' or text[i] == ']')) depth -= 1
-                if (at_end == 1 or (text[i] == ',' and depth == 0))
+            Some(close_idx) -> {
+                let mut params: [Ty] = []
+                let mut start = 3
+                depth = 0
+                for (i in 3 .. close_idx + 1)
                 {
-                    let part = ty_trim(ty_slice(text, start, i))
-                    if (part != "") params.push(ty_from_text(store, part))
-                    start = i + 1
+                    let at_end = i == close_idx
+                    if (at_end == 0 and (text[i] == '(' or text[i] == '[')) depth += 1
+                    elif (at_end == 0 and (text[i] == ')' or text[i] == ']')) depth -= 1
+                    if (at_end == 1 or (text[i] == ',' and depth == 0))
+                    {
+                        let part = ty_trim(ty_slice(text, start, i))
+                        if (part != "") params.push(ty_from_text(store, part))
+                        start = i + 1
+                    }
                 }
+                let mut ret_start = close_idx + 1
+                while (ret_start < text.length and (text[ret_start] == ':' or text[ret_start] == ' '))
+                {
+                    ret_start += 1
+                }
+                return ty_fun(store, params, ty_from_text(store, ty_trim(ty_slice(text, ret_start, text.length))))
             }
-            let mut ret_start = close + 1
-            while (ret_start < text.length and (text[ret_start] == ':' or text[ret_start] == ' '))
-            {
-                ret_start += 1
-            }
-            return ty_fun(store, params, ty_from_text(store, ty_trim(ty_slice(text, ret_start, text.length))))
+            None -> {}
         }
     }
     if (text.length > 1 and text[0] == '&')
@@ -611,36 +644,39 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
         }
         return ty_ptr(store, ty_from_text(store, inner))
     }
-    let generic_open = ty_find_char(text, '[')
-    if (generic_open > 0)
+    match ty_find_char(text, '[')
     {
-        let mut base_end = generic_open
-        if (base_end > 0 and text[base_end - 1] == ':') base_end -= 1
-        let base = ty_slice(text, 0, base_end)
-        let mut args: [Ty] = []
-        let mut start = generic_open + 1
-        let mut depth = 0
-        for (i in generic_open + 1 .. text.length)
+        Some(generic_open) -> if (generic_open > 0)
         {
-            if (text[i] == '[') depth += 1
-            elif (text[i] == ']')
+            let mut base_end = generic_open
+            if (base_end > 0 and text[base_end - 1] == ':') base_end -= 1
+            let base = ty_slice(text, 0, base_end)
+            let mut args: [Ty] = []
+            let mut start = generic_open + 1
+            let mut depth = 0
+            for (i in generic_open + 1 .. text.length)
             {
-                if (depth == 0)
+                if (text[i] == '[') depth += 1
+                elif (text[i] == ']')
                 {
-                    let arg = ty_trim(ty_slice(text, start, i))
-                    if (arg != "") args.push(ty_from_text(store, arg))
-                    return ty_adt(store, base, args)
+                    if (depth == 0)
+                    {
+                        let arg = ty_trim(ty_slice(text, start, i))
+                        if (arg != "") args.push(ty_from_text(store, arg))
+                        return ty_adt(store, base, args)
+                    }
+                    depth -= 1
                 }
-                depth -= 1
+                elif (text[i] == ',' and depth == 0)
+                {
+                    let arg2 = ty_trim(ty_slice(text, start, i))
+                    if (arg2 != "") args.push(ty_from_text(store, arg2))
+                    start = i + 1
+                }
             }
-            elif (text[i] == ',' and depth == 0)
-            {
-                let arg2 = ty_trim(ty_slice(text, start, i))
-                if (arg2 != "") args.push(ty_from_text(store, arg2))
-                start = i + 1
-            }
+            return ty_adt(store, base, args)
         }
-        return ty_adt(store, base, args)
+        None -> {}
     }
     if (text.length > 2 and text[0] == '[')
     {
@@ -658,13 +694,13 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
     return ty_adt(store, text, [])
 }
 
-pub fn ty_find_char(text: string, needle: i8): i32
+pub fn ty_find_char(text: string, needle: i8): ?i32
 {
     for (i in 0 .. text.length)
     {
-        if (text[i] == needle) return i
+        if (text[i] == needle) return Some(i)
     }
-    return -1
+    return None
 }
 
 pub fn ty_char_string(ch: i8): string

@@ -157,7 +157,25 @@ pub fn parse_expression(parser: &Parser): i32
             parser_advance(parser)
             let type_args = parse_generic_call_type_args(parser)
             if (parser.ok == 0) { return -1 }
-            right = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, []), line, col)
+            let mut explicit_args: [i32] = []
+            if (parser_text(parser) == "(")
+            {
+                parser_advance(parser)
+                if (parser_text(parser) != ")")
+                {
+                    explicit_args.push(parse_expression(parser))
+                    if (parser.ok == 0) { return -1 }
+                    while (parser_text(parser) == ",")
+                    {
+                        parser_advance(parser)
+                        explicit_args.push(parse_expression(parser))
+                        if (parser.ok == 0) { return -1 }
+                    }
+                }
+                parser_expect_text(parser, ")")
+                if (parser.ok == 0) { return -1 }
+            }
+            right = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, explicit_args), line, col)
         }
         else
         {

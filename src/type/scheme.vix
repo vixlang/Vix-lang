@@ -21,16 +21,15 @@ pub fn scheme_forall(vars: [i32], ty: Ty): Scheme
 
 pub fn scheme_free_vars(store: &TyStore, scheme: Scheme): [i32]
 {
-    let vars = ty_free_vars(store, scheme.ty)
-    let mut out: [i32] = []
-    for (i in 0 .. vars.length)
-    {
-        if (ty_array_contains_i32(scheme.vars, vars[i]) == 0)
-        {
-            out = ty_array_append_unique_i32(out, vars[i])
-        }
-    }
+    let out: [i32] = []
+    scheme_collect_free_vars(store, scheme, &out)
     return out
+}
+
+pub fn scheme_collect_free_vars(store: &TyStore, scheme: Scheme, out: &[i32]): i32
+{
+    let excluded = scheme.vars
+    return ty_collect_free_vars_except(store, scheme.ty, &excluded, out)
 }
 
 pub fn scheme_apply(store: &TyStore, subst: &Subst, scheme: Scheme): Scheme
@@ -52,6 +51,17 @@ pub fn scheme_instantiate(store: &TyStore, fresh: &Fresh, scheme: Scheme): Ty
     for (i in 0 .. scheme.vars.length)
     {
         subst_extend(&subst, scheme.vars[i], ty_fresh_var(fresh))
+    }
+    return subst_apply_ty(store, &subst, scheme.ty)
+}
+
+pub fn scheme_instantiate_with(store: &TyStore, fresh: &Fresh, scheme: Scheme, args: [Ty]): Ty
+{
+    let subst = subst_empty()
+    for (i in 0 .. scheme.vars.length)
+    {
+        let replacement = if (i < args.length) args[i] else ty_fresh_var(fresh)
+        subst_extend(&subst, scheme.vars[i], replacement)
     }
     return subst_apply_ty(store, &subst, scheme.ty)
 }
