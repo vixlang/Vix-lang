@@ -3,10 +3,16 @@ fn take_array(xs: [i32]): i32
     return xs[0]
 }
 
-fn add_refs(a: ref i32, b: ref i32): i32
+fn add_refs(a: &i32, b: &i32): i32
 {
     return @a + @b
 }
+
+fn add_mut_refs(a: &mut i32, b: &mut i32): i32
+{
+    return @a + @b
+}
+
 fn use_after_move(): i32
 {
     let xs = [1, 2, 3]
@@ -17,12 +23,12 @@ fn use_after_move(): i32
 fn duplicate_mut_borrow(): i32
 {
     let mut value = 10
-    return add_refs(mut ref value, mut ref value)
+    return add_mut_refs(&mut value, &mut value)
 }
-fn dangling_local_ref(): ref i32
+fn dangling_local_ref(): &i32
 {
     let local = 99
-    return ref local
+    return &local
 }
 
 fn legal_last_use_move(): i32
@@ -36,7 +42,7 @@ fn legal_copy_and_shared_borrow(): i32
 {
     let x = 7
     let y = x
-    return add_refs(ref x, ref y)
+    return add_refs(&x, &y)
 }
 
 fn main(): i32

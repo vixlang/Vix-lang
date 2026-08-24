@@ -119,7 +119,7 @@ pub fn json_ast_expr(es: &ExprStore, store: &StmtStore, idx: i32): string
         "lambda" -> "{\"type\":\"LambdaExpression\",\"generatedName\":" + json_ast_quote(expr.text) + ",\"captures\":" + json_ast_string_array(expr.capture_names) + ",\"parameters\":" + json_ast_lambda_params(expr) + ",\"returnType\":" + json_ast_quote(expr.option_value) + ",\"body\":" + json_ast_expr(es, store, expr.left_idx) + "," + loc + "}"
         "index" -> "{\"type\":\"IndexExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"index\":" + json_ast_expr(es, store, expr.right_idx) + "," + loc + "}"
         "slice" -> "{\"type\":\"SliceExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"start\":" + json_ast_expr(es, store, expr.right_idx) + ",\"end\":" + json_ast_expr(es, store, expr.args[0]) + "," + loc + "}"
-        "addr" -> "{\"type\":\"AddressOfExpression\",\"name\":" + json_ast_quote(expr.text) + "," + loc + "}"
+        "addr" -> "{\"type\":\"AddressOfExpression\",\"mutable\":" + json_ast_bool(expr.int_value) + ",\"name\":" + json_ast_quote(expr.text) + "," + loc + "}"
         "deref" -> "{\"type\":\"DerefExpression\",\"operand\":" + json_ast_expr(es, store, expr.left_idx) + "," + loc + "}"
         "field" -> "{\"type\":\"FieldExpression\",\"base\":" + json_ast_expr(es, store, expr.left_idx) + ",\"field\":" + json_ast_quote(expr.text) + "," + loc + "}"
         "struct_literal" -> "{\"type\":\"StructLiteral\",\"name\":" + json_ast_quote(expr.text) + ",\"fields\":" + json_ast_struct_fields(es, store, expr) + "," + loc + "}"

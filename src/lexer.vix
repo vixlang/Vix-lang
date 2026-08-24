@@ -255,6 +255,13 @@ pub fn tokenize(src: string): TokenStream
                         }
                     }
                     39 -> {
+                        if (pos + 1 < src.length and is_alpha(compiler_string_byte(src, pos + 1)) == 1 and (pos + 2 >= src.length or compiler_string_byte(src, pos + 2) != 39))
+                        {
+                            stream_push(&stream, tk_symbol(), "'", 0, line, column)
+                            pos += 1
+                            column += 1
+                            continue
+                        }
                     let start_col = column
                     pos += 1
                     column += 1

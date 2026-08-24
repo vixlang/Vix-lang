@@ -279,7 +279,12 @@ pub fn ast_expr_slice(store: &ExprStore, base_idx: i32, start_idx: i32, end_idx:
 
 pub fn ast_expr_addr(store: &ExprStore, name: string): i32
 {
-    return expr_store_add(store, AstExpr{ tag: "addr", text: name, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", capture_names: [], $ast_default_loc_fields() })
+    return ast_expr_borrow(store, name, 0)
+}
+
+pub fn ast_expr_borrow(store: &ExprStore, name: string, is_mut: i32): i32
+{
+    return expr_store_add(store, AstExpr{ tag: "addr", text: name, int_value: is_mut, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", capture_names: [], $ast_default_loc_fields() })
 }
 
 pub fn ast_expr_deref(store: &ExprStore, operand: i32): i32
@@ -579,7 +584,7 @@ pub fn ast_expr_debug(store: &ExprStore, idx: i32): string
         "lambda" -> "fn " + expr.text + "(...)"
         "index" -> ast_expr_debug(store, expr.left_idx) + "[" + ast_expr_debug(store, expr.right_idx) + "]"
         "slice" -> ast_expr_debug(store, expr.left_idx) + "[" + ast_expr_debug(store, expr.right_idx) + ".." + ast_expr_debug(store, expr.args[0]) + "]"
-        "addr" -> "&" + expr.text
+        "addr" -> if (expr.int_value == 1) { "&mut " + expr.text } else { "&" + expr.text }
         "deref" -> "@" + ast_expr_debug(store, expr.left_idx)
         "field" -> ast_expr_debug(store, expr.left_idx) + "." + expr.text
         "struct_literal" -> expr.text + "{...}"

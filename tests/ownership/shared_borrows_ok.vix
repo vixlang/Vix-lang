@@ -1,0 +1,7 @@
+fn main(): i32
+{
+    let value = 21
+    let left = &value
+    let right = &value
+    return @left + @right
+}

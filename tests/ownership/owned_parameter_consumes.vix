@@ -1,0 +1,11 @@
+fn consume(text: string): i32
+{
+    return text.length
+}
+
+fn main(): i32
+{
+    let text = "vix"
+    print(consume(text))
+    return text.length
+}

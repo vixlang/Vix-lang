@@ -1,0 +1,9 @@
+extern "C"
+{
+    fn first:['a, T](xs: &'a [T]): &'a T
+}
+
+fn main(): i32
+{
+    return 0
+}

@@ -1,4 +1,4 @@
-fn partition(arr: &[i32], low: i32, high: i32): i32
+fn partition(arr: &mut [i32], low: i32, high: i32): i32
 {
     let pivot = arr[high]
     let mut i = low - 1
@@ -19,7 +19,7 @@ fn partition(arr: &[i32], low: i32, high: i32): i32
     return i
 }
 
-fn quicksort(arr: &[i32], low: i32, high: i32)
+fn quicksort(arr: &mut [i32], low: i32, high: i32)
 {
     if (low < high)
     {
@@ -31,8 +31,8 @@ fn quicksort(arr: &[i32], low: i32, high: i32)
 
 fn main(): i32
 {
-    let arr = [10, 7, 8, 9, 1, 5]
-    quicksort(ref arr, 0, 5)
+    let mut arr = [10, 7, 8, 9, 1, 5]
+    quicksort(&mut arr, 0, 5)
     for (i in 0 .. 6) {
         print(arr[i])
     }

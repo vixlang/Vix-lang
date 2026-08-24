@@ -345,9 +345,15 @@ pub fn parse_unary(parser: &Parser): i32
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
+        let mut is_mut = 0
+        if (parser_text(parser) == "mut")
+        {
+            is_mut = 1
+            parser_advance(parser)
+        }
         let name = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
-        return parser_expr_at(parser, ast_expr_addr(parser.expr_store, name), line, col)
+        if (parser_expect_kind(parser, tk_ident()) == 0) return -1
+        return parser_expr_at(parser, ast_expr_borrow(parser.expr_store, name, is_mut), line, col)
     }
     return match parser_text(parser) {
         "@" -> {
@@ -1643,10 +1649,28 @@ pub fn parse_type_text(parser: &Parser): string
     }
     if (parser_text(parser) == "&" or parser_text(parser) == "ref")
     {
+        let legacy_ref = parser_text(parser) == "ref"
         parser_advance(parser)
+        let mut lifetime = ""
+        if (parser_text(parser) == "'")
+        {
+            parser_advance(parser)
+            lifetime = parser_text(parser)
+            if (parser_expect_kind(parser, tk_ident()) == 0) return "unknown"
+        }
+        let mut is_mut = 0
+        if (parser_text(parser) == "mut")
+        {
+            is_mut = 1
+            parser_advance(parser)
+        }
         let inner = parse_type_text(parser)
-        if (parser.ok == 0) { return "unknown" }
-        return "ptr:" + inner
+        if (parser.ok == 0) return "unknown"
+        if (legacy_ref == 1) return "ptr:" + inner
+        let mut prefix = "&"
+        if (lifetime != "") prefix = prefix + "'" + lifetime + " "
+        if (is_mut == 1) prefix = prefix + "mut "
+        return prefix + inner
     }
     if (parser_text(parser) == "[")
     {
@@ -1831,10 +1855,12 @@ pub fn parse_extern_function(parser: &Parser): AstFunction
     if (parser_expect_text(parser, "fn") == 0) { return ast_function("", "i32", -1) }
     let name = parser_text(parser)
     if (parser_expect_kind(parser, tk_ident()) == 0) { return ast_function("", "i32", -1) }
+    let type_params = parse_type_params_after_name(parser)
+    if (parser.ok == 0) return ast_function(name, "i32", -1)
     if (parser_expect_text(parser, "(") == 0) { return ast_function(name, "i32", -1) }
     let func = parse_function_params_and_return(parser, name)
     parser_accept_text(parser, ";")
-    return ast_function_with_loc(func, line, col)
+    return ast_function_with_loc(ast_function_generic_full_vararg(func.name, func.ret_ty, func.body_idx, func.param_names, func.param_types, type_params, func.is_var_arg), line, col)
 }
 
 pub fn parse_extern_block(parser: &Parser): AstFunction
@@ -1918,9 +1944,16 @@ pub fn parse_type_params_after_name(parser: &Parser): [string]
             parser_advance(parser)
             continue
         }
-        let param = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0) { return params }
-        params.push(param)
+        let mut param = parser_text(parser)
+        let mut is_lifetime = 0
+        if (param == "'")
+        {
+            parser_advance(parser)
+            param = "'" + parser_text(parser)
+            is_lifetime = 1
+        }
+        if (parser_expect_kind(parser, tk_ident()) == 0) return params
+        if (is_lifetime == 0) params.push(param)
         parser_accept_text(parser, ",")
     }
     parser_expect_text(parser, "]")

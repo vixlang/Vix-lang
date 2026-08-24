@@ -1,0 +1,1399 @@
+#[no_main]
+
+import "../ast.vix"
+import "../error.vix"
+import "../lexer.vix"
+
+pub type AnalysisPlace = struct {
+    root: string,
+    projections: [string],
+    ty: string,
+    line: i32,
+    col: i32
+}
+
+pub type TypedAnalysisValue = struct {
+    expr_id: i32,
+    ty: string,
+    place_id: i32,
+    line: i32,
+    col: i32
+}
+
+pub type TypedAnalysisInstruction = struct {
+    kind: string,
+    expr_id: i32,
+    stmt_id: i32,
+    place_id: i32,
+    value_id: i32,
+    target_block: i32,
+    line: i32,
+    col: i32
+}
+
+pub type TypedAnalysisBlock = struct {
+    id: i32,
+    function_name: string,
+    stmt_id: i32,
+    instruction_ids: [i32],
+    successors: [i32],
+    line: i32,
+    col: i32
+}
+
+pub type TypedAnalysisIR = struct {
+    blocks: [TypedAnalysisBlock],
+    instructions: [TypedAnalysisInstruction],
+    values: [TypedAnalysisValue],
+    places: [AnalysisPlace]
+}
+
+pub type OwnershipMoveFact = struct {
+    stmt_id: i32,
+    place: string,
+    line: i32,
+    col: i32
+}
+
+pub type OwnershipBorrowFact = struct {
+    expr_id: i32,
+    source: string,
+    kind: string,
+    line: i32,
+    col: i32
+}
+
+pub type OwnershipBlockBorrowFact = struct {
+    block_id: i32,
+    sources: [string]
+}
+
+pub type OwnershipFacts = struct {
+    expr_actions: [string],
+    expr_types: [string],
+    stmt_moves: [OwnershipMoveFact],
+    expr_borrows: [OwnershipBorrowFact],
+    block_borrows: [OwnershipBlockBorrowFact]
+}
+
+pub type DropEvent = struct {
+    scope_id: i32,
+    stmt_id: i32,
+    return_id: i32,
+    block_id: i32,
+    place: string,
+    ty: string,
+    reason: string,
+    line: i32,
+    col: i32
+}
+
+pub type DropPlan = struct {
+    events: [DropEvent]
+}
+
+pub type TypedAnalysisResult = struct {
+    ok: i32,
+    ownership_ok: i32,
+    error: string,
+    ir: TypedAnalysisIR,
+    facts: OwnershipFacts,
+    drops: DropPlan
+}
+
+pub type AnalysisEnv = struct {
+    names: [string],
+    types: [string],
+    mutable: [i32]
+}
+
+pub type AnalysisFlow = struct {
+    entry: i32,
+    exits: [i32]
+}
+
+pub type OwnershipCheckState = struct {
+    names: [string],
+    types: [string],
+    mutable: [i32],
+    status: [string],
+    active: [i32],
+    is_param: [i32],
+    shared_borrows: [i32],
+    mut_borrow: [i32],
+    borrow_source: [string],
+    borrow_kind: [string],
+    borrow_end_line: [i32],
+    diagnostics: [string],
+    error_count: i32
+}
+
+pub fn ownership_state_new(): OwnershipCheckState
+{
+    return OwnershipCheckState{ names: [], types: [], mutable: [], status: [], active: [], is_param: [], shared_borrows: [], mut_borrow: [], borrow_source: [], borrow_kind: [], borrow_end_line: [], diagnostics: [], error_count: 0 }
+}
+
+pub fn ownership_state_clone(state: &OwnershipCheckState): OwnershipCheckState
+{
+    let out = ownership_state_new()
+    for (i in 0 .. state.names.length)
+    {
+        out.names.push(state.names[i])
+        out.types.push(state.types[i])
+        out.mutable.push(state.mutable[i])
+        out.status.push(state.status[i])
+        out.active.push(state.active[i])
+        out.is_param.push(state.is_param[i])
+        out.shared_borrows.push(state.shared_borrows[i])
+        out.mut_borrow.push(state.mut_borrow[i])
+        out.borrow_source.push(state.borrow_source[i])
+        out.borrow_kind.push(state.borrow_kind[i])
+        out.borrow_end_line.push(state.borrow_end_line[i])
+    }
+    for (i in 0 .. state.diagnostics.length)
+    {
+        out.diagnostics.push(state.diagnostics[i])
+    }
+    out.error_count = state.error_count
+    return out
+}
+
+pub fn ownership_state_add(state: &OwnershipCheckState, name: string, ty: string, is_mut: i32, is_param: i32, borrow_source: string, borrow_kind: string, borrow_end_line: i32)
+{
+    state.names.push(name)
+    state.types.push(ty)
+    state.mutable.push(is_mut)
+    state.status.push("Available")
+    state.active.push(1)
+    state.is_param.push(is_param)
+    state.shared_borrows.push(0)
+    state.mut_borrow.push(0)
+    state.borrow_source.push(borrow_source)
+    state.borrow_kind.push(borrow_kind)
+    state.borrow_end_line.push(borrow_end_line)
+}
+
+pub fn ownership_state_find(state: &OwnershipCheckState, name: string): i32
+{
+    let mut i = state.names.length
+    while (i > 0)
+    {
+        i -= 1
+        if (state.active[i] == 1 and state.names[i] == name) return i
+    }
+    return -1
+}
+
+pub fn ownership_state_env(state: &OwnershipCheckState): AnalysisEnv
+{
+    let env = analysis_env_new()
+    for (i in 0 .. state.names.length)
+    {
+        if (state.active[i] == 1) analysis_env_add(&env, state.names[i], state.types[i], state.mutable[i])
+    }
+    return env
+}
+
+pub fn ownership_max(a: i32, b: i32): i32
+{
+    if (a > b) return a
+    return b
+}
+
+pub fn ownership_add_error(state: &OwnershipCheckState, source: string, filename: string, message: string, line: i32, col: i32, span_len: i32): i32
+{
+    let diagnostic = format_diagnostic(source, filename, diag_error_level(), "OwnershipError", message, line, col, span_len)
+    for (i in 0 .. state.diagnostics.length)
+    {
+        if (state.diagnostics[i] == diagnostic) return 0
+    }
+    state.diagnostics.push(diagnostic)
+    state.error_count += 1
+    return 0
+}
+
+pub fn ownership_expr_last_use_line(program: AstProgram, idx: i32, name: string): i32
+{
+    if (idx < 0) return -1
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    let mut last = -1
+    if ((expr.tag == "ident" or expr.tag == "addr") and expr.text == name) last = expr.line
+    if (expr.left_idx >= 0) last = ownership_max(last, ownership_expr_last_use_line(program, expr.left_idx, name))
+    if (expr.right_idx >= 0) last = ownership_max(last, ownership_expr_last_use_line(program, expr.right_idx, name))
+    for (i in 0 .. expr.args.length)
+    {
+        if (expr.args[i] >= 0) last = ownership_max(last, ownership_expr_last_use_line(program, expr.args[i], name))
+    }
+    return last
+}
+
+pub fn ownership_stmt_last_use_line(program: AstProgram, idx: i32, name: string): i32
+{
+    if (idx < 0) return -1
+    let store = program.store
+    let stmt = stmt_store_get(&store, idx)
+    let mut last = -1
+    if (stmt.value_idx >= 0) last = ownership_max(last, ownership_expr_last_use_line(program, stmt.value_idx, name))
+    if (stmt.print_idx >= 0) last = ownership_max(last, ownership_expr_last_use_line(program, stmt.print_idx, name))
+    if (stmt.tag != "if" and stmt.assign_idx >= 0) last = ownership_max(last, ownership_expr_last_use_line(program, stmt.assign_idx, name))
+    if (stmt.tag == "store_index" and stmt.direct_ret >= 0) last = ownership_max(last, ownership_expr_last_use_line(program, stmt.direct_ret, name))
+    if (stmt.body_idx >= 0) last = ownership_max(last, ownership_stmt_last_use_line(program, stmt.body_idx, name))
+    if (stmt.tag == "if" and stmt.assign_idx >= 0) last = ownership_max(last, ownership_stmt_last_use_line(program, stmt.assign_idx, name))
+    for (i in 0 .. stmt.stmt_indices.length)
+    {
+        last = ownership_max(last, ownership_stmt_last_use_line(program, stmt.stmt_indices[i], name))
+    }
+    for (i in 0 .. stmt.match_body_indices.length)
+    {
+        last = ownership_max(last, ownership_stmt_last_use_line(program, stmt.match_body_indices[i], name))
+    }
+    return last
+}
+
+pub fn ownership_release_reference(state: &OwnershipCheckState, ref_idx: i32): i32
+{
+    if (ref_idx < 0 or ref_idx >= state.names.length or state.borrow_source[ref_idx] == "") return 0
+    let owner_idx = ownership_state_find(state, state.borrow_source[ref_idx])
+    if (owner_idx >= 0)
+    {
+        if (state.borrow_kind[ref_idx] == "BorrowMut") state.mut_borrow[owner_idx] = 0
+        elif (state.shared_borrows[owner_idx] > 0) state.shared_borrows[owner_idx] = state.shared_borrows[owner_idx] - 1
+    }
+    state.borrow_end_line[ref_idx] = -2
+    return 0
+}
+
+pub fn ownership_expire_borrows(state: &OwnershipCheckState, line: i32)
+{
+    for (i in 0 .. state.names.length)
+    {
+        if (state.active[i] == 1 and state.borrow_end_line[i] >= 0 and state.borrow_end_line[i] < line) ownership_release_reference(state, i)
+    }
+}
+
+pub fn ownership_leave_scope(state: &OwnershipCheckState, start: i32)
+{
+    let mut i = state.names.length
+    while (i > start)
+    {
+        i -= 1
+        if (state.active[i] == 1) ownership_release_reference(state, i)
+        state.active[i] = 0
+    }
+}
+
+pub fn ownership_function_param_type(program: AstProgram, name: string, index: i32): string
+{
+    for (i in 0 .. program.functions.length)
+    {
+        if (program.functions[i].name == name and index < program.functions[i].param_types.length) return program.functions[i].param_types[index]
+    }
+    for (i in 0 .. program.extern_functions.length)
+    {
+        if (program.extern_functions[i].name == name and index < program.extern_functions[i].param_types.length) return program.extern_functions[i].param_types[index]
+    }
+    return "unknown"
+}
+
+pub fn ownership_release_direct(state: &OwnershipCheckState, owner_idx: i32, kind: string): i32
+{
+    if (owner_idx < 0) return 0
+    if (kind == "BorrowMut") state.mut_borrow[owner_idx] = 0
+    elif (state.shared_borrows[owner_idx] > 0) state.shared_borrows[owner_idx] = state.shared_borrows[owner_idx] - 1
+    return 0
+}
+
+pub fn ownership_create_borrow(state: &OwnershipCheckState, expr: AstExpr, source: string, filename: string): i32
+{
+    let owner_idx = ownership_state_find(state, expr.text)
+    if (owner_idx < 0) return -1
+    if (state.status[owner_idx] == "Moved")
+    {
+        ownership_add_error(state, source, filename, "cannot borrow moved value '" + expr.text + "'", expr.line, expr.col, expr.text.length)
+        return -1
+    }
+    if (expr.int_value == 1)
+    {
+        if (state.mutable[owner_idx] == 0)
+        {
+            ownership_add_error(state, source, filename, "cannot mutably borrow immutable owner '" + expr.text + "'", expr.line, expr.col, expr.text.length)
+            return -1
+        }
+        if (state.mut_borrow[owner_idx] == 1 or state.shared_borrows[owner_idx] > 0)
+        {
+            ownership_add_error(state, source, filename, "cannot create mutable borrow of '" + expr.text + "' while it is already borrowed", expr.line, expr.col, expr.text.length)
+            return -1
+        }
+        state.mut_borrow[owner_idx] = 1
+    }
+    else
+    {
+        if (state.mut_borrow[owner_idx] == 1)
+        {
+            ownership_add_error(state, source, filename, "cannot create shared borrow of '" + expr.text + "' while it is mutably borrowed", expr.line, expr.col, expr.text.length)
+            return -1
+        }
+        state.shared_borrows[owner_idx] = state.shared_borrows[owner_idx] + 1
+    }
+    return owner_idx
+}
+
+pub fn ownership_check_ident(program: AstProgram, state: &OwnershipCheckState, facts: &OwnershipFacts, expr: AstExpr, stmt_id: i32, consume: i32, source: string, filename: string): i32
+{
+    let local_idx = ownership_state_find(state, expr.text)
+    if (local_idx < 0) return 0
+    if (state.status[local_idx] == "Moved")
+    {
+        ownership_add_error(state, source, filename, "use of moved value '" + expr.text + "'", expr.line, expr.col, expr.text.length)
+        return 0
+    }
+    if (consume == 1 and analysis_type_is_copy(program, state.types[local_idx]) == 0)
+    {
+        if (state.shared_borrows[local_idx] > 0 or state.mut_borrow[local_idx] == 1)
+        {
+            ownership_add_error(state, source, filename, "cannot move '" + expr.text + "' while it is borrowed", expr.line, expr.col, expr.text.length)
+            return 0
+        }
+        state.status[local_idx] = "Moved"
+        facts.stmt_moves.push(OwnershipMoveFact{ stmt_id: stmt_id, place: expr.text, line: expr.line, col: expr.col })
+        let expr_id = ownership_expr_id_for(program, expr)
+        if (expr_id >= 0) facts.expr_actions[expr_id] = "Move"
+    }
+    return 0
+}
+
+pub fn ownership_expr_id_for(program: AstProgram, target: AstExpr): i32
+{
+    for (i in 0 .. program.expr_store.exprs.length)
+    {
+        let expr = program.expr_store.exprs[i]
+        if (expr.line == target.line and expr.col == target.col and expr.tag == target.tag and expr.text == target.text) return i
+    }
+    return -1
+}
+
+pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, facts: &OwnershipFacts, idx: i32, stmt_id: i32, consume: i32, source: string, filename: string): i32
+{
+    if (idx < 0) return 0
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    if (expr.tag == "ident")
+    {
+        ownership_check_ident(program, state, facts, expr, stmt_id, consume, source, filename)
+        return 0
+    }
+    if (expr.tag == "addr")
+    {
+        let owner_idx = ownership_create_borrow(state, expr, source, filename)
+        ownership_release_direct(state, owner_idx, if (expr.int_value == 1) { "BorrowMut" } else { "BorrowShared" })
+        return 0
+    }
+    if (expr.tag == "call")
+    {
+        if (expr.left_idx >= 0) ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
+        let mut direct_owners: [i32] = []
+        let mut direct_kinds: [string] = []
+        for (i in 0 .. expr.args.length)
+        {
+            let arg = expr_store_get(&es, expr.args[i])
+            let param_ty = ownership_function_param_type(program, expr.text, i)
+            if (expr.text == "clone") ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename)
+            elif (analysis_type_is_reference(param_ty) == 1 and arg.tag == "addr")
+            {
+                let owner_idx = ownership_create_borrow(state, arg, source, filename)
+                direct_owners.push(owner_idx)
+                direct_kinds.push(if (arg.int_value == 1) { "BorrowMut" } else { "BorrowShared" })
+                if (analysis_type_is_mut_reference(param_ty) == 1 and arg.int_value == 0) ownership_add_error(state, source, filename, "mutable reference parameter requires '&mut'", arg.line, arg.col, arg.text.length)
+            }
+            elif (analysis_type_is_reference(param_ty) == 1) ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename)
+            else ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 1, source, filename)
+        }
+        for (i in 0 .. direct_owners.length)
+        {
+            ownership_release_direct(state, direct_owners[i], direct_kinds[i])
+        }
+        return 0
+    }
+    if (expr.tag == "index" or expr.tag == "field" or expr.tag == "slice")
+    {
+        ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
+        if (expr.right_idx >= 0) ownership_check_expr(program, state, facts, expr.right_idx, stmt_id, 0, source, filename)
+        for (i in 0 .. expr.args.length)
+        {
+            if (expr.args[i] >= 0) ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename)
+        }
+        return 0
+    }
+    if (expr.tag == "deref" or expr.tag == "unaryop")
+    {
+        ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
+        return 0
+    }
+    if (expr.tag == "binop")
+    {
+        ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
+        ownership_check_expr(program, state, facts, expr.right_idx, stmt_id, 0, source, filename)
+        return 0
+    }
+    for (i in 0 .. expr.args.length)
+    {
+        if (expr.args[i] >= 0) ownership_check_expr(program, state, facts, expr.args[i], stmt_id, consume, source, filename)
+    }
+    if (expr.left_idx >= 0) ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, consume, source, filename)
+    if (expr.right_idx >= 0) ownership_check_expr(program, state, facts, expr.right_idx, stmt_id, consume, source, filename)
+    return 0
+}
+
+pub fn ownership_place_root(program: AstProgram, idx: i32): string
+{
+    if (idx < 0) return ""
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    if (expr.tag == "ident" or expr.tag == "addr") return expr.text
+    if (expr.tag == "field" or expr.tag == "index" or expr.tag == "slice" or expr.tag == "deref") return ownership_place_root(program, expr.left_idx)
+    return ""
+}
+
+pub fn ownership_check_mutation(program: AstProgram, state: &OwnershipCheckState, place_idx: i32, source: string, filename: string): i32
+{
+    let root = ownership_place_root(program, place_idx)
+    if (root == "") return -1
+    let owner_idx = ownership_state_find(state, root)
+    if (owner_idx < 0) return -1
+    let es = program.expr_store
+    let place = expr_store_get(&es, place_idx)
+    if (analysis_type_is_reference(state.types[owner_idx]) == 1 and analysis_type_is_mut_reference(state.types[owner_idx]) == 0)
+    {
+        ownership_add_error(state, source, filename, "cannot assign through shared reference '" + root + "'", place.line, place.col, root.length)
+        return owner_idx
+    }
+    if (analysis_type_is_mut_reference(state.types[owner_idx]) == 0 and state.mutable[owner_idx] == 0)
+    {
+        ownership_add_error(state, source, filename, "cannot assign to immutable owner '" + root + "'", place.line, place.col, root.length)
+        return owner_idx
+    }
+    if (state.shared_borrows[owner_idx] > 0 or state.mut_borrow[owner_idx] == 1) ownership_add_error(state, source, filename, "cannot assign to '" + root + "' while it is borrowed", place.line, place.col, root.length)
+    return owner_idx
+}
+
+pub fn ownership_return_source(program: AstProgram, state: &OwnershipCheckState, idx: i32): string
+{
+    if (idx < 0) return ""
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    if (expr.tag == "addr") return expr.text
+    if (expr.tag == "ident")
+    {
+        let local_idx = ownership_state_find(state, expr.text)
+        if (local_idx < 0) return ""
+        if (state.borrow_source[local_idx] != "") return state.borrow_source[local_idx]
+        if (analysis_type_is_reference(state.types[local_idx]) == 1) return expr.text
+    }
+    return ""
+}
+
+pub fn ownership_function_return_param_index(program: AstProgram, name: string): i32
+{
+    let mut ret_ty = ""
+    let mut param_types: [string] = []
+    for (i in 0 .. program.functions.length)
+    {
+        if (program.functions[i].name == name)
+        {
+            ret_ty = program.functions[i].ret_ty
+            param_types = program.functions[i].param_types
+        }
+    }
+    for (i in 0 .. program.extern_functions.length)
+    {
+        if (program.extern_functions[i].name == name)
+        {
+            ret_ty = program.extern_functions[i].ret_ty
+            param_types = program.extern_functions[i].param_types
+        }
+    }
+    if (analysis_type_is_reference(ret_ty) == 0) return -1
+    let ret_lifetime = analysis_type_lifetime(ret_ty)
+    let mut source_idx = -1
+    for (i in 0 .. param_types.length)
+    {
+        if (analysis_type_is_reference(param_types[i]) == 1)
+        {
+            let param_lifetime = analysis_type_lifetime(param_types[i])
+            if (ret_lifetime == "" or param_lifetime == ret_lifetime)
+            {
+                if (source_idx >= 0) return -2
+                source_idx = i
+            }
+        }
+    }
+    return source_idx
+}
+
+pub fn ownership_check_return(program: AstProgram, state: &OwnershipCheckState, func: AstFunction, expr_idx: i32, source: string, filename: string): i32
+{
+    if (analysis_type_is_reference(func.ret_ty) == 0) return 0
+    let borrow_source = ownership_return_source(program, state, expr_idx)
+    let es = program.expr_store
+    let expr = expr_store_get(&es, expr_idx)
+    if (borrow_source == "")
+    {
+        ownership_add_error(state, source, filename, "borrowed return value has no single input source", expr.line, expr.col, 1)
+        return 0
+    }
+    let source_idx = ownership_state_find(state, borrow_source)
+    if (source_idx < 0 or (state.is_param[source_idx] != 2 and (state.is_param[source_idx] != 1 or analysis_type_is_reference(state.types[source_idx]) == 0)))
+    {
+        ownership_add_error(state, source, filename, "cannot return reference to local value '" + borrow_source + "'", expr.line, expr.col, borrow_source.length)
+        return 0
+    }
+    let ret_lifetime = analysis_type_lifetime(func.ret_ty)
+    let source_lifetime = analysis_type_lifetime(state.types[source_idx])
+    if (ret_lifetime != "" and source_lifetime != ret_lifetime) ownership_add_error(state, source, filename, "returned reference lifetime " + source_lifetime + " does not match " + ret_lifetime, expr.line, expr.col, borrow_source.length)
+    if (analysis_type_is_mut_reference(func.ret_ty) == 1 and analysis_type_is_mut_reference(state.types[source_idx]) == 0) ownership_add_error(state, source, filename, "cannot return mutable reference from shared source '" + borrow_source + "'", expr.line, expr.col, borrow_source.length)
+    return 0
+}
+
+pub fn ownership_merge_diagnostics(target: &OwnershipCheckState, other: &OwnershipCheckState)
+{
+    for (i in 0 .. other.diagnostics.length)
+    {
+        let mut found = 0
+        for (j in 0 .. target.diagnostics.length)
+        {
+            if (target.diagnostics[j] == other.diagnostics[i]) found = 1
+        }
+        if (found == 0)
+        {
+            target.diagnostics.push(other.diagnostics[i])
+            target.error_count += 1
+        }
+    }
+}
+
+pub fn ownership_merge_state(target: &OwnershipCheckState, left: &OwnershipCheckState, right: &OwnershipCheckState, count: i32): i32
+{
+    let mut changed = 0
+    for (i in 0 .. count)
+    {
+        let merged_status = if (left.status[i] == "Moved" or right.status[i] == "Moved") { "Moved" } elif (left.status[i] == "Uninitialized" or right.status[i] == "Uninitialized") { "Uninitialized" } else { "Available" }
+        let merged_shared = ownership_max(left.shared_borrows[i], right.shared_borrows[i])
+        let merged_mut = ownership_max(left.mut_borrow[i], right.mut_borrow[i])
+        if (target.status[i] != merged_status or target.shared_borrows[i] != merged_shared or target.mut_borrow[i] != merged_mut) changed = 1
+        target.status[i] = merged_status
+        target.shared_borrows[i] = merged_shared
+        target.mut_borrow[i] = merged_mut
+    }
+    ownership_merge_diagnostics(target, left)
+    ownership_merge_diagnostics(target, right)
+    return changed
+}
+
+pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, facts: &OwnershipFacts, func: AstFunction, body_root: i32, idx: i32, source: string, filename: string): i32
+{
+    if (idx < 0) return 0
+    let store = program.store
+    let stmt = stmt_store_get(&store, idx)
+    ownership_expire_borrows(state, stmt.line)
+    if (stmt.tag == "block")
+    {
+        let scope_start = state.names.length
+        if (stmt.stmt_indices.length > 0)
+        {
+            for (i in 0 .. stmt.stmt_indices.length)
+            {
+                ownership_check_stmt(program, state, facts, func, body_root, stmt.stmt_indices[i], source, filename)
+            }
+        }
+        else
+        {
+            for (i in 0 .. stmt.block_count)
+            {
+                ownership_check_stmt(program, state, facts, func, body_root, stmt.block_start + i, source, filename)
+            }
+        }
+        ownership_leave_scope(state, scope_start)
+        return 0
+    }
+    if (stmt.tag == "let")
+    {
+        let env = ownership_state_env(state)
+        let inferred = analysis_expr_type(program, &env, stmt.assign_idx)
+        let ty = if (stmt.type_text != "") { stmt.type_text } else { inferred }
+        let es = program.expr_store
+        let init = expr_store_get(&es, stmt.assign_idx)
+        if (init.tag == "addr")
+        {
+            let owner_idx = ownership_create_borrow(state, init, source, filename)
+            let mut end_line = ownership_stmt_last_use_line(program, body_root, stmt.assign_name)
+            if (end_line < stmt.line) end_line = stmt.line
+            let kind = if (init.int_value == 1) { "BorrowMut" } else { "BorrowShared" }
+            let ref_state_idx = state.names.length
+            ownership_state_add(state, stmt.assign_name, ty, stmt.is_mut, 0, init.text, kind, end_line)
+            if (owner_idx < 0) state.borrow_end_line[ref_state_idx] = -2
+        }
+        elif (init.tag == "call" and analysis_type_is_reference(ty) == 1)
+        {
+            ownership_check_expr(program, state, facts, stmt.assign_idx, idx, 0, source, filename)
+            let source_param = ownership_function_return_param_index(program, init.text)
+            let mut borrow_source = ""
+            let mut borrow_kind = ""
+            let mut owner_idx = -1
+            if (source_param >= 0 and source_param < init.args.length)
+            {
+                let source_arg = expr_store_get(&es, init.args[source_param])
+                if (source_arg.tag == "addr")
+                {
+                    borrow_source = source_arg.text
+                    borrow_kind = if (analysis_type_is_mut_reference(ty) == 1) { "BorrowMut" } else { "BorrowShared" }
+                    let mut borrow_expr = source_arg
+                    borrow_expr.int_value = analysis_type_is_mut_reference(ty)
+                    owner_idx = ownership_create_borrow(state, borrow_expr, source, filename)
+                }
+            }
+            if (source_param == -2) ownership_add_error(state, source, filename, "borrowed return value has multiple possible input sources", init.line, init.col, init.text.length)
+            elif (borrow_source == "") ownership_add_error(state, source, filename, "borrowed return value has no direct input source", init.line, init.col, init.text.length)
+            let mut end_line = ownership_stmt_last_use_line(program, body_root, stmt.assign_name)
+            if (end_line < stmt.line) end_line = stmt.line
+            let ref_state_idx = state.names.length
+            ownership_state_add(state, stmt.assign_name, ty, stmt.is_mut, 0, borrow_source, borrow_kind, end_line)
+            if (owner_idx < 0) state.borrow_end_line[ref_state_idx] = -2
+        }
+        else
+        {
+            ownership_check_expr(program, state, facts, stmt.assign_idx, idx, 1, source, filename)
+            ownership_state_add(state, stmt.assign_name, ty, stmt.is_mut, 0, "", "", -1)
+        }
+        return 0
+    }
+    if (stmt.tag == "assign")
+    {
+        let owner_idx = ownership_state_find(state, stmt.assign_name)
+        if (owner_idx >= 0)
+        {
+            if (state.mutable[owner_idx] == 0) ownership_add_error(state, source, filename, "cannot assign to immutable owner '" + stmt.assign_name + "'", stmt.line, stmt.col, stmt.assign_name.length)
+            if (state.shared_borrows[owner_idx] > 0 or state.mut_borrow[owner_idx] == 1) ownership_add_error(state, source, filename, "cannot assign to '" + stmt.assign_name + "' while it is borrowed", stmt.line, stmt.col, stmt.assign_name.length)
+        }
+        ownership_check_expr(program, state, facts, stmt.assign_idx, idx, 1, source, filename)
+        if (owner_idx >= 0) state.status[owner_idx] = "Available"
+        return 0
+    }
+    if (stmt.tag == "store_index" or stmt.tag == "field_assign" or stmt.tag == "store_deref")
+    {
+        ownership_check_mutation(program, state, stmt.value_idx, source, filename)
+        ownership_check_expr(program, state, facts, stmt.value_idx, idx, 0, source, filename)
+        if (stmt.tag == "store_index") ownership_check_expr(program, state, facts, stmt.direct_ret, idx, 0, source, filename)
+        ownership_check_expr(program, state, facts, stmt.assign_idx, idx, 1, source, filename)
+        return 0
+    }
+    if (stmt.tag == "return_expr")
+    {
+        ownership_check_return(program, state, func, stmt.value_idx, source, filename)
+        ownership_check_expr(program, state, facts, stmt.value_idx, idx, if (analysis_type_is_reference(func.ret_ty) == 1) { 0 } else { 1 }, source, filename)
+        return 0
+    }
+    if (stmt.tag == "print")
+    {
+        ownership_check_expr(program, state, facts, stmt.print_idx, idx, 0, source, filename)
+        return 0
+    }
+    if (stmt.tag == "expr")
+    {
+        ownership_check_expr(program, state, facts, stmt.value_idx, idx, 0, source, filename)
+        return 0
+    }
+    if (stmt.tag == "if")
+    {
+        ownership_check_expr(program, state, facts, stmt.value_idx, idx, 0, source, filename)
+        let base_count = state.names.length
+        let left = ownership_state_clone(state)
+        let right = ownership_state_clone(state)
+        ownership_check_stmt(program, &left, facts, func, body_root, stmt.body_idx, source, filename)
+        ownership_check_stmt(program, &right, facts, func, body_root, stmt.assign_idx, source, filename)
+        ownership_merge_state(state, &left, &right, base_count)
+        return 0
+    }
+    if (stmt.tag == "while")
+    {
+        ownership_check_expr(program, state, facts, stmt.value_idx, idx, 0, source, filename)
+        let base_count = state.names.length
+        let mut iteration = 0
+        let mut changed = 1
+        while (iteration < 8 and changed == 1)
+        {
+            let body_state = ownership_state_clone(state)
+            ownership_check_stmt(program, &body_state, facts, func, body_root, stmt.body_idx, source, filename)
+            changed = ownership_merge_state(state, state, &body_state, base_count)
+            iteration += 1
+        }
+        return 0
+    }
+    if (stmt.tag == "for_range")
+    {
+        ownership_check_expr(program, state, facts, stmt.value_idx, idx, 0, source, filename)
+        ownership_check_expr(program, state, facts, stmt.assign_idx, idx, 0, source, filename)
+        let loop_state = ownership_state_clone(state)
+        ownership_state_add(&loop_state, stmt.assign_name, "i32", 1, 0, "", "", -1)
+        ownership_check_stmt(program, &loop_state, facts, func, body_root, stmt.body_idx, source, filename)
+        ownership_merge_state(state, state, &loop_state, state.names.length)
+        return 0
+    }
+    if (stmt.tag == "match")
+    {
+        ownership_check_expr(program, state, facts, stmt.value_idx, idx, 0, source, filename)
+        let count = state.names.length
+        for (i in 0 .. stmt.match_body_indices.length)
+        {
+            let arm_state = ownership_state_clone(state)
+            ownership_check_stmt(program, &arm_state, facts, func, body_root, stmt.match_body_indices[i], source, filename)
+            ownership_merge_state(state, state, &arm_state, count)
+        }
+        return 0
+    }
+    return 0
+}
+
+pub fn ownership_check_function(program: AstProgram, facts: &OwnershipFacts, func: AstFunction, source: string, filename: string): OwnershipCheckState
+{
+    let state = ownership_state_new()
+    let env = analysis_env_new()
+    for (i in 0 .. program.globals.length)
+    {
+        let global = program.globals[i]
+        let global_ty = if (global.type_text != "") { global.type_text } else { analysis_expr_type(program, &env, global.assign_idx) }
+        ownership_state_add(&state, global.assign_name, global_ty, global.is_mut, 2, "", "", -1)
+        analysis_env_add(&env, global.assign_name, global_ty, global.is_mut)
+    }
+    for (i in 0 .. func.param_names.length)
+    {
+        let is_mut = if (analysis_type_is_mut_reference(func.param_types[i]) == 1) { 1 } else { 0 }
+        ownership_state_add(&state, func.param_names[i], func.param_types[i], is_mut, 1, "", "", -1)
+    }
+    ownership_check_stmt(program, &state, facts, func, func.body_idx, func.body_idx, source, filename)
+    return state
+}
+
+pub fn typed_analysis_ir_new(): TypedAnalysisIR
+{
+    return TypedAnalysisIR{ blocks: [], instructions: [], values: [], places: [] }
+}
+
+pub fn ownership_facts_new(expr_count: i32): OwnershipFacts
+{
+    let mut actions: [string] = []
+    let mut types: [string] = []
+    for (i in 0 .. expr_count)
+    {
+        actions.push("")
+        types.push("unknown")
+    }
+    return OwnershipFacts{ expr_actions: actions, expr_types: types, stmt_moves: [], expr_borrows: [], block_borrows: [] }
+}
+
+pub fn drop_plan_new(): DropPlan
+{
+    return DropPlan{ events: [] }
+}
+
+pub fn analysis_env_new(): AnalysisEnv
+{
+    return AnalysisEnv{ names: [], types: [], mutable: [] }
+}
+
+pub fn analysis_env_clone(env: &AnalysisEnv): AnalysisEnv
+{
+    let mut names: [string] = []
+    let mut types: [string] = []
+    let mut mutable: [i32] = []
+    for (i in 0 .. env.names.length)
+    {
+        names.push(env.names[i])
+        types.push(env.types[i])
+        mutable.push(env.mutable[i])
+    }
+    return AnalysisEnv{ names: names, types: types, mutable: mutable }
+}
+
+pub fn analysis_env_add(env: &AnalysisEnv, name: string, ty: string, is_mut: i32)
+{
+    env.names.push(name)
+    env.types.push(ty)
+    env.mutable.push(is_mut)
+}
+
+pub fn analysis_env_type(env: &AnalysisEnv, name: string): string
+{
+    let mut i = env.names.length
+    while (i > 0)
+    {
+        i -= 1
+        if (env.names[i] == name) return env.types[i]
+    }
+    return "unknown"
+}
+
+pub fn analysis_function_return_type(program: AstProgram, name: string): string
+{
+    for (i in 0 .. program.functions.length)
+    {
+        if (program.functions[i].name == name) return program.functions[i].ret_ty
+    }
+    for (i in 0 .. program.extern_functions.length)
+    {
+        if (program.extern_functions[i].name == name) return program.extern_functions[i].ret_ty
+    }
+    return "unknown"
+}
+
+pub fn analysis_array_inner(ty: string): string
+{
+    if (ty.length < 3 or compiler_string_byte(ty, 0) != '[') return "unknown"
+    let mut out = ""
+    for (i in 1 .. ty.length - 1)
+    {
+        if (compiler_string_byte(ty, i) == '*') return out
+        out = out + ast_char_string(compiler_string_byte(ty, i))
+    }
+    return out
+}
+
+pub fn analysis_ptr_inner(ty: string): string
+{
+    if (ty.length < 5 or compiler_string_byte(ty, 0) != 'p' or compiler_string_byte(ty, 1) != 't' or compiler_string_byte(ty, 2) != 'r' or compiler_string_byte(ty, 3) != ':') return "unknown"
+    let mut out = ""
+    for (i in 4 .. ty.length)
+    {
+        out = out + ast_char_string(compiler_string_byte(ty, i))
+    }
+    return out
+}
+
+pub fn analysis_type_is_scalar_copy(ty: string): i32
+{
+    return match ty {
+        "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64" | "usize" | "f32" | "f64" | "bool" | "char" | "ptr" -> 1
+        _ -> 0
+    }
+}
+
+pub fn analysis_type_is_copy(program: AstProgram, ty: string): i32
+{
+    if (analysis_type_is_scalar_copy(ty) == 1) return 1
+    if (analysis_type_is_reference(ty) == 1) return if (analysis_type_is_mut_reference(ty) == 1) { 0 } else { 1 }
+    if (ty == "string" or (ty.length > 0 and compiler_string_byte(ty, 0) == '[')) return 0
+    let base = ast_type_base_name(ty)
+    if (base == "Option")
+    {
+        let inner = ast_generic_arg_at(ty, 0)
+        if (inner == "") return 0
+        return analysis_type_is_copy(program, inner)
+    }
+    for (i in 0 .. program.structs.length)
+    {
+        if (program.structs[i].name == base)
+        {
+            for (j in 0 .. program.structs[i].field_types.length)
+            {
+                if (analysis_type_is_copy(program, program.structs[i].field_types[j]) == 0) return 0
+            }
+            return 1
+        }
+    }
+    for (i in 0 .. program.adts.length)
+    {
+        if (program.adts[i].name == base)
+        {
+            for (j in 0 .. program.adts[i].variant_payload_types.length)
+            {
+                let payload = program.adts[i].variant_payload_types[j]
+                if (payload != "" and analysis_type_is_copy(program, payload) == 0) return 0
+            }
+            return 1
+        }
+    }
+    return 0
+}
+
+pub fn analysis_struct_field_type(program: AstProgram, base_ty: string, field: string): string
+{
+    let mut ty = base_ty
+    if (analysis_type_is_reference(ty) == 1) ty = analysis_reference_inner(ty)
+    if (analysis_ptr_inner(ty) != "unknown") ty = analysis_ptr_inner(ty)
+    let base = ast_type_base_name(ty)
+    for (i in 0 .. program.structs.length)
+    {
+        if (program.structs[i].name == base)
+        {
+            for (j in 0 .. program.structs[i].field_names.length)
+            {
+                if (program.structs[i].field_names[j] == field) return program.structs[i].field_types[j]
+            }
+        }
+    }
+    return "unknown"
+}
+
+pub fn analysis_expr_type(program: AstProgram, env: &AnalysisEnv, idx: i32): string
+{
+    if (idx < 0) return "void"
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    return match expr.tag {
+        "int" -> "i32"
+        "float" -> "f64"
+        "bool" -> "bool"
+        "string" -> "string"
+        "ident" -> analysis_env_type(env, expr.text)
+        "addr" -> (if (expr.int_value == 1) { "&mut " } else { "&" }) + analysis_env_type(env, expr.text)
+        "deref" -> {
+            let base = analysis_expr_type(program, env, expr.left_idx)
+            if (analysis_type_is_reference(base) == 1) return analysis_reference_inner(base)
+            return analysis_ptr_inner(base)
+        }
+        "index" -> {
+            let mut base = analysis_expr_type(program, env, expr.left_idx)
+            if (analysis_type_is_reference(base) == 1) base = analysis_reference_inner(base)
+            if (base == "string") return "i8"
+            return analysis_array_inner(base)
+        }
+        "slice" -> analysis_expr_type(program, env, expr.left_idx)
+        "field" -> {
+            if (expr.text == "length") return "i32"
+            return analysis_struct_field_type(program, analysis_expr_type(program, env, expr.left_idx), expr.text)
+        }
+        "array_literal" -> {
+            if (expr.args.length == 0) return "[unknown]"
+            return "[" + analysis_expr_type(program, env, expr.args[0]) + "]"
+        }
+        "option" -> if (expr.left_idx < 0) { "Option[unknown]" } else { "Option[" + analysis_expr_type(program, env, expr.left_idx) + "]" }
+        "struct_literal" -> expr.text
+        "call" -> {
+            if (expr.text == "clone" and expr.args.length > 0) return analysis_expr_type(program, env, expr.args[0])
+            return analysis_function_return_type(program, expr.text)
+        }
+        "method_call" -> if (expr.text == "length") { "i32" } else { "unknown" }
+        "unaryop" -> if (expr.text == "!") { "bool" } else { analysis_expr_type(program, env, expr.left_idx) }
+        "binop" -> {
+            let left = analysis_expr_type(program, env, expr.left_idx)
+            if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=" or expr.text == "and" or expr.text == "or") return "bool"
+            return left
+        }
+        "lambda" -> "fn"
+        _ -> "unknown"
+    }
+}
+
+pub fn analysis_place_for_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, idx: i32): i32
+{
+    if (idx < 0) return -1
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    let mut root = ""
+    let mut projections: [string] = []
+    if (expr.tag == "ident" or expr.tag == "addr") root = expr.text
+    elif (expr.tag == "field" or expr.tag == "index")
+    {
+        let base_place = analysis_place_for_expr(program, env, ir, expr.left_idx)
+        if (base_place < 0) return -1
+        root = ir.places[base_place].root
+        for (i in 0 .. ir.places[base_place].projections.length)
+        {
+            projections.push(ir.places[base_place].projections[i])
+        }
+        if (expr.tag == "field") projections.push("field:" + expr.text)
+        else projections.push("index")
+    }
+    elif (expr.tag == "deref")
+    {
+        let base_place2 = analysis_place_for_expr(program, env, ir, expr.left_idx)
+        if (base_place2 < 0) return -1
+        root = ir.places[base_place2].root
+        for (i in 0 .. ir.places[base_place2].projections.length)
+        {
+            projections.push(ir.places[base_place2].projections[i])
+        }
+        projections.push("deref")
+    }
+    else return -1
+    let place_id = ir.places.length
+    ir.places.push(AnalysisPlace{ root: root, projections: projections, ty: analysis_expr_type(program, env, idx), line: expr.line, col: expr.col })
+    return place_id
+}
+
+pub fn analysis_add_instruction(ir: &TypedAnalysisIR, block_id: i32, kind: string, expr_id: i32, stmt_id: i32, place_id: i32, value_id: i32, target_block: i32, line: i32, col: i32): i32
+{
+    let id = ir.instructions.length
+    ir.instructions.push(TypedAnalysisInstruction{ kind: kind, expr_id: expr_id, stmt_id: stmt_id, place_id: place_id, value_id: value_id, target_block: target_block, line: line, col: col })
+    ir.blocks[block_id].instruction_ids.push(id)
+    return id
+}
+
+pub fn analysis_add_block(ir: &TypedAnalysisIR, facts: &OwnershipFacts, function_name: string, stmt_id: i32, line: i32, col: i32): i32
+{
+    let id = ir.blocks.length
+    ir.blocks.push(TypedAnalysisBlock{ id: id, function_name: function_name, stmt_id: stmt_id, instruction_ids: [], successors: [], line: line, col: col })
+    facts.block_borrows.push(OwnershipBlockBorrowFact{ block_id: id, sources: [] })
+    return id
+}
+
+pub fn analysis_add_edge(ir: &TypedAnalysisIR, from: i32, to: i32): i32
+{
+    if (from < 0 or to < 0) return 0
+    for (i in 0 .. ir.blocks[from].successors.length)
+    {
+        if (ir.blocks[from].successors[i] == to) return 0
+    }
+    ir.blocks[from].successors.push(to)
+    return 0
+}
+
+pub fn analysis_flow(entry: i32, exits: [i32]): AnalysisFlow
+{
+    return AnalysisFlow{ entry: entry, exits: exits }
+}
+
+pub fn analysis_link_exits(ir: &TypedAnalysisIR, exits: [i32], target: i32)
+{
+    for (i in 0 .. exits.length)
+    {
+        analysis_add_edge(ir, exits[i], target)
+    }
+}
+
+pub fn analysis_expr_action(program: AstProgram, ty: string, expr: AstExpr): string
+{
+    if (expr.tag == "addr") return if (expr.int_value == 1) { "BorrowMut" } else { "BorrowShared" }
+    if (analysis_type_is_copy(program, ty) == 1) return "Copy"
+    return "Move"
+}
+
+pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, facts: &OwnershipFacts, block_id: i32, stmt_id: i32, idx: i32): i32
+{
+    if (idx < 0) return -1
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    if (expr.left_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, stmt_id, expr.left_idx)
+    if (expr.right_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, stmt_id, expr.right_idx)
+    for (i in 0 .. expr.args.length)
+    {
+        if (expr.args[i] >= 0) analysis_collect_expr(program, env, ir, facts, block_id, stmt_id, expr.args[i])
+    }
+    if (facts.expr_actions[idx] != "") return -1
+    let ty = analysis_expr_type(program, env, idx)
+    let place_id = analysis_place_for_expr(program, env, ir, idx)
+    let value_id = ir.values.length
+    ir.values.push(TypedAnalysisValue{ expr_id: idx, ty: ty, place_id: place_id, line: expr.line, col: expr.col })
+    let action = analysis_expr_action(program, ty, expr)
+    facts.expr_actions[idx] = action
+    facts.expr_types[idx] = ty
+    let mut kind = "value"
+    if (expr.tag == "call" or expr.tag == "method_call") kind = "call"
+    elif (expr.tag == "addr") kind = if (expr.int_value == 1) { "borrow_mut" } else { "borrow_shared" }
+    elif (expr.tag == "ident" or expr.tag == "field" or expr.tag == "index" or expr.tag == "deref") kind = if (action == "Move") { "move" } else { "use" }
+    analysis_add_instruction(ir, block_id, kind, idx, stmt_id, place_id, value_id, -1, expr.line, expr.col)
+    if (expr.tag == "addr")
+    {
+        let borrow_kind = if (expr.int_value == 1) { "BorrowMut" } else { "BorrowShared" }
+        facts.expr_borrows.push(OwnershipBorrowFact{ expr_id: idx, source: expr.text, kind: borrow_kind, line: expr.line, col: expr.col })
+        facts.block_borrows[block_id].sources.push(expr.text)
+    }
+    return value_id
+}
+
+pub fn analysis_stmt_line(program: AstProgram, idx: i32): i32
+{
+    if (idx < 0) return 0
+    let store = program.store
+    return stmt_store_get(&store, idx).line
+}
+
+pub fn analysis_stmt_col(program: AstProgram, idx: i32): i32
+{
+    if (idx < 0) return 0
+    let store = program.store
+    return stmt_store_get(&store, idx).col
+}
+
+pub fn analysis_add_scope_drops(program: AstProgram, env: &AnalysisEnv, start: i32, scope_id: i32, block_id: i32, drops: &DropPlan)
+{
+    let mut i = env.names.length
+    while (i > start)
+    {
+        i -= 1
+        if (analysis_type_is_copy(program, env.types[i]) == 0 and analysis_type_is_reference(env.types[i]) == 0) drops.events.push(DropEvent{ scope_id: scope_id, stmt_id: -1, return_id: -1, block_id: block_id, place: env.names[i], ty: env.types[i], reason: "scope_exit", line: 0, col: 0 })
+    }
+}
+
+pub fn analysis_emit_simple_stmt(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, facts: &OwnershipFacts, drops: &DropPlan, function_name: string, idx: i32): AnalysisFlow
+{
+    let store = program.store
+    let stmt = stmt_store_get(&store, idx)
+    let block_id = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
+    if (stmt.value_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.value_idx)
+    if (stmt.print_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.print_idx)
+    if (stmt.tag != "if" and stmt.assign_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.assign_idx)
+    if (stmt.tag == "store_index" and stmt.direct_ret >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.direct_ret)
+    let mut kind = stmt.tag
+    if (stmt.tag == "let" or stmt.tag == "assign" or stmt.tag == "field_assign" or stmt.tag == "store_index" or stmt.tag == "store_deref") kind = "assign"
+    analysis_add_instruction(ir, block_id, kind, -1, idx, -1, -1, -1, stmt.line, stmt.col)
+    if (stmt.tag == "let")
+    {
+        let inferred = analysis_expr_type(program, env, stmt.assign_idx)
+        let ty = if (stmt.type_text != "") { stmt.type_text } else { inferred }
+        analysis_env_add(env, stmt.assign_name, ty, stmt.is_mut)
+    }
+    if (stmt.tag == "assign")
+    {
+        let old_ty = analysis_env_type(env, stmt.assign_name)
+        if (analysis_type_is_copy(program, old_ty) == 0) drops.events.push(DropEvent{ scope_id: -1, stmt_id: idx, return_id: -1, block_id: block_id, place: stmt.assign_name, ty: old_ty, reason: "overwrite", line: stmt.line, col: stmt.col })
+    }
+    if (stmt.tag == "return_expr")
+    {
+        drops.events.push(DropEvent{ scope_id: -1, stmt_id: -1, return_id: idx, block_id: block_id, place: "", ty: "", reason: "return", line: stmt.line, col: stmt.col })
+        return analysis_flow(block_id, [])
+    }
+    if (stmt.tag == "break" or stmt.tag == "continue") return analysis_flow(block_id, [])
+    return analysis_flow(block_id, [block_id])
+}
+
+pub fn analysis_emit_stmt(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, facts: &OwnershipFacts, drops: &DropPlan, function_name: string, idx: i32): AnalysisFlow
+{
+    if (idx < 0) return analysis_flow(-1, [])
+    let store = program.store
+    let stmt = stmt_store_get(&store, idx)
+    if (stmt.tag == "block")
+    {
+        let scope_start = env.names.length
+        let mut entry = -1
+        let mut exits: [i32] = []
+        if (stmt.stmt_indices.length > 0)
+        {
+            for (i in 0 .. stmt.stmt_indices.length)
+            {
+                let flow = analysis_emit_stmt(program, env, ir, facts, drops, function_name, stmt.stmt_indices[i])
+                if (entry < 0) entry = flow.entry
+                if (exits.length > 0 and flow.entry >= 0) analysis_link_exits(ir, exits, flow.entry)
+                exits = flow.exits
+            }
+        }
+        else
+        {
+            for (i in 0 .. stmt.block_count)
+            {
+                let flow2 = analysis_emit_stmt(program, env, ir, facts, drops, function_name, stmt.block_start + i)
+                if (entry < 0) entry = flow2.entry
+                if (exits.length > 0 and flow2.entry >= 0) analysis_link_exits(ir, exits, flow2.entry)
+                exits = flow2.exits
+            }
+        }
+        let exit_block = if (exits.length > 0) { exits[0] } else { -1 }
+        analysis_add_scope_drops(program, env, scope_start, idx, exit_block, drops)
+        return analysis_flow(entry, exits)
+    }
+    if (stmt.tag == "if")
+    {
+        let cond_block = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
+        analysis_collect_expr(program, env, ir, facts, cond_block, idx, stmt.value_idx)
+        analysis_add_instruction(ir, cond_block, "branch", stmt.value_idx, idx, -1, -1, -1, stmt.line, stmt.col)
+        let then_env = analysis_env_clone(env)
+        let else_env = analysis_env_clone(env)
+        let then_flow = analysis_emit_stmt(program, &then_env, ir, facts, drops, function_name, stmt.body_idx)
+        let else_flow = analysis_emit_stmt(program, &else_env, ir, facts, drops, function_name, stmt.assign_idx)
+        let merge = analysis_add_block(ir, facts, function_name, -1, stmt.line, stmt.col)
+        if (then_flow.entry >= 0) analysis_add_edge(ir, cond_block, then_flow.entry)
+        else analysis_add_edge(ir, cond_block, merge)
+        if (else_flow.entry >= 0) analysis_add_edge(ir, cond_block, else_flow.entry)
+        else analysis_add_edge(ir, cond_block, merge)
+        analysis_link_exits(ir, then_flow.exits, merge)
+        analysis_link_exits(ir, else_flow.exits, merge)
+        return analysis_flow(cond_block, [merge])
+    }
+    if (stmt.tag == "while")
+    {
+        let cond_block = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
+        analysis_collect_expr(program, env, ir, facts, cond_block, idx, stmt.value_idx)
+        analysis_add_instruction(ir, cond_block, "branch", stmt.value_idx, idx, -1, -1, -1, stmt.line, stmt.col)
+        let body_env = analysis_env_clone(env)
+        let body_flow = analysis_emit_stmt(program, &body_env, ir, facts, drops, function_name, stmt.body_idx)
+        let exit_block = analysis_add_block(ir, facts, function_name, -1, stmt.line, stmt.col)
+        if (body_flow.entry >= 0) analysis_add_edge(ir, cond_block, body_flow.entry)
+        else analysis_add_edge(ir, cond_block, cond_block)
+        analysis_add_edge(ir, cond_block, exit_block)
+        analysis_link_exits(ir, body_flow.exits, cond_block)
+        return analysis_flow(cond_block, [exit_block])
+    }
+    if (stmt.tag == "match")
+    {
+        let branch_block = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
+        analysis_collect_expr(program, env, ir, facts, branch_block, idx, stmt.value_idx)
+        analysis_add_instruction(ir, branch_block, "branch", stmt.value_idx, idx, -1, -1, -1, stmt.line, stmt.col)
+        let merge = analysis_add_block(ir, facts, function_name, -1, stmt.line, stmt.col)
+        for (i in 0 .. stmt.match_body_indices.length)
+        {
+            let arm_env = analysis_env_clone(env)
+            let arm_flow = analysis_emit_stmt(program, &arm_env, ir, facts, drops, function_name, stmt.match_body_indices[i])
+            if (arm_flow.entry >= 0) analysis_add_edge(ir, branch_block, arm_flow.entry)
+            else analysis_add_edge(ir, branch_block, merge)
+            analysis_link_exits(ir, arm_flow.exits, merge)
+        }
+        return analysis_flow(branch_block, [merge])
+    }
+    return analysis_emit_simple_stmt(program, env, ir, facts, drops, function_name, idx)
+}
+
+pub fn typed_analysis_program(program: AstProgram, source: string, filename: string): TypedAnalysisResult
+{
+    let ir = typed_analysis_ir_new()
+    let facts = ownership_facts_new(program.expr_store.exprs.length)
+    let drops = drop_plan_new()
+    let mut error = ""
+    let mut error_count = 0
+    for (i in 0 .. program.functions.length)
+    {
+        let func = program.functions[i]
+        let env = analysis_env_new()
+        for (j in 0 .. program.globals.length)
+        {
+            let global = program.globals[j]
+            let global_ty = if (global.type_text != "") { global.type_text } else { analysis_expr_type(program, &env, global.assign_idx) }
+            analysis_env_add(&env, global.assign_name, global_ty, global.is_mut)
+        }
+        for (j in 0 .. func.param_names.length)
+        {
+            analysis_env_add(&env, func.param_names[j], func.param_types[j], if (analysis_type_is_mut_reference(func.param_types[j]) == 1) { 1 } else { 0 })
+        }
+        let param_count = env.names.length
+        let flow = analysis_emit_stmt(program, &env, &ir, &facts, &drops, func.name, func.body_idx)
+        let exit_block = if (flow.exits.length > 0) { flow.exits[0] } else { -1 }
+        analysis_add_scope_drops(program, &env, 0, func.body_idx, exit_block, &drops)
+        if (param_count < 0) return TypedAnalysisResult{ ok: 0, ownership_ok: 0, error: "invalid analysis environment", ir: ir, facts: facts, drops: drops }
+        let ownership = ownership_check_function(program, &facts, func, source, filename)
+        for (j in 0 .. ownership.diagnostics.length)
+        {
+            error = error + ownership.diagnostics[j]
+        }
+        error_count += ownership.error_count
+    }
+    return TypedAnalysisResult{ ok: 1, ownership_ok: if (error_count == 0) { 1 } else { 0 }, error: error, ir: ir, facts: facts, drops: drops }
+}
+
+pub fn analysis_reference_inner(ty: string): string
+{
+    if (ty.length < 2 or compiler_string_byte(ty, 0) != '&') return ty
+    let mut start = 1
+    if (start < ty.length and compiler_string_byte(ty, start) == 39)
+    {
+        start += 1
+        while (start < ty.length and compiler_string_byte(ty, start) != ' ')
+        {
+            start += 1
+        }
+    }
+    while (start < ty.length and compiler_string_byte(ty, start) == ' ')
+    {
+        start += 1
+    }
+    if (start + 3 < ty.length and compiler_string_byte(ty, start) == 'm' and compiler_string_byte(ty, start + 1) == 'u' and compiler_string_byte(ty, start + 2) == 't' and compiler_string_byte(ty, start + 3) == ' ') start += 4
+    let mut inner = ""
+    for (i in start .. ty.length)
+    {
+        inner = inner + ast_char_string(compiler_string_byte(ty, i))
+    }
+    return inner
+}
+
+pub fn analysis_type_is_reference(ty: string): i32
+{
+    if (ty.length > 1 and compiler_string_byte(ty, 0) == '&') return 1
+    return 0
+}
+
+pub fn analysis_type_is_mut_reference(ty: string): i32
+{
+    if (analysis_type_is_reference(ty) == 0) return 0
+    let mut prefix_end = 1
+    if (compiler_string_byte(ty, prefix_end) == 39)
+    {
+        while (prefix_end < ty.length and compiler_string_byte(ty, prefix_end) != ' ')
+        {
+            prefix_end += 1
+        }
+        while (prefix_end < ty.length and compiler_string_byte(ty, prefix_end) == ' ')
+        {
+            prefix_end += 1
+        }
+    }
+    if (prefix_end + 2 < ty.length and compiler_string_byte(ty, prefix_end) == 'm' and compiler_string_byte(ty, prefix_end + 1) == 'u' and compiler_string_byte(ty, prefix_end + 2) == 't') return 1
+    return 0
+}
+
+pub fn analysis_type_lifetime(ty: string): string
+{
+    if (analysis_type_is_reference(ty) == 0 or ty.length < 3 or compiler_string_byte(ty, 1) != 39) return ""
+    let mut out = "'"
+    for (i in 2 .. ty.length)
+    {
+        if (compiler_string_byte(ty, i) == ' ') return out
+        out = out + ast_char_string(compiler_string_byte(ty, i))
+    }
+    return out
+}
+
+pub fn analysis_lower_type_for_backend(ty: string): string
+{
+    if (analysis_type_is_reference(ty) == 1) return "ptr:" + analysis_lower_type_for_backend(analysis_reference_inner(ty))
+    return ty
+}
+
+pub fn analysis_lower_program_for_backend(program: AstProgram): AstProgram
+{
+    let mut out = program
+    for (i in 0 .. out.functions.length)
+    {
+        out.functions[i].ret_ty = analysis_lower_type_for_backend(out.functions[i].ret_ty)
+        for (j in 0 .. out.functions[i].param_types.length)
+        {
+            out.functions[i].param_types[j] = analysis_lower_type_for_backend(out.functions[i].param_types[j])
+        }
+    }
+    for (i in 0 .. out.extern_functions.length)
+    {
+        out.extern_functions[i].ret_ty = analysis_lower_type_for_backend(out.extern_functions[i].ret_ty)
+        for (j in 0 .. out.extern_functions[i].param_types.length)
+        {
+            out.extern_functions[i].param_types[j] = analysis_lower_type_for_backend(out.extern_functions[i].param_types[j])
+        }
+    }
+    for (i in 0 .. out.structs.length)
+    {
+        for (j in 0 .. out.structs[i].field_types.length)
+        {
+            out.structs[i].field_types[j] = analysis_lower_type_for_backend(out.structs[i].field_types[j])
+        }
+    }
+    for (i in 0 .. out.adts.length)
+    {
+        for (j in 0 .. out.adts[i].variant_payload_types.length)
+        {
+            out.adts[i].variant_payload_types[j] = analysis_lower_type_for_backend(out.adts[i].variant_payload_types[j])
+        }
+    }
+    for (i in 0 .. out.globals.length)
+    {
+        out.globals[i].type_text = analysis_lower_type_for_backend(out.globals[i].type_text)
+    }
+    for (i in 0 .. out.store.stmts.length)
+    {
+        out.store.stmts[i].type_text = analysis_lower_type_for_backend(out.store.stmts[i].type_text)
+    }
+    for (i in 0 .. out.expr_store.exprs.length)
+    {
+        if (out.expr_store.exprs[i].tag == "lambda") out.expr_store.exprs[i].option_value = analysis_lower_type_for_backend(out.expr_store.exprs[i].option_value)
+        for (j in 0 .. out.expr_store.exprs[i].type_args.length)
+        {
+            out.expr_store.exprs[i].type_args[j] = analysis_lower_type_for_backend(out.expr_store.exprs[i].type_args[j])
+        }
+    }
+    return out
+}

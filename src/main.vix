@@ -33,7 +33,7 @@ fn compiler_mode(arg: string): CompilerModeResult
     return match arg {
         "-h" | "--help" -> CompilerModeName("--help")
         "-v" | "--version" -> CompilerModeName("--version")
-        "--lex" | "--parse-stats" | "--parser" | "--ast" | "-ast" | "--ast-json" | "--typeinfer" | "--tyinfer" | "--semantic" | "--check" | "--module-graph" | "-ll" | "-obj" | "-S" -> CompilerModeName(arg)
+        "--lex" | "--parse-stats" | "--parser" | "--ast" | "-ast" | "--ast-json" | "--typeinfer" | "--tyinfer" | "--semantic" | "--check" | "--ownership-check" | "--module-graph" | "-ll" | "-obj" | "-S" -> CompilerModeName(arg)
         _ -> CompilerModeUnknown
     }
 }
@@ -153,6 +153,7 @@ fn print_help(): i32
     print("  -l<lib>, -l <lib>      Link executable with a system library")
     print("  -L<dir>, -L <dir>      Add a system library search path")
     print("  --check                Syntax & type check only")
+    print("  --ownership-check      Run the experimental ownership checker")
     print("  --lex                  Print tokens to stdout")
     print("  --parse-stats          Print lightweight parser input statistics")
     print("  --parser               Print parse tree to stdout")
@@ -443,7 +444,19 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         return mode_failure()
     }
 
-    let lowered_program = desugar_program(merged_program)
+    let analysis_program = desugar_program(merged_program)
+    let analysis_result = typed_analysis_program(analysis_program, src, filename)
+    if (analysis_result.ok == 0)
+    {
+        diag_print(analysis_result.error)
+        return mode_failure()
+    }
+    if (mode == "--ownership-check" and analysis_result.ownership_ok == 0)
+    {
+        diag_print(analysis_result.error)
+        return mode_failure()
+    }
+    let lowered_program = analysis_lower_program_for_backend(analysis_program)
 
     if (mode == "debug_llvm")
     {
@@ -492,7 +505,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
 
     match mode
     {
-        "--check" -> { return mode_success() }
+        "--check" | "--ownership-check" -> { return mode_success() }
         _ -> {}
     }
 

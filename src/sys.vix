@@ -1,5 +1,6 @@
 // Compiler aggregate. Paths are relative to this file and loaded without PP.
 mod "ast.vix"
+mod "analysis/typed_analysis.vix"
 mod "backend/boot16.vix"
 mod "backend/linker.vix"
 mod "backend/llc.vix"

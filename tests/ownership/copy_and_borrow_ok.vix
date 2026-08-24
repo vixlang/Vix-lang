@@ -1,0 +1,23 @@
+fn inspect(xs: &[i32]): i32
+{
+    return xs[0]
+}
+
+fn edit(xs: &mut [i32])
+{
+    xs[0] = xs[0] + 1
+}
+
+fn add_refs(a: &i32, b: &i32): i32
+{
+    return @a + @b
+}
+
+fn main(): i32
+{
+    let x = 20
+    let y = x
+    let mut xs = [20]
+    edit(&mut xs)
+    return inspect(&xs) + add_refs(&x, &y)
+}

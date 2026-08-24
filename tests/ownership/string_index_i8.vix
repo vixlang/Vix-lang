@@ -1,0 +1,6 @@
+fn main(): i32
+{
+    let mut text = "vix"
+    text[0] = 'V'
+    return text[0]
+}

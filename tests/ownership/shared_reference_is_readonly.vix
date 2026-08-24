@@ -1,0 +1,11 @@
+fn modify(xs: &[i32])
+{
+    xs[0] = 2
+}
+
+fn main(): i32
+{
+    let xs = [1]
+    modify(&xs)
+    return 0
+}

@@ -1,0 +1,7 @@
+fn main(): i32
+{
+    let mut xs = [1, 2]
+    let view = &xs
+    xs[0] = 3
+    return view[0]
+}

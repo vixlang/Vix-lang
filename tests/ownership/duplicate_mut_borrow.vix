@@ -1,0 +1,10 @@
+fn use_two(a: &mut i32, b: &mut i32): i32
+{
+    return @a + @b
+}
+
+fn main(): i32
+{
+    let mut value = 1
+    return use_two(&mut value, &mut value)
+}

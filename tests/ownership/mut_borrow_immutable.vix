@@ -1,0 +1,10 @@
+fn use_mut(value: &mut i32): i32
+{
+    return @value
+}
+
+fn main(): i32
+{
+    let value = 1
+    return use_mut(&mut value)
+}

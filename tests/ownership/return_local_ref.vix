@@ -1,0 +1,10 @@
+fn bad(): &i32
+{
+    let local = 1
+    return &local
+}
+
+fn main(): i32
+{
+    return 0
+}

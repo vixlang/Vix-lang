@@ -626,7 +626,21 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
     }
     if (text.length > 1 and compiler_string_byte(text, 0) == '&')
     {
-        return ty_ptr(store, ty_from_text(store, ty_slice(text, 1, text.length)))
+        let mut inner_start = 1
+        if (inner_start < text.length and compiler_string_byte(text, inner_start) == 39)
+        {
+            inner_start += 1
+            while (inner_start < text.length and compiler_string_byte(text, inner_start) != ' ')
+            {
+                inner_start += 1
+            }
+        }
+        while (inner_start < text.length and compiler_string_byte(text, inner_start) == ' ')
+        {
+            inner_start += 1
+        }
+        if (inner_start + 3 < text.length and compiler_string_byte(text, inner_start) == 'm' and compiler_string_byte(text, inner_start + 1) == 'u' and compiler_string_byte(text, inner_start + 2) == 't' and compiler_string_byte(text, inner_start + 3) == ' ') inner_start += 4
+        return ty_ptr(store, ty_from_text(store, ty_slice(text, inner_start, text.length)))
     }
     if (text.length > 4 and compiler_string_byte(text, 0) == 'r' and compiler_string_byte(text, 1) == 'e' and compiler_string_byte(text, 2) == 'f' and compiler_string_byte(text, 3) == ' ')
     {

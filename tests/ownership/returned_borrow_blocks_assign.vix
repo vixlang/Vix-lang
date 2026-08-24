@@ -1,0 +1,12 @@
+fn identity:['a](value: &'a i32): &'a i32
+{
+    return value
+}
+
+fn main(): i32
+{
+    let mut value = 1
+    let result = identity(&value)
+    value = 2
+    return @result
+}
