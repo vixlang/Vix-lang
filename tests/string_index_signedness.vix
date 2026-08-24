@@ -1,0 +1,30 @@
+extern "C"
+{
+    fn malloc(size: usize): string
+}
+
+fn widen_i8(value: i8): i32
+{
+    return value
+}
+
+fn widen_u8(value: u8): i32
+{
+    return value
+}
+
+fn widen_char(value: char): i32
+{
+    return value
+}
+
+fn main(): i32
+{
+    let buf: string = malloc(2)
+    let signed: i8 = 255
+    let unsigned: u8 = 255
+    let character: char = 'A'
+    buf[0] = signed
+    buf[1] = 0
+    return if (buf[0] == -1 and widen_i8(signed) == -1 and widen_u8(unsigned) == 255 and widen_char(character) == 65) 0 else 1
+}

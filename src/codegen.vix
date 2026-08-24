@@ -36,7 +36,7 @@ pub fn codegen_type_is_pointer_like(ty: string): i32
 pub fn codegen_is_lambda_name(name: string): i32
 {
     if (name.length < 9) { return 0 }
-    if (name[0] == '_' and name[1] == '_' and name[2] == 'l' and name[3] == 'a' and name[4] == 'm' and name[5] == 'b' and name[6] == 'd' and name[7] == 'a' and name[8] == '_') { return 1 }
+    if (compiler_string_byte(name, 0) == '_' and compiler_string_byte(name, 1) == '_' and compiler_string_byte(name, 2) == 'l' and compiler_string_byte(name, 3) == 'a' and compiler_string_byte(name, 4) == 'm' and compiler_string_byte(name, 5) == 'b' and compiler_string_byte(name, 6) == 'd' and compiler_string_byte(name, 7) == 'a' and compiler_string_byte(name, 8) == '_') return 1
     return 0
 }
 
@@ -83,9 +83,9 @@ pub fn codegen_emit_function_value_wrapper(b: &LlvmBuilder, func: AstFunction)
 pub fn codegen_expected_type_accepts_null(ty: string): i32
 {
     if (ty == "ptr" or ty == "string") { return 1 }
-    if (ty.length > 0 and ty[0] == '[') { return 1 }
-    if (ty.length > 3 and ty[0] == 'p' and ty[1] == 't' and ty[2] == 'r' and ty[3] == ':') { return 1 }
-    if (ty.length > 6 and ty[0] == 'O' and ty[1] == 'p' and ty[2] == 't' and ty[3] == 'i' and ty[4] == 'o' and ty[5] == 'n' and ty[6] == '[') { return 1 }
+    if (ty.length > 0 and compiler_string_byte(ty, 0) == '[') return 1
+    if (ty.length > 3 and compiler_string_byte(ty, 0) == 'p' and compiler_string_byte(ty, 1) == 't' and compiler_string_byte(ty, 2) == 'r' and compiler_string_byte(ty, 3) == ':') return 1
+    if (ty.length > 6 and compiler_string_byte(ty, 0) == 'O' and compiler_string_byte(ty, 1) == 'p' and compiler_string_byte(ty, 2) == 't' and compiler_string_byte(ty, 3) == 'i' and compiler_string_byte(ty, 4) == 'o' and compiler_string_byte(ty, 5) == 'n' and compiler_string_byte(ty, 6) == '[') return 1
     return 0
 }
 
@@ -538,7 +538,7 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
         let base = codegen_expr_value_typed(b, es, store, base_expr, base_ty)
         let index = codegen_expr_value_typed(b, es, store, index_expr, "i32")
         let element_ty_text = type_text_index_element(base_ty)
-        if (base_ty == "string") { return llvm_load_string_char(b, base, index) }
+        if (base_ty == "string") return llvm_load_string_char(b, base, index, expected_ty)
         if (is_ptr_to_struct(base_ty) == 1 or base_ty == "ptr") { return llvm_load_typed_index(b, base, index, element_ty_text, expected_ty) }
         let element_ty = llvm_type_for(element_ty_text)
         let indices = [index]

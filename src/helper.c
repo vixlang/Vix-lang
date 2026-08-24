@@ -5,7 +5,42 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <unistd.h>
+
+void *vix_lexer_peek_char(const char *src, int pos) {
+  if (src == NULL || pos < 0 || (size_t)pos >= strlen(src))
+    return NULL;
+  return (void *)(uintptr_t)((unsigned char)src[pos] + 1u);
+}
+
+void *vix_lexer_next_non_space_char(const char *src, int pos) {
+  if (src == NULL || pos < 0)
+    return NULL;
+  size_t len = strlen(src);
+  size_t i = (size_t)pos;
+  while (i < len) {
+    if (src[i] == ' ' || src[i] == '\t' || src[i] == '\r' || src[i] == '\n') {
+      i++;
+    } else if (src[i] == '/' && i + 1 < len && src[i + 1] == '/') {
+      while (i < len && src[i] != '\n')
+        i++;
+    } else if (src[i] == '/' && i + 1 < len && src[i + 1] == '*') {
+      i += 2;
+      while (i + 1 < len && (src[i] != '*' || src[i + 1] != '/'))
+        i++;
+      if (i + 1 < len)
+        i += 2;
+    } else {
+      return (void *)(uintptr_t)((unsigned char)src[i] + 1u);
+    }
+  }
+  return NULL;
+}
+
+int32_t compiler_string_byte(const char *text, int32_t index) {
+  return (int32_t)(int8_t)(unsigned char)text[index];
+}
 
 int vix_asm_write_line(void *file, const char *text) {
   if (file == NULL || text == NULL)
@@ -1092,6 +1127,11 @@ LLVMValueRef vix_LLVMBuildFCmp(LLVMBuilderRef builder, LLVMRealPredicate op,
 LLVMValueRef vix_LLVMBuildZExt(LLVMBuilderRef builder, LLVMValueRef val,
                                LLVMTypeRef dest_ty, const char *name) {
   return LLVMBuildZExt(builder, val, dest_ty, name);
+}
+
+LLVMValueRef vix_LLVMBuildSExt(LLVMBuilderRef builder, LLVMValueRef val,
+                               LLVMTypeRef dest_ty, const char *name) {
+  return LLVMBuildSExt(builder, val, dest_ty, name);
 }
 
 LLVMValueRef vix_LLVMBuildTrunc(LLVMBuilderRef builder, LLVMValueRef val,

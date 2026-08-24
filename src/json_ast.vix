@@ -8,7 +8,7 @@ fn json_ast_escape(text: string): string
     let mut pos = 0
     for (i in 0 .. text.length)
     {
-        let ch = text[i]
+        let ch = compiler_string_byte(text, i)
         if (ch == '"' or ch == 92)
         {
             out[pos] = 92
@@ -27,8 +27,8 @@ fn json_ast_escape(text: string): string
             out[pos + 1] = 'u'
             out[pos + 2] = '0'
             out[pos + 3] = '0'
-            out[pos + 4] = hex[ch / 16]
-            out[pos + 5] = hex[ch % 16]
+            out[pos + 4] = compiler_string_byte(hex, ch / 16)
+            out[pos + 5] = compiler_string_byte(hex, ch % 16)
             pos += 6
         }
         else

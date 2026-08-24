@@ -14,7 +14,7 @@ pub fn mir_escape_string(text: string): string
     let mut out = ""
     for (i in 0 .. text.length)
     {
-        let c = text[i]
+        let c = compiler_string_byte(text, i)
         if (c == 92) { out = out + "\\\\" }
         elif (c == '"') { out = out + "\\\"" }
         elif (c == 10) { out = out + "\\n" }
@@ -81,14 +81,14 @@ pub fn mir_zero_value(ty: string): string
 pub fn mir_type_is_option_text(ty: string): i32
 {
     if (type_text_is_option(ty) == 1) { return 1 }
-    if (ty.length > 1 and ty[0] == '?') { return 1 }
+    if (ty.length > 1 and compiler_string_byte(ty, 0) == '?') return 1
     return 0
 }
 
 pub fn mir_type_option_inner(ty: string): string
 {
     if (type_text_is_option(ty) == 1) { return type_text_option_inner(ty) }
-    if (ty.length > 1 and ty[0] == '?') { return str_from(ty, 1) }
+    if (ty.length > 1 and compiler_string_byte(ty, 0) == '?') return str_from(ty, 1)
     return "unknown"
 }
 
@@ -224,11 +224,16 @@ pub fn mir_expr_type(es: &ExprStore, expr: AstExpr): string
 
 pub fn mir_cast_if_needed(b: &MirBuilder, value: MirValue, to_ty: string): MirValue
 {
-    if (to_ty == "" or value.ty == to_ty) { return value }
+    if (to_ty == "" or value.ty == to_ty) return value
     let from_mir = mir_type(value.ty)
     let to_mir = mir_type(to_ty)
     let out = mir_temp(b)
-    if ((value.ty == "bool" or type_is_small_int(value.ty) == 1) and to_ty == "i32")
+    if ((value.ty == "i8" or value.ty == "i16") and to_ty == "i32")
+    {
+        mir_inst(b, out + " = sext " + from_mir + " " + value.name + " to i32")
+        return MirValue{ name: out, ty: to_ty }
+    }
+    if ((value.ty == "bool" or value.ty == "u8" or value.ty == "u16" or value.ty == "char") and to_ty == "i32")
     {
         mir_inst(b, out + " = zext " + from_mir + " " + value.name + " to i32")
         return MirValue{ name: out, ty: to_ty }

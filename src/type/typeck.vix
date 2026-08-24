@@ -106,13 +106,13 @@ pub fn type_numeric_result(left_ty: string, right_ty: string): string
 
 pub fn type_is_option_text(ty: string): i32
 {
-    if (ty.length > 7 and ty[0] == 'O' and ty[1] == 'p' and ty[2] == 't' and ty[3] == 'i' and ty[4] == 'o' and ty[5] == 'n' and ty[6] == '[') return 1
+    if (ty.length > 7 and compiler_string_byte(ty, 0) == 'O' and compiler_string_byte(ty, 1) == 'p' and compiler_string_byte(ty, 2) == 't' and compiler_string_byte(ty, 3) == 'i' and compiler_string_byte(ty, 4) == 'o' and compiler_string_byte(ty, 5) == 'n' and compiler_string_byte(ty, 6) == '[') return 1
     return 0
 }
 
 pub fn type_is_array_text_semantic(ty: string): i32
 {
-    if (ty.length > 2 and ty[0] == '[') return 1
+    if (ty.length > 2 and compiler_string_byte(ty, 0) == '[') return 1
     return 0
 }
 
@@ -123,7 +123,7 @@ pub fn type_option_inner(ty: string): string
     for (i in 7 .. ty.length - 1)
     {
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }
@@ -132,7 +132,7 @@ pub fn type_option_inner(ty: string): string
 
 pub fn type_text_is_array_typeinfer(ty: string): i32
 {
-    if (ty.length > 0 and ty[0] == '[') return 1
+    if (ty.length > 0 and compiler_string_byte(ty, 0) == '[') return 1
     return 0
 }
 
@@ -143,12 +143,12 @@ pub fn type_array_element_typeinfer(ty: string): string
     let mut end = ty.length - 1
     for (i in 1 .. ty.length - 1)
     {
-        if (ty[i] == '*') end = i
+        if (compiler_string_byte(ty, i) == '*') end = i
     }
     for (i in 1 .. end)
     {
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }
@@ -157,7 +157,7 @@ pub fn type_array_element_typeinfer(ty: string): string
 
 pub fn is_ptr_to_struct_semantic(ty: string): i32
 {
-    if (ty.length > 4 and ty[0] == 'p' and ty[1] == 't' and ty[2] == 'r' and ty[3] == ':') return 1
+    if (ty.length > 4 and compiler_string_byte(ty, 0) == 'p' and compiler_string_byte(ty, 1) == 't' and compiler_string_byte(ty, 2) == 'r' and compiler_string_byte(ty, 3) == ':') return 1
     return 0
 }
 
@@ -168,7 +168,7 @@ pub fn strip_ptr_prefix_semantic(ty: string): string
     for (i in 4 .. ty.length)
     {
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }

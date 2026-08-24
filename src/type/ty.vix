@@ -579,17 +579,17 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
         |> ty_prim_from_name
     if (ty_is_unknown(prim) == 0) return prim
     if (text == "unknown" or text == "") return TyUnknown
-    if (text.length >= 5 and text[0] == 'f' and text[1] == 'n' and text[2] == '(')
+    if (text.length >= 5 and compiler_string_byte(text, 0) == 'f' and compiler_string_byte(text, 1) == 'n' and compiler_string_byte(text, 2) == '(')
     {
         let mut close: ?i32 = None
         let mut depth = 0
         for (i in 2 .. text.length)
         {
-            if (text[i] == '(' or text[i] == '[') depth += 1
-            elif (text[i] == ')' or text[i] == ']')
+            if (compiler_string_byte(text, i) == '(' or compiler_string_byte(text, i) == '[') depth += 1
+            elif (compiler_string_byte(text, i) == ')' or compiler_string_byte(text, i) == ']')
             {
                 depth -= 1
-                if (text[i] == ')' and depth == 0)
+                if (compiler_string_byte(text, i) == ')' and depth == 0)
                 {
                     close = Some(i)
                     break
@@ -605,9 +605,9 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
                 for (i in 3 .. close_idx + 1)
                 {
                     let at_end = i == close_idx
-                    if (at_end == 0 and (text[i] == '(' or text[i] == '[')) depth += 1
-                    elif (at_end == 0 and (text[i] == ')' or text[i] == ']')) depth -= 1
-                    if (at_end == 1 or (text[i] == ',' and depth == 0))
+                    if (at_end == 0 and (compiler_string_byte(text, i) == '(' or compiler_string_byte(text, i) == '[')) depth += 1
+                    elif (at_end == 0 and (compiler_string_byte(text, i) == ')' or compiler_string_byte(text, i) == ']')) depth -= 1
+                    if (at_end == 1 or (compiler_string_byte(text, i) == ',' and depth == 0))
                     {
                         let part = ty_trim(ty_slice(text, start, i))
                         if (part != "") params.push(ty_from_text(store, part))
@@ -615,7 +615,7 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
                     }
                 }
                 let mut ret_start = close_idx + 1
-                while (ret_start < text.length and (text[ret_start] == ':' or text[ret_start] == ' '))
+                while (ret_start < text.length and (compiler_string_byte(text, ret_start) == ':' or compiler_string_byte(text, ret_start) == ' '))
                 {
                     ret_start += 1
                 }
@@ -624,21 +624,21 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
             None -> {}
         }
     }
-    if (text.length > 1 and text[0] == '&')
+    if (text.length > 1 and compiler_string_byte(text, 0) == '&')
     {
         return ty_ptr(store, ty_from_text(store, ty_slice(text, 1, text.length)))
     }
-    if (text.length > 4 and text[0] == 'r' and text[1] == 'e' and text[2] == 'f' and text[3] == ' ')
+    if (text.length > 4 and compiler_string_byte(text, 0) == 'r' and compiler_string_byte(text, 1) == 'e' and compiler_string_byte(text, 2) == 'f' and compiler_string_byte(text, 3) == ' ')
     {
         return ty_ptr(store, ty_from_text(store, ty_slice(text, 4, text.length)))
     }
-    if (text.length > 4 and text[0] == 'p' and text[1] == 't' and text[2] == 'r' and text[3] == ':')
+    if (text.length > 4 and compiler_string_byte(text, 0) == 'p' and compiler_string_byte(text, 1) == 't' and compiler_string_byte(text, 2) == 'r' and compiler_string_byte(text, 3) == ':')
     {
         let mut inner = ""
         for (i in 4 .. text.length)
         {
             let s: string = malloc(2)
-            s[0] = text[i]
+            s[0] = compiler_string_byte(text, i)
             s[1] = 0
             inner = inner + s
         }
@@ -649,15 +649,15 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
         Some(generic_open) -> if (generic_open > 0)
         {
             let mut base_end = generic_open
-            if (base_end > 0 and text[base_end - 1] == ':') base_end -= 1
+            if (base_end > 0 and compiler_string_byte(text, base_end - 1) == ':') base_end -= 1
             let base = ty_slice(text, 0, base_end)
             let mut args: [Ty] = []
             let mut start = generic_open + 1
             let mut depth = 0
             for (i in generic_open + 1 .. text.length)
             {
-                if (text[i] == '[') depth += 1
-                elif (text[i] == ']')
+                if (compiler_string_byte(text, i) == '[') depth += 1
+                elif (compiler_string_byte(text, i) == ']')
                 {
                     if (depth == 0)
                     {
@@ -667,7 +667,7 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
                     }
                     depth -= 1
                 }
-                elif (text[i] == ',' and depth == 0)
+                elif (compiler_string_byte(text, i) == ',' and depth == 0)
                 {
                     let arg2 = ty_trim(ty_slice(text, start, i))
                     if (arg2 != "") args.push(ty_from_text(store, arg2))
@@ -678,14 +678,14 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
         }
         None -> {}
     }
-    if (text.length > 2 and text[0] == '[')
+    if (text.length > 2 and compiler_string_byte(text, 0) == '[')
     {
         let mut inner = ""
         for (i in 1 .. text.length - 1)
         {
-            if (text[i] == '*') return ty_array(store, ty_from_text(store, inner))
+            if (compiler_string_byte(text, i) == '*') return ty_array(store, ty_from_text(store, inner))
             let s: string = malloc(2)
-            s[0] = text[i]
+            s[0] = compiler_string_byte(text, i)
             s[1] = 0
             inner = inner + s
         }
@@ -694,16 +694,16 @@ pub fn ty_from_text(store: &TyStore, text: string): Ty
     return ty_adt(store, text, [])
 }
 
-pub fn ty_find_char(text: string, needle: i8): ?i32
+pub fn ty_find_char(text: string, needle: i32): ?i32
 {
     for (i in 0 .. text.length)
     {
-        if (text[i] == needle) return Some(i)
+        if (compiler_string_byte(text, i) == needle) return Some(i)
     }
     return None
 }
 
-pub fn ty_char_string(ch: i8): string
+pub fn ty_char_string(ch: i32): string
 {
     let s: string = malloc(2)
     s[0] = ch
@@ -716,7 +716,7 @@ pub fn ty_slice(text: string, start: i32, end: i32): string
     let mut out = ""
     for (i in start .. end)
     {
-        out = out + ty_char_string(text[i])
+        out = out + ty_char_string(compiler_string_byte(text, i))
     }
     return out
 }
@@ -727,12 +727,12 @@ pub fn ty_trim(text: string): string
     let mut end = text.length
     while (start < end)
     {
-        if (text[start] != ' ') break
+        if (compiler_string_byte(text, start) != ' ') break
         start += 1
     }
     while (end > start)
     {
-        if (text[end - 1] != ' ') break
+        if (compiler_string_byte(text, end - 1) != ' ') break
         end -= 1
     }
     return ty_slice(text, start, end)

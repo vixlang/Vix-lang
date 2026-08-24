@@ -13,7 +13,7 @@ pub fn mir_opt_starts_with(text: string, prefix: string): i32
     if (text.length < prefix.length) { return 0 }
     for (i in 0 .. prefix.length)
     {
-        if (text[i] != prefix[i]) { return 0 }
+        if (compiler_string_byte(text, i) != compiler_string_byte(prefix, i)) return 0
     }
     return 1
 }
@@ -33,16 +33,16 @@ pub fn mir_opt_trim(text: string): string
     return vix_trim_ascii(text)
 }
 
-pub fn mir_opt_find(text: string, needle: i8, start: i32): i32
+pub fn mir_opt_find(text: string, needle: i32, start: i32): i32
 {
     for (i in start .. text.length)
     {
-        if (text[i] == needle) { return i }
+        if (compiler_string_byte(text, i) == needle) return i
     }
     return -1
 }
 
-pub fn mir_opt_is_name_char(c: i8): i32
+pub fn mir_opt_is_name_char(c: i32): i32
 {
     if (c >= 'a' and c <= 'z') { return 1 }
     if (c >= 'A' and c <= 'Z') { return 1 }
@@ -60,13 +60,13 @@ pub fn mir_opt_contains_name(text: string, name: string): i32
         let mut ok = 1
         for (j in 0 .. name.length)
         {
-            if (text[i + j] != name[j]) { ok = 0 }
+            if (compiler_string_byte(text, i + j) != compiler_string_byte(name, j)) ok = 0
         }
         if (ok == 1)
         {
-            let left_ok = if (i == 0) { 1 } else { 1 - mir_opt_is_name_char(text[i - 1]) }
+            let left_ok = if (i == 0) 1 else 1 - mir_opt_is_name_char(compiler_string_byte(text, i - 1))
             let right_pos = i + name.length
-            let right_ok = if (right_pos >= text.length) { 1 } else { 1 - mir_opt_is_name_char(text[right_pos]) }
+            let right_ok = if (right_pos >= text.length) 1 else 1 - mir_opt_is_name_char(compiler_string_byte(text, right_pos))
             if (left_ok == 1 and right_ok == 1) { return 1 }
         }
     }
@@ -84,7 +84,7 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
     {
         if (in_string == 1)
         {
-            let c = text[i]
+            let c = compiler_string_byte(text, i)
             out = out + char_string(c)
             if (escaped == 1) { escaped = 0 }
             elif (c == 92) { escaped = 1 }
@@ -92,9 +92,9 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
             i += 1
             continue
         }
-        if (text[i] == '"')
+        if (compiler_string_byte(text, i) == '"')
         {
-            out = out + char_string(text[i])
+            out = out + char_string(compiler_string_byte(text, i))
             in_string = 1
             i += 1
             continue
@@ -105,13 +105,13 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
             ok = 1
             for (j in 0 .. name.length)
             {
-                if (text[i + j] != name[j]) { ok = 0 }
+                if (compiler_string_byte(text, i + j) != compiler_string_byte(name, j)) ok = 0
             }
             if (ok == 1)
             {
-                let left_ok = if (i == 0) { 1 } else { 1 - mir_opt_is_name_char(text[i - 1]) }
+                let left_ok = if (i == 0) 1 else 1 - mir_opt_is_name_char(compiler_string_byte(text, i - 1))
                 let right_pos = i + name.length
-                let right_ok = if (right_pos >= text.length) { 1 } else { 1 - mir_opt_is_name_char(text[right_pos]) }
+                let right_ok = if (right_pos >= text.length) 1 else 1 - mir_opt_is_name_char(compiler_string_byte(text, right_pos))
                 if (left_ok == 0 or right_ok == 0) { ok = 0 }
             }
         }
@@ -122,7 +122,7 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
         }
         else
         {
-            out = out + char_string(text[i])
+            out = out + char_string(compiler_string_byte(text, i))
             i += 1
         }
     }
@@ -176,7 +176,7 @@ pub fn mir_opt_split_lines(text: string): [string]
     let mut start = 0
     for (i in 0 .. text.length)
     {
-        if (text[i] == 10)
+        if (compiler_string_byte(text, i) == 10)
         {
             lines.push(mir_opt_slice(text, start, i))
             start = i + 1
@@ -212,7 +212,7 @@ pub fn mir_opt_block_name(line: string): string
 {
     if (mir_opt_is_block(line) == 0) { return "" }
     let mut end = line.length
-    if (end > 0 and line[end - 1] == ':') { end -= 1 }
+    if (end > 0 and compiler_string_byte(line, end - 1) == ':') end -= 1
     return mir_opt_trim(mir_opt_slice(line, 6, end))
 }
 

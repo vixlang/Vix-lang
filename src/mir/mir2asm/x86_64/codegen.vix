@@ -59,7 +59,7 @@ pub fn mir2asm_begin_function(b: &MirAsm, line: string)
     }
     while (rp > 0 and pos < rp)
     {
-        if (line[pos] == '%')
+        if (compiler_string_byte(line, pos) == '%')
         {
             let colon = mir2asm_find(line, ':', pos)
             if (colon > pos and colon < rp)
@@ -220,7 +220,7 @@ pub fn mir2asm_float_literal(val: string): string
 {
     for (i in 0 .. val.length)
     {
-        if (val[i] == '.' or val[i] == 'e' or val[i] == 'E') { return val }
+        if (compiler_string_byte(val, i) == '.' or compiler_string_byte(val, i) == 'e' or compiler_string_byte(val, i) == 'E') return val
     }
     return val + ".0"
 }
@@ -240,7 +240,7 @@ pub fn mir2asm_emit_load_float_arg(b: &MirAsm, reg: string, val: string, ty: str
         else { mir2asm_line(b, "    movd " + reg + ", dword " + mir2asm_mem(b.offsets[val_idx])) }
         return
     }
-    if ((v[0] >= '0' and v[0] <= '9') or v[0] == '-')
+    if ((compiler_string_byte(v, 0) >= '0' and compiler_string_byte(v, 0) <= '9') or compiler_string_byte(v, 0) == '-')
     {
         let label = mir2asm_float_label(b, v, ty)
         if (ty == "f64") { mir2asm_line(b, "    movsd " + reg + ", qword [rel " + label + "]") }
@@ -341,7 +341,7 @@ pub fn mir2asm_type_decl_ready(b: &MirAsm, line: string): i32
         let comma = mir2asm_find(line, ',', pos)
         let end = if (comma < 0 or comma > rb) { rb } else { comma }
         let ty = mir2asm_trim(mir2asm_slice(line, pos, end))
-        if (ty.length > 0 and ty[0] == '@' and mir2asm_struct_index(b, ty) < 0) { return 0 }
+        if (ty.length > 0 and compiler_string_byte(ty, 0) == '@' and mir2asm_struct_index(b, ty) < 0) return 0
         pos = end + 1
     }
     return 1
@@ -522,9 +522,9 @@ pub fn mir2asm_index_in_brackets(text: string, start: i32): i32
     let mut out = 0
     for (i in 0 .. value.length)
     {
-        if (value[i] >= '0' and value[i] <= '9')
+        if (compiler_string_byte(value, i) >= '0' and compiler_string_byte(value, i) <= '9')
         {
-            out = out * 10 + (value[i] - '0')
+            out = out * 10 + (compiler_string_byte(value, i) - '0')
         }
     }
     return out
@@ -589,7 +589,7 @@ pub fn mir2asm_emit_extractvalue(b: &MirAsm, dest: string, rhs: string)
     if (b.slot_tys[src_idx] == "ptr:" + ty)
     {
         let dest_off_ptr = mir2asm_alloc_slot_typed(b, dest, 0, field_ty)
-        if (mir2asm_type_is_struct_value(b, field_ty) == 1 or (field_ty.length > 0 and field_ty[0] == '@'))
+        if (mir2asm_type_is_struct_value(b, field_ty) == 1 or (field_ty.length > 0 and compiler_string_byte(field_ty, 0) == '@'))
         {
             mir2asm_emit_copy_ptr_field_to_stack(b, dest_off_ptr, src, field_off, mir2asm_type_size_for(b, field_ty))
             return
@@ -600,7 +600,7 @@ pub fn mir2asm_emit_extractvalue(b: &MirAsm, dest: string, rhs: string)
         mir2asm_line(b, "    mov " + mir2asm_mem_word(field_ty) + " " + mir2asm_mem(dest_off_ptr) + ", " + mir2asm_acc(field_ty))
         return
     }
-    if (mir2asm_type_is_struct_value(b, field_ty) == 1 or (field_ty.length > 0 and field_ty[0] == '@'))
+    if (mir2asm_type_is_struct_value(b, field_ty) == 1 or (field_ty.length > 0 and compiler_string_byte(field_ty, 0) == '@'))
     {
         let dest_off = mir2asm_alloc_slot_typed(b, dest, 0, field_ty)
         mir2asm_emit_copy_stack_bytes(b, dest_off, b.offsets[src_idx] - field_off, mir2asm_type_size_for(b, field_ty))

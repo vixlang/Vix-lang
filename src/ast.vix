@@ -19,7 +19,7 @@ pub fn ast_f64(n: f64): string
     return buf
 }
 
-pub fn ast_char_string(ch: i8): string
+pub fn ast_char_string(ch: i32): string
 {
     let text: string = malloc(2)
     text[0] = ch
@@ -594,9 +594,9 @@ pub fn ast_type_base_name(ty: string): string
     let mut result = ""
     for (i in 0 .. ty.length)
     {
-        if (ty[i] == '[' or ty[i] == ':') { return result }
+        if (compiler_string_byte(ty, i) == '[' or compiler_string_byte(ty, i) == ':') return result
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }
@@ -611,31 +611,31 @@ pub fn ast_generic_arg_count(ty: string): i32
     let mut depth = 0
     for (i in 0 .. ty.length)
     {
-        if (in_args == 0 and ty[i] == '[')
+        if (in_args == 0 and compiler_string_byte(ty, i) == '[')
         {
             in_args = 1
             has_arg = 0
         }
-        elif (in_args == 1 and ty[i] == '[')
+        elif (in_args == 1 and compiler_string_byte(ty, i) == '[')
         {
             depth += 1
             has_arg = 1
         }
-        elif (in_args == 1 and ty[i] == ']' and depth > 0)
+        elif (in_args == 1 and compiler_string_byte(ty, i) == ']' and depth > 0)
         {
             depth -= 1
         }
-        elif (in_args == 1 and ty[i] == ']')
+        elif (in_args == 1 and compiler_string_byte(ty, i) == ']')
         {
             if (has_arg == 1) { count += 1 }
             in_args = 0
         }
-        elif (in_args == 1 and ty[i] == ',' and depth == 0)
+        elif (in_args == 1 and compiler_string_byte(ty, i) == ',' and depth == 0)
         {
             count += 1
             has_arg = 0
         }
-        elif (in_args == 1 and ty[i] != ' ')
+        elif (in_args == 1 and compiler_string_byte(ty, i) != ' ')
         {
             has_arg = 1
         }
@@ -651,37 +651,37 @@ pub fn ast_generic_arg_at(ty: string, target: i32): string
     let mut result = ""
     for (i in 0 .. ty.length)
     {
-        if (in_args == 0 and ty[i] == '[')
+        if (in_args == 0 and compiler_string_byte(ty, i) == '[')
         {
             in_args = 1
             idx = 0
             result = ""
         }
-        elif (in_args == 1 and ty[i] == '[')
+        elif (in_args == 1 and compiler_string_byte(ty, i) == '[')
         {
             depth += 1
             if (idx == target) { result = result + "[" }
         }
-        elif (in_args == 1 and ty[i] == ']' and depth > 0)
+        elif (in_args == 1 and compiler_string_byte(ty, i) == ']' and depth > 0)
         {
             depth -= 1
             if (idx == target) { result = result + "]" }
         }
-        elif (in_args == 1 and ty[i] == ']')
+        elif (in_args == 1 and compiler_string_byte(ty, i) == ']')
         {
             if (idx == target) { return result }
             in_args = 0
         }
-        elif (in_args == 1 and ty[i] == ',' and depth == 0)
+        elif (in_args == 1 and compiler_string_byte(ty, i) == ',' and depth == 0)
         {
             if (idx == target) { return result }
             idx += 1
             result = ""
         }
-        elif (in_args == 1 and idx == target and ty[i] != ' ')
+        elif (in_args == 1 and idx == target and compiler_string_byte(ty, i) != ' ')
         {
             let s: string = malloc(2)
-            s[0] = ty[i]
+            s[0] = compiler_string_byte(ty, i)
             s[1] = 0
             result = result + s
         }

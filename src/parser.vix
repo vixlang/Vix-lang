@@ -2116,17 +2116,17 @@ fn parse_strip_attr_lines(src: string): string
     let mut i = 0
     while (i < src.length)
     {
-        if (src[i] == '#' and i + 1 < src.length and src[i + 1] == '[')
+        if (compiler_string_byte(src, i) == '#' and i + 1 < src.length and compiler_string_byte(src, i + 1) == '[')
         {
             i += 2
-            while (i < src.length and src[i] != ']') { i += 1 }
+            while (i < src.length and compiler_string_byte(src, i) != ']') { i += 1 }
             if (i < src.length) { i += 1 }
-            while (i < src.length and src[i] != 10) { i += 1 }
+            while (i < src.length and compiler_string_byte(src, i) != 10) { i += 1 }
             if (i < src.length) { out = out + char_string(10); i += 1 }
         }
         else
         {
-            out = out + char_string(src[i])
+            out = out + char_string(compiler_string_byte(src, i))
             i += 1
         }
     }
@@ -2277,7 +2277,7 @@ pub fn parse_program_stats_source(src: string, filename: string, imports: &Impor
     let mut i = 0
     while (i < src.length)
     {
-        if (src[i] == '#')
+        if (compiler_string_byte(src, i) == '#')
         {
             i = skip_attr_line(src, i)
             continue

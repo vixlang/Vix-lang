@@ -31,7 +31,7 @@ pub fn str_starts_with(text: string, prefix: string): i32
     if (text_len < prefix_len) return 0
     for (i in 0 .. prefix_len)
     {
-        if (text[i] != prefix[i]) return 0
+        if (compiler_string_byte(text, i) != compiler_string_byte(prefix, i)) return 0
     }
     return 1
 }
@@ -43,7 +43,7 @@ pub fn str_from(text: string, start: i32): string
     let text_len = diag_strlen(text)
     while (i < text_len)
     {
-        out = out + char_string(text[i])
+        out = out + char_string(compiler_string_byte(text, i))
         i += 1
     }
     return out
@@ -57,7 +57,7 @@ pub fn strip_func_prefix(message: string): string
     let mut i = start
     while (i + 1 < message.length)
     {
-        if (message[i] == ':' and message[i + 1] == ' ') return str_from(message, i + 2)
+        if (compiler_string_byte(message, i) == ':' and compiler_string_byte(message, i + 1) == ' ') return str_from(message, i + 2)
         i += 1
     }
     return message
@@ -267,7 +267,7 @@ pub fn source_get_line(src: string, target_line: i32): string
             found = 1
             break
         }
-        if (src[i] == 10)
+        if (compiler_string_byte(src, i) == 10)
         {
             current += 1
             if (current == target_line)
@@ -287,7 +287,7 @@ pub fn source_get_line(src: string, target_line: i32): string
             line_start = 0
             found = 1
         }
-        elif (current == target_line and src_len > 0 and src[src_len - 1] == 10)
+        elif (current == target_line and src_len > 0 and compiler_string_byte(src, src_len - 1) == 10)
         {
             line_start = src_len
             found = 1
@@ -299,12 +299,12 @@ pub fn source_get_line(src: string, target_line: i32): string
     }
 
     let mut end = line_start
-    while (end < src_len and src[end] != 10)
+    while (end < src_len and compiler_string_byte(src, end) != 10)
     {
         end += 1
     }
     let mut len = end - line_start
-    if (len > 0 and src[end - 1] == 13) len = len - 1
+    if (len > 0 and compiler_string_byte(src, end - 1) == 13) len = len - 1
 
     return vix_source_line_copy(src, line_start, len)
 }
@@ -316,7 +316,7 @@ pub fn expand_tabs(line: string): string
     let line_len = diag_strlen(line)
     for (i in 0 .. line_len)
     {
-        if (line[i] == 9)
+        if (compiler_string_byte(line, i) == 9)
         {
             let next_stop = ((col - 1) / 8 + 1) * 8 + 1
             while (col < next_stop)
@@ -327,7 +327,7 @@ pub fn expand_tabs(line: string): string
         }
         else
         {
-            out = out + char_string(line[i])
+            out = out + char_string(compiler_string_byte(line, i))
             col += 1
         }
     }
@@ -351,19 +351,19 @@ pub fn format_highlighted_line(line: string, col: i32, length: i32, color: strin
     let mut i = 0
     while (i < start)
     {
-        out = out + char_string(expanded[i])
+        out = out + char_string(compiler_string_byte(expanded, i))
         i += 1
     }
     out = out + color + diag_bold()
     while (i < end)
     {
-        out = out + char_string(expanded[i])
+        out = out + char_string(compiler_string_byte(expanded, i))
         i += 1
     }
     out = out + diag_reset()
     while (i < line_len)
     {
-        out = out + char_string(expanded[i])
+        out = out + char_string(compiler_string_byte(expanded, i))
         i += 1
     }
     return out

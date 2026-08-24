@@ -175,7 +175,7 @@ pub fn ml_pop_stack(loader: &ModuleLoader, qname: string)
 pub fn ml_join_dir(dir: string, name: string): string
 {
     if (dir == "" or dir == ".") { return name }
-    if (dir[dir.length - 1] == '/') { return dir + name }
+    if (compiler_string_byte(dir, dir.length - 1) == '/') return dir + name
     return dir + "/" + name
 }
 
@@ -184,11 +184,11 @@ pub fn ml_dirname(path: string): string
     let mut last = -1
     for (i in 0 .. path.length)
     {
-        if (path[i] == '/') { last = i }
+        if (compiler_string_byte(path, i) == '/') last = i
     }
     if (last < 0) { return "." }
     let mut out = ""
-    for (i in 0 .. last) { out = out + char_string(path[i]) }
+    for (i in 0 .. last) { out = out + char_string(compiler_string_byte(path, i)) }
     return out
 }
 
@@ -196,14 +196,14 @@ pub fn ml_dirname(path: string): string
 // Returns the file path, "" if not found, or "AMBIGUOUS:..." if both exist.
 pub fn ml_locate(base_dir: string, name: string): string
 {
-    if (name.length >= 4 and name[name.length - 4] == '.' and name[name.length - 3] == 'v' and name[name.length - 2] == 'i' and name[name.length - 1] == 'x')
+    if (name.length >= 4 and compiler_string_byte(name, name.length - 4) == '.' and compiler_string_byte(name, name.length - 3) == 'v' and compiler_string_byte(name, name.length - 2) == 'i' and compiler_string_byte(name, name.length - 1) == 'x')
     {
         let direct = ml_join_dir(base_dir, name)
         if (read_file_content(direct) != "") { return direct }
         return ""
     }
     let has_slash = 0
-    for (i in 0 .. name.length) { if (name[i] == '/') { has_slash = 1 } }
+    for (i in 0 .. name.length) { if (compiler_string_byte(name, i) == '/') has_slash = 1 }
     if (has_slash == 1)
     {
         let direct = ml_join_dir(base_dir, name)
@@ -307,7 +307,7 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
             "  tried: " + ml_join_dir(ml_join_dir(base_dir, name), "mod.vix"))
         return
     }
-    if (located.length >= 9 and located[0] == 'A' and located[1] == 'M' and located[2] == 'B')
+    if (located.length >= 9 and compiler_string_byte(located, 0) == 'A' and compiler_string_byte(located, 1) == 'M' and compiler_string_byte(located, 2) == 'B')
     {
         ml_add_error(loader,
             "error: ambiguous module '" + qname + "': " + located)
@@ -387,7 +387,7 @@ pub fn mangle_name(qualified_module: string, sym: string): string
     {
         let at_end = if (i == qualified_module.length) { 1 } else { 0 }
         let at_sep = if (at_end == 0 and i + 1 < qualified_module.length
-                        and qualified_module[i] == ':' and qualified_module[i + 1] == ':')
+                        and compiler_string_byte(qualified_module, i) == ':' and compiler_string_byte(qualified_module, i + 1) == ':')
         {
             1
         }
@@ -406,7 +406,7 @@ pub fn mangle_name(qualified_module: string, sym: string): string
         }
         else
         {
-            seg = seg + char_string(qualified_module[i])
+            seg = seg + char_string(compiler_string_byte(qualified_module, i))
             i += 1
         }
     }
@@ -422,14 +422,14 @@ pub fn mangle_flat_name(flat: string): string
     let mut i = 0
     while (i + 1 < flat.length)
     {
-        if (flat[i] == ':' and flat[i + 1] == ':') { last_sep = i }
+        if (compiler_string_byte(flat, i) == ':' and compiler_string_byte(flat, i + 1) == ':') last_sep = i
         i += 1
     }
     if (last_sep < 0) { return flat }
     let mut mod_path = ""
-    for (j in 0 .. last_sep)               { mod_path = mod_path + char_string(flat[j]) }
+    for (j in 0 .. last_sep)               { mod_path = mod_path + char_string(compiler_string_byte(flat, j)) }
     let mut sym      = ""
-    for (j in last_sep + 2 .. flat.length) { sym = sym + char_string(flat[j]) }
+    for (j in last_sep + 2 .. flat.length) { sym = sym + char_string(compiler_string_byte(flat, j)) }
     return mangle_name(mod_path, sym)
 }
 
@@ -486,12 +486,12 @@ pub fn symbol_is_duplicate(names: [string], name: string): i32
 fn module_strip_root_prefix(qname: string): string
 {
     if (qname == "root") { return "" }
-    if (qname.length > 6 and qname[0] == 'r' and qname[1] == 'o' and qname[2] == 'o' and qname[3] == 't' and qname[4] == ':' and qname[5] == ':')
+    if (qname.length > 6 and compiler_string_byte(qname, 0) == 'r' and compiler_string_byte(qname, 1) == 'o' and compiler_string_byte(qname, 2) == 'o' and compiler_string_byte(qname, 3) == 't' and compiler_string_byte(qname, 4) == ':' and compiler_string_byte(qname, 5) == ':')
     {
         let mut out = ""
         for (i in 6 .. qname.length)
         {
-            out = out + char_string(qname[i])
+            out = out + char_string(compiler_string_byte(qname, i))
         }
         return out
     }
@@ -503,7 +503,7 @@ fn module_strip_root_prefix(qname: string): string
 fn module_is_sys_member(qname: string): i32
 {
     if (qname.length < 11) { return 0 }
-    if (qname[0] == 'r' and qname[1] == 'o' and qname[2] == 'o' and qname[3] == 't' and qname[4] == ':' and qname[5] == ':' and qname[6] == 's' and qname[7] == 'y' and qname[8] == 's' and qname[9] == ':' and qname[10] == ':') { return 1 }
+    if (compiler_string_byte(qname, 0) == 'r' and compiler_string_byte(qname, 1) == 'o' and compiler_string_byte(qname, 2) == 'o' and compiler_string_byte(qname, 3) == 't' and compiler_string_byte(qname, 4) == ':' and compiler_string_byte(qname, 5) == ':' and compiler_string_byte(qname, 6) == 's' and compiler_string_byte(qname, 7) == 'y' and compiler_string_byte(qname, 8) == 's' and compiler_string_byte(qname, 9) == ':' and compiler_string_byte(qname, 10) == ':') return 1
     return 0
 }
 

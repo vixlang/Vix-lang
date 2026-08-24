@@ -73,6 +73,7 @@ extern "C"
     fn vix_LLVMBuildICmp(builder: ptr, op: i32, left: ptr, right: ptr, name: string): ptr
     fn vix_LLVMBuildFCmp(builder: ptr, op: i32, left: ptr, right: ptr, name: string): ptr
     fn vix_LLVMBuildZExt(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
+    fn vix_LLVMBuildSExt(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
     fn vix_LLVMBuildTrunc(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
     fn vix_LLVMBuildPtrToInt(builder: ptr, val: ptr, dest_ty: ptr, name: string): ptr
     fn vix_LLVMSizeOf(ty: ptr): ptr
@@ -254,13 +255,13 @@ pub fn register_struct_sig(name: string, field_names: [string], field_types: [st
 
 pub fn type_text_is_array(ty: string): i32
 {
-    if (ty.length > 0 and ty[0] == '[') { return 1 }
+    if (ty.length > 0 and compiler_string_byte(ty, 0) == '[') return 1
     return 0
 }
 
 pub fn type_text_is_function(ty: string): i32
 {
-    if (ty.length >= 4 and ty[0] == 'f' and ty[1] == 'n' and ty[2] == '(') return 1
+    if (ty.length >= 4 and compiler_string_byte(ty, 0) == 'f' and compiler_string_byte(ty, 1) == 'n' and compiler_string_byte(ty, 2) == '(') return 1
     return 0
 }
 
@@ -270,7 +271,7 @@ pub fn type_text_slice(ty: string, start: i32, end: i32): string
     for (i in start .. end)
     {
         let ch: string = malloc(2)
-        ch[0] = ty[i]
+        ch[0] = compiler_string_byte(ty, i)
         ch[1] = 0
         out = out + ch
     }
@@ -281,11 +282,11 @@ pub fn type_text_trim(ty: string): string
 {
     let mut start = 0
     let mut end = ty.length
-    while (start < end and ty[start] == ' ')
+    while (start < end and compiler_string_byte(ty, start) == ' ')
     {
         start += 1
     }
-    while (end > start and ty[end - 1] == ' ')
+    while (end > start and compiler_string_byte(ty, end - 1) == ' ')
     {
         end -= 1
     }
@@ -297,11 +298,11 @@ pub fn type_function_close(ty: string): i32
     let mut depth = 0
     for (i in 2 .. ty.length)
     {
-        if (ty[i] == '(' or ty[i] == '[') depth += 1
-        elif (ty[i] == ')' or ty[i] == ']')
+        if (compiler_string_byte(ty, i) == '(' or compiler_string_byte(ty, i) == '[') depth += 1
+        elif (compiler_string_byte(ty, i) == ')' or compiler_string_byte(ty, i) == ']')
         {
             depth -= 1
-            if (ty[i] == ')' and depth == 0) return i
+            if (compiler_string_byte(ty, i) == ')' and depth == 0) return i
         }
     }
     return -1
@@ -317,9 +318,9 @@ pub fn type_function_params(ty: string): [string]
     for (i in 3 .. close + 1)
     {
         let at_end = i == close
-        if (at_end == 0 and (ty[i] == '(' or ty[i] == '[')) depth += 1
-        elif (at_end == 0 and (ty[i] == ')' or ty[i] == ']')) depth -= 1
-        if (at_end == 1 or (ty[i] == ',' and depth == 0))
+        if (at_end == 0 and (compiler_string_byte(ty, i) == '(' or compiler_string_byte(ty, i) == '[')) depth += 1
+        elif (at_end == 0 and (compiler_string_byte(ty, i) == ')' or compiler_string_byte(ty, i) == ']')) depth -= 1
+        if (at_end == 1 or (compiler_string_byte(ty, i) == ',' and depth == 0))
         {
             let param = type_text_trim(type_text_slice(ty, start, i))
             if (param != "") params.push(param)
@@ -334,7 +335,7 @@ pub fn type_function_return(ty: string): string
     let close = type_function_close(ty)
     if (close < 0) return "unknown"
     let mut start = close + 1
-    while (start < ty.length and (ty[start] == ':' or ty[start] == ' '))
+    while (start < ty.length and (compiler_string_byte(ty, start) == ':' or compiler_string_byte(ty, start) == ' '))
     {
         start += 1
     }
@@ -348,12 +349,12 @@ pub fn type_array_element(ty: string): string
     let mut end = ty.length - 1
     for (i in 1 .. ty.length - 1)
     {
-        if (ty[i] == '*') { end = i }
+        if (compiler_string_byte(ty, i) == '*') end = i
     }
     for (i in 1 .. end)
     {
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }
@@ -365,7 +366,7 @@ pub fn type_text_is_fixed_array(ty: string): i32
     if (type_text_is_array(ty) == 0) { return 0 }
     for (i in 1 .. ty.length - 1)
     {
-        if (ty[i] == '*') { return 1 }
+        if (compiler_string_byte(ty, i) == '*') return 1
     }
     return 0
 }
@@ -376,13 +377,13 @@ pub fn type_fixed_array_count(ty: string): i32
     let mut in_count = 0
     for (i in 1 .. ty.length - 1)
     {
-        if (ty[i] == '*')
+        if (compiler_string_byte(ty, i) == '*')
         {
             in_count = 1
         }
-        elif (in_count == 1 and ty[i] >= '0' and ty[i] <= '9')
+        elif (in_count == 1 and compiler_string_byte(ty, i) >= '0' and compiler_string_byte(ty, i) <= '9')
         {
-            count = count * 10 + (ty[i] - '0')
+            count = count * 10 + (compiler_string_byte(ty, i) - '0')
         }
     }
     return count
@@ -390,7 +391,7 @@ pub fn type_fixed_array_count(ty: string): i32
 
 pub fn is_ptr_to_struct(ty: string): i32
 {
-    if (ty.length > 4 and ty[0] == 'p' and ty[1] == 't' and ty[2] == 'r' and ty[3] == ':') { return 1 }
+    if (ty.length > 4 and compiler_string_byte(ty, 0) == 'p' and compiler_string_byte(ty, 1) == 't' and compiler_string_byte(ty, 2) == 'r' and compiler_string_byte(ty, 3) == ':') return 1
     return 0
 }
 
@@ -401,7 +402,7 @@ pub fn strip_ptr_prefix(ty: string): string
     for (i in 4 .. ty.length)
     {
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }
@@ -425,7 +426,7 @@ pub fn type_text_index_element(ty: string): string
 
 pub fn type_text_is_option(ty: string): i32
 {
-    if (ty.length > 7 and ty[0] == 'O' and ty[1] == 'p' and ty[2] == 't' and ty[3] == 'i' and ty[4] == 'o' and ty[5] == 'n' and ty[6] == '[') { return 1 }
+    if (ty.length > 7 and compiler_string_byte(ty, 0) == 'O' and compiler_string_byte(ty, 1) == 'p' and compiler_string_byte(ty, 2) == 't' and compiler_string_byte(ty, 3) == 'i' and compiler_string_byte(ty, 4) == 'o' and compiler_string_byte(ty, 5) == 'n' and compiler_string_byte(ty, 6) == '[') return 1
     return 0
 }
 
@@ -434,9 +435,9 @@ pub fn type_text_base_name_builder(ty: string): string
     let mut result = ""
     for (i in 0 .. ty.length)
     {
-        if (ty[i] == ':' or ty[i] == '[') { return result }
+        if (compiler_string_byte(ty, i) == ':' or compiler_string_byte(ty, i) == '[') return result
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }
@@ -450,7 +451,7 @@ pub fn type_text_option_inner(ty: string): string
     for (i in 7 .. ty.length - 1)
     {
         let s: string = malloc(2)
-        s[0] = ty[i]
+        s[0] = compiler_string_byte(ty, i)
         s[1] = 0
         result = result + s
     }
@@ -853,13 +854,15 @@ pub fn llvm_load_typed_index(b: &LlvmBuilder, base: ptr, index: ptr, element_ty_
     return llvm_cast_value(b, value, element_ty_text, expected_ty)
 }
 
-pub fn llvm_load_string_char(b: &LlvmBuilder, base: ptr, index: ptr): ptr
+pub fn llvm_load_string_char(b: &LlvmBuilder, base: ptr, index: ptr, expected_ty: string): ptr
 {
     let element_ty = LLVMInt8Type()
     let indices = [index]
     let slot = vix_LLVMBuildGEP2(b.builder, element_ty, base, indices, 1, llvm_temp(b, "sidx"))
     let byte = vix_LLVMBuildLoad2(b.builder, element_ty, slot, llvm_temp(b, "sbyte"))
-    return vix_LLVMBuildZExt(b.builder, byte, LLVMInt32Type(), llvm_temp(b, "schar"))
+    if (expected_ty == "i8") return byte
+    if (expected_ty == "i32") return vix_LLVMBuildSExt(b.builder, byte, LLVMInt32Type(), llvm_temp(b, "schar"))
+    return llvm_cast_value(b, byte, "i8", expected_ty)
 }
 
 pub fn llvm_ptr_offset_i8(b: &LlvmBuilder, base: ptr, index: ptr): ptr
@@ -1019,11 +1022,19 @@ pub fn llvm_cast_value(b: &LlvmBuilder, value: ptr, from_ty: string, to_ty: stri
     {
         return vix_LLVMBuildFPTrunc(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "fptrunc"))
     }
-    if ((to_ty == "i64" or to_ty == "u64" or to_ty == "usize") and (from_ty == "i32" or from_ty == "u32" or from_ty == "i8" or from_ty == "u8" or from_ty == "char"))
+    if ((to_ty == "i64" or to_ty == "u64" or to_ty == "usize") and from_ty == "i8")
+    {
+        return vix_LLVMBuildSExt(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "sext"))
+    }
+    if ((to_ty == "i64" or to_ty == "u64" or to_ty == "usize") and (from_ty == "i32" or from_ty == "u32" or from_ty == "u8" or from_ty == "char"))
     {
         return vix_LLVMBuildZExt(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "zext"))
     }
-    if ((to_ty == "i32" or to_ty == "u32") and (from_ty == "i8" or from_ty == "u8" or from_ty == "char"))
+    if ((to_ty == "i32" or to_ty == "u32") and from_ty == "i8")
+    {
+        return vix_LLVMBuildSExt(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "sext"))
+    }
+    if ((to_ty == "i32" or to_ty == "u32") and (from_ty == "u8" or from_ty == "char"))
     {
         return vix_LLVMBuildZExt(b.builder, value, llvm_type_for(to_ty), llvm_temp(b, "zext"))
     }

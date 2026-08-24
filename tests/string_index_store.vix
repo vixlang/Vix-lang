@@ -1,0 +1,13 @@
+extern "C"
+{
+    fn malloc(size: usize): string
+}
+
+fn main(): i32
+{
+    let buf: string = malloc(4)
+    buf[0] = 'A'
+    buf[1] = 'B'
+    buf[2] = '\0'
+    return if (buf[0] == 'A' and buf[1] == 'B') 0 else 1
+}

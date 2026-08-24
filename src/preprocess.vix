@@ -78,7 +78,7 @@ pub fn resolve_import_path(importer: string, import_path: string): string
     let mut last_slash = -1
     for (i in 0 .. importer.length)
     {
-        if (importer[i] == '/') { last_slash = i }
+        if (compiler_string_byte(importer, i) == '/') last_slash = i
     }
     if (last_slash < 0)
     {
@@ -87,7 +87,7 @@ pub fn resolve_import_path(importer: string, import_path: string): string
     let mut dir = ""
     for (i in 0 .. (last_slash + 1))
     {
-        dir = dir + char_string(importer[i])
+        dir = dir + char_string(compiler_string_byte(importer, i))
     }
     return dir + import_path
 }
@@ -95,17 +95,17 @@ pub fn resolve_import_path(importer: string, import_path: string): string
 pub fn skip_attr_line(src: string, start: i32): i32
 {
     let mut i = start
-    while (i < src.length and src[i] != ']') { i += 1 }
+    while (i < src.length and compiler_string_byte(src, i) != ']') { i += 1 }
     if (i < src.length) { i += 1 }
     let mut done = 0
     while (i < src.length and done == 0)
     {
-        if (src[i] == 10)
+        if (compiler_string_byte(src, i) == 10)
         {
             i += 1
             done = 1
         }
-        elif (src[i] != 32 and src[i] != 9 and src[i] != 13)
+        elif (compiler_string_byte(src, i) != 32 and compiler_string_byte(src, i) != 9 and compiler_string_byte(src, i) != 13)
         {
             done = 1
         }
@@ -122,9 +122,9 @@ pub fn scan_import_line(src: string, start: i32): i32
     if (start > 0)
     {
         let mut j = start - 1
-        while (j >= 0 and src[j] != 10)
+        while (j >= 0 and compiler_string_byte(src, j) != 10)
         {
-            if (src[j] != 32 and src[j] != 9 and src[j] != 13) { return -1 }
+            if (compiler_string_byte(src, j) != 32 and compiler_string_byte(src, j) != 9 and compiler_string_byte(src, j) != 13) return -1
             j -= 1
         }
     }
@@ -133,16 +133,16 @@ pub fn scan_import_line(src: string, start: i32): i32
     let keyword = "import"
     for (k in 0 .. 6)
     {
-        if (src[i + k] != keyword[k]) { return -1 }
+        if (compiler_string_byte(src, i + k) != compiler_string_byte(keyword, k)) return -1
     }
     i += 6
-    while (i < src.length and (src[i] == 32 or src[i] == 9)) { i += 1 }
-    if (i >= src.length or src[i] != '"') { return -1 }
+    while (i < src.length and (compiler_string_byte(src, i) == 32 or compiler_string_byte(src, i) == 9)) { i += 1 }
+    if (i >= src.length or compiler_string_byte(src, i) != '"') return -1
     i += 1
-    while (i < src.length and src[i] != 10 and src[i] != '"') { i += 1 }
-    if (i >= src.length or src[i] != '"') { return -1 }
+    while (i < src.length and compiler_string_byte(src, i) != 10 and compiler_string_byte(src, i) != '"') { i += 1 }
+    if (i >= src.length or compiler_string_byte(src, i) != '"') return -1
     i += 1
-    while (i < src.length and src[i] != 10) { i += 1 }
+    while (i < src.length and compiler_string_byte(src, i) != 10) { i += 1 }
     if (i < src.length) { i += 1 }
     return i
 }
@@ -150,13 +150,13 @@ pub fn scan_import_line(src: string, start: i32): i32
 pub fn extract_import_path(src: string, start: i32): string
 {
     let mut i = start + 6
-    while (i < src.length and (src[i] == 32 or src[i] == 9)) { i += 1 }
-    if (i >= src.length or src[i] != '"') { return "" }
+    while (i < src.length and (compiler_string_byte(src, i) == 32 or compiler_string_byte(src, i) == 9)) { i += 1 }
+    if (i >= src.length or compiler_string_byte(src, i) != '"') return ""
     i += 1
     let mut path = ""
-    while (i < src.length and src[i] != '"')
+    while (i < src.length and compiler_string_byte(src, i) != '"')
     {
-        path = path + char_string(src[i])
+        path = path + char_string(compiler_string_byte(src, i))
         i += 1
     }
     return path
@@ -169,7 +169,7 @@ pub fn slice_text(src: string, start: i32, end: i32): string
     let mut j = 0
     for (i in start .. end)
     {
-        out[j] = src[i]
+        out[j] = compiler_string_byte(src, i)
         j += 1
     }
     out[len] = 0
@@ -181,7 +181,7 @@ pub fn newline_padding(src: string, start: i32, end: i32): string
     let mut out = ""
     for (i in start .. end)
     {
-        if (src[i] == 10) { out = out + char_string(10) }
+        if (compiler_string_byte(src, i) == 10) out = out + char_string(10)
     }
     return out
 }
@@ -189,19 +189,19 @@ pub fn newline_padding(src: string, start: i32, end: i32): string
 pub fn trim_text(src: string): string
 {
     let mut start = 0
-    while (start < src.length and is_space_or_newline(src[start]) == 1) { start += 1 }
+    while (start < src.length and is_space_or_newline(compiler_string_byte(src, start)) == 1) { start += 1 }
     let mut end = src.length
-    while (end > start and is_space_or_newline(src[end - 1]) == 1) { end -= 1 }
+    while (end > start and is_space_or_newline(compiler_string_byte(src, end - 1)) == 1) { end -= 1 }
     return slice_text(src, start, end)
 }
 
-pub fn is_space_or_newline(c: i8): i32
+pub fn is_space_or_newline(c: i32): i32
 {
     if (c == 32 or c == 9 or c == 10 or c == 13) { return 1 }
     return 0
 }
 
-pub fn is_macro_ident_char(c: i8): i32
+pub fn is_macro_ident_char(c: i32): i32
 {
     if (is_alpha(c) == 1 or is_digit(c) == 1 or c == '_') { return 1 }
     return 0
@@ -210,7 +210,7 @@ pub fn is_macro_ident_char(c: i8): i32
 pub fn skip_spaces(src: string, start: i32): i32
 {
     let mut i = start
-    while (i < src.length and is_space_or_newline(src[i]) == 1) { i += 1 }
+    while (i < src.length and is_space_or_newline(compiler_string_byte(src, i)) == 1) { i += 1 }
     return i
 }
 
@@ -219,32 +219,32 @@ pub fn text_at(src: string, start: i32, text: string): i32
     if (start < 0 or start + text.length > src.length) { return 0 }
     for (i in 0 .. text.length)
     {
-        if (src[start + i] != text[i]) { return 0 }
+        if (compiler_string_byte(src, start + i) != compiler_string_byte(text, i)) return 0
     }
     return 1
 }
 
-pub fn scan_balanced(src: string, start: i32, open_ch: i8, close_ch: i8): i32
+pub fn scan_balanced(src: string, start: i32, open_ch: i32, close_ch: i32): i32
 {
-    if (start >= src.length or src[start] != open_ch) { return -1 }
+    if (start >= src.length or compiler_string_byte(src, start) != open_ch) return -1
     let mut depth = 1
     let mut i = start + 1
     while (i < src.length and depth > 0)
     {
-        if (src[i] == '"')
+        if (compiler_string_byte(src, i) == '"')
         {
             i += 1
-            while (i < src.length and src[i] != '"')
+            while (i < src.length and compiler_string_byte(src, i) != '"')
             {
-                if (src[i] == 92 and i + 1 < src.length) { i += 2 }
+                if (compiler_string_byte(src, i) == 92 and i + 1 < src.length) i += 2
                 else { i += 1 }
             }
         }
-        elif (src[i] == open_ch)
+        elif (compiler_string_byte(src, i) == open_ch)
         {
             depth += 1
         }
-        elif (src[i] == close_ch)
+        elif (compiler_string_byte(src, i) == close_ch)
         {
             depth -= 1
         }
@@ -262,22 +262,22 @@ pub fn top_level_comma(src: string): i32
     let mut i = 0
     while (i < src.length)
     {
-        if (src[i] == '"')
+        if (compiler_string_byte(src, i) == '"')
         {
             i += 1
-            while (i < src.length and src[i] != '"')
+            while (i < src.length and compiler_string_byte(src, i) != '"')
             {
-                if (src[i] == 92 and i + 1 < src.length) { i += 2 }
+                if (compiler_string_byte(src, i) == 92 and i + 1 < src.length) i += 2
                 else { i += 1 }
             }
         }
-        elif (src[i] == '(') { paren_depth += 1 }
-        elif (src[i] == ')') { paren_depth -= 1 }
-        elif (src[i] == '[') { bracket_depth += 1 }
-        elif (src[i] == ']') { bracket_depth -= 1 }
-        elif (src[i] == '{') { brace_depth += 1 }
-        elif (src[i] == '}') { brace_depth -= 1 }
-        elif (src[i] == ',' and paren_depth == 0 and bracket_depth == 0 and brace_depth == 0)
+        elif (compiler_string_byte(src, i) == '(') paren_depth += 1
+        elif (compiler_string_byte(src, i) == ')') paren_depth -= 1
+        elif (compiler_string_byte(src, i) == '[') bracket_depth += 1
+        elif (compiler_string_byte(src, i) == ']') bracket_depth -= 1
+        elif (compiler_string_byte(src, i) == '{') brace_depth += 1
+        elif (compiler_string_byte(src, i) == '}') brace_depth -= 1
+        elif (compiler_string_byte(src, i) == ',' and paren_depth == 0 and bracket_depth == 0 and brace_depth == 0)
         {
             return i
         }
@@ -305,12 +305,12 @@ pub fn macro_repeat_param_name(params_text: string, fallback: string): string
     let mut p = 0
     while (p + 1 < params_text.length)
     {
-        if (params_text[p] == '$' and params_text[p + 1] == '(')
+        if (compiler_string_byte(params_text, p) == '$' and compiler_string_byte(params_text, p + 1) == '(')
         {
             p += 2
-            while (p < params_text.length and is_space_or_newline(params_text[p]) == 1) { p += 1 }
+            while (p < params_text.length and is_space_or_newline(compiler_string_byte(params_text, p)) == 1) { p += 1 }
             let start = p
-            while (p < params_text.length and is_macro_ident_char(params_text[p]) == 1) { p += 1 }
+            while (p < params_text.length and is_macro_ident_char(compiler_string_byte(params_text, p)) == 1) { p += 1 }
             if (p > start) { return slice_text(params_text, start, p) }
         }
         p += 1
@@ -318,7 +318,7 @@ pub fn macro_repeat_param_name(params_text: string, fallback: string): string
     p = 0
     while (p < params_text.length)
     {
-        if (params_text[p] == '*') { return fallback }
+        if (compiler_string_byte(params_text, p) == '*') return fallback
         p += 1
     }
     return ""
@@ -330,7 +330,7 @@ pub fn remove_trailing_macro_separator(text: string): string
     while (end > 0)
     {
         let prev = end - 1
-        if (text[prev] == 32 or text[prev] == 9 or text[prev] == 13 or text[prev] == 10)
+        if (compiler_string_byte(text, prev) == 32 or compiler_string_byte(text, prev) == 9 or compiler_string_byte(text, prev) == 13 or compiler_string_byte(text, prev) == 10)
         {
             end -= 1
         }
@@ -342,7 +342,7 @@ pub fn remove_trailing_macro_separator(text: string): string
     if (end > 0)
     {
         let comma_pos = end - 1
-        if (text[comma_pos] == ',')
+        if (compiler_string_byte(text, comma_pos) == ',')
         {
             return slice_text(text, 0, comma_pos)
         }
@@ -355,28 +355,28 @@ pub fn skip_macro_definition(src: string, start: i32, macros: &MacroSet): i32
     let mut macro_start = start
     if (text_at(src, start, "pub") == 1)
     {
-        if (start > 0 and is_macro_ident_char(src[start - 1]) == 1) { return -1 }
-        if (start + 3 < src.length and is_macro_ident_char(src[start + 3]) == 1) { return -1 }
+        if (start > 0 and is_macro_ident_char(compiler_string_byte(src, start - 1)) == 1) return -1
+        if (start + 3 < src.length and is_macro_ident_char(compiler_string_byte(src, start + 3)) == 1) return -1
         macro_start = skip_spaces(src, start + 3)
     }
     if (text_at(src, macro_start, "macro") == 0) { return -1 }
-    if (macro_start > 0 and is_macro_ident_char(src[macro_start - 1]) == 1) { return -1 }
-    if (macro_start + 5 < src.length and is_macro_ident_char(src[macro_start + 5]) == 1) { return -1 }
+    if (macro_start > 0 and is_macro_ident_char(compiler_string_byte(src, macro_start - 1)) == 1) return -1
+    if (macro_start + 5 < src.length and is_macro_ident_char(compiler_string_byte(src, macro_start + 5)) == 1) return -1
 
     let mut i = skip_spaces(src, macro_start + 5)
-    if (i < src.length and src[i] == '$') { i += 1 }
+    if (i < src.length and compiler_string_byte(src, i) == '$') i += 1
     let name_start = i
-    while (i < src.length and is_macro_ident_char(src[i]) == 1) { i += 1 }
+    while (i < src.length and is_macro_ident_char(compiler_string_byte(src, i)) == 1) { i += 1 }
     if (i == name_start) { return -1 }
     let name = slice_text(src, name_start, i)
     let mut bracket_call = 0
-    if (i < src.length and src[i] == '!')
+    if (i < src.length and compiler_string_byte(src, i) == '!')
     {
         bracket_call = 1
         i += 1
     }
     i = skip_spaces(src, i)
-    let open_ch = if (i < src.length and src[i] == '[') { '[' } else { '(' }
+    let open_ch = if (i < src.length and compiler_string_byte(src, i) == '[') '[' else '('
     let close_ch = if (open_ch == '[') { ']' } else { ')' }
     if (open_ch == '[') { bracket_call = 1 }
     let params_end = scan_balanced(src, i, open_ch, close_ch)
@@ -385,13 +385,13 @@ pub fn skip_macro_definition(src: string, start: i32, macros: &MacroSet): i32
     let mut param = ""
     let mut repeat_param = 0
     let mut p = 0
-    while (p < params_text.length and is_space_or_newline(params_text[p]) == 1) { p += 1 }
+    while (p < params_text.length and is_space_or_newline(compiler_string_byte(params_text, p)) == 1) { p += 1 }
     let param_start = p
-    while (p < params_text.length and is_macro_ident_char(params_text[p]) == 1) { p += 1 }
+    while (p < params_text.length and is_macro_ident_char(compiler_string_byte(params_text, p)) == 1) { p += 1 }
     if (p > param_start) { param = slice_text(params_text, param_start, p) }
     while (p < params_text.length)
     {
-        if (params_text[p] == '*') { repeat_param = 1 }
+        if (compiler_string_byte(params_text, p) == '*') repeat_param = 1
         p += 1
     }
     let repeat_param_name = macro_repeat_param_name(params_text, param)
@@ -438,7 +438,7 @@ pub fn replace_macro_param(body: string, param: string, arg: string, repeat_para
         }
         else
         {
-            out = out + char_string(body[i])
+            out = out + char_string(compiler_string_byte(body, i))
             i += 1
         }
     }
@@ -465,22 +465,22 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
     let mut changed = 0
     while (i < src.length)
     {
-        if (src[i] == '"')
+        if (compiler_string_byte(src, i) == '"')
         {
             i += 1
-            while (i < src.length and src[i] != '"')
+            while (i < src.length and compiler_string_byte(src, i) != '"')
             {
-                if (src[i] == 92 and i + 1 < src.length) { i += 2 }
+                if (compiler_string_byte(src, i) == 92 and i + 1 < src.length) i += 2
                 else { i += 1 }
             }
             if (i < src.length) { i += 1 }
             continue
         }
-        elif (src[i] == '$' and i + 1 < src.length and is_macro_ident_char(src[i + 1]) == 1)
+        elif (compiler_string_byte(src, i) == '$' and i + 1 < src.length and is_macro_ident_char(compiler_string_byte(src, i + 1)) == 1)
         {
             let name_start = i + 1
             let mut name_end = name_start
-            while (name_end < src.length and is_macro_ident_char(src[name_end]) == 1) { name_end += 1 }
+            while (name_end < src.length and is_macro_ident_char(compiler_string_byte(src, name_end)) == 1) { name_end += 1 }
             let name = slice_text(src, name_start, name_end)
             let macro_idx = macro_set_find(macros, name)
             if (macro_idx >= 0)
@@ -488,7 +488,7 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
                 let mut call_pos = skip_spaces(src, name_end)
                 let open_ch = if (macros.bracket_calls[macro_idx] == 1) { '[' } else { '(' }
                 let close_ch = if (open_ch == '[') { ']' } else { ')' }
-                if (call_pos < src.length and src[call_pos] == open_ch)
+                if (call_pos < src.length and compiler_string_byte(src, call_pos) == open_ch)
                 {
                     let call_end = scan_balanced(src, call_pos, open_ch, close_ch)
                     if (call_end > call_pos)
@@ -554,7 +554,7 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
     
     while (i < src.length)
     {
-        if (src[i] == '#' and i + 1 < src.length and src[i + 1] == '[')
+        if (compiler_string_byte(src, i) == '#' and i + 1 < src.length and compiler_string_byte(src, i + 1) == '[')
         {
             if (segment_start < i)
             {
@@ -574,7 +574,7 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
             }
             let skipped_start = i
             i = macro_end
-            while (i < src.length and (src[i] == 10 or src[i] == 13)) { i += 1 }
+            while (i < src.length and (compiler_string_byte(src, i) == 10 or compiler_string_byte(src, i) == 13)) { i += 1 }
             out = out + newline_padding(src, skipped_start, i)
             segment_start = i
             continue
@@ -635,7 +635,7 @@ pub fn preprocess_source_local(src: string, filename: string): string
     let mut segment_start = 0
     while (i < src.length)
     {
-        if (src[i] == '#' and i + 1 < src.length and src[i + 1] == '[')
+        if (compiler_string_byte(src, i) == '#' and i + 1 < src.length and compiler_string_byte(src, i + 1) == '[')
         {
             if (segment_start < i) { out = out + slice_text(src, segment_start, i) }
             i = skip_attr_line(src, i)
@@ -648,7 +648,7 @@ pub fn preprocess_source_local(src: string, filename: string): string
             if (segment_start < i) { out = out + slice_text(src, segment_start, i) }
             let skipped_start = i
             i = macro_end
-            while (i < src.length and (src[i] == 10 or src[i] == 13)) { i += 1 }
+            while (i < src.length and (compiler_string_byte(src, i) == 10 or compiler_string_byte(src, i) == 13)) { i += 1 }
             out = out + newline_padding(src, skipped_start, i)
             segment_start = i
             continue

@@ -288,7 +288,7 @@ pub fn semantic_scope_require(scope: &SemanticScope, result: &SemanticResult, so
     {
         Some(_) -> {}
         None -> {
-            let is_lambda = func_name.length >= 9 and func_name[0] == '_' and func_name[1] == '_' and func_name[2] == 'l' and func_name[3] == 'a' and func_name[4] == 'm' and func_name[5] == 'b' and func_name[6] == 'd' and func_name[7] == 'a' and func_name[8] == '_'
+            let is_lambda = func_name.length >= 9 and compiler_string_byte(func_name, 0) == '_' and compiler_string_byte(func_name, 1) == '_' and compiler_string_byte(func_name, 2) == 'l' and compiler_string_byte(func_name, 3) == 'a' and compiler_string_byte(func_name, 4) == 'm' and compiler_string_byte(func_name, 5) == 'b' and compiler_string_byte(func_name, 6) == 'd' and compiler_string_byte(func_name, 7) == 'a' and compiler_string_byte(func_name, 8) == '_'
             if (is_lambda) semantic_add_error_loc(result, source, filename, "NameError", "variable `" + name + "` must be explicitly captured", func_name, line, col, diag_strlen(name))
             else semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, diag_strlen(name))
         }
@@ -783,7 +783,7 @@ pub fn semantic_check_function_body(func: AstFunction, program: AstProgram, resu
     // Synthetic lambda functions get their explicitly captured names as
     // read-only locals for semantic checking. The enclosing expression has
     // already validated that each capture is defined in the outer scope.
-    if (func.name.length >= 9 and func.name[0] == '_' and func.name[1] == '_' and func.name[2] == 'l' and func.name[3] == 'a' and func.name[4] == 'm' and func.name[5] == 'b' and func.name[6] == 'd' and func.name[7] == 'a' and func.name[8] == '_')
+    if (func.name.length >= 9 and compiler_string_byte(func.name, 0) == '_' and compiler_string_byte(func.name, 1) == '_' and compiler_string_byte(func.name, 2) == 'l' and compiler_string_byte(func.name, 3) == 'a' and compiler_string_byte(func.name, 4) == 'm' and compiler_string_byte(func.name, 5) == 'b' and compiler_string_byte(func.name, 6) == 'd' and compiler_string_byte(func.name, 7) == 'a' and compiler_string_byte(func.name, 8) == '_')
     {
         let expr_store = program.expr_store
         for (i in 0 .. expr_store.exprs.length)

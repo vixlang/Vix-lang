@@ -54,7 +54,7 @@ pub fn machine_lir_is_register_type(ty: string): i32
 pub fn machine_lir_is_known_type(ty: string): i32
 {
     if (machine_lir_is_register_type(ty) == 1 or ty == "f32" or ty == "f64") { return 1 }
-    if (ty.length > 0) { if (ty[0] == '@' or ty[0] == '[') { return 1 } }
+    if (ty.length > 0) if (compiler_string_byte(ty, 0) == '@' or compiler_string_byte(ty, 0) == '[') return 1
     return 0
 }
 
@@ -76,12 +76,12 @@ pub fn machine_lir_branch_target(inst: MachineInst, which: i32): string
 pub fn machine_lir_temp_number(name: string): i32
 {
     if (name.length < 3) { return -1 }
-    if (name[0] != '%' or name[1] != 't') { return -1 }
+    if (compiler_string_byte(name, 0) != '%' or compiler_string_byte(name, 1) != 't') return -1
     let mut value = 0
     for (i in 2 .. name.length)
     {
-        if (name[i] < '0' or name[i] > '9') { return -1 }
-        value = value * 10 + (name[i] - '0')
+        if (compiler_string_byte(name, i) < '0' or compiler_string_byte(name, i) > '9') return -1
+        value = value * 10 + (compiler_string_byte(name, i) - '0')
     }
     return value
 }
@@ -411,7 +411,7 @@ pub fn machine_lir_build(module: MachineModule): MachineLirModule
                     let is_label = if (operand == machine_lir_branch_target(inst, 0) or operand == machine_lir_branch_target(inst, 1)) { 1 } else { 0 }
                     if (operand.length > 0)
                     {
-                        if (operand[0] == '%' and is_label == 0 and machine_lir_name_index(lir, operand) < 0 and out.error == "") { machine_lir_error(&out, f, inst, "undefined local SSA operand " + operand) }
+                        if (compiler_string_byte(operand, 0) == '%' and is_label == 0 and machine_lir_name_index(lir, operand) < 0 and out.error == "") machine_lir_error(&out, f, inst, "undefined local SSA operand " + operand)
                     }
                 }
             }

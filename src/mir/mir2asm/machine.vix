@@ -45,7 +45,7 @@ pub fn machine_first_word(text: string): string
     return mir2asm_slice(text, 0, sp)
 }
 
-pub fn machine_is_name_char(c: i8): i32
+pub fn machine_is_name_char(c: i32): i32
 {
     if (c >= 'a' and c <= 'z') { return 1 }
     if (c >= 'A' and c <= 'Z') { return 1 }
@@ -58,7 +58,7 @@ pub fn machine_type_after_opcode(rhs: string, opcode: string): string
 {
     let rest = mir2asm_trim(mir2asm_after(rhs, opcode.length))
     let word = machine_first_word(rest)
-    if (word.length > 0 and word[word.length - 1] == ',') { return mir2asm_slice(word, 0, word.length - 1) }
+    if (word.length > 0 and compiler_string_byte(word, word.length - 1) == ',') return mir2asm_slice(word, 0, word.length - 1)
     return word
 }
 
@@ -80,7 +80,7 @@ pub fn machine_result_type(rhs: string, opcode: string): string
         if (rhs.length < 4) { return "" }
         for (i in 0 .. rhs.length - 3)
         {
-            if (rhs[i] == ' ' and rhs[i + 1] == 't' and rhs[i + 2] == 'o' and rhs[i + 3] == ' ') { to_pos = i }
+            if (compiler_string_byte(rhs, i) == ' ' and compiler_string_byte(rhs, i + 1) == 't' and compiler_string_byte(rhs, i + 2) == 'o' and compiler_string_byte(rhs, i + 3) == ' ') to_pos = i
         }
         if (to_pos >= 0) { return mir2asm_trim(mir2asm_after(rhs, to_pos + 4)) }
     }
@@ -98,20 +98,20 @@ pub fn machine_collect_operands(line: string, dest: string): [string]
         if (in_string == 1)
         {
             if (escaped == 1) { escaped = 0 }
-            elif (line[i] == 92) { escaped = 1 }
-            elif (line[i] == '"') { in_string = 0 }
+            elif (compiler_string_byte(line, i) == 92) escaped = 1
+            elif (compiler_string_byte(line, i) == '"') in_string = 0
             i += 1
         }
-        elif (line[i] == '"')
+        elif (compiler_string_byte(line, i) == '"')
         {
             in_string = 1
             i += 1
         }
-        elif (line[i] == '%' or line[i] == '@')
+        elif (compiler_string_byte(line, i) == '%' or compiler_string_byte(line, i) == '@')
         {
             let start = i
             i += 1
-            while (i < line.length and machine_is_name_char(line[i]) == 1) { i += 1 }
+            while (i < line.length and machine_is_name_char(compiler_string_byte(line, i)) == 1) { i += 1 }
             let name = mir2asm_slice(line, start, i)
             if (name != dest) { out.push(name) }
         }
@@ -181,10 +181,10 @@ pub fn machine_parse(mir: string): MachineModule
         if (at_end == 0)
         {
             if (escaped == 1) { escaped = 0 }
-            elif (mir[i] == 92 and in_string == 1) { escaped = 1 }
-            elif (mir[i] == '"') { in_string = if (in_string == 0) { 1 } else { 0 } }
+            elif (compiler_string_byte(mir, i) == 92 and in_string == 1) escaped = 1
+            elif (compiler_string_byte(mir, i) == '"') in_string = if (in_string == 0) 1 else 0
         }
-        if (at_end == 1 or (mir[i] == '\n' and in_string == 0))
+        if (at_end == 1 or (compiler_string_byte(mir, i) == '\n' and in_string == 0))
         {
             line = mir2asm_trim(mir2asm_slice(mir, start, i))
             if (in_fn == 0 and mir2asm_starts_with(line, "fn @") == 1)
@@ -198,7 +198,7 @@ pub fn machine_parse(mir: string): MachineModule
             {
                 if (have_block == 1) { current_fn.blocks.push(current_block) }
                 block_end = line.length
-                if (block_end > 0 and line[block_end - 1] == ':') { block_end -= 1 }
+                if (block_end > 0 and compiler_string_byte(line, block_end - 1) == ':') block_end -= 1
                 current_block = MachineBlock{ name: mir2asm_trim(mir2asm_slice(line, 6, block_end)), insts: [] }
                 have_block = 1
             }

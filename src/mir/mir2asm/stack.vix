@@ -65,7 +65,7 @@ pub fn mir2asm_lir_reg(b: &MirAsm, value: string, ty: string): string
 pub fn mir2asm_type_is_byte(ty: string): i32
 {
     if (ty == "i8" or ty == "u8" or ty == "char") { return 1 }
-    if (ty.length == 2 and (ty[0] == 'i' or ty[0] == 'u') and ty[1] == '8') { return 1 }
+    if (ty.length == 2 and (compiler_string_byte(ty, 0) == 'i' or compiler_string_byte(ty, 0) == 'u') and compiler_string_byte(ty, 1) == '8') return 1
     return 0
 }
 
@@ -74,13 +74,13 @@ pub fn mir2asm_operand_typed(b: &MirAsm, value: string, ty: string): string
     let v = mir2asm_trim(value)
     if (v == "null" or v == "undef") { return "0" }
     if (v.length == 0) { return "0" }
-    if (mir2asm_starts_with(v, "sizeof(") == 1 and v[v.length - 1] == ')')
+    if (mir2asm_starts_with(v, "sizeof(") == 1 and compiler_string_byte(v, v.length - 1) == ')')
     {
         let size_ty = mir2asm_trim(mir2asm_slice(v, 7, v.length - 1))
         return i32_to_str(mir2asm_type_size_for(b, size_ty))
     }
-    if (v[0] >= '0' and v[0] <= '9') { return v }
-    if (v[0] == '-' and v.length > 1) { return v }
+    if (compiler_string_byte(v, 0) >= '0' and compiler_string_byte(v, 0) <= '9') return v
+    if (compiler_string_byte(v, 0) == '-' and v.length > 1) return v
     let lir_reg = mir2asm_lir_reg(b, v, ty)
     if (lir_reg != "") { return lir_reg }
     let clean = mir2asm_clean_name(v)

@@ -21,7 +21,7 @@ fn string_ends_with(text: string, suffix: string): i32
     let offset = text.length - suffix.length
     for (i in 0 .. suffix.length)
     {
-        if (text[offset + i] != suffix[i]) { return 0 }
+        if (compiler_string_byte(text, offset + i) != compiler_string_byte(suffix, i)) return 0
     }
     return 1
 }
@@ -46,19 +46,19 @@ fn strip_vix_ext(name: string): string
         let end = name.length - 4
         for (i in 0 .. end)
         {
-            out = out + char_string(name[i])
+            out = out + char_string(compiler_string_byte(name, i))
         }
         return out
     }
     return name
 }
 
-fn find_last_char(text: string, needle: i8): ?i32
+fn find_last_char(text: string, needle: i32): ?i32
 {
     let mut found: ?i32 = None
     for (i in 0 .. text.length)
     {
-        if (text[i] == needle) { found = Some(i) }
+        if (compiler_string_byte(text, i) == needle) found = Some(i)
     }
     return found
 }
@@ -68,7 +68,7 @@ fn slice_string(text: string, start: i32, end: i32): string
     let mut out = ""
     for (i in start .. end)
     {
-        out = out + char_string(text[i])
+        out = out + char_string(compiler_string_byte(text, i))
     }
     return out
 }

@@ -1,0 +1,11 @@
+extern "C"
+{
+    fn malloc(size: usize): string
+}
+
+fn main(): i32
+{
+    let buf: string = malloc(2)
+    buf[0] = "x"
+    return 0
+}

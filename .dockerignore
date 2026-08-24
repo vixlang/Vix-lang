@@ -1,0 +1,9 @@
+.git
+.gitignore
+build
+runtime/*.o
+tests/bin
+test
+test.vix
+seed/vixc.ll.tmp.*
+seed/vixc.ll.normalized.*

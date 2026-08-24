@@ -455,11 +455,11 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
         }
         "index" -> {
             let base = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
-            if (base.ok == 0) { return base }
+            if (base.ok == 0) return base
             let index = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.right_idx)
-            if (index.ok == 0) { return index }
+            if (index.ok == 0) return index
             let uidx = hm_unify(store, subst, index.ty, TyPrim(ty_prim_i32()), pos)
-            if (uidx.ok == 0) { return uidx }
+            if (uidx.ok == 0) return uidx
             let base_ty = subst_apply_ty(store, subst, base.ty)
             if (ty_eq(store, base_ty, TyPrim(ty_prim_string())) == 1)
             {
@@ -674,6 +674,37 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (rhs.ok == 0) { return rhs }
             hm_unify(store, subst, lhs.ty, rhs.ty, pos)
         }
+        "store_index" -> {
+            let base = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.value_idx)
+            if (base.ok == 0) return base
+            let index = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.direct_ret)
+            if (index.ok == 0) return index
+            let uidx = hm_unify(store, subst, index.ty, TyPrim(ty_prim_i32()), pos)
+            if (uidx.ok == 0) return uidx
+
+            let base_ty = subst_apply_ty(store, subst, base.ty)
+            if (ty_eq(store, base_ty, TyPrim(ty_prim_string())) == 1)
+            {
+                let string_value = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
+                if (string_value.ok == 0) return string_value
+                return hm_unify(store, subst, TyPrim(ty_prim_i8()), string_value.ty, pos)
+            }
+
+            let ptr_elem = hm_ptr_array_elem(store, base_ty)
+            if (ty_is_unknown(ptr_elem) == 0)
+            {
+                let ptr_value = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
+                if (ptr_value.ok == 0) return ptr_value
+                return hm_unify(store, subst, subst_apply_ty(store, subst, ptr_elem), ptr_value.ty, pos)
+            }
+
+            let elem_ty = ty_fresh_var(fresh)
+            let ubase = hm_unify(store, subst, base.ty, ty_array(store, elem_ty), pos)
+            if (ubase.ok == 0) return ubase
+            let value = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
+            if (value.ok == 0) return value
+            hm_unify(store, subst, subst_apply_ty(store, subst, elem_ty), value.ty, pos)
+        }
         "print" -> {
             let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.print_idx)
             if (v.ok == 0) { return v }
@@ -774,7 +805,7 @@ pub fn hm_check_function(func: AstFunction, base_env: &TypeEnv, store: &TyStore,
     // Synthetic lambdas keep their explicit capture names in the lambda AST.
     // Expose those names as unknown locals so their uses participate in the
     // normal expression constraints.
-    if (func.name.length >= 9 and func.name[0] == '_' and func.name[1] == '_' and func.name[2] == 'l' and func.name[3] == 'a' and func.name[4] == 'm' and func.name[5] == 'b' and func.name[6] == 'd' and func.name[7] == 'a' and func.name[8] == '_')
+    if (func.name.length >= 9 and compiler_string_byte(func.name, 0) == '_' and compiler_string_byte(func.name, 1) == '_' and compiler_string_byte(func.name, 2) == 'l' and compiler_string_byte(func.name, 3) == 'a' and compiler_string_byte(func.name, 4) == 'm' and compiler_string_byte(func.name, 5) == 'b' and compiler_string_byte(func.name, 6) == 'd' and compiler_string_byte(func.name, 7) == 'a' and compiler_string_byte(func.name, 8) == '_')
     {
         for (e in 0 .. es.exprs.length)
         {
