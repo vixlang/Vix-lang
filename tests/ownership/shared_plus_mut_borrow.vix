@@ -1,0 +1,10 @@
+fn use_two(shared: &i32, unique: &mut i32): i32
+{
+    return @shared + @unique
+}
+
+fn main(): i32
+{
+    let mut value = 1
+    return use_two(&value, &mut value)
+}

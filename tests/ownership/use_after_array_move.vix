@@ -1,0 +1,11 @@
+fn consume(values: [string]): i32
+{
+    return values.length
+}
+
+fn main(): i32
+{
+    let values = ["vix"]
+    print(consume(values))
+    return values.length
+}

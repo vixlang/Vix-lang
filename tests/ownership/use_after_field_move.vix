@@ -1,0 +1,12 @@
+type Boxed = struct {
+    text: string,
+    count: i32
+}
+
+fn main(): i32
+{
+    let item = Boxed{ text: "vix", count: 3 }
+    let moved = item.text
+    print(moved)
+    return item.text.length
+}

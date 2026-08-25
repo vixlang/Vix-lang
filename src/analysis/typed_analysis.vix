@@ -4,68 +4,102 @@ import "../ast.vix"
 import "../error.vix"
 import "../lexer.vix"
 
-pub type AnalysisPlace = struct {
-    root: string,
-    projections: [string],
-    ty: string,
+pub type AnalysisSpan = struct {
+    file: string,
     line: i32,
-    col: i32
+    column: i32,
+    length: i32
+}
+
+pub type AnalysisProjection = ProjectionField(string) | ProjectionIndex | ProjectionDeref
+
+pub type AnalysisPlace = struct {
+    id: i32,
+    root: string,
+    projections: [AnalysisProjection],
+    ty: string,
+    span: AnalysisSpan,
+    owner_mutable: i32,
+    owner_scope: i32,
+    is_parameter: i32
 }
 
 pub type TypedAnalysisValue = struct {
+    id: i32,
     expr_id: i32,
     ty: string,
     place_id: i32,
-    line: i32,
-    col: i32
+    span: AnalysisSpan
 }
 
 pub type TypedAnalysisInstruction = struct {
+    id: i32,
     kind: string,
     expr_id: i32,
     stmt_id: i32,
     place_id: i32,
     value_id: i32,
     target_block: i32,
-    line: i32,
-    col: i32
+    span: AnalysisSpan
 }
 
 pub type TypedAnalysisBlock = struct {
     id: i32,
+    function_id: i32,
     function_name: string,
+    scope_id: i32,
     stmt_id: i32,
     instruction_ids: [i32],
+    predecessors: [i32],
     successors: [i32],
-    line: i32,
-    col: i32
+    span: AnalysisSpan
+}
+
+pub type TypedAnalysisScope = struct {
+    id: i32,
+    kind: string,
+    parent: i32,
+    entry_block: i32,
+    exit_blocks: [i32],
+    local_place_ids: [i32],
+    span: AnalysisSpan
+}
+
+pub type TypedAnalysisFunction = struct {
+    id: i32,
+    name: string,
+    scope_id: i32,
+    entry_block: i32,
+    exit_blocks: [i32],
+    span: AnalysisSpan
 }
 
 pub type TypedAnalysisIR = struct {
+    functions: [TypedAnalysisFunction],
     blocks: [TypedAnalysisBlock],
     instructions: [TypedAnalysisInstruction],
     values: [TypedAnalysisValue],
-    places: [AnalysisPlace]
+    places: [AnalysisPlace],
+    scopes: [TypedAnalysisScope]
 }
 
 pub type OwnershipMoveFact = struct {
     stmt_id: i32,
-    place: string,
-    line: i32,
-    col: i32
+    place_id: i32,
+    span: AnalysisSpan
 }
 
 pub type OwnershipBorrowFact = struct {
     expr_id: i32,
-    source: string,
+    source_place_id: i32,
     kind: string,
-    line: i32,
-    col: i32
+    last_use_stmt_id: i32,
+    span: AnalysisSpan
 }
 
 pub type OwnershipBlockBorrowFact = struct {
     block_id: i32,
-    sources: [string]
+    source_place_ids: [i32]
 }
 
 pub type OwnershipFacts = struct {
@@ -81,11 +115,10 @@ pub type DropEvent = struct {
     stmt_id: i32,
     return_id: i32,
     block_id: i32,
-    place: string,
+    place_id: i32,
     ty: string,
     reason: string,
-    line: i32,
-    col: i32
+    span: AnalysisSpan
 }
 
 pub type DropPlan = struct {
@@ -109,7 +142,23 @@ pub type AnalysisEnv = struct {
 
 pub type AnalysisFlow = struct {
     entry: i32,
-    exits: [i32]
+    exits: [i32],
+    break_exits: [i32],
+    continue_exits: [i32],
+    return_exits: [i32]
+}
+
+pub type AnalysisBuildContext = struct {
+    filename: string,
+    function_id: i32,
+    function_name: string,
+    scope_id: i32,
+    loop_condition: i32,
+    loop_exit: i32
+}
+
+macro tyir_empty_flow() {
+    break_exits: [], continue_exits: [], return_exits: []
 }
 
 pub type OwnershipCheckState = struct {
@@ -339,7 +388,7 @@ pub fn ownership_create_borrow(state: &OwnershipCheckState, expr: AstExpr, sourc
     return owner_idx
 }
 
-pub fn ownership_check_ident(program: AstProgram, state: &OwnershipCheckState, facts: &OwnershipFacts, expr: AstExpr, stmt_id: i32, consume: i32, source: string, filename: string): i32
+pub fn ownership_check_ident(program: AstProgram, state: &OwnershipCheckState, facts: &OwnershipFacts, expr_id: i32, expr: AstExpr, stmt_id: i32, consume: i32, source: string, filename: string): i32
 {
     let local_idx = ownership_state_find(state, expr.text)
     if (local_idx < 0) return 0
@@ -348,7 +397,8 @@ pub fn ownership_check_ident(program: AstProgram, state: &OwnershipCheckState, f
         ownership_add_error(state, source, filename, "use of moved value '" + expr.text + "'", expr.line, expr.col, expr.text.length)
         return 0
     }
-    if (consume == 1 and analysis_type_is_copy(program, state.types[local_idx]) == 0)
+    let ir_action = if (expr_id >= 0 and expr_id < facts.expr_actions.length) { facts.expr_actions[expr_id] } else { "" }
+    if (consume == 1 and (ir_action == "Move" or (ir_action == "" and analysis_type_is_copy(program, state.types[local_idx]) == 0)))
     {
         if (state.shared_borrows[local_idx] > 0 or state.mut_borrow[local_idx] == 1)
         {
@@ -356,21 +406,9 @@ pub fn ownership_check_ident(program: AstProgram, state: &OwnershipCheckState, f
             return 0
         }
         state.status[local_idx] = "Moved"
-        facts.stmt_moves.push(OwnershipMoveFact{ stmt_id: stmt_id, place: expr.text, line: expr.line, col: expr.col })
-        let expr_id = ownership_expr_id_for(program, expr)
         if (expr_id >= 0) facts.expr_actions[expr_id] = "Move"
     }
     return 0
-}
-
-pub fn ownership_expr_id_for(program: AstProgram, target: AstExpr): i32
-{
-    for (i in 0 .. program.expr_store.exprs.length)
-    {
-        let expr = program.expr_store.exprs[i]
-        if (expr.line == target.line and expr.col == target.col and expr.tag == target.tag and expr.text == target.text) return i
-    }
-    return -1
 }
 
 pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, facts: &OwnershipFacts, idx: i32, stmt_id: i32, consume: i32, source: string, filename: string): i32
@@ -380,7 +418,7 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
     let expr = expr_store_get(&es, idx)
     if (expr.tag == "ident")
     {
-        ownership_check_ident(program, state, facts, expr, stmt_id, consume, source, filename)
+        ownership_check_ident(program, state, facts, idx, expr, stmt_id, consume, source, filename)
         return 0
     }
     if (expr.tag == "addr")
@@ -417,7 +455,17 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
     }
     if (expr.tag == "index" or expr.tag == "field" or expr.tag == "slice")
     {
-        ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
+        let env = ownership_state_env(state)
+        let projected_ty = analysis_expr_type(program, &env, idx)
+        if (consume == 1 and (expr.tag == "index" or expr.tag == "field") and analysis_type_is_copy(program, projected_ty) == 0)
+        {
+            let root = ownership_place_root(program, idx)
+            let mut root_expr = expr
+            root_expr.tag = "ident"
+            root_expr.text = root
+            ownership_check_ident(program, state, facts, idx, root_expr, stmt_id, 1, source, filename)
+        }
+        else ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
         if (expr.right_idx >= 0) ownership_check_expr(program, state, facts, expr.right_idx, stmt_id, 0, source, filename)
         for (i in 0 .. expr.args.length)
         {
@@ -776,7 +824,7 @@ pub fn ownership_check_function(program: AstProgram, facts: &OwnershipFacts, fun
 
 pub fn typed_analysis_ir_new(): TypedAnalysisIR
 {
-    return TypedAnalysisIR{ blocks: [], instructions: [], values: [], places: [] }
+    return TypedAnalysisIR{ functions: [], blocks: [], instructions: [], values: [], places: [], scopes: [] }
 }
 
 pub fn ownership_facts_new(expr_count: i32): OwnershipFacts
@@ -984,73 +1032,249 @@ pub fn analysis_expr_type(program: AstProgram, env: &AnalysisEnv, idx: i32): str
     }
 }
 
-pub fn analysis_place_for_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, idx: i32): i32
+pub fn analysis_span(filename: string, line: i32, column: i32, length: i32): AnalysisSpan
+{
+    return AnalysisSpan{ file: filename, line: if (line > 0) { line } else { 1 }, column: if (column > 0) { column } else { 1 }, length: if (length > 0) { length } else { 1 } }
+}
+
+pub fn analysis_expr_span(filename: string, expr: AstExpr): AnalysisSpan
+{
+    return analysis_span(filename, expr.line, expr.col, if (expr.text.length > 0) { expr.text.length } else { 1 })
+}
+
+pub fn analysis_expr_source_id(program: AstProgram, idx: i32): i32
+{
+    if (idx < 0) return -1
+    let es = program.expr_store
+    let expr = expr_store_get(&es, idx)
+    if (expr.line > 0 and expr.col > 0) return idx
+    let left = analysis_expr_source_id(program, expr.left_idx)
+    if (left >= 0) return left
+    let right = analysis_expr_source_id(program, expr.right_idx)
+    if (right >= 0) return right
+    for (i in 0 .. expr.args.length)
+    {
+        let argument = analysis_expr_source_id(program, expr.args[i])
+        if (argument >= 0) return argument
+    }
+    return -1
+}
+
+pub fn analysis_resolved_expr_span(program: AstProgram, filename: string, idx: i32): AnalysisSpan
+{
+    let source_id = analysis_expr_source_id(program, idx)
+    if (source_id >= 0)
+    {
+        let es = program.expr_store
+        return analysis_expr_span(filename, expr_store_get(&es, source_id))
+    }
+    return analysis_span(filename, 1, 1, 1)
+}
+
+pub fn analysis_projection_equal(left: AnalysisProjection, right: AnalysisProjection): i32
+{
+    return match left {
+        ProjectionField(left_name) -> match right { ProjectionField(right_name) -> if (left_name == right_name) { 1 } else { 0 } _ -> 0 }
+        ProjectionIndex -> match right { ProjectionIndex -> 1 _ -> 0 }
+        ProjectionDeref -> match right { ProjectionDeref -> 1 _ -> 0 }
+    }
+}
+
+pub fn analysis_place_path_equal(place: AnalysisPlace, root: string, projections: [AnalysisProjection]): i32
+{
+    if (place.root != root or place.projections.length != projections.length) return 0
+    for (i in 0 .. projections.length)
+    {
+        if (analysis_projection_equal(place.projections[i], projections[i]) == 0) return 0
+    }
+    return 1
+}
+
+pub fn analysis_env_mutable(env: &AnalysisEnv, name: string): i32
+{
+    let mut i = env.names.length
+    while (i > 0)
+    {
+        i -= 1
+        if (env.names[i] == name) return env.mutable[i]
+    }
+    return 0
+}
+
+pub fn analysis_find_place(ir: &TypedAnalysisIR, root: string, projections: [AnalysisProjection], owner_scope: i32): i32
+{
+    let mut i = ir.places.length
+    while (i > 0)
+    {
+        i -= 1
+        if ((owner_scope < 0 or ir.places[i].owner_scope == owner_scope) and analysis_place_path_equal(ir.places[i], root, projections) == 1) return i
+    }
+    return -1
+}
+
+pub fn analysis_add_place(ir: &TypedAnalysisIR, root: string, projections: [AnalysisProjection], ty: string, span: AnalysisSpan, span_length: i32, owner_mutable: i32, owner_scope: i32, is_parameter: i32): i32
+{
+    let id = ir.places.length
+    let fixed_span = span
+    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
+    ir.places.push(AnalysisPlace{ id: id, root: root, projections: projections, ty: ty, span: fixed_span, owner_mutable: owner_mutable, owner_scope: owner_scope, is_parameter: is_parameter })
+    return id
+}
+
+pub fn analysis_add_local_place(ir: &TypedAnalysisIR, env: &AnalysisEnv, scope_id: i32, name: string, ty: string, is_mut: i32, is_parameter: i32, span: AnalysisSpan, span_length: i32): i32
+{
+    let place_id = analysis_add_place(ir, name, [], ty, span, span_length, is_mut, scope_id, is_parameter)
+    ir.scopes[scope_id].local_place_ids.push(place_id)
+    return place_id
+}
+
+pub fn analysis_place_for_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, idx: i32, filename: string, scope_id: i32): i32
 {
     if (idx < 0) return -1
     let es = program.expr_store
     let expr = expr_store_get(&es, idx)
     let mut root = ""
-    let mut projections: [string] = []
-    if (expr.tag == "ident" or expr.tag == "addr") root = expr.text
-    elif (expr.tag == "field" or expr.tag == "index")
+    let mut projections: [AnalysisProjection] = []
+    let mut owner_scope = scope_id
+    if (expr.tag == "ident" or expr.tag == "addr")
     {
-        let base_place = analysis_place_for_expr(program, env, ir, expr.left_idx)
+        root = expr.text
+        let root_place = analysis_find_place(ir, root, [], -1)
+        if (root_place >= 0) return root_place
+    }
+    elif (expr.tag == "field" or expr.tag == "index" or expr.tag == "deref")
+    {
+        let base_place = analysis_place_for_expr(program, env, ir, expr.left_idx, filename, scope_id)
         if (base_place < 0) return -1
         root = ir.places[base_place].root
+        owner_scope = ir.places[base_place].owner_scope
         for (i in 0 .. ir.places[base_place].projections.length)
         {
             projections.push(ir.places[base_place].projections[i])
         }
-        if (expr.tag == "field") projections.push("field:" + expr.text)
-        else projections.push("index")
-    }
-    elif (expr.tag == "deref")
-    {
-        let base_place2 = analysis_place_for_expr(program, env, ir, expr.left_idx)
-        if (base_place2 < 0) return -1
-        root = ir.places[base_place2].root
-        for (i in 0 .. ir.places[base_place2].projections.length)
-        {
-            projections.push(ir.places[base_place2].projections[i])
+        match expr.tag {
+            "field" -> projections.push(ProjectionField(expr.text))
+            "index" -> projections.push(ProjectionIndex)
+            _ -> projections.push(ProjectionDeref)
         }
-        projections.push("deref")
     }
     else return -1
-    let place_id = ir.places.length
-    ir.places.push(AnalysisPlace{ root: root, projections: projections, ty: analysis_expr_type(program, env, idx), line: expr.line, col: expr.col })
-    return place_id
+    let existing = analysis_find_place(ir, root, projections, owner_scope)
+    if (existing >= 0) return existing
+    return analysis_add_place(ir, root, projections, analysis_expr_type(program, env, idx), analysis_resolved_expr_span(program, filename, idx), if (expr.text.length > 0) { expr.text.length } else { 1 }, analysis_env_mutable(env, root), owner_scope, 0)
 }
 
-pub fn analysis_add_instruction(ir: &TypedAnalysisIR, block_id: i32, kind: string, expr_id: i32, stmt_id: i32, place_id: i32, value_id: i32, target_block: i32, line: i32, col: i32): i32
+pub fn analysis_add_instruction(ir: &TypedAnalysisIR, block_id: i32, kind: string, expr_id: i32, stmt_id: i32, place_id: i32, value_id: i32, target_block: i32, span: AnalysisSpan, span_length: i32): i32
 {
     let id = ir.instructions.length
-    ir.instructions.push(TypedAnalysisInstruction{ kind: kind, expr_id: expr_id, stmt_id: stmt_id, place_id: place_id, value_id: value_id, target_block: target_block, line: line, col: col })
+    let fixed_span = span
+    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
+    ir.instructions.push(TypedAnalysisInstruction{ id: id, kind: kind, expr_id: expr_id, stmt_id: stmt_id, place_id: place_id, value_id: value_id, target_block: target_block, span: fixed_span })
     ir.blocks[block_id].instruction_ids.push(id)
     return id
 }
 
-pub fn analysis_add_block(ir: &TypedAnalysisIR, facts: &OwnershipFacts, function_name: string, stmt_id: i32, line: i32, col: i32): i32
+pub fn analysis_add_scope(ir: &TypedAnalysisIR, kind: string, parent: i32, span: AnalysisSpan, span_length: i32): i32
+{
+    let id = ir.scopes.length
+    let fixed_span = span
+    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
+    ir.scopes.push(TypedAnalysisScope{ id: id, kind: kind, parent: parent, entry_block: -1, exit_blocks: [], local_place_ids: [], span: fixed_span })
+    return id
+}
+
+pub fn analysis_add_block(ir: &TypedAnalysisIR, context: AnalysisBuildContext, stmt_id: i32, span: AnalysisSpan, span_length: i32): i32
 {
     let id = ir.blocks.length
-    ir.blocks.push(TypedAnalysisBlock{ id: id, function_name: function_name, stmt_id: stmt_id, instruction_ids: [], successors: [], line: line, col: col })
-    facts.block_borrows.push(OwnershipBlockBorrowFact{ block_id: id, sources: [] })
+    let fixed_span = span
+    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
+    ir.blocks.push(TypedAnalysisBlock{ id: id, function_id: context.function_id, function_name: context.function_name, scope_id: context.scope_id, stmt_id: stmt_id, instruction_ids: [], predecessors: [], successors: [], span: fixed_span })
+    if (ir.scopes[context.scope_id].entry_block < 0) ir.scopes[context.scope_id].entry_block = id
     return id
+}
+
+pub fn analysis_scope_add_exit(ir: &TypedAnalysisIR, scope_id: i32, block_id: i32): i32
+{
+    if (scope_id < 0 or scope_id >= ir.scopes.length or block_id < 0) return 0
+    for (i in 0 .. ir.scopes[scope_id].exit_blocks.length)
+    {
+        if (ir.scopes[scope_id].exit_blocks[i] == block_id) return 0
+    }
+    ir.scopes[scope_id].exit_blocks.push(block_id)
+    return 0
+}
+
+pub fn analysis_finalize_scope_exits(ir: &TypedAnalysisIR): i32
+{
+    for (i in 0 .. ir.scopes.length)
+    {
+        ir.scopes[i].exit_blocks = []
+    }
+    for (i in 0 .. ir.blocks.length)
+    {
+        let source_scope = ir.blocks[i].scope_id
+        if (ir.blocks[i].successors.length == 0)
+        {
+            let mut terminal_scope = source_scope
+            while (terminal_scope >= 0 and terminal_scope < ir.scopes.length)
+            {
+                analysis_scope_add_exit(ir, terminal_scope, i)
+                terminal_scope = ir.scopes[terminal_scope].parent
+            }
+        }
+        for (j in 0 .. ir.blocks[i].successors.length)
+        {
+            let successor_scope = ir.blocks[ir.blocks[i].successors[j]].scope_id
+            let mut source_current = source_scope
+            while (source_current >= 0 and source_current < ir.scopes.length)
+            {
+                let mut successor_current = successor_scope
+                let mut successor_contained = 0
+                while (successor_current >= 0 and successor_current < ir.scopes.length)
+                {
+                    if (successor_current == source_current) successor_contained = 1
+                    successor_current = ir.scopes[successor_current].parent
+                }
+                if (successor_contained == 0) analysis_scope_add_exit(ir, source_current, i)
+                source_current = ir.scopes[source_current].parent
+            }
+        }
+    }
+    return 0
+}
+
+pub fn ownership_block_add_source(facts: &OwnershipFacts, block_id: i32, place_id: i32): i32
+{
+    if (block_id < 0 or block_id >= facts.block_borrows.length or place_id < 0) return 0
+    for (i in 0 .. facts.block_borrows[block_id].source_place_ids.length)
+    {
+        if (facts.block_borrows[block_id].source_place_ids[i] == place_id) return 0
+    }
+    facts.block_borrows[block_id].source_place_ids.push(place_id)
+    return 0
 }
 
 pub fn analysis_add_edge(ir: &TypedAnalysisIR, from: i32, to: i32): i32
 {
     if (from < 0 or to < 0) return 0
+    let mut has_successor = 0
     for (i in 0 .. ir.blocks[from].successors.length)
     {
-        if (ir.blocks[from].successors[i] == to) return 0
+        if (ir.blocks[from].successors[i] == to) has_successor = 1
     }
-    ir.blocks[from].successors.push(to)
+    if (has_successor == 0) ir.blocks[from].successors.push(to)
+    let mut has_predecessor = 0
+    for (i in 0 .. ir.blocks[to].predecessors.length)
+    {
+        if (ir.blocks[to].predecessors[i] == from) has_predecessor = 1
+    }
+    if (has_predecessor == 0) ir.blocks[to].predecessors.push(from)
     return 0
 }
 
 pub fn analysis_flow(entry: i32, exits: [i32]): AnalysisFlow
 {
-    return AnalysisFlow{ entry: entry, exits: exits }
+    return AnalysisFlow{ entry: entry, exits: exits, $tyir_empty_flow() }
 }
 
 pub fn analysis_link_exits(ir: &TypedAnalysisIR, exits: [i32], target: i32)
@@ -1061,43 +1285,67 @@ pub fn analysis_link_exits(ir: &TypedAnalysisIR, exits: [i32], target: i32)
     }
 }
 
-pub fn analysis_expr_action(program: AstProgram, ty: string, expr: AstExpr): string
+pub fn analysis_expr_action(program: AstProgram, ty: string, expr: AstExpr, consume: i32): string
 {
     if (expr.tag == "addr") return if (expr.int_value == 1) { "BorrowMut" } else { "BorrowShared" }
     if (analysis_type_is_copy(program, ty) == 1) return "Copy"
-    return "Move"
+    if (consume == 1) return "Move"
+    return ""
 }
 
-pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, facts: &OwnershipFacts, block_id: i32, stmt_id: i32, idx: i32): i32
+pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, block_id: i32, stmt_id: i32, idx: i32, consume: i32, filename: string, scope_id: i32): i32
 {
     if (idx < 0) return -1
     let es = program.expr_store
     let expr = expr_store_get(&es, idx)
-    if (expr.left_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, stmt_id, expr.left_idx)
-    if (expr.right_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, stmt_id, expr.right_idx)
-    for (i in 0 .. expr.args.length)
+    if (expr.tag == "call" or expr.tag == "method_call")
     {
-        if (expr.args[i] >= 0) analysis_collect_expr(program, env, ir, facts, block_id, stmt_id, expr.args[i])
+        if (expr.left_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, 0, filename, scope_id)
+        for (i in 0 .. expr.args.length)
+        {
+            let parameter_ty = ownership_function_param_type(program, expr.text, i)
+            let argument_consume = if (expr.text == "clone" or analysis_type_is_reference(parameter_ty) == 1) { 0 } else { 1 }
+            analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.args[i], argument_consume, filename, scope_id)
+        }
     }
-    if (facts.expr_actions[idx] != "") return -1
+    elif (expr.tag == "field" or expr.tag == "lambda") {}
+    elif (expr.tag == "block_expr")
+    {
+        if (expr.right_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.right_idx, consume, filename, scope_id)
+    }
+    elif (expr.tag == "index" or expr.tag == "slice")
+    {
+        if (expr.right_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.right_idx, 0, filename, scope_id)
+        for (i in 0 .. expr.args.length)
+        {
+            if (expr.args[i] >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.args[i], 0, filename, scope_id)
+        }
+    }
+    elif (expr.tag == "deref") analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, 0, filename, scope_id)
+    else
+    {
+        if (expr.left_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, 0, filename, scope_id)
+        if (expr.right_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.right_idx, 0, filename, scope_id)
+        for (i in 0 .. expr.args.length)
+        {
+            if (expr.args[i] >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.args[i], 0, filename, scope_id)
+        }
+    }
     let ty = analysis_expr_type(program, env, idx)
-    let place_id = analysis_place_for_expr(program, env, ir, idx)
+    let place_id = analysis_place_for_expr(program, env, ir, idx, filename, scope_id)
     let value_id = ir.values.length
-    ir.values.push(TypedAnalysisValue{ expr_id: idx, ty: ty, place_id: place_id, line: expr.line, col: expr.col })
-    let action = analysis_expr_action(program, ty, expr)
-    facts.expr_actions[idx] = action
-    facts.expr_types[idx] = ty
-    let mut kind = "value"
-    if (expr.tag == "call" or expr.tag == "method_call") kind = "call"
-    elif (expr.tag == "addr") kind = if (expr.int_value == 1) { "borrow_mut" } else { "borrow_shared" }
-    elif (expr.tag == "ident" or expr.tag == "field" or expr.tag == "index" or expr.tag == "deref") kind = if (action == "Move") { "move" } else { "use" }
-    analysis_add_instruction(ir, block_id, kind, idx, stmt_id, place_id, value_id, -1, expr.line, expr.col)
-    if (expr.tag == "addr")
-    {
-        let borrow_kind = if (expr.int_value == 1) { "BorrowMut" } else { "BorrowShared" }
-        facts.expr_borrows.push(OwnershipBorrowFact{ expr_id: idx, source: expr.text, kind: borrow_kind, line: expr.line, col: expr.col })
-        facts.block_borrows[block_id].sources.push(expr.text)
+    let span = analysis_resolved_expr_span(program, filename, idx)
+    let span_length = if (expr.text.length > 0) { expr.text.length } else { 1 }
+    span.length = span_length
+    ir.values.push(TypedAnalysisValue{ id: value_id, expr_id: idx, ty: ty, place_id: place_id, span: span })
+    let action = analysis_expr_action(program, ty, expr, consume)
+    let kind = match expr.tag {
+        "call" | "method_call" -> "call"
+        "addr" -> if (expr.int_value == 1) { "borrow_mut" } else { "borrow_shared" }
+        "ident" | "field" | "index" | "deref" -> match action { "Copy" -> "copy" "Move" -> "move" _ -> "use" }
+        _ -> "nop"
     }
+    analysis_add_instruction(ir, block_id, kind, idx, stmt_id, place_id, value_id, -1, span, span_length)
     return value_id
 }
 
@@ -1115,143 +1363,731 @@ pub fn analysis_stmt_col(program: AstProgram, idx: i32): i32
     return stmt_store_get(&store, idx).col
 }
 
-pub fn analysis_add_scope_drops(program: AstProgram, env: &AnalysisEnv, start: i32, scope_id: i32, block_id: i32, drops: &DropPlan)
+pub fn analysis_stmt_span(program: AstProgram, filename: string, stmt: AstStmt): AnalysisSpan
 {
-    let mut i = env.names.length
-    while (i > start)
+    if (stmt.line > 0 and stmt.col > 0) return analysis_span(filename, stmt.line, stmt.col, if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 })
+    let value_source = analysis_expr_source_id(program, stmt.value_idx)
+    if (value_source >= 0) return analysis_resolved_expr_span(program, filename, value_source)
+    let assignment_source = analysis_expr_source_id(program, stmt.assign_idx)
+    if (assignment_source >= 0) return analysis_resolved_expr_span(program, filename, assignment_source)
+    let print_source = analysis_expr_source_id(program, stmt.print_idx)
+    if (print_source >= 0) return analysis_resolved_expr_span(program, filename, print_source)
+    return analysis_span(filename, 1, 1, 1)
+}
+
+pub fn analysis_context_with_scope(context: AnalysisBuildContext, scope_id: i32): AnalysisBuildContext
+{
+    let mut out = context
+    out.scope_id = scope_id
+    return out
+}
+
+pub fn analysis_context_with_loop(context: AnalysisBuildContext, scope_id: i32, condition: i32, exit_block: i32): AnalysisBuildContext
+{
+    let mut out = analysis_context_with_scope(context, scope_id)
+    out.loop_condition = condition
+    out.loop_exit = exit_block
+    return out
+}
+
+pub fn analysis_flow_merge_control(target: &AnalysisFlow, source: &AnalysisFlow)
+{
+    for (i in 0 .. source.break_exits.length)
     {
-        i -= 1
-        if (analysis_type_is_copy(program, env.types[i]) == 0 and analysis_type_is_reference(env.types[i]) == 0) drops.events.push(DropEvent{ scope_id: scope_id, stmt_id: -1, return_id: -1, block_id: block_id, place: env.names[i], ty: env.types[i], reason: "scope_exit", line: 0, col: 0 })
+        target.break_exits.push(source.break_exits[i])
+    }
+    for (i in 0 .. source.continue_exits.length)
+    {
+        target.continue_exits.push(source.continue_exits[i])
+    }
+    for (i in 0 .. source.return_exits.length)
+    {
+        target.return_exits.push(source.return_exits[i])
     }
 }
 
-pub fn analysis_emit_simple_stmt(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, facts: &OwnershipFacts, drops: &DropPlan, function_name: string, idx: i32): AnalysisFlow
+pub fn analysis_place_is_prefix(prefix: AnalysisPlace, place: AnalysisPlace): i32
+{
+    if (prefix.root != place.root or prefix.projections.length > place.projections.length) return 0
+    for (i in 0 .. prefix.projections.length)
+    {
+        if (analysis_projection_equal(prefix.projections[i], place.projections[i]) == 0) return 0
+    }
+    return 1
+}
+
+pub fn analysis_place_was_moved(ir: &TypedAnalysisIR, place_id: i32): i32
+{
+    if (place_id < 0 or place_id >= ir.places.length) return 0
+    for (i in 0 .. ir.instructions.length)
+    {
+        let instruction = ir.instructions[i]
+        if (instruction.kind == "move" and instruction.place_id >= 0)
+        {
+            if (analysis_place_is_prefix(ir.places[instruction.place_id], ir.places[place_id]) == 1) return 1
+        }
+    }
+    return 0
+}
+
+pub fn analysis_drop_exists(drops: &DropPlan, block_id: i32, place_id: i32, reason: string): i32
+{
+    for (i in 0 .. drops.events.length)
+    {
+        let event = drops.events[i]
+        if (event.block_id == block_id and event.place_id == place_id and event.reason == reason) return 1
+    }
+    return 0
+}
+
+pub fn analysis_add_drop_event(program: AstProgram, ir: &TypedAnalysisIR, drops: &DropPlan, scope_id: i32, stmt_id: i32, return_id: i32, block_id: i32, place_id: i32, reason: string, span: AnalysisSpan, span_length: i32): i32
+{
+    if (place_id < 0 or place_id >= ir.places.length) return 0
+    let place = ir.places[place_id]
+    if (analysis_type_is_copy(program, place.ty) == 1 or analysis_type_is_reference(place.ty) == 1) return 0
+    if (analysis_place_was_moved(ir, place_id) == 1) return 0
+    if (analysis_drop_exists(drops, block_id, place_id, reason) == 1) return 0
+    let fixed_span = span
+    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
+    drops.events.push(DropEvent{ scope_id: scope_id, stmt_id: stmt_id, return_id: return_id, block_id: block_id, place_id: place_id, ty: place.ty, reason: reason, span: fixed_span })
+    return 0
+}
+
+pub fn analysis_add_scope_drops(program: AstProgram, ir: &TypedAnalysisIR, drops: &DropPlan, scope_id: i32, exits: [i32], reason: string, stmt_id: i32, return_id: i32, span: AnalysisSpan, span_length: i32): i32
+{
+    if (scope_id < 0) return 0
+    for (i in 0 .. exits.length)
+    {
+        for (j in 0 .. ir.scopes[scope_id].local_place_ids.length)
+        {
+            analysis_add_drop_event(program, ir, drops, scope_id, stmt_id, return_id, exits[i], ir.scopes[scope_id].local_place_ids[j], reason, span, span_length)
+        }
+    }
+    return 0
+}
+
+pub fn analysis_add_nested_exit_drops(program: AstProgram, ir: &TypedAnalysisIR, drops: &DropPlan, scope_id: i32, block_id: i32, stmt_id: i32, return_id: i32, reason: string, span: AnalysisSpan, span_length: i32)
+{
+    let mut current = scope_id
+    while (current >= 0)
+    {
+        analysis_add_scope_drops(program, ir, drops, current, [block_id], reason, stmt_id, return_id, span, span_length)
+        current = ir.scopes[current].parent
+    }
+}
+
+pub fn drop_plan_finalize(program: AstProgram, ir: &TypedAnalysisIR, pending: &DropPlan): DropPlan
+{
+    let out = drop_plan_new()
+    for (i in 0 .. pending.events.length)
+    {
+        let event = pending.events[i]
+        if (analysis_place_was_moved(ir, event.place_id) == 0 and analysis_drop_exists(&out, event.block_id, event.place_id, event.reason) == 0) out.events.push(event)
+    }
+    return out
+}
+
+pub fn analysis_assignment_place(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, stmt: AstStmt, filename: string, scope_id: i32): i32
+{
+    if (stmt.tag == "assign") return analysis_find_place(ir, stmt.assign_name, [], -1)
+    let base_id = analysis_place_for_expr(program, env, ir, stmt.value_idx, filename, scope_id)
+    if (base_id < 0) return -1
+    let base = ir.places[base_id]
+    let mut projections: [AnalysisProjection] = []
+    for (i in 0 .. base.projections.length)
+    {
+        projections.push(base.projections[i])
+    }
+    match stmt.tag {
+        "field_assign" -> projections.push(ProjectionField(stmt.assign_name))
+        "store_index" -> projections.push(ProjectionIndex)
+        "store_deref" -> projections.push(ProjectionDeref)
+        _ -> return base_id
+    }
+    let existing = analysis_find_place(ir, base.root, projections, base.owner_scope)
+    if (existing >= 0) return existing
+    return analysis_add_place(ir, base.root, projections, analysis_expr_type(program, env, stmt.assign_idx), analysis_stmt_span(program, filename, stmt), if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 }, base.owner_mutable, base.owner_scope, base.is_parameter)
+}
+
+pub fn analysis_emit_simple_stmt(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, drops: &DropPlan, context: AnalysisBuildContext, idx: i32): AnalysisFlow
 {
     let store = program.store
     let stmt = stmt_store_get(&store, idx)
-    let block_id = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
-    if (stmt.value_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.value_idx)
-    if (stmt.print_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.print_idx)
-    if (stmt.tag != "if" and stmt.assign_idx >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.assign_idx)
-    if (stmt.tag == "store_index" and stmt.direct_ret >= 0) analysis_collect_expr(program, env, ir, facts, block_id, idx, stmt.direct_ret)
-    let mut kind = stmt.tag
-    if (stmt.tag == "let" or stmt.tag == "assign" or stmt.tag == "field_assign" or stmt.tag == "store_index" or stmt.tag == "store_deref") kind = "assign"
-    analysis_add_instruction(ir, block_id, kind, -1, idx, -1, -1, -1, stmt.line, stmt.col)
+    let span = analysis_stmt_span(program, context.filename, stmt)
+    let span_length = if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 }
+    span.length = span_length
+    let block_id = analysis_add_block(ir, context, idx, span, span_length)
     if (stmt.tag == "let")
     {
         let inferred = analysis_expr_type(program, env, stmt.assign_idx)
         let ty = if (stmt.type_text != "") { stmt.type_text } else { inferred }
+        let value_id = analysis_collect_expr(program, env, ir, block_id, idx, stmt.assign_idx, 1, context.filename, context.scope_id)
         analysis_env_add(env, stmt.assign_name, ty, stmt.is_mut)
+        let place_id = analysis_add_local_place(ir, env, context.scope_id, stmt.assign_name, ty, stmt.is_mut, 0, span, span_length)
+        analysis_add_instruction(ir, block_id, "assign", stmt.assign_idx, idx, place_id, value_id, -1, span, span_length)
     }
-    if (stmt.tag == "assign")
+    elif (stmt.tag == "assign" or stmt.tag == "field_assign" or stmt.tag == "store_index" or stmt.tag == "store_deref")
     {
-        let old_ty = analysis_env_type(env, stmt.assign_name)
-        if (analysis_type_is_copy(program, old_ty) == 0) drops.events.push(DropEvent{ scope_id: -1, stmt_id: idx, return_id: -1, block_id: block_id, place: stmt.assign_name, ty: old_ty, reason: "overwrite", line: stmt.line, col: stmt.col })
+        if (stmt.value_idx >= 0) analysis_collect_expr(program, env, ir, block_id, idx, stmt.value_idx, 0, context.filename, context.scope_id)
+        if (stmt.tag == "store_index" and stmt.direct_ret >= 0) analysis_collect_expr(program, env, ir, block_id, idx, stmt.direct_ret, 0, context.filename, context.scope_id)
+        let value_id2 = analysis_collect_expr(program, env, ir, block_id, idx, stmt.assign_idx, 1, context.filename, context.scope_id)
+        let place_id2 = analysis_assignment_place(program, env, ir, stmt, context.filename, context.scope_id)
+        if (stmt.tag == "assign" and place_id2 >= 0) analysis_add_drop_event(program, ir, drops, context.scope_id, idx, -1, block_id, place_id2, "overwrite", span, span_length)
+        analysis_add_instruction(ir, block_id, "assign", stmt.assign_idx, idx, place_id2, value_id2, -1, span, span_length)
     }
-    if (stmt.tag == "return_expr")
+    elif (stmt.tag == "return_expr")
     {
-        drops.events.push(DropEvent{ scope_id: -1, stmt_id: -1, return_id: idx, block_id: block_id, place: "", ty: "", reason: "return", line: stmt.line, col: stmt.col })
-        return analysis_flow(block_id, [])
+        let value_id3 = analysis_collect_expr(program, env, ir, block_id, idx, stmt.value_idx, 1, context.filename, context.scope_id)
+        let place_id3 = if (value_id3 >= 0) { ir.values[value_id3].place_id } else { -1 }
+        analysis_add_instruction(ir, block_id, "return_value", stmt.value_idx, idx, place_id3, value_id3, -1, span, span_length)
+        analysis_add_nested_exit_drops(program, ir, drops, context.scope_id, block_id, idx, stmt.value_idx, "return_exit", span, span_length)
+        let flow = analysis_flow(block_id, [])
+        flow.return_exits.push(block_id)
+        return flow
     }
-    if (stmt.tag == "break" or stmt.tag == "continue") return analysis_flow(block_id, [])
+    elif (stmt.tag == "break" or stmt.tag == "continue")
+    {
+        let target = if (stmt.tag == "break") { context.loop_exit } else { context.loop_condition }
+        analysis_add_instruction(ir, block_id, "branch", -1, idx, -1, -1, target, span, span_length)
+        if (target >= 0) analysis_add_edge(ir, block_id, target)
+        let reason = if (stmt.tag == "break") { "break_exit" } else { "continue_exit" }
+        analysis_add_nested_exit_drops(program, ir, drops, context.scope_id, block_id, idx, -1, reason, span, span_length)
+        let flow2 = analysis_flow(block_id, [])
+        if (stmt.tag == "break") flow2.break_exits.push(block_id)
+        else flow2.continue_exits.push(block_id)
+        return flow2
+    }
+    else
+    {
+        let expr_id = if (stmt.print_idx >= 0) { stmt.print_idx } else { stmt.value_idx }
+        let value_id4 = analysis_collect_expr(program, env, ir, block_id, idx, expr_id, 0, context.filename, context.scope_id)
+        let place_id4 = if (value_id4 >= 0) { ir.values[value_id4].place_id } else { -1 }
+        analysis_add_instruction(ir, block_id, "use", expr_id, idx, place_id4, value_id4, -1, span, span_length)
+    }
     return analysis_flow(block_id, [block_id])
 }
 
-pub fn analysis_emit_stmt(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, facts: &OwnershipFacts, drops: &DropPlan, function_name: string, idx: i32): AnalysisFlow
+pub fn analysis_emit_block(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, drops: &DropPlan, context: AnalysisBuildContext, idx: i32, kind: string): AnalysisFlow
+{
+    let store = program.store
+    let stmt = stmt_store_get(&store, idx)
+    let span = analysis_stmt_span(program, context.filename, stmt)
+    let span_length = if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 }
+    span.length = span_length
+    let parent_kind = if (context.scope_id >= 0 and context.scope_id < ir.scopes.length) { ir.scopes[context.scope_id].kind } else { "" }
+    let scope_kind = match parent_kind { "branch" | "match_arm" -> parent_kind _ -> kind }
+    let scope_id = analysis_add_scope(ir, scope_kind, context.scope_id, span, span_length)
+    let child_context = analysis_context_with_scope(context, scope_id)
+    let mut entry = -1
+    let mut exits: [i32] = []
+    let combined = analysis_flow(-1, [])
+    let count = if (stmt.stmt_indices.length > 0) { stmt.stmt_indices.length } else { stmt.block_count }
+    for (i in 0 .. count)
+    {
+        let child_idx = if (stmt.stmt_indices.length > 0) { stmt.stmt_indices[i] } else { stmt.block_start + i }
+        let flow = analysis_emit_stmt(program, env, ir, drops, child_context, child_idx)
+        if (entry < 0) entry = flow.entry
+        if (exits.length > 0 and flow.entry >= 0) analysis_link_exits(ir, exits, flow.entry)
+        if (exits.length > 0) exits = flow.exits
+        elif (i == 0 or flow.entry >= 0) exits = flow.exits
+        analysis_flow_merge_control(&combined, &flow)
+    }
+    if (entry < 0)
+    {
+        entry = analysis_add_block(ir, child_context, -1, span, span_length)
+        analysis_add_instruction(ir, entry, "nop", -1, -1, -1, -1, -1, span, span_length)
+        exits = [entry]
+    }
+    ir.scopes[scope_id].exit_blocks = exits
+    let drop_reason = match scope_kind { "branch" | "match_arm" -> "branch_exit" _ -> "scope_exit" }
+    analysis_add_scope_drops(program, ir, drops, scope_id, exits, drop_reason, -1, -1, span, span_length)
+    combined.entry = entry
+    combined.exits = exits
+    return combined
+}
+
+pub fn analysis_emit_stmt(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnalysisIR, drops: &DropPlan, context: AnalysisBuildContext, idx: i32): AnalysisFlow
 {
     if (idx < 0) return analysis_flow(-1, [])
     let store = program.store
     let stmt = stmt_store_get(&store, idx)
-    if (stmt.tag == "block")
-    {
-        let scope_start = env.names.length
-        let mut entry = -1
-        let mut exits: [i32] = []
-        if (stmt.stmt_indices.length > 0)
-        {
-            for (i in 0 .. stmt.stmt_indices.length)
-            {
-                let flow = analysis_emit_stmt(program, env, ir, facts, drops, function_name, stmt.stmt_indices[i])
-                if (entry < 0) entry = flow.entry
-                if (exits.length > 0 and flow.entry >= 0) analysis_link_exits(ir, exits, flow.entry)
-                exits = flow.exits
-            }
-        }
-        else
-        {
-            for (i in 0 .. stmt.block_count)
-            {
-                let flow2 = analysis_emit_stmt(program, env, ir, facts, drops, function_name, stmt.block_start + i)
-                if (entry < 0) entry = flow2.entry
-                if (exits.length > 0 and flow2.entry >= 0) analysis_link_exits(ir, exits, flow2.entry)
-                exits = flow2.exits
-            }
-        }
-        let exit_block = if (exits.length > 0) { exits[0] } else { -1 }
-        analysis_add_scope_drops(program, env, scope_start, idx, exit_block, drops)
-        return analysis_flow(entry, exits)
-    }
+    let span = analysis_stmt_span(program, context.filename, stmt)
+    let span_length = if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 }
+    span.length = span_length
+    if (stmt.tag == "block") return analysis_emit_block(program, env, ir, drops, context, idx, "block")
     if (stmt.tag == "if")
     {
-        let cond_block = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
-        analysis_collect_expr(program, env, ir, facts, cond_block, idx, stmt.value_idx)
-        analysis_add_instruction(ir, cond_block, "branch", stmt.value_idx, idx, -1, -1, -1, stmt.line, stmt.col)
+        let condition = analysis_add_block(ir, context, idx, span, span_length)
+        let condition_value = analysis_collect_expr(program, env, ir, condition, idx, stmt.value_idx, 0, context.filename, context.scope_id)
+        let merge = analysis_add_block(ir, context, -1, span, span_length)
         let then_env = analysis_env_clone(env)
         let else_env = analysis_env_clone(env)
-        let then_flow = analysis_emit_stmt(program, &then_env, ir, facts, drops, function_name, stmt.body_idx)
-        let else_flow = analysis_emit_stmt(program, &else_env, ir, facts, drops, function_name, stmt.assign_idx)
-        let merge = analysis_add_block(ir, facts, function_name, -1, stmt.line, stmt.col)
-        if (then_flow.entry >= 0) analysis_add_edge(ir, cond_block, then_flow.entry)
-        else analysis_add_edge(ir, cond_block, merge)
-        if (else_flow.entry >= 0) analysis_add_edge(ir, cond_block, else_flow.entry)
-        else analysis_add_edge(ir, cond_block, merge)
+        let then_scope = analysis_add_scope(ir, "branch", context.scope_id, span, span_length)
+        let else_scope = analysis_add_scope(ir, "branch", context.scope_id, span, span_length)
+        let then_flow = analysis_emit_stmt(program, &then_env, ir, drops, analysis_context_with_scope(context, then_scope), stmt.body_idx)
+        let else_flow = analysis_emit_stmt(program, &else_env, ir, drops, analysis_context_with_scope(context, else_scope), stmt.assign_idx)
+        let then_entry = if (then_flow.entry >= 0) { then_flow.entry } else { merge }
+        let else_entry = if (else_flow.entry >= 0) { else_flow.entry } else { merge }
+        analysis_add_instruction(ir, condition, "branch", stmt.value_idx, idx, -1, condition_value, then_entry, span, span_length)
+        analysis_add_instruction(ir, condition, "branch", stmt.value_idx, idx, -1, condition_value, else_entry, span, span_length)
+        analysis_add_edge(ir, condition, then_entry)
+        analysis_add_edge(ir, condition, else_entry)
         analysis_link_exits(ir, then_flow.exits, merge)
         analysis_link_exits(ir, else_flow.exits, merge)
-        return analysis_flow(cond_block, [merge])
+        ir.scopes[then_scope].entry_block = then_entry
+        ir.scopes[then_scope].exit_blocks = then_flow.exits
+        ir.scopes[else_scope].entry_block = else_entry
+        ir.scopes[else_scope].exit_blocks = else_flow.exits
+        analysis_add_scope_drops(program, ir, drops, then_scope, then_flow.exits, "branch_exit", idx, -1, span, span_length)
+        analysis_add_scope_drops(program, ir, drops, else_scope, else_flow.exits, "branch_exit", idx, -1, span, span_length)
+        let result = analysis_flow(condition, [merge])
+        analysis_flow_merge_control(&result, &then_flow)
+        analysis_flow_merge_control(&result, &else_flow)
+        return result
     }
-    if (stmt.tag == "while")
+    if (stmt.tag == "while" or stmt.tag == "for_range")
     {
-        let cond_block = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
-        analysis_collect_expr(program, env, ir, facts, cond_block, idx, stmt.value_idx)
-        analysis_add_instruction(ir, cond_block, "branch", stmt.value_idx, idx, -1, -1, -1, stmt.line, stmt.col)
+        let loop_scope = analysis_add_scope(ir, "loop", context.scope_id, span, span_length)
+        let loop_context0 = analysis_context_with_scope(context, loop_scope)
+        let condition = analysis_add_block(ir, loop_context0, idx, span, span_length)
+        let exit_block = analysis_add_block(ir, context, -1, span, span_length)
+        let loop_context = analysis_context_with_loop(context, loop_scope, condition, exit_block)
+        if (stmt.tag == "while") analysis_collect_expr(program, env, ir, condition, idx, stmt.value_idx, 0, context.filename, loop_scope)
+        else
+        {
+            analysis_collect_expr(program, env, ir, condition, idx, stmt.value_idx, 0, context.filename, loop_scope)
+            analysis_collect_expr(program, env, ir, condition, idx, stmt.assign_idx, 0, context.filename, loop_scope)
+        }
         let body_env = analysis_env_clone(env)
-        let body_flow = analysis_emit_stmt(program, &body_env, ir, facts, drops, function_name, stmt.body_idx)
-        let exit_block = analysis_add_block(ir, facts, function_name, -1, stmt.line, stmt.col)
-        if (body_flow.entry >= 0) analysis_add_edge(ir, cond_block, body_flow.entry)
-        else analysis_add_edge(ir, cond_block, cond_block)
-        analysis_add_edge(ir, cond_block, exit_block)
-        analysis_link_exits(ir, body_flow.exits, cond_block)
-        return analysis_flow(cond_block, [exit_block])
+        if (stmt.tag == "for_range")
+        {
+            analysis_env_add(&body_env, stmt.assign_name, "i32", 1)
+            analysis_add_local_place(ir, &body_env, loop_scope, stmt.assign_name, "i32", 1, 0, span, span_length)
+        }
+        let body_flow = analysis_emit_stmt(program, &body_env, ir, drops, loop_context, stmt.body_idx)
+        let body_entry = if (body_flow.entry >= 0) { body_flow.entry } else { condition }
+        analysis_add_instruction(ir, condition, "branch", stmt.value_idx, idx, -1, -1, body_entry, span, span_length)
+        analysis_add_instruction(ir, condition, "branch", stmt.value_idx, idx, -1, -1, exit_block, span, span_length)
+        analysis_add_edge(ir, condition, body_entry)
+        analysis_add_edge(ir, condition, exit_block)
+        analysis_link_exits(ir, body_flow.exits, condition)
+        ir.scopes[loop_scope].entry_block = condition
+        ir.scopes[loop_scope].exit_blocks = [exit_block]
+        let result2 = analysis_flow(condition, [exit_block])
+        for (i in 0 .. body_flow.return_exits.length)
+        {
+            result2.return_exits.push(body_flow.return_exits[i])
+        }
+        return result2
     }
     if (stmt.tag == "match")
     {
-        let branch_block = analysis_add_block(ir, facts, function_name, idx, stmt.line, stmt.col)
-        analysis_collect_expr(program, env, ir, facts, branch_block, idx, stmt.value_idx)
-        analysis_add_instruction(ir, branch_block, "branch", stmt.value_idx, idx, -1, -1, -1, stmt.line, stmt.col)
-        let merge = analysis_add_block(ir, facts, function_name, -1, stmt.line, stmt.col)
+        let branch = analysis_add_block(ir, context, idx, span, span_length)
+        let subject = analysis_collect_expr(program, env, ir, branch, idx, stmt.value_idx, 0, context.filename, context.scope_id)
+        let merge = analysis_add_block(ir, context, -1, span, span_length)
+        let result3 = analysis_flow(branch, [merge])
         for (i in 0 .. stmt.match_body_indices.length)
         {
+            let arm_scope = analysis_add_scope(ir, "match_arm", context.scope_id, span, span_length)
             let arm_env = analysis_env_clone(env)
-            let arm_flow = analysis_emit_stmt(program, &arm_env, ir, facts, drops, function_name, stmt.match_body_indices[i])
-            if (arm_flow.entry >= 0) analysis_add_edge(ir, branch_block, arm_flow.entry)
-            else analysis_add_edge(ir, branch_block, merge)
+            let arm_flow = analysis_emit_stmt(program, &arm_env, ir, drops, analysis_context_with_scope(context, arm_scope), stmt.match_body_indices[i])
+            let arm_entry = if (arm_flow.entry >= 0) { arm_flow.entry } else { merge }
+            analysis_add_instruction(ir, branch, "branch", stmt.value_idx, idx, -1, subject, arm_entry, span, span_length)
+            analysis_add_edge(ir, branch, arm_entry)
             analysis_link_exits(ir, arm_flow.exits, merge)
+            ir.scopes[arm_scope].entry_block = arm_entry
+            ir.scopes[arm_scope].exit_blocks = arm_flow.exits
+            analysis_add_scope_drops(program, ir, drops, arm_scope, arm_flow.exits, "branch_exit", idx, -1, span, span_length)
+            analysis_flow_merge_control(&result3, &arm_flow)
         }
-        return analysis_flow(branch_block, [merge])
+        return result3
     }
-    return analysis_emit_simple_stmt(program, env, ir, facts, drops, function_name, idx)
+    return analysis_emit_simple_stmt(program, env, ir, drops, context, idx)
+}
+
+pub fn analysis_last_place_use_set(ir: &TypedAnalysisIR, uses: &[i32], instruction_id: i32): i32
+{
+    let instruction = ir.instructions[instruction_id]
+    if (instruction.place_id >= 0 and instruction.place_id < uses.length and instruction.stmt_id >= 0) uses[instruction.place_id] = instruction.stmt_id
+    return 0
+}
+
+pub fn analysis_last_place_uses(ir: &TypedAnalysisIR): [i32]
+{
+    let mut uses: [i32] = []
+    for (i in 0 .. ir.places.length)
+    {
+        uses.push(-1)
+    }
+    for (i in 0 .. ir.instructions.length)
+    {
+        analysis_last_place_use_set(ir, &uses, i)
+    }
+    return uses
+}
+
+pub fn analysis_instruction_blocks(ir: &TypedAnalysisIR): [i32]
+{
+    let mut blocks: [i32] = []
+    for (i in 0 .. ir.instructions.length)
+    {
+        blocks.push(-1)
+    }
+    for (i in 0 .. ir.blocks.length)
+    {
+        for (j in 0 .. ir.blocks[i].instruction_ids.length)
+        {
+            if (ir.blocks[i].instruction_ids[j] >= 0 and ir.blocks[i].instruction_ids[j] < blocks.length) blocks[ir.blocks[i].instruction_ids[j]] = i
+        }
+    }
+    return blocks
+}
+
+pub fn ownership_facts_add_value(facts: &OwnershipFacts, ir: &TypedAnalysisIR, value_id: i32): i32
+{
+    let value = ir.values[value_id]
+    if (value.expr_id >= 0 and value.expr_id < facts.expr_types.length) facts.expr_types[value.expr_id] = value.ty
+    return 0
+}
+
+pub fn ownership_borrow_last_use(ir: &TypedAnalysisIR, last_place_uses: &[i32], instruction_id: i32): i32
+{
+    let borrow = ir.instructions[instruction_id]
+    for (i in instruction_id + 1 .. ir.instructions.length)
+    {
+        let instruction = ir.instructions[i]
+        if (instruction.kind == "assign" and instruction.value_id == borrow.value_id and instruction.place_id >= 0 and instruction.place_id < last_place_uses.length)
+        {
+            let last_use = last_place_uses[instruction.place_id]
+            if (last_use >= 0) return last_use
+        }
+    }
+    return borrow.stmt_id
+}
+
+pub fn ownership_facts_add_instruction(facts: &OwnershipFacts, ir: &TypedAnalysisIR, last_place_uses: &[i32], instruction_blocks: &[i32], instruction_id: i32): i32
+{
+    let instruction = ir.instructions[instruction_id]
+    let action = match instruction.kind { "copy" -> "Copy" "move" -> "Move" "borrow_shared" -> "BorrowShared" "borrow_mut" -> "BorrowMut" _ -> "" }
+    if (instruction.expr_id >= 0 and instruction.expr_id < facts.expr_actions.length and action != "") facts.expr_actions[instruction.expr_id] = action
+    if (instruction.kind == "move" and instruction.place_id >= 0 and instruction.place_id < ir.places.length) facts.stmt_moves.push(OwnershipMoveFact{ stmt_id: instruction.stmt_id, place_id: instruction.place_id, span: instruction.span })
+    if ((instruction.kind == "borrow_shared" or instruction.kind == "borrow_mut") and instruction.place_id >= 0 and instruction.place_id < ir.places.length)
+    {
+        let last_use = ownership_borrow_last_use(ir, last_place_uses, instruction_id)
+        facts.expr_borrows.push(OwnershipBorrowFact{ expr_id: instruction.expr_id, source_place_id: instruction.place_id, kind: action, last_use_stmt_id: last_use, span: instruction.span })
+        let borrow_block = if (instruction.id >= 0 and instruction.id < instruction_blocks.length) { instruction_blocks[instruction.id] } else { -1 }
+        if (borrow_block >= 0 and borrow_block < facts.block_borrows.length)
+        {
+            let mut has_source = 0
+            for (j in 0 .. facts.block_borrows[borrow_block].source_place_ids.length)
+            {
+                if (facts.block_borrows[borrow_block].source_place_ids[j] == instruction.place_id) has_source = 1
+            }
+            if (has_source == 0) facts.block_borrows[borrow_block].source_place_ids.push(instruction.place_id)
+        }
+    }
+    return 0
+}
+
+pub fn ownership_borrow_start_block(ir: &TypedAnalysisIR, instruction_blocks: &[i32], fact: OwnershipBorrowFact): i32
+{
+    let expected_kind = if (fact.kind == "BorrowMut") { "borrow_mut" } else { "borrow_shared" }
+    for (i in 0 .. ir.instructions.length)
+    {
+        let instruction = ir.instructions[i]
+        if (instruction.kind == expected_kind and instruction.expr_id == fact.expr_id and instruction.place_id == fact.source_place_id) return instruction_blocks[i]
+    }
+    return -1
+}
+
+pub fn ownership_borrow_last_use_block(ir: &TypedAnalysisIR, fact: OwnershipBorrowFact): i32
+{
+    if (fact.last_use_stmt_id < 0) return -1
+    for (i in 0 .. ir.blocks.length)
+    {
+        for (j in 0 .. ir.blocks[i].instruction_ids.length)
+        {
+            let instruction_id = ir.blocks[i].instruction_ids[j]
+            if (ir.instructions[instruction_id].stmt_id == fact.last_use_stmt_id) return i
+        }
+    }
+    return -1
+}
+
+pub fn ownership_facts_propagate_borrow(facts: &OwnershipFacts, ir: &TypedAnalysisIR, instruction_blocks: &[i32], fact: OwnershipBorrowFact): i32
+{
+    let start_block = ownership_borrow_start_block(ir, instruction_blocks, fact)
+    if (start_block < 0) return 0
+    let last_use_block = ownership_borrow_last_use_block(ir, fact)
+    let mut visited: [i32] = []
+    for (i in 0 .. ir.blocks.length)
+    {
+        visited.push(0)
+    }
+    let mut work = [start_block]
+    let mut cursor = 0
+    while (cursor < work.length)
+    {
+        let block_id = work[cursor]
+        cursor += 1
+        if (block_id < 0 or block_id >= ir.blocks.length or visited[block_id] == 1) continue
+        visited[block_id] = 1
+        ownership_block_add_source(facts, block_id, fact.source_place_id)
+        if (block_id != last_use_block)
+        {
+            for (i in 0 .. ir.blocks[block_id].successors.length)
+            {
+                work.push(ir.blocks[block_id].successors[i])
+            }
+        }
+    }
+    return 0
+}
+
+pub fn ownership_facts_from_ir(program: AstProgram, ir: &TypedAnalysisIR): OwnershipFacts
+{
+    let facts = ownership_facts_new(program.expr_store.exprs.length)
+    let last_place_uses = analysis_last_place_uses(ir)
+    let instruction_blocks = analysis_instruction_blocks(ir)
+    for (i in 0 .. ir.values.length)
+    {
+        ownership_facts_add_value(&facts, ir, i)
+    }
+    for (i in 0 .. ir.blocks.length)
+    {
+        facts.block_borrows.push(OwnershipBlockBorrowFact{ block_id: ir.blocks[i].id, source_place_ids: [] })
+    }
+    for (i in 0 .. ir.instructions.length)
+    {
+        ownership_facts_add_instruction(&facts, ir, &last_place_uses, &instruction_blocks, i)
+    }
+    for (i in 0 .. facts.expr_borrows.length)
+    {
+        ownership_facts_propagate_borrow(&facts, ir, &instruction_blocks, facts.expr_borrows[i])
+    }
+    return facts
+}
+
+pub fn analysis_instruction_block(ir: &TypedAnalysisIR, instruction_id: i32): i32
+{
+    for (i in 0 .. ir.blocks.length)
+    {
+        for (j in 0 .. ir.blocks[i].instruction_ids.length)
+        {
+            if (ir.blocks[i].instruction_ids[j] == instruction_id) return i
+        }
+    }
+    return -1
+}
+
+pub fn typed_analysis_span_validate(file: string, line: i32, column: i32, length: i32): string
+{
+    if (file == "") return "TypedAnalysisIR span has no source file"
+    if (line < 1 or column < 1 or length < 1) return "TypedAnalysisIR span has invalid source coordinates"
+    return ""
+}
+
+pub fn typed_analysis_edge_contains(edges: [i32], target: i32): i32
+{
+    for (i in 0 .. edges.length)
+    {
+        if (edges[i] == target) return 1
+    }
+    return 0
+}
+
+pub fn typed_analysis_place_validate(ir: &TypedAnalysisIR, index: i32): string
+{
+    let place = ir.places[index]
+    if (place.id != index) return "TypedAnalysisIR place ID is not stable"
+    if (place.root == "") return "TypedAnalysisIR place has no local root"
+    return typed_analysis_span_validate(place.span.file, place.span.line, place.span.column, place.span.length)
+}
+
+pub fn typed_analysis_value_validate(ir: &TypedAnalysisIR, index: i32): string
+{
+    let value = ir.values[index]
+    if (value.id != index) return "TypedAnalysisIR value ID is not stable"
+    if (value.expr_id < 0) return "TypedAnalysisIR value has no expression ID"
+    if (value.place_id >= ir.places.length) return "TypedAnalysisIR value references an unknown place"
+    return typed_analysis_span_validate(value.span.file, value.span.line, value.span.column, value.span.length)
+}
+
+pub fn typed_analysis_instruction_validate(ir: &TypedAnalysisIR, index: i32): string
+{
+    let instruction = ir.instructions[index]
+    if (instruction.id != index) return "TypedAnalysisIR instruction ID is not stable"
+    let known_kind = match instruction.kind { "use" | "copy" | "move" | "borrow_shared" | "borrow_mut" | "assign" | "call" | "return_value" | "branch" | "nop" -> 1 _ -> 0 }
+    if (known_kind == 0) return "TypedAnalysisIR contains an unknown instruction kind"
+    if (instruction.value_id >= ir.values.length) return "TypedAnalysisIR instruction references an unknown value"
+    if (instruction.place_id >= ir.places.length) return "TypedAnalysisIR instruction references an unknown place"
+    if (instruction.target_block >= ir.blocks.length) return "TypedAnalysisIR instruction references an unknown target block"
+    return typed_analysis_span_validate(instruction.span.file, instruction.span.line, instruction.span.column, instruction.span.length)
+}
+
+pub fn typed_analysis_block_validate(ir: &TypedAnalysisIR, index: i32): string
+{
+    let block = ir.blocks[index]
+    if (block.id != index) return "TypedAnalysisIR block ID is not stable"
+    if (block.function_id < 0 or block.function_id >= ir.functions.length) return "TypedAnalysisIR block references an unknown function"
+    if (block.scope_id < 0 or block.scope_id >= ir.scopes.length) return "TypedAnalysisIR block references an unknown scope"
+    for (i in 0 .. block.instruction_ids.length)
+    {
+        if (block.instruction_ids[i] < 0 or block.instruction_ids[i] >= ir.instructions.length) return "TypedAnalysisIR block references an unknown instruction"
+    }
+    for (i in 0 .. block.successors.length)
+    {
+        let successor = block.successors[i]
+        if (successor < 0 or successor >= ir.blocks.length) return "TypedAnalysisIR block has an unknown successor"
+        if (typed_analysis_edge_contains(ir.blocks[successor].predecessors, index) == 0) return "TypedAnalysisIR CFG successor/predecessor edge is not symmetric"
+    }
+    for (i in 0 .. block.predecessors.length)
+    {
+        let predecessor = block.predecessors[i]
+        if (predecessor < 0 or predecessor >= ir.blocks.length) return "TypedAnalysisIR block has an unknown predecessor"
+        if (typed_analysis_edge_contains(ir.blocks[predecessor].successors, index) == 0) return "TypedAnalysisIR CFG predecessor/successor edge is not symmetric"
+    }
+    return typed_analysis_span_validate(block.span.file, block.span.line, block.span.column, block.span.length)
+}
+
+pub fn typed_analysis_scope_validate(ir: &TypedAnalysisIR, index: i32): string
+{
+    let scope = ir.scopes[index]
+    if (scope.id != index) return "TypedAnalysisIR scope ID is not stable"
+    if (scope.parent >= ir.scopes.length) return "TypedAnalysisIR scope references an unknown parent"
+    if (scope.entry_block >= ir.blocks.length) return "TypedAnalysisIR scope references an unknown entry block"
+    for (i in 0 .. scope.exit_blocks.length)
+    {
+        if (scope.exit_blocks[i] < 0 or scope.exit_blocks[i] >= ir.blocks.length) return "TypedAnalysisIR scope references an unknown exit block"
+    }
+    for (i in 0 .. scope.local_place_ids.length)
+    {
+        if (scope.local_place_ids[i] < 0 or scope.local_place_ids[i] >= ir.places.length) return "TypedAnalysisIR scope references an unknown local place"
+    }
+    return typed_analysis_span_validate(scope.span.file, scope.span.line, scope.span.column, scope.span.length)
+}
+
+pub fn typed_analysis_function_validate(ir: &TypedAnalysisIR, index: i32): string
+{
+    let function = ir.functions[index]
+    if (function.id != index) return "TypedAnalysisIR function ID is not stable"
+    if (function.scope_id < 0 or function.scope_id >= ir.scopes.length) return "TypedAnalysisIR function references an unknown scope"
+    if (function.entry_block < 0 or function.entry_block >= ir.blocks.length) return "TypedAnalysisIR function references an unknown entry block"
+    if (ir.scopes[function.scope_id].entry_block != function.entry_block) return "TypedAnalysisIR function and scope entry blocks disagree"
+    for (i in 0 .. function.exit_blocks.length)
+    {
+        let exit_block = function.exit_blocks[i]
+        if (exit_block < 0 or exit_block >= ir.blocks.length) return "TypedAnalysisIR function references an unknown exit block"
+        if (ir.blocks[exit_block].function_id != index) return "TypedAnalysisIR function exit belongs to another function"
+        if (ir.blocks[exit_block].successors.length != 0) return "TypedAnalysisIR function exit still has a successor"
+        if (typed_analysis_edge_contains(ir.scopes[function.scope_id].exit_blocks, exit_block) == 0) return "TypedAnalysisIR function and scope exit blocks disagree"
+    }
+    return typed_analysis_span_validate(function.span.file, function.span.line, function.span.column, function.span.length)
+}
+
+pub fn ownership_facts_validate(ir: &TypedAnalysisIR, facts: &OwnershipFacts): string
+{
+    for (i in 0 .. facts.stmt_moves.length)
+    {
+        let fact = facts.stmt_moves[i]
+        if (fact.stmt_id < 0) return "OwnershipFacts move has no statement ID"
+        if (fact.place_id < 0 or fact.place_id >= ir.places.length) return "OwnershipFacts move references an unknown place"
+        let span_error = typed_analysis_span_validate(fact.span.file, fact.span.line, fact.span.column, fact.span.length)
+        if (span_error != "") return span_error
+    }
+    for (i in 0 .. facts.expr_borrows.length)
+    {
+        let fact = facts.expr_borrows[i]
+        if (fact.expr_id < 0) return "OwnershipFacts borrow has no expression ID"
+        if (fact.source_place_id < 0 or fact.source_place_id >= ir.places.length) return "OwnershipFacts borrow references an unknown source place"
+        if (fact.kind != "BorrowShared" and fact.kind != "BorrowMut") return "OwnershipFacts borrow has an unknown action"
+        let span_error2 = typed_analysis_span_validate(fact.span.file, fact.span.line, fact.span.column, fact.span.length)
+        if (span_error2 != "") return span_error2
+    }
+    for (i in 0 .. facts.block_borrows.length)
+    {
+        let fact = facts.block_borrows[i]
+        if (fact.block_id != i or fact.block_id >= ir.blocks.length) return "OwnershipFacts block borrow ID is not stable"
+        for (j in 0 .. fact.source_place_ids.length)
+        {
+            if (fact.source_place_ids[j] < 0 or fact.source_place_ids[j] >= ir.places.length) return "OwnershipFacts block borrow references an unknown source place"
+        }
+    }
+    return ""
+}
+
+pub fn drop_plan_validate(ir: &TypedAnalysisIR, drops: &DropPlan): string
+{
+    for (i in 0 .. drops.events.length)
+    {
+        let event = drops.events[i]
+        if (event.scope_id < 0 or event.scope_id >= ir.scopes.length) return "DropPlan event references an unknown scope"
+        if (event.block_id < 0 or event.block_id >= ir.blocks.length) return "DropPlan event references an unknown block"
+        if (event.place_id < 0 or event.place_id >= ir.places.length) return "DropPlan event references an unknown place"
+        let known_reason = match event.reason { "scope_exit" | "overwrite" | "return_exit" | "branch_exit" | "break_exit" | "continue_exit" -> 1 _ -> 0 }
+        if (known_reason == 0) return "DropPlan event has an unknown reason"
+        let span_error = typed_analysis_span_validate(event.span.file, event.span.line, event.span.column, event.span.length)
+        if (span_error != "") return span_error
+    }
+    return ""
+}
+
+pub fn typed_analysis_ir_validate(ir: &TypedAnalysisIR): string
+{
+    let mut error = ""
+    let mut i = 0
+    while (i < ir.places.length and error == "")
+    {
+        error = typed_analysis_place_validate(ir, i)
+        i += 1
+    }
+    i = 0
+    while (i < ir.values.length and error == "")
+    {
+        error = typed_analysis_value_validate(ir, i)
+        i += 1
+    }
+    i = 0
+    while (i < ir.instructions.length and error == "")
+    {
+        error = typed_analysis_instruction_validate(ir, i)
+        i += 1
+    }
+    i = 0
+    while (i < ir.blocks.length and error == "")
+    {
+        error = typed_analysis_block_validate(ir, i)
+        i += 1
+    }
+    i = 0
+    while (i < ir.scopes.length and error == "")
+    {
+        error = typed_analysis_scope_validate(ir, i)
+        i += 1
+    }
+    i = 0
+    while (i < ir.functions.length and error == "")
+    {
+        error = typed_analysis_function_validate(ir, i)
+        i += 1
+    }
+    return error
 }
 
 pub fn typed_analysis_program(program: AstProgram, source: string, filename: string): TypedAnalysisResult
 {
     let ir = typed_analysis_ir_new()
-    let facts = ownership_facts_new(program.expr_store.exprs.length)
     let drops = drop_plan_new()
-    let mut error = ""
-    let mut error_count = 0
     for (i in 0 .. program.functions.length)
     {
         let func = program.functions[i]
+        let function_span = analysis_span(filename, func.line, func.col, func.name.length)
+        let function_span_length = if (func.name.length > 0) { func.name.length } else { 1 }
+        function_span.length = function_span_length
+        let function_scope = analysis_add_scope(&ir, "function", -1, function_span, function_span_length)
+        let function_id = ir.functions.length
+        ir.functions.push(TypedAnalysisFunction{ id: function_id, name: func.name, scope_id: function_scope, entry_block: -1, exit_blocks: [], span: function_span })
+        let context = AnalysisBuildContext{ filename: filename, function_id: function_id, function_name: func.name, scope_id: function_scope, loop_condition: -1, loop_exit: -1 }
         let env = analysis_env_new()
         for (j in 0 .. program.globals.length)
         {
@@ -1261,21 +2097,153 @@ pub fn typed_analysis_program(program: AstProgram, source: string, filename: str
         }
         for (j in 0 .. func.param_names.length)
         {
-            analysis_env_add(&env, func.param_names[j], func.param_types[j], if (analysis_type_is_mut_reference(func.param_types[j]) == 1) { 1 } else { 0 })
+            let parameter_mutable = if (analysis_type_is_mut_reference(func.param_types[j]) == 1) { 1 } else { 0 }
+            analysis_env_add(&env, func.param_names[j], func.param_types[j], parameter_mutable)
+            analysis_add_local_place(&ir, &env, function_scope, func.param_names[j], func.param_types[j], parameter_mutable, 1, function_span, function_span_length)
         }
-        let param_count = env.names.length
-        let flow = analysis_emit_stmt(program, &env, &ir, &facts, &drops, func.name, func.body_idx)
-        let exit_block = if (flow.exits.length > 0) { flow.exits[0] } else { -1 }
-        analysis_add_scope_drops(program, &env, 0, func.body_idx, exit_block, &drops)
-        if (param_count < 0) return TypedAnalysisResult{ ok: 0, ownership_ok: 0, error: "invalid analysis environment", ir: ir, facts: facts, drops: drops }
-        let ownership = ownership_check_function(program, &facts, func, source, filename)
+        let flow = analysis_emit_stmt(program, &env, &ir, &drops, context, func.body_idx)
+        ir.scopes[function_scope].entry_block = flow.entry
+        ir.functions[function_id].entry_block = flow.entry
+        for (j in 0 .. ir.blocks.length)
+        {
+            if (ir.blocks[j].function_id == function_id and ir.blocks[j].successors.length == 0)
+            {
+                ir.functions[function_id].exit_blocks.push(j)
+                ir.scopes[function_scope].exit_blocks.push(j)
+            }
+        }
+        analysis_add_scope_drops(program, &ir, &drops, function_scope, flow.exits, "scope_exit", -1, -1, function_span, function_span_length)
+    }
+    analysis_finalize_scope_exits(&ir)
+    let validation_error = typed_analysis_ir_validate(&ir)
+    if (validation_error != "") return TypedAnalysisResult{ ok: 0, ownership_ok: 0, error: "vixc: error: " + validation_error, ir: ir, facts: ownership_facts_new(program.expr_store.exprs.length), drops: drops }
+    let facts = ownership_facts_from_ir(program, &ir)
+    let final_drops = drop_plan_finalize(program, &ir, &drops)
+    let facts_error = ownership_facts_validate(&ir, &facts)
+    if (facts_error != "") return TypedAnalysisResult{ ok: 0, ownership_ok: 0, error: "vixc: error: " + facts_error, ir: ir, facts: facts, drops: final_drops }
+    let drop_error = drop_plan_validate(&ir, &final_drops)
+    if (drop_error != "") return TypedAnalysisResult{ ok: 0, ownership_ok: 0, error: "vixc: error: " + drop_error, ir: ir, facts: facts, drops: final_drops }
+    let mut error = ""
+    let mut error_count = 0
+    for (i in 0 .. program.functions.length)
+    {
+        let ownership = ownership_check_function(program, &facts, program.functions[i], source, filename)
         for (j in 0 .. ownership.diagnostics.length)
         {
             error = error + ownership.diagnostics[j]
         }
         error_count += ownership.error_count
     }
-    return TypedAnalysisResult{ ok: 1, ownership_ok: if (error_count == 0) { 1 } else { 0 }, error: error, ir: ir, facts: facts, drops: drops }
+    return TypedAnalysisResult{ ok: 1, ownership_ok: if (error_count == 0) { 1 } else { 0 }, error: error, ir: ir, facts: facts, drops: final_drops }
+}
+
+pub fn typed_analysis_span_debug(file: string, line: i32, column: i32): string
+{
+    return file + ":" + ast_i32(line) + ":" + ast_i32(column)
+}
+
+pub fn typed_analysis_projection_debug(projection: AnalysisProjection): string
+{
+    return match projection {
+        ProjectionField(name) -> "." + name
+        ProjectionIndex -> "[index]"
+        ProjectionDeref -> "@"
+    }
+}
+
+pub fn typed_analysis_place_path(place: AnalysisPlace): string
+{
+    let mut out = place.root
+    for (i in 0 .. place.projections.length)
+    {
+        let projection = place.projections[i]
+        let rendered = projection
+            |> typed_analysis_projection_debug
+        out = match projection {
+            ProjectionDeref -> "@" + out
+            _ -> out + rendered
+        }
+    }
+    return out
+}
+
+pub fn typed_analysis_ids_debug(values: [i32]): string
+{
+    let mut out = "["
+    for (i in 0 .. values.length)
+    {
+        if (i > 0) out = out + ","
+        out = out + ast_i32(values[i])
+    }
+    return out + "]"
+}
+
+pub fn typed_analysis_action_for(facts: &OwnershipFacts, expr_id: i32): string
+{
+    if (expr_id < 0 or expr_id >= facts.expr_actions.length) return "none"
+    if (facts.expr_actions[expr_id] == "") return "none"
+    return facts.expr_actions[expr_id]
+}
+
+pub fn typed_analysis_ir_debug(result: &TypedAnalysisResult): string
+{
+    let ir = result.ir
+    let facts = result.facts
+    let show_id = fn (id: i32): string => if (id >= 0) ast_i32(id) else "none"
+    let mut out = "TypedAnalysisIR\n"
+    for (i in 0 .. ir.functions.length)
+    {
+        let function = ir.functions[i]
+        let location = typed_analysis_span_debug(function.span.file, function.span.line, function.span.column)
+        out = out + "function " + ast_i32(function.id) + " " + function.name + " scope=" + ast_i32(function.scope_id) + " entry=" + show_id(function.entry_block) + " exits=" + typed_analysis_ids_debug(function.exit_blocks) + " source=" + location + "\n"
+    }
+    for (i in 0 .. ir.scopes.length)
+    {
+        let scope = ir.scopes[i]
+        out = out + "  scope " + ast_i32(scope.id) + " kind=" + scope.kind + " parent=" + show_id(scope.parent) + " entry=" + show_id(scope.entry_block) + " exits=" + typed_analysis_ids_debug(scope.exit_blocks) + " locals=" + typed_analysis_ids_debug(scope.local_place_ids) + " source=" + typed_analysis_span_debug(scope.span.file, scope.span.line, scope.span.column) + "\n"
+    }
+    for (i in 0 .. ir.blocks.length)
+    {
+        let block = ir.blocks[i]
+        out = out + "  block " + ast_i32(block.id) + " function=" + ast_i32(block.function_id) + " scope=" + ast_i32(block.scope_id) + " predecessors=" + typed_analysis_ids_debug(block.predecessors) + " successors=" + typed_analysis_ids_debug(block.successors) + " source=" + typed_analysis_span_debug(block.span.file, block.span.line, block.span.column) + "\n"
+        for (j in 0 .. block.instruction_ids.length)
+        {
+            let instruction = ir.instructions[block.instruction_ids[j]]
+            out = out + "    instruction " + ast_i32(instruction.id) + " kind=" + instruction.kind + " expr_id=" + show_id(instruction.expr_id) + " stmt_id=" + show_id(instruction.stmt_id) + " value_id=" + show_id(instruction.value_id) + " place_id=" + show_id(instruction.place_id) + " target=" + show_id(instruction.target_block) + " action=" + typed_analysis_action_for(&facts, instruction.expr_id) + " source=" + typed_analysis_span_debug(instruction.span.file, instruction.span.line, instruction.span.column) + "\n"
+            if (instruction.value_id >= 0 and instruction.value_id < ir.values.length)
+            {
+                let value = ir.values[instruction.value_id]
+                out = out + "      typed value " + ast_i32(value.id) + " expr_id=" + ast_i32(value.expr_id) + " type=" + value.ty + " place_id=" + show_id(value.place_id) + " source=" + typed_analysis_span_debug(value.span.file, value.span.line, value.span.column) + "\n"
+            }
+            if (instruction.place_id >= 0 and instruction.place_id < ir.places.length)
+            {
+                let place = ir.places[instruction.place_id]
+                out = out + "      place " + ast_i32(place.id) + " path=" + typed_analysis_place_path(place) + " type=" + place.ty + " source=" + typed_analysis_span_debug(place.span.file, place.span.line, place.span.column) + "\n"
+            }
+        }
+    }
+    out = out + "OwnershipFacts\n"
+    for (i in 0 .. facts.stmt_moves.length)
+    {
+        let move = facts.stmt_moves[i]
+        out = out + "  move stmt_id=" + ast_i32(move.stmt_id) + " place_id=" + ast_i32(move.place_id) + " source=" + typed_analysis_span_debug(move.span.file, move.span.line, move.span.column) + "\n"
+    }
+    for (i in 0 .. facts.expr_borrows.length)
+    {
+        let borrow = facts.expr_borrows[i]
+        out = out + "  borrow expr_id=" + ast_i32(borrow.expr_id) + " action=" + borrow.kind + " source_place_id=" + ast_i32(borrow.source_place_id) + " last_use_stmt_id=" + show_id(borrow.last_use_stmt_id) + " source=" + typed_analysis_span_debug(borrow.span.file, borrow.span.line, borrow.span.column) + "\n"
+    }
+    for (i in 0 .. facts.block_borrows.length)
+    {
+        let active = facts.block_borrows[i]
+        out = out + "  block borrow block_id=" + ast_i32(active.block_id) + " active_sources=" + typed_analysis_ids_debug(active.source_place_ids) + "\n"
+    }
+    for (i in 0 .. result.drops.events.length)
+    {
+        let event = result.drops.events[i]
+        out = out + "  drop scope=" + ast_i32(event.scope_id) + " stmt_id=" + show_id(event.stmt_id) + " return_expr=" + show_id(event.return_id) + " block=" + ast_i32(event.block_id) + " place_id=" + ast_i32(event.place_id) + " type=" + event.ty + " reason=" + event.reason + " source=" + typed_analysis_span_debug(event.span.file, event.span.line, event.span.column) + "\n"
+    }
+    return out
 }
 
 pub fn analysis_reference_inner(ty: string): string

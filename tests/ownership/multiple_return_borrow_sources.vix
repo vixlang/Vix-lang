@@ -1,0 +1,13 @@
+fn choose:['a](condition: bool, left: &'a i32, right: &'a i32): &'a i32
+{
+    if (condition) return left
+    return right
+}
+
+fn main(): i32
+{
+    let left = 1
+    let right = 2
+    let selected = choose(true, &left, &right)
+    return @selected
+}

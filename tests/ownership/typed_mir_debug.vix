@@ -1,0 +1,50 @@
+type Choice = First(i32) | Second(i32)
+
+type Pair = struct {
+    left: i32,
+    right: i32
+}
+
+fn consume(text: string): i32
+{
+    return text.length
+}
+
+fn main(): i32
+{
+    let pair = Pair{ left: 3, right: 4 }
+    let values = [pair.left, pair.right]
+    let seed = values[0]
+    let first = &seed
+    let deref_value = @first
+    let mut total = deref_value
+    let label = "typed-mir"
+    let moved_size = consume(label)
+    let mut mutable_value = moved_size
+    let mutable_view = &mut mutable_value
+    let mutable_read = @mutable_view
+    total = total + mutable_read
+    if (total > 0)
+    {
+        let branch_owned = "branch"
+        total = total + branch_owned.length + values[1]
+    }
+    else total = 0
+    for (i in 0 .. values.length)
+    {
+        if (i == 0) continue
+        total = total + values[i]
+    }
+    while (total < 20)
+    {
+        total = total + 1
+        if (total == 18) break
+    }
+    let choice = First(total)
+    match choice {
+        First(value) -> total = value
+        Second(value) -> total = value + 1
+    }
+    print(total)
+    return 0
+}

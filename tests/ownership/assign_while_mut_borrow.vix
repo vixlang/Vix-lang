@@ -1,0 +1,7 @@
+fn main(): i32
+{
+    let mut value = 1
+    let view = &mut value
+    value = 2
+    return @view
+}

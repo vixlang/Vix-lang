@@ -1,0 +1,223 @@
+;; TypedAnalysisIR v0.1
+;;
+;; This file specifies the ownership-analysis IR.  It is deliberately
+;; independent from LLVM, backend MIR, LIR, registers, and stack slots.
+
+module typed_analysis_ir
+
+;; --------------------------------------------------------------------------
+;; Identity and source locations
+;; --------------------------------------------------------------------------
+
+type ExprId = i32
+type StmtId = i32
+type BlockId = i32
+type ValueId = i32
+type PlaceId = i32
+type ScopeId = i32
+type FunctionId = i32
+
+struct Span {
+    file: string
+    line: i32
+    column: i32
+    length: i32
+}
+
+;; --------------------------------------------------------------------------
+;; Types and places
+;; --------------------------------------------------------------------------
+
+type OwnershipType = string
+
+enum Projection {
+    field(name: string)
+    index
+    deref
+}
+
+struct Place {
+    id: PlaceId
+    root: string
+    projections: [Projection]
+    ty: OwnershipType
+    span: Span
+}
+
+struct Value {
+    id: ValueId
+    expr: ExprId
+    ty: OwnershipType
+    place: ?PlaceId
+    span: Span
+}
+
+;; Index projections are intentionally whole-place projections in v0.1.
+;; Distinct array indices are not assumed disjoint.
+
+;; --------------------------------------------------------------------------
+;; Instructions and control flow
+;; --------------------------------------------------------------------------
+
+enum InstructionKind {
+    use
+    copy
+    move
+    borrow_shared
+    borrow_mut
+    assign
+    call
+    return_value
+    branch
+    nop
+}
+
+struct Instruction {
+    id: i32
+    kind: InstructionKind
+    expr: ?ExprId
+    stmt: ?StmtId
+    value: ?ValueId
+    place: ?PlaceId
+    target: ?BlockId
+    span: Span
+}
+
+struct BasicBlock {
+    id: BlockId
+    function: FunctionId
+    scope: ScopeId
+    instructions: [i32]
+    predecessors: [BlockId]
+    successors: [BlockId]
+    span: Span
+}
+
+struct Scope {
+    id: ScopeId
+    parent: ?ScopeId
+    entry: BlockId
+    exits: [BlockId]
+    locals: [PlaceId]
+}
+
+struct TypedAnalysisIR {
+    blocks: [BasicBlock]
+    instructions: [Instruction]
+    values: [Value]
+    places: [Place]
+    scopes: [Scope]
+}
+
+;; --------------------------------------------------------------------------
+;; Analysis side tables
+;; --------------------------------------------------------------------------
+
+enum ExprAction {
+    copy
+    move
+    borrow_shared
+    borrow_mut
+}
+
+struct MoveFact {
+    stmt: StmtId
+    place: PlaceId
+    span: Span
+}
+
+struct BorrowFact {
+    expr: ExprId
+    source: PlaceId
+    kind: ExprAction
+    last_use: ?StmtId
+    span: Span
+}
+
+struct BlockBorrowFact {
+    block: BlockId
+    active_sources: [PlaceId]
+}
+
+struct OwnershipFacts {
+    expr_actions: map<ExprId, ExprAction>
+    expr_types: map<ExprId, OwnershipType>
+    stmt_moves: [MoveFact]
+    expr_borrows: [BorrowFact]
+    block_borrows: [BlockBorrowFact]
+}
+
+enum DropReason {
+    scope_exit
+    overwrite
+    return_exit
+    branch_exit
+    break_exit
+    continue_exit
+}
+
+struct DropEvent {
+    scope: ScopeId
+    stmt: ?StmtId
+    return_expr: ?ExprId
+    block: BlockId
+    place: PlaceId
+    ty: OwnershipType
+    reason: DropReason
+    span: Span
+}
+
+struct DropPlan {
+    events: [DropEvent]
+}
+
+;; --------------------------------------------------------------------------
+;; Required invariants
+;; --------------------------------------------------------------------------
+
+invariant ir_is_analysis_only {
+    no llvm_instruction
+    no register
+    no stack_slot
+    no lir_instruction
+    no machine_code
+}
+
+invariant every_instruction_has_source {
+    instruction.span.line >= 1
+    instruction.span.column >= 1
+}
+
+invariant place_ids_are_stable {
+    place.id is unique
+    value.place references an existing Place.id when present
+}
+
+invariant cfg_is_closed {
+    every predecessor references an existing block
+    every successor references an existing block
+    predecessor/successor edges are symmetric
+}
+
+invariant analysis_lifetime {
+    TypedAnalysisIR is created after typecheck and desugar
+    OwnershipFacts and DropPlan are produced before backend lowering
+    TypedAnalysisIR is not passed to LLVM/MIR/LIR codegen
+}
+
+;; --------------------------------------------------------------------------
+;; Canonical lowering shape
+;; --------------------------------------------------------------------------
+
+pipeline {
+    ast
+    typecheck
+    desugar
+    typed_analysis_ir
+    ownership_and_borrow
+    ownership_facts
+    drop_plan
+    discard_typed_analysis_ir
+    existing_mir
+    existing_llvm_backend
+}
