@@ -21,6 +21,10 @@ pub fn desugar_adt_payload_is_pointer(payload_ty: string): i32
     if (payload_ty.length > 3 and compiler_string_byte(payload_ty, 0) == 'p' and compiler_string_byte(payload_ty, 1) == 't' and compiler_string_byte(payload_ty, 2) == 'r') return 1
     if (payload_ty.length > 3 and compiler_string_byte(payload_ty, 0) == 'f' and compiler_string_byte(payload_ty, 1) == 'n' and compiler_string_byte(payload_ty, 2) == '(') return 1
     if (payload_ty.length > 7 and compiler_string_byte(payload_ty, 0) == 'O' and compiler_string_byte(payload_ty, 1) == 'p' and compiler_string_byte(payload_ty, 2) == 't' and compiler_string_byte(payload_ty, 3) == 'i' and compiler_string_byte(payload_ty, 4) == 'o' and compiler_string_byte(payload_ty, 5) == 'n' and compiler_string_byte(payload_ty, 6) == '[') return 1
+    // Aggregate payloads are boxed in the ADT's pointer lane.  The old
+    // lowering selected payload_i32 for named structs, then inserted the
+    // aggregate value into an i32 field and produced invalid LLVM IR.
+    if (payload_ty != "i8" and payload_ty != "u8" and payload_ty != "i16" and payload_ty != "u16" and payload_ty != "i32" and payload_ty != "u32" and payload_ty != "i64" and payload_ty != "u64" and payload_ty != "usize" and payload_ty != "bool" and payload_ty != "char" and payload_ty != "f32" and payload_ty != "f64" and payload_ty != "string") return 1
     return 0
 }
 

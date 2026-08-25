@@ -722,7 +722,23 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
         
         for (i in 0 .. prog.adts.length)
         {
-            merged_adts.push(prog.adts[i])
+            let mut existing = -1
+            for (j in 0 .. merged_adts.length)
+            {
+                if (merged_adts[j].name == prog.adts[i].name) { existing = j }
+            }
+            if (existing < 0)
+            {
+                merged_adts.push(prog.adts[i])
+            }
+            elif (merged_adts[existing].line == 0 and prog.adts[i].line > 0)
+            {
+                // A module may use Ok/Err before the module graph has seen an
+                // explicit shared Result declaration.  Replace that parser-
+                // injected placeholder with the real declaration so ADT
+                // constructors and payload layout are generated only once.
+                merged_adts[existing] = prog.adts[i]
+            }
         }
     }
     

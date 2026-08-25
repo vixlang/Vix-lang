@@ -592,6 +592,12 @@ pub fn llvm_heap_alloc_bytes(b: &LlvmBuilder, size: i32): ptr
     return vix_LLVMBuildCall2(b.builder, vix_LLVMFunctionType2(LLVMPointerType(LLVMInt8Type(), 0), LLVMInt64Type(), LLVMInt64Type(), 0), b.calloc_fn, args, 2, llvm_temp(b, "calloc"))
 }
 
+pub fn llvm_heap_alloc_type(b: &LlvmBuilder, ty: string): ptr
+{
+    let args = [llvm_const_i64(1), llvm_sizeof_i64(b, ty)]
+    return vix_LLVMBuildCall2(b.builder, vix_LLVMFunctionType2(LLVMPointerType(LLVMInt8Type(), 0), LLVMInt64Type(), LLVMInt64Type(), 0), b.calloc_fn, args, 2, llvm_temp(b, "calloc"))
+}
+
 pub fn llvm_closure_new(b: &LlvmBuilder, code: ptr, env: ptr): ptr
 {
     let closure = llvm_heap_alloc_bytes(b, 16)

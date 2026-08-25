@@ -257,10 +257,13 @@ pub fn codegen_field_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &S
     if (is_ptr_to_struct(base_ty) == 1)
     {
         let base_ptr = codegen_expr_value_typed(b, es, store, base_expr, "ptr")
-        return llvm_build_struct_field_from_ptr(b, struct_ty, base_ptr, field_index, field_ty, expected_ty)
+        let field_value = llvm_build_struct_field_from_ptr(b, struct_ty, base_ptr, field_index, field_ty, field_ty)
+        if (field_ty == "ptr" and type_is_struct(type_text_base_name_builder(expected_ty)) == 1) return llvm_load_typed_pointer(b, field_value, expected_ty)
+        return llvm_cast_value(b, field_value, field_ty, expected_ty)
     }
     let base_val = codegen_expr_value_typed(b, es, store, base_expr, base_ty)
     let field_val = llvm_extract_value(b, base_val, field_index)
+    if (field_ty == "ptr" and type_is_struct(type_text_base_name_builder(expected_ty)) == 1) return llvm_load_typed_pointer(b, field_val, expected_ty)
     return llvm_cast_value(b, field_val, field_ty, expected_ty)
 }
 
@@ -525,7 +528,14 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
             let field_ty = get_struct_field_type(expr.text, field_name)
             let field_index = get_struct_field_index(expr.text, field_name)
             let field_expr = expr_store_get(es, expr.args[i])
-            let val = if (codegen_expected_type_accepts_null(field_ty) == 1 and field_expr.tag == "int" and field_expr.int_value == 0) { llvm_const_null_ptr() } else { codegen_expr_value_typed(b, es, store, field_expr, field_ty) }
+            let val = if (codegen_expected_type_accepts_null(field_ty) == 1 and field_expr.tag == "int" and field_expr.int_value == 0) { llvm_const_null_ptr() } elif (field_ty == "ptr" and codegen_expr_type(b, es, field_expr) != "ptr" and type_is_struct(type_text_base_name_builder(codegen_expr_type(b, es, field_expr))) == 1) {
+                let boxed = llvm_heap_alloc_type(b, codegen_expr_type(b, es, field_expr))
+                let struct_ptr_ty = LLVMPointerType(llvm_type_for(codegen_expr_type(b, es, field_expr)), 0)
+                let typed_box = vix_LLVMBuildBitCast(b.builder, boxed, struct_ptr_ty, llvm_temp(b, "box"))
+                let aggregate = codegen_expr_value_typed(b, es, store, field_expr, codegen_expr_type(b, es, field_expr))
+                vix_LLVMBuildStore(b.builder, aggregate, typed_box)
+                boxed
+            } else { codegen_expr_value_typed(b, es, store, field_expr, field_ty) }
             agg = llvm_insert_value(b, agg, val, field_index)
         }
         return agg
@@ -1215,6 +1225,15 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
     for (i in 0 .. program.functions.length)
     {
         register_function_sig(program.functions[i].name, program.functions[i].ret_ty, program.functions[i].param_types)
+        // Module-qualified names are mangled before they reach LLVM.  The
+        // signature table is keyed by the emitted name too, so calls that are
+        // routed through the mangled name still recover the real return type
+        // instead of falling back to i32.
+        let mangled_sig_name = mangle_flat_name(program.functions[i].name)
+        if (mangled_sig_name != program.functions[i].name)
+        {
+            register_function_sig(mangled_sig_name, program.functions[i].ret_ty, program.functions[i].param_types)
+        }
         let mut emit_param_types = program.functions[i].param_types
         if (codegen_is_lambda_name(program.functions[i].name) == 1)
         {
