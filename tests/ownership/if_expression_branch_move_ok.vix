@@ -1,0 +1,11 @@
+fn choose(flag: bool, value: string): string
+{
+    let selected = if (flag) { value } else { value }
+    return selected
+}
+
+fn main(): i32
+{
+    if (choose(true, "branch") != "branch") return 1
+    return 0
+}

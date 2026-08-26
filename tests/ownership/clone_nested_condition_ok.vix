@@ -1,0 +1,13 @@
+fn take(value: string): bool
+{
+    return value.length > 0
+}
+
+fn main(): i32
+{
+    let value = "kept"
+    let preserved = clone(value)
+    if (!take(value)) return 1
+    if (preserved.length == 0) return 2
+    return 0
+}

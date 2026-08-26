@@ -1,0 +1,16 @@
+fn take(value: string): i32 { return value.length }
+
+fn choose(flag: bool): string
+{
+    let mut out = "value"
+    while (flag)
+    {
+        if (out.length > 0) return out
+    }
+    return out
+}
+
+fn main(): i32
+{
+    return take(choose(false))
+}

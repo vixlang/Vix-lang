@@ -40,6 +40,20 @@ VIXC ?= $(SEED_GC_TARGET)
 
 VIX_SOURCES := $(shell find $(SRC_DIR) -type f -name '*.vix')
 
+OWNERSHIP_OK := \
+	clone_keeps_owner_ok clone_nested_call_ok clone_nested_condition_ok \
+	copy_and_borrow_ok extern_pointer_borrows_ok if_expression_branch_move_ok \
+	lifetime_return_ok lifetime_syntax mut_typed_pointer_ref_runtime \
+	shared_borrows_ok string_index_i8 terminated_loop_state_ok \
+	typed_mir_debug typed_pointer_copy_ok
+OWNERSHIP_REJECT := \
+	assign_while_mut_borrow assign_while_shared_borrow duplicate_mut_borrow \
+	lifetime_mismatch move_while_mut_borrow move_while_shared_borrow \
+	multiple_return_borrow_sources mut_borrow_immutable owned_parameter_consumes \
+	return_local_ref returned_borrow_blocks_assign shared_plus_mut_borrow \
+	shared_reference_is_readonly string_use_after_move use_after_array_move \
+	use_after_field_move use_after_move
+
 all: $(TARGET)
 	rm -f vixc
 
@@ -106,10 +120,21 @@ clean:
 	rm -f $(TARGET) $(SEED_GC_TARGET) $(BOOTSTRAP_TARGET) $(SELF_STAGE_TARGET) $(SELF_LIR_STAGE_TARGET) $(SEED_OBJ) $(HELPER_OBJ) $(RUNTIME_OBJ) $(COMPILER_GC_OBJ) $(BOOTSTRAP_OBJ) $(VIXC_OBJ) $(SELF_STAGE_OBJ) $(SELF_LIR_STAGE_OBJ) $(LLVM_API_OBJS) test test.ll
 
 test: all
-	$(TARGET) ../tests/vixc0/let_and_print.vix -o test
+	$(TARGET) tests/files/test20.vix -o test
 	./test >/dev/null
 
 pytest: all
 	python3 -m pytest ../tests/vixc0_tests/*.py
 
-.PHONY: all self-stage self-lir-stage clean test pytest
+ownership-test: all
+	@set -e; for name in $(OWNERSHIP_OK); do \
+		$(TARGET) --ownership-check tests/ownership/$$name.vix -o $(BUILD_DIR)/ownership_$$name; \
+	done
+	@set -e; for name in $(OWNERSHIP_REJECT); do \
+		if $(TARGET) --ownership-check tests/ownership/$$name.vix -o $(BUILD_DIR)/ownership_$$name >/dev/null 2>&1; then \
+			echo "expected ownership rejection: $$name"; exit 1; \
+		fi; \
+	done
+	@echo "ownership tests passed: $(words $(OWNERSHIP_OK)) accepted, $(words $(OWNERSHIP_REJECT)) rejected"
+
+.PHONY: all self-stage self-lir-stage clean test pytest ownership-test

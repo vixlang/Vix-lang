@@ -1,0 +1,13 @@
+extern "C" { fn puts(value: ptr): i32 }
+
+fn take(value: string): i32
+{
+    return puts(value)
+}
+
+fn main(): i32
+{
+    let value = "kept"
+    take(clone(value))
+    return take(value)
+}

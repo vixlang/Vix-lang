@@ -1,0 +1,13 @@
+extern "C"
+{
+    fn printf(format: ptr, ...): i32
+    fn strlen(value: ptr): usize
+}
+
+fn main(): i32
+{
+    let value = "hello"
+    printf("%s", value)
+    let length = strlen(value)
+    return if (value.length == length) { 0 } else { 1 }
+}

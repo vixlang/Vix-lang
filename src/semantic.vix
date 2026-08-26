@@ -468,11 +468,11 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             {
                 semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
             }
-            elif (semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0 and semantic_scope_contains(scope, expr.text) == 0)
+            elif (expr.text != "clone" and semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0 and semantic_scope_contains(scope, expr.text) == 0)
             {
                 semantic_add_error_loc(result, source, filename, "NameError", "undefined function '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(expr.text))
             }
-            if (expr.left_idx < 0) semantic_check_generic_call(program, expr, result, source, filename, func_name)
+            if (expr.left_idx < 0 and expr.text != "clone") semantic_check_generic_call(program, expr, result, source, filename, func_name)
             for (i in 0 .. expr.args.length)
             {
                 semantic_check_expr(scope, program, expr.args[i], result, source, filename, func_name)

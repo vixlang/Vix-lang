@@ -1,0 +1,10 @@
+extern "C" { fn malloc(size: usize): ptr }
+
+fn main(): i32
+{
+    let data = malloc(2)
+    let bytes: ptr:[u8] = data
+    bytes[0] = 65
+    bytes[1] = 0
+    return if (bytes[0] == 65 and bytes[1] == 0) { 0 } else { 1 }
+}

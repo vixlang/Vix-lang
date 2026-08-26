@@ -427,6 +427,10 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             infer_value_ok(ty_fun(store, params, hm_type_param_ty(store, type_params.names, type_params.vars, expr.option_value)))
         }
         "call" -> {
+            if (expr.text == "clone" and expr.args.length == 1)
+            {
+                return hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.args[0])
+            }
             let callee = if (expr.left_idx >= 0) hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
             elif (expr.type_args.length > 0 and type_env_has(env, expr.text) == 1)
             {

@@ -174,12 +174,13 @@ pub type OwnershipCheckState = struct {
     borrow_kind: [string],
     borrow_end_line: [i32],
     diagnostics: [string],
-    error_count: i32
+    error_count: i32,
+    terminated: i32
 }
 
 pub fn ownership_state_new(): OwnershipCheckState
 {
-    return OwnershipCheckState{ names: [], types: [], mutable: [], status: [], active: [], is_param: [], shared_borrows: [], mut_borrow: [], borrow_source: [], borrow_kind: [], borrow_end_line: [], diagnostics: [], error_count: 0 }
+    return OwnershipCheckState{ names: [], types: [], mutable: [], status: [], active: [], is_param: [], shared_borrows: [], mut_borrow: [], borrow_source: [], borrow_kind: [], borrow_end_line: [], diagnostics: [], error_count: 0, terminated: 0 }
 }
 
 pub fn ownership_state_clone(state: &OwnershipCheckState): OwnershipCheckState
@@ -204,6 +205,7 @@ pub fn ownership_state_clone(state: &OwnershipCheckState): OwnershipCheckState
         out.diagnostics.push(state.diagnostics[i])
     }
     out.error_count = state.error_count
+    out.terminated = state.terminated
     return out
 }
 
@@ -345,6 +347,24 @@ pub fn ownership_function_param_type(program: AstProgram, name: string, index: i
     return "unknown"
 }
 
+pub fn ownership_function_is_extern_vararg(program: AstProgram, name: string): i32
+{
+    for (i in 0 .. program.extern_functions.length)
+    {
+        if (program.extern_functions[i].name == name and program.extern_functions[i].is_var_arg == 1) return 1
+    }
+    return 0
+}
+
+pub fn ownership_parameter_borrows_value(program: AstProgram, function_name: string, param_ty: string): i32
+{
+    // Raw pointers are non-owning ABI values. Passing a string/array-backed
+    // address to C must not move the language-level owner.
+    if (param_ty == "ptr" or analysis_ptr_inner(param_ty) != "unknown") return 1
+    if (param_ty == "unknown" and ownership_function_is_extern_vararg(program, function_name) == 1) return 1
+    return 0
+}
+
 pub fn ownership_release_direct(state: &OwnershipCheckState, owner_idx: i32, kind: string): i32
 {
     if (owner_idx < 0) return 0
@@ -444,7 +464,7 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
                 direct_kinds.push(if (arg.int_value == 1) { "BorrowMut" } else { "BorrowShared" })
                 if (analysis_type_is_mut_reference(param_ty) == 1 and arg.int_value == 0) ownership_add_error(state, source, filename, "mutable reference parameter requires '&mut'", arg.line, arg.col, arg.text.length)
             }
-            elif (analysis_type_is_reference(param_ty) == 1) ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename)
+            elif (analysis_type_is_reference(param_ty) == 1 or ownership_parameter_borrows_value(program, expr.text, param_ty) == 1) ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename)
             else ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 1, source, filename)
         }
         for (i in 0 .. direct_owners.length)
@@ -484,6 +504,22 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
         ownership_check_expr(program, state, facts, expr.right_idx, stmt_id, 0, source, filename)
         return 0
     }
+    if (expr.tag == "block_expr")
+    {
+        if (expr.right_idx >= 0) ownership_check_expr(program, state, facts, expr.right_idx, stmt_id, consume, source, filename)
+        return 0
+    }
+    if (expr.tag == "if_expr")
+    {
+        ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
+        let base_count = state.names.length
+        let then_state = ownership_state_clone(state)
+        let else_state = ownership_state_clone(state)
+        ownership_check_expr(program, &then_state, facts, expr.right_idx, stmt_id, consume, source, filename)
+        if (expr.args.length > 0) ownership_check_expr(program, &else_state, facts, expr.args[0], stmt_id, consume, source, filename)
+        ownership_merge_state(state, &then_state, &else_state, base_count)
+        return 0
+    }
     for (i in 0 .. expr.args.length)
     {
         if (expr.args[i] >= 0) ownership_check_expr(program, state, facts, expr.args[i], stmt_id, consume, source, filename)
@@ -516,7 +552,9 @@ pub fn ownership_check_mutation(program: AstProgram, state: &OwnershipCheckState
         ownership_add_error(state, source, filename, "cannot assign through shared reference '" + root + "'", place.line, place.col, root.length)
         return owner_idx
     }
-    if (analysis_type_is_mut_reference(state.types[owner_idx]) == 0 and state.mutable[owner_idx] == 0)
+    let owner_ty = state.types[owner_idx]
+    let pointee_mutation = if (owner_ty == "string" or owner_ty == "ptr" or analysis_ptr_inner(owner_ty) != "unknown") { 1 } else { 0 }
+    if (analysis_type_is_mut_reference(owner_ty) == 0 and state.mutable[owner_idx] == 0 and pointee_mutation == 0)
     {
         ownership_add_error(state, source, filename, "cannot assign to immutable owner '" + root + "'", place.line, place.col, root.length)
         return owner_idx
@@ -652,6 +690,7 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
             for (i in 0 .. stmt.stmt_indices.length)
             {
                 ownership_check_stmt(program, state, facts, func, body_root, stmt.stmt_indices[i], source, filename)
+                if (state.terminated == 1) break
             }
         }
         else
@@ -659,6 +698,7 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
             for (i in 0 .. stmt.block_count)
             {
                 ownership_check_stmt(program, state, facts, func, body_root, stmt.block_start + i, source, filename)
+                if (state.terminated == 1) break
             }
         }
         ownership_leave_scope(state, scope_start)
@@ -739,6 +779,12 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
     {
         ownership_check_return(program, state, func, stmt.value_idx, source, filename)
         ownership_check_expr(program, state, facts, stmt.value_idx, idx, if (analysis_type_is_reference(func.ret_ty) == 1) { 0 } else { 1 }, source, filename)
+        state.terminated = 1
+        return 0
+    }
+    if (stmt.tag == "return")
+    {
+        state.terminated = 1
         return 0
     }
     if (stmt.tag == "print")
@@ -759,7 +805,23 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
         let right = ownership_state_clone(state)
         ownership_check_stmt(program, &left, facts, func, body_root, stmt.body_idx, source, filename)
         ownership_check_stmt(program, &right, facts, func, body_root, stmt.assign_idx, source, filename)
-        ownership_merge_state(state, &left, &right, base_count)
+        if (left.terminated == 1 and right.terminated == 1)
+        {
+            ownership_merge_diagnostics(state, &left)
+            ownership_merge_diagnostics(state, &right)
+            state.terminated = 1
+        }
+        elif (left.terminated == 1)
+        {
+            ownership_merge_state(state, &right, &right, base_count)
+            ownership_merge_diagnostics(state, &left)
+        }
+        elif (right.terminated == 1)
+        {
+            ownership_merge_state(state, &left, &left, base_count)
+            ownership_merge_diagnostics(state, &right)
+        }
+        else ownership_merge_state(state, &left, &right, base_count)
         return 0
     }
     if (stmt.tag == "while")
@@ -772,7 +834,12 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
         {
             let body_state = ownership_state_clone(state)
             ownership_check_stmt(program, &body_state, facts, func, body_root, stmt.body_idx, source, filename)
-            changed = ownership_merge_state(state, state, &body_state, base_count)
+            if (body_state.terminated == 1)
+            {
+                ownership_merge_diagnostics(state, &body_state)
+                changed = 0
+            }
+            else changed = ownership_merge_state(state, state, &body_state, base_count)
             iteration += 1
         }
         return 0
@@ -784,19 +851,27 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
         let loop_state = ownership_state_clone(state)
         ownership_state_add(&loop_state, stmt.assign_name, "i32", 1, 0, "", "", -1)
         ownership_check_stmt(program, &loop_state, facts, func, body_root, stmt.body_idx, source, filename)
-        ownership_merge_state(state, state, &loop_state, state.names.length)
+        if (loop_state.terminated == 1) ownership_merge_diagnostics(state, &loop_state)
+        else ownership_merge_state(state, state, &loop_state, state.names.length)
         return 0
     }
     if (stmt.tag == "match")
     {
         ownership_check_expr(program, state, facts, stmt.value_idx, idx, 0, source, filename)
         let count = state.names.length
+        let mut continuing_arms = 0
         for (i in 0 .. stmt.match_body_indices.length)
         {
             let arm_state = ownership_state_clone(state)
             ownership_check_stmt(program, &arm_state, facts, func, body_root, stmt.match_body_indices[i], source, filename)
-            ownership_merge_state(state, state, &arm_state, count)
+            if (arm_state.terminated == 1) ownership_merge_diagnostics(state, &arm_state)
+            else
+            {
+                ownership_merge_state(state, state, &arm_state, count)
+                continuing_arms += 1
+            }
         }
+        if (stmt.match_body_indices.length > 0 and continuing_arms == 0) state.terminated = 1
         return 0
     }
     return 0
@@ -928,6 +1003,7 @@ pub fn analysis_type_is_scalar_copy(ty: string): i32
 pub fn analysis_type_is_copy(program: AstProgram, ty: string): i32
 {
     if (analysis_type_is_scalar_copy(ty) == 1) return 1
+    if (analysis_ptr_inner(ty) != "unknown") return 1
     if (analysis_type_is_reference(ty) == 1) return if (analysis_type_is_mut_reference(ty) == 1) { 0 } else { 1 }
     if (ty == "string" or (ty.length > 0 and compiler_string_byte(ty, 0) == '[')) return 0
     let base = ast_type_base_name(ty)
@@ -1002,6 +1078,7 @@ pub fn analysis_expr_type(program: AstProgram, env: &AnalysisEnv, idx: i32): str
         "index" -> {
             let mut base = analysis_expr_type(program, env, expr.left_idx)
             if (analysis_type_is_reference(base) == 1) base = analysis_reference_inner(base)
+            if (analysis_ptr_inner(base) != "unknown") base = analysis_ptr_inner(base)
             if (base == "string") return "i8"
             return analysis_array_inner(base)
         }
@@ -2310,7 +2387,12 @@ pub fn analysis_type_lifetime(ty: string): string
 
 pub fn analysis_lower_type_for_backend(ty: string): string
 {
-    if (analysis_type_is_reference(ty) == 1) return "ptr:" + analysis_lower_type_for_backend(analysis_reference_inner(ty))
+    if (analysis_type_is_reference(ty) == 1)
+    {
+        let inner = analysis_lower_type_for_backend(analysis_reference_inner(ty))
+        if (analysis_ptr_inner(inner) != "unknown") return "refptr:" + inner
+        return "ptr:" + inner
+    }
     return ty
 }
 

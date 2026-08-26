@@ -1,0 +1,8 @@
+fn consume(value: string): i32 { return value.length }
+
+fn main(): i32
+{
+    let original = "value"
+    let copied = clone(original)
+    return consume(copied) + original.length - 10
+}

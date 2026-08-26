@@ -29,7 +29,7 @@ pub fn codegen_type_is_float(ty: string): i32
 
 pub fn codegen_type_is_pointer_like(ty: string): i32
 {
-    if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or type_text_is_option(ty) == 1 or type_text_is_function(ty) == 1) { return 1 }
+    if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_ref_to_ptr(ty) == 1 or type_text_is_array(ty) == 1 or type_text_is_option(ty) == 1 or type_text_is_function(ty) == 1) { return 1 }
     return 0
 }
 
@@ -133,6 +133,7 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
     if (expr.tag == "deref")
     {
         let base_ty = codegen_expr_type(b, es, expr_store_get(es, expr.left_idx))
+        if (type_text_is_ref_to_ptr(base_ty) == 1) { return strip_ref_to_ptr_prefix(base_ty) }
         if (is_ptr_to_struct(base_ty) == 1) { return strip_ptr_prefix(base_ty) }
         if (base_ty == "string") { return "i8" }
         return "i32"
@@ -184,6 +185,7 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
     }
     if (expr.tag == "call")
     {
+        if (expr.text == "clone" and expr.args.length == 1) return codegen_expr_type(b, es, expr_store_get(es, expr.args[0]))
         if (expr.left_idx >= 0) return type_function_return(codegen_expr_type(b, es, expr_store_get(es, expr.left_idx)))
         if (has_local_var(expr.text) == 1) return type_function_return(get_var_type(b, expr.text))
         return get_function_return_type(expr.text)
@@ -514,7 +516,7 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
         let ptr_expr = expr_store_get(es, expr.left_idx)
         let base_ty = codegen_expr_type(b, es, ptr_expr)
         let ptr_val = codegen_expr_value_typed(b, es, store, ptr_expr, "ptr")
-        let pointee_ty = if (is_ptr_to_struct(base_ty) == 1) { strip_ptr_prefix(base_ty) } elif (base_ty == "string") { "i8" } else { "i32" }
+        let pointee_ty = if (type_text_is_ref_to_ptr(base_ty) == 1) { strip_ref_to_ptr_prefix(base_ty) } elif (is_ptr_to_struct(base_ty) == 1) { strip_ptr_prefix(base_ty) } elif (base_ty == "string") { "i8" } else { "i32" }
         let loaded = llvm_load_typed_pointer(b, ptr_val, pointee_ty)
         return llvm_cast_value(b, loaded, pointee_ty, expected_ty)
     }
@@ -545,11 +547,13 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
         let base_expr = expr_store_get(es, expr.left_idx)
         let index_expr = expr_store_get(es, expr.right_idx)
         let base_ty = codegen_expr_type(b, es, base_expr)
-        let base = codegen_expr_value_typed(b, es, store, base_expr, base_ty)
+        let raw_base = codegen_expr_value_typed(b, es, store, base_expr, base_ty)
+        let indexed_ty = if (type_text_is_ref_to_ptr(base_ty) == 1) { strip_ref_to_ptr_prefix(base_ty) } else { base_ty }
+        let base = if (type_text_is_ref_to_ptr(base_ty) == 1) { llvm_load_typed_pointer(b, raw_base, indexed_ty) } else { raw_base }
         let index = codegen_expr_value_typed(b, es, store, index_expr, "i32")
-        let element_ty_text = type_text_index_element(base_ty)
-        if (base_ty == "string") return llvm_load_string_char(b, base, index, expected_ty)
-        if (is_ptr_to_struct(base_ty) == 1 or base_ty == "ptr") { return llvm_load_typed_index(b, base, index, element_ty_text, expected_ty) }
+        let element_ty_text = type_text_index_element(indexed_ty)
+        if (indexed_ty == "string") return llvm_load_string_char(b, base, index, expected_ty)
+        if (is_ptr_to_struct(indexed_ty) == 1 or indexed_ty == "ptr") { return llvm_load_typed_index(b, base, index, element_ty_text, expected_ty) }
         let element_ty = llvm_type_for(element_ty_text)
         let indices = [index]
         let slot = vix_LLVMBuildGEP2(b.builder, element_ty, base, indices, 1, llvm_temp(b, "idx"))
@@ -573,6 +577,12 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
     if (expr.tag == "unaryop") { return codegen_unary_expr_value_typed(b, es, store, expr) }
     if (expr.tag == "call")
     {
+        if (expr.text == "clone" and expr.args.length == 1)
+        {
+            let cloned_expr = expr_store_get(es, expr.args[0])
+            let cloned_ty = codegen_expr_type(b, es, cloned_expr)
+            return codegen_expr_value_typed(b, es, store, cloned_expr, if (expected_ty == "" or expected_ty == "unknown") { cloned_ty } else { expected_ty })
+        }
         if (expr.left_idx < 0 and has_local_var(expr.text) == 1)
         {
             let callee_ty = get_var_type(b, expr.text)
@@ -889,8 +899,10 @@ pub fn codegen_field_address(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore,
         let base_expr = expr_store_get(es, expr.left_idx)
         let index_expr = expr_store_get(es, expr.right_idx)
         let base_ty = codegen_expr_type(b, es, base_expr)
-        let element_ty_text = type_text_index_element(base_ty)
-        let base = codegen_expr_value_typed(b, es, store, base_expr, "ptr")
+        let indexed_ty = if (type_text_is_ref_to_ptr(base_ty) == 1) { strip_ref_to_ptr_prefix(base_ty) } else { base_ty }
+        let raw_base = codegen_expr_value_typed(b, es, store, base_expr, "ptr")
+        let base = if (type_text_is_ref_to_ptr(base_ty) == 1) { llvm_load_typed_pointer(b, raw_base, indexed_ty) } else { raw_base }
+        let element_ty_text = type_text_index_element(indexed_ty)
         let index = codegen_expr_value_typed(b, es, store, index_expr, "i32")
         let indices = [index]
         return vix_LLVMBuildGEP2(b.builder, llvm_type_for(element_ty_text), base, indices, 1, llvm_temp(b, "idxaddr"))
@@ -953,8 +965,10 @@ pub fn codegen_stmt_in_loop(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, 
         "store_index" -> {
             let base_expr = expr_store_get(es, stmt.value_idx)
             let base_ty = codegen_expr_type(b, es, base_expr)
-            let element_ty_text = type_text_index_element(base_ty)
-            let base = codegen_expr_value_typed(b, es, store, base_expr, "ptr")
+            let indexed_ty = if (type_text_is_ref_to_ptr(base_ty) == 1) { strip_ref_to_ptr_prefix(base_ty) } else { base_ty }
+            let raw_base = codegen_expr_value_typed(b, es, store, base_expr, "ptr")
+            let base = if (type_text_is_ref_to_ptr(base_ty) == 1) { llvm_load_typed_pointer(b, raw_base, indexed_ty) } else { raw_base }
+            let element_ty_text = type_text_index_element(indexed_ty)
             let index = codegen_expr_value_typed(b, es, store, expr_store_get(es, stmt.direct_ret), "i32")
             let value_expr = expr_store_get(es, stmt.assign_idx)
             let value_ty = codegen_expr_type(b, es, value_expr)

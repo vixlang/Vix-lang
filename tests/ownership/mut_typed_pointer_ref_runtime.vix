@@ -1,0 +1,15 @@
+extern "C" { fn malloc(size: usize): ptr }
+
+fn put(buffer: &mut ptr:[u8])
+{
+    buffer[0] = 65
+    buffer[1] = 0
+}
+
+fn main(): i32
+{
+    let data = malloc(2)
+    let mut bytes: ptr:[u8] = data
+    put(&mut bytes)
+    return if (bytes[0] == 65) { 0 } else { 1 }
+}

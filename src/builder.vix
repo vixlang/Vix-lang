@@ -395,6 +395,18 @@ pub fn is_ptr_to_struct(ty: string): i32
     return 0
 }
 
+pub fn type_text_is_ref_to_ptr(ty: string): i32
+{
+    if (ty.length > 7 and type_text_slice(ty, 0, 7) == "refptr:") return 1
+    return 0
+}
+
+pub fn strip_ref_to_ptr_prefix(ty: string): string
+{
+    if (type_text_is_ref_to_ptr(ty) == 0) return ty
+    return type_text_slice(ty, 7, ty.length)
+}
+
 pub fn strip_ptr_prefix(ty: string): string
 {
     if (is_ptr_to_struct(ty) == 0) { return ty }
@@ -417,6 +429,7 @@ pub fn type_text_is_ptr_to_array(ty: string): i32
 
 pub fn type_text_index_element(ty: string): string
 {
+    if (type_text_is_ref_to_ptr(ty) == 1) return type_text_index_element(strip_ref_to_ptr_prefix(ty))
     if (type_text_is_array(ty) == 1) { return type_array_element(ty) }
     if (type_text_is_ptr_to_array(ty) == 1) { return type_array_element(strip_ptr_prefix(ty)) }
     if (ty == "string" or ty == "ptr") { return "i8" }
@@ -488,7 +501,7 @@ pub fn llvm_type_for(ty: string): ptr
     {
         return LLVMPointerType(LLVMInt8Type(), 0)
     }
-    if (is_ptr_to_struct(ty) == 1)
+    if (is_ptr_to_struct(ty) == 1 or type_text_is_ref_to_ptr(ty) == 1)
     {
         return LLVMPointerType(LLVMInt8Type(), 0)
     }
@@ -760,7 +773,7 @@ pub fn llvm_zero_value_for(ty: string): ptr
 {
     if (ty == "f32" or ty == "f64") { return llvm_const_float(0.0, ty) }
     if (ty == "i64" or ty == "u64" or ty == "usize") { return llvm_const_i64(0) }
-    if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or type_text_is_option(ty) == 1) { return llvm_const_null_ptr() }
+    if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_ref_to_ptr(ty) == 1 or type_text_is_array(ty) == 1 or type_text_is_option(ty) == 1) { return llvm_const_null_ptr() }
     if (vix_is_struct_type(type_text_base_name_builder(ty)) == 1) { return llvm_undef(type_text_base_name_builder(ty)) }
     return llvm_const_i32(0)
 }
