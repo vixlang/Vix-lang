@@ -1,0 +1,21 @@
+type Inner = Empty | Number(i32)
+type Outer = Wrap(Inner) | Other
+
+fn main(): i32
+{
+    let wrapped = Wrap(Empty)
+    match wrapped
+    {
+        Wrap(Empty) -> {}
+        _ -> { return 1 }
+    }
+
+    // Empty must still resolve to the global nullary constructor here. Before
+    // the regression fix, the nested pattern above leaked a local named Empty.
+    let value = Empty
+    match value
+    {
+        Empty -> { return 0 }
+        _ -> { return 2 }
+    }
+}

@@ -1,0 +1,8 @@
+mod module_global_child
+
+fn main(): i32
+{
+    if (module_global_child::increment() != 41) return 1
+    if (module_global_child::increment() != 42) return 2
+    return 0
+}

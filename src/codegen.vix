@@ -605,7 +605,14 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
         {
             let arg_expr = expr_store_get(es, expr.args[i])
             let expected_arg_ty = if (i < fixed_param_count) { get_function_param_type(expr.text, i) } else { vararg_promoted_type(codegen_expr_type(b, es, arg_expr)) }
-            let arg = codegen_expr_value_typed(b, es, store, arg_expr, expected_arg_ty)
+            // Vix function values are closure objects, but a C extern callback
+            // parameter expects a raw code pointer. Named Vix functions do not
+            // need an environment, so pass their emitted function directly
+            // when the callee has no Vix function-value wrapper (that is, it
+            // is an extern declaration).
+            let extern_style_call = vix_LLVMGetNamedFunction(b.module, codegen_function_value_wrapper_name(expr.text)) == 0
+            let named_c_callback = extern_style_call and type_text_is_function(expected_arg_ty) == 1 and arg_expr.tag == "ident" and has_local_var(arg_expr.text) == 0
+            let arg = if (named_c_callback) { vix_LLVMGetNamedFunction(b.module, mangle_flat_name(arg_expr.text)) } else { codegen_expr_value_typed(b, es, store, arg_expr, expected_arg_ty) }
             args.push(arg)
         }
         let llvm_fn_name = mangle_flat_name(expr.text)
@@ -1256,7 +1263,8 @@ pub fn codegen_program_target(program: AstProgram, target_triple: string): strin
         let global_ty = if (global_stmt.type_text != "") { global_stmt.type_text } else { codegen_expr_type(b, program.expr_store, global_expr) }
         if (global_expr.tag == "int" or global_expr.tag == "bool")
         {
-            llvm_define_global(b, global_stmt.assign_name, global_ty, llvm_const_i32(global_expr.int_value))
+            let initializer = if (global_expr.int_value == 0 and codegen_type_is_pointer_like(global_ty) == 1) { llvm_const_null_ptr() } else { llvm_const_i32(global_expr.int_value) }
+            llvm_define_global(b, global_stmt.assign_name, global_ty, initializer)
         }
         elif (global_expr.tag == "string")
         {

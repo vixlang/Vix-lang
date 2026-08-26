@@ -1,0 +1,28 @@
+extern "C"
+{
+    fn malloc(size: usize): ptr
+    fn free(value: ptr): void
+    fn qsort(base: ptr, count: usize, size: usize, compare: fn(ptr, ptr): i32)
+}
+
+fn compare_i32(left: ptr, right: ptr): i32
+{
+    let a: ptr:[i32] = left
+    let b: ptr:[i32] = right
+    if (a[0] < b[0]) return -1
+    if (a[0] > b[0]) return 1
+    return 0
+}
+
+fn main(): i32
+{
+    let data = malloc(12)
+    let values: ptr:[i32] = data
+    values[0] = 3
+    values[1] = 1
+    values[2] = 2
+    qsort(data, 3, 4, compare_i32)
+    let ok = values[0] == 1 and values[1] == 2 and values[2] == 3
+    free(data)
+    if (ok) return 0 else return 1
+}

@@ -713,6 +713,14 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
                 merged_externs.push(prog.extern_functions[i])
             }
         }
+
+        for (i in 0 .. prog.globals.length)
+        {
+            let mut global = prog.globals[i]
+            if (global.assign_idx >= 0) { global.assign_idx = global.assign_idx + expr_off }
+            if (prefix != "") { global.assign_name = prefix + "::" + global.assign_name }
+            merged_globals.push(global)
+        }
         
         for (i in 0 .. prog.structs.length)
         {

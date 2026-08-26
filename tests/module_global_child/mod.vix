@@ -1,0 +1,7 @@
+let mut child_counter: i32 = 40
+
+pub fn increment(): i32
+{
+    module_global_child::child_counter = module_global_child::child_counter + 1
+    return module_global_child::child_counter
+}

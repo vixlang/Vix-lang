@@ -444,6 +444,11 @@ pub fn desugar_match_body_with_binding(adts: [AstAdtDecl], es: &ExprStore, store
     let payload_param_ty = desugar_resolve_payload_type(adts[decl_idx], subject_ty, payload_ty)
     let bind_expr = expr_store_get(es, pattern.args[0])
     if (bind_expr.tag != "ident" or bind_expr.text == "_") { return desugar_match_arm_body(adts, es, store, body_idx) }
+    // A nullary ADT constructor in a nested pattern is a value pattern, not a
+    // new local binding. Treating it as a binding shadows the global
+    // constructor and can later make codegen attempt to call an aggregate as
+    // a closure (for example, `Ok(VNull)` followed by `VNull`).
+    if (desugar_find_variant(adts, bind_expr.text) >= 0) { return desugar_match_arm_body(adts, es, store, body_idx) }
     let field_idx = ast_expr_field(es, subject_idx, desugar_adt_payload_field(payload_param_ty))
     let let_idx = ast_stmt_let_typed(store, bind_expr.text, desugar_adt_storage_type(payload_param_ty), field_idx)
     let new_body = desugar_match_arm_body(adts, es, store, body_idx)
