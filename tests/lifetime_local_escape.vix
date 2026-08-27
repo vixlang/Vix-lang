@@ -1,0 +1,7 @@
+fn invalid(): &i32
+{
+    let value = 42
+    return &value
+}
+
+fn main(): i32 { return 0 }

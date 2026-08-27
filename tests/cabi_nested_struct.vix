@@ -1,0 +1,8 @@
+extern "C"
+{
+    type Inner = struct { x: i32, y: i32 }
+    type Outer = struct { inner: Inner, values: [u16*3] }
+    fn take_outer(value: Outer): i32
+}
+
+fn main(): i32 { return 0 }

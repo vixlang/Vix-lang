@@ -157,6 +157,7 @@ pub type AstStructDecl = struct {
     name: string,
     field_names: [string],
     field_types: [string],
+    is_c_abi: i32,
     line: i32,
     col: i32
 }

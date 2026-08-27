@@ -108,6 +108,7 @@ extern "C"
     fn vix_reset_struct_sigs()
     fn vix_declare_struct_sig(name: string)
     fn vix_register_struct_sig(name: string, field_names: ptr, field_types: ptr, field_count: i32)
+    fn vix_register_struct_sig_abi(name: string, field_names: ptr, field_types: ptr, field_count: i32, is_c_abi: i32)
     fn vix_is_struct_type(name: string): i32
     fn vix_get_llvm_type_for_struct(name: string): ptr
     fn vix_get_struct_field_index(struct_name: string, field_name: string): i32
@@ -250,7 +251,12 @@ pub fn declare_struct_sig(name: string)
 
 pub fn register_struct_sig(name: string, field_names: [string], field_types: [string])
 {
-    vix_register_struct_sig(name, field_names, field_types, field_names.length)
+    vix_register_struct_sig_abi(name, field_names, field_types, field_names.length, 0)
+}
+
+pub fn register_struct_sig_abi(name: string, field_names: [string], field_types: [string], is_c_abi: i32)
+{
+    vix_register_struct_sig_abi(name, field_names, field_types, field_names.length, is_c_abi)
 }
 
 pub fn type_text_is_array(ty: string): i32

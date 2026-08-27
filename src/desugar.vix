@@ -103,7 +103,7 @@ pub fn desugar_adt_literal(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore
 
 pub fn desugar_adt_struct(decl: AstAdtDecl): AstStructDecl
 {
-    return AstStructDecl{ name: decl.name, field_names: ["tag", "payload_i32", "payload_string", "payload_ptr", "payload_f64"], field_types: ["i32", "i32", "string", "ptr", "f64"], line: decl.line, col: decl.col }
+    return AstStructDecl{ name: decl.name, field_names: ["tag", "payload_i32", "payload_string", "payload_ptr", "payload_f64"], field_types: ["i32", "i32", "string", "ptr", "f64"], is_c_abi: 0, line: decl.line, col: decl.col }
 }
 
 pub fn desugar_ctor_function(decl: AstAdtDecl, variant_idx: i32, es: &ExprStore, store: &StmtStore): AstFunction

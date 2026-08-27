@@ -891,6 +891,46 @@ pub fn semantic_check_duplicate_fields(decl: AstStructDecl, result: &SemanticRes
     }
 }
 
+pub fn semantic_cabi_type_allowed(program: AstProgram, ty: string): i32
+{
+    if (ty == "i8" or ty == "u8" or ty == "i16" or ty == "u16" or ty == "i32" or ty == "u32" or ty == "i64" or ty == "u64" or ty == "f32" or ty == "f64" or ty == "ptr") return 1
+    if (ty == "bool") return 0
+    if (ty.length > 0 and compiler_string_byte(ty, 0) == '[')
+    {
+        for (i in 0 .. ty.length)
+        {
+            if (compiler_string_byte(ty, i) == '*') return 1
+        }
+        return 0
+    }
+    for (i in 0 .. program.structs.length)
+    {
+        if (program.structs[i].name == ty and program.structs[i].is_c_abi == 1) return 1
+    }
+    return 0
+}
+
+pub fn semantic_check_cabi_structs(program: AstProgram, result: &SemanticResult, source: string, filename: string)
+{
+    for (i in 0 .. program.structs.length)
+    {
+        let decl = program.structs[i]
+        if (decl.is_c_abi == 0) continue
+        for (j in 0 .. decl.field_types.length)
+        {
+            let ty = decl.field_types[j]
+            if (ty == "bool")
+            {
+                semantic_add_error_loc(result, source, filename, "TypeError", "bool is not supported as a C ABI struct field", "", decl.line, decl.col, decl.name.length)
+            }
+            elif (semantic_cabi_type_allowed(program, ty) == 0)
+            {
+                semantic_add_error_loc(result, source, filename, "TypeError", "illegal C ABI struct field type '" + ty + "'", "", decl.line, decl.col, decl.name.length)
+            }
+        }
+    }
+}
+
 pub fn semantic_find_function(funcs: [AstFunction], name: string): i32
 {
     for (i in 0 .. funcs.length)
@@ -928,6 +968,7 @@ pub fn semantic_check_program_with_warnings(program: AstProgram, source: string,
     }
     semantic_check_duplicate_functions(program.functions, program.extern_functions, &result, source, filename)
     semantic_check_duplicate_structs(program.structs, &result, source, filename)
+    semantic_check_cabi_structs(program, &result, source, filename)
     for (i in 0 .. program.functions.length)
     {
         semantic_check_duplicate_params(program.functions[i], &result, source, filename)

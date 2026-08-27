@@ -1887,23 +1887,28 @@ pub fn parse_extern_block(parser: &Parser): AstFunction
     return func
 }
 
-pub fn parse_struct_decl(parser: &Parser): AstStructDecl
+pub fn parse_struct_decl_abi(parser: &Parser, is_c_abi: i32): AstStructDecl
 {
     let line = parser_line(parser)
     let col = parser_col(parser)
     if (parser_text(parser) == "pub") { parser_advance(parser) }
     parser_expect_text(parser, "type")
-    if (parser.ok == 0) { return AstStructDecl{ name: "", field_names: [], field_types: [], line: line, col: col } }
+    if (parser.ok == 0) { return AstStructDecl{ name: "", field_names: [], field_types: [], is_c_abi: is_c_abi, line: line, col: col } }
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return AstStructDecl{ name: "", field_names: [], field_types: [], line: line, col: col } }
+    if (parser_expect_kind(parser, tk_ident()) == 0) { return AstStructDecl{ name: "", field_names: [], field_types: [], is_c_abi: is_c_abi, line: line, col: col } }
     let ignored_type_params = parse_type_params_after_name(parser)
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], line: line, col: col } }
+    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, line: line, col: col } }
     parser_expect_text(parser, "=")
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], line: line, col: col } }
+    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, line: line, col: col } }
     parser_expect_text(parser, "struct")
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], line: line, col: col } }
+    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, line: line, col: col } }
+    if (is_c_abi == 1 and parser_text(parser) == "packed")
+    {
+        parser_fail(parser, "packed C ABI structs are not supported")
+        return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, line: line, col: col }
+    }
     parser_expect_text(parser, "{")
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], line: line, col: col } }
+    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, line: line, col: col } }
     let mut field_names: [string] = []
     let mut field_types: [string] = []
     while (parser_text(parser) != "}" and parser_at_end(parser) == 0)
@@ -1914,17 +1919,22 @@ pub fn parse_struct_decl(parser: &Parser): AstStructDecl
             continue
         }
         let field_name = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, line: line, col: col } }
+        if (parser_expect_kind(parser, tk_ident()) == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, line: line, col: col } }
         parser_expect_text(parser, ":")
-        if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, line: line, col: col } }
+        if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, line: line, col: col } }
         let field_type = parse_type_text(parser)
-        if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, line: line, col: col } }
+        if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, line: line, col: col } }
         field_names.push(field_name)
         field_types.push(field_type)
         parser_accept_text(parser, ",")
     }
     parser_expect_text(parser, "}")
-    return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, line: line, col: col }
+    return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, line: line, col: col }
+}
+
+pub fn parse_struct_decl(parser: &Parser): AstStructDecl
+{
+    return parse_struct_decl_abi(parser, 0)
 }
 
 pub fn parse_type_params_after_name(parser: &Parser): [string]
@@ -2224,9 +2234,18 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
                     parser_advance(&parser)
                     continue
                 }
-                let extern_func = parse_extern_function(&parser)
-                if (parser.ok == 0) { return ast_program_err(parser.error) }
-                extern_functions.push(extern_func)
+                if (parser_text(&parser) == "type")
+                {
+                    let decl = parse_struct_decl_abi(&parser, 1)
+                    if (parser.ok == 0) { return ast_program_err(parser.error) }
+                    structs.push(decl)
+                }
+                else
+                {
+                    let extern_func = parse_extern_function(&parser)
+                    if (parser.ok == 0) { return ast_program_err(parser.error) }
+                    extern_functions.push(extern_func)
+                }
             }
             parser_expect_text(&parser, "}")
             if (parser.ok == 0) { return ast_program_err(parser.error) }

@@ -1,0 +1,7 @@
+extern "C"
+{
+    type CPair = struct { left: i32, right: i32 }
+    fn c_read(pair: &CPair): i32
+}
+
+fn main(): i32 { return 0 }

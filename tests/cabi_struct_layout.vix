@@ -1,0 +1,13 @@
+extern "C"
+{
+    type CPair = struct { left: i32, right: i32 }
+    type CBytes = struct { tag: u8, value: u32 }
+    type CPtr = struct { tag: u8, value: ptr, code: u16 }
+    type CArray = struct { values: [i32*4] }
+    fn take_pair(value: CPair): i32
+    fn take_bytes(value: CBytes): i32
+    fn take_ptr(value: CPtr): i32
+    fn take_array(value: CArray): i32
+}
+
+fn main(): i32 { return 0 }

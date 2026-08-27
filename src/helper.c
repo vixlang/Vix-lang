@@ -726,6 +726,8 @@ LLVMTypeRef vix_get_llvm_type_for_struct(const char *name) {
   return LLVMInt32Type();
 }
 
+static int vix_layout_c_abi = 0;
+
 static LLVMTypeRef vix_llvm_type_for_name(const char *type) {
   if (strcmp(type, "void") == 0)
     return LLVMVoidType();
@@ -733,11 +735,34 @@ static LLVMTypeRef vix_llvm_type_for_name(const char *type) {
     return LLVMInt32Type();
   if (strcmp(type, "i64") == 0)
     return LLVMInt64Type();
+  if (strcmp(type, "u64") == 0 || strcmp(type, "usize") == 0)
+    return LLVMInt64Type();
+  if (strcmp(type, "i32") == 0 || strcmp(type, "u32") == 0)
+    return LLVMInt32Type();
+  if (strcmp(type, "i16") == 0 || strcmp(type, "u16") == 0)
+    return LLVMInt16Type();
+  if (strcmp(type, "i8") == 0 || strcmp(type, "u8") == 0 ||
+      strcmp(type, "char") == 0)
+    return LLVMInt8Type();
   if (strcmp(type, "f32") == 0)
     return LLVMFloatType();
   if (strcmp(type, "f64") == 0)
     return LLVMDoubleType();
-  if (type[0] == '[' || strncmp(type, "Option[", 7) == 0) {
+  if (type[0] == '[') {
+    const char *star = strchr(type, '*');
+    if (star != NULL && star > type + 1) {
+      char elem[TYPE_SIZE];
+      size_t len = (size_t)(star - (type + 1));
+      if (len >= sizeof(elem)) len = sizeof(elem) - 1;
+      memcpy(elem, type + 1, len);
+      elem[len] = '\0';
+      unsigned long count = strtoul(star + 1, NULL, 10);
+      if (count > 0 && count <= UINT_MAX && vix_layout_c_abi)
+        return LLVMArrayType(vix_llvm_type_for_name(elem), (unsigned)count);
+    }
+    return LLVMPointerType(LLVMInt8Type(), 0);
+  }
+  if (strncmp(type, "Option[", 7) == 0) {
     return LLVMPointerType(LLVMInt8Type(), 0);
   }
   if (strcmp(type, "string") == 0 || strcmp(type, "ptr") == 0 ||
@@ -750,8 +775,18 @@ static LLVMTypeRef vix_llvm_type_for_name(const char *type) {
   return LLVMInt32Type();
 }
 
+void vix_register_struct_sig_abi(const char *name, const char **field_names,
+                                 const char **field_types, int field_count,
+                                 int is_c_abi);
+
 void vix_register_struct_sig(const char *name, const char **field_names,
                              const char **field_types, int field_count) {
+  vix_register_struct_sig_abi(name, field_names, field_types, field_count, 0);
+}
+
+void vix_register_struct_sig_abi(const char *name, const char **field_names,
+                                 const char **field_types, int field_count,
+                                 int is_c_abi) {
   vix_declare_struct_sig(name);
   int idx = vix_find_struct_index(name);
   if (idx < 0)
@@ -760,6 +795,8 @@ void vix_register_struct_sig(const char *name, const char **field_names,
     field_count = MAX_FIELDS;
   structs[idx].field_count = field_count;
   LLVMTypeRef llvm_fields[MAX_FIELDS];
+  int previous_layout = vix_layout_c_abi;
+  vix_layout_c_abi = is_c_abi;
   for (int i = 0; i < field_count; i++) {
     strncpy(structs[idx].field_names[i], field_names[i], NAME_SIZE - 1);
     structs[idx].field_names[i][NAME_SIZE - 1] = '\0';
@@ -767,6 +804,7 @@ void vix_register_struct_sig(const char *name, const char **field_names,
     structs[idx].field_types[i][TYPE_SIZE - 1] = '\0';
     llvm_fields[i] = vix_llvm_type_for_name(field_types[i]);
   }
+  vix_layout_c_abi = previous_layout;
   if (!structs[idx].body_set) {
     LLVMStructSetBody(structs[idx].llvm_type, llvm_fields, field_count, 0);
     structs[idx].body_set = 1;

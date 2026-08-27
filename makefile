@@ -122,6 +122,21 @@ clean:
 test: all
 	$(TARGET) tests/files/test20.vix -o test
 	./test >/dev/null
+	$(TARGET) --check tests/cabi_struct_parse.vix
+	$(TARGET) --check tests/cabi_struct_layout.vix
+	$(TARGET) --check tests/cabi_nested_struct.vix
+	@set -e; for name in cabi_invalid_fields cabi_packed_unsupported; do \
+		if $(TARGET) --check tests/$$name.vix >/dev/null 2>&1; then \
+			echo "expected C ABI rejection: $$name"; exit 1; \
+		fi; \
+	done
+	$(TARGET) --ownership-check tests/lifetime_return_ok.vix
+	$(TARGET) --ownership-check tests/lifetime_generic.vix
+	@set -e; for name in lifetime_mismatch lifetime_local_escape lifetime_mutation_while_borrowed; do \
+		if $(TARGET) --ownership-check tests/$$name.vix >/dev/null 2>&1; then \
+			echo "expected lifetime rejection: $$name"; exit 1; \
+		fi; \
+	done
 
 pytest: all
 	python3 -m pytest ../tests/vixc0_tests/*.py

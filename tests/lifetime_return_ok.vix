@@ -1,0 +1,17 @@
+fn identity:['a](value: &'a i32): &'a i32
+{
+    return value
+}
+
+fn choose:['a](condition: bool, left: &'a i32, right: &'a i32): &'a i32
+{
+    if (condition) { return left }
+    return right
+}
+
+fn main(): i32
+{
+    let value = 42
+    let result = identity(&value)
+    return @result
+}

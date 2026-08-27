@@ -1,0 +1,6 @@
+fn wrong:['a, 'b](left: &'a i32, right: &'b i32): &'a i32
+{
+    return right
+}
+
+fn main(): i32 { let left = 1; let right = 2; return @wrong(&left, &right) }

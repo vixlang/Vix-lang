@@ -1,0 +1,6 @@
+extern "C"
+{
+    type Packed = struct packed { value: i32 }
+}
+
+fn main(): i32 { return 0 }

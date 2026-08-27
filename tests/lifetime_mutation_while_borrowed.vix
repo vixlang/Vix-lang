@@ -1,0 +1,9 @@
+fn invalid(): i32
+{
+    let mut value = 1
+    let reference = &value
+    value = 2
+    return @reference
+}
+
+fn main(): i32 { return invalid() }

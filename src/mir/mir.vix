@@ -137,7 +137,7 @@ pub fn mir_register_program(program: AstProgram)
     }
     for (i in 0 .. program.structs.length)
     {
-        register_struct_sig(program.structs[i].name, program.structs[i].field_names, program.structs[i].field_types)
+        register_struct_sig_abi(program.structs[i].name, program.structs[i].field_names, program.structs[i].field_types, program.structs[i].is_c_abi)
     }
     for (i in 0 .. program.extern_functions.length)
     {

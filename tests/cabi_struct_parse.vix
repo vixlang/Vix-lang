@@ -1,0 +1,7 @@
+extern "C"
+{
+    type CPair = struct { left: i32, right: i32 }
+    type CPoint = struct { x: f64, y: f64 }
+}
+
+fn main(): i32 { return 0 }

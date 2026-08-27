@@ -1,0 +1,8 @@
+extern "C"
+{
+    type BadString = struct { value: string }
+    type BadArray = struct { values: [i32] }
+    type BadBool = struct { value: bool }
+}
+
+fn main(): i32 { return 0 }
