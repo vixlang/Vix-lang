@@ -234,6 +234,9 @@ pub fn type_category(ty: string): string
 
 pub type TypeInferResult = struct {
     ok: i32,
+    code: string,
+    title: string,
+    phase: DiagPhase,
     error: string,
     return_type: string,
     error_func: string,
@@ -244,12 +247,12 @@ pub type TypeInferResult = struct {
 
 pub fn typeinfer_ok(return_type: string): TypeInferResult
 {
-    return TypeInferResult{ ok: 1, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
+    return TypeInferResult{ ok: 1, code: "", title: "", phase: DiagType, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
 }
 
 pub fn typeinfer_error(message: string, return_type: string, error_func: string, line: i32, col: i32): TypeInferResult
 {
-    return TypeInferResult{ ok: 0, error: message, return_type: return_type, error_func: error_func, line: line, col: col, span_len: 1 }
+    return TypeInferResult{ ok: 0, code: "E3000", title: "type error", phase: DiagType, error: message, return_type: return_type, error_func: error_func, line: line, col: col, span_len: 1 }
 }
 
 pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename: string): string
@@ -259,7 +262,12 @@ pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename:
         let message = if (result.error_func != "") "in function " + result.error_func + ": " + result.error else result.error
         if (result.line > 0)
         {
-            return format_diagnostic(source, filename, diag_error_level(), "TypeError", message, result.line, result.col, result.span_len)
+            let span = diag_span_at(source, filename, result.line, result.col, result.span_len)
+            let mut diagnostic = diag_new(result.code, DiagError, result.phase, result.title)
+                |> diag_message(message)
+                |> diag_primary(span, result.error)
+            if (result.code == "E3002") { diagnostic = diag_help(diagnostic, "use a value compatible with the expected type") }
+            return diag_render(diagnostic, diag_render_options(source, filename))
         }
         if (result.error_func != "")
         {
@@ -278,7 +286,7 @@ pub fn typeck_check_program(program: AstProgram): TypeInferResult
     {
         return typeinfer_ok(hm.return_type)
     }
-    return TypeInferResult{ ok: 0, error: hm.error, return_type: hm.return_type, error_func: hm.error_func, line: hm.line, col: hm.col, span_len: hm.span_len }
+    return TypeInferResult{ ok: 0, code: hm.code, title: hm.title, phase: hm.phase, error: hm.error, return_type: hm.return_type, error_func: hm.error_func, line: hm.line, col: hm.col, span_len: hm.span_len }
 }
 
 pub fn typeck_result_debug(result: TypeInferResult, source: string, filename: string): string

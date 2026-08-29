@@ -1,0 +1,9 @@
+fn main(): i32
+{
+    let mut values: [i32] = [
+        1,
+        2,
+        "three"
+    ]
+    return values[0]
+}

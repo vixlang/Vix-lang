@@ -173,7 +173,7 @@ pub type OwnershipCheckState = struct {
     borrow_source: [string],
     borrow_kind: [string],
     borrow_end_line: [i32],
-    diagnostics: [string],
+    diagnostics: [Diagnostic],
     error_count: i32,
     terminated: i32
 }
@@ -251,12 +251,28 @@ pub fn ownership_max(a: i32, b: i32): i32
     return b
 }
 
-pub fn ownership_add_error(state: &OwnershipCheckState, source: string, filename: string, message: string, line: i32, col: i32, span_len: i32): i32
+pub fn ownership_error_title(code: string): string
 {
-    let diagnostic = format_diagnostic(source, filename, diag_error_level(), "OwnershipError", message, line, col, span_len)
+    return match code {
+        "E5001" -> "use of moved value"
+        "E5002" -> "mutation while borrowed"
+        "E5003" -> "conflicting borrow"
+        "E5004" -> "immutable owner"
+        "E5005" -> "invalid reference argument"
+        "E5006" -> "shared reference is read-only"
+        "E5008" -> "invalid returned reference"
+        _ -> "ownership error"
+    }
+}
+
+pub fn ownership_add_error(state: &OwnershipCheckState, source: string, filename: string, code: string, message: string, line: i32, col: i32, span_len: i32): i32
+{
+    let diagnostic = diag_new(code, DiagError, DiagOwnership, ownership_error_title(code))
+        |> diag_message(message)
+        |> diag_primary(diag_span_at(source, filename, line, col, span_len), message)
     for (i in 0 .. state.diagnostics.length)
     {
-        if (state.diagnostics[i] == diagnostic) return 0
+        if (diag_same(state.diagnostics[i], diagnostic) == 1) return 0
     }
     state.diagnostics.push(diagnostic)
     state.error_count += 1
@@ -379,19 +395,19 @@ pub fn ownership_create_borrow(state: &OwnershipCheckState, expr: AstExpr, sourc
     if (owner_idx < 0) return -1
     if (state.status[owner_idx] == "Moved")
     {
-        ownership_add_error(state, source, filename, "cannot borrow moved value '" + expr.text + "'", expr.line, expr.col, expr.text.length)
+        ownership_add_error(state, source, filename, "E5001", "cannot borrow moved value '" + expr.text + "'", expr.line, expr.col, expr.text.length)
         return -1
     }
     if (expr.int_value == 1)
     {
         if (state.mutable[owner_idx] == 0)
         {
-            ownership_add_error(state, source, filename, "cannot mutably borrow immutable owner '" + expr.text + "'", expr.line, expr.col, expr.text.length)
+            ownership_add_error(state, source, filename, "E5004", "cannot mutably borrow immutable owner '" + expr.text + "'", expr.line, expr.col, expr.text.length)
             return -1
         }
         if (state.mut_borrow[owner_idx] == 1 or state.shared_borrows[owner_idx] > 0)
         {
-            ownership_add_error(state, source, filename, "cannot create mutable borrow of '" + expr.text + "' while it is already borrowed", expr.line, expr.col, expr.text.length)
+            ownership_add_error(state, source, filename, "E5003", "cannot create mutable borrow of '" + expr.text + "' while it is already borrowed", expr.line, expr.col, expr.text.length)
             return -1
         }
         state.mut_borrow[owner_idx] = 1
@@ -400,7 +416,7 @@ pub fn ownership_create_borrow(state: &OwnershipCheckState, expr: AstExpr, sourc
     {
         if (state.mut_borrow[owner_idx] == 1)
         {
-            ownership_add_error(state, source, filename, "cannot create shared borrow of '" + expr.text + "' while it is mutably borrowed", expr.line, expr.col, expr.text.length)
+            ownership_add_error(state, source, filename, "E5003", "cannot create shared borrow of '" + expr.text + "' while it is mutably borrowed", expr.line, expr.col, expr.text.length)
             return -1
         }
         state.shared_borrows[owner_idx] = state.shared_borrows[owner_idx] + 1
@@ -414,7 +430,7 @@ pub fn ownership_check_ident(program: AstProgram, state: &OwnershipCheckState, f
     if (local_idx < 0) return 0
     if (state.status[local_idx] == "Moved")
     {
-        ownership_add_error(state, source, filename, "use of moved value '" + expr.text + "'", expr.line, expr.col, expr.text.length)
+        ownership_add_error(state, source, filename, "E5001", "use of moved value '" + expr.text + "'", expr.line, expr.col, expr.text.length)
         return 0
     }
     let ir_action = if (expr_id >= 0 and expr_id < facts.expr_actions.length) { facts.expr_actions[expr_id] } else { "" }
@@ -422,7 +438,7 @@ pub fn ownership_check_ident(program: AstProgram, state: &OwnershipCheckState, f
     {
         if (state.shared_borrows[local_idx] > 0 or state.mut_borrow[local_idx] == 1)
         {
-            ownership_add_error(state, source, filename, "cannot move '" + expr.text + "' while it is borrowed", expr.line, expr.col, expr.text.length)
+            ownership_add_error(state, source, filename, "E5002", "cannot move '" + expr.text + "' while it is borrowed", expr.line, expr.col, expr.text.length)
             return 0
         }
         state.status[local_idx] = "Moved"
@@ -462,7 +478,7 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
                 let owner_idx = ownership_create_borrow(state, arg, source, filename)
                 direct_owners.push(owner_idx)
                 direct_kinds.push(if (arg.int_value == 1) { "BorrowMut" } else { "BorrowShared" })
-                if (analysis_type_is_mut_reference(param_ty) == 1 and arg.int_value == 0) ownership_add_error(state, source, filename, "mutable reference parameter requires '&mut'", arg.line, arg.col, arg.text.length)
+                if (analysis_type_is_mut_reference(param_ty) == 1 and arg.int_value == 0) ownership_add_error(state, source, filename, "E5005", "mutable reference parameter requires '&mut'", arg.line, arg.col, arg.text.length)
             }
             elif (analysis_type_is_reference(param_ty) == 1 or ownership_parameter_borrows_value(program, expr.text, param_ty) == 1) ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename)
             else ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 1, source, filename)
@@ -549,17 +565,17 @@ pub fn ownership_check_mutation(program: AstProgram, state: &OwnershipCheckState
     let place = expr_store_get(&es, place_idx)
     if (analysis_type_is_reference(state.types[owner_idx]) == 1 and analysis_type_is_mut_reference(state.types[owner_idx]) == 0)
     {
-        ownership_add_error(state, source, filename, "cannot assign through shared reference '" + root + "'", place.line, place.col, root.length)
+        ownership_add_error(state, source, filename, "E5006", "cannot assign through shared reference '" + root + "'", place.line, place.col, root.length)
         return owner_idx
     }
     let owner_ty = state.types[owner_idx]
     let pointee_mutation = if (owner_ty == "string" or owner_ty == "ptr" or analysis_ptr_inner(owner_ty) != "unknown") { 1 } else { 0 }
     if (analysis_type_is_mut_reference(owner_ty) == 0 and state.mutable[owner_idx] == 0 and pointee_mutation == 0)
     {
-        ownership_add_error(state, source, filename, "cannot assign to immutable owner '" + root + "'", place.line, place.col, root.length)
+        ownership_add_error(state, source, filename, "E5004", "cannot assign to immutable owner '" + root + "'", place.line, place.col, root.length)
         return owner_idx
     }
-    if (state.shared_borrows[owner_idx] > 0 or state.mut_borrow[owner_idx] == 1) ownership_add_error(state, source, filename, "cannot assign to '" + root + "' while it is borrowed", place.line, place.col, root.length)
+    if (state.shared_borrows[owner_idx] > 0 or state.mut_borrow[owner_idx] == 1) ownership_add_error(state, source, filename, "E5002", "cannot assign to '" + root + "' while it is borrowed", place.line, place.col, root.length)
     return owner_idx
 }
 
@@ -625,19 +641,19 @@ pub fn ownership_check_return(program: AstProgram, state: &OwnershipCheckState, 
     let expr = expr_store_get(&es, expr_idx)
     if (borrow_source == "")
     {
-        ownership_add_error(state, source, filename, "borrowed return value has no single input source", expr.line, expr.col, 1)
+        ownership_add_error(state, source, filename, "E5008", "borrowed return value has no single input source", expr.line, expr.col, 1)
         return 0
     }
     let source_idx = ownership_state_find(state, borrow_source)
     if (source_idx < 0 or (state.is_param[source_idx] != 2 and (state.is_param[source_idx] != 1 or analysis_type_is_reference(state.types[source_idx]) == 0)))
     {
-        ownership_add_error(state, source, filename, "cannot return reference to local value '" + borrow_source + "'", expr.line, expr.col, borrow_source.length)
+        ownership_add_error(state, source, filename, "E5008", "cannot return reference to local value '" + borrow_source + "'", expr.line, expr.col, borrow_source.length)
         return 0
     }
     let ret_lifetime = analysis_type_lifetime(func.ret_ty)
     let source_lifetime = analysis_type_lifetime(state.types[source_idx])
-    if (ret_lifetime != "" and source_lifetime != ret_lifetime) ownership_add_error(state, source, filename, "returned reference lifetime " + source_lifetime + " does not match " + ret_lifetime, expr.line, expr.col, borrow_source.length)
-    if (analysis_type_is_mut_reference(func.ret_ty) == 1 and analysis_type_is_mut_reference(state.types[source_idx]) == 0) ownership_add_error(state, source, filename, "cannot return mutable reference from shared source '" + borrow_source + "'", expr.line, expr.col, borrow_source.length)
+    if (ret_lifetime != "" and source_lifetime != ret_lifetime) ownership_add_error(state, source, filename, "E5008", "returned reference lifetime " + source_lifetime + " does not match " + ret_lifetime, expr.line, expr.col, borrow_source.length)
+    if (analysis_type_is_mut_reference(func.ret_ty) == 1 and analysis_type_is_mut_reference(state.types[source_idx]) == 0) ownership_add_error(state, source, filename, "E5008", "cannot return mutable reference from shared source '" + borrow_source + "'", expr.line, expr.col, borrow_source.length)
     return 0
 }
 
@@ -648,7 +664,7 @@ pub fn ownership_merge_diagnostics(target: &OwnershipCheckState, other: &Ownersh
         let mut found = 0
         for (j in 0 .. target.diagnostics.length)
         {
-            if (target.diagnostics[j] == other.diagnostics[i]) found = 1
+            if (diag_same(target.diagnostics[j], other.diagnostics[i]) == 1) found = 1
         }
         if (found == 0)
         {
@@ -740,8 +756,8 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
                     owner_idx = ownership_create_borrow(state, borrow_expr, source, filename)
                 }
             }
-            if (source_param == -2) ownership_add_error(state, source, filename, "borrowed return value has multiple possible input sources", init.line, init.col, init.text.length)
-            elif (borrow_source == "") ownership_add_error(state, source, filename, "borrowed return value has no direct input source", init.line, init.col, init.text.length)
+            if (source_param == -2) ownership_add_error(state, source, filename, "E5008", "borrowed return value has multiple possible input sources", init.line, init.col, init.text.length)
+            elif (borrow_source == "") ownership_add_error(state, source, filename, "E5008", "borrowed return value has no direct input source", init.line, init.col, init.text.length)
             let mut end_line = ownership_stmt_last_use_line(program, body_root, stmt.assign_name)
             if (end_line < stmt.line) end_line = stmt.line
             let ref_state_idx = state.names.length
@@ -760,8 +776,8 @@ pub fn ownership_check_stmt(program: AstProgram, state: &OwnershipCheckState, fa
         let owner_idx = ownership_state_find(state, stmt.assign_name)
         if (owner_idx >= 0)
         {
-            if (state.mutable[owner_idx] == 0) ownership_add_error(state, source, filename, "cannot assign to immutable owner '" + stmt.assign_name + "'", stmt.line, stmt.col, stmt.assign_name.length)
-            if (state.shared_borrows[owner_idx] > 0 or state.mut_borrow[owner_idx] == 1) ownership_add_error(state, source, filename, "cannot assign to '" + stmt.assign_name + "' while it is borrowed", stmt.line, stmt.col, stmt.assign_name.length)
+            if (state.mutable[owner_idx] == 0) ownership_add_error(state, source, filename, "E5004", "cannot assign to immutable owner '" + stmt.assign_name + "'", stmt.line, stmt.col, stmt.assign_name.length)
+            if (state.shared_borrows[owner_idx] > 0 or state.mut_borrow[owner_idx] == 1) ownership_add_error(state, source, filename, "E5002", "cannot assign to '" + stmt.assign_name + "' while it is borrowed", stmt.line, stmt.col, stmt.assign_name.length)
         }
         ownership_check_expr(program, state, facts, stmt.assign_idx, idx, 1, source, filename)
         if (owner_idx >= 0) state.status[owner_idx] = "Available"
@@ -2205,10 +2221,9 @@ pub fn typed_analysis_program(program: AstProgram, source: string, filename: str
     for (i in 0 .. program.functions.length)
     {
         let ownership = ownership_check_function(program, &facts, program.functions[i], source, filename)
-        for (j in 0 .. ownership.diagnostics.length)
-        {
-            error = error + ownership.diagnostics[j]
-        }
+        let mut bag = diag_bag_new()
+        for (j in 0 .. ownership.diagnostics.length) { diag_emit(&bag, ownership.diagnostics[j]) }
+        error = error + diag_render_bag_body(&bag, diag_render_options(source, filename))
         error_count += ownership.error_count
     }
     return TypedAnalysisResult{ ok: 1, ownership_ok: if (error_count == 0) { 1 } else { 0 }, error: error, ir: ir, facts: facts, drops: final_drops }

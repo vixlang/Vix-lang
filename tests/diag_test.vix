@@ -1,0 +1,6 @@
+fn main(): i32
+{
+    let mut count: i32 = 0
+    count = "hello"
+    return count
+}

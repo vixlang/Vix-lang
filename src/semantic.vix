@@ -10,7 +10,9 @@ pub type SemanticResult = struct {
     type_error_count: i32,
     warning_count: i32,
     emit_warnings: i32,
-    diagnostics: [string],
+    bag: DiagBag,
+    source: string,
+    filename: string,
     type_result: TypeInferResult
 }
 
@@ -21,20 +23,45 @@ pub fn semantic_result_new(): SemanticResult
 
 pub fn semantic_result_new_with_warnings(emit_warnings: i32): SemanticResult
 {
-    return SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, emit_warnings: emit_warnings, diagnostics: [], type_result: typeinfer_ok("unknown") }
+    return SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, emit_warnings: emit_warnings, bag: diag_bag_new(), source: "", filename: "", type_result: typeinfer_ok("unknown") }
+}
+
+pub fn semantic_phase(error_type: string): DiagPhase
+{
+    return match error_type {
+        "NameError" -> DiagName
+        "TypeError" -> DiagType
+        "OwnershipError" -> DiagOwnership
+        _ -> DiagSemantic
+    }
+}
+
+pub fn semantic_diagnostic(source: string, filename: string, code: string, level: DiagLevel, phase: DiagPhase, title: string, message: string, func_name: string, line: i32, col: i32, length: i32): Diagnostic
+{
+    let full_message = if (func_name != "") "in function " + func_name + ": " + message else message
+    let mut diagnostic = diag_new(code, level, phase, title)
+        |> diag_message(full_message)
+        |> diag_function(func_name)
+    if (line > 0)
+    {
+        diagnostic = diag_primary(diagnostic, diag_span_at(source, filename, line, col, length), message)
+    }
+    return diagnostic
+}
+
+pub fn semantic_emit_diag(result: &SemanticResult, diagnostic: Diagnostic): i32
+{
+    let mut bag = result.bag
+    let emitted = diag_emit(&bag, diagnostic)
+    result.bag = bag
+    return emitted
 }
 
 pub fn semantic_add_error(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, func_name: string)
 {
-    let located = if (func_name != "")
-    {
-        format_diagnostic_no_loc(diag_error_level(), error_type, "in function " + func_name + ": " + message, filename)
-    }
-    else
-    {
-        format_diagnostic_no_loc(diag_error_level(), error_type, message, filename)
-    }
-    result.diagnostics.push(located)
+    let code = error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic(source, filename, code, DiagError, semantic_phase(error_type), diagnostic_title(code, message), message, func_name, 0, 0, 1)
+    if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.error_count += 1
     if (error_type == "TypeError") { result.type_error_count += 1 }
     result.ok = 0
@@ -42,15 +69,9 @@ pub fn semantic_add_error(result: &SemanticResult, source: string, filename: str
 
 pub fn semantic_add_error_loc(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, func_name: string, line: i32, col: i32, length: i32)
 {
-    let full_message = if (func_name != "") { "in function " + func_name + ": " + message } else { message }
-    if (line > 0)
-    {
-        result.diagnostics.push(format_diagnostic(source, filename, diag_error_level(), error_type, full_message, line, col, length))
-    }
-    else
-    {
-        result.diagnostics.push(format_diagnostic_no_loc(diag_error_level(), error_type, full_message, filename))
-    }
+    let code = error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic(source, filename, code, DiagError, semantic_phase(error_type), diagnostic_title(code, message), message, func_name, line, col, length)
+    if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.error_count += 1
     if (error_type == "TypeError") { result.type_error_count += 1 }
     result.ok = 0
@@ -59,36 +80,26 @@ pub fn semantic_add_error_loc(result: &SemanticResult, source: string, filename:
 pub fn semantic_add_warning(result: &SemanticResult, filename: string, error_type: string, message: string)
 {
     if (result.emit_warnings == 0) { return }
-    result.diagnostics.push(format_diagnostic_no_loc(diag_warning_level(), error_type, message, filename))
+    let code = error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic("", filename, code, DiagWarning, DiagSemantic, diagnostic_title(code, message), message, "", 0, 0, 1)
+    if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.warning_count += 1
 }
 
 pub fn semantic_add_warning_loc(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, line: i32, col: i32, length: i32)
 {
     if (result.emit_warnings == 0) { return }
-    if (line > 0)
-    {
-        result.diagnostics.push(format_diagnostic(source, filename, diag_warning_level(), error_type, message, line, col, length))
-    }
-    else
-    {
-        result.diagnostics.push(format_diagnostic_no_loc(diag_warning_level(), error_type, message, filename))
-    }
+    let code = error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic(source, filename, code, DiagWarning, DiagSemantic, diagnostic_title(code, message), message, "", line, col, length)
+    if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.warning_count += 1
 }
 
 pub fn semantic_add_typeck_error(result: &SemanticResult, source: string, filename: string, check: TypeInferResult)
 {
     if (check.ok == 1) { return }
-    let full_message = if (check.error_func != "") { "in function " + check.error_func + ": " + check.error } else { check.error }
-    if (check.line > 0)
-    {
-        result.diagnostics.push(format_diagnostic(source, filename, diag_error_level(), "TypeError", full_message, check.line, check.col, check.span_len))
-    }
-    else
-    {
-        result.diagnostics.push(format_diagnostic_no_loc(diag_error_level(), "TypeError", full_message, filename))
-    }
+    let diagnostic = semantic_diagnostic(source, filename, check.code, DiagError, check.phase, check.title, check.error, check.error_func, check.line, check.col, check.span_len)
+    if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.error_count += 1
     result.type_error_count += 1
     result.ok = 0
@@ -962,6 +973,8 @@ pub fn semantic_check_program(program: AstProgram, source: string, filename: str
 pub fn semantic_check_program_with_warnings(program: AstProgram, source: string, filename: string, emit_warnings: i32): SemanticResult
 {
     let mut result = semantic_result_new_with_warnings(emit_warnings)
+    result.source = source
+    result.filename = filename
     if (program.ok == 0)
     {
         return result
@@ -993,14 +1006,10 @@ pub fn semantic_check_program_with_warnings(program: AstProgram, source: string,
 
 pub fn semantic_result_debug(result: SemanticResult): string
 {
-    if (result.diagnostics.length == 0)
+    if (result.bag.diagnostics.length == 0)
     {
         return "SemanticOk"
     }
-    let mut out = ""
-    for (i in 0 .. result.diagnostics.length)
-    {
-        out = out + result.diagnostics[i]
-    }
-    return out
+    let mut bag = result.bag
+    return diag_render_bag_body(&bag, diag_render_options(result.source, result.filename))
 }

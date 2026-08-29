@@ -1,0 +1,12 @@
+macro $check(value: expr)
+{
+    let tmp = $value
+    print(tmp)
+}
+
+fn main(): i32
+{
+    let tmp = 40
+    $check(2)
+    return tmp - 40
+}

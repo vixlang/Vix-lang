@@ -1,0 +1,18 @@
+macro $inner(value: expr)
+{
+    let tmp = $value
+    print(tmp)
+}
+
+macro $outer(value: expr)
+{
+    let tmp = $value + 1
+    $inner(tmp)
+}
+
+fn main(): i32
+{
+    let tmp = 9
+    $outer(1)
+    return tmp - 9
+}

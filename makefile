@@ -11,7 +11,7 @@ CLANG ?= clang
 
 # Keep a compiler regression inside one process instead of letting it starve
 # the desktop or invoke the global OOM killer.
-VIXC_RUN ?= nice -n 10 prlimit --as=1610612736 --stack=67108864
+VIXC_RUN ?= nice -n 10 prlimit --as=1610612736 --stack=536870912
 
 SRC_DIR := src
 BUILD_DIR := build

@@ -11,6 +11,9 @@ pub type InferValue = struct {
 
 pub type HmCheckResult = struct {
     ok: i32,
+    code: string,
+    title: string,
+    phase: DiagPhase,
     error: string,
     return_type: string,
     error_func: string,
@@ -46,12 +49,12 @@ pub fn hm_unknown_ty(): Ty
 
 pub fn hm_ok(return_type: string): HmCheckResult
 {
-    return HmCheckResult{ ok: 1, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
+    return HmCheckResult{ ok: 1, code: "", title: "", phase: DiagType, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
 }
 
 pub fn hm_fail(error: InferError, error_func: string): HmCheckResult
 {
-    return HmCheckResult{ ok: 0, error: error.message, return_type: "unknown", error_func: error_func, line: error.pos.line, col: error.pos.col, span_len: error.pos.span_len }
+    return HmCheckResult{ ok: 0, code: error.code, title: error.title, phase: error.phase, error: error.message, return_type: "unknown", error_func: error_func, line: error.pos.line, col: error.pos.col, span_len: error.pos.span_len }
 }
 
 pub fn hm_expr_pos(expr: AstExpr): SourcePos
@@ -836,7 +839,7 @@ pub fn hm_check_program(program: AstProgram): HmCheckResult
 {
     if (program.ok == 0)
     {
-        return HmCheckResult{ ok: 0, error: program.error, return_type: "unknown", error_func: "", line: 0, col: 0, span_len: 1 }
+        return HmCheckResult{ ok: 0, code: "E1000", title: "parse error", phase: DiagParser, error: program.error, return_type: "unknown", error_func: "", line: 0, col: 0, span_len: 1 }
     }
     let store = ty_store_new()
     let fresh = fresh_new()

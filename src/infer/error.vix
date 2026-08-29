@@ -7,6 +7,9 @@ pub type InferErrorKind = InferUnboundName | InferMismatch | InferOccursCheck | 
 
 pub type InferError = struct {
     kind: InferErrorKind,
+    code: string,
+    title: string,
+    phase: DiagPhase,
     message: string,
     expected: Ty,
     actual: Ty,
@@ -15,40 +18,40 @@ pub type InferError = struct {
 
 pub fn infer_error_ok(): InferError
 {
-    return InferError{ kind: InferOther, message: "", expected: TyUnknown, actual: TyUnknown, pos: pos_none() }
+    return InferError{ kind: InferOther, code: "E3000", title: "type error", phase: DiagType, message: "", expected: TyUnknown, actual: TyUnknown, pos: pos_none() }
 }
 
-pub fn infer_error(kind: InferErrorKind, message: string, expected: Ty, actual: Ty, pos: SourcePos): InferError
+pub fn infer_error(kind: InferErrorKind, code: string, title: string, phase: DiagPhase, message: string, expected: Ty, actual: Ty, pos: SourcePos): InferError
 {
-    return InferError{ kind: kind, message: message, expected: expected, actual: actual, pos: pos }
+    return InferError{ kind: kind, code: code, title: title, phase: phase, message: message, expected: expected, actual: actual, pos: pos }
 }
 
 pub fn infer_error_unbound(name: string, pos: SourcePos): InferError
 {
-    return infer_error(InferUnboundName, "unbound name '" + name + "'", TyUnknown, TyUnknown, pos)
+    return infer_error(InferUnboundName, "E2001", "undefined symbol", DiagName, "unbound name '" + name + "'", TyUnknown, TyUnknown, pos)
 }
 
 pub fn infer_error_other(message: string, pos: SourcePos): InferError
 {
-    return infer_error(InferOther, message, TyUnknown, TyUnknown, pos)
+    return infer_error(InferOther, "E3000", "type error", DiagType, message, TyUnknown, TyUnknown, pos)
 }
 
 pub fn infer_error_mismatch(store: &TyStore, expected: Ty, actual: Ty, pos: SourcePos): InferError
 {
-    return infer_error(InferMismatch, "type mismatch: expected " + ty_to_string(store, expected) + ", got " + ty_to_string(store, actual), expected, actual, pos)
+    return infer_error(InferMismatch, "E3002", "type mismatch", DiagType, "type mismatch: expected " + ty_to_string(store, expected) + ", got " + ty_to_string(store, actual), expected, actual, pos)
 }
 
 pub fn infer_error_occurs(store: &TyStore, var_id: i32, ty: Ty, pos: SourcePos): InferError
 {
-    return infer_error(InferOccursCheck, "occurs-check failed: t" + ty_i32_text(var_id) + " occurs in " + ty_to_string(store, ty), TyVar(var_id), ty, pos)
+    return infer_error(InferOccursCheck, "E3009", "recursive type", DiagType, "occurs-check failed: t" + ty_i32_text(var_id) + " occurs in " + ty_to_string(store, ty), TyVar(var_id), ty, pos)
 }
 
 pub fn infer_error_arity(expected: i32, actual: i32, pos: SourcePos): InferError
 {
-    return infer_error(InferArity, "arity mismatch: expected " + ty_i32_text(expected) + " arguments, got " + ty_i32_text(actual), TyUnknown, TyUnknown, pos)
+    return infer_error(InferArity, "E3020", "invalid function call", DiagType, "arity mismatch: expected " + ty_i32_text(expected) + " arguments, got " + ty_i32_text(actual), TyUnknown, TyUnknown, pos)
 }
 
 pub fn infer_error_not_callable(store: &TyStore, actual: Ty, pos: SourcePos): InferError
 {
-    return infer_error(InferNotCallable, "not callable: " + ty_to_string(store, actual), TyUnknown, actual, pos)
+    return infer_error(InferNotCallable, "E3020", "value is not callable", DiagType, "not callable: " + ty_to_string(store, actual), TyUnknown, actual, pos)
 }

@@ -1,0 +1,11 @@
+macro $broken(value: expr)
+{
+    let tmp = $capture(1)
+    print(tmp)
+}
+
+fn main(): i32
+{
+    $broken(1)
+    return 0
+}

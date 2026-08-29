@@ -1,0 +1,4 @@
+fn main(): i32 {
+    print("$capture(not_a_macro)")
+    return 0
+}

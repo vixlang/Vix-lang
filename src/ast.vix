@@ -201,7 +201,8 @@ pub type AstProgram = struct {
     expr_store: ExprStore,
     store: StmtStore,
     ok: i32,
-    error: string
+    error: string,
+    diagnostic: Diagnostic
 }
 
 macro ast_default_loc_fields() {
@@ -518,7 +519,7 @@ pub fn ast_function_with_loc(func: AstFunction, line: i32, col: i32): AstFunctio
 pub fn ast_program_ok(function: AstFunction, expr_store: ExprStore, store: StmtStore): AstProgram
 {
     let entry = ast_function_with_loc(function, function.line, function.col)
-    return AstProgram{ function: entry, functions: [function], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store, store: store, ok: 1, error: "" }
+    return AstProgram{ function: entry, functions: [function], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store, store: store, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, "") }
 }
 
 pub fn ast_program_ok_functions(functions: [AstFunction], expr_store: ExprStore, store: StmtStore): AstProgram
@@ -560,12 +561,19 @@ pub fn ast_program_full(functions: [AstFunction], extern_functions: [AstFunction
             }
         }
     }
-    return AstProgram{ function: entry, functions: functions, extern_functions: extern_functions, globals: globals, structs: structs, adts: adts, mod_decls: mod_decls, import_decls: import_decls, expr_store: expr_store, store: store, ok: 1, error: "" }
+    return AstProgram{ function: entry, functions: functions, extern_functions: extern_functions, globals: globals, structs: structs, adts: adts, mod_decls: mod_decls, import_decls: import_decls, expr_store: expr_store, store: store, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, "") }
 }
 
 pub fn ast_program_err(message: string): AstProgram
 {
-    return AstProgram{ function: ast_function("main", "i32", -1), functions: [], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store_new(), store: stmt_store_new(), ok: 0, error: message }
+    let diagnostic = diag_new("E1000", DiagError, DiagParser, "parse error")
+        |> diag_message(message)
+    return ast_program_err_diag(message, diagnostic)
+}
+
+pub fn ast_program_err_diag(message: string, diagnostic: Diagnostic): AstProgram
+{
+    return AstProgram{ function: ast_function("main", "i32", -1), functions: [], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store_new(), store: stmt_store_new(), ok: 0, error: message, diagnostic: diagnostic }
 }
 
 pub fn ast_expr_debug(store: &ExprStore, idx: i32): string

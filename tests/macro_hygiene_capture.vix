@@ -1,0 +1,17 @@
+macro $add_to_total(value: expr)
+{
+    $capture(total) = $capture(total) + $value
+}
+
+macro $publish(value: expr)
+{
+    let $raw(exposed) = $value
+}
+
+fn main(): i32
+{
+    let mut total = 1
+    $add_to_total(2)
+    $publish(4)
+    return total + exposed - 7
+}

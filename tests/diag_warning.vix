@@ -1,0 +1,5 @@
+fn main(): i32
+{
+    let unused = 10
+    return 0
+}

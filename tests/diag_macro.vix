@@ -1,0 +1,11 @@
+macro $identity(value: expr)
+{
+    $value
+}
+
+fn main(): i32
+{
+    let mut value: i32 = 1
+    value = $identity("wrong")
+    return value
+}

@@ -1,0 +1,7 @@
+fn main(): i32
+{
+    let greeting = "你好，Vix"
+	let mut value: i32 = 1
+	value = greeting
+    return value
+}

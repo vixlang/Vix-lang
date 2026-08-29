@@ -95,6 +95,28 @@ const char *vix_diag_yellow(void) { return "\033[33m"; }
 
 const char *vix_diag_reset(void) { return "\033[0m"; }
 
+static int vix_diag_format_mode = 0;
+static int vix_diag_color_mode = 0;
+static int vix_diag_test_mode = 0;
+
+void vix_diag_configure(int format, int color, int test_mode) {
+  vix_diag_format_mode = format;
+  vix_diag_color_mode = color;
+  vix_diag_test_mode = test_mode;
+}
+
+int vix_diag_format(void) { return vix_diag_format_mode; }
+
+int vix_diag_test(void) { return vix_diag_test_mode; }
+
+int vix_diag_color_enabled(void) {
+  if (vix_diag_test_mode || vix_diag_color_mode == 2)
+    return 0;
+  if (vix_diag_color_mode == 1)
+    return 1;
+  return isatty(STDERR_FILENO) ? 1 : 0;
+}
+
 int vix_diag_strlen(const char *s) {
   if (!s)
     return 0;

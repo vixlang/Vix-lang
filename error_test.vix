@@ -1,4 +1,10 @@
+type Ptr = struct 
+{
+    x: Ptr
+}
+
 fn main(): i32
 {
-    let a 
+    let ptr = Ptr
+    return 0
 }

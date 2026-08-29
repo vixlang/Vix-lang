@@ -1,0 +1,824 @@
+#[no_main]
+
+extern "C"
+{
+    fn malloc(size: usize): string
+    fn snprintf(buf: string, size: usize, fmt: string, ...): i32
+    fn compiler_string_byte(text: string, index: i32): i32
+    fn vix_diag_format(): i32
+    fn vix_diag_test(): i32
+    fn vix_diag_color_enabled(): i32
+}
+
+pub type DiagLevel = DiagError | DiagWarning | DiagNote | DiagHelp
+
+pub type DiagPhase = DiagLexer | DiagParser | DiagName | DiagType | DiagOwnership | DiagSemantic | DiagBackend
+
+pub type DiagColor = DiagColorAuto | DiagColorAlways | DiagColorNever
+
+pub type DiagFormat = DiagHuman | DiagShort | DiagJson
+
+pub type DiagSpan = struct {
+    file: string,
+    start: i32,
+    end: i32,
+    line: i32,
+    column: i32
+}
+
+pub type DiagLabel = struct {
+    span: DiagSpan,
+    message: string,
+    primary: i32
+}
+
+pub type DiagSuggestion = struct {
+    span: DiagSpan,
+    replacement: string,
+    message: string
+}
+
+pub type DiagMacroFrame = struct {
+    name: string,
+    span: DiagSpan,
+    message: string
+}
+
+pub type DiagPart =
+    DiagLabelPart(DiagLabel)
+    | DiagNotePart(string)
+    | DiagHelpPart(string)
+    | DiagSuggestionPart(DiagSuggestion)
+    | DiagMacroPart(DiagMacroFrame)
+
+pub type Diagnostic = struct {
+    code: string,
+    level: DiagLevel,
+    phase: DiagPhase,
+    title: string,
+    message: string,
+    parts: [DiagPart],
+    function_name: string
+}
+
+pub type DiagBag = struct {
+    diagnostics: [Diagnostic],
+    error_count: i32,
+    warning_count: i32,
+    limit: i32,
+    stopped: i32
+}
+
+pub type DiagRenderOptions = struct {
+    format: DiagFormat,
+    color: DiagColor,
+    color_enabled: i32,
+    test_mode: i32,
+    source: string,
+    input_file: string
+}
+
+macro diag_default_fields() {
+    message: "", parts: [], function_name: ""
+}
+
+pub fn diag_i32(value: i32): string
+{
+    let buf: string = malloc(64)
+    snprintf(buf, 64, "%d", value)
+    return buf
+}
+
+pub fn diag_char(ch: i32): string
+{
+    let out: string = malloc(2)
+    out[0] = ch
+    out[1] = 0
+    return out
+}
+
+pub fn diag_text_slice(text: string, start: i32, end: i32): string
+{
+    let mut out = ""
+    let safe_start = if (start < 0) 0 else start
+    let safe_end = if (end > text.length) text.length else end
+    for (i in safe_start .. safe_end) { out = out + diag_char(compiler_string_byte(text, i)) }
+    return out
+}
+
+pub fn diag_span(file: string, start: i32, end: i32, line: i32, column: i32): DiagSpan
+{
+    let safe_start = if (start < 0) 0 else start
+    let safe_end = if (end < safe_start) safe_start else end
+    return DiagSpan{ file: file, start: safe_start, end: safe_end, line: if (line < 1) 1 else line, column: if (column < 1) 1 else column }
+}
+
+pub fn diag_empty_span(): DiagSpan
+{
+    return diag_span("", 0, 0, 1, 1)
+}
+
+pub fn diag_utf8_width(byte: i32): i32
+{
+    if ((byte & 192) != 128) { return 1 }
+    return 0
+}
+
+pub fn diag_offset_at(source: string, target_line: i32, target_column: i32): i32
+{
+    let wanted_line = if (target_line < 1) 1 else target_line
+    let wanted_column = if (target_column < 1) 1 else target_column
+    let mut line = 1
+    let mut column = 1
+    let mut offset = 0
+    while (offset < source.length)
+    {
+        if (line == wanted_line and column >= wanted_column) { return offset }
+        let byte = compiler_string_byte(source, offset)
+        if (byte == 13)
+        {
+            if (offset + 1 < source.length and compiler_string_byte(source, offset + 1) == 10) { offset += 1 }
+            if (line == wanted_line) { return offset }
+            line += 1
+            column = 1
+        }
+        elif (byte == 10)
+        {
+            if (line == wanted_line) { return offset }
+            line += 1
+            column = 1
+        }
+        elif (byte == 9)
+        {
+            column = ((column - 1) / 8 + 1) * 8 + 1
+        }
+        else
+        {
+            column += diag_utf8_width(byte)
+        }
+        offset += 1
+    }
+    return source.length
+}
+
+pub fn diag_span_at(source: string, file: string, line: i32, column: i32, display_length: i32): DiagSpan
+{
+    let start = diag_offset_at(source, line, column)
+    let wanted = if (display_length < 1) 1 else display_length
+    let mut end = start
+    let mut width = 0
+    while (end < source.length and width < wanted)
+    {
+        let byte = compiler_string_byte(source, end)
+        if (byte == 10 or byte == 13) { break }
+        if (byte == 9) { width = ((column + width - 1) / 8 + 1) * 8 - column + 1 }
+        else { width += diag_utf8_width(byte) }
+        end += 1
+    }
+    if (end == start and start < source.length) { end += 1 }
+    return diag_span(file, start, end, line, column)
+}
+
+pub fn diag_new(code: string, level: DiagLevel, phase: DiagPhase, title: string): Diagnostic
+{
+    return Diagnostic{ code: code, level: level, phase: phase, title: title, $diag_default_fields() }
+}
+
+pub fn diag_message(diag: Diagnostic, message: string): Diagnostic
+{
+    diag.message = message
+    return diag
+}
+
+pub fn diag_function(diag: Diagnostic, function_name: string): Diagnostic
+{
+    diag.function_name = function_name
+    return diag
+}
+
+pub fn diag_primary(diag: Diagnostic, span: DiagSpan, message: string): Diagnostic
+{
+    diag.parts.push(DiagLabelPart(DiagLabel{ span: span, message: message, primary: 1 }))
+    return diag
+}
+
+pub fn diag_secondary(diag: Diagnostic, span: DiagSpan, message: string): Diagnostic
+{
+    diag.parts.push(DiagLabelPart(DiagLabel{ span: span, message: message, primary: 0 }))
+    return diag
+}
+
+pub fn diag_note(diag: Diagnostic, text: string): Diagnostic
+{
+    diag.parts.push(DiagNotePart(text))
+    return diag
+}
+
+pub fn diag_help(diag: Diagnostic, text: string): Diagnostic
+{
+    diag.parts.push(DiagHelpPart(text))
+    return diag
+}
+
+pub fn diag_suggest(diag: Diagnostic, span: DiagSpan, replacement: string, message: string): Diagnostic
+{
+    diag.parts.push(DiagSuggestionPart(DiagSuggestion{ span: span, replacement: replacement, message: message }))
+    return diag
+}
+
+pub fn diag_macro_frame(diag: Diagnostic, macro_name: string, span: DiagSpan, message: string): Diagnostic
+{
+    diag.parts.push(DiagMacroPart(DiagMacroFrame{ name: macro_name, span: span, message: message }))
+    return diag
+}
+
+pub fn diag_bag_new(): DiagBag
+{
+    return DiagBag{ diagnostics: [], error_count: 0, warning_count: 0, limit: 50, stopped: 0 }
+}
+
+pub fn diag_bag_with_limit(limit: i32): DiagBag
+{
+    return DiagBag{ diagnostics: [], error_count: 0, warning_count: 0, limit: if (limit < 1) 1 else limit, stopped: 0 }
+}
+
+pub fn diag_level_rank(level: DiagLevel): i32
+{
+    return match level { DiagError -> 0 DiagWarning -> 1 DiagNote -> 2 DiagHelp -> 3 }
+}
+
+pub fn diag_level_is_error(level: DiagLevel): i32
+{
+    return match level { DiagError -> 1 _ -> 0 }
+}
+
+pub fn diag_level_is_warning(level: DiagLevel): i32
+{
+    return match level { DiagWarning -> 1 _ -> 0 }
+}
+
+pub fn diag_color_is_never(color: DiagColor): i32
+{
+    return match color { DiagColorNever -> 1 _ -> 0 }
+}
+
+pub fn diag_level_text(level: DiagLevel): string
+{
+    return match level { DiagError -> "error" DiagWarning -> "warning" DiagNote -> "note" DiagHelp -> "help" }
+}
+
+pub fn diag_phase_text(phase: DiagPhase): string
+{
+    return match phase {
+        DiagLexer -> "lexer"
+        DiagParser -> "parser"
+        DiagName -> "name"
+        DiagType -> "type"
+        DiagOwnership -> "ownership"
+        DiagSemantic -> "semantic"
+        DiagBackend -> "backend"
+    }
+}
+
+pub fn diag_primary_span(diag: Diagnostic): DiagSpan
+{
+    for (i in 0 .. diag.parts.length)
+    {
+        match diag.parts[i]
+        {
+            DiagLabelPart(label) -> if (label.primary == 1) { return label.span }
+            _ -> {}
+        }
+    }
+    return diag_empty_span()
+}
+
+pub fn diag_same(a: Diagnostic, b: Diagnostic): i32
+{
+    if (a.code != b.code or a.message != b.message) { return 0 }
+    let sa = diag_primary_span(a)
+    let sb = diag_primary_span(b)
+    if (sa.file == sb.file and sa.start == sb.start and sa.end == sb.end) { return 1 }
+    return 0
+}
+
+pub fn diag_emit(bag: &DiagBag, diag: Diagnostic): i32
+{
+    for (i in 0 .. bag.diagnostics.length)
+    {
+        if (diag_same(bag.diagnostics[i], diag) == 1) { return 0 }
+    }
+    if (diag_level_is_error(diag.level) == 1 and bag.error_count >= bag.limit)
+    {
+        bag.stopped = 1
+        return 0
+    }
+    bag.diagnostics.push(diag)
+    if (diag_level_is_error(diag.level) == 1) { bag.error_count += 1 }
+    elif (diag_level_is_warning(diag.level) == 1) { bag.warning_count += 1 }
+    return 1
+}
+
+pub fn diag_has_errors(bag: &DiagBag): i32
+{
+    return if (bag.error_count > 0) 1 else 0
+}
+
+pub fn diag_text_compare(a: string, b: string): i32
+{
+    let length = if (a.length < b.length) a.length else b.length
+    for (i in 0 .. length)
+    {
+        let ac = compiler_string_byte(a, i)
+        let bc = compiler_string_byte(b, i)
+        if (ac < bc) { return -1 }
+        if (ac > bc) { return 1 }
+    }
+    if (a.length < b.length) { return -1 }
+    if (a.length > b.length) { return 1 }
+    return 0
+}
+
+pub fn diag_compare(a: Diagnostic, b: Diagnostic): i32
+{
+    let sa = diag_primary_span(a)
+    let sb = diag_primary_span(b)
+    let file_order = diag_text_compare(sa.file, sb.file)
+    if (file_order != 0) { return file_order }
+    if (sa.start < sb.start) { return -1 }
+    if (sa.start > sb.start) { return 1 }
+    let ar = diag_level_rank(a.level)
+    let br = diag_level_rank(b.level)
+    if (ar < br) { return -1 }
+    if (ar > br) { return 1 }
+    return diag_text_compare(a.code, b.code)
+}
+
+pub fn diag_sort(bag: &DiagBag)
+{
+    let compare = fn (a: Diagnostic, b: Diagnostic): i32 => diag_compare(a, b)
+    for (i in 0 .. bag.diagnostics.length)
+    {
+        let mut j = i + 1
+        while (j < bag.diagnostics.length)
+        {
+            if (compare(bag.diagnostics[j], bag.diagnostics[i]) < 0)
+            {
+                let tmp = bag.diagnostics[i]
+                bag.diagnostics[i] = bag.diagnostics[j]
+                bag.diagnostics[j] = tmp
+            }
+            j += 1
+        }
+    }
+}
+
+pub fn diag_deduplicate(bag: &DiagBag)
+{
+    let mut unique: [Diagnostic] = []
+    for (i in 0 .. bag.diagnostics.length)
+    {
+        let mut found = 0
+        for (j in 0 .. unique.length)
+        {
+            if (diag_same(unique[j], bag.diagnostics[i]) == 1) { found = 1 }
+        }
+        if (found == 0) { unique.push(bag.diagnostics[i]) }
+    }
+    bag.diagnostics = unique
+}
+
+pub fn diag_render_options(source: string, input_file: string): DiagRenderOptions
+{
+    let format = match vix_diag_format() { 1 -> DiagShort 2 -> DiagJson _ -> DiagHuman }
+    let test_mode = vix_diag_test()
+    return DiagRenderOptions{ format: format, color: if (test_mode == 1) DiagColorNever else DiagColorAuto, color_enabled: vix_diag_color_enabled(), test_mode: test_mode, source: source, input_file: input_file }
+}
+
+pub fn diag_color_code(enabled: i32, code: string): string
+{
+    return if (enabled == 1) "\033[" + code + "m" else ""
+}
+
+pub fn diag_level_color(level: DiagLevel, enabled: i32): string
+{
+    return match level {
+        DiagWarning -> diag_color_code(enabled, "33")
+        DiagNote -> diag_color_code(enabled, "36")
+        DiagHelp -> diag_color_code(enabled, "32")
+        DiagError -> diag_color_code(enabled, "31")
+    }
+}
+
+pub fn diag_phase_color(phase: DiagPhase, enabled: i32): string
+{
+    return match phase {
+        DiagParser -> diag_color_code(enabled, "35")
+        DiagType -> diag_color_code(enabled, "34")
+        DiagName -> diag_color_code(enabled, "36")
+        _ -> diag_level_color(DiagError, enabled)
+    }
+}
+
+pub fn diag_reset_code(enabled: i32): string
+{
+    return diag_color_code(enabled, "0")
+}
+
+pub fn diag_stable_path(path: string): string
+{
+    if (path == "") { return "" }
+    let marker = "tests/"
+    let mut marker_at = -1
+    let mut last_slash = -1
+    for (i in 0 .. path.length)
+    {
+        if (compiler_string_byte(path, i) == '/') { last_slash = i }
+        if (i + marker.length <= path.length)
+        {
+            let mut same = 1
+            for (j in 0 .. marker.length)
+            {
+                if (compiler_string_byte(path, i + j) != compiler_string_byte(marker, j)) { same = 0 }
+            }
+            if (same == 1) { marker_at = i }
+        }
+    }
+    if (marker_at >= 0) { return diag_text_slice(path, marker_at, path.length) }
+    if (compiler_string_byte(path, 0) == '/' and last_slash >= 0) { return diag_text_slice(path, last_slash + 1, path.length) }
+    return path
+}
+
+pub fn diag_source_line(source: string, target_line: i32): string
+{
+    if (target_line < 1) { return "" }
+    let mut line = 1
+    let mut start = 0
+    let mut i = 0
+    while (i < source.length and line < target_line)
+    {
+        if (compiler_string_byte(source, i) == 10) { line += 1; start = i + 1 }
+        i += 1
+    }
+    if (line != target_line) { return "" }
+    let mut end = start
+    while (end < source.length and compiler_string_byte(source, end) != 10 and compiler_string_byte(source, end) != 13) { end += 1 }
+    return diag_text_slice(source, start, end)
+}
+
+pub fn diag_expand_tabs(line: string): string
+{
+    let mut out = ""
+    let mut column = 1
+    let mut i = 0
+    while (i < line.length)
+    {
+        let byte = compiler_string_byte(line, i)
+        if (byte == 9)
+        {
+            let stop = ((column - 1) / 8 + 1) * 8 + 1
+            while (column < stop) { out = out + " "; column += 1 }
+        }
+        else
+        {
+            out = out + diag_char(byte)
+            column += diag_utf8_width(byte)
+        }
+        i += 1
+    }
+    return out
+}
+
+pub fn diag_repeat(text: string, count: i32): string
+{
+    let mut out = ""
+    for (_i in 0 .. count) { out = out + text }
+    return out
+}
+
+pub fn diag_line_width(line: i32): i32
+{
+    let mut n = if (line < 1) 1 else line
+    let mut width = 1
+    while (n >= 10) { n = n / 10; width += 1 }
+    return width
+}
+
+pub fn diag_pad_number(value: i32, width: i32): string
+{
+    let text = diag_i32(value)
+    return diag_repeat(" ", width - text.length) + text
+}
+
+pub fn diag_label_length(label: DiagLabel): i32
+{
+    let length = label.span.end - label.span.start
+    return if (length < 1) 1 else length
+}
+
+pub fn diag_span_display_length(source: string, span: DiagSpan): i32
+{
+    let mut offset = span.start
+    let mut column = span.column
+    let mut width = 0
+    let end = if (span.end <= span.start) span.start + 1 else span.end
+    while (offset < source.length and offset < end)
+    {
+        let byte = compiler_string_byte(source, offset)
+        if (byte == 10 or byte == 13) { return if (width < 1) 1 else width }
+        if (byte == 9)
+        {
+            let next = ((column - 1) / 8 + 1) * 8 + 1
+            width += next - column
+            column = next
+        }
+        else
+        {
+            let advance = diag_utf8_width(byte)
+            width += advance
+            column += advance
+        }
+        offset += 1
+    }
+    return if (width < 1) 1 else width
+}
+
+pub fn diag_is_ident_start(byte: i32): i32
+{
+    if ((byte >= 'a' and byte <= 'z') or (byte >= 'A' and byte <= 'Z') or byte == '_') { return 1 }
+    return 0
+}
+
+pub fn diag_is_ident_continue(byte: i32): i32
+{
+    if (diag_is_ident_start(byte) == 1 or (byte >= '0' and byte <= '9')) { return 1 }
+    return 0
+}
+
+pub fn diag_is_keyword(word: string): i32
+{
+    return match word {
+        "fn" | "let" | "mut" | "return" | "if" | "elif" | "else" | "while" | "for" | "in" | "match" | "struct" | "type" | "pub" | "import" | "extern" | "macro" | "mod" | "break" | "continue" | "as" -> 1
+        _ -> 0
+    }
+}
+
+pub fn diag_is_type_word(word: string): i32
+{
+    return match word { "i8" | "i16" | "i32" | "i64" | "f32" | "f64" | "string" | "void" | "bool" -> 1 _ -> 0 }
+}
+
+pub fn diag_highlight_line(line: string, enabled: i32): string
+{
+    if (enabled == 0) { return line }
+    let mut out = ""
+    let mut i = 0
+    while (i < line.length)
+    {
+        let byte = compiler_string_byte(line, i)
+        if (byte == '"')
+        {
+            let start = i
+            i += 1
+            while (i < line.length and compiler_string_byte(line, i) != '"')
+            {
+                if (compiler_string_byte(line, i) == 92 and i + 1 < line.length) i += 2
+                else { i += 1 }
+            }
+            if (i < line.length) { i += 1 }
+            out = out + diag_color_code(1, "32") + diag_text_slice(line, start, i) + diag_reset_code(1)
+        }
+        elif (diag_is_ident_start(byte) == 1)
+        {
+            let start = i
+            i += 1
+            while (i < line.length and diag_is_ident_continue(compiler_string_byte(line, i)) == 1) { i += 1 }
+            let word = diag_text_slice(line, start, i)
+            let color = if (diag_is_keyword(word) == 1) "34" else if (diag_is_type_word(word) == 1) "36" else if (word == "true" or word == "false" or word == "nil") "35" else ""
+            let color_prefix = if (color == "") "" else diag_color_code(1, color)
+            let color_reset = if (color == "") "" else diag_reset_code(1)
+            out = out + color_prefix + word + color_reset
+        }
+        elif (byte >= '0' and byte <= '9')
+        {
+            let start = i
+            i += 1
+            while (i < line.length and ((compiler_string_byte(line, i) >= '0' and compiler_string_byte(line, i) <= '9') or compiler_string_byte(line, i) == '.')) { i += 1 }
+            out = out + diag_color_code(1, "35") + diag_text_slice(line, start, i) + diag_reset_code(1)
+        }
+        else
+        {
+            out = out + diag_char(byte)
+            i += 1
+        }
+    }
+    return out
+}
+
+pub fn diag_render_source_context_line(source: string, line: i32, width: i32, enabled: i32): string
+{
+    let dim = diag_color_code(enabled, "2")
+    let reset = diag_reset_code(enabled)
+    return dim + diag_pad_number(line, width) + " | " + reset + diag_highlight_line(diag_expand_tabs(diag_source_line(source, line)), enabled) + "\n"
+}
+
+pub fn diag_render_label(source: string, label: DiagLabel, stable: i32, enabled: i32): string
+{
+    let line_text = diag_expand_tabs(diag_source_line(source, label.span.line))
+    let width = diag_line_width(label.span.line + 1)
+    let prefix = diag_repeat(" ", width) + " | "
+    let marker = if (label.primary == 1) "^" else "-"
+    let length = diag_span_display_length(source, label.span)
+    let max_length = line_text.length - label.span.column + 1
+    let shown_length = if (max_length > 0 and length > max_length) max_length else length
+    let mut out = ""
+    if (label.span.line > 1 and diag_source_line(source, label.span.line - 1) != "")
+    {
+        out = out + diag_render_source_context_line(source, label.span.line - 1, width, enabled)
+    }
+    let dim = diag_color_code(enabled, "2")
+    let reset = diag_reset_code(enabled)
+    out = out + dim + diag_pad_number(label.span.line, width) + " | " + reset + diag_highlight_line(line_text, enabled) + "\n"
+    let marker_color = if (label.primary == 1) diag_color_code(enabled, "31") else diag_color_code(enabled, "36")
+    out = out + dim + prefix + reset + diag_repeat(" ", label.span.column - 1) + marker_color + diag_repeat(marker, if (shown_length < 1) 1 else shown_length) + reset
+    if (label.message != "") { out = out + " " + label.message }
+    out = out + "\n"
+    if (label.span.end > label.span.start)
+    {
+        let mut offset = label.span.start
+        let mut end_line = label.span.line
+        while (offset < source.length and offset < label.span.end)
+        {
+            let byte = compiler_string_byte(source, offset)
+            if (byte == 13)
+            {
+                if (offset + 1 < source.length and compiler_string_byte(source, offset + 1) == 10) { offset += 1 }
+                end_line += 1
+            }
+            elif (byte == 10) { end_line += 1 }
+            offset += 1
+        }
+        if (end_line > label.span.line and diag_source_line(source, end_line) != "")
+        {
+            out = out + diag_render_source_context_line(source, end_line, width, enabled)
+            out = out + dim + prefix + reset + marker_color + diag_repeat("~", if (label.primary == 1) 1 else 0) + reset + " span ends here\n"
+        }
+    }
+    if (diag_source_line(source, label.span.line + 1) != "")
+    {
+        out = out + diag_render_source_context_line(source, label.span.line + 1, width, enabled)
+    }
+    return out
+}
+
+pub fn diag_json_escape(text: string): string
+{
+    let mut out = ""
+    for (i in 0 .. text.length)
+    {
+        let byte = compiler_string_byte(text, i)
+        if (byte == '"') { out = out + "\\\"" }
+        elif (byte == 92) { out = out + "\\\\" }
+        elif (byte == 10) { out = out + "\\n" }
+        elif (byte == 13) { out = out + "\\r" }
+        elif (byte == 9) { out = out + "\\t" }
+        else { out = out + diag_char(byte) }
+    }
+    return out
+}
+
+pub fn diag_render_short(diag: Diagnostic, options: DiagRenderOptions): string
+{
+    let span = diag_primary_span(diag)
+    let file = if (options.test_mode == 1) diag_stable_path(span.file) else span.file
+    let loc = if (file != "") file + ":" + diag_i32(span.line) + ":" + diag_i32(span.column) + ": " else ""
+    return loc + diag_level_text(diag.level) + "[" + diag.code + "]: " + diag.title + "\n"
+}
+
+pub fn diag_render_json(diag: Diagnostic, options: DiagRenderOptions): string
+{
+    let primary = diag_primary_span(diag)
+    let file = if (options.test_mode == 1) diag_stable_path(primary.file) else primary.file
+    let mut primary_message = ""
+    let mut secondary = "["
+    let mut notes = "["
+    let mut helps = "["
+    let mut first_secondary = 1
+    let mut first_note = 1
+    let mut first_help = 1
+    for (i in 0 .. diag.parts.length)
+    {
+        match diag.parts[i]
+        {
+            DiagLabelPart(label) -> {
+                if (label.primary == 1) { primary_message = label.message }
+                else
+                {
+                    if (first_secondary == 0) { secondary = secondary + "," }
+                    secondary = secondary + "{\"file\":\"" + diag_json_escape(if (options.test_mode == 1) diag_stable_path(label.span.file) else label.span.file) + "\",\"line\":" + diag_i32(label.span.line) + ",\"column\":" + diag_i32(label.span.column) + ",\"length\":" + diag_i32(diag_label_length(label)) + ",\"message\":\"" + diag_json_escape(label.message) + "\"}"
+                    first_secondary = 0
+                }
+            }
+            DiagNotePart(note) -> {
+                if (first_note == 0) { notes = notes + "," }
+                notes = notes + "\"" + diag_json_escape(note) + "\""
+                first_note = 0
+            }
+            DiagHelpPart(help) -> {
+                if (first_help == 0) { helps = helps + "," }
+                helps = helps + "\"" + diag_json_escape(help) + "\""
+                first_help = 0
+            }
+            DiagSuggestionPart(suggestion) -> {
+                if (first_help == 0) { helps = helps + "," }
+                helps = helps + "\"" + diag_json_escape(suggestion.message + ": replace with `" + suggestion.replacement + "`") + "\""
+                first_help = 0
+            }
+            DiagMacroPart(frame) -> {
+                if (first_note == 0) { notes = notes + "," }
+                let detail = if (frame.message != "") ": " + diag_json_escape(frame.message) else ""
+                notes = notes + "\"expanded from macro `$" + diag_json_escape(frame.name) + "` at " + diag_json_escape(diag_stable_path(frame.span.file)) + ":" + diag_i32(frame.span.line) + ":" + diag_i32(frame.span.column) + detail + "\""
+                first_note = 0
+            }
+        }
+    }
+    secondary = secondary + "]"
+    notes = notes + "]"
+    helps = helps + "]"
+    return "{\"level\":\"" + diag_level_text(diag.level) + "\",\"code\":\"" + diag_json_escape(diag.code) + "\",\"phase\":\"" + diag_phase_text(diag.phase) + "\",\"title\":\"" + diag_json_escape(diag.title) + "\",\"message\":\"" + diag_json_escape(diag.message) + "\",\"file\":\"" + diag_json_escape(file) + "\",\"primary\":{\"line\":" + diag_i32(primary.line) + ",\"column\":" + diag_i32(primary.column) + ",\"length\":" + diag_i32(primary.end - primary.start) + ",\"message\":\"" + diag_json_escape(primary_message) + "\"},\"secondary\":" + secondary + ",\"notes\":" + notes + ",\"help\":" + helps + "}\n"
+}
+
+pub fn diag_render_human(diag: Diagnostic, options: DiagRenderOptions): string
+{
+    let enabled = if (options.test_mode == 1 or diag_color_is_never(options.color) == 1) 0 else options.color_enabled
+    let level_color = diag_level_color(diag.level, enabled)
+    let phase_color = diag_phase_color(diag.phase, enabled)
+    let reset = diag_reset_code(enabled)
+    let primary = diag_primary_span(diag)
+    let file = if (options.test_mode == 1) diag_stable_path(primary.file) else primary.file
+    let mut out = level_color + diag_level_text(diag.level) + reset + "[" + phase_color + diag.code + reset + "]: " + diag.title + "\n"
+    if (diag.message != "" and diag.message != diag.title) { out = out + "  " + diag.message + "\n" }
+    if (file != "")
+    {
+        out = out + " --> " + file + ":" + diag_i32(primary.line) + ":" + diag_i32(primary.column) + "\n"
+        out = out + "  |\n"
+    }
+    for (i in 0 .. diag.parts.length)
+    {
+        match diag.parts[i]
+        {
+            DiagLabelPart(label) -> out = out + diag_render_label(options.source, label, options.test_mode, enabled)
+            DiagNotePart(note) -> out = out + "  |\nnote: " + note + "\n"
+            DiagHelpPart(help) -> out = out + "  |\nhelp: " + help + "\n"
+            DiagSuggestionPart(suggestion) -> out = out + "  |\nhelp: " + suggestion.message + ": replace with `" + suggestion.replacement + "`\n"
+            DiagMacroPart(frame) -> {
+                let macro_file = if (options.test_mode == 1) diag_stable_path(frame.span.file) else frame.span.file
+                out = out + "  |\nnote: expanded from macro `$" + frame.name + "`\n --> " + macro_file + ":" + diag_i32(frame.span.line) + ":" + diag_i32(frame.span.column) + "\n"
+                if (frame.message != "") { out = out + "  = " + frame.message + "\n" }
+            }
+        }
+    }
+    return out
+}
+
+pub fn diag_render(diag: Diagnostic, options: DiagRenderOptions): string
+{
+    return match options.format {
+        DiagShort -> diag_render_short(diag, options)
+        DiagJson -> diag_render_json(diag, options)
+        DiagHuman -> diag_render_human(diag, options)
+    }
+}
+
+pub fn diag_render_summary(bag: &DiagBag): string
+{
+    if (bag.stopped == 1) { return "error: too many errors emitted; stopping after " + diag_i32(bag.limit) + " errors" }
+    if (bag.error_count == 0 and bag.warning_count == 0) { return "diagnostic summary: 0 errors, 0 warnings" }
+    if (bag.error_count > 0)
+    {
+        let suffix = if (bag.error_count == 1) " previous error" else " previous errors"
+        return "error: aborting due to " + diag_i32(bag.error_count) + suffix
+    }
+    let suffix = if (bag.warning_count == 1) " warning" else " warnings"
+    return "warning: emitted " + diag_i32(bag.warning_count) + suffix
+}
+
+pub fn diag_render_bag_body(bag: &DiagBag, options: DiagRenderOptions): string
+{
+    diag_deduplicate(bag)
+    diag_sort(bag)
+    let mut out = ""
+    for (i in 0 .. bag.diagnostics.length)
+    {
+        if (i > 0) { out = out + "\n" }
+        out = out + diag_render(bag.diagnostics[i], options) + "\n"
+    }
+    return out
+}
+
+pub fn diag_render_bag(bag: &DiagBag, options: DiagRenderOptions): string
+{
+    let mut out = diag_render_bag_body(bag, options)
+    if (options.test_mode == 1) { out = out + diag_render_summary(bag) + "\n" }
+    return out
+}

@@ -5,13 +5,71 @@ pub type ImportSet = struct {
     paths: [string]
 }
 
+pub type MacroTokenKind = MacroText | MacroIdentifier | MacroParameter | MacroCapture | MacroRaw | MacroRepeat
+
+pub type MacroToken = struct {
+    kind: i32,
+    text: string,
+    start: i32,
+    end: i32,
+    line: i32,
+    column: i32,
+    // Encoded TokenOrigin.  MacroToken values live in growable arrays while
+    // expanding nested macros, so use a compact tag and expose conversion
+    // helpers at the stream boundary.
+    origin: i32,
+    hygiene_id: i32
+}
+
+pub type MacroSourceEntry = struct {
+    output_start: i32,
+    output_end: i32,
+    source_file: string,
+    source_start: i32,
+    source_end: i32,
+    line: i32,
+    column: i32,
+    origin: i32,
+    hygiene_id: i32,
+    macro_name: string
+}
+
+pub type MacroSourceMap = struct {
+    entries: [MacroSourceEntry]
+}
+
+pub type PreprocessResult = struct {
+    ok: i32,
+    source: string,
+    diagnostic: Diagnostic,
+    source_map: MacroSourceMap
+}
+
 pub type MacroSet = struct {
     names: [string],
     params: [string],
     repeat_params: [i32],
     repeat_param_names: [string],
     bracket_calls: [i32],
-    bodies: [string]
+    bodies: [string],
+    param_kinds: [string],
+    files: [string],
+    definition_starts: [i32],
+    definition_ends: [i32],
+    definition_lines: [i32],
+    definition_columns: [i32],
+    next_hygiene_id: i32,
+    source_entries: [MacroSourceEntry],
+    error_code: string,
+    error_title: string,
+    error_message: string,
+    error_file: string,
+    error_start: i32,
+    error_end: i32,
+    error_line: i32,
+    error_column: i32,
+    error_macro_names: [string],
+    error_macro_indices: [i32]
 }
 
 pub fn import_set_new(): ImportSet
@@ -21,10 +79,10 @@ pub fn import_set_new(): ImportSet
 
 pub fn macro_set_new(): MacroSet
 {
-    return MacroSet{ names: [], params: [], repeat_params: [], repeat_param_names: [], bracket_calls: [], bodies: [] }
+    return MacroSet{ names: [], params: [], repeat_params: [], repeat_param_names: [], bracket_calls: [], bodies: [], param_kinds: [], files: [], definition_starts: [], definition_ends: [], definition_lines: [], definition_columns: [], next_hygiene_id: 1, source_entries: [], error_code: "", error_title: "", error_message: "", error_file: "", error_start: 0, error_end: 0, error_line: 1, error_column: 1, error_macro_names: [], error_macro_indices: [] }
 }
 
-pub fn macro_set_add(macros: &MacroSet, name: string, param: string, repeat_param: i32, repeat_param_name: string, bracket_call: i32, body: string)
+pub fn macro_set_add(macros: &MacroSet, name: string, param: string, param_kind: string, repeat_param: i32, repeat_param_name: string, bracket_call: i32, body: string, file: string, definition_start: i32, definition_end: i32, definition_line: i32, definition_column: i32)
 {
     macros.names.push(name)
     macros.params.push(param)
@@ -32,6 +90,152 @@ pub fn macro_set_add(macros: &MacroSet, name: string, param: string, repeat_para
     macros.repeat_param_names.push(repeat_param_name)
     macros.bracket_calls.push(bracket_call)
     macros.bodies.push(body)
+    macros.param_kinds.push(param_kind)
+    macros.files.push(file)
+    macros.definition_starts.push(definition_start)
+    macros.definition_ends.push(definition_end)
+    macros.definition_lines.push(definition_line)
+    macros.definition_columns.push(definition_column)
+}
+
+pub fn macro_source_map_new(): MacroSourceMap { return MacroSourceMap{ entries: [] } }
+
+pub fn macro_origin_rank(origin: TokenOrigin): i32
+{
+    return match origin { TokenCallSite -> 0 TokenDefinitionSite -> 1 TokenGenerated -> 2 }
+}
+
+pub fn macro_token_kind_rank(kind: MacroTokenKind): i32
+{
+    return match kind { MacroText -> 0 MacroIdentifier -> 1 MacroParameter -> 2 MacroCapture -> 3 MacroRaw -> 4 MacroRepeat -> 5 }
+}
+
+pub fn macro_origin_from_rank(origin: i32): TokenOrigin
+{
+    return match origin { 1 -> TokenDefinitionSite 2 -> TokenGenerated _ -> TokenCallSite }
+}
+
+pub fn macro_source_map_add(macros: &MacroSet, output_start: i32, output_end: i32, token: MacroToken, macro_name: string, source_file: string)
+{
+    // Parser name resolution only consumes hygiene/origin information on
+    // identifiers.  Mapping punctuation and whitespace made large legacy
+    // macro files quadratic without adding semantic information.
+    if (token.kind != macro_token_kind_rank(MacroIdentifier) and token.kind != macro_token_kind_rank(MacroCapture) and token.kind != macro_token_kind_rank(MacroRaw)) { return }
+    macros.source_entries.push(MacroSourceEntry{ output_start: output_start, output_end: output_end, source_file: source_file, source_start: token.start, source_end: token.end, line: token.line, column: token.column, origin: token.origin, hygiene_id: token.hygiene_id, macro_name: macro_name })
+}
+
+pub fn macro_set_error(macros: &MacroSet, code: string, title: string, message: string, file: string, start: i32, end: i32, line: i32, column: i32)
+{
+    if (macros.error_code != "") { return }
+    macros.error_code = code
+    macros.error_title = title
+    macros.error_message = message
+    macros.error_file = file
+    macros.error_start = start
+    macros.error_end = end
+    macros.error_line = line
+    macros.error_column = column
+}
+
+pub fn macro_error_diagnostic(macros: &MacroSet): Diagnostic
+{
+    let span = diag_span(macros.error_file, macros.error_start, macros.error_end, macros.error_line, macros.error_column)
+    let mut diagnostic = diag_new(macros.error_code, DiagError, DiagParser, macros.error_title)
+        |> diag_message(macros.error_message)
+        |> diag_primary(span, "macro invocation")
+    for (i in 0 .. macros.error_macro_indices.length)
+    {
+        let idx = macros.error_macro_indices[i]
+        let def_span = diag_span(macros.files[idx], macros.definition_starts[idx], macros.definition_ends[idx], macros.definition_lines[idx], macros.definition_columns[idx])
+        diagnostic = diag_macro_frame(diagnostic, macros.error_macro_names[i], def_span, "macro defined here")
+    }
+    if (macros.error_code == "E1106") { diagnostic = diag_help(diagnostic, "use `$capture(name)` for call-site bindings or `$raw(name)` for an unhygienic name") }
+    return diagnostic
+}
+
+pub fn macro_source_map_shift(macros: &MacroSet, from: i32, amount: i32)
+{
+    for (i in from .. macros.source_entries.length)
+    {
+        let mut entry = macros.source_entries[i]
+        entry.output_start += amount
+        entry.output_end += amount
+        macros.source_entries[i] = entry
+    }
+}
+
+pub fn macro_definition_keyword_at(source: string, offset: i32): i32
+{
+    // Macro declarations are item declarations.  Requiring the keyword to be
+    // the first non-whitespace token on its line keeps literals and comments
+    // such as `"expanded from macro ..."` out of the declaration scanner.
+    let mut line_head = offset
+    while (line_head > 0 and compiler_string_byte(source, line_head - 1) != 10 and compiler_string_byte(source, line_head - 1) != 13)
+    {
+        line_head -= 1
+    }
+    for (i in line_head .. offset)
+    {
+        let byte = compiler_string_byte(source, i)
+        if (byte != 32 and byte != 9) { return 0 }
+    }
+    let mut start = offset
+    if (text_at(source, start, "pub") == 1)
+    {
+        if (start > 0 and is_macro_ident_char(compiler_string_byte(source, start - 1)) == 1) { return 0 }
+        start = skip_spaces(source, start + 3)
+    }
+    if (text_at(source, start, "macro") == 0) { return 0 }
+    if (start > 0 and is_macro_ident_char(compiler_string_byte(source, start - 1)) == 1) { return 0 }
+    if (start + 5 < source.length and is_macro_ident_char(compiler_string_byte(source, start + 5)) == 1) { return 0 }
+    return 1
+}
+
+pub fn tokenize_with_macro_origins(source: string, source_map: &MacroSourceMap): TokenStream
+{
+    let original = tokenize(source)
+    let mapped = stream_new()
+    for (i in 0 .. stream_len(&original))
+    {
+        let start = stream_start_at(&original, i)
+        let mut origin = stream_origin_at(&original, i)
+        let mut hygiene_id = stream_hygiene_at(&original, i)
+        for (j in 0 .. source_map.entries.length)
+        {
+            let entry = source_map.entries[j]
+            if (start >= entry.output_start and start < entry.output_end)
+            {
+                origin = macro_origin_from_rank(entry.origin)
+                hygiene_id = entry.hygiene_id
+            }
+        }
+        stream_push_origin(&mapped, stream_kind_at(&original, i), stream_text_at(&original, i), stream_int_at(&original, i), stream_float_at(&original, i), stream_line_at(&original, i), stream_col_at(&original, i), stream_start_at(&original, i), stream_end_at(&original, i), origin, hygiene_id)
+    }
+    return mapped
+}
+
+pub fn macro_line_at(source: string, offset: i32): i32
+{
+    let mut line = 1
+    let end = if (offset > source.length) source.length else offset
+    for (i in 0 .. end) { if (compiler_string_byte(source, i) == 10) { line += 1 } }
+    return line
+}
+
+pub fn macro_column_at(source: string, offset: i32): i32
+{
+    let mut column = 1
+    let mut i = 0
+    let end = if (offset > source.length) source.length else offset
+    while (i < end)
+    {
+        let byte = compiler_string_byte(source, i)
+        if (byte == 10 or byte == 13) { column = 1 }
+        elif (byte == 9) { column = ((column - 1) / 8 + 1) * 8 + 1 }
+        elif ((byte & 192) != 128) { column += 1 }
+        i += 1
+    }
+    return column
 }
 
 pub fn macro_set_find(macros: &MacroSet, name: string): i32
@@ -262,6 +466,17 @@ pub fn top_level_comma(src: string): i32
     let mut i = 0
     while (i < src.length)
     {
+        if (compiler_string_byte(src, i) == 39)
+        {
+            i += 1
+            while (i < src.length and compiler_string_byte(src, i) != 39)
+            {
+                if (compiler_string_byte(src, i) == 92 and i + 1 < src.length) i += 2
+                else { i += 1 }
+            }
+            if (i < src.length) { i += 1 }
+            continue
+        }
         if (compiler_string_byte(src, i) == '"')
         {
             i += 1
@@ -350,7 +565,7 @@ pub fn remove_trailing_macro_separator(text: string): string
     return text
 }
 
-pub fn skip_macro_definition(src: string, start: i32, macros: &MacroSet): i32
+pub fn skip_macro_definition(src: string, filename: string, start: i32, macros: &MacroSet): i32
 {
     let mut macro_start = start
     if (text_at(src, start, "pub") == 1)
@@ -377,18 +592,28 @@ pub fn skip_macro_definition(src: string, start: i32, macros: &MacroSet): i32
     }
     i = skip_spaces(src, i)
     let open_ch = if (i < src.length and compiler_string_byte(src, i) == '[') '[' else '('
-    let close_ch = if (open_ch == '[') { ']' } else { ')' }
+    let close_ch = if (open_ch == '[') ']' else ')'
     if (open_ch == '[') { bracket_call = 1 }
     let params_end = scan_balanced(src, i, open_ch, close_ch)
     if (params_end < 0) { return -1 }
     let params_text = slice_text(src, i + 1, params_end - 1)
     let mut param = ""
+    let mut param_kind = "expr"
     let mut repeat_param = 0
     let mut p = 0
     while (p < params_text.length and is_space_or_newline(compiler_string_byte(params_text, p)) == 1) { p += 1 }
     let param_start = p
     while (p < params_text.length and is_macro_ident_char(compiler_string_byte(params_text, p)) == 1) { p += 1 }
     if (p > param_start) { param = slice_text(params_text, param_start, p) }
+    while (p < params_text.length and is_space_or_newline(compiler_string_byte(params_text, p)) == 1) { p += 1 }
+    if (p < params_text.length and compiler_string_byte(params_text, p) == ':')
+    {
+        p += 1
+        while (p < params_text.length and is_space_or_newline(compiler_string_byte(params_text, p)) == 1) { p += 1 }
+        let kind_start = p
+        while (p < params_text.length and is_macro_ident_char(compiler_string_byte(params_text, p)) == 1) { p += 1 }
+        if (p > kind_start) { param_kind = slice_text(params_text, kind_start, p) }
+    }
     while (p < params_text.length)
     {
         if (compiler_string_byte(params_text, p) == '*') repeat_param = 1
@@ -401,8 +626,236 @@ pub fn skip_macro_definition(src: string, start: i32, macros: &MacroSet): i32
     let body_end = scan_balanced(src, i, '{', '}')
     if (body_end < 0) { return -1 }
     let body = slice_text(src, i + 1, body_end - 1)
-    macro_set_add(macros, name, param, repeat_param, repeat_param_name, bracket_call, body)
+    macro_set_add(macros, name, param, param_kind, repeat_param, repeat_param_name, bracket_call, body, filename, macro_start, body_end, macro_line_at(src, macro_start), macro_column_at(src, macro_start))
     return body_end
+}
+
+pub fn macro_token(kind: MacroTokenKind, text: string, start: i32, end: i32, line: i32, column: i32, origin: TokenOrigin, hygiene_id: i32): MacroToken
+{
+    return MacroToken{ kind: macro_token_kind_rank(kind), text: text, start: start, end: end, line: line, column: column, origin: macro_origin_rank(origin), hygiene_id: hygiene_id }
+}
+
+pub fn macro_is_identifier_text(text: string): i32
+{
+    if (text.length == 0 or is_alpha(compiler_string_byte(text, 0)) == 0) { return 0 }
+    for (i in 1 .. text.length) { if (is_macro_ident_char(compiler_string_byte(text, i)) == 0) { return 0 } }
+    return 1
+}
+
+pub fn macro_tokenize_text(text: string, origin: TokenOrigin, hygiene_id: i32, start: i32, line: i32, column: i32): [MacroToken]
+{
+    let mut tokens: [MacroToken] = []
+    let mut i = 0
+    let mut current_line = line
+    let mut current_column = column
+    while (i < text.length)
+    {
+        let token_start = i
+        let token_line = current_line
+        let token_column = current_column
+        let byte = compiler_string_byte(text, i)
+        if (byte == '"')
+        {
+            i += 1
+            while (i < text.length and compiler_string_byte(text, i) != '"')
+            {
+                if (compiler_string_byte(text, i) == 92 and i + 1 < text.length) { i += 2; current_column += 2 }
+                else { i += 1; current_column += 1 }
+            }
+            if (i < text.length) { i += 1 }
+            current_column += i - token_start
+            tokens.push(macro_token(MacroText, slice_text(text, token_start, i), start + token_start, start + i, token_line, token_column, origin, hygiene_id))
+        }
+        elif (is_alpha(byte) == 1)
+        {
+            i += 1
+            while (i < text.length and is_macro_ident_char(compiler_string_byte(text, i)) == 1) { i += 1 }
+            let ident = slice_text(text, token_start, i)
+            tokens.push(macro_token(MacroIdentifier, ident, start + token_start, start + i, token_line, token_column, origin, hygiene_id))
+            current_column += i - token_start
+        }
+        else
+        {
+            i += 1
+            if (byte == 10) { current_line += 1; current_column = 1 }
+            elif (byte == 9) { current_column = ((current_column - 1) / 8 + 1) * 8 + 1 }
+            else { current_column += 1 }
+            tokens.push(macro_token(MacroText, slice_text(text, token_start, i), start + token_start, start + i, token_line, token_column, origin, hygiene_id))
+        }
+    }
+    return tokens
+}
+
+pub fn macro_token_is_identifier(token: MacroToken): i32
+{
+    return if (token.kind == macro_token_kind_rank(MacroIdentifier)) 1 else 0
+}
+
+pub fn macro_token_is_text(token: MacroToken): i32
+{
+    return if (token.kind == macro_token_kind_rank(MacroText)) 1 else 0
+}
+
+pub fn macro_token_is_space(token: MacroToken): i32
+{
+    if (macro_token_is_text(token) == 0) { return 0 }
+    if (token.text.length != 1) { return 0 }
+    return is_space_or_newline(compiler_string_byte(token.text, 0))
+}
+
+pub fn macro_next_significant(tokens: &[MacroToken], start: i32): i32
+{
+    let mut i = start
+    while (i < tokens.length and macro_token_is_space(tokens[i]) == 1) { i += 1 }
+    return i
+}
+
+pub fn macro_name_in(names: [string], name: string): i32
+{
+    for (i in 0 .. names.length) { if (names[i] == name) { return 1 } }
+    return 0
+}
+
+pub fn macro_local_names(tokens: &[MacroToken]): [string]
+{
+    let mut names: [string] = []
+    for (i in 0 .. tokens.length)
+    {
+        if (macro_token_is_identifier(tokens[i]) == 1 and (tokens[i].text == "let" or tokens[i].text == "for"))
+        {
+            let mut next = macro_next_significant(tokens, i + 1)
+            if (next < tokens.length and tokens[next].text == "mut") { next = macro_next_significant(tokens, next + 1) }
+            if (next < tokens.length and macro_token_is_identifier(tokens[next]) == 1 and macro_name_in(names, tokens[next].text) == 0) { names.push(tokens[next].text) }
+        }
+    }
+    return names
+}
+
+pub fn macro_gensym(hygiene_id: i32, name: string): string
+{
+    return "__vix_m" + i32_to_str(hygiene_id) + "_" + name
+}
+
+pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat_param: i32, repeat_param_name: string, repeat_arg: string, file: string, body_start: i32, body_line: i32, body_column: i32, hygiene_id: i32, macros: &MacroSet): [MacroToken]
+{
+    let mut tokens: [MacroToken] = []
+    let mut i = 0
+    let spread_pat = "$(" + repeat_param_name + "),*"
+    let paren_spread_pat = "$((" + repeat_param_name + "),*)"
+    while (i < body.length)
+    {
+        if (repeat_param == 1 and text_at(body, i, paren_spread_pat) == 1)
+        {
+            let appended = macro_tokenize_text(repeat_arg, TokenCallSite, 0, 0, body_line, body_column)
+            for (j in 0 .. appended.length) { tokens.push(appended[j]) }
+            i += paren_spread_pat.length
+        }
+        elif (repeat_param == 1 and text_at(body, i, spread_pat) == 1)
+        {
+            let appended = macro_tokenize_text(repeat_arg, TokenCallSite, 0, 0, body_line, body_column)
+            for (j in 0 .. appended.length) { tokens.push(appended[j]) }
+            i += spread_pat.length
+        }
+        elif (compiler_string_byte(body, i) == '$')
+        {
+            let name_start = i + 1
+            let mut name_end = name_start
+            while (name_end < body.length and is_macro_ident_char(compiler_string_byte(body, name_end)) == 1) { name_end += 1 }
+            let name = slice_text(body, name_start, name_end)
+            if (param != "" and name == param)
+            {
+                let appended = macro_tokenize_text(arg, TokenCallSite, 0, 0, body_line, body_column)
+                for (j in 0 .. appended.length) { tokens.push(appended[j]) }
+                i = name_end
+            }
+            elif (name == "capture" or name == "raw")
+            {
+                let open = skip_spaces(body, name_end)
+                let close = if (open < body.length and compiler_string_byte(body, open) == '(') scan_balanced(body, open, '(', ')') else -1
+                let inner = if (close > open) trim_text(slice_text(body, open + 1, close - 1)) else ""
+                if (close < 0 or macro_is_identifier_text(inner) == 0)
+                {
+                    macro_set_error(macros, "E1106", "invalid capture/raw usage", "`$" + name + "` expects exactly one identifier", file, body_start + i, body_start + name_end, body_line, body_column)
+                    tokens.push(macro_token(MacroText, slice_text(body, i, name_end), body_start + i, body_start + name_end, body_line, body_column, TokenDefinitionSite, hygiene_id))
+                    i = name_end
+                }
+                else
+                {
+                    let kind = if (name == "capture") MacroCapture else MacroRaw
+                    let origin = if (name == "capture") TokenCallSite else TokenGenerated
+                    tokens.push(macro_token(kind, inner, body_start + i, body_start + close, body_line, body_column, origin, if (name == "capture") 0 else hygiene_id))
+                    i = close
+                }
+            }
+            else
+            {
+                tokens.push(macro_token(MacroText, "$", body_start + i, body_start + i + 1, body_line, body_column, TokenDefinitionSite, hygiene_id))
+                i += 1
+            }
+        }
+        else
+        {
+            let start = i
+            if (compiler_string_byte(body, i) == '"')
+            {
+                i += 1
+                while (i < body.length and compiler_string_byte(body, i) != '"')
+                {
+                    if (compiler_string_byte(body, i) == 92 and i + 1 < body.length) { i += 2 } else { i += 1 }
+                }
+                if (i < body.length) { i += 1 }
+            }
+            elif (is_alpha(compiler_string_byte(body, i)) == 1)
+            {
+                i += 1
+                while (i < body.length and is_macro_ident_char(compiler_string_byte(body, i)) == 1) { i += 1 }
+            }
+            else { i += 1 }
+            let text = slice_text(body, start, i)
+            let kind = if (macro_is_identifier_text(text) == 1) MacroIdentifier else MacroText
+            tokens.push(macro_token(kind, text, body_start + start, body_start + i, body_line, body_column, TokenDefinitionSite, hygiene_id))
+        }
+    }
+    let locals = macro_local_names(&tokens)
+    for (k in 0 .. tokens.length)
+    {
+        if (macro_token_is_identifier(tokens[k]) == 1 and macro_name_in(locals, tokens[k].text) == 1)
+        {
+            let mut token = tokens[k]
+            token.text = macro_gensym(hygiene_id, token.text)
+            token.origin = macro_origin_rank(TokenGenerated)
+            token.hygiene_id = hygiene_id
+            tokens[k] = token
+        }
+    }
+    return tokens
+}
+
+pub fn macro_render_tokens(macros: &MacroSet, tokens: &[MacroToken], macro_name: string): string
+{
+    let mut out = ""
+    for (i in 0 .. tokens.length)
+    {
+        let start = out.length
+        out = out + tokens[i].text
+        macro_source_map_add(macros, start, out.length, tokens[i], macro_name, "")
+    }
+    return out
+}
+
+pub fn expand_macro_tokens(macros: &MacroSet, macro_idx: i32, arg: string, repeat_arg: string): string
+{
+    if (macros.param_kinds[macro_idx] == "ident" and arg != "" and macro_is_identifier_text(arg) == 0)
+    {
+        macro_set_error(macros, "E1102", "invalid macro argument", "expected an identifier argument", macros.files[macro_idx], macros.definition_starts[macro_idx], macros.definition_ends[macro_idx], macros.definition_lines[macro_idx], macros.definition_columns[macro_idx])
+        return ""
+    }
+    let hygiene_id = macros.next_hygiene_id
+    macros.next_hygiene_id += 1
+    let tokens = macro_tokenize_expansion(macros.bodies[macro_idx], macros.params[macro_idx], arg, macros.repeat_params[macro_idx], macros.repeat_param_names[macro_idx], repeat_arg, macros.files[macro_idx], macros.definition_starts[macro_idx], macros.definition_lines[macro_idx], macros.definition_columns[macro_idx], hygiene_id, macros)
+    let rendered = macro_render_tokens(macros, &tokens, macros.names[macro_idx])
+    if (macros.repeat_params[macro_idx] == 1 and repeat_arg == "") { return remove_trailing_macro_separator(rendered) }
+    return rendered
 }
 
 pub fn replace_macro_param(body: string, param: string, arg: string, repeat_param: i32, repeat_param_name: string, repeat_arg: string): string
@@ -456,7 +909,7 @@ pub fn macro_expansion_is_item(text: string): i32
     return 0
 }
 
-pub fn expand_macros_once(src: string, macros: &MacroSet): string
+pub fn expand_macros_once(src: string, filename: string, macros: &MacroSet): string
 {
     let mut out = ""
     let mut hoisted = ""
@@ -465,6 +918,17 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
     let mut changed = 0
     while (i < src.length)
     {
+        if (compiler_string_byte(src, i) == 39)
+        {
+            i += 1
+            while (i < src.length and compiler_string_byte(src, i) != 39)
+            {
+                if (compiler_string_byte(src, i) == 92 and i + 1 < src.length) i += 2
+                else { i += 1 }
+            }
+            if (i < src.length) { i += 1 }
+            continue
+        }
         if (compiler_string_byte(src, i) == '"')
         {
             i += 1
@@ -474,6 +938,12 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
                 else { i += 1 }
             }
             if (i < src.length) { i += 1 }
+            continue
+        }
+        if (compiler_string_byte(src, i) == '/' and i + 1 < src.length and compiler_string_byte(src, i + 1) == '/')
+        {
+            i += 2
+            while (i < src.length and compiler_string_byte(src, i) != 10) { i += 1 }
             continue
         }
         elif (compiler_string_byte(src, i) == '$' and i + 1 < src.length and is_macro_ident_char(compiler_string_byte(src, i + 1)) == 1)
@@ -486,8 +956,8 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
             if (macro_idx >= 0)
             {
                 let mut call_pos = skip_spaces(src, name_end)
-                let open_ch = if (macros.bracket_calls[macro_idx] == 1) { '[' } else { '(' }
-                let close_ch = if (open_ch == '[') { ']' } else { ')' }
+                let open_ch = if (macros.bracket_calls[macro_idx] == 1) '[' else '('
+                let close_ch = if (open_ch == '[') ']' else ')'
                 if (call_pos < src.length and compiler_string_byte(src, call_pos) == open_ch)
                 {
                     let call_end = scan_balanced(src, call_pos, open_ch, close_ch)
@@ -501,17 +971,31 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
                             normal_arg = first_macro_arg(arg_text)
                             repeat_arg = rest_macro_args(arg_text)
                         }
-                        let replacement = replace_macro_param(macros.bodies[macro_idx], macros.params[macro_idx], normal_arg, macros.repeat_params[macro_idx], macros.repeat_param_names[macro_idx], repeat_arg)
+                        let map_start = macros.source_entries.length
+                        let replacement = expand_macro_tokens(macros, macro_idx, normal_arg, repeat_arg)
                         if (segment_start < i)
                         {
                             out = out + slice_text(src, segment_start, i)
                         }
+                        if (macros.error_code != "")
+                        {
+                            macros.error_file = filename
+                            macros.error_start = i
+                            macros.error_end = call_end
+                            macros.error_line = macro_line_at(src, i)
+                            macros.error_column = macro_column_at(src, i)
+                            macros.error_macro_names.push(name)
+                            macros.error_macro_indices.push(macro_idx)
+                            return src
+                        }
                         if (macro_expansion_is_item(replacement) == 1)
                         {
+                            macro_source_map_shift(macros, map_start, hoisted.length)
                             hoisted = hoisted + replacement + "\n"
                         }
                         else
                         {
+                            macro_source_map_shift(macros, map_start, out.length)
                             out = out + replacement
                         }
                         i = call_end
@@ -519,6 +1003,25 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
                         changed = 1
                         continue
                     }
+                    else
+                    {
+                        macro_set_error(macros, "E1103", "unbalanced macro delimiter", "macro invocation has an unbalanced delimiter", filename, i, src.length, macro_line_at(src, i), macro_column_at(src, i))
+                        return src
+                    }
+                }
+            }
+            elif (name == "capture" or name == "raw")
+            {
+                macro_set_error(macros, "E1106", "invalid capture/raw usage", "`$" + name + "` is only valid inside a macro body", filename, i, name_end, macro_line_at(src, i), macro_column_at(src, i))
+                return src
+            }
+            else
+            {
+                let call_pos = skip_spaces(src, name_end)
+                if (call_pos < src.length and (compiler_string_byte(src, call_pos) == '(' or compiler_string_byte(src, call_pos) == '['))
+                {
+                    macro_set_error(macros, "E1105", "unresolved macro", "cannot find macro `$" + name + "`", filename, i, name_end, macro_line_at(src, i), macro_column_at(src, i))
+                    return src
                 }
             }
         }
@@ -533,14 +1036,20 @@ pub fn expand_macros_once(src: string, macros: &MacroSet): string
     return out
 }
 
-pub fn expand_macros(src: string, macros: &MacroSet): string
+pub fn expand_macros(src: string, filename: string, macros: &MacroSet): string
 {
     let mut expanded = src
-    for (_round in 0 .. 8)
+    for (_round in 0 .. 64)
     {
-        let next = expand_macros_once(expanded, macros)
+        let next = expand_macros_once(expanded, filename, macros)
+        if (macros.error_code != "") { return expanded }
         if (next == expanded) { return expanded }
         expanded = next
+    }
+    let next = expand_macros_once(expanded, filename, macros)
+    if (next != expanded)
+    {
+        macro_set_error(macros, "E1104", "macro expansion limit exceeded", "macro expansion exceeded 64 levels", filename, 0, 0, 1, 1)
     }
     return expanded
 }
@@ -554,6 +1063,17 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
     
     while (i < src.length)
     {
+        if (compiler_string_byte(src, i) == '"')
+        {
+            i += 1
+            while (i < src.length and compiler_string_byte(src, i) != '"')
+            {
+                if (compiler_string_byte(src, i) == 92 and i + 1 < src.length) i += 2
+                else { i += 1 }
+            }
+            if (i < src.length) { i += 1 }
+            continue
+        }
         if (compiler_string_byte(src, i) == '#' and i + 1 < src.length and compiler_string_byte(src, i + 1) == '[')
         {
             if (segment_start < i)
@@ -565,7 +1085,7 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
             continue
         }
 
-        let macro_end = skip_macro_definition(src, i, macros)
+        let macro_end = skip_macro_definition(src, filename, i, macros)
         if (macro_end > i)
         {
             if (segment_start < i)
@@ -578,6 +1098,11 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
             out = out + newline_padding(src, skipped_start, i)
             segment_start = i
             continue
+        }
+        if (macro_definition_keyword_at(src, i) == 1)
+        {
+            macro_set_error(macros, "E1101", "malformed macro definition", "macro definition is malformed", filename, i, i + 5, macro_line_at(src, i), macro_column_at(src, i))
+            return out + slice_text(src, segment_start, src.length)
         }
         
         let import_end = scan_import_line(src, i)
@@ -616,7 +1141,7 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
     {
         out = out + slice_text(src, segment_start, src.length)
     }
-    return expand_macros(out, macros)
+    return expand_macros(out, filename, macros)
 }
 
 pub fn preprocess_source(src: string, filename: string, imports: &ImportSet): string
@@ -625,16 +1150,37 @@ pub fn preprocess_source(src: string, filename: string, imports: &ImportSet): st
     return preprocess_source_with_macros(src, filename, imports, &macros)
 }
 
-// Process attributes, local macro declarations, and local macro calls without
-// recursively loading legacy quoted imports. Module graph loading owns that.
-pub fn preprocess_source_local(src: string, filename: string): string
+pub fn preprocess_source_result(src: string, filename: string, imports: &ImportSet): PreprocessResult
 {
     let mut macros = macro_set_new()
+    let expanded = preprocess_source_with_macros(src, filename, imports, &macros)
+    if (macros.error_code != "")
+    {
+        return PreprocessResult{ ok: 0, source: expanded, diagnostic: macro_error_diagnostic(&macros), source_map: MacroSourceMap{ entries: macros.source_entries } }
+    }
+    return PreprocessResult{ ok: 1, source: expanded, diagnostic: diag_new("E0000", DiagError, DiagParser, ""), source_map: MacroSourceMap{ entries: macros.source_entries } }
+}
+
+// Process attributes, local macro declarations, and local macro calls without
+// recursively loading legacy quoted imports. Module graph loading owns that.
+pub fn preprocess_source_local_with_macros(src: string, filename: string, macros: &MacroSet): string
+{
     let mut out = ""
     let mut i = 0
     let mut segment_start = 0
     while (i < src.length)
     {
+        if (compiler_string_byte(src, i) == '"')
+        {
+            i += 1
+            while (i < src.length and compiler_string_byte(src, i) != '"')
+            {
+                if (compiler_string_byte(src, i) == 92 and i + 1 < src.length) i += 2
+                else { i += 1 }
+            }
+            if (i < src.length) { i += 1 }
+            continue
+        }
         if (compiler_string_byte(src, i) == '#' and i + 1 < src.length and compiler_string_byte(src, i + 1) == '[')
         {
             if (segment_start < i) { out = out + slice_text(src, segment_start, i) }
@@ -642,7 +1188,7 @@ pub fn preprocess_source_local(src: string, filename: string): string
             segment_start = i
             continue
         }
-        let macro_end = skip_macro_definition(src, i, &macros)
+        let macro_end = skip_macro_definition(src, filename, i, macros)
         if (macro_end > i)
         {
             if (segment_start < i) { out = out + slice_text(src, segment_start, i) }
@@ -652,6 +1198,11 @@ pub fn preprocess_source_local(src: string, filename: string): string
             out = out + newline_padding(src, skipped_start, i)
             segment_start = i
             continue
+        }
+        if (macro_definition_keyword_at(src, i) == 1)
+        {
+            macro_set_error(macros, "E1101", "malformed macro definition", "macro definition is malformed", filename, i, i + 5, macro_line_at(src, i), macro_column_at(src, i))
+            break
         }
         let import_end = scan_import_line(src, i)
         if (import_end > i)
@@ -664,5 +1215,22 @@ pub fn preprocess_source_local(src: string, filename: string): string
         i += 1
     }
     if (segment_start < src.length) { out = out + slice_text(src, segment_start, src.length) }
-    return expand_macros(out, &macros)
+    return expand_macros(out, filename, macros)
+}
+
+pub fn preprocess_source_local(src: string, filename: string): string
+{
+    let mut macros = macro_set_new()
+    return preprocess_source_local_with_macros(src, filename, &macros)
+}
+
+pub fn preprocess_source_local_result(src: string, filename: string): PreprocessResult
+{
+    let mut macros = macro_set_new()
+    let expanded = preprocess_source_local_with_macros(src, filename, &macros)
+    if (macros.error_code != "")
+    {
+        return PreprocessResult{ ok: 0, source: expanded, diagnostic: macro_error_diagnostic(&macros), source_map: MacroSourceMap{ entries: macros.source_entries } }
+    }
+    return PreprocessResult{ ok: 1, source: expanded, diagnostic: diag_new("E0000", DiagError, DiagParser, ""), source_map: MacroSourceMap{ entries: macros.source_entries } }
 }

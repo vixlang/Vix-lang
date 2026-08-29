@@ -1,23 +1,12 @@
 #[no_main]
 
 import "lexer.vix"
+import "diag.vix"
 
 extern "C"
 {
-    fn malloc(size: usize): string
-    fn snprintf(buf: string, size: usize, fmt: string, ...): i32
     fn vix_diag_strlen(s: string): i32
-    fn vix_source_line_copy(src: string, start: i32, len: i32): string
 }
-
-pub fn diag_red(): string { return "\033[31m" }
-pub fn diag_yellow(): string { return "\033[33m" }
-pub fn diag_blue(): string { return "\033[34m" }
-pub fn diag_magenta(): string { return "\033[35m" }
-pub fn diag_cyan(): string { return "\033[36m" }
-pub fn diag_bold(): string { return "\033[1m" }
-pub fn diag_dim(): string { return "\033[2m" }
-pub fn diag_reset(): string { return "\033[0m" }
 
 pub fn diag_strlen(text: string): i32
 {
@@ -91,6 +80,7 @@ pub fn name_error_code(msg: string): string
 
 pub fn type_error_code(msg: string): string
 {
+    if (str_starts_with(msg, "type mismatch:") == 1) return "E3002"
     if (str_starts_with(msg, "cannot initialize '") == 1) return "E3001"
     if (str_starts_with(msg, "cannot assign to immutable binding '") == 1) return "E3013"
     if (str_starts_with(msg, "cannot assign field '") == 1) return "E3013"
@@ -121,6 +111,34 @@ pub fn type_error_code(msg: string): string
     if (str_starts_with(msg, "'break' used outside loop") == 1) return "E3019"
     if (str_starts_with(msg, "'continue' used outside loop") == 1) return "E3019"
     return "E3000"
+}
+
+pub fn diagnostic_title(code: string, message: string): string
+{
+    return match code {
+        "E1001" -> "expected token"
+        "E1002" -> "unexpected token"
+        "E1003" -> "invalid conditional branch"
+        "E1004" -> "empty source"
+        "E1005" -> "expected function"
+        "E2001" -> "undefined symbol"
+        "E2002" -> "duplicate symbol"
+        "E2003" -> "undefined function"
+        "E2004" -> "duplicate function"
+        "E2006" -> "duplicate struct"
+        "E2007" -> "duplicate parameter"
+        "E2008" -> "duplicate field"
+        "E3001" -> "invalid initialization"
+        "E3002" -> "type mismatch"
+        "E3003" -> "invalid dereference"
+        "E3005" -> "unknown field"
+        "E3006" -> "unknown struct"
+        "E3013" -> "invalid assignment"
+        "E4001" -> "missing main function"
+        "E4002" -> "invalid main function"
+        "W4001" -> "unused variable"
+        _ -> strip_func_prefix(message)
+    }
 }
 
 pub fn semantic_error_code(msg: string): string
@@ -234,296 +252,36 @@ pub fn diagnostic_level_is_warning(level: i32): i32
     return 0
 }
 
-pub type Diagnostic = struct {
-    code: string,
-    level: i32,
-    error_type: string,
-    message: string,
-    line: i32,
-    col: i32,
-    span_len: i32,
-    func_name: string
-}
-
 pub fn diagnostic_new(code: string, level: i32, error_type: string, message: string): Diagnostic
 {
-    return Diagnostic{ code: code, level: level, error_type: error_type, message: message, line: 0, col: 0, span_len: 1, func_name: "" }
-}
-
-pub fn source_get_line(src: string, target_line: i32): string
-{
-    if (target_line <= 0) return ""
-    let src_len = diag_strlen(src)
-    let mut current = 1
-    let mut line_start = 0
-    let mut found = 0
-    let mut i = 0
-
-    while (i < src_len)
-    {
-        if (current == target_line)
-        {
-            line_start = i
-            found = 1
-            break
-        }
-        if (compiler_string_byte(src, i) == 10)
-        {
-            current += 1
-            if (current == target_line)
-            {
-                line_start = i + 1
-                found = 1
-                break
-            }
-        }
-        i += 1
+    let diag_level = if (level == diag_warning_level()) DiagWarning else DiagError
+    let phase = match diagnostic_kind(error_type) {
+        ParseDiagnostic -> DiagParser
+        NameDiagnostic -> DiagName
+        TypeDiagnostic -> DiagType
+        SemanticDiagnostic -> DiagSemantic
+        WarningDiagnostic -> DiagSemantic
+        UnknownDiagnostic -> DiagBackend
     }
-
-    if (found == 0)
-    {
-        if (current == target_line and target_line == 1)
-        {
-            line_start = 0
-            found = 1
-        }
-        elif (current == target_line and src_len > 0 and compiler_string_byte(src, src_len - 1) == 10)
-        {
-            line_start = src_len
-            found = 1
-        }
-        else
-        {
-            return ""
-        }
-    }
-
-    let mut end = line_start
-    while (end < src_len and compiler_string_byte(src, end) != 10)
-    {
-        end += 1
-    }
-    let mut len = end - line_start
-    if (len > 0 and compiler_string_byte(src, end - 1) == 13) len = len - 1
-
-    return vix_source_line_copy(src, line_start, len)
-}
-
-pub fn expand_tabs(line: string): string
-{
-    let mut out = ""
-    let mut col = 1
-    let line_len = diag_strlen(line)
-    for (i in 0 .. line_len)
-    {
-        if (compiler_string_byte(line, i) == 9)
-        {
-            let next_stop = ((col - 1) / 8 + 1) * 8 + 1
-            while (col < next_stop)
-            {
-                out = out + " "
-                col += 1
-            }
-        }
-        else
-        {
-            out = out + char_string(compiler_string_byte(line, i))
-            col += 1
-        }
-    }
-    return out
-}
-
-pub fn format_highlighted_line(line: string, col: i32, length: i32, color: string): string
-{
-    let expanded = expand_tabs(line)
-    let line_len = diag_strlen(expanded)
-    let safe_col = if (col <= 0) 1 else col
-    let safe_len = if (length <= 0) 1 else length
-    let effective_col = if (safe_col > line_len) line_len else safe_col
-
-    let start = effective_col - 1
-    let mut end = start + safe_len
-    if (end > line_len) end = line_len
-    if (end < start) end = start
-
-    let mut out = ""
-    let mut i = 0
-    while (i < start)
-    {
-        out = out + char_string(compiler_string_byte(expanded, i))
-        i += 1
-    }
-    out = out + color + diag_bold()
-    while (i < end)
-    {
-        out = out + char_string(compiler_string_byte(expanded, i))
-        i += 1
-    }
-    out = out + diag_reset()
-    while (i < line_len)
-    {
-        out = out + char_string(compiler_string_byte(expanded, i))
-        i += 1
-    }
-    return out
-}
-
-pub fn format_caret_line(line: string, col: i32, length: i32, color: string): string
-{
-    let expanded = expand_tabs(line)
-    let line_len = diag_strlen(expanded)
-    let safe_col = if (col <= 0) 1 else col
-    let mut safe_len = if (length <= 0) 1 else length
-    let effective_col = if (safe_col > line_len) line_len + 1 else safe_col
-    let max_len = line_len - effective_col + 1
-    if (max_len > 0 and safe_len > max_len) safe_len = max_len
-    if (safe_len <= 0) safe_len = 1
-
-    let mut out = ""
-    for (__c in 0 .. effective_col - 1)
-    {
-        out = out + " "
-    }
-    out = out + color + diag_bold()
-    for (__i in 0 .. safe_len)
-    {
-        out = out + "^"
-    }
-    out = out + diag_reset()
-    return out
-}
-
-pub fn line_number_width(line: i32): i32
-{
-    if (line <= 0) return 1
-    let mut width = 1
-    let mut n = line + 1
-    while (n >= 10)
-    {
-        n = n / 10
-        width += 1
-    }
-    return width
-}
-
-pub fn i32_digit_width(n: i32): i32
-{
-    if (n <= 0) return 1
-    let mut width = 1
-    let mut value = n
-    while (value >= 10)
-    {
-        value = value / 10
-        width += 1
-    }
-    return width
-}
-
-pub fn line_num_str(line: i32, width: i32): string
-{
-    let num = i32_to_str(line)
-    let padding = width - i32_digit_width(line)
-    let mut out = ""
-    for (__p in 0 .. padding)
-    {
-        out = out + " "
-    }
-    return out + num
-}
-
-pub fn line_blank_str(width: i32): string
-{
-    let mut out = ""
-    for (__w in 0 .. width)
-    {
-        out = out + " "
-    }
-    return out
-}
-
-pub fn show_source_context(src: string, line: i32, col: i32, length: i32, level: i32): string
-{
-    if (line <= 0 or src == "") return ""
-
-    let width = line_number_width(line)
-    let is_warning = diagnostic_level_is_warning(level)
-    let highlight_color = if (is_warning == 1) diag_yellow() else diag_red()
-    let gutter = diag_dim()
-    let reset = diag_reset()
-    let mut out = ""
-
-    out = out + gutter + line_blank_str(width) + " |" + reset + "\n"
-
-    if (line > 1)
-    {
-        let prev = source_get_line(src, line - 1)
-        if (prev != "")
-        {
-            out = out + gutter + line_num_str(line - 1, width) + " | " + reset + prev + "\n"
-        }
-    }
-
-    let err_line = source_get_line(src, line)
-    if (err_line != "")
-    {
-        out = out + diag_bold() + line_num_str(line, width) + gutter + " |" + reset + " "
-        out = out + format_highlighted_line(err_line, col, length, highlight_color)
-        out = out + "\n"
-
-        out = out + gutter + line_blank_str(width) + " |" + reset + " "
-        out = out + format_caret_line(err_line, col, length, highlight_color)
-        out = out + "\n"
-    }
-
-    let next = source_get_line(src, line + 1)
-    if (next != "")
-    {
-        out = out + gutter + line_num_str(line + 1, width) + " | " + reset + next + "\n"
-    }
-
-    out = out + gutter + line_blank_str(width) + " |" + reset + "\n"
-    return out
-}
-
-pub fn format_header(level: i32, error_type: string, message: string): string
-{
-    let is_warning = diagnostic_level_is_warning(level)
-    let level_text = if (is_warning == 1) "warning" else "error"
-    let level_color = if (is_warning == 1) diag_yellow() else diag_red()
-    let type_color = match error_type {
-        "ParseError" -> diag_magenta()
-        "TypeError" -> diag_blue()
-        "NameError" -> diag_cyan()
-        "SemanticError" -> diag_yellow()
-        "SemanticWarning" -> diag_yellow()
-        _ -> diag_red()
-    }
-    let code = error_code_for_type(error_type, message)
-
-    let mut out = level_color + diag_bold() + level_text + diag_reset()
-    out = out + " " + diag_dim() + "[" + type_color + error_type + "(" + code + ")" + diag_reset() + diag_dim() + "]" + diag_reset()
-    out = out + ": " + message + "\n"
-    return out
+    return diag_new(code, diag_level, phase, diagnostic_title(code, message))
+        |> diag_message(message)
 }
 
 pub fn format_diagnostic(src: string, filename: string, level: i32, error_type: string, message: string, line: i32, col: i32, length: i32): string
 {
-    let mut out = format_header(level, error_type, message)
-    if (filename != "" and line > 0)
-    {
-        out = out + line_blank_str(line_number_width(line)) + diag_blue() + "-->" + diag_reset() + " " + filename + ":" + i32_to_str(line) + ":" + i32_to_str(col) + "\n"
-        out = out + show_source_context(src, line, col, length, level)
-    }
-    return out
+    let code = error_code_for_type(error_type, message)
+    let span = diag_span_at(src, filename, line, col, length)
+    let mut diagnostic = diagnostic_new(code, level, error_type, strip_func_prefix(message))
+        |> diag_message(message)
+        |> diag_primary(span, strip_func_prefix(message))
+    if (code == "E3002") { diagnostic = diag_help(diagnostic, "use a value compatible with the expected type") }
+    return diag_render(diagnostic, diag_render_options(src, filename))
 }
 
 pub fn format_diagnostic_no_loc(level: i32, error_type: string, message: string, filename: string): string
 {
-    let mut out = format_header(level, error_type, message)
-    if (filename != "")
-    {
-        out = out + "  " + diag_blue() + "-->" + diag_reset() + " " + filename + "\n"
-    }
-    return out
+    let code = error_code_for_type(error_type, message)
+    let diagnostic = diagnostic_new(code, level, error_type, strip_func_prefix(message))
+        |> diag_message(message)
+    return diag_render(diagnostic, diag_render_options("", filename))
 }

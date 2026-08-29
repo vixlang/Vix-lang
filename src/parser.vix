@@ -9,6 +9,7 @@ pub type Parser = struct {
     pos: i32,
     ok: i32,
     error: string,
+    diagnostic: Diagnostic,
     expr_store: ExprStore,
     store: StmtStore,
     source: string,
@@ -20,7 +21,12 @@ pub type Parser = struct {
 
 pub fn parser_new(src: string, filename: string): Parser
 {
-    return Parser{ stream: tokenize(src), pos: 0, ok: 1, error: "", expr_store: expr_store_new(), store: stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
+    return parser_new_stream(src, filename, tokenize(src))
+}
+
+pub fn parser_new_stream(src: string, filename: string, stream: TokenStream): Parser
+{
+    return Parser{ stream: stream, pos: 0, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, ""), expr_store: expr_store_new(), store: stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
 }
 
 pub fn parser_kind(parser: &Parser): i32
@@ -87,6 +93,11 @@ pub fn parser_advance(parser: &Parser)
 
 pub fn parser_fail(parser: &Parser, message: string)
 {
+    parser_fail_code(parser, parse_error_code(message), message)
+}
+
+pub fn parser_fail_code(parser: &Parser, code: string, message: string)
+{
     if (parser.ok == 1)
     {
         parser.ok = 0
@@ -98,15 +109,19 @@ pub fn parser_fail(parser: &Parser, message: string)
         {
             length = diag_strlen(text)
         }
-        if (parser_kind(parser) == tk_eof())
+        let mut start = stream_start_at(parser.stream, parser.pos)
+        let mut end = stream_end_at(parser.stream, parser.pos)
+        if (start < 0)
         {
-            if (parser.pos > 0)
-            {
-                line = stream_line_at(parser.stream, parser.pos - 1)
-                col = stream_col_at(parser.stream, parser.pos - 1)
-            }
+            let fallback = diag_span_at(parser.source, parser.filename, line, col, length)
+            start = fallback.start
+            end = fallback.end
         }
-        parser.error = format_diagnostic(parser.source, parser.filename, diag_error_level(), "ParseError", message, line, col, length)
+        let span = diag_span(parser.filename, start, end, line, col)
+        parser.diagnostic = diag_new(code, DiagError, DiagParser, diagnostic_title(code, message))
+            |> diag_message(message)
+            |> diag_primary(span, message)
+        parser.error = diag_render(parser.diagnostic, diag_render_options(parser.source, parser.filename))
     }
 }
 
@@ -126,7 +141,7 @@ pub fn parser_expect_text(parser: &Parser, text: string): i32
     {
         return 1
     }
-    parser_fail(parser, "expected '" + text + "', got '" + parser_text(parser) + "'")
+    parser_fail_code(parser, "E1001", "expected '" + text + "', got '" + parser_text(parser) + "'")
     return 0
 }
 
@@ -137,7 +152,7 @@ pub fn parser_expect_kind(parser: &Parser, kind: i32): i32
         parser_advance(parser)
         return 1
     }
-    parser_fail(parser, "unexpected token '" + parser_text(parser) + "'")
+    parser_fail_code(parser, "E1002", "unexpected token '" + parser_text(parser) + "'")
     return 0
 }
 
@@ -2179,10 +2194,22 @@ fn parse_strip_attr_lines(src: string): string
 pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): AstProgram
 {
     let mut imports = import_set_new()
-    let combined = if (do_preprocess == 1) { preprocess_source(src, filename, &imports) } else { preprocess_source_local(src, filename) }
+    let preprocess = if (do_preprocess == 1) preprocess_source_result(src, filename, &imports) else preprocess_source_local_result(src, filename)
+    if (preprocess.ok == 0)
+    {
+        return ast_program_err_diag(diag_render(preprocess.diagnostic, diag_render_options(src, filename)), preprocess.diagnostic)
+    }
+    let combined = preprocess.source
 
-    let mut parser = parser_new(combined, filename)
-    if (parser_at_end(&parser) == 1) { return ast_program_err("empty source") }
+    let mut source_map = preprocess.source_map
+    let mut parser = parser_new_stream(combined, filename, tokenize_with_macro_origins(combined, &source_map))
+    if (parser_at_end(&parser) == 1)
+    {
+        let diagnostic = diag_new("E1004", DiagError, DiagParser, "empty source")
+            |> diag_message("the input file is empty")
+            |> diag_primary(diag_span(filename, 0, 0, 1, 1), "expected a declaration")
+        return ast_program_err_diag(diag_render(diagnostic, diag_render_options(src, filename)), diagnostic)
+    }
     let parser_stream = parser.stream
     let uses_builtin_result = parse_stream_uses_result_ctor(&parser_stream)
     let mut functions: [AstFunction] = []
@@ -2204,14 +2231,14 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
         if (parser_text(&parser) == "mod" or is_pub_mod == 1)
         {
             let mdecl = parse_mod_decl(&parser)
-            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             mod_decls.push(mdecl)
         }
         // `import ident...`; quoted imports are legacy no-ops in raw module mode.
         elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
         {
             let idecl = parse_import_decl(&parser)
-            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             import_decls.push(idecl)
         }
         elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
@@ -2223,10 +2250,10 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
         elif (parser_text(&parser) == "extern")
         {
             parser_expect_text(&parser, "extern")
-            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             if (parser_kind(&parser) == tk_string()) { parser_advance(&parser) }
             parser_expect_text(&parser, "{")
-            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             while (parser_text(&parser) != "}" and parser_at_end(&parser) == 0)
             {
                 if (parser_text(&parser) == ";")
@@ -2237,61 +2264,64 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
                 if (parser_text(&parser) == "type")
                 {
                     let decl = parse_struct_decl_abi(&parser, 1)
-                    if (parser.ok == 0) { return ast_program_err(parser.error) }
+                    if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
                     structs.push(decl)
                 }
                 else
                 {
                     let extern_func = parse_extern_function(&parser)
-                    if (parser.ok == 0) { return ast_program_err(parser.error) }
+                    if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
                     extern_functions.push(extern_func)
                 }
             }
             parser_expect_text(&parser, "}")
-            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
         }
         elif (parser_text(&parser) == "type" or (parser_text(&parser) == "pub" and stream_text_at(parser.stream, parser.pos + 1) == "type"))
         {
             if (top_level_type_is_struct(&parser) == 1)
             {
                 let decl = parse_struct_decl(&parser)
-                if (parser.ok == 0) { return ast_program_err(parser.error) }
+                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
                 structs.push(decl)
             }
             else
             {
                 let decl = parse_adt_decl(&parser)
-                if (parser.ok == 0) { return ast_program_err(parser.error) }
+                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
                 adts.push(decl)
             }
         }
         elif (parser_text(&parser) == "let")
         {
             let global_idx = parse_statement(&parser)
-            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             let global_stmt = stmt_store_get(parser.store, global_idx)
             globals.push(global_stmt)
         }
         elif (parser_text(&parser) == "fn" or parser_text(&parser) == "pub")
         {
             let func = parse_function(&parser)
-            if (parser.ok == 0) { return ast_program_err(parser.error) }
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             functions.push(func)
         }
         else
         {
             parser_fail(&parser, "expected top-level declaration, got '" + parser_text(&parser) + "'")
-            return ast_program_err(parser.error)
+            return ast_program_err_diag(parser.error, parser.diagnostic)
         }
         if (parser.pos == before_pos)
         {
             parser_fail(&parser, "parser made no progress at top-level declaration")
-            return ast_program_err(parser.error)
+            return ast_program_err_diag(parser.error, parser.diagnostic)
         }
     }
     if (functions.length == 0 and extern_functions.length == 0 and globals.length == 0 and structs.length == 0 and adts.length == 0 and mod_decls.length == 0 and import_decls.length == 0)
     {
-        return ast_program_err("expected function")
+        let diagnostic = diag_new("E1005", DiagError, DiagParser, "expected function")
+            |> diag_message("expected a top-level function or declaration")
+            |> diag_primary(diag_span(filename, combined.length, combined.length, parser_line(&parser), parser_col(&parser)), "expected function")
+        return ast_program_err_diag(diag_render(diagnostic, diag_render_options(combined, filename)), diagnostic)
     }
     if (uses_builtin_result == 1 and parse_has_adt_name(adts, "Result") == 0 and parse_has_function_name(functions, "Ok") == 0 and parse_has_function_name(functions, "Err") == 0 and parse_has_function_name(extern_functions, "Ok") == 0 and parse_has_function_name(extern_functions, "Err") == 0)
     {

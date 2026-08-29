@@ -13,6 +13,9 @@ extern "C"
     fn vix_diag_reset(): string
     fn vix_compiler_runtime_object_path(argv0: string): string
     fn vix_api_source_has_no_std(src: string): i32
+    fn vix_diag_configure(format: i32, color: i32, test_mode: i32)
+    fn vix_diag_format(): i32
+    fn vix_diag_test(): i32
 }
 
 fn string_ends_with(text: string, suffix: string): i32
@@ -103,6 +106,27 @@ fn diag_print(text: string)
     vix_print_stderr(text)
 }
 
+fn diag_protocol_finish(error_count: i32, warning_count: i32)
+{
+    if (vix_diag_test() == 0) { return }
+    if (vix_diag_format() == 2)
+    {
+        let aborting = match error_count { 0 -> "false" _ -> "true" }
+        diag_print("\n{\"summary\":{\"errors\":" + i32_to_str(error_count) + ",\"warnings\":" + i32_to_str(warning_count) + ",\"aborting\":" + aborting + "}}\n")
+        return
+    }
+    if (error_count > 0)
+    {
+        let suffix = match error_count { 1 -> " previous error" _ -> " previous errors" }
+        diag_print("\nerror: aborting due to " + i32_to_str(error_count) + suffix + "\n")
+    }
+    else
+    {
+        let suffix = match warning_count { 1 -> " warning" _ -> " warnings" }
+        diag_print("\nwarning: emitted " + i32_to_str(warning_count) + suffix + "\n")
+    }
+}
+
 fn info_print(text: string)
 {
     print(text)
@@ -154,6 +178,9 @@ fn print_help(): i32
     print("  -L<dir>, -L <dir>      Add a system library search path")
     print("  --check                Syntax & type check only")
     print("  --ownership-check      Run the experimental ownership checker")
+    print("  --diag-test            Emit the stable diagnostic snapshot protocol")
+    print("  --diag-format=<human|short|json> Select diagnostic output format")
+    print("  --color=<auto|always|never> Control ANSI diagnostic colors")
     print("  --lex                  Print tokens to stdout")
     print("  --parse-stats          Print lightweight parser input statistics")
     print("  --parser               Print parse tree to stdout")
@@ -367,6 +394,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     if (program.ok == 0)
     {
         diag_print(program.error)
+        diag_protocol_finish(1, 0)
         return mode_failure()
     }
 
@@ -421,11 +449,13 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             _ -> {}
         }
         diag_print(semantic_result_debug(semantic_result))
+        diag_protocol_finish(semantic_result.error_count, semantic_result.warning_count)
         return mode_failure()
     }
     if (semantic_result.warning_count > 0)
     {
         diag_print(semantic_result_debug(semantic_result))
+        diag_protocol_finish(0, semantic_result.warning_count)
     }
 
     let infer_result = semantic_result.type_result
@@ -441,6 +471,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     if (infer_result.ok == 0)
     {
         diag_print(typeck_result_debug(infer_result, src, filename))
+        diag_protocol_finish(1, 0)
         return mode_failure()
     }
 
@@ -449,11 +480,13 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     if (analysis_result.ok == 0)
     {
         diag_print(analysis_result.error)
+        diag_protocol_finish(1, 0)
         return mode_failure()
     }
     if (mode == "--ownership-check" and analysis_result.ownership_ok == 0)
     {
         diag_print(analysis_result.error)
+        diag_protocol_finish(1, 0)
         return mode_failure()
     }
     if (mode == "debug_typed_mir")
@@ -687,6 +720,11 @@ fn main(argc: i32, argv: &string): i32
     let mut backend = "llvm"
     let mut optimize_mir = 0
     let mut opt_level = 0
+    let mut diag_format = 0
+    let mut diag_color = 0
+    let mut diag_test_mode = 0
+
+    vix_diag_configure(diag_format, diag_color, diag_test_mode)
 
     let mut i = 1
     while (i < argc)
@@ -699,6 +737,39 @@ fn main(argc: i32, argv: &string): i32
         elif (arg == "-v" or arg == "--version")
         {
             want_version = 1
+        }
+        elif (arg == "--diag-test")
+        {
+            diag_test_mode = 1
+            diag_color = 2
+            vix_diag_configure(diag_format, diag_color, diag_test_mode)
+        }
+        elif (str_starts_with(arg, "--diag-format=") == 1)
+        {
+            let value = slice_string(arg, 14, arg.length)
+            if (value == "human") { diag_format = 0 }
+            elif (value == "short") { diag_format = 1 }
+            elif (value == "json") { diag_format = 2 }
+            else
+            {
+                diag_print("vixc: error: unknown diagnostic format '" + value + "'")
+                return 1
+            }
+            vix_diag_configure(diag_format, diag_color, diag_test_mode)
+        }
+        elif (str_starts_with(arg, "--color=") == 1)
+        {
+            let value = slice_string(arg, 8, arg.length)
+            if (value == "auto") { diag_color = 0 }
+            elif (value == "always") { diag_color = 1 }
+            elif (value == "never") { diag_color = 2 }
+            else
+            {
+                diag_print("vixc: error: unknown color mode '" + value + "'")
+                return 1
+            }
+            if (diag_test_mode == 1) { diag_color = 2 }
+            vix_diag_configure(diag_format, diag_color, diag_test_mode)
         }
         elif (str_starts_with(arg, "--explan=") == 1)
         {
