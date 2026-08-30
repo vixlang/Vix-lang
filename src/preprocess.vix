@@ -137,6 +137,32 @@ pub fn macro_set_error(macros: &MacroSet, code: string, title: string, message: 
     macros.error_column = column
 }
 
+pub fn macro_error_note(code: string): string
+{
+    return match code {
+        "E1101" -> "macro definitions require a name, parameter list, and a balanced body"
+        "E1102" -> "this macro parameter accepts an identifier rather than an arbitrary expression"
+        "E1103" -> "macro arguments must keep parentheses, brackets, and braces balanced"
+        "E1104" -> "recursive macro expansion is limited to prevent expansion from continuing forever"
+        "E1105" -> "macros must be defined or imported before they are invoked"
+        "E1106" -> "captured names and deliberately unhygienic names require an explicit wrapper"
+        _ -> ""
+    }
+}
+
+pub fn macro_error_help(code: string): string
+{
+    return match code {
+        "E1101" -> "write the definition as `macro name(...) { ... }` and balance its delimiters"
+        "E1102" -> "pass a single identifier for this macro argument"
+        "E1103" -> "close the unmatched delimiter in this macro invocation"
+        "E1104" -> "remove the recursive expansion or add a terminating macro case"
+        "E1105" -> "define or import this macro before invoking it"
+        "E1106" -> "use `$capture(name)` for call-site bindings or `$raw(name)` for an unhygienic name"
+        _ -> ""
+    }
+}
+
 pub fn macro_error_diagnostic(macros: &MacroSet): Diagnostic
 {
     let span = diag_span(macros.error_file, macros.error_start, macros.error_end, macros.error_line, macros.error_column)
@@ -149,7 +175,10 @@ pub fn macro_error_diagnostic(macros: &MacroSet): Diagnostic
         let def_span = diag_span(macros.files[idx], macros.definition_starts[idx], macros.definition_ends[idx], macros.definition_lines[idx], macros.definition_columns[idx])
         diagnostic = diag_macro_frame(diagnostic, macros.error_macro_names[i], def_span, "macro defined here")
     }
-    if (macros.error_code == "E1106") { diagnostic = diag_help(diagnostic, "use `$capture(name)` for call-site bindings or `$raw(name)` for an unhygienic name") }
+    let note = macro_error_note(macros.error_code)
+    let help = macro_error_help(macros.error_code)
+    if (note != "") { diagnostic = diag_note(diagnostic, note) }
+    if (help != "") { diagnostic = diag_help(diagnostic, help) }
     return diagnostic
 }
 
@@ -193,6 +222,11 @@ pub fn macro_definition_keyword_at(source: string, offset: i32): i32
 
 pub fn tokenize_with_macro_origins(source: string, source_map: &MacroSourceMap): TokenStream
 {
+    // Most compiler sources do not expand a macro.  Avoid rebuilding the
+    // entire token stream in that case: the bootstrap backend keeps loop
+    // temporaries on its stack until the function returns, so this otherwise
+    // needlessly turns a large source file into a stack overflow.
+    if (source_map.entries.length == 0) { return tokenize(source) }
     let original = tokenize(source)
     let mapped = stream_new()
     for (i in 0 .. stream_len(&original))

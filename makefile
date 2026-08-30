@@ -1,7 +1,7 @@
 LLVM_CFLAGS := $(shell llvm-config --cflags)
 LLVM_CXXFLAGS := $(shell llvm-config --cxxflags)
 LLVM_LDFLAGS := $(shell llvm-config --ldflags --libs all)
-LLD_LIBS := -llldELF -llldCommon
+LLD_LIBS := -llldELF -llldCommon -lz -lzstd
 GC_LIBS := $(shell pkg-config --libs bdw-gc 2>/dev/null || echo -lgc)
 GC_WRAP_LDFLAGS := -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free
 
@@ -137,6 +137,10 @@ test: all
 			echo "expected lifetime rejection: $$name"; exit 1; \
 		fi; \
 	done
+	python3 tests/diagnostics.py $(TARGET)
+
+diagnostic-test: all
+	python3 tests/diagnostics.py $(TARGET)
 
 pytest: all
 	python3 -m pytest ../tests/vixc0_tests/*.py
@@ -152,4 +156,4 @@ ownership-test: all
 	done
 	@echo "ownership tests passed: $(words $(OWNERSHIP_OK)) accepted, $(words $(OWNERSHIP_REJECT)) rejected"
 
-.PHONY: all self-stage self-lir-stage clean test pytest ownership-test
+.PHONY: all self-stage self-lir-stage clean test pytest ownership-test diagnostic-test

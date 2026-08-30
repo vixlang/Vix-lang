@@ -17,7 +17,7 @@ clang++ -c lib/llvm/Llc.cpp -o build/Llc.o $(llvm-config --cxxflags) -Wno-deprec
 clang++ -c lib/llvm/Linker.cpp -o build/Linker.o $(llvm-config --cxxflags) -Wno-deprecated-declarations
 clang++ -c lib/llvm/Passes.cpp -o build/Passes.o $(llvm-config --cxxflags) -Wno-deprecated-declarations
 
-clang++ -fuse-ld=lld -o vixc seed/vixc.ll build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o $(llvm-config --ldflags --libs all) -llldELF -llldCommon
+clang++ -fuse-ld=lld -o vixc seed/vixc.ll build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o $(llvm-config --ldflags --libs all) -llldELF -llldCommon -lz -lzstd -lz -lzstd
 echo "build vixc ok!"
 ulimit -s 65536 && ./vixc src/main.vix --check
 mv vixc seed/

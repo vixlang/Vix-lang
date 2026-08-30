@@ -46,7 +46,7 @@ pub fn semantic_diagnostic(source: string, filename: string, code: string, level
     {
         diagnostic = diag_primary(diagnostic, diag_span_at(source, filename, line, col, length), message)
     }
-    return diagnostic
+    return diagnostic_with_guidance(diagnostic)
 }
 
 pub fn semantic_emit_diag(result: &SemanticResult, diagnostic: Diagnostic): i32

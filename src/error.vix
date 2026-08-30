@@ -252,6 +252,104 @@ pub fn diagnostic_level_is_warning(level: i32): i32
     return 0
 }
 
+// Keep actionable guidance keyed by stable diagnostic code.  Callers add it
+// after source labels so human output reads from the failing span to context
+// and finally to a concrete next step.
+pub fn diagnostic_note_for_code(code: string): string
+{
+    return match code {
+        "E1001" -> "the parser cannot continue until the expected token closes or separates this construct"
+        "E1002" -> "this token is not valid in the surrounding grammar"
+        "E1003" -> "conditional branches must form an `if`, zero or more `elif`, then optional `else` chain"
+        "E1004" -> "Vix source files must contain at least one declaration"
+        "E1005" -> "executable code belongs inside a function; the file level contains declarations"
+        "E2001" | "E2003" -> "names are resolved only from declarations and imports visible in the current scope"
+        "E2002" | "E2004" | "E2006" | "E2007" | "E2008" -> "a name may be declared only once in the same scope"
+        "E3001" | "E3002" | "E3012" | "E3015" -> "Vix does not implicitly convert between unrelated value types"
+        "E3003" | "E3004" -> "dereference and indirect stores require a pointer or reference value"
+        "E3005" -> "field lookup uses the statically known struct type of the value"
+        "E3006" -> "struct names must resolve to a visible type declaration"
+        "E3007" | "E3014" -> "indexing requires an indexable value and an integer index"
+        "E3008" | "E3010" | "E3011" -> "operators are checked against the types of both operands"
+        "E3013" -> "bindings are immutable unless declared with `let mut`"
+        "E3016" -> "conditions are not implicitly converted to `bool`"
+        "E3017" -> "both ends of a range must have integer type"
+        "E3018" -> "every pattern is checked against the type of the matched expression"
+        "E3019" -> "`break` and `continue` target the nearest enclosing loop"
+        "E3020" -> "a call must match the callee's parameter count and parameter types"
+        "E3021" | "E3022" | "E3023" -> "a struct initializer must provide each declared field exactly once"
+        "E3024" | "E3025" -> "all values stored in an array must match its element type"
+        "E4001" | "W4002" -> "an executable entry point is named `main`"
+        "E4002" | "W4003" -> "the entry point must use a supported `main` signature"
+        "W4001" -> "unused bindings often indicate dead code or a misspelled use"
+        "E5001" -> "moving a non-copy value transfers ownership and invalidates the previous binding"
+        "E5002" -> "a value cannot be moved or mutated while a live reference borrows it"
+        "E5003" -> "a mutable borrow must be exclusive; shared borrows may coexist only with shared borrows"
+        "E5004" -> "creating a mutable reference or assigning through an owner requires a mutable binding"
+        "E5005" -> "a mutable-reference parameter grants the callee permission to modify its argument"
+        "E5006" -> "a shared reference permits reads but not writes"
+        "E5008" -> "a returned reference must be tied to one compatible input lifetime, never to a local value"
+        _ -> ""
+    }
+}
+
+pub fn diagnostic_help_for_code(code: string): string
+{
+    return match code {
+        "E1000" | "E1002" -> "check the surrounding delimiters and remove or move the unexpected token"
+        "E1001" -> "insert the expected token at the highlighted location"
+        "E1003" -> "reorder or rename this branch so it follows the enclosing `if`"
+        "E1004" -> "add a declaration such as `fn main(): i32 { return 0 }`"
+        "E1005" -> "start a top-level declaration with `fn`, `type`, `let`, `mod`, or `import`"
+        "E2000" | "E2001" | "E2003" -> "declare or import the name before use, and check its spelling"
+        "E2002" | "E2004" | "E2006" | "E2007" | "E2008" -> "rename one declaration or remove the duplicate"
+        "E2009" -> "choose an iterator name that does not conflict with an active binding"
+        "E2010" -> "call the function with `(...)`, or use a value name in this position"
+        "E3000" | "E3001" | "E3002" -> "make the value type match the expected type, or change the declaration"
+        "E3003" -> "remove the dereference or use a pointer/reference value"
+        "E3004" -> "store through a mutable pointer/reference, or assign to a mutable binding"
+        "E3005" -> "use a field declared by this struct, or correct the receiver type"
+        "E3006" -> "declare or import the struct, or correct its name"
+        "E3007" -> "index an array or another indexable value"
+        "E3008" | "E3010" | "E3011" -> "use compatible operand types or choose an operator defined for these values"
+        "E3012" -> "return the declared result type, or update the return type annotation"
+        "E3013" -> "declare the binding with `let mut` if mutation is intended"
+        "E3014" -> "replace this index with an integer expression"
+        "E3015" -> "store a value matching the destination's element type"
+        "E3016" -> "replace the condition with an expression of type `bool`"
+        "E3017" -> "use integer expressions for both range bounds"
+        "E3018" -> "change the pattern so its type matches the value being matched"
+        "E3019" -> "move this statement inside a loop or use `return` where appropriate"
+        "E3020" -> "pass the number and types of arguments required by the function"
+        "E3021" | "E3022" -> "initialize every required field using its declared type"
+        "E3023" -> "remove the repeated field initializer"
+        "E3024" | "E3025" -> "use a value matching the array's element type"
+        "E4000" -> "correct the program-level rule described above"
+        "E4001" | "W4002" -> "define `fn main(): i32` when building an executable"
+        "E4002" | "W4003" -> "change `main` to a supported parameter list and return type"
+        "W4000" -> "review the warning and simplify or correct the affected code"
+        "W4001" -> "remove the binding or use it in the current scope"
+        "E5001" -> "use the value before it is moved, borrow it, or clone it when a copy is intended"
+        "E5002" -> "end the borrow before this operation, or perform the operation before borrowing"
+        "E5003" -> "end the earlier borrow before creating this conflicting borrow"
+        "E5004" -> "declare the owner with `let mut` if mutation is intended"
+        "E5005" -> "pass a mutable borrow with `&mut value`"
+        "E5006" -> "use a mutable reference `&mut` when the pointee must be changed"
+        "E5008" -> "return a reference derived from one input reference with a compatible lifetime"
+        _ -> ""
+    }
+}
+
+pub fn diagnostic_with_guidance(diagnostic: Diagnostic): Diagnostic
+{
+    let mut out = diagnostic
+    let note = diagnostic_note_for_code(diagnostic.code)
+    let help = diagnostic_help_for_code(diagnostic.code)
+    if (note != "") { out = diag_note(out, note) }
+    if (help != "") { out = diag_help(out, help) }
+    return out
+}
+
 pub fn diagnostic_new(code: string, level: i32, error_type: string, message: string): Diagnostic
 {
     let diag_level = if (level == diag_warning_level()) DiagWarning else DiagError
@@ -274,7 +372,7 @@ pub fn format_diagnostic(src: string, filename: string, level: i32, error_type: 
     let mut diagnostic = diagnostic_new(code, level, error_type, strip_func_prefix(message))
         |> diag_message(message)
         |> diag_primary(span, strip_func_prefix(message))
-    if (code == "E3002") { diagnostic = diag_help(diagnostic, "use a value compatible with the expected type") }
+    diagnostic = diagnostic_with_guidance(diagnostic)
     return diag_render(diagnostic, diag_render_options(src, filename))
 }
 
@@ -283,5 +381,6 @@ pub fn format_diagnostic_no_loc(level: i32, error_type: string, message: string,
     let code = error_code_for_type(error_type, message)
     let diagnostic = diagnostic_new(code, level, error_type, strip_func_prefix(message))
         |> diag_message(message)
+        |> diagnostic_with_guidance
     return diag_render(diagnostic, diag_render_options("", filename))
 }

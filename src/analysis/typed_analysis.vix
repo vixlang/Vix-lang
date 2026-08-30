@@ -270,6 +270,7 @@ pub fn ownership_add_error(state: &OwnershipCheckState, source: string, filename
     let diagnostic = diag_new(code, DiagError, DiagOwnership, ownership_error_title(code))
         |> diag_message(message)
         |> diag_primary(diag_span_at(source, filename, line, col, span_len), message)
+        |> diagnostic_with_guidance
     for (i in 0 .. state.diagnostics.length)
     {
         if (diag_same(state.diagnostics[i], diagnostic) == 1) return 0

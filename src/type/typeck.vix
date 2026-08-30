@@ -266,7 +266,7 @@ pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename:
             let mut diagnostic = diag_new(result.code, DiagError, result.phase, result.title)
                 |> diag_message(message)
                 |> diag_primary(span, result.error)
-            if (result.code == "E3002") { diagnostic = diag_help(diagnostic, "use a value compatible with the expected type") }
+            diagnostic = diagnostic_with_guidance(diagnostic)
             return diag_render(diagnostic, diag_render_options(source, filename))
         }
         if (result.error_func != "")

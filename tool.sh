@@ -21,7 +21,10 @@ normalized_ir=$(mktemp "$root/seed/vixc.ll.normalized.XXXXXX")
 bootstrap_log=$(mktemp "${TMPDIR:-/tmp}/vixc-bootstrap.XXXXXX")
 trap 'rm -f "$tmp_ir" "$normalized_ir" "$bootstrap_log"' EXIT HUP INT TERM
 
-ulimit -s 65536
+# The bootstrap compiler keeps some loop temporaries on its stack while
+# processing large self-hosted modules.  Keep this in sync with makefile's
+# staged-bootstrap limit so refreshing the seed cannot exhaust a 64 MiB stack.
+ulimit -s 524288
 if ! "$compiler" "$root/src/main.vix" -ll -o "$tmp_ir" >"$bootstrap_log" 2>&1; then
     if [ -z "${VIXC+x}" ] && [ "$compiler" != "$seed_compiler" ] && [ -x "$seed_compiler" ]; then
         echo "refresh-seed: $compiler failed; retrying with stable $seed_compiler"
