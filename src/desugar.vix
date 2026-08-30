@@ -98,7 +98,13 @@ pub fn desugar_adt_literal(adts: [AstAdtDecl], es: &ExprStore, store: &StmtStore
             }
         }
     }
-    return ast_expr_struct_literal(es, desugar_type_base(expected_ty), field_names, field_values)
+    let literal_idx = ast_expr_struct_literal(es, desugar_type_base(expected_ty), field_names, field_values)
+    // Preserve the logical payload type alongside the physical ADT lane.
+    // Generic Option/array/struct payloads all use payload_ptr physically, but
+    // pattern bindings still need their concrete source type during analysis
+    // and LLVM lowering.
+    es.exprs[literal_idx].option_value = concrete_payload_ty
+    return literal_idx
 }
 
 pub fn desugar_adt_struct(decl: AstAdtDecl): AstStructDecl
@@ -537,10 +543,41 @@ pub fn desugar_expr_with_env(adts: [AstAdtDecl], es: &ExprStore, store: &StmtSto
         {
             let pattern_idx = expr.args[i * 2]
             let body_idx = expr.args[i * 2 + 1]
+            let mut body_names: [string] = []
+            let mut body_types: [string] = []
+            for (__bn in 0 .. names.length) { body_names.push(names[__bn]) }
+            for (__bt in 0 .. types.length) { body_types.push(types[__bt]) }
+            if (pattern_idx >= 0)
+            {
+                let source_pattern = expr_store_get(es, pattern_idx)
+                if (source_pattern.tag == "call" and source_pattern.args.length > 0)
+                {
+                    let decl_idx = desugar_find_variant(adts, source_pattern.text)
+                    let local_idx = desugar_find_variant_local(adts, source_pattern.text)
+                    if (decl_idx >= 0 and local_idx >= 0)
+                    {
+                        let bind_expr = expr_store_get(es, source_pattern.args[0])
+                        if (bind_expr.tag == "ident" and bind_expr.text != "_" and desugar_find_variant(adts, bind_expr.text) < 0)
+                        {
+                            body_names.push(bind_expr.text)
+                            body_types.push(desugar_resolve_payload_type(adts[decl_idx], subject_ty, adts[decl_idx].variant_payload_types[local_idx]))
+                        }
+                    }
+                }
+                elif (source_pattern.tag == "option" and source_pattern.option_has_value == 1 and source_pattern.left_idx >= 0)
+                {
+                    let bind_expr2 = expr_store_get(es, source_pattern.left_idx)
+                    if (bind_expr2.tag == "ident" and bind_expr2.text != "_")
+                    {
+                        body_names.push(bind_expr2.text)
+                        body_types.push(ast_generic_arg_at(subject_ty, 0))
+                    }
+                }
+            }
             if (pattern_idx >= 0 and ast_generic_arg_count(subject_ty) > 0) patterns.push(desugar_expr_expected(adts, es, store, pattern_idx, subject_ty))
             elif (pattern_idx >= 0) patterns.push(desugar_expr(adts, es, store, pattern_idx))
             else patterns.push(pattern_idx)
-            bodies.push(desugar_expr_with_env(adts, es, store, body_idx, names, types, expected_ty))
+            bodies.push(desugar_expr_with_env(adts, es, store, body_idx, body_names, body_types, expected_ty))
         }
         return ast_expr_match(es, desugar_expr_with_env(adts, es, store, expr.left_idx, names, types, subject_ty), patterns, bodies)
     }

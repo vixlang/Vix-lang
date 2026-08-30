@@ -229,21 +229,30 @@ pub fn tokenize_with_macro_origins(source: string, source_map: &MacroSourceMap):
     if (source_map.entries.length == 0) { return tokenize(source) }
     let original = tokenize(source)
     let mapped = stream_new()
-    for (i in 0 .. stream_len(&original))
+    let mut i = 0
+    let token_count = stream_len(&original)
+    let entry_count = source_map.entries.length
+    let mut start = 0
+    let mut origin_rank = 0
+    let mut hygiene_id = 0
+    let mut j = 0
+    while (i < token_count)
     {
-        let start = stream_start_at(&original, i)
-        let mut origin = stream_origin_at(&original, i)
-        let mut hygiene_id = stream_hygiene_at(&original, i)
-        for (j in 0 .. source_map.entries.length)
+        start = stream_start_at(&original, i)
+        origin_rank = original.origins[i]
+        hygiene_id = original.hygiene_ids[i]
+        j = 0
+        while (j < entry_count)
         {
-            let entry = source_map.entries[j]
-            if (start >= entry.output_start and start < entry.output_end)
+            if (start >= source_map.entries[j].output_start and start < source_map.entries[j].output_end)
             {
-                origin = macro_origin_from_rank(entry.origin)
-                hygiene_id = entry.hygiene_id
+                origin_rank = source_map.entries[j].origin
+                hygiene_id = source_map.entries[j].hygiene_id
             }
+            j += 1
         }
-        stream_push_origin(&mapped, stream_kind_at(&original, i), stream_text_at(&original, i), stream_int_at(&original, i), stream_float_at(&original, i), stream_line_at(&original, i), stream_col_at(&original, i), stream_start_at(&original, i), stream_end_at(&original, i), origin, hygiene_id)
+        stream_push_origin_rank(&mapped, stream_kind_at(&original, i), stream_text_at(&original, i), stream_int_at(&original, i), stream_float_at(&original, i), stream_line_at(&original, i), stream_col_at(&original, i), start, stream_end_at(&original, i), origin_rank, hygiene_id)
+        i += 1
     }
     return mapped
 }
@@ -770,6 +779,17 @@ pub fn macro_gensym(hygiene_id: i32, name: string): string
     return "__vix_m" + i32_to_str(hygiene_id) + "_" + name
 }
 
+pub fn macro_tokens_remove_trailing_separator(tokens: [MacroToken]): [MacroToken]
+{
+    let mut end = tokens.length
+    while (end > 0 and macro_token_is_space(tokens[end - 1]) == 1) { end -= 1 }
+    if (end == 0 or tokens[end - 1].text != ",") { return tokens }
+    end -= 1
+    let mut kept: [MacroToken] = []
+    for (i in 0 .. end) { kept.push(tokens[i]) }
+    return kept
+}
+
 pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat_param: i32, repeat_param_name: string, repeat_arg: string, file: string, body_start: i32, body_line: i32, body_column: i32, hygiene_id: i32, macros: &MacroSet): [MacroToken]
 {
     let mut tokens: [MacroToken] = []
@@ -786,8 +806,15 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
         }
         elif (repeat_param == 1 and text_at(body, i, spread_pat) == 1)
         {
-            let appended = macro_tokenize_text(repeat_arg, TokenCallSite, 0, 0, body_line, body_column)
-            for (j in 0 .. appended.length) { tokens.push(appended[j]) }
+            if (repeat_arg == "")
+            {
+                tokens = macro_tokens_remove_trailing_separator(tokens)
+            }
+            else
+            {
+                let appended = macro_tokenize_text(repeat_arg, TokenCallSite, 0, 0, body_line, body_column)
+                for (j in 0 .. appended.length) { tokens.push(appended[j]) }
+            }
             i += spread_pat.length
         }
         elif (compiler_string_byte(body, i) == '$')
@@ -853,9 +880,11 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
     let locals = macro_local_names(&tokens)
     for (k in 0 .. tokens.length)
     {
-        if (macro_token_is_identifier(tokens[k]) == 1 and macro_name_in(locals, tokens[k].text) == 1)
+        if (macro_token_is_identifier(tokens[k]) == 1 and tokens[k].text != "_" and macro_name_in(locals, tokens[k].text) == 1)
         {
             let mut token = tokens[k]
+            // `_` is a discard rather than a bindable local and is therefore
+            // intentionally excluded from hygienic renaming.
             token.text = macro_gensym(hygiene_id, token.text)
             token.origin = macro_origin_rank(TokenGenerated)
             token.hygiene_id = hygiene_id
@@ -1083,7 +1112,21 @@ pub fn expand_macros(src: string, filename: string, macros: &MacroSet): string
     let next = expand_macros_once(expanded, filename, macros)
     if (next != expanded)
     {
-        macro_set_error(macros, "E1104", "macro expansion limit exceeded", "macro expansion exceeded 64 levels", filename, 0, 0, 1, 1)
+        let mut start = 0
+        while (start < src.length and compiler_string_byte(src, start) != '$') { start += 1 }
+        let mut end = start + 1
+        while (end < src.length and is_macro_ident_char(compiler_string_byte(src, end)) == 1) { end += 1 }
+        macro_set_error(macros, "E1104", "macro expansion limit exceeded", "macro expansion exceeded 64 levels", filename, start, end, macro_line_at(src, start), macro_column_at(src, start))
+        if (start < src.length)
+        {
+            let name = slice_text(src, start + 1, end)
+            let macro_idx = macro_set_find(macros, name)
+            if (macro_idx >= 0)
+            {
+                macros.error_macro_names.push(name)
+                macros.error_macro_indices.push(macro_idx)
+            }
+        }
     }
     return expanded
 }

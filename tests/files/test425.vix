@@ -1,0 +1,43 @@
+macro $plus_one(value: expr)
+{
+    ($value + 1)
+}
+
+type Packet:[T] = Packed(T) | Missing
+
+type Pair = struct {
+    left: i32,
+    right: i32
+}
+
+fn option_map:[T, U](value: ?T, transform: fn(T): U): ?U
+{
+    return match value {
+        Some(inner) -> Some(transform(inner))
+        None -> None
+    }
+}
+
+fn packet_score(packet: Packet:[?i32]): i32
+{
+    return match packet {
+        Packed(optional) -> match optional {
+            Some(number) -> number
+            None -> 0
+        }
+        Missing -> 0
+    }
+}
+
+fn main(): i32
+{
+    let pair = Pair{ left: 20, right: 21 }
+    let values = [pair.left, pair.right]
+    let offset = 1
+    let mapped = Some($plus_one(values[0]))
+        |> option_map[i32, i32](
+            fn [offset](number: i32): i32 => number + offset
+        )
+    let packet: Packet:[?i32] = Packed(mapped)
+    return if (packet_score(packet) == 22 and values[1] == 21) 0 else 1
+}

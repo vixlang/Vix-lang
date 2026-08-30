@@ -44,6 +44,7 @@ OWNERSHIP_OK := \
 	clone_keeps_owner_ok clone_nested_call_ok clone_nested_condition_ok \
 	copy_and_borrow_ok extern_pointer_borrows_ok if_expression_branch_move_ok \
 	lifetime_return_ok lifetime_syntax mut_typed_pointer_ref_runtime \
+	primitive_copy_types_ok \
 	shared_borrows_ok string_index_i8 terminated_loop_state_ok \
 	typed_mir_debug typed_pointer_copy_ok
 OWNERSHIP_REJECT := \

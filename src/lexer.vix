@@ -83,6 +83,15 @@ pub fn stream_push_full(stream: &TokenStream, kind: i32, text: string, int_value
 
 pub fn stream_push_origin(stream: &TokenStream, kind: i32, text: string, int_value: i32, float_value: f64, line: i32, column: i32, start: i32, end: i32, origin: TokenOrigin, hygiene_id: i32)
 {
+    stream_push_origin_rank(stream, kind, text, int_value, float_value, line, column, start, end, token_origin_rank(origin), hygiene_id)
+}
+
+// Internal rank-based entry point for source-map rebuilding.  Keeping the
+// compact rank across the token loop avoids constructing an ADT temporary for
+// every token; bootstrap-generated loop temporaries otherwise remain live on
+// the native stack until the function returns.
+pub fn stream_push_origin_rank(stream: &TokenStream, kind: i32, text: string, int_value: i32, float_value: f64, line: i32, column: i32, start: i32, end: i32, origin_rank: i32, hygiene_id: i32)
+{
     stream.kinds.push(kind)
     stream.texts.push(text)
     stream.ints.push(int_value)
@@ -91,7 +100,7 @@ pub fn stream_push_origin(stream: &TokenStream, kind: i32, text: string, int_val
     stream.columns.push(column)
     stream.starts.push(start)
     stream.ends.push(end)
-    stream.origins.push(token_origin_rank(origin))
+    stream.origins.push(origin_rank)
     stream.hygiene_ids.push(hygiene_id)
 }
 

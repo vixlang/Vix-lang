@@ -59,6 +59,11 @@ def main() -> int:
             [],
             ["error[E1106]", "note: captured names and deliberately unhygienic", "help: use `$capture(name)`"],
         ),
+        (
+            "tests/macro_recursion_limit.vix",
+            [],
+            ["error[E1104]", "tests/macro_recursion_limit.vix:8:12", "note: expanded from macro `$loop`", "help: remove the recursive expansion"],
+        ),
     ]
 
     for source, extra, expected in cases:

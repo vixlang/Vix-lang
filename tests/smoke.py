@@ -52,7 +52,15 @@ def run_dedicated_macro_tests(root: Path, macro_files: list[Path]) -> int:
 
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
-    files = sorted((root / "tests" / "files").glob("test*.vix"))
+    # The generated numeric smoke corpus is test1..test400.  Additional named
+    # numeric regressions (currently test401+, including backend interaction
+    # cases) belong to tests/run.py and must not invalidate this corpus-size
+    # guard.
+    files = sorted(
+        path
+        for path in (root / "tests" / "files").glob("test*.vix")
+        if 1 <= int(path.stem.removeprefix("test")) <= 400
+    )
     if len(files) != 400:
         print(f"error: expected 400 smoke files, found {len(files)}")
         return 1

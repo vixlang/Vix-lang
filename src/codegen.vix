@@ -872,8 +872,9 @@ pub fn codegen_bind_adt_pattern(b: &LlvmBuilder, es: &ExprStore, pattern_idx: i3
             if (bind_expr.tag == "ident" and bind_expr.text != "_")
             {
                 let field_idx = get_struct_field_index(struct_ty, field_name)
-                let field_ty = get_struct_field_type(struct_ty, field_name)
-                llvm_define_var(b, bind_expr.text, field_ty, llvm_extract_value(b, subject_val, field_idx))
+                let storage_ty = get_struct_field_type(struct_ty, field_name)
+                let logical_ty = if (pattern_expr.option_value != "") pattern_expr.option_value else storage_ty
+                llvm_define_var(b, bind_expr.text, logical_ty, llvm_extract_value(b, subject_val, field_idx))
             }
         }
     }

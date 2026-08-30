@@ -57,6 +57,7 @@ NAMED_TESTS = {
     "test422.vic": {"exit": 42},
     "test423.vic": {"exit": 3},
     "test424.vic": {"compile_fail": ["MIR line", "@main", "invalid load type mystery"], "only": ["self-lir"]},
+    "test425.vix": {"exit": 0, "only": ["llvm"]},
     "lambda_basic.vix": {"exit": 3, "only": ["llvm"]},
     "lambda_pass.vix": {"exit": 42, "only": ["llvm"]},
     "lambda_block.vix": {"exit": 42, "only": ["llvm"]},

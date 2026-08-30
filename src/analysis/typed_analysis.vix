@@ -1392,6 +1392,7 @@ pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedA
     if (idx < 0) return -1
     let es = program.expr_store
     let expr = expr_store_get(&es, idx)
+    let mut match_result_ty = ""
     if (expr.tag == "call" or expr.tag == "method_call")
     {
         if (expr.left_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, 0, filename, scope_id)
@@ -1403,6 +1404,44 @@ pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedA
         }
     }
     elif (expr.tag == "field" or expr.tag == "lambda") {}
+    elif (expr.tag == "match_expr")
+    {
+        analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, 0, filename, scope_id)
+        let subject_ty = analysis_expr_type(program, env, expr.left_idx)
+        let arm_count = expr.args.length / 2
+        for (i in 0 .. arm_count)
+        {
+            let pattern_idx = expr.args[i * 2]
+            let body_idx = expr.args[i * 2 + 1]
+            let arm_env = analysis_env_clone(env)
+            if (pattern_idx >= 0)
+            {
+                let pattern = expr_store_get(&es, pattern_idx)
+                if (pattern.tag == "option" and pattern.option_has_value == 1 and pattern.left_idx >= 0)
+                {
+                    let bind = expr_store_get(&es, pattern.left_idx)
+                    if (bind.tag == "ident" and bind.text != "_") analysis_env_add(&arm_env, bind.text, ast_generic_arg_at(subject_ty, 0), 0)
+                }
+                elif (pattern.tag == "struct_literal")
+                {
+                    for (j in 0 .. pattern.field_names.length)
+                    {
+                        if (pattern.field_names[j] != "tag")
+                        {
+                            let bind2 = expr_store_get(&es, pattern.args[j])
+                            if (bind2.tag == "ident" and bind2.text != "_")
+                            {
+                                let bind_ty = if (pattern.option_value != "") pattern.option_value else analysis_struct_field_type(program, subject_ty, pattern.field_names[j])
+                                analysis_env_add(&arm_env, bind2.text, bind_ty, 0)
+                            }
+                        }
+                    }
+                }
+            }
+            let body_value = analysis_collect_expr(program, &arm_env, ir, block_id, stmt_id, body_idx, consume, filename, scope_id)
+            if (body_value >= 0 and (match_result_ty == "" or match_result_ty == "unknown")) match_result_ty = ir.values[body_value].ty
+        }
+    }
     elif (expr.tag == "block_expr")
     {
         if (expr.right_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.right_idx, consume, filename, scope_id)
@@ -1425,7 +1464,7 @@ pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedA
             if (expr.args[i] >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.args[i], 0, filename, scope_id)
         }
     }
-    let ty = analysis_expr_type(program, env, idx)
+    let ty = if (expr.tag == "match_expr" and match_result_ty != "") match_result_ty else analysis_expr_type(program, env, idx)
     let place_id = analysis_place_for_expr(program, env, ir, idx, filename, scope_id)
     let value_id = ir.values.length
     let span = analysis_resolved_expr_span(program, filename, idx)

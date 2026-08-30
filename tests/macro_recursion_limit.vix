@@ -1,0 +1,9 @@
+macro $loop(value: expr)
+{
+    $loop($value)
+}
+
+fn main(): i32
+{
+    return $loop(1)
+}

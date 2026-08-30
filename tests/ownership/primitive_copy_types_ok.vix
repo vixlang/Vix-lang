@@ -1,0 +1,30 @@
+fn reuse_primitives(a: i8, b: i16, c: i32, d: i64, e: f32, f: f64, flag: bool): i32
+{
+    let a1 = a
+    let a2 = a
+    let b1 = b
+    let b2 = b
+    let c1 = c
+    let c2 = c
+    let d1 = d
+    let d2 = d
+    let e1 = e
+    let e2 = e
+    let f1 = f
+    let f2 = f
+    let flag1 = flag
+    let flag2 = flag
+    if (a1 != a2) return 1
+    if (b1 != b2) return 2
+    if (c1 != c2) return 3
+    if (d1 != d2) return 4
+    if (e1 != e2) return 5
+    if (f1 != f2) return 6
+    if (flag1 != flag2) return 7
+    return 0
+}
+
+fn main(): i32
+{
+    return 0
+}
