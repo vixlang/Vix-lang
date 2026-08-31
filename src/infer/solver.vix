@@ -127,6 +127,19 @@ pub fn hm_ty_adt_name(store: &TyStore, ty: Ty): string
     return ""
 }
 
+pub fn hm_option_inner(store: &TyStore, ty: Ty): Ty
+{
+    match ty
+    {
+        TyAdt(idx) -> {
+            let data = store.adts[idx]
+            if (data.name == "Option" and data.args.length == 1) return data.args[0]
+        }
+        _ -> {}
+    }
+    return TyUnknown
+}
+
 pub fn hm_ptr_array_elem(store: &TyStore, ty: Ty): Ty
 {
     match ty
@@ -387,6 +400,15 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (l.ok == 0) { return l }
             let r = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.right_idx)
             if (r.ok == 0) { return r }
+            if (expr.text == "??")
+            {
+                let left_ty = subst_apply_ty(store, subst, l.ty)
+                let inner_ty = hm_option_inner(store, left_ty)
+                if (ty_is_unknown(inner_ty) == 1) return infer_value_fail(infer_error_other("left operand of ?? must be Option", pos))
+                let u = hm_unify(store, subst, inner_ty, r.ty, pos)
+                if (u.ok == 0) return u
+                return infer_value_ok(subst_apply_ty(store, subst, inner_ty))
+            }
             let numeric_ty = hm_numeric_result_ty(store, subst, l.ty, r.ty)
             if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == ">" or expr.text == "<=" or expr.text == ">=")
             {

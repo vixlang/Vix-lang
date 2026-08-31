@@ -499,6 +499,9 @@ pub fn tokenize(src: string): TokenStream
                                     ':' -> {
                                         if (next == ':') symbol = "::"
                                     }
+                                    '?' -> {
+                                        if (next == '?') symbol = "??"
+                                    }
                                     '|' -> {
                                         if (next == '>') symbol = "|>"
                                     }

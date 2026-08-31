@@ -268,16 +268,32 @@ pub fn parse_bitwise_or(parser: &Parser): i32
 
 pub fn parse_bitwise_and(parser: &Parser): i32
 {
-    let mut left = parse_comparison(parser)
+    let mut left = parse_coalesce(parser)
     if (parser.ok == 0) { return -1 }
     while (parser_kind(parser) == tk_symbol() and parser_text(parser) == "&")
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
-        let right = parse_comparison(parser)
+        let right = parse_coalesce(parser)
         if (parser.ok == 0) { return -1 }
         left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "&", left, right), line, col)
+    }
+    return left
+}
+
+pub fn parse_coalesce(parser: &Parser): i32
+{
+    let left = parse_comparison(parser)
+    if (parser.ok == 0) { return -1 }
+    if (parser_kind(parser) == tk_symbol() and parser_text(parser) == "??")
+    {
+        let line = parser_line(parser)
+        let col = parser_col(parser)
+        parser_advance(parser)
+        let right = parse_coalesce(parser)
+        if (parser.ok == 0) { return -1 }
+        return parser_expr_at(parser, ast_expr_binop(parser.expr_store, "??", left, right), line, col)
     }
     return left
 }

@@ -190,6 +190,7 @@ pub fn mir_expr_type(es: &ExprStore, expr: AstExpr): string
             mir_expr_type(es, expr_store_get(es, expr.left_idx))
         }
         "binop" -> {
+            if (expr.text == "??") return mir_type_option_inner(mir_expr_type(es, expr_store_get(es, expr.left_idx)))
             if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=" or expr.text == "and" or expr.text == "or") { return "bool" }
             let left_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
             let right_ty = mir_expr_type(es, expr_store_get(es, expr.right_idx))
@@ -649,6 +650,48 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
 
 pub fn mir_binop_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr, expected_ty: string): MirValue
 {
+    if (expr.text == "??")
+    {
+        let left_expr = expr_store_get(es, expr.left_idx)
+        let right_expr = expr_store_get(es, expr.right_idx)
+        let option_ty = mir_expr_type(es, left_expr)
+        let inner_ty = mir_type_option_inner(option_ty)
+        let option = mir_expr_value_typed(b, es, store, left_expr, option_ty)
+        let slot = mir_temp(b)
+        mir_inst(b, slot + " = alloca " + mir_type(inner_ty))
+        let some_label = mir_label(b, "coalesce.some")
+        let none_label = mir_label(b, "coalesce.none")
+        let end_label = mir_label(b, "coalesce.end")
+        let test = mir_temp(b)
+        mir_inst(b, test + " = icmp ne ptr " + option.name + ", null")
+        mir_emit_term(b, "br_cond " + test + ", label " + some_label + ", label " + none_label)
+        mir_block(b, some_label)
+        let mut some = option.name
+        if (inner_ty != "ptr" and inner_ty != "string" and type_text_is_array(inner_ty) == 0 and is_ptr_to_struct(inner_ty) == 0)
+        {
+            let encoded = mir_temp(b)
+            mir_inst(b, encoded + " = ptrtoint ptr " + option.name + " to i64")
+            let decoded = mir_temp(b)
+            mir_inst(b, decoded + " = sub i64 " + encoded + ", 1")
+            some = decoded
+            if (inner_ty != "i64" and inner_ty != "u64" and inner_ty != "usize")
+            {
+                let cast = mir_temp(b)
+                mir_inst(b, cast + " = trunc i64 " + some + " to " + mir_type(inner_ty))
+                some = cast
+            }
+        }
+        mir_inst(b, "store " + mir_type(inner_ty) + " " + some + ", " + slot)
+        mir_emit_term(b, "br label " + end_label)
+        mir_block(b, none_label)
+        let fallback = mir_expr_value_typed(b, es, store, right_expr, inner_ty)
+        mir_inst(b, "store " + mir_type(inner_ty) + " " + fallback.name + ", " + slot)
+        mir_emit_term(b, "br label " + end_label)
+        mir_block(b, end_label)
+        let out = mir_temp(b)
+        mir_inst(b, out + " = load " + mir_type(inner_ty) + ", " + slot)
+        return MirValue{ name: out, ty: inner_ty }
+    }
     if (expr.text == "and" or expr.text == "or")
     {
         let left = mir_truthy(b, mir_expr_value_typed(b, es, store, expr_store_get(es, expr.left_idx), "bool"))

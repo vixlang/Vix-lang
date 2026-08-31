@@ -1,0 +1,18 @@
+fn choose(): ?i32
+{
+    return Some(41)
+}
+
+fn fallback(): i32
+{
+    return 99
+}
+
+fn main(): i32
+{
+    let present = choose() ?? fallback()
+    let missing: ?i32 = None
+    let absent = missing ?? 42
+    let chained = missing ?? choose() ?? 7
+    return present + absent + chained - 124
+}

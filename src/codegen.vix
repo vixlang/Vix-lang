@@ -162,6 +162,7 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
     }
     if (expr.tag == "binop")
     {
+        if (expr.text == "??") return type_text_option_inner(codegen_expr_type(b, es, expr_store_get(es, expr.left_idx)))
         if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == "<=" or expr.text == ">" or expr.text == ">=" or expr.text == "and" or expr.text == "or")
         {
             return "bool"
@@ -275,6 +276,40 @@ pub fn codegen_binop_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &S
     let right_expr = expr_store_get(es, expr.right_idx)
     let left_ty = codegen_expr_type(b, es, left_expr)
     let right_ty = codegen_expr_type(b, es, right_expr)
+
+    if (expr.text == "??")
+    {
+        let inner_ty = type_text_option_inner(left_ty)
+        let option_val = codegen_expr_value_typed(b, es, store, left_expr, left_ty)
+        let is_some = llvm_build_icmp_value(b, 33, option_val, llvm_const_null_ptr())
+        let is_some_i1 = llvm_build_truthy_typed_i1(b, is_some, "bool")
+        let some_block = llvm_append_block(b, "coalesce.some")
+        let none_block = llvm_append_block(b, "coalesce.none")
+        let merge_block = llvm_append_block(b, "coalesce.merge")
+        vix_LLVMBuildCondBr(b.builder, is_some_i1, some_block, none_block)
+
+        llvm_position_at_end(b, some_block)
+        let mut some_val = option_val
+        if (inner_ty != "ptr" and inner_ty != "string" and type_text_is_array(inner_ty) == 0 and is_ptr_to_struct(inner_ty) == 0)
+        {
+            some_val = llvm_ptr_to_i64(b, option_val)
+            some_val = llvm_build_sub_value(b, some_val, llvm_const_i64(1))
+            if (inner_ty != "i64" and inner_ty != "u64" and inner_ty != "usize") some_val = llvm_cast_value(b, some_val, "i64", inner_ty)
+        }
+        let some_end = vix_LLVMGetInsertBlock(b.builder)
+        vix_LLVMBuildBr(b.builder, merge_block)
+
+        llvm_position_at_end(b, none_block)
+        let none_val = codegen_expr_value_typed(b, es, store, right_expr, inner_ty)
+        let none_end = vix_LLVMGetInsertBlock(b.builder)
+        vix_LLVMBuildBr(b.builder, merge_block)
+
+        llvm_position_at_end(b, merge_block)
+        let result = vix_LLVMBuildPHI(b.builder, llvm_type_for(inner_ty), llvm_temp(b, "coalesce"))
+        vix_LLVMAddIncoming(result, some_val, some_end)
+        vix_LLVMAddIncoming(result, none_val, none_end)
+        return result
+    }
 
     if (expr.text == "and")
     {
