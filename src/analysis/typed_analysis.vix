@@ -1209,9 +1209,9 @@ pub fn analysis_find_place(ir: &TypedAnalysisIR, root: string, projections: [Ana
 pub fn analysis_add_place(ir: &TypedAnalysisIR, root: string, projections: [AnalysisProjection], ty: string, span: AnalysisSpan, span_length: i32, owner_mutable: i32, owner_scope: i32, is_parameter: i32): i32
 {
     let id = ir.places.length
-    let fixed_span = span
-    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
-    ir.places.push(AnalysisPlace{ id: id, root: root, projections: projections, ty: ty, span: fixed_span, owner_mutable: owner_mutable, owner_scope: owner_scope, is_parameter: is_parameter })
+    // Keep the normalized span as a whole. Field writes on copied aggregates
+    // containing strings are miscompiled by the self-hosted backend.
+    ir.places.push(AnalysisPlace{ id: id, root: root, projections: projections, ty: ty, span: span, owner_mutable: owner_mutable, owner_scope: owner_scope, is_parameter: is_parameter })
     return id
 }
 
@@ -1261,9 +1261,7 @@ pub fn analysis_place_for_expr(program: AstProgram, env: &AnalysisEnv, ir: &Type
 pub fn analysis_add_instruction(ir: &TypedAnalysisIR, block_id: i32, kind: string, expr_id: i32, stmt_id: i32, place_id: i32, value_id: i32, target_block: i32, span: AnalysisSpan, span_length: i32): i32
 {
     let id = ir.instructions.length
-    let fixed_span = span
-    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
-    ir.instructions.push(TypedAnalysisInstruction{ id: id, kind: kind, expr_id: expr_id, stmt_id: stmt_id, place_id: place_id, value_id: value_id, target_block: target_block, span: fixed_span })
+    ir.instructions.push(TypedAnalysisInstruction{ id: id, kind: kind, expr_id: expr_id, stmt_id: stmt_id, place_id: place_id, value_id: value_id, target_block: target_block, span: span })
     ir.blocks[block_id].instruction_ids.push(id)
     return id
 }
@@ -1271,18 +1269,14 @@ pub fn analysis_add_instruction(ir: &TypedAnalysisIR, block_id: i32, kind: strin
 pub fn analysis_add_scope(ir: &TypedAnalysisIR, kind: string, parent: i32, span: AnalysisSpan, span_length: i32): i32
 {
     let id = ir.scopes.length
-    let fixed_span = span
-    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
-    ir.scopes.push(TypedAnalysisScope{ id: id, kind: kind, parent: parent, entry_block: -1, exit_blocks: [], local_place_ids: [], span: fixed_span })
+    ir.scopes.push(TypedAnalysisScope{ id: id, kind: kind, parent: parent, entry_block: -1, exit_blocks: [], local_place_ids: [], span: span })
     return id
 }
 
 pub fn analysis_add_block(ir: &TypedAnalysisIR, context: AnalysisBuildContext, stmt_id: i32, span: AnalysisSpan, span_length: i32): i32
 {
     let id = ir.blocks.length
-    let fixed_span = span
-    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
-    ir.blocks.push(TypedAnalysisBlock{ id: id, function_id: context.function_id, function_name: context.function_name, scope_id: context.scope_id, stmt_id: stmt_id, instruction_ids: [], predecessors: [], successors: [], span: fixed_span })
+    ir.blocks.push(TypedAnalysisBlock{ id: id, function_id: context.function_id, function_name: context.function_name, scope_id: context.scope_id, stmt_id: stmt_id, instruction_ids: [], predecessors: [], successors: [], span: span })
     if (ir.scopes[context.scope_id].entry_block < 0) ir.scopes[context.scope_id].entry_block = id
     return id
 }
@@ -1469,7 +1463,7 @@ pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedA
     let value_id = ir.values.length
     let span = analysis_resolved_expr_span(program, filename, idx)
     let span_length = if (expr.text.length > 0) { expr.text.length } else { 1 }
-    span.length = span_length
+    // analysis_span already normalized the requested length.
     ir.values.push(TypedAnalysisValue{ id: value_id, expr_id: idx, ty: ty, place_id: place_id, span: span })
     let action = analysis_expr_action(program, ty, expr, consume)
     let kind = match expr.tag {
@@ -1580,9 +1574,7 @@ pub fn analysis_add_drop_event(program: AstProgram, ir: &TypedAnalysisIR, drops:
     if (analysis_type_is_copy(program, place.ty) == 1 or analysis_type_is_reference(place.ty) == 1) return 0
     if (analysis_place_was_moved(ir, place_id) == 1) return 0
     if (analysis_drop_exists(drops, block_id, place_id, reason) == 1) return 0
-    let fixed_span = span
-    fixed_span.length = if (span_length > 0) { span_length } else { 1 }
-    drops.events.push(DropEvent{ scope_id: scope_id, stmt_id: stmt_id, return_id: return_id, block_id: block_id, place_id: place_id, ty: place.ty, reason: reason, span: fixed_span })
+    drops.events.push(DropEvent{ scope_id: scope_id, stmt_id: stmt_id, return_id: return_id, block_id: block_id, place_id: place_id, ty: place.ty, reason: reason, span: span })
     return 0
 }
 
@@ -1648,7 +1640,7 @@ pub fn analysis_emit_simple_stmt(program: AstProgram, env: &AnalysisEnv, ir: &Ty
     let stmt = stmt_store_get(&store, idx)
     let span = analysis_stmt_span(program, context.filename, stmt)
     let span_length = if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 }
-    span.length = span_length
+    // analysis_span already normalized the requested length.
     let block_id = analysis_add_block(ir, context, idx, span, span_length)
     if (stmt.tag == "let")
     {
@@ -1706,7 +1698,7 @@ pub fn analysis_emit_block(program: AstProgram, env: &AnalysisEnv, ir: &TypedAna
     let stmt = stmt_store_get(&store, idx)
     let span = analysis_stmt_span(program, context.filename, stmt)
     let span_length = if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 }
-    span.length = span_length
+    // analysis_span already normalized the requested length.
     let parent_kind = if (context.scope_id >= 0 and context.scope_id < ir.scopes.length) { ir.scopes[context.scope_id].kind } else { "" }
     let scope_kind = match parent_kind { "branch" | "match_arm" -> parent_kind _ -> kind }
     let scope_id = analysis_add_scope(ir, scope_kind, context.scope_id, span, span_length)
@@ -1746,7 +1738,7 @@ pub fn analysis_emit_stmt(program: AstProgram, env: &AnalysisEnv, ir: &TypedAnal
     let stmt = stmt_store_get(&store, idx)
     let span = analysis_stmt_span(program, context.filename, stmt)
     let span_length = if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 }
-    span.length = span_length
+    // analysis_span already normalized the requested length.
     if (stmt.tag == "block") return analysis_emit_block(program, env, ir, drops, context, idx, "block")
     if (stmt.tag == "if")
     {
@@ -2216,7 +2208,7 @@ pub fn typed_analysis_program(program: AstProgram, source: string, filename: str
         let func = program.functions[i]
         let function_span = analysis_span(filename, func.line, func.col, func.name.length)
         let function_span_length = if (func.name.length > 0) { func.name.length } else { 1 }
-        function_span.length = function_span_length
+        // analysis_span already normalized the requested length.
         let function_scope = analysis_add_scope(&ir, "function", -1, function_span, function_span_length)
         let function_id = ir.functions.length
         ir.functions.push(TypedAnalysisFunction{ id: function_id, name: func.name, scope_id: function_scope, entry_block: -1, exit_blocks: [], span: function_span })
