@@ -66,7 +66,7 @@ pub fn machine_result_type(rhs: string, opcode: string): string
 {
     if (opcode == "icmp" or opcode == "fcmp") { return "i32" }
     if (opcode == "gep" or opcode == "offset" or opcode == "global_addr") { return "ptr" }
-    if (opcode == "call")
+    if (opcode == "call" or opcode == "call_indirect")
     {
         let lp = mir2asm_find(rhs, '(', 0)
         let rp = mir2asm_find_matching_paren(rhs, lp)
@@ -134,6 +134,7 @@ pub fn machine_parse_inst(line: string, line_no: i32): MachineInst
     elif (mir2asm_starts_with(line, "br_cond ") == 1) { inst.opcode = "br_cond" }
     elif (mir2asm_starts_with(line, "store ") == 1) { inst.opcode = "store" }
     elif (mir2asm_starts_with(line, "call ") == 1) { inst.opcode = "call" }
+    elif (mir2asm_starts_with(line, "call_indirect ") == 1) { inst.opcode = "call_indirect" }
     if (inst.dest != "") { inst.ty = machine_result_type(rhs, inst.opcode) }
     inst.operands = []
     return inst

@@ -1,0 +1,2 @@
+fn same:[A, B](a: A, b: B): A { let _ = b return a }
+fn main(): i32 { return if (same[i32, string](6, "x") == 6) 0 else 1 }

@@ -1,0 +1,2 @@
+fn id:[T](x: T): T { return x }
+fn main(): i32 { return id[i32](3) - 3 }

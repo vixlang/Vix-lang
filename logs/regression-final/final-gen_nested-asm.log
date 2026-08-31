@@ -1,0 +1,354 @@
+Script started on 2026-08-31 20:47:29+08:00 [COMMAND="build/vixc tests/complex/gen_nested.vix --backend=self --debug=asm" <not executed on terminal>]
+default rel
+section .text
+    ; MIR: mir_module vixc0 { (line 1)
+    ; MIR: type @Box = { i32, i32, ptr, ptr, f64 } (line 2)
+    ; MIR: extern_vararg fn @printf(ptr): i32 (line 3)
+extern printf
+    ; MIR: extern fn @calloc(usize, usize): ptr (line 4)
+extern calloc
+    ; MIR: extern fn @strcmp(ptr, ptr): i32 (line 5)
+extern strcmp
+    ; MIR: extern fn @strlen(ptr): i32 (line 6)
+extern strlen
+    ; MIR: extern fn @vix_array_len(ptr): i32 (line 7)
+extern vix_array_len
+    ; MIR: extern fn @vix_array_push_i32(ptr, i32): ptr (line 8)
+extern vix_array_push_i32
+    ; MIR: extern fn @vix_array_push_ptr(ptr, ptr): ptr (line 9)
+extern vix_array_push_ptr
+    ; MIR: extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr (line 10)
+extern vix_array_push_bytes
+    ; MIR: extern fn @vix_array_slice_bytes(ptr, i32, i32, usize): ptr (line 11)
+extern vix_array_slice_bytes
+    ; MIR: extern fn @vix_safe_sdiv_i32(i32, i32): i32 (line 12)
+extern vix_safe_sdiv_i32
+    ; MIR: extern fn @vix_safe_srem_i32(i32, i32): i32 (line 13)
+extern vix_safe_srem_i32
+    ; MIR: extern fn @vix_string_concat(ptr, ptr): ptr (line 14)
+extern vix_string_concat
+    ; MIR: extern fn @vix_string_slice(ptr, i32, i32): ptr (line 15)
+extern vix_string_slice
+    ; MIR: } (line 103)
+    ; MIR: fn @Boxed(%value: i32): @Box { (line 17)
+global Boxed
+Boxed:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 240
+    mov qword [rbp-8], rdi
+    mov dword [rbp-16], esi
+    ; MIR: block %entry: (line 17)
+    ; MIR: %value_addr = alloca i32 (line 20)
+    ; MIR: store i32 %value, %value_addr (line 21)
+    mov eax, dword [rbp-16]
+    mov dword [rbp-24], eax
+    ; MIR: %t0 = const @Box undef (line 22)
+    mov qword [rbp-56], 0
+    mov qword [rbp-48], 0
+    mov qword [rbp-40], 0
+    mov qword [rbp-32], 0
+    ; MIR: %t1 = insertvalue @Box %t0, 0, [0] (line 23)
+    mov rax, qword [rbp-56]
+    mov qword [rbp-88], rax
+    mov rax, qword [rbp-48]
+    mov qword [rbp-80], rax
+    mov rax, qword [rbp-40]
+    mov qword [rbp-72], rax
+    mov rax, qword [rbp-32]
+    mov qword [rbp-64], rax
+    mov eax, 0
+    mov dword [rbp-88], eax
+    ; MIR: %t2 = load i32, %value_addr (line 24)
+    mov eax, dword [rbp-24]
+    mov dword [rbp-96], eax
+    ; MIR: %t3 = insertvalue @Box %t1, %t2, [1] (line 25)
+    mov rax, qword [rbp-88]
+    mov qword [rbp-128], rax
+    mov rax, qword [rbp-80]
+    mov qword [rbp-120], rax
+    mov rax, qword [rbp-72]
+    mov qword [rbp-112], rax
+    mov rax, qword [rbp-64]
+    mov qword [rbp-104], rax
+    mov eax, dword [rbp-96]
+    mov dword [rbp-124], eax
+    ; MIR: %t4 = const ptr "" (line 26)
+    lea rax, [Lstr0]
+    mov qword [rbp-136], rax
+    ; MIR: %t5 = insertvalue @Box %t3, %t4, [2] (line 27)
+    mov rax, qword [rbp-128]
+    mov qword [rbp-168], rax
+    mov rax, qword [rbp-120]
+    mov qword [rbp-160], rax
+    mov rax, qword [rbp-112]
+    mov qword [rbp-152], rax
+    mov rax, qword [rbp-104]
+    mov qword [rbp-144], rax
+    mov rax, qword [rbp-136]
+    mov qword [rbp-160], rax
+    ; MIR: %t6 = insertvalue @Box %t5, 0, [3] (line 28)
+    mov rax, qword [rbp-168]
+    mov qword [rbp-200], rax
+    mov rax, qword [rbp-160]
+    mov qword [rbp-192], rax
+    mov rax, qword [rbp-152]
+    mov qword [rbp-184], rax
+    mov rax, qword [rbp-144]
+    mov qword [rbp-176], rax
+    mov rax, 0
+    mov qword [rbp-184], rax
+    ; MIR: %t7 = insertvalue @Box %t6, 0, [4] (line 29)
+    mov rax, qword [rbp-200]
+    mov qword [rbp-232], rax
+    mov rax, qword [rbp-192]
+    mov qword [rbp-224], rax
+    mov rax, qword [rbp-184]
+    mov qword [rbp-216], rax
+    mov rax, qword [rbp-176]
+    mov qword [rbp-208], rax
+    mov rax, 0
+    mov qword [rbp-208], rax
+    ; MIR: ret @Box %t7 (line 30)
+    mov r11, qword [rbp-8]
+    mov rax, qword [rbp-232]
+    mov qword [r11+0], rax
+    mov rax, qword [rbp-224]
+    mov qword [r11+8], rax
+    mov rax, qword [rbp-216]
+    mov qword [r11+16], rax
+    mov rax, qword [rbp-208]
+    mov qword [r11+24], rax
+    mov rax, qword [rbp-8]
+    jmp Boxed__return
+Boxed__return:
+    mov rsp, rbp
+    pop rbp
+    ret
+    ; MIR: fn @main(): i32 { (line 34)
+global main
+main:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 400
+    ; MIR: block %entry: (line 34)
+    ; MIR: %x_addr = alloca @Box (line 37)
+    ; MIR: %t0 = const @Box undef (line 38)
+    mov qword [rbp-64], 0
+    mov qword [rbp-56], 0
+    mov qword [rbp-48], 0
+    mov qword [rbp-40], 0
+    ; MIR: %t1 = insertvalue @Box %t0, 0, [0] (line 39)
+    mov rax, qword [rbp-64]
+    mov qword [rbp-96], rax
+    mov rax, qword [rbp-56]
+    mov qword [rbp-88], rax
+    mov rax, qword [rbp-48]
+    mov qword [rbp-80], rax
+    mov rax, qword [rbp-40]
+    mov qword [rbp-72], rax
+    mov eax, 0
+    mov dword [rbp-96], eax
+    ; MIR: %t2 = insertvalue @Box %t1, 0, [1] (line 40)
+    mov rax, qword [rbp-96]
+    mov qword [rbp-128], rax
+    mov rax, qword [rbp-88]
+    mov qword [rbp-120], rax
+    mov rax, qword [rbp-80]
+    mov qword [rbp-112], rax
+    mov rax, qword [rbp-72]
+    mov qword [rbp-104], rax
+    mov eax, 0
+    mov dword [rbp-124], eax
+    ; MIR: %t3 = const ptr "" (line 41)
+    lea rax, [Lstr0]
+    mov qword [rbp-136], rax
+    ; MIR: %t4 = insertvalue @Box %t2, %t3, [2] (line 42)
+    mov rax, qword [rbp-128]
+    mov qword [rbp-168], rax
+    mov rax, qword [rbp-120]
+    mov qword [rbp-160], rax
+    mov rax, qword [rbp-112]
+    mov qword [rbp-152], rax
+    mov rax, qword [rbp-104]
+    mov qword [rbp-144], rax
+    mov rax, qword [rbp-136]
+    mov qword [rbp-160], rax
+    ; MIR: %t6 = zext i32 8 to i64 (line 43)
+    mov eax, 8
+    mov qword [rbp-176], rax
+    ; MIR: %t5 = add i64 %t6, 1 (line 44)
+    mov rax, qword [rbp-176]
+    add rax, 1
+    mov qword [rbp-184], rax
+    ; MIR: %t7 = inttoptr i64 %t5 to ptr (line 45)
+    mov rax, qword [rbp-184]
+    mov qword [rbp-192], rax
+    ; MIR: %t8 = insertvalue @Box %t4, %t7, [3] (line 46)
+    mov rax, qword [rbp-168]
+    mov qword [rbp-224], rax
+    mov rax, qword [rbp-160]
+    mov qword [rbp-216], rax
+    mov rax, qword [rbp-152]
+    mov qword [rbp-208], rax
+    mov rax, qword [rbp-144]
+    mov qword [rbp-200], rax
+    mov rax, qword [rbp-192]
+    mov qword [rbp-208], rax
+    ; MIR: %t9 = insertvalue @Box %t8, 0, [4] (line 47)
+    mov rax, qword [rbp-224]
+    mov qword [rbp-256], rax
+    mov rax, qword [rbp-216]
+    mov qword [rbp-248], rax
+    mov rax, qword [rbp-208]
+    mov qword [rbp-240], rax
+    mov rax, qword [rbp-200]
+    mov qword [rbp-232], rax
+    mov rax, 0
+    mov qword [rbp-232], rax
+    ; MIR: store @Box %t9, %x_addr (line 48)
+    mov rax, qword [rbp-256]
+    mov qword [rbp-32], rax
+    mov rax, qword [rbp-248]
+    mov qword [rbp-24], rax
+    mov rax, qword [rbp-240]
+    mov qword [rbp-16], rax
+    mov rax, qword [rbp-232]
+    mov qword [rbp-8], rax
+    ; MIR: %t10 = load @Box, %x_addr (line 49)
+    mov rax, qword [rbp-32]
+    mov qword [rbp-288], rax
+    mov rax, qword [rbp-24]
+    mov qword [rbp-280], rax
+    mov rax, qword [rbp-16]
+    mov qword [rbp-272], rax
+    mov rax, qword [rbp-8]
+    mov qword [rbp-264], rax
+    ; MIR: %t11 = alloca i32 (line 50)
+    ; MIR: br label %matchexpr.test1 (line 51)
+    jmp main__matchexpr_test1
+    ; MIR: block %matchexpr.test1: (line 34)
+main__matchexpr_test1:
+    ; MIR: %t12 = extractvalue @Box %t10, [0] (line 54)
+    mov eax, dword [rbp-288]
+    mov dword [rbp-304], eax
+    ; MIR: %t13 = icmp eq i32 %t12, 0 (line 55)
+    mov eax, dword [rbp-304]
+    cmp eax, 0
+    sete al
+    movzx eax, al
+    mov dword [rbp-312], eax
+    ; MIR: br_cond %t13, label %matchexpr.body2, label %matchexpr.test3 (line 56)
+    mov eax, dword [rbp-312]
+    cmp eax, 0
+    je main__matchexpr_test3
+    jmp main__matchexpr_body2
+    ; MIR: block %matchexpr.body2: (line 34)
+main__matchexpr_body2:
+    ; MIR: %t14 = extractvalue @Box %t10, [3] (line 59)
+    mov rax, qword [rbp-272]
+    mov qword [rbp-320], rax
+    ; MIR: %v_addr = alloca ptr (line 60)
+    ; MIR: store ptr %t14, %v_addr (line 61)
+    mov rax, qword [rbp-320]
+    mov qword [rbp-328], rax
+    ; MIR: %t15 = alloca i32 (line 62)
+    ; MIR: %t16 = load ptr, %v_addr (line 63)
+    mov rax, qword [rbp-328]
+    mov qword [rbp-344], rax
+    ; MIR: %t17 = call @id__Option_i32_(ptr %t16): ptr (line 64)
+    mov rdi, qword [rbp-344]
+    mov al, 0
+    call id__Option_i32_
+    mov qword [rbp-352], rax
+    ; MIR: %t19 = zext i32 8 to i64 (line 65)
+    mov eax, 8
+    mov qword [rbp-360], rax
+    ; MIR: %t18 = add i64 %t19, 1 (line 66)
+    mov rax, qword [rbp-360]
+    add rax, 1
+    mov qword [rbp-368], rax
+    ; MIR: %t20 = inttoptr i64 %t18 to ptr (line 67)
+    mov rax, qword [rbp-368]
+    mov qword [rbp-376], rax
+    ; MIR: %t21 = icmp eq ptr %t17, %t20 (line 68)
+    mov rax, qword [rbp-352]
+    cmp rax, qword [rbp-376]
+    sete al
+    movzx eax, al
+    mov dword [rbp-384], eax
+    ; MIR: br_cond %t21, label %ifexpr.then4, label %ifexpr.else5 (line 69)
+    mov eax, dword [rbp-384]
+    cmp eax, 0
+    je main__ifexpr_else5
+    jmp main__ifexpr_then4
+    ; MIR: block %ifexpr.then4: (line 34)
+main__ifexpr_then4:
+    ; MIR: store i32 0, %t15 (line 72)
+    mov eax, 0
+    mov dword [rbp-336], eax
+    ; MIR: br label %ifexpr.end6 (line 73)
+    jmp main__ifexpr_end6
+    ; MIR: block %ifexpr.else5: (line 34)
+main__ifexpr_else5:
+    ; MIR: store i32 1, %t15 (line 76)
+    mov eax, 1
+    mov dword [rbp-336], eax
+    ; MIR: br label %ifexpr.end6 (line 77)
+    jmp main__ifexpr_end6
+    ; MIR: block %ifexpr.end6: (line 34)
+main__ifexpr_end6:
+    ; MIR: %t22 = load i32, %t15 (line 80)
+    mov eax, dword [rbp-336]
+    mov dword [rbp-392], eax
+    ; MIR: store i32 %t22, %t11 (line 81)
+    mov eax, dword [rbp-392]
+    mov dword [rbp-296], eax
+    ; MIR: br label %matchexpr.end0 (line 82)
+    jmp main__matchexpr_end0
+    ; MIR: block %matchexpr.test3: (line 34)
+main__matchexpr_test3:
+    ; MIR: store i32 0, %t11 (line 85)
+    mov eax, 0
+    mov dword [rbp-296], eax
+    ; MIR: br label %matchexpr.end0 (line 86)
+    jmp main__matchexpr_end0
+    ; MIR: block %matchexpr.end0: (line 34)
+main__matchexpr_end0:
+    ; MIR: %t23 = load i32, %t11 (line 89)
+    mov eax, dword [rbp-296]
+    mov dword [rbp-400], eax
+    ; MIR: ret i32 %t23 (line 90)
+    mov eax, dword [rbp-400]
+    jmp main__return
+main__return:
+    mov rsp, rbp
+    pop rbp
+    ret
+    ; MIR: fn @id__Option_i32_(%x: ptr): ptr { (line 94)
+global id__Option_i32_
+id__Option_i32_:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 32
+    mov qword [rbp-8], rdi
+    ; MIR: block %entry: (line 94)
+    ; MIR: %x_addr = alloca ptr (line 97)
+    ; MIR: store ptr %x, %x_addr (line 98)
+    mov rax, qword [rbp-8]
+    mov qword [rbp-16], rax
+    ; MIR: %t0 = load ptr, %x_addr (line 99)
+    mov rax, qword [rbp-16]
+    mov qword [rbp-24], rax
+    ; MIR: ret ptr %t0 (line 100)
+    mov rax, qword [rbp-24]
+    jmp id__Option_i32___return
+id__Option_i32___return:
+    mov rsp, rbp
+    pop rbp
+    ret
+section .data
+Lstr0: db 0
+
+
+Script done on 2026-08-31 20:47:29+08:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,4 @@
+Script started on 2026-08-31 20:30:42+08:00 [COMMAND="make clean" <not executed on terminal>]
+rm -f build/vixc build/vixc-seed-gc build/vixc-bootstrap build/vixc-self build/vixc-self-lir build/vixc-seed.o build/helper.o runtime/runtime.o build/compiler_gc.o build/vixc-bootstrap.o build/vixc.o build/vixc-self.o build/vixc-self-lir.o build/api.o build/Llc.o build/Linker.o build/Passes.o test test.ll
+
+Script done on 2026-08-31 20:30:42+08:00 [COMMAND_EXIT_CODE="0"]

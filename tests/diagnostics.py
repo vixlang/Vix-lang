@@ -55,14 +55,14 @@ def main() -> int:
             ["error[E5001]", "note: moving a non-copy value", "help: use the value before it is moved"],
         ),
         (
-            "tests/macro_hygiene_error.vix",
+            "tests/mac_hyg_err.vix",
             [],
             ["error[E1106]", "note: captured names and deliberately unhygienic", "help: use `$capture(name)`"],
         ),
         (
-            "tests/macro_recursion_limit.vix",
+            "tests/mac_rec_limit.vix",
             [],
-            ["error[E1104]", "tests/macro_recursion_limit.vix:8:12", "note: expanded from macro `$loop`", "help: remove the recursive expansion"],
+            ["error[E1104]", "tests/mac_rec_limit.vix:8:12", "note: expanded from macro `$loop`", "help: remove the recursive expansion"],
         ),
     ]
 

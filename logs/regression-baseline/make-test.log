@@ -1,0 +1,17 @@
+rm -f vixc
+build/vixc tests/files/test20.vix -o test
+test
+./test >/dev/null
+build/vixc --check tests/cabi_struct_parse.vix
+build/vixc --check tests/cabi_struct_layout.vix
+build/vixc --check tests/cabi_nested_struct.vix
+build/vixc --ownership-check tests/ownership/life_return.vix
+build/vixc --ownership-check tests/lifetime_generic.vix
+python3 tests/diagnostics.py build/vixc
+ok   tests/diag_parse.vix
+ok   tests/diag_test.vix
+ok   tests/diag_warning.vix
+ok   tests/ownership/use_after_move.vix
+ok   tests/mac_hyg_err.vix
+ok   tests/mac_rec_limit.vix
+ok   diagnostic JSON note/help

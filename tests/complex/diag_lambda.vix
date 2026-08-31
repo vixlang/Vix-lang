@@ -1,0 +1,1 @@
+fn main(): i32 { let x = 1; let f = fn(y: i32): i32 => x + y; return f(1) }

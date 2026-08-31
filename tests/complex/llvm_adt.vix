@@ -1,0 +1,2 @@
+type R = A(i32) | B
+fn main(): i32 { let r = A(4); return match r { A(x) -> x - 4 B -> 1 } }

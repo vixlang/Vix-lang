@@ -1,0 +1,2 @@
+type Step = More(i32) | Done
+fn main(): i32 { let mut x = 0; let mut s: Step = More(3); while (x < 3) { s = match s { More(v) -> if (v == 1) Done else More(v - 1) Done -> Done }; x += 1 }; return match s { More(_) -> 1 Done -> 0 } }

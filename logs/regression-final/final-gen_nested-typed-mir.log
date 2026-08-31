@@ -1,0 +1,86 @@
+Script started on 2026-08-31 20:47:29+08:00 [COMMAND="build/vixc tests/complex/gen_nested.vix --debug=typed-mir" <not executed on terminal>]
+TypedAnalysisIR
+function 0 Boxed scope=0 entry=0 exits=[0] source=tests/complex/gen_nested.vix:1:1
+function 1 main scope=2 entry=1 exits=[2] source=tests/complex/gen_nested.vix:3:1
+function 2 id__Option_i32_ scope=4 entry=3 exits=[3] source=tests/complex/gen_nested.vix:2:1
+  scope 0 kind=function parent=none entry=0 exits=[0] locals=[0] source=tests/complex/gen_nested.vix:1:1
+  scope 1 kind=block parent=0 entry=0 exits=[0] locals=[] source=tests/complex/gen_nested.vix:1:1
+  scope 2 kind=function parent=none entry=1 exits=[2] locals=[] source=tests/complex/gen_nested.vix:3:1
+  scope 3 kind=block parent=2 entry=1 exits=[2] locals=[1] source=tests/complex/gen_nested.vix:1:1
+  scope 4 kind=function parent=none entry=3 exits=[3] locals=[3] source=tests/complex/gen_nested.vix:2:1
+  scope 5 kind=block parent=4 entry=3 exits=[3] locals=[] source=tests/complex/gen_nested.vix:1:1
+  block 0 function=0 scope=1 predecessors=[] successors=[] source=tests/complex/gen_nested.vix:1:1
+    instruction 0 kind=nop expr_id=32 stmt_id=10 value_id=0 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 0 expr_id=32 type=i32 place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 1 kind=copy expr_id=37 stmt_id=10 value_id=1 place_id=0 target=none action=Copy source=tests/complex/gen_nested.vix:1:1
+      typed value 1 expr_id=37 type=i32 place_id=0 source=tests/complex/gen_nested.vix:1:1
+      place 0 path=value type=i32 source=tests/complex/gen_nested.vix:1:1
+    instruction 2 kind=nop expr_id=34 stmt_id=10 value_id=2 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 2 expr_id=34 type=string place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 3 kind=nop expr_id=35 stmt_id=10 value_id=3 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 3 expr_id=35 type=i32 place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 4 kind=nop expr_id=36 stmt_id=10 value_id=4 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 4 expr_id=36 type=f64 place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 5 kind=nop expr_id=38 stmt_id=10 value_id=5 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 5 expr_id=38 type=Box place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 6 kind=return_value expr_id=38 stmt_id=10 value_id=5 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 5 expr_id=38 type=Box place_id=none source=tests/complex/gen_nested.vix:1:1
+  block 1 function=1 scope=3 predecessors=[] successors=[2] source=tests/complex/gen_nested.vix:3:48
+    instruction 7 kind=nop expr_id=39 stmt_id=12 value_id=6 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 6 expr_id=39 type=i32 place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 8 kind=nop expr_id=40 stmt_id=12 value_id=7 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 7 expr_id=40 type=i32 place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 9 kind=nop expr_id=41 stmt_id=12 value_id=8 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 8 expr_id=41 type=string place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 10 kind=nop expr_id=16 stmt_id=12 value_id=9 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:48
+      typed value 9 expr_id=16 type=i32 place_id=none source=tests/complex/gen_nested.vix:3:48
+    instruction 11 kind=nop expr_id=44 stmt_id=12 value_id=10 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:48
+      typed value 10 expr_id=44 type=Option[i32] place_id=none source=tests/complex/gen_nested.vix:3:48
+    instruction 12 kind=nop expr_id=43 stmt_id=12 value_id=11 place_id=none target=none action=none source=tests/complex/gen_nested.vix:1:1
+      typed value 11 expr_id=43 type=f64 place_id=none source=tests/complex/gen_nested.vix:1:1
+    instruction 13 kind=nop expr_id=45 stmt_id=12 value_id=12 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:48
+      typed value 12 expr_id=45 type=Box place_id=none source=tests/complex/gen_nested.vix:3:48
+    instruction 14 kind=assign expr_id=45 stmt_id=12 value_id=12 place_id=1 target=none action=none source=tests/complex/gen_nested.vix:3:48
+      typed value 12 expr_id=45 type=Box place_id=none source=tests/complex/gen_nested.vix:3:48
+      place 1 path=x type=Box:[Option[i32]] source=tests/complex/gen_nested.vix:3:48
+  block 2 function=1 scope=3 predecessors=[1] successors=[] source=tests/complex/gen_nested.vix:3:76
+    instruction 15 kind=use expr_id=19 stmt_id=13 value_id=13 place_id=1 target=none action=Move source=tests/complex/gen_nested.vix:1:1
+      typed value 13 expr_id=19 type=Box:[Option[i32]] place_id=1 source=tests/complex/gen_nested.vix:1:1
+      place 1 path=x type=Box:[Option[i32]] source=tests/complex/gen_nested.vix:3:48
+    instruction 16 kind=copy expr_id=22 stmt_id=13 value_id=14 place_id=2 target=none action=Copy source=tests/complex/gen_nested.vix:3:95
+      typed value 14 expr_id=22 type=Option[i32] place_id=2 source=tests/complex/gen_nested.vix:3:95
+      place 2 path=v type=Option[i32] source=tests/complex/gen_nested.vix:3:95
+    instruction 17 kind=call expr_id=52 stmt_id=13 value_id=15 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:95
+      typed value 15 expr_id=52 type=Option[i32] place_id=none source=tests/complex/gen_nested.vix:3:95
+    instruction 18 kind=nop expr_id=25 stmt_id=13 value_id=16 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:106
+      typed value 16 expr_id=25 type=i32 place_id=none source=tests/complex/gen_nested.vix:3:106
+    instruction 19 kind=nop expr_id=53 stmt_id=13 value_id=17 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:106
+      typed value 17 expr_id=53 type=Option[i32] place_id=none source=tests/complex/gen_nested.vix:3:106
+    instruction 20 kind=nop expr_id=54 stmt_id=13 value_id=18 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:95
+      typed value 18 expr_id=54 type=bool place_id=none source=tests/complex/gen_nested.vix:3:95
+    instruction 21 kind=nop expr_id=28 stmt_id=13 value_id=19 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:110
+      typed value 19 expr_id=28 type=i32 place_id=none source=tests/complex/gen_nested.vix:3:110
+    instruction 22 kind=nop expr_id=29 stmt_id=13 value_id=20 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:117
+      typed value 20 expr_id=29 type=i32 place_id=none source=tests/complex/gen_nested.vix:3:117
+    instruction 23 kind=nop expr_id=55 stmt_id=13 value_id=21 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:95
+      typed value 21 expr_id=55 type=unknown place_id=none source=tests/complex/gen_nested.vix:3:95
+    instruction 24 kind=nop expr_id=56 stmt_id=13 value_id=22 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:76
+      typed value 22 expr_id=56 type=unknown place_id=none source=tests/complex/gen_nested.vix:3:76
+    instruction 25 kind=return_value expr_id=56 stmt_id=13 value_id=22 place_id=none target=none action=none source=tests/complex/gen_nested.vix:3:76
+      typed value 22 expr_id=56 type=unknown place_id=none source=tests/complex/gen_nested.vix:3:76
+  block 3 function=2 scope=5 predecessors=[] successors=[] source=tests/complex/gen_nested.vix:2:29
+    instruction 26 kind=copy expr_id=23 stmt_id=15 value_id=23 place_id=3 target=none action=Copy source=tests/complex/gen_nested.vix:2:29
+      typed value 23 expr_id=23 type=Option[i32] place_id=3 source=tests/complex/gen_nested.vix:2:29
+      place 3 path=x type=Option[i32] source=tests/complex/gen_nested.vix:2:1
+    instruction 27 kind=return_value expr_id=23 stmt_id=15 value_id=23 place_id=3 target=none action=Copy source=tests/complex/gen_nested.vix:2:29
+      typed value 23 expr_id=23 type=Option[i32] place_id=3 source=tests/complex/gen_nested.vix:2:29
+      place 3 path=x type=Option[i32] source=tests/complex/gen_nested.vix:2:1
+OwnershipFacts
+  block borrow block_id=0 active_sources=[]
+  block borrow block_id=1 active_sources=[]
+  block borrow block_id=2 active_sources=[]
+  block borrow block_id=3 active_sources=[]
+  drop scope=3 stmt_id=13 return_expr=56 block=2 place_id=1 type=Box:[Option[i32]] reason=return_exit source=tests/complex/gen_nested.vix:3:76
+
+
+Script done on 2026-08-31 20:47:29+08:00 [COMMAND_EXIT_CODE="0"]

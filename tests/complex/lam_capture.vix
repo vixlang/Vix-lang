@@ -1,0 +1,1 @@
+fn main(): i32 { let a = 2; let b = 3; let f = fn [a, b](x: i32): i32 => x + a + b; return f(0) - 5 }

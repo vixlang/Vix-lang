@@ -1,0 +1,2 @@
+type R = V(i32) | N
+fn main(): i32 { let f = fn(x: R): i32 => match x { V(v) -> v N -> 0 }; return f(V(5)) - 5 }

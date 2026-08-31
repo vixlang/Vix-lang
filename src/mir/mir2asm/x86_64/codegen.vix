@@ -1137,10 +1137,12 @@ pub fn mir2asm_emit_syscall(b: &MirAsm, dest: string, rhs: string)
 
 pub fn mir2asm_emit_call(b: &MirAsm, dest: string, rhs: string)
 {
-    let at = mir2asm_find(rhs, '@', 0)
-    let lp = mir2asm_find(rhs, '(', at)
-    if (at < 0 or lp < 0) { return }
-    let func = mir2asm_clean_name(mir2asm_slice(rhs, at, lp))
+    let indirect = mir2asm_starts_with(rhs, "call_indirect ")
+    let target_start = if (indirect == 1) { 14 } else { mir2asm_find(rhs, '@', 0) }
+    let lp = mir2asm_find(rhs, '(', target_start)
+    if (target_start < 0 or lp < 0) { return }
+    let raw_func = mir2asm_trim(mir2asm_slice(rhs, target_start, lp))
+    let func = if (indirect == 1) { raw_func } else { mir2asm_clean_name(raw_func) }
     if (func == "syscall")
     {
         mir2asm_emit_syscall(b, dest, rhs)
@@ -1237,7 +1239,8 @@ pub fn mir2asm_emit_call(b: &MirAsm, dest: string, rhs: string)
         pos = end + 1
     }
     mir2asm_line(b, "    mov al, " + i32_to_str(float_arg))
-    mir2asm_line(b, "    call " + func)
+    if (indirect == 1) { mir2asm_line(b, "    call " + mir2asm_operand_typed(b, func, "ptr")) }
+    else { mir2asm_line(b, "    call " + func) }
     if (stack_bytes > 0) { mir2asm_line(b, "    add rsp, " + i32_to_str(stack_bytes)) }
     if (dest != "" and sret == 0)
     {
@@ -1404,7 +1407,7 @@ pub fn mir2asm_emit_instruction(b: &MirAsm, line: string)
         }
         return
     }
-    if (mir2asm_starts_with(line, "call ") == 1)
+    if (mir2asm_starts_with(line, "call ") == 1 or mir2asm_starts_with(line, "call_indirect ") == 1)
     {
         mir2asm_emit_call(b, "", line)
         return
@@ -1505,7 +1508,15 @@ pub fn mir2asm_emit_instruction(b: &MirAsm, line: string)
     if (mir2asm_starts_with(rhs, "fcmp ") == 1) { mir2asm_emit_fcmp(b, dest, rhs); return }
     if (mir2asm_starts_with(rhs, "zext ") == 1 or mir2asm_starts_with(rhs, "trunc ") == 1 or mir2asm_starts_with(rhs, "sitofp ") == 1 or mir2asm_starts_with(rhs, "fpext ") == 1 or mir2asm_starts_with(rhs, "sext ") == 1 or mir2asm_starts_with(rhs, "fptrunc ") == 1 or mir2asm_starts_with(rhs, "fptoui ") == 1 or mir2asm_starts_with(rhs, "fptosi ") == 1 or mir2asm_starts_with(rhs, "uitofp ") == 1 or mir2asm_starts_with(rhs, "ptrtoint ") == 1 or mir2asm_starts_with(rhs, "inttoptr ") == 1 or mir2asm_starts_with(rhs, "bitcast ") == 1) { mir2asm_emit_cast(b, dest, rhs); return }
     if (mir2asm_starts_with(rhs, "gep ") == 1) { mir2asm_emit_gep(b, dest, rhs); return }
-    if (mir2asm_starts_with(rhs, "call ") == 1) { mir2asm_emit_call(b, dest, rhs); return }
+    if (mir2asm_starts_with(rhs, "call ") == 1 or mir2asm_starts_with(rhs, "call_indirect ") == 1) { mir2asm_emit_call(b, dest, rhs); return }
+    if (mir2asm_starts_with(rhs, "global_addr @") == 1)
+    {
+        let name = mir2asm_clean_name(mir2asm_trim(mir2asm_after(rhs, 12)))
+        let dest_off = mir2asm_alloc_slot_typed(b, dest, 0, "ptr")
+        mir2asm_line(b, "    lea rax, [rel " + name + "]")
+        mir2asm_line(b, "    mov qword " + mir2asm_mem(dest_off) + ", rax")
+        return
+    }
     if (mir2asm_starts_with(rhs, "insertvalue ") == 1) { mir2asm_emit_insertvalue(b, dest, rhs); return }
     if (mir2asm_starts_with(rhs, "extractvalue ") == 1) { mir2asm_emit_extractvalue(b, dest, rhs); return }
     if (mir2asm_starts_with(rhs, "const ptr \"") == 1)

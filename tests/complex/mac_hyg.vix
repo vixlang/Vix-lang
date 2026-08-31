@@ -1,0 +1,2 @@
+macro $make(value: expr) { let tmp = $value print(tmp) }
+fn main(): i32 { let tmp = 4; $make(5); return tmp - 4 }

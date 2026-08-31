@@ -1,0 +1,71 @@
+Vix compiler repair exit-code manifest
+Date: 2026-08-31 Asia/Shanghai
+
+Baseline evidence (preserved under logs/regression-baseline):
+complex llvm = 0 (52/52)
+complex self = 1 (42/52; 10 failures)
+complex self-lir = 1 (42/52; 10 failures)
+lam_bug self compile = 1
+isolated pure-HEAD self-stage/self-lir-stage comparison = 1
+  self-lir first error: undefined local SSA operand %path_addr
+  self first error class: unresolved lambda symbols / NASM label changes
+
+Final build and bootstrap:
+make clean = 0
+make -j2 all = 0
+make -j2 self-stage self-lir-stage = 0
+seed compiler --version = 0
+bootstrap compiler --version = 0
+final build/vixc --version = 0
+self-stage compiler --version = 0
+self-lir-stage compiler --version = 0
+
+Final complex regression (strictly sequential):
+make complex-test = 0 (52/52 LLVM)
+complex llvm = 0 (52/52)
+complex self = 0 (52/52)
+complex self-lir = 0 (52/52)
+
+Required regression commands:
+make -j2 all = 0
+make test = 0
+make ownership-test = 0 (15 accepted, 17 rejected)
+make diagnostic-test = 0
+make pytest = 0 (external ../tests/vixc0_tests absent; repository fallback passed)
+python3 tests/run.py --compiler build/vixc = 0 (436 passed)
+python3 tests/smoke.py = 0 (420 self plus 400 dedicated large macro cases)
+python3 tests/fuzz.py --cases 200 = 0
+python3 tests/stree.py --cases 30 = 0
+python3 tests/boot16.py = 0
+
+Resource and large-input checks:
+build/vixc tests/files/test129.vix --check = 0
+prlimit --stack=536870912 build/vixc tests/files/test129.vix --check = 0
+build/vixc tests/files/test250.vix --check = 0
+build/vixc tests/files/test400.vix --check = 0
+build/vixc tests/files/macro_test001.vix --check = 0
+build/vixc tests/files/macro_test200.vix --check = 0
+build/vixc tests/files/macro_test400.vix --check = 0
+
+Post-fix evidence dumps:
+lam_bug AST / typed MIR / MIR / LIR / ASM = 0 / 0 / 0 / 0 / 0
+adt_nested AST / typed MIR / MIR / LIR / ASM = 0 / 0 / 0 / 0 / 0
+gen_nested AST / typed MIR / MIR / LIR / ASM = 0 / 0 / 0 / 0 / 0
+
+Additional transparent checks outside the required acceptance matrix:
+build/vixc-self tests/complex/adt_nested.vix --check = 1
+build/vixc-self-lir tests/complex/adt_nested.vix --check = 1
+error: TypedAnalysisIR span has invalid source coordinates
+The pure-HEAD comparison could not reach this check because both baseline self stages fail earlier.
+
+Discarded concurrent matrix attempt (preserved, not counted as compiler results):
+concurrent complex llvm = 1 (shared tests/bin temporary-output collision)
+concurrent complex self = 1 (shared tests/bin temporary-output collision)
+concurrent complex self-lir = 0
+
+Final abnormal-termination counts in required tests:
+timeouts = 0
+SIGSEGV/SIGABRT/SIGBUS = 0
+invalid LLVM IR = 0
+invalid NASM = 0
+silent skips added by this repair = 0

@@ -1,0 +1,42 @@
+Script started on 2026-08-31 20:47:28+08:00 [COMMAND="build/vixc tests/complex/lam_bug.vix --debug=typed-mir" <not executed on terminal>]
+TypedAnalysisIR
+function 0 main scope=0 entry=0 exits=[1] source=tests/complex/lam_bug.vix:1:1
+function 1 __lambda_main_0 scope=2 entry=2 exits=[2] source=tests/complex/lam_bug.vix:1:26
+  scope 0 kind=function parent=none entry=0 exits=[1] locals=[] source=tests/complex/lam_bug.vix:1:1
+  scope 1 kind=block parent=0 entry=0 exits=[1] locals=[0] source=tests/complex/lam_bug.vix:1:16
+  scope 2 kind=function parent=none entry=2 exits=[2] locals=[1] source=tests/complex/lam_bug.vix:1:26
+  block 0 function=0 scope=1 predecessors=[] successors=[1] source=tests/complex/lam_bug.vix:1:22
+    instruction 0 kind=nop expr_id=3 stmt_id=1 value_id=0 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:26
+      typed value 0 expr_id=3 type=fn place_id=none source=tests/complex/lam_bug.vix:1:26
+    instruction 1 kind=assign expr_id=3 stmt_id=1 value_id=0 place_id=0 target=none action=none source=tests/complex/lam_bug.vix:1:22
+      typed value 0 expr_id=3 type=fn place_id=none source=tests/complex/lam_bug.vix:1:26
+      place 0 path=f type=fn source=tests/complex/lam_bug.vix:1:22
+  block 1 function=0 scope=1 predecessors=[0] successors=[] source=tests/complex/lam_bug.vix:1:52
+    instruction 2 kind=nop expr_id=4 stmt_id=2 value_id=1 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:61
+      typed value 1 expr_id=4 type=i32 place_id=none source=tests/complex/lam_bug.vix:1:61
+    instruction 3 kind=call expr_id=5 stmt_id=2 value_id=2 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:59
+      typed value 2 expr_id=5 type=unknown place_id=none source=tests/complex/lam_bug.vix:1:59
+    instruction 4 kind=nop expr_id=6 stmt_id=2 value_id=3 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:66
+      typed value 3 expr_id=6 type=i32 place_id=none source=tests/complex/lam_bug.vix:1:66
+    instruction 5 kind=nop expr_id=7 stmt_id=2 value_id=4 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:64
+      typed value 4 expr_id=7 type=unknown place_id=none source=tests/complex/lam_bug.vix:1:64
+    instruction 6 kind=return_value expr_id=7 stmt_id=2 value_id=4 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:52
+      typed value 4 expr_id=7 type=unknown place_id=none source=tests/complex/lam_bug.vix:1:64
+  block 2 function=1 scope=2 predecessors=[] successors=[] source=tests/complex/lam_bug.vix:1:47
+    instruction 7 kind=copy expr_id=0 stmt_id=0 value_id=5 place_id=1 target=none action=Copy source=tests/complex/lam_bug.vix:1:45
+      typed value 5 expr_id=0 type=i32 place_id=1 source=tests/complex/lam_bug.vix:1:45
+      place 1 path=x type=i32 source=tests/complex/lam_bug.vix:1:26
+    instruction 8 kind=nop expr_id=1 stmt_id=0 value_id=6 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:49
+      typed value 6 expr_id=1 type=i32 place_id=none source=tests/complex/lam_bug.vix:1:49
+    instruction 9 kind=nop expr_id=2 stmt_id=0 value_id=7 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:47
+      typed value 7 expr_id=2 type=i32 place_id=none source=tests/complex/lam_bug.vix:1:47
+    instruction 10 kind=return_value expr_id=2 stmt_id=0 value_id=7 place_id=none target=none action=none source=tests/complex/lam_bug.vix:1:47
+      typed value 7 expr_id=2 type=i32 place_id=none source=tests/complex/lam_bug.vix:1:47
+OwnershipFacts
+  block borrow block_id=0 active_sources=[]
+  block borrow block_id=1 active_sources=[]
+  block borrow block_id=2 active_sources=[]
+  drop scope=1 stmt_id=2 return_expr=7 block=1 place_id=0 type=fn reason=return_exit source=tests/complex/lam_bug.vix:1:52
+
+
+Script done on 2026-08-31 20:47:28+08:00 [COMMAND_EXIT_CODE="0"]

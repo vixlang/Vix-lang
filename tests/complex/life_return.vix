@@ -1,0 +1,2 @@
+fn keep(x: &i32): &i32 { return x }
+fn main(): i32 { let x = 3; return @keep(&x) - 3 }

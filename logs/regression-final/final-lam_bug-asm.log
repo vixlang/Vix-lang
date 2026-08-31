@@ -1,0 +1,133 @@
+Script started on 2026-08-31 20:47:28+08:00 [COMMAND="build/vixc tests/complex/lam_bug.vix --backend=self --debug=asm" <not executed on terminal>]
+default rel
+section .text
+    ; MIR: mir_module vixc0 { (line 1)
+    ; MIR: extern_vararg fn @printf(ptr): i32 (line 2)
+extern printf
+    ; MIR: extern fn @calloc(usize, usize): ptr (line 3)
+extern calloc
+    ; MIR: extern fn @strcmp(ptr, ptr): i32 (line 4)
+extern strcmp
+    ; MIR: extern fn @strlen(ptr): i32 (line 5)
+extern strlen
+    ; MIR: extern fn @vix_array_len(ptr): i32 (line 6)
+extern vix_array_len
+    ; MIR: extern fn @vix_array_push_i32(ptr, i32): ptr (line 7)
+extern vix_array_push_i32
+    ; MIR: extern fn @vix_array_push_ptr(ptr, ptr): ptr (line 8)
+extern vix_array_push_ptr
+    ; MIR: extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr (line 9)
+extern vix_array_push_bytes
+    ; MIR: extern fn @vix_array_slice_bytes(ptr, i32, i32, usize): ptr (line 10)
+extern vix_array_slice_bytes
+    ; MIR: extern fn @vix_safe_sdiv_i32(i32, i32): i32 (line 11)
+extern vix_safe_sdiv_i32
+    ; MIR: extern fn @vix_safe_srem_i32(i32, i32): i32 (line 12)
+extern vix_safe_srem_i32
+    ; MIR: extern fn @vix_string_concat(ptr, ptr): ptr (line 13)
+extern vix_string_concat
+    ; MIR: extern fn @vix_string_slice(ptr, i32, i32): ptr (line 14)
+extern vix_string_slice
+    ; MIR: } (line 47)
+    ; MIR: fn @main(): i32 { (line 16)
+global main
+main:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 96
+    ; MIR: block %entry: (line 16)
+    ; MIR: %f_addr = alloca ptr (line 19)
+    ; MIR: %t0 = call @calloc(usize 1, usize 8): ptr (line 20)
+    mov rdi, 1
+    mov rsi, 8
+    mov al, 0
+    call calloc
+    mov qword [rbp-16], rax
+    ; MIR: %t1 = call @calloc(usize 2, usize 8): ptr (line 21)
+    mov rdi, 2
+    mov rsi, 8
+    mov al, 0
+    call calloc
+    mov qword [rbp-24], rax
+    ; MIR: %t2 = global_addr @__lambda_main_0 (line 22)
+    lea rax, [rel __lambda_main_0]
+    mov qword [rbp-32], rax
+    ; MIR: store ptr %t2, %t1 (line 23)
+    mov rax, qword [rbp-32]
+    mov r11, qword [rbp-24]
+    mov qword [r11], rax
+    ; MIR: %t3 = gep i8, %t1, [8] (line 24)
+    mov rax, qword [rbp-24]
+    mov ecx, 8
+    add rax, rcx
+    mov qword [rbp-40], rax
+    ; MIR: store ptr %t0, %t3 (line 25)
+    mov rax, qword [rbp-16]
+    mov r11, qword [rbp-40]
+    mov qword [r11], rax
+    ; MIR: store ptr %t1, %f_addr (line 26)
+    mov rax, qword [rbp-24]
+    mov qword [rbp-8], rax
+    ; MIR: %t4 = load ptr, %f_addr (line 27)
+    mov rax, qword [rbp-8]
+    mov qword [rbp-48], rax
+    ; MIR: %t5 = load ptr, %t4 (line 28)
+    mov rax, qword [rbp-48]
+    mov rax, qword [rax]
+    mov qword [rbp-56], rax
+    ; MIR: %t6 = gep i8, %t4, [8] (line 29)
+    mov rax, qword [rbp-48]
+    mov ecx, 8
+    add rax, rcx
+    mov qword [rbp-64], rax
+    ; MIR: %t7 = load ptr, %t6 (line 30)
+    mov rax, qword [rbp-64]
+    mov rax, qword [rax]
+    mov qword [rbp-72], rax
+    ; MIR: %t8 = call_indirect %t5(ptr %t7, i32 3): i32 (line 31)
+    mov rdi, qword [rbp-72]
+    mov esi, 3
+    mov al, 0
+    call qword [rbp-56]
+    mov dword [rbp-80], eax
+    ; MIR: %t9 = sub i32 %t8, 5 (line 32)
+    mov eax, dword [rbp-80]
+    sub eax, 5
+    mov dword [rbp-88], eax
+    ; MIR: ret i32 %t9 (line 33)
+    mov eax, dword [rbp-88]
+    jmp main__return
+main__return:
+    mov rsp, rbp
+    pop rbp
+    ret
+    ; MIR: fn @__lambda_main_0(%__lambda_env: ptr, %x: i32): i32 { (line 37)
+global __lambda_main_0
+__lambda_main_0:
+    push rbp
+    mov rbp, rsp
+    sub rsp, 48
+    mov qword [rbp-8], rdi
+    mov dword [rbp-16], esi
+    ; MIR: block %entry: (line 37)
+    ; MIR: %x_addr = alloca i32 (line 40)
+    ; MIR: store i32 %x, %x_addr (line 41)
+    mov eax, dword [rbp-16]
+    mov dword [rbp-24], eax
+    ; MIR: %t0 = load i32, %x_addr (line 42)
+    mov eax, dword [rbp-24]
+    mov dword [rbp-32], eax
+    ; MIR: %t1 = add i32 %t0, 2 (line 43)
+    mov eax, dword [rbp-32]
+    add eax, 2
+    mov dword [rbp-40], eax
+    ; MIR: ret i32 %t1 (line 44)
+    mov eax, dword [rbp-40]
+    jmp __lambda_main_0__return
+__lambda_main_0__return:
+    mov rsp, rbp
+    pop rbp
+    ret
+
+
+Script done on 2026-08-31 20:47:28+08:00 [COMMAND_EXIT_CODE="0"]

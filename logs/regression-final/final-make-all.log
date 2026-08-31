@@ -1,0 +1,19 @@
+Script started on 2026-08-31 20:30:49+08:00 [COMMAND="make -j2 all" <not executed on terminal>]
+clang -c seed/vixc.ll -o build/vixc-seed.o
+clang  -c src/helper.c -o build/helper.o -I/usr/lib/llvm-21/include  -D_GNU_SOURCE -DEXPERIMENTAL_KEY_INSTRUCTIONS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wno-deprecated-declarations
+clang  -c src/runtime.c -o runtime/runtime.o
+clang  -c lib/api.c -o build/api.o
+g++ -c lib/llvm/Llc.cpp -o build/Llc.o -I/usr/lib/llvm-21/include -std=c++17   -fno-exceptions -funwind-tables -D_GNU_SOURCE -DEXPERIMENTAL_KEY_INSTRUCTIONS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wno-deprecated-declarations
+g++ -c lib/llvm/Linker.cpp -o build/Linker.o -I/usr/lib/llvm-21/include -std=c++17   -fno-exceptions -funwind-tables -D_GNU_SOURCE -DEXPERIMENTAL_KEY_INSTRUCTIONS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wno-deprecated-declarations
+g++ -c lib/llvm/Passes.cpp -o build/Passes.o -I/usr/lib/llvm-21/include -std=c++17   -fno-exceptions -funwind-tables -D_GNU_SOURCE -DEXPERIMENTAL_KEY_INSTRUCTIONS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wno-deprecated-declarations
+clang  -c src/compiler_gc.c -o build/compiler_gc.o
+g++ -fuse-ld=lld -o build/vixc-seed-gc build/vixc-seed.o build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o -L/usr/lib/llvm-21/lib  -lLLVM-21 -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free -lgc -lpthread -ldl -llldELF -llldCommon -lz -lzstd
+nice -n 10 prlimit --as=1610612736 --stack=536870912 build/vixc-seed-gc src/main.vix -obj -o build/vixc-bootstrap.o
+build/vixc-bootstrap.o
+g++ -fuse-ld=lld -o build/vixc-bootstrap build/vixc-bootstrap.o build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o -L/usr/lib/llvm-21/lib  -lLLVM-21 -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free -lgc -lpthread -ldl -llldELF -llldCommon -lz -lzstd
+nice -n 10 prlimit --as=1610612736 --stack=536870912 build/vixc-bootstrap src/main.vix -obj -o build/vixc.o
+build/vixc.o
+g++ -fuse-ld=lld -o build/vixc build/vixc.o build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o -L/usr/lib/llvm-21/lib  -lLLVM-21 -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free -lgc -lpthread -ldl -llldELF -llldCommon -lz -lzstd
+rm -f vixc
+
+Script done on 2026-08-31 20:34:48+08:00 [COMMAND_EXIT_CODE="0"]

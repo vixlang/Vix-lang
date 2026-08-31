@@ -1,0 +1,12 @@
+Script started on 2026-08-31 20:43:35+08:00 [COMMAND="make diagnostic-test" <not executed on terminal>]
+rm -f vixc
+python3 tests/diagnostics.py build/vixc
+ok   tests/diag_parse.vix
+ok   tests/diag_test.vix
+ok   tests/diag_warning.vix
+ok   tests/ownership/use_after_move.vix
+ok   tests/mac_hyg_err.vix
+ok   tests/mac_rec_limit.vix
+ok   diagnostic JSON note/help
+
+Script done on 2026-08-31 20:43:35+08:00 [COMMAND_EXIT_CODE="0"]

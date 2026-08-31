@@ -1,0 +1,2 @@
+type R = A(i32)
+fn main(): i32 { let r: R = A(1); return match r { A(x) -> "bad" } }

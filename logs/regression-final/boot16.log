@@ -1,0 +1,3 @@
+ok   boot16 size=512 signature=55aa
+/home/zty/Vix-lang/tests/boot16.bin: DOS/MBR boot sector
+000001fe: 55aa                                     U.

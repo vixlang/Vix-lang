@@ -1,0 +1,3 @@
+type Box:[T] = Boxed(T)
+fn id:[T](x: T): T { return x }
+fn main(): i32 { let x: Box[?i32] = Boxed(Some(8)); return match x { Boxed(v) -> if (id[?i32](v) == Some(8)) 0 else 1 } }

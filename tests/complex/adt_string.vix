@@ -1,0 +1,3 @@
+type K = A | B
+fn name(k: K): string { return match k { A -> "a" B -> "b" } }
+fn main(): i32 { return if (name(A) == "a" and name(B) == "b") 0 else 1 }

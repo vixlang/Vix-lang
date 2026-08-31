@@ -1,0 +1,2 @@
+macro $twice(value: expr) { $value + $value }
+fn main(): i32 { return $twice(2) - 4 }

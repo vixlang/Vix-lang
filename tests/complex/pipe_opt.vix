@@ -1,0 +1,2 @@
+fn unwrap:[T](x: ?T): T { return match x { Some(v) -> v None -> 0 } }
+fn main(): i32 { return (Some(6) |> unwrap[i32]) - 6 }

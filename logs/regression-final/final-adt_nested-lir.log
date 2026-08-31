@@ -1,0 +1,18 @@
+Script started on 2026-08-31 20:47:28+08:00 [COMMAND="build/vixc tests/complex/adt_nested.vix --debug=lir" <not executed on terminal>]
+machine_lir {
+  fn @Good frame=224 {
+    vreg %t5: ptr [7,8] -> r12
+  }
+  fn @Bad frame=208 {
+  }
+  fn @main frame=448 {
+    vreg %t15: ptr [18,43] -> r12
+    vreg %t22: i32 [32,33] -> r13
+    vreg %t24: i32 [39,40] -> r13
+    vreg %t26: i32 [48,49] -> r12
+    vreg %t29: i32 [58,59] -> r12
+  }
+}
+
+
+Script done on 2026-08-31 20:47:28+08:00 [COMMAND_EXIT_CODE="0"]

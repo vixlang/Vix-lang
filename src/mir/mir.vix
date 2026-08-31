@@ -49,6 +49,10 @@ pub fn mir_type(ty: string): string
 	    {
 		return "ptr"
 	    }
+            if (type_text_is_function(ty) == 1)
+	    {
+		return "ptr"
+	    }
             if (mir_type_is_option_text(ty) == 1)
 	    {
 		return "ptr"
@@ -69,7 +73,7 @@ pub fn mir_zero_value(ty: string): string
         "f32" | "f64" -> "0.0"
         "ptr" | "string" -> "null"
         _ -> {
-            if (is_ptr_to_struct(ty) == 1 or type_text_is_ref_to_ptr(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1)
+            if (is_ptr_to_struct(ty) == 1 or type_text_is_ref_to_ptr(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1 or type_text_is_function(ty) == 1)
 	    {
 	        return "null"
             }
@@ -199,7 +203,22 @@ pub fn mir_expr_type(es: &ExprStore, expr: AstExpr): string
             if (expr.text == "+" and (left_ty == "string" or left_ty == "ptr") and (right_ty == "string" or right_ty == "ptr")) { return "string" }
             type_numeric_result(left_ty, right_ty)
         }
-        "call" -> if (expr.text == "clone" and expr.args.length == 1) { mir_expr_type(es, expr_store_get(es, expr.args[0])) } else { get_function_return_type(expr.text) }
+        "lambda" -> {
+            let mut out = "fn("
+            for (i in 0 .. expr.type_args.length)
+            {
+                if (i > 0) { out = out + ", " }
+                out = out + expr.type_args[i]
+            }
+            out + "): " + expr.option_value
+        }
+        "call" -> {
+            if (expr.text == "clone" and expr.args.length == 1) { return mir_expr_type(es, expr_store_get(es, expr.args[0])) }
+            if (expr.left_idx >= 0) { return type_function_return(mir_expr_type(es, expr_store_get(es, expr.left_idx))) }
+            let local_ty = mir_get_local_ty(expr.text)
+            if (type_text_is_function(local_ty) == 1) { return type_function_return(local_ty) }
+            get_function_return_type(expr.text)
+        }
         "array_literal" -> {
             if (expr.args.length == 0) { return "[i32]" }
             return "[" + mir_expr_type(es, expr_store_get(es, expr.args[0])) + "]"
@@ -281,8 +300,82 @@ pub fn mir_truthy(b: &MirBuilder, value: MirValue): MirValue
 
 pub fn mir_type_is_pointer_like(ty: string): i32
 {
-    if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1) { return 1 }
+    if (ty == "ptr" or ty == "string" or is_ptr_to_struct(ty) == 1 or type_text_is_array(ty) == 1 or mir_type_is_option_text(ty) == 1 or type_text_is_function(ty) == 1) { return 1 }
     return 0
+}
+
+pub fn mir_is_lambda_name(name: string): i32
+{
+    if (name.length < 9) { return 0 }
+    if (compiler_string_byte(name, 0) == '_' and compiler_string_byte(name, 1) == '_' and compiler_string_byte(name, 2) == 'l' and compiler_string_byte(name, 3) == 'a' and compiler_string_byte(name, 4) == 'm' and compiler_string_byte(name, 5) == 'b' and compiler_string_byte(name, 6) == 'd' and compiler_string_byte(name, 7) == 'a' and compiler_string_byte(name, 8) == '_') { return 1 }
+    return 0
+}
+
+pub fn mir_lambda_expr_for_name(es: &ExprStore, name: string): AstExpr
+{
+    for (i in 0 .. es.exprs.length)
+    {
+        if (es.exprs[i].tag == "lambda" and es.exprs[i].text == name) { return es.exprs[i] }
+    }
+    return es.exprs[0]
+}
+
+pub fn mir_emit_closure(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr): MirValue
+{
+    // Function values share the LLVM backend ABI: two pointer-sized fields,
+    // code followed by an independently allocated capture environment.
+    let env_count = if (expr.capture_names.length > 0) { expr.capture_names.length } else { 1 }
+    let env = mir_temp(b)
+    mir_inst(b, env + " = call @calloc(usize " + mir_i32(env_count) + ", usize 8): ptr")
+    let mut capture_types: [string] = []
+    for (i in 0 .. expr.capture_names.length)
+    {
+        let capture_ty = mir_get_local_ty(expr.capture_names[i])
+        capture_types.push(capture_ty)
+        let capture = mir_expr_value_typed(b, es, store, AstExpr{ tag: "ident", text: expr.capture_names[i], int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", capture_names: [], line: 0, col: 0 }, capture_ty)
+        let slot = mir_temp(b)
+        mir_inst(b, slot + " = gep i8, " + env + ", [" + mir_i32(i * 8) + "]")
+        mir_inst(b, "store " + mir_type(capture_ty) + " " + capture.name + ", " + slot)
+    }
+    register_function_sig("__mir_capture_types_" + expr.text, "void", capture_types)
+    let closure = mir_temp(b)
+    mir_inst(b, closure + " = call @calloc(usize 2, usize 8): ptr")
+    let code = mir_temp(b)
+    mir_inst(b, code + " = global_addr @" + expr.text)
+    mir_inst(b, "store ptr " + code + ", " + closure)
+    let env_slot = mir_temp(b)
+    mir_inst(b, env_slot + " = gep i8, " + closure + ", [8]")
+    mir_inst(b, "store ptr " + env + ", " + env_slot)
+    return MirValue{ name: closure, ty: mir_expr_type(es, expr) }
+}
+
+pub fn mir_emit_closure_call(b: &MirBuilder, es: &ExprStore, store: &StmtStore, callee_expr: AstExpr, args: [i32], expected_ty: string): MirValue
+{
+    let callee_ty = mir_expr_type(es, callee_expr)
+    let ret_ty = type_function_return(callee_ty)
+    let param_types = type_function_params(callee_ty)
+    let closure = mir_expr_value_typed(b, es, store, callee_expr, callee_ty)
+    let code = mir_temp(b)
+    mir_inst(b, code + " = load ptr, " + closure.name)
+    let env_slot = mir_temp(b)
+    mir_inst(b, env_slot + " = gep i8, " + closure.name + ", [8]")
+    let env = mir_temp(b)
+    mir_inst(b, env + " = load ptr, " + env_slot)
+    let mut args_text = "ptr " + env
+    for (i in 0 .. args.length)
+    {
+        let arg_ty = if (i < param_types.length) { param_types[i] } else { mir_expr_type(es, expr_store_get(es, args[i])) }
+        let val = mir_expr_value_typed(b, es, store, expr_store_get(es, args[i]), arg_ty)
+        args_text = args_text + ", " + mir_type(arg_ty) + " " + val.name
+    }
+    if (ret_ty == "void")
+    {
+        mir_inst(b, "call_indirect " + code + "(" + args_text + "): void")
+        return MirValue{ name: "0", ty: "i32" }
+    }
+    let out = mir_temp(b)
+    mir_inst(b, out + " = call_indirect " + code + "(" + args_text + "): " + mir_type(ret_ty))
+    return mir_cast_if_needed(b, MirValue{ name: out, ty: ret_ty }, expected_ty)
 }
 
 pub fn mir_array_element_type(es: &ExprStore, expr: AstExpr, expected_ty: string): string
@@ -334,6 +427,10 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
         let out = mir_temp(b)
         mir_inst(b, out + " = const ptr \"" + mir_escape_string(expr.text) + "\"")
         return MirValue{ name: out, ty: "string" }
+    }
+    if (expr.tag == "lambda")
+    {
+        return mir_emit_closure(b, es, store, expr)
     }
     if (expr.tag == "ident")
     {
@@ -477,6 +574,16 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
             let cloned_ty = mir_expr_type(es, cloned_expr)
             return mir_expr_value_typed(b, es, store, cloned_expr, if (expected_ty == "" or expected_ty == "unknown") { cloned_ty } else { expected_ty })
         }
+        if (expr.left_idx >= 0)
+        {
+            return mir_emit_closure_call(b, es, store, expr_store_get(es, expr.left_idx), expr.args, expected_ty)
+        }
+        let local_callee_ty = mir_get_local_ty(expr.text)
+        if (type_text_is_function(local_callee_ty) == 1)
+        {
+            let local_callee = AstExpr{ tag: "ident", text: expr.text, int_value: 0, float_value: 0.0, left_idx: -1, right_idx: -1, args: [], field_names: [], type_args: [], option_has_value: 0, option_value: "", capture_names: [], line: expr.line, col: expr.col }
+            return mir_emit_closure_call(b, es, store, local_callee, expr.args, expected_ty)
+        }
         let ret_ty = get_function_return_type(expr.text)
         let mut args_text = ""
         for (i in 0 .. expr.args.length)
@@ -509,8 +616,16 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
             {
                 return MirValue{ name: value.name, ty: "ptr" }
             }
+            let widened = mir_temp(b)
+            if (value_ty == "i64" or value_ty == "u64" or value_ty == "usize") { mir_inst(b, widened + " = add i64 " + value.name + ", 1") }
+            else
+            {
+                let as_i64 = mir_temp(b)
+                mir_inst(b, as_i64 + " = zext " + mir_type(value_ty) + " " + value.name + " to i64")
+                mir_inst(b, widened + " = add i64 " + as_i64 + ", 1")
+            }
             let out = mir_temp(b)
-            mir_inst(b, out + " = add " + mir_type(value_ty) + " " + value.name + ", 1")
+            mir_inst(b, out + " = inttoptr i64 " + widened + " to ptr")
             return MirValue{ name: out, ty: "ptr" }
         }
         let out = mir_temp(b)
@@ -1075,8 +1190,16 @@ pub fn mir_bind_option_pattern(b: &MirBuilder, es: &ExprStore, subject: MirValue
     let mut bind_val = subject.name
     if (inner_ty != "ptr" and inner_ty != "string" and type_text_is_array(inner_ty) == 0 and is_ptr_to_struct(inner_ty) == 0)
     {
+        let encoded = mir_temp(b)
+        mir_inst(b, encoded + " = ptrtoint ptr " + subject.name + " to i64")
         bind_val = mir_temp(b)
-        mir_inst(b, bind_val + " = sub " + mir_type(inner_ty) + " " + subject.name + ", 1")
+        mir_inst(b, bind_val + " = sub i64 " + encoded + ", 1")
+        if (inner_ty != "i64" and inner_ty != "u64" and inner_ty != "usize")
+        {
+            let narrowed = mir_temp(b)
+            mir_inst(b, narrowed + " = trunc i64 " + bind_val + " to " + mir_type(inner_ty))
+            bind_val = narrowed
+        }
     }
     mir_inst(b, "store " + mir_type(inner_ty) + " " + bind_val + ", " + mir_var_addr(bind_expr.text))
 }
@@ -1095,13 +1218,14 @@ pub fn mir_bind_adt_pattern(b: &MirBuilder, es: &ExprStore, subject: MirValue, p
             let bind = expr_store_get(es, pattern.args[i])
             if (bind.tag == "ident" and bind.text != "_")
             {
-                let field_ty = get_struct_field_type(struct_ty, field_name)
+                let storage_ty = get_struct_field_type(struct_ty, field_name)
+                let field_ty = if (pattern.option_value != "") { pattern.option_value } else { storage_ty }
                 let field_idx = get_struct_field_index(struct_ty, field_name)
                 let value = mir_temp(b)
                 mir_inst(b, value + " = extractvalue " + mir_type(subject.ty) + " " + subject.name + ", [" + mir_i32(field_idx) + "]")
                 mir_define_local(bind.text, field_ty)
                 mir_inst(b, mir_var_addr(bind.text) + " = alloca " + mir_type(field_ty))
-                mir_inst(b, "store " + mir_type(field_ty) + " " + value + ", " + mir_var_addr(bind.text))
+                mir_inst(b, "store " + mir_type(storage_ty) + " " + value + ", " + mir_var_addr(bind.text))
             }
         }
     }
@@ -1147,10 +1271,17 @@ pub fn mir_match_stmt(b: &MirBuilder, es: &ExprStore, store: &StmtStore, stmt: A
 pub fn mir_function_header(func: AstFunction): string
 {
     let mut out = "fn @" + func.name + "("
+    let mut wrote_param = 0
+    if (mir_is_lambda_name(func.name) == 1)
+    {
+        out = out + "%__lambda_env: ptr"
+        wrote_param = 1
+    }
     for (i in 0 .. func.param_names.length)
     {
-        if (i > 0) { out = out + ", " }
+        if (wrote_param == 1) { out = out + ", " }
         out = out + "%" + func.param_names[i] + ": " + mir_type(func.param_types[i])
+        wrote_param = 1
     }
     out = out + "): " + mir_type(func.ret_ty) + " {"
     return out
@@ -1163,6 +1294,23 @@ pub fn mir_emit_function(program: AstProgram, func: AstFunction): string
     reset_local_vars()
     mir_line(&b, mir_function_header(func))
     mir_block(&b, "%entry")
+    if (mir_is_lambda_name(func.name) == 1)
+    {
+        let lambda_expr = mir_lambda_expr_for_name(program.expr_store, func.name)
+        mir_define_local("__lambda_env", "ptr")
+        for (c in 0 .. lambda_expr.capture_names.length)
+        {
+            let capture_key = "__mir_capture_types_" + func.name
+            let capture_ty = if (c < get_function_param_count(capture_key)) { get_function_param_type(capture_key, c) } else { "i32" }
+            let slot = mir_temp(&b)
+            mir_inst(&b, slot + " = gep i8, %__lambda_env, [" + mir_i32(c * 8) + "]")
+            let value = mir_temp(&b)
+            mir_inst(&b, value + " = load " + mir_type(capture_ty) + ", " + slot)
+            mir_define_local(lambda_expr.capture_names[c], capture_ty)
+            mir_inst(&b, mir_var_addr(lambda_expr.capture_names[c]) + " = alloca " + mir_type(capture_ty))
+            mir_inst(&b, "store " + mir_type(capture_ty) + " " + value + ", " + mir_var_addr(lambda_expr.capture_names[c]))
+        }
+    }
     for (i in 0 .. func.param_names.length)
     {
         mir_define_local(func.param_names[i], func.param_types[i])
@@ -1218,10 +1366,26 @@ pub fn mir_program(program: AstProgram): string
     out.push("    extern fn @vix_safe_srem_i32(i32, i32): i32")
     out.push("    extern fn @vix_string_concat(ptr, ptr): ptr")
     out.push("    extern fn @vix_string_slice(ptr, i32, i32): ptr")
+    // Parser-generated nested lambdas are appended child-first. Emit ordinary
+    // functions first and lambdas parent-first so closure construction records
+    // concrete capture types before the corresponding lambda prologue is built.
     for (i in 0 .. program.functions.length)
     {
-        out.push("")
-        out.push(mir_emit_function(program, program.functions[i]))
+        if (mir_is_lambda_name(program.functions[i].name) == 0)
+        {
+            out.push("")
+            out.push(mir_emit_function(program, program.functions[i]))
+        }
+    }
+    let mut lambda_i = program.functions.length
+    while (lambda_i > 0)
+    {
+        lambda_i -= 1
+        if (mir_is_lambda_name(program.functions[lambda_i].name) == 1)
+        {
+            out.push("")
+            out.push(mir_emit_function(program, program.functions[lambda_i]))
+        }
     }
     out.push("}")
     return vix_join_lines(out)

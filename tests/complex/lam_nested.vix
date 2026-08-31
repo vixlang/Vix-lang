@@ -1,0 +1,1 @@
+fn main(): i32 { let a = 4; let outer = fn [a](x: i32): i32 => (fn [a](y: i32): i32 => y + a)(x); return outer(1) - 5 }

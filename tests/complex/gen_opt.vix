@@ -1,0 +1,2 @@
+fn pick:[T](value: ?T, fallback: T): T { return match value { Some(x) -> x None -> fallback } }
+fn main(): i32 { return if (pick[i32](Some(7), 2) == 7) 0 else 1 }

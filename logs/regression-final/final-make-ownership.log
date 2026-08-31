@@ -1,0 +1,5 @@
+Script started on 2026-08-31 20:43:35+08:00 [COMMAND="make ownership-test" <not executed on terminal>]
+rm -f vixc
+ownership tests passed: 15 accepted, 17 rejected
+
+Script done on 2026-08-31 20:43:35+08:00 [COMMAND_EXIT_CODE="0"]

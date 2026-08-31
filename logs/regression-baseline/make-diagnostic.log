@@ -1,0 +1,9 @@
+rm -f vixc
+python3 tests/diagnostics.py build/vixc
+ok   tests/diag_parse.vix
+ok   tests/diag_test.vix
+ok   tests/diag_warning.vix
+ok   tests/ownership/use_after_move.vix
+ok   tests/mac_hyg_err.vix
+ok   tests/mac_rec_limit.vix
+ok   diagnostic JSON note/help

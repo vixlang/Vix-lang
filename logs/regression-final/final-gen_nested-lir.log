@@ -1,0 +1,17 @@
+Script started on 2026-08-31 20:47:29+08:00 [COMMAND="build/vixc tests/complex/gen_nested.vix --debug=lir" <not executed on terminal>]
+machine_lir {
+  fn @Boxed frame=224 {
+    vreg %t2: i32 [4,5] -> r12
+  }
+  fn @main frame=384 {
+    vreg %t16: ptr [22,23] -> r12
+    vreg %t22: i32 [33,34] -> r12
+    vreg %t23: i32 [38,39] -> r12
+  }
+  fn @id__Option_i32_ frame=16 {
+    vreg %t0: ptr [2,3] -> r12
+  }
+}
+
+
+Script done on 2026-08-31 20:47:29+08:00 [COMMAND_EXIT_CODE="0"]

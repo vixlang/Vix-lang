@@ -1,0 +1,3 @@
+mod mod_math
+import mod_math::add
+fn main(): i32 { return mod_math::add(2, 3) - 5 }

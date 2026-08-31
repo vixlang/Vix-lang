@@ -1,0 +1,51 @@
+Script started on 2026-08-31 20:47:28+08:00 [COMMAND="build/vixc tests/complex/lam_bug.vix --debug=mir" <not executed on terminal>]
+mir_module vixc0 {
+    extern_vararg fn @printf(ptr): i32
+    extern fn @calloc(usize, usize): ptr
+    extern fn @strcmp(ptr, ptr): i32
+    extern fn @strlen(ptr): i32
+    extern fn @vix_array_len(ptr): i32
+    extern fn @vix_array_push_i32(ptr, i32): ptr
+    extern fn @vix_array_push_ptr(ptr, ptr): ptr
+    extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr
+    extern fn @vix_array_slice_bytes(ptr, i32, i32, usize): ptr
+    extern fn @vix_safe_sdiv_i32(i32, i32): i32
+    extern fn @vix_safe_srem_i32(i32, i32): i32
+    extern fn @vix_string_concat(ptr, ptr): ptr
+    extern fn @vix_string_slice(ptr, i32, i32): ptr
+
+fn @main(): i32 {
+
+    block %entry:
+        %f_addr = alloca ptr
+        %t0 = call @calloc(usize 1, usize 8): ptr
+        %t1 = call @calloc(usize 2, usize 8): ptr
+        %t2 = global_addr @__lambda_main_0
+        store ptr %t2, %t1
+        %t3 = gep i8, %t1, [8]
+        store ptr %t0, %t3
+        store ptr %t1, %f_addr
+        %t4 = load ptr, %f_addr
+        %t5 = load ptr, %t4
+        %t6 = gep i8, %t4, [8]
+        %t7 = load ptr, %t6
+        %t8 = call_indirect %t5(ptr %t7, i32 3): i32
+        %t9 = sub i32 %t8, 5
+        ret i32 %t9
+}
+
+
+fn @__lambda_main_0(%__lambda_env: ptr, %x: i32): i32 {
+
+    block %entry:
+        %x_addr = alloca i32
+        store i32 %x, %x_addr
+        %t0 = load i32, %x_addr
+        %t1 = add i32 %t0, 2
+        ret i32 %t1
+}
+
+}
+
+
+Script done on 2026-08-31 20:47:28+08:00 [COMMAND_EXIT_CODE="0"]

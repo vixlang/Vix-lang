@@ -1,0 +1,2 @@
+macro $add(value: expr) { $value + 2 }
+fn main(): i32 { let mut x = 1; x = $add(x); x = $add(x); return x - 5 }

@@ -1,0 +1,14 @@
+Script started on 2026-08-31 20:47:28+08:00 [COMMAND="build/vixc tests/complex/lam_bug.vix --debug=lir" <not executed on terminal>]
+machine_lir {
+  fn @main frame=64 {
+    vreg %t4: ptr [8,10] -> r12
+    vreg %t5: ptr [9,12] -> r13
+    vreg %t7: ptr [11,12] -> r12
+  }
+  fn @__lambda_main_0 frame=32 {
+    vreg %t0: i32 [2,3] -> r12
+  }
+}
+
+
+Script done on 2026-08-31 20:47:28+08:00 [COMMAND_EXIT_CODE="0"]

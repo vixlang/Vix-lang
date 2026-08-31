@@ -1,0 +1,2 @@
+fn apply:[T](f: fn(T): T, x: T): T { return f(x) }
+fn main(): i32 { let f = fn(x: i32): i32 => x + 1; return apply[i32](f, 4) - 5 }

@@ -1,0 +1,3 @@
+macro $inner(value: expr) { $value + 1 }
+macro $outer(value: expr) { $inner($value) + 1 }
+fn main(): i32 { return $outer(3) - 5 }

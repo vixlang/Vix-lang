@@ -1,0 +1,63 @@
+Script started on 2026-08-31 20:29:40+08:00 [COMMAND="python3 tests/complex_tests.py --compiler build/vixc --backend self" <not executed on terminal>]
+ok   gen_opt rc=0
+ok   gen_adt rc=0
+ok   gen_struct rc=0
+ok   gen_nested rc=0
+ok   gen_multi rc=0
+ok   adt_match rc=0
+ok   adt_nested rc=0
+ok   adt_string rc=0
+ok   adt_loop rc=0
+ok   adt_lambda rc=0
+ok   lam_basic rc=0
+ok   lam_capture rc=0
+ok   lam_nested rc=0
+ok   lam_return rc=0
+ok   lam_generic rc=0
+ok   mac_basic rc=0
+ok   mac_expr rc=0
+ok   mac_nested rc=0
+ok   mac_hyg rc=0
+ok   mac_repeat rc=0
+ok   pipe_basic rc=0
+ok   pipe_gen rc=0
+ok   pipe_opt rc=0
+ok   pipe_lam rc=0
+ok   pipe_nested rc=0
+ok   own_copy rc=0
+ok   own_borrow rc=0
+ok   own_branch rc=0
+ok   own_loop rc=0
+ok   life_return rc=0
+ok   syn_nested rc=0
+ok   syn_precedence rc=0
+ok   syn_array rc=0
+ok   syn_nullish rc=0
+ok   syn_if_match rc=0
+ok   diag_generic rc=1
+ok   diag_match rc=1
+ok   diag_lambda rc=1
+ok   diag_macro rc=1
+ok   diag_life rc=1
+ok   llvm_adt rc=0
+FAIL llvm_gen rc=1
+lld args: ld.lld -o /home/zty/Vix-lang/tests/bin/llvm_gen-complex /usr/lib/x86_64-linux-gnu/Scrt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o /home/zty/Vix-lang/tests/bin/llvm_gen-complex.tmp.o /home/zty/Vix-lang/build/./../runtime/runtime.o -L/usr/lib -L/usr/lib64 -L/lib -L/lib64 -L/usr/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lm -lc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/x86_64-linux-gnu/crtn.o
+ld.lld: error: cannot open /home/zty/Vix-lang/tests/bin/llvm_gen-complex.tmp.o: No such file or directory
+vixc: error: failed to link '/home/zty/Vix-lang/tests/bin/llvm_gen-complex'
+FAIL llvm_load rc=1
+lld args: ld.lld -o /home/zty/Vix-lang/tests/bin/llvm_load-complex /usr/lib/x86_64-linux-gnu/Scrt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o /home/zty/Vix-lang/tests/bin/llvm_load-complex.tmp.o /home/zty/Vix-lang/build/./../runtime/runtime.o -L/usr/lib -L/usr/lib64 -L/lib -L/lib64 -L/usr/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lm -lc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/x86_64-linux-gnu/crtn.o
+ld.lld: error: undefined symbol: main
+>>> referenced by /usr/lib/x86_64-linux-gnu/Scrt1.o:(_start)
+vixc: error: failed to link '/home/zty/Vix-lang/tests/bin/llvm_load-complex'
+ok   llvm_lambda rc=0
+ok   llvm_pipe rc=0
+ok   self_adt rc=0
+ok   self_gen rc=0
+ok   ast_nested rc=0
+ok   ast_lambda rc=0
+ok   check_generic rc=0
+ok   check_macro rc=0
+ok   mod_basic rc=0
+complex cases=52 failures=2
+
+Script done on 2026-08-31 20:29:41+08:00 [COMMAND_EXIT_CODE="1"]

@@ -1,0 +1,2 @@
+type R = A(i32) | B
+fn main(): i32 { let r = A(2); if (match r { A(x) -> x == 2 B -> false }) { return 0 }; return 1 }

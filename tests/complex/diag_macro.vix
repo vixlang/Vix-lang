@@ -1,0 +1,2 @@
+macro $bad(value: ident) { $value }
+fn main(): i32 { return $bad(1) }

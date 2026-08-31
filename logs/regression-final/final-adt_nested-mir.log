@@ -1,0 +1,147 @@
+Script started on 2026-08-31 20:47:28+08:00 [COMMAND="build/vixc tests/complex/adt_nested.vix --debug=mir" <not executed on terminal>]
+mir_module vixc0 {
+    type @R = { i32, i32, ptr, ptr, f64 }
+    extern_vararg fn @printf(ptr): i32
+    extern fn @calloc(usize, usize): ptr
+    extern fn @strcmp(ptr, ptr): i32
+    extern fn @strlen(ptr): i32
+    extern fn @vix_array_len(ptr): i32
+    extern fn @vix_array_push_i32(ptr, i32): ptr
+    extern fn @vix_array_push_ptr(ptr, ptr): ptr
+    extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr
+    extern fn @vix_array_slice_bytes(ptr, i32, i32, usize): ptr
+    extern fn @vix_safe_sdiv_i32(i32, i32): i32
+    extern fn @vix_safe_srem_i32(i32, i32): i32
+    extern fn @vix_string_concat(ptr, ptr): ptr
+    extern fn @vix_string_slice(ptr, i32, i32): ptr
+
+fn @Good(%value: ptr): @R {
+
+    block %entry:
+        %value_addr = alloca ptr
+        store ptr %value, %value_addr
+        %t0 = const @R undef
+        %t1 = insertvalue @R %t0, 0, [0]
+        %t2 = insertvalue @R %t1, 0, [1]
+        %t3 = const ptr ""
+        %t4 = insertvalue @R %t2, %t3, [2]
+        %t5 = load ptr, %value_addr
+        %t6 = insertvalue @R %t4, %t5, [3]
+        %t7 = insertvalue @R %t6, 0, [4]
+        ret @R %t7
+}
+
+
+fn @Bad(): @R {
+
+    block %entry:
+        %t0 = const @R undef
+        %t1 = insertvalue @R %t0, 1, [0]
+        %t2 = insertvalue @R %t1, 0, [1]
+        %t3 = const ptr ""
+        %t4 = insertvalue @R %t2, %t3, [2]
+        %t5 = insertvalue @R %t4, 0, [3]
+        %t6 = insertvalue @R %t5, 0, [4]
+        ret @R %t6
+}
+
+
+fn @main(): i32 {
+
+    block %entry:
+        %r_addr = alloca @R
+        %t0 = const @R undef
+        %t1 = insertvalue @R %t0, 0, [0]
+        %t2 = insertvalue @R %t1, 0, [1]
+        %t3 = const ptr ""
+        %t4 = insertvalue @R %t2, %t3, [2]
+        %t6 = zext i32 4 to i64
+        %t5 = add i64 %t6, 1
+        %t7 = inttoptr i64 %t5 to ptr
+        %t8 = insertvalue @R %t4, %t7, [3]
+        %t9 = insertvalue @R %t8, 0, [4]
+        store @R %t9, %r_addr
+        %t10 = load @R, %r_addr
+        %t11 = alloca i32
+        br label %matchexpr.test1
+
+    block %matchexpr.test1:
+        %t12 = extractvalue @R %t10, [0]
+        %t13 = icmp eq i32 %t12, 0
+        br_cond %t13, label %matchexpr.body2, label %matchexpr.test3
+
+    block %matchexpr.body2:
+        %t14 = extractvalue @R %t10, [3]
+        %v_addr = alloca ptr
+        store ptr %t14, %v_addr
+        %t15 = load ptr, %v_addr
+        %t16 = alloca i32
+        br label %matchexpr.test5
+
+    block %matchexpr.test5:
+        %t17 = icmp ne ptr %t15, null
+        br_cond %t17, label %matchexpr.body6, label %matchexpr.test7
+
+    block %matchexpr.body6:
+        %x_addr = alloca i32
+        %t18 = ptrtoint ptr %t15 to i64
+        %t19 = sub i64 %t18, 1
+        %t20 = trunc i64 %t19 to i32
+        store i32 %t20, %x_addr
+        %t21 = alloca i32
+        %t22 = load i32, %x_addr
+        %t23 = icmp eq i32 %t22, 4
+        br_cond %t23, label %ifexpr.then8, label %ifexpr.else9
+
+    block %ifexpr.then8:
+        store i32 0, %t21
+        br label %ifexpr.end10
+
+    block %ifexpr.else9:
+        store i32 1, %t21
+        br label %ifexpr.end10
+
+    block %ifexpr.end10:
+        %t24 = load i32, %t21
+        store i32 %t24, %t16
+        br label %matchexpr.end4
+
+    block %matchexpr.test7:
+        %t25 = icmp eq ptr %t15, null
+        br_cond %t25, label %matchexpr.body11, label %matchexpr.test12
+
+    block %matchexpr.body11:
+        store i32 2, %t16
+        br label %matchexpr.end4
+
+    block %matchexpr.test12:
+        store i32 0, %t16
+        br label %matchexpr.end4
+
+    block %matchexpr.end4:
+        %t26 = load i32, %t16
+        store i32 %t26, %t11
+        br label %matchexpr.end0
+
+    block %matchexpr.test3:
+        %t27 = call @Bad(): @R
+        %t28 = icmp eq @R %t10, %t27
+        br_cond %t28, label %matchexpr.body13, label %matchexpr.test14
+
+    block %matchexpr.body13:
+        store i32 3, %t11
+        br label %matchexpr.end0
+
+    block %matchexpr.test14:
+        store i32 0, %t11
+        br label %matchexpr.end0
+
+    block %matchexpr.end0:
+        %t29 = load i32, %t11
+        ret i32 %t29
+}
+
+}
+
+
+Script done on 2026-08-31 20:47:28+08:00 [COMMAND_EXIT_CODE="0"]

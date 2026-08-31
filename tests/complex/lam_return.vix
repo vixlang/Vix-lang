@@ -1,0 +1,2 @@
+fn maker(x: i32): fn(i32): i32 { return fn [x](y: i32): i32 => x + y }
+fn main(): i32 { return maker(2)(3) - 5 }

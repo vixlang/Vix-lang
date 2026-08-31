@@ -1,0 +1,8 @@
+fn selected(value: ?i32): i32
+{
+    return match value {
+        Some(v) -> v
+        None -> 0
+    }
+}
+fn main(): i32 { let x = if (true) selected(Some(2)) else 1; return x - 2 }

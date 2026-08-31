@@ -1,0 +1,2 @@
+macro $inc(value: expr) { $value + 1 }
+fn main(): i32 { return $inc($inc(3)) - 5 }

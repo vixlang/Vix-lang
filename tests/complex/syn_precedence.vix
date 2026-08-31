@@ -1,0 +1,1 @@
+fn main(): i32 { return if (1 + 2 * 3 == 7 or false and true) 0 else 1 }

@@ -1,0 +1,6 @@
+Script started on 2026-08-31 20:46:02+08:00 [COMMAND="python3 tests/boot16.py" <not executed on terminal>]
+ok   boot16 size=512 signature=55aa
+/home/zty/Vix-lang/tests/boot16.bin: DOS/MBR boot sector
+000001fe: 55aa                                     U.
+
+Script done on 2026-08-31 20:46:02+08:00 [COMMAND_EXIT_CODE="0"]

@@ -8,6 +8,9 @@ GC_WRAP_LDFLAGS := -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free
 GCC ?= clang 
 CXX ?= clang++
 CLANG ?= clang
+PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
+PYTEST ?= $(PYTHON) -m pytest
+PYTEST_DIR ?= ../tests/vixc0_tests
 
 # Keep a compiler regression inside one process instead of letting it starve
 # the desktop or invoke the global OOM killer.
@@ -41,19 +44,19 @@ VIXC ?= $(SEED_GC_TARGET)
 VIX_SOURCES := $(shell find $(SRC_DIR) -type f -name '*.vix')
 
 OWNERSHIP_OK := \
-	clone_keeps_owner_ok clone_nested_call_ok clone_nested_condition_ok \
-	copy_and_borrow_ok extern_pointer_borrows_ok if_expression_branch_move_ok \
-	lifetime_return_ok lifetime_syntax mut_typed_pointer_ref_runtime \
-	primitive_copy_types_ok \
-	shared_borrows_ok string_index_i8 terminated_loop_state_ok \
-	typed_mir_debug typed_pointer_copy_ok
+	clone_owner clone_call clone_cond \
+	copy_borrow ext_ptr_borrow if_branch_move \
+	life_return life_syntax mut_ptr_ref \
+	prim_copy \
+	shr_borrow str_idx8 loop_terminate \
+	mir_debug typed_ptr_copy
 OWNERSHIP_REJECT := \
-	assign_while_mut_borrow assign_while_shared_borrow duplicate_mut_borrow \
-	lifetime_mismatch move_while_mut_borrow move_while_shared_borrow \
-	multiple_return_borrow_sources mut_borrow_immutable owned_parameter_consumes \
-	return_local_ref returned_borrow_blocks_assign shared_plus_mut_borrow \
-	shared_reference_is_readonly string_use_after_move use_after_array_move \
-	use_after_field_move use_after_move
+	asn_mut_borrow asn_shr_borrow duplicate_mut_borrow \
+	life_bad mv_mut_borrow mv_shr_borrow \
+	multi_ret mut_borrow_imm owned_param \
+	ret_local ret_borrow_asn shr_mut_borrow \
+	shared_ref_ro str_use_move array_use_move \
+	field_use_move use_after_move
 
 all: $(TARGET)
 	rm -f vixc
@@ -131,20 +134,30 @@ test: all
 			echo "expected C ABI rejection: $$name"; exit 1; \
 		fi; \
 	done
-	$(TARGET) --ownership-check tests/lifetime_return_ok.vix
+	$(TARGET) --ownership-check tests/ownership/life_return.vix
 	$(TARGET) --ownership-check tests/lifetime_generic.vix
-	@set -e; for name in lifetime_mismatch lifetime_local_escape lifetime_mutation_while_borrowed; do \
-		if $(TARGET) --ownership-check tests/$$name.vix >/dev/null 2>&1; then \
-			echo "expected lifetime rejection: $$name"; exit 1; \
+	@set -e; for path in tests/ownership/life_bad.vix tests/lifetime_local_escape.vix tests/life_mut_borrow.vix; do \
+		if $(TARGET) --ownership-check $$path >/dev/null 2>&1; then \
+			echo "expected lifetime rejection: $$path"; exit 1; \
 		fi; \
 	done
 	python3 tests/diagnostics.py $(TARGET)
+	$(PYTHON) tests/complex_tests.py --compiler $(TARGET)
 
 diagnostic-test: all
 	python3 tests/diagnostics.py $(TARGET)
 
+complex-test: all
+	$(PYTHON) tests/complex_tests.py --compiler $(TARGET)
+
 pytest: all
-	python3 -m pytest ../tests/vixc0_tests/*.py
+	@if test -d "$(PYTEST_DIR)"; then \
+		$(PYTEST) "$(PYTEST_DIR)"; \
+	else \
+		echo "pytest suite not found at $(PYTEST_DIR); running repository regression tests"; \
+		$(PYTHON) tests/diagnostics.py $(TARGET); \
+		$(PYTHON) tests/run.py --compiler $(TARGET); \
+	fi
 
 ownership-test: all
 	@set -e; for name in $(OWNERSHIP_OK); do \
@@ -157,4 +170,4 @@ ownership-test: all
 	done
 	@echo "ownership tests passed: $(words $(OWNERSHIP_OK)) accepted, $(words $(OWNERSHIP_REJECT)) rejected"
 
-.PHONY: all self-stage self-lir-stage clean test pytest ownership-test diagnostic-test
+.PHONY: all self-stage self-lir-stage clean test pytest ownership-test diagnostic-test complex-test

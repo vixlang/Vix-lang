@@ -1,0 +1,107 @@
+Script started on 2026-08-31 20:47:29+08:00 [COMMAND="build/vixc tests/complex/gen_nested.vix --debug=mir" <not executed on terminal>]
+mir_module vixc0 {
+    type @Box = { i32, i32, ptr, ptr, f64 }
+    extern_vararg fn @printf(ptr): i32
+    extern fn @calloc(usize, usize): ptr
+    extern fn @strcmp(ptr, ptr): i32
+    extern fn @strlen(ptr): i32
+    extern fn @vix_array_len(ptr): i32
+    extern fn @vix_array_push_i32(ptr, i32): ptr
+    extern fn @vix_array_push_ptr(ptr, ptr): ptr
+    extern fn @vix_array_push_bytes(ptr, ptr, usize): ptr
+    extern fn @vix_array_slice_bytes(ptr, i32, i32, usize): ptr
+    extern fn @vix_safe_sdiv_i32(i32, i32): i32
+    extern fn @vix_safe_srem_i32(i32, i32): i32
+    extern fn @vix_string_concat(ptr, ptr): ptr
+    extern fn @vix_string_slice(ptr, i32, i32): ptr
+
+fn @Boxed(%value: i32): @Box {
+
+    block %entry:
+        %value_addr = alloca i32
+        store i32 %value, %value_addr
+        %t0 = const @Box undef
+        %t1 = insertvalue @Box %t0, 0, [0]
+        %t2 = load i32, %value_addr
+        %t3 = insertvalue @Box %t1, %t2, [1]
+        %t4 = const ptr ""
+        %t5 = insertvalue @Box %t3, %t4, [2]
+        %t6 = insertvalue @Box %t5, 0, [3]
+        %t7 = insertvalue @Box %t6, 0, [4]
+        ret @Box %t7
+}
+
+
+fn @main(): i32 {
+
+    block %entry:
+        %x_addr = alloca @Box
+        %t0 = const @Box undef
+        %t1 = insertvalue @Box %t0, 0, [0]
+        %t2 = insertvalue @Box %t1, 0, [1]
+        %t3 = const ptr ""
+        %t4 = insertvalue @Box %t2, %t3, [2]
+        %t6 = zext i32 8 to i64
+        %t5 = add i64 %t6, 1
+        %t7 = inttoptr i64 %t5 to ptr
+        %t8 = insertvalue @Box %t4, %t7, [3]
+        %t9 = insertvalue @Box %t8, 0, [4]
+        store @Box %t9, %x_addr
+        %t10 = load @Box, %x_addr
+        %t11 = alloca i32
+        br label %matchexpr.test1
+
+    block %matchexpr.test1:
+        %t12 = extractvalue @Box %t10, [0]
+        %t13 = icmp eq i32 %t12, 0
+        br_cond %t13, label %matchexpr.body2, label %matchexpr.test3
+
+    block %matchexpr.body2:
+        %t14 = extractvalue @Box %t10, [3]
+        %v_addr = alloca ptr
+        store ptr %t14, %v_addr
+        %t15 = alloca i32
+        %t16 = load ptr, %v_addr
+        %t17 = call @id__Option_i32_(ptr %t16): ptr
+        %t19 = zext i32 8 to i64
+        %t18 = add i64 %t19, 1
+        %t20 = inttoptr i64 %t18 to ptr
+        %t21 = icmp eq ptr %t17, %t20
+        br_cond %t21, label %ifexpr.then4, label %ifexpr.else5
+
+    block %ifexpr.then4:
+        store i32 0, %t15
+        br label %ifexpr.end6
+
+    block %ifexpr.else5:
+        store i32 1, %t15
+        br label %ifexpr.end6
+
+    block %ifexpr.end6:
+        %t22 = load i32, %t15
+        store i32 %t22, %t11
+        br label %matchexpr.end0
+
+    block %matchexpr.test3:
+        store i32 0, %t11
+        br label %matchexpr.end0
+
+    block %matchexpr.end0:
+        %t23 = load i32, %t11
+        ret i32 %t23
+}
+
+
+fn @id__Option_i32_(%x: ptr): ptr {
+
+    block %entry:
+        %x_addr = alloca ptr
+        store ptr %x, %x_addr
+        %t0 = load ptr, %x_addr
+        ret ptr %t0
+}
+
+}
+
+
+Script done on 2026-08-31 20:47:29+08:00 [COMMAND_EXIT_CODE="0"]

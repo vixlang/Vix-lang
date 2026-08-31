@@ -1,0 +1,87 @@
+ok   gen_opt rc=0
+ok   gen_adt rc=0
+ok   gen_struct rc=0
+FAIL gen_nested rc=0
+/home/zty/Vix-lang/tests/bin/gen_nested-complex
+
+run exit=1 stdout= stderr=
+ok   gen_multi rc=0
+ok   adt_match rc=0
+FAIL adt_nested rc=1
+vixc: error: MIR line 79 in function @main: undefined local SSA operand %x_addr
+ok   adt_string rc=0
+ok   adt_loop rc=0
+FAIL adt_lambda rc=1
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:248: error: symbol `f' not defined
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:253: error: label `main__return' changed during code generation (offset 0x481 -> 0x47c) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:258: error: label `__lambda_main_0' changed during code generation (offset 0x486 -> 0x481) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:290: error: label `__lambda_main_0__matchexpr_test1' changed during code generation (offset 0x4fb -> 0x4f6) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:300: error: label `__lambda_main_0__matchexpr_body2' changed during code generation (offset 0x514 -> 0x50f) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:308: error: label `__lambda_main_0__matchexpr_test3' changed during code generation (offset 0x52f -> 0x52a) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:320: error: label `__lambda_main_0__matchexpr_body4' changed during code generation (offset 0x559 -> 0x554) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:324: error: label `__lambda_main_0__matchexpr_test5' changed during code generation (offset 0x563 -> 0x55e) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:328: error: label `__lambda_main_0__matchexpr_end0' changed during code generation (offset 0x56d -> 0x568) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.asm:332: error: label `__lambda_main_0__return' changed during code generation (offset 0x576 -> 0x571) [-w+error=label-redef-late]
+vixc: error: failed to assemble '/home/zty/Vix-lang/tests/bin/adt_lambda-complex.tmp.o'
+FAIL lam_basic rc=1
+/home/zty/Vix-lang/tests/bin/lam_basic-complex.tmp.asm:26: error: symbol `f' not defined
+/home/zty/Vix-lang/tests/bin/lam_basic-complex.tmp.asm:31: error: label `main__return' changed during code generation (offset 0x2a -> 0x25) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/lam_basic-complex.tmp.asm:36: error: label `__lambda_main_0' changed during code generation (offset 0x2f -> 0x2a) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/lam_basic-complex.tmp.asm:50: error: label `__lambda_main_0__return' changed during code generation (offset 0x55 -> 0x50) [-w+error=label-redef-late]
+vixc: error: failed to assemble '/home/zty/Vix-lang/tests/bin/lam_basic-complex.tmp.o'
+FAIL lam_capture rc=1
+vixc: error: MIR line 38 in function @__lambda_main_0: undefined local SSA operand %a_addr
+FAIL lam_nested rc=1
+vixc: error: MIR line 36 in function @__lambda_main_0: undefined local SSA operand %a_addr
+FAIL lam_return rc=1
+vixc: error: MIR line 40 in function @__lambda_maker_0: undefined local SSA operand %x_addr
+FAIL lam_generic rc=1
+/home/zty/Vix-lang/tests/bin/lam_generic-complex.tmp.asm:79: error: symbol `f' not defined
+/home/zty/Vix-lang/tests/bin/lam_generic-complex.tmp.asm:82: error: label `apply__i32__return' changed during code generation (offset 0xb1 -> 0xac) [-w+error=label-redef-late]
+vixc: error: failed to assemble '/home/zty/Vix-lang/tests/bin/lam_generic-complex.tmp.o'
+ok   mac_basic rc=0
+ok   mac_expr rc=0
+ok   mac_nested rc=0
+ok   mac_hyg rc=0
+ok   mac_repeat rc=0
+ok   pipe_basic rc=0
+ok   pipe_gen rc=0
+ok   pipe_opt rc=0
+FAIL pipe_lam rc=1
+/home/zty/Vix-lang/tests/bin/pipe_lam-complex.tmp.asm:26: error: symbol `f' not defined
+/home/zty/Vix-lang/tests/bin/pipe_lam-complex.tmp.asm:31: error: label `main__return' changed during code generation (offset 0x2a -> 0x25) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/pipe_lam-complex.tmp.asm:36: error: label `__lambda_main_0' changed during code generation (offset 0x2f -> 0x2a) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/pipe_lam-complex.tmp.asm:50: error: label `__lambda_main_0__return' changed during code generation (offset 0x55 -> 0x50) [-w+error=label-redef-late]
+vixc: error: failed to assemble '/home/zty/Vix-lang/tests/bin/pipe_lam-complex.tmp.o'
+ok   pipe_nested rc=0
+ok   own_copy rc=0
+ok   own_borrow rc=0
+ok   own_branch rc=0
+ok   own_loop rc=0
+ok   life_return rc=0
+ok   syn_nested rc=0
+ok   syn_precedence rc=0
+ok   syn_array rc=0
+ok   syn_nullish rc=0
+ok   syn_if_match rc=0
+ok   diag_generic rc=1
+ok   diag_match rc=1
+ok   diag_lambda rc=1
+ok   diag_macro rc=1
+ok   diag_life rc=1
+ok   llvm_adt rc=0
+ok   llvm_gen rc=0
+ok   llvm_load rc=0
+FAIL llvm_lambda rc=1
+/home/zty/Vix-lang/tests/bin/llvm_lambda-complex.tmp.asm:26: error: symbol `f' not defined
+/home/zty/Vix-lang/tests/bin/llvm_lambda-complex.tmp.asm:31: error: label `main__return' changed during code generation (offset 0x2a -> 0x25) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/llvm_lambda-complex.tmp.asm:36: error: label `__lambda_main_0' changed during code generation (offset 0x2f -> 0x2a) [-w+error=label-redef-late]
+/home/zty/Vix-lang/tests/bin/llvm_lambda-complex.tmp.asm:50: error: label `__lambda_main_0__return' changed during code generation (offset 0x55 -> 0x50) [-w+error=label-redef-late]
+vixc: error: failed to assemble '/home/zty/Vix-lang/tests/bin/llvm_lambda-complex.tmp.o'
+ok   llvm_pipe rc=0
+ok   ast_nested rc=0
+ok   ast_lambda rc=0
+ok   check_generic rc=0
+ok   check_macro rc=0
+ok   mod_basic rc=0
+complex cases=52 failures=10

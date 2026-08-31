@@ -1,0 +1,2 @@
+fn add:[T](x: T, y: T): T { return x + y }
+fn main(): i32 { return add[i32](2, 3) - 5 }

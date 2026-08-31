@@ -1,0 +1,2 @@
+fn size(x: &i32): i32 { return @x }
+fn main(): i32 { let x = 4; return size(&x) - 4 }

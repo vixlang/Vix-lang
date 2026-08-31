@@ -1,0 +1,156 @@
+ok   gen_opt rc=0
+ok   gen_adt rc=0
+FAIL gen_struct rc=1
+error[E1001]: expected token
+  expected ')', got ','
+ --> /home/zty/Vix-lang/tests/complex/gen_struct.vix:1:26
+  |
+1 | type Pair:[A, B] = Pair(A, B)
+  |                          ^ expected ')', got ','
+2 | fn first:[A, B](p: Pair[A, B]): A { return match p { Pair(a, _) -> a } }
+  |
+note: the parser cannot continue until the expected token closes or separates this construct
+  |
+help: insert the expected token at the highlighted location
+ok   gen_nested rc=0
+ok   gen_multi rc=0
+FAIL adt_match rc=1
+error[E3002]: type mismatch
+  in function main: type mismatch: expected R, got Result
+ --> /home/zty/Vix-lang/tests/complex/adt_match.vix:2:22
+  |
+1 | type R = Ok(i32) | Err(string)
+2 | fn main(): i32 { let r: R = Ok(3); return match r { Ok(x) -> if (x == 3) 0 else 1 Err(_) -> 2 } }
+  |                      ^ type mismatch: expected R, got Result
+  |
+note: Vix does not implicitly convert between unrelated value types
+  |
+help: make the value type match the expected type, or change the declaration
+
+FAIL adt_nested rc=1
+error[E2001]: undefined symbol
+  in function main: undefined symbol 'x'
+ --> /home/zty/Vix-lang/tests/complex/adt_nested.vix:2:82
+  |
+1 | type R = Good(?i32) | Bad
+2 | fn main(): i32 { let r: R = Good(Some(4)); return match r { Good(Some(x)) -> if (x == 4) 0 else 1 Good(None) -> 2 Bad -> 3 } }
+  |                                                                                  ^ undefined symbol 'x'
+  |
+note: names are resolved only from declarations and imports visible in the current scope
+  |
+help: declare or import the name before use, and check its spelling
+
+ok   adt_string rc=0
+FAIL adt_loop rc=0
+/home/zty/Vix-lang/tests/bin/adt_loop-complex
+
+run exit=1 stdout= stderr=
+ok   adt_lambda rc=0
+ok   lam_basic rc=0
+ok   lam_capture rc=0
+FAIL lam_nested rc=1
+error[E2000]: variable `a` must be explicitly captured
+  in function __lambda_main_0: variable `a` must be explicitly captured
+ --> /home/zty/Vix-lang/tests/complex/lam_nested.vix:1:88
+  |
+1 | fn main(): i32 { let a = 4; let outer = fn [a](x: i32): i32 => (fn(y: i32): i32 => y + a)(x); return outer(1) - 5 }
+  |                                                                                        ^ variable `a` must be explicitly captured
+  |
+help: declare or import the name before use, and check its spelling
+
+FAIL lam_return rc=1
+error[E1000]: expected type name, got '('
+ --> /home/zty/Vix-lang/tests/complex/lam_return.vix:1:19
+  |
+1 | fn maker(x: i32): (i32): i32 { return fn(y: i32): i32 => x + y }
+  |                   ^ expected type name, got '('
+2 | fn main(): i32 { return maker(2)(3) - 5 }
+  |
+help: check the surrounding delimiters and remove or move the unexpected token
+FAIL lam_generic rc=1
+error[E1000]: expected type name, got '('
+ --> /home/zty/Vix-lang/tests/complex/lam_generic.vix:1:17
+  |
+1 | fn apply:[T](f: (T): T, x: T): T { return f(x) }
+  |                 ^ expected type name, got '('
+2 | fn main(): i32 { let f = fn(x: i32): i32 => x + 1; return apply[i32](f, 4) - 5 }
+  |
+help: check the surrounding delimiters and remove or move the unexpected token
+ok   mac_basic rc=0
+ok   mac_expr rc=0
+ok   mac_nested rc=0
+ok   mac_hyg rc=0
+ok   mac_repeat rc=0
+ok   pipe_basic rc=0
+ok   pipe_gen rc=0
+ok   pipe_opt rc=0
+ok   pipe_lam rc=0
+ok   pipe_nested rc=0
+ok   own_copy rc=0
+FAIL own_borrow rc=1
+error[E1002]: unexpected token
+  unexpected token in expression: '*'
+ --> /home/zty/Vix-lang/tests/complex/own_borrow.vix:1:32
+  |
+1 | fn size(x: &i32): i32 { return *x }
+  |                                ^ unexpected token in expression: '*'
+2 | fn main(): i32 { let x = 4; return size(&x) - 4 }
+  |
+note: this token is not valid in the surrounding grammar
+  |
+help: check the surrounding delimiters and remove or move the unexpected token
+ok   own_branch rc=0
+ok   own_loop rc=0
+FAIL life_return rc=1
+error[E1002]: unexpected token
+  unexpected token in expression: '*'
+ --> /home/zty/Vix-lang/tests/complex/life_return.vix:2:36
+  |
+1 | fn keep(x: &i32): &i32 { return x }
+2 | fn main(): i32 { let x = 3; return *keep(&x) - 3 }
+  |                                    ^ unexpected token in expression: '*'
+  |
+note: this token is not valid in the surrounding grammar
+  |
+help: check the surrounding delimiters and remove or move the unexpected token
+FAIL syn_nested rc=1
+error[E1002]: unexpected token
+  unexpected token after identifier: 'None'
+ --> /home/zty/Vix-lang/tests/complex/syn_nested.vix:1:67
+  |
+1 | fn main(): i32 { let x = if (true) { match Some(2) { Some(v) -> v None -> 0 } } else 1; return x - 2 }
+  |                                                                   ^^^^ unexpected token after identifier: 'None'
+  |
+note: this token is not valid in the surrounding grammar
+  |
+help: check the surrounding delimiters and remove or move the unexpected token
+ok   syn_precedence rc=0
+ok   syn_array rc=0
+FAIL syn_nullish rc=1
+error[E3002]: type mismatch
+  in function main: type mismatch: expected i32, got Option:[i32]
+ --> /home/zty/Vix-lang/tests/complex/syn_nullish.vix:1:48
+  |
+1 | fn main(): i32 { let x: ?i32 = None; let y = x ?? Some(4); return match y { Some(v) -> v - 4 None -> 1 } }
+  |                                                ^^ type mismatch: expected i32, got Option:[i32]
+  |
+note: Vix does not implicitly convert between unrelated value types
+  |
+help: make the value type match the expected type, or change the declaration
+
+ok   syn_if_match rc=0
+ok   diag_generic rc=1
+ok   diag_match rc=1
+ok   diag_lambda rc=1
+ok   diag_macro rc=1
+ok   diag_life rc=1
+ok   llvm_adt rc=0
+ok   llvm_gen rc=0
+ok   llvm_load rc=0
+ok   llvm_lambda rc=0
+ok   llvm_pipe rc=0
+ok   ast_nested rc=0
+ok   ast_lambda rc=0
+ok   check_generic rc=0
+ok   check_macro rc=0
+complex cases=51 failures=11

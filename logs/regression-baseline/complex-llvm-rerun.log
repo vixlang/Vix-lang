@@ -1,0 +1,62 @@
+ok   gen_opt rc=0
+ok   gen_adt rc=0
+ok   gen_struct rc=0
+ok   gen_nested rc=0
+ok   gen_multi rc=0
+ok   adt_match rc=0
+ok   adt_nested rc=0
+ok   adt_string rc=0
+ok   adt_loop rc=0
+ok   adt_lambda rc=0
+ok   lam_basic rc=0
+ok   lam_capture rc=0
+ok   lam_nested rc=0
+ok   lam_return rc=0
+ok   lam_generic rc=0
+ok   mac_basic rc=0
+ok   mac_expr rc=0
+ok   mac_nested rc=0
+ok   mac_hyg rc=0
+ok   mac_repeat rc=0
+ok   pipe_basic rc=0
+ok   pipe_gen rc=0
+ok   pipe_opt rc=0
+ok   pipe_lam rc=0
+ok   pipe_nested rc=0
+ok   own_copy rc=0
+ok   own_borrow rc=0
+ok   own_branch rc=0
+ok   own_loop rc=0
+ok   life_return rc=0
+FAIL syn_nested rc=1
+error[E1002]: unexpected token
+  unexpected token after identifier: 'None'
+ --> /home/zty/Vix-lang/tests/complex/syn_nested.vix:6:13
+  |
+5 |             Some(v) -> v
+6 |             None -> 0
+  |             ^^^^ unexpected token after identifier: 'None'
+7 |         }
+  |
+note: this token is not valid in the surrounding grammar
+  |
+help: check the surrounding delimiters and remove or move the unexpected token
+ok   syn_precedence rc=0
+ok   syn_array rc=0
+ok   syn_nullish rc=0
+ok   syn_if_match rc=0
+ok   diag_generic rc=1
+ok   diag_match rc=1
+ok   diag_lambda rc=1
+ok   diag_macro rc=1
+ok   diag_life rc=1
+ok   llvm_adt rc=0
+ok   llvm_gen rc=0
+ok   llvm_load rc=0
+ok   llvm_lambda rc=0
+ok   llvm_pipe rc=0
+ok   ast_nested rc=0
+ok   ast_lambda rc=0
+ok   check_generic rc=0
+ok   check_macro rc=0
+complex cases=51 failures=1

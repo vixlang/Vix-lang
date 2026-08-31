@@ -1,0 +1,9 @@
+Script started on 2026-08-31 20:34:58+08:00 [COMMAND="make -j2 self-stage self-lir-stage" <not executed on terminal>]
+nice -n 10 prlimit --as=1610612736 --stack=536870912 build/vixc --backend=self src/main.vix -obj -o build/vixc-self.o
+nice -n 10 prlimit --as=1610612736 --stack=536870912 build/vixc --backend=self-lir src/main.vix -obj -o build/vixc-self-lir.o
+build/vixc-self-lir.o
+g++ -fuse-ld=lld -o build/vixc-self-lir build/vixc-self-lir.o build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o -L/usr/lib/llvm-21/lib  -lLLVM-21 -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free -lgc -lpthread -ldl -llldELF -llldCommon -lz -lzstd
+build/vixc-self.o
+g++ -fuse-ld=lld -o build/vixc-self build/vixc-self.o build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o -L/usr/lib/llvm-21/lib  -lLLVM-21 -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free -lgc -lpthread -ldl -llldELF -llldCommon -lz -lzstd
+
+Script done on 2026-08-31 20:43:07+08:00 [COMMAND_EXIT_CODE="0"]

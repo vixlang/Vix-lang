@@ -1,0 +1,3 @@
+type Pair:[A] = Pair(A)
+fn first:[A](p: Pair:[A]): A { return match p { Pair(a) -> a } }
+fn main(): i32 { return if (first[i32](Pair(4)) == 4) 0 else 1 }

@@ -1,0 +1,2 @@
+type R = Good(?i32) | Bad
+fn main(): i32 { let r: R = Good(Some(4)); return match r { Good(v) -> match v { Some(x) -> if (x == 4) 0 else 1 None -> 2 } Bad -> 3 } }
