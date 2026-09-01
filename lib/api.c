@@ -7,8 +7,12 @@
 #include <io.h>
 #define access _access
 #define strdup _strdup
+#ifndef R_OK
 #define R_OK 4
+#endif
+#ifndef X_OK
 #define X_OK 0
+#endif
 #else
 #include <unistd.h>
 #endif
