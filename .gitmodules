@@ -1,0 +1,3 @@
+[submodule "vstd"]
+	path = vstd
+	url = https://github.com/vixlang/vstd.git

@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -78,10 +80,6 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: make -j2 all VIXC_RUN="" GCC=clang CXX=clang++ CLANG=clang GC_WRAP_LDFLAGS="" LLD_LIBS=""
-
-      - name: Fetch vstd standard library
-        shell: bash
-        run: git clone --depth 1 https://github.com/vixlang/std.git vstd
 
       - name: Package compiler
         shell: bash
