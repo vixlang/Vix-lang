@@ -6,6 +6,7 @@
 #if defined(_WIN32) || defined(WIN32)
 #include <io.h>
 #define access _access
+#define strdup _strdup
 #define R_OK 4
 #define X_OK 0
 #else

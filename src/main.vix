@@ -7,7 +7,7 @@ extern "C"
     fn remove(filename: ptr): i32
     fn vix_print_stderr(s: string)
     fn malloc(size: usize): string
-    fn LLVMGetDefaultTargetTriple(): string
+    fn vix_LLVMGetDefaultTargetTripleCopy(): string
     fn vix_diag_red(): string
     fn vix_diag_yellow(): string
     fn vix_diag_reset(): string
@@ -226,7 +226,7 @@ fn mode_continue(): ?i32 { return None }
 
 fn host_target_triple(): string
 {
-    let triple = LLVMGetDefaultTargetTriple()
+    let triple = vix_LLVMGetDefaultTargetTripleCopy()
     if (triple == nil or triple == "") { return "" }
     return triple
 }
@@ -476,7 +476,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     }
 
     let analysis_program = desugar_program(merged_program)
-    let analysis_result = typed_analysis_program(analysis_program, src, filename)
+    let analysis_result = typed_analysis_program_with_ownership(analysis_program, src, filename, if (mode == "--ownership-check") { 1 } else { 0 })
     if (analysis_result.ok == 0)
     {
         diag_print(analysis_result.error)

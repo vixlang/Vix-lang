@@ -3,7 +3,14 @@ LLVM_CXXFLAGS := $(shell llvm-config --cxxflags)
 LLVM_LDFLAGS := $(shell llvm-config --ldflags --libs all)
 LLD_LIBS := -llldELF -llldCommon -lz -lzstd
 GC_LIBS := $(shell pkg-config --libs bdw-gc 2>/dev/null || echo -lgc)
+HOST_UNAME := $(shell uname -s)
+ifeq ($(OS),Windows_NT)
+GC_WRAP_LDFLAGS :=
+else ifeq ($(HOST_UNAME),Darwin)
+GC_WRAP_LDFLAGS :=
+else
 GC_WRAP_LDFLAGS := -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free
+endif
 
 GCC ?= clang 
 CXX ?= clang++
@@ -12,9 +19,11 @@ PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 PYTEST ?= $(PYTHON) -m pytest
 PYTEST_DIR ?= ../tests/vixc0_tests
 
-# Keep a compiler regression inside one process instead of letting it starve
-# the desktop or invoke the global OOM killer.
-VIXC_RUN ?= nice -n 10 prlimit --as=1610612736 --stack=536870912
+# Limits are opt-in byte counts.  The launcher preserves child failures and
+# reports unsupported limit mechanisms instead of silently running unbounded.
+VIXC_AS_LIMIT ?= 0
+VIXC_STACK_LIMIT ?= 0
+VIXC_RUN ?= VIXC_AS_LIMIT=$(VIXC_AS_LIMIT) VIXC_STACK_LIMIT=$(VIXC_STACK_LIMIT) ./scripts/vixc-run
 
 SRC_DIR := src
 BUILD_DIR := build
@@ -142,10 +151,14 @@ test: all
 		fi; \
 	done
 	python3 tests/diagnostics.py $(TARGET)
+	python3 tests/entry_alloca.py --compiler $(TARGET)
 	$(PYTHON) tests/complex_tests.py --compiler $(TARGET)
 
 diagnostic-test: all
 	python3 tests/diagnostics.py $(TARGET)
+
+entry-alloca-test: all
+	python3 tests/entry_alloca.py --compiler $(TARGET)
 
 complex-test: all
 	$(PYTHON) tests/complex_tests.py --compiler $(TARGET)
@@ -170,4 +183,4 @@ ownership-test: all
 	done
 	@echo "ownership tests passed: $(words $(OWNERSHIP_OK)) accepted, $(words $(OWNERSHIP_REJECT)) rejected"
 
-.PHONY: all self-stage self-lir-stage clean test pytest ownership-test diagnostic-test complex-test
+.PHONY: all self-stage self-lir-stage clean test pytest ownership-test diagnostic-test entry-alloca-test complex-test

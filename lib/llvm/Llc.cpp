@@ -4,6 +4,7 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/CodeGen.h>
@@ -59,6 +60,14 @@ int compileIrFile(const char *InputPath, const char *OutputPath,
     llvm::raw_string_ostream OS(Message);
     Diagnostic.print("vixc", OS);
     setError(OS.str());
+    return 1;
+  }
+
+  std::string VerifyError;
+  llvm::raw_string_ostream VerifyOS(VerifyError);
+  if (llvm::verifyModule(*Module, &VerifyOS)) {
+    VerifyOS.flush();
+    setError(VerifyError);
     return 1;
   }
 

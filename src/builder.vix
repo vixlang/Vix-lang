@@ -16,7 +16,7 @@ extern "C"
     fn LLVMCreateBuilder(): ptr
     fn LLVMDisposeModule(module: ptr)
     fn LLVMDisposeBuilder(builder: ptr)
-    fn LLVMPrintModuleToString(module: ptr): string
+    fn vix_LLVMPrintModuleToStringCopy(module: ptr): string
     fn LLVMSetTarget(module: ptr, triple: string)
     fn vix_LLVMVerifyModule(module: ptr): i32
     fn LLVMVoidType(): ptr
@@ -655,7 +655,10 @@ pub fn llvm_build_closure_call_value(b: &LlvmBuilder, closure: ptr, fn_ty_text: 
 
 pub fn llvm_get_code(b: &LlvmBuilder): string
 {
-    return LLVMPrintModuleToString(b.module)
+    let code = vix_LLVMPrintModuleToStringCopy(b.module)
+    LLVMDisposeBuilder(b.builder)
+    LLVMDisposeModule(b.module)
+    return code
 }
 
 pub fn llvm_temp(b: &LlvmBuilder, prefix: string): string

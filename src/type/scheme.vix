@@ -34,6 +34,10 @@ pub fn scheme_collect_free_vars(store: &TyStore, scheme: Scheme, out: &[i32]): i
 
 pub fn scheme_apply(store: &TyStore, subst: &Subst, scheme: Scheme): Scheme
 {
+    // A substitution cannot change a closed scheme.  Most entries in the
+    // compiler's base environment have fully explicit signatures; avoiding a
+    // filtered copy of every binding here removes the dominant bootstrap cost.
+    if (subst.bindings.length == 0 or ty_has_free_vars(store, scheme.ty) == 0) { return scheme }
     let filtered = subst_empty()
     for (i in 0 .. subst.bindings.length)
     {

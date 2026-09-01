@@ -1,6 +1,7 @@
 #include <llvm-c/Core.h>
 #include <llvm-c/Types.h>
 #include <llvm-c/Analysis.h>
+#include <llvm-c/TargetMachine.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,7 +10,16 @@
 #if defined(_WIN32) || defined(WIN32)
 #include <io.h>
 #define isatty _isatty
+#define access _access
+#define strdup _strdup
+#define strtok_r strtok_s
 #define STDERR_FILENO 2
+#ifndef R_OK
+#define R_OK 4
+#endif
+#ifndef X_OK
+#define X_OK 0
+#endif
 #else
 #include <unistd.h>
 #endif
@@ -140,6 +150,9 @@ int vix_diag_strlen(const char *s) {
 char *vix_source_line_copy(const char *src, int start, int len) {
   if (src == NULL || start < 0 || len < 0)
     return NULL;
+  size_t src_len = strlen(src);
+  if ((size_t)start > src_len || (size_t)len > src_len - (size_t)start)
+    return NULL;
   char *out = (char *)malloc((size_t)len + 1);
   if (out == NULL)
     return NULL;
@@ -159,12 +172,16 @@ char *vix_join_lines(char **lines) {
       empty[0] = '\0';
     return empty;
   }
-  int count = *(int *)((char *)lines - 8);
+  extern int vix_array_len(void *arr);
+  int count = vix_array_len(lines);
+  if (count < 0)
+    return NULL;
   size_t total = 1;
   for (int i = 0; i < count; i++) {
-    if (lines[i])
-      total += strlen(lines[i]);
-    total += 1;
+    size_t len = lines[i] ? strlen(lines[i]) : 0;
+    if (len > SIZE_MAX - total - 1)
+      return NULL;
+    total += len + 1;
   }
   char *out = (char *)malloc(total);
   if (!out)
@@ -553,7 +570,11 @@ static char *vix_object_from_executable_path(const char *path,
   const char *usable = path;
   char *allocated = NULL;
 
+#if defined(_WIN32) || defined(WIN32)
+  if (_fullpath(resolved, path, sizeof(resolved)) != NULL) {
+#else
   if (realpath(path, resolved) != NULL) {
+#endif
     usable = resolved;
   } else {
     allocated = strdup(path);
@@ -563,6 +584,11 @@ static char *vix_object_from_executable_path(const char *path,
   }
 
   const char *slash = strrchr(usable, '/');
+#if defined(_WIN32) || defined(WIN32)
+  const char *backslash = strrchr(usable, '\\');
+  if (backslash != NULL && (slash == NULL || backslash > slash))
+    slash = backslash;
+#endif
   if (!slash) {
     free(allocated);
     return vix_join_object(".", object_name);
@@ -1079,7 +1105,40 @@ LLVMValueRef vix_LLVMBuildLoad2(LLVMBuilderRef builder, LLVMTypeRef ty,
 
 LLVMValueRef vix_LLVMBuildAlloca(LLVMBuilderRef builder, LLVMTypeRef ty,
                                  const char *name) {
-  return LLVMBuildAlloca(builder, ty, name);
+  /*
+   * A source-level local can be declared in a loop body.  Emitting its alloca
+   * at the current insertion point makes the native stack grow on every loop
+   * iteration; large compiler passes eventually hit the stack guard and die
+   * with SIGSEGV.  Use a short-lived builder so every fixed-size local lives
+   * in the function entry block without disturbing the caller's insertion
+   * point.  This is also the canonical form expected by mem2reg.
+   */
+  if (builder == NULL || ty == NULL)
+    return NULL;
+
+  LLVMBasicBlockRef current = LLVMGetInsertBlock(builder);
+  if (current == NULL)
+    return LLVMBuildAlloca(builder, ty, name);
+
+  LLVMValueRef function = LLVMGetBasicBlockParent(current);
+  if (function == NULL)
+    return LLVMBuildAlloca(builder, ty, name);
+
+  LLVMBasicBlockRef entry = LLVMGetEntryBasicBlock(function);
+  if (entry == NULL)
+    return LLVMBuildAlloca(builder, ty, name);
+
+  LLVMBuilderRef entry_builder = LLVMCreateBuilder();
+  if (entry_builder == NULL)
+    return NULL;
+  LLVMValueRef first = LLVMGetFirstInstruction(entry);
+  if (first != NULL)
+    LLVMPositionBuilderBefore(entry_builder, first);
+  else
+    LLVMPositionBuilderAtEnd(entry_builder, entry);
+  LLVMValueRef alloca = LLVMBuildAlloca(entry_builder, ty, name);
+  LLVMDisposeBuilder(entry_builder);
+  return alloca;
 }
 
 LLVMValueRef vix_LLVMBuildStore(LLVMBuilderRef builder, LLVMValueRef val,
@@ -1315,4 +1374,28 @@ int vix_LLVMVerifyModule(LLVMModuleRef module) {
     LLVMDisposeMessage(msg);
   }
   return (int)result;
+}
+
+char *vix_LLVMGetDefaultTargetTripleCopy(void) {
+  char *triple = LLVMGetDefaultTargetTriple();
+  if (triple == NULL)
+    return NULL;
+  size_t length = strlen(triple);
+  char *copy = (char *)malloc(length + 1);
+  if (copy != NULL)
+    memcpy(copy, triple, length + 1);
+  LLVMDisposeMessage(triple);
+  return copy;
+}
+
+char *vix_LLVMPrintModuleToStringCopy(LLVMModuleRef module) {
+  char *text = LLVMPrintModuleToString(module);
+  if (text == NULL)
+    return NULL;
+  size_t length = strlen(text);
+  char *copy = (char *)malloc(length + 1);
+  if (copy != NULL)
+    memcpy(copy, text, length + 1);
+  LLVMDisposeMessage(text);
+  return copy;
 }

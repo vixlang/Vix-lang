@@ -895,6 +895,7 @@ pub fn hm_check_program(program: AstProgram): HmCheckResult
             type_env_extend(&env, global.assign_name, hm_generalize_let(&store, &env, &global_subst, global_ty))
         }
     }
+    type_env_mark_closed_prefix(&store, &env)
     for (i in 0 .. program.functions.length)
     {
         let r = hm_check_function(program.functions[i], &env, &store, &fresh, program.structs, &expr_store, &stmt_store)

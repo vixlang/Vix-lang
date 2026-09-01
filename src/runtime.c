@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -31,6 +32,8 @@ static int vix_array_grown_capacity(int old_capacity, int needed) {
   if (capacity < VIX_ARRAY_INITIAL_CAPACITY)
     capacity = VIX_ARRAY_INITIAL_CAPACITY;
   while (capacity < needed) {
+    if (capacity > INT_MAX / 2)
+      return needed;
     int next = capacity * 2;
     if (next <= capacity)
       return needed;
@@ -42,10 +45,15 @@ static int vix_array_grown_capacity(int old_capacity, int needed) {
 static void *vix_array_reserve_for_push(void *arr, size_t elem_size,
                                         int old_len, int new_len) {
   int old_capacity = vix_array_capacity(arr);
+  if (old_len < 0 || new_len < 0 || old_capacity < 0)
+    return NULL;
   if (old_capacity >= new_len)
     return arr;
 
   int new_capacity = vix_array_grown_capacity(old_capacity, new_len);
+  if (new_capacity < new_len ||
+      elem_size > (SIZE_MAX - VIX_ARRAY_HEADER_BYTES) / (size_t)new_capacity)
+    return NULL;
   void *base = (arr == NULL) ? NULL
                              : (void *)((char *)arr - VIX_ARRAY_HEADER_BYTES);
   size_t data_bytes = (size_t)new_capacity * elem_size;
@@ -65,6 +73,8 @@ static void *vix_array_push_raw(void *arr, const void *val, size_t elem_size) {
     return arr;
 
   int old_len = vix_array_len(arr);
+  if (old_len < 0 || old_len == INT_MAX)
+    return NULL;
   int new_len = old_len + 1;
   void *reserved = vix_array_reserve_for_push(arr, elem_size, old_len, new_len);
   if (reserved == NULL)
@@ -105,7 +115,7 @@ void *vix_array_slice_bytes(void *arr, int start, int end, size_t elem_size) {
   header[0] = (int)count;
   header[1] = (int)count;
   memcpy((char *)header + VIX_ARRAY_HEADER_BYTES,
-         (char *)arr + VIX_ARRAY_HEADER_BYTES + (size_t)start * elem_size,
+         (char *)arr + (size_t)start * elem_size,
          count * elem_size);
   return (char *)header + VIX_ARRAY_HEADER_BYTES;
 }

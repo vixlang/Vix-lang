@@ -1,0 +1,108 @@
+#!/bin/sh
+
+# Portable compiler launcher. Limits are opt-in and expressed in bytes.
+# Command stdout/stderr and the child's non-zero status are always preserved.
+
+as_limit=${VIXC_AS_LIMIT:-0}
+stack_limit=${VIXC_STACK_LIMIT:-0}
+nice_level=${VIXC_NICE:-10}
+memory_log=${VIXC_MEMORY_LOG:-}
+
+case "$as_limit:$stack_limit" in
+  *[!0-9:]*|'')
+    echo "vixc-run: VIXC_AS_LIMIT and VIXC_STACK_LIMIT must be byte counts or 0" >&2
+    exit 125
+    ;;
+esac
+
+if [ "$#" -eq 0 ]; then
+  echo "vixc-run: missing compiler command" >&2
+  exit 125
+fi
+
+run_child()
+{
+  if [ -n "$memory_log" ]; then
+    if [ ! -x /usr/bin/time ]; then
+      echo "vixc-run: VIXC_MEMORY_LOG requires /usr/bin/time" >&2
+      return 125
+    fi
+    /usr/bin/time -v -o "$memory_log" "$@"
+    return $?
+  fi
+  "$@"
+}
+
+report_limited_failure()
+{
+  status=$1
+  if [ "$status" -gt 128 ]; then
+    signal=$((status - 128))
+    echo "vixc-run: memory limit exceeded or child faulted under configured limits; signal=$signal exit=$status VIXC_AS_LIMIT=$as_limit VIXC_STACK_LIMIT=$stack_limit" >&2
+  else
+    echo "vixc-run: memory limit exceeded or child failed under configured limits; exit=$status VIXC_AS_LIMIT=$as_limit VIXC_STACK_LIMIT=$stack_limit" >&2
+  fi
+}
+
+os_name=$(uname -s)
+case "$os_name" in
+  Linux)
+    if { [ "$as_limit" -ne 0 ] || [ "$stack_limit" -ne 0 ]; } && ! command -v prlimit >/dev/null 2>&1; then
+      echo "vixc-run: hard limits requested but Linux prlimit is unavailable" >&2
+      exit 125
+    fi
+
+    if [ "$as_limit" -ne 0 ] && [ "$stack_limit" -ne 0 ]; then
+      run_child nice -n "$nice_level" prlimit "--as=$as_limit" "--stack=$stack_limit" -- "$@"
+    elif [ "$as_limit" -ne 0 ]; then
+      run_child nice -n "$nice_level" prlimit "--as=$as_limit" -- "$@"
+    elif [ "$stack_limit" -ne 0 ]; then
+      run_child nice -n "$nice_level" prlimit "--stack=$stack_limit" -- "$@"
+    else
+      run_child nice -n "$nice_level" "$@"
+    fi
+    status=$?
+    ;;
+  Darwin)
+    if [ "$as_limit" -ne 0 ]; then
+      echo "vixc-run: VIXC_AS_LIMIT is not supported on macOS; use a sandbox/container memory policy" >&2
+      exit 125
+    fi
+    if [ -n "$memory_log" ]; then
+      echo "vixc-run: VIXC_MEMORY_LOG GNU format is not supported on macOS" >&2
+      exit 125
+    fi
+    if [ "$stack_limit" -ne 0 ]; then
+      stack_kib=$(((stack_limit + 1023) / 1024))
+      ulimit -s "$stack_kib"
+      limit_status=$?
+      if [ "$limit_status" -ne 0 ]; then
+        echo "vixc-run: cannot apply VIXC_STACK_LIMIT=$stack_limit on macOS" >&2
+        exit 125
+      fi
+    fi
+    nice -n "$nice_level" "$@"
+    status=$?
+    ;;
+  MINGW*|MSYS*|CYGWIN*)
+    if [ "$as_limit" -ne 0 ] || [ "$stack_limit" -ne 0 ]; then
+      echo "vixc-run: hard limits on Windows require scripts/vixc-run.ps1 (Job Object); POSIX launcher cannot apply them" >&2
+      exit 125
+    fi
+    "$@"
+    status=$?
+    ;;
+  *)
+    if [ "$as_limit" -ne 0 ] || [ "$stack_limit" -ne 0 ]; then
+      echo "vixc-run: hard memory limits are unsupported on $os_name" >&2
+      exit 125
+    fi
+    "$@"
+    status=$?
+    ;;
+esac
+
+if [ "$status" -ne 0 ] && { [ "$as_limit" -ne 0 ] || [ "$stack_limit" -ne 0 ]; }; then
+  report_limited_failure "$status"
+fi
+exit "$status"

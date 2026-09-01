@@ -169,6 +169,8 @@ struct DropEvent {
 
 struct DropPlan {
     events: [DropEvent]
+    block_heads: [i32]
+    next_in_block: [i32]
 }
 
 ;; --------------------------------------------------------------------------

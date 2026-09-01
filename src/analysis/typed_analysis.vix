@@ -122,7 +122,11 @@ pub type DropEvent = struct {
 }
 
 pub type DropPlan = struct {
-    events: [DropEvent]
+    events: [DropEvent],
+    // Per-basic-block intrusive lists keep duplicate detection local to the
+    // block.  This avoids an O(events^2) full scan while the plan is built.
+    block_heads: [i32],
+    next_in_block: [i32]
 }
 
 pub type TypedAnalysisResult = struct {
@@ -933,7 +937,7 @@ pub fn ownership_facts_new(expr_count: i32): OwnershipFacts
 
 pub fn drop_plan_new(): DropPlan
 {
-    return DropPlan{ events: [] }
+    return DropPlan{ events: [], block_heads: [], next_in_block: [] }
 }
 
 pub fn analysis_env_new(): AnalysisEnv
@@ -1559,12 +1563,41 @@ pub fn analysis_place_was_moved(ir: &TypedAnalysisIR, place_id: i32): i32
 
 pub fn analysis_drop_exists(drops: &DropPlan, block_id: i32, place_id: i32, reason: string): i32
 {
-    for (i in 0 .. drops.events.length)
+    if (block_id < 0 or block_id >= drops.block_heads.length) return 0
+    let mut event_id = drops.block_heads[block_id]
+    while (event_id >= 0)
     {
-        let event = drops.events[i]
-        if (event.block_id == block_id and event.place_id == place_id and event.reason == reason) return 1
+        // Do not copy DropEvent into a loop-local value here.  The immutable
+        // seed lowers that aggregate temporary to a per-iteration stack
+        // allocation, which can exhaust the process stack on a large plan.
+        if (drops.events[event_id].place_id == place_id and drops.events[event_id].reason == reason) return 1
+        event_id = drops.next_in_block[event_id]
     }
     return 0
+}
+
+fn analysis_drop_plan_index_last(drops: &DropPlan, block_id: i32)
+{
+    if (block_id < 0) { return }
+    while (drops.block_heads.length <= block_id) { drops.block_heads.push(-1) }
+    let event_id = drops.events.length - 1
+    drops.next_in_block.push(drops.block_heads[block_id])
+    drops.block_heads[block_id] = event_id
+}
+
+fn analysis_drop_plan_push(drops: &DropPlan, event: DropEvent)
+{
+    drops.events.push(event)
+    analysis_drop_plan_index_last(drops, event.block_id)
+}
+
+// Keep the aggregate copy in a non-looping frame.  The seed compiler reclaims
+// this frame on every call even though it cannot reclaim aggregate temporaries
+// allocated directly inside the caller's loop.
+fn analysis_drop_plan_copy_event(target: &DropPlan, source: &DropPlan, index: i32)
+{
+    let event = source.events[index]
+    analysis_drop_plan_push(target, event)
 }
 
 pub fn analysis_add_drop_event(program: AstProgram, ir: &TypedAnalysisIR, drops: &DropPlan, scope_id: i32, stmt_id: i32, return_id: i32, block_id: i32, place_id: i32, reason: string, span: AnalysisSpan, span_length: i32): i32
@@ -1574,7 +1607,7 @@ pub fn analysis_add_drop_event(program: AstProgram, ir: &TypedAnalysisIR, drops:
     if (analysis_type_is_copy(program, place.ty) == 1 or analysis_type_is_reference(place.ty) == 1) return 0
     if (analysis_place_was_moved(ir, place_id) == 1) return 0
     if (analysis_drop_exists(drops, block_id, place_id, reason) == 1) return 0
-    drops.events.push(DropEvent{ scope_id: scope_id, stmt_id: stmt_id, return_id: return_id, block_id: block_id, place_id: place_id, ty: place.ty, reason: reason, span: span })
+    analysis_drop_plan_push(drops, DropEvent{ scope_id: scope_id, stmt_id: stmt_id, return_id: return_id, block_id: block_id, place_id: place_id, ty: place.ty, reason: reason, span: span })
     return 0
 }
 
@@ -1606,8 +1639,10 @@ pub fn drop_plan_finalize(program: AstProgram, ir: &TypedAnalysisIR, pending: &D
     let out = drop_plan_new()
     for (i in 0 .. pending.events.length)
     {
-        let event = pending.events[i]
-        if (analysis_place_was_moved(ir, event.place_id) == 0 and analysis_drop_exists(&out, event.block_id, event.place_id, event.reason) == 0) out.events.push(event)
+        if (analysis_place_was_moved(ir, pending.events[i].place_id) == 0 and analysis_drop_exists(&out, pending.events[i].block_id, pending.events[i].place_id, pending.events[i].reason) == 0)
+        {
+            analysis_drop_plan_copy_event(&out, pending, i)
+        }
     }
     return out
 }
@@ -2199,7 +2234,7 @@ pub fn typed_analysis_ir_validate(ir: &TypedAnalysisIR): string
     return error
 }
 
-pub fn typed_analysis_program(program: AstProgram, source: string, filename: string): TypedAnalysisResult
+pub fn typed_analysis_program_with_ownership(program: AstProgram, source: string, filename: string, check_ownership: i32): TypedAnalysisResult
 {
     let ir = typed_analysis_ir_new()
     let drops = drop_plan_new()
@@ -2248,6 +2283,7 @@ pub fn typed_analysis_program(program: AstProgram, source: string, filename: str
     if (facts_error != "") return TypedAnalysisResult{ ok: 0, ownership_ok: 0, error: "vixc: error: " + facts_error, ir: ir, facts: facts, drops: final_drops }
     let drop_error = drop_plan_validate(&ir, &final_drops)
     if (drop_error != "") return TypedAnalysisResult{ ok: 0, ownership_ok: 0, error: "vixc: error: " + drop_error, ir: ir, facts: facts, drops: final_drops }
+    if (check_ownership == 0) return TypedAnalysisResult{ ok: 1, ownership_ok: 1, error: "", ir: ir, facts: facts, drops: final_drops }
     let mut error = ""
     let mut error_count = 0
     for (i in 0 .. program.functions.length)
@@ -2259,6 +2295,11 @@ pub fn typed_analysis_program(program: AstProgram, source: string, filename: str
         error_count += ownership.error_count
     }
     return TypedAnalysisResult{ ok: 1, ownership_ok: if (error_count == 0) { 1 } else { 0 }, error: error, ir: ir, facts: facts, drops: final_drops }
+}
+
+pub fn typed_analysis_program(program: AstProgram, source: string, filename: string): TypedAnalysisResult
+{
+    return typed_analysis_program_with_ownership(program, source, filename, 1)
 }
 
 pub fn typed_analysis_span_debug(file: string, line: i32, column: i32): string
