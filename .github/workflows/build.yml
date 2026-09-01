@@ -73,17 +73,20 @@ jobs:
         run: |
           if [ "${{ runner.os }}" = "macOS" ]; then
             make -j2 all VIXC_RUN="" GCC=clang CXX=clang++ CLANG=clang \
+              VIXC="./build/vixc-seed-gc" \
               LLVM_CXXFLAGS="$(llvm-config --cxxflags) -I$(brew --prefix lld)/include" \
               LLD_LIBS="-L$(brew --prefix lld)/lib -llldELF -llldCommon" \
               GC_WRAP_LDFLAGS=""
           else
-            make -j2 all VIXC_RUN="" GCC=clang-21 CXX=clang++-21 CLANG=clang-21
+            make -j2 all VIXC_RUN="" VIXC="./build/vixc-seed-gc" \
+              GCC=clang-21 CXX=clang++-21 CLANG=clang-21
           fi
 
       - name: Build vixc (Windows)
         if: runner.os == 'Windows'
         shell: msys2 {0}
-        run: make -j2 all VIXC_RUN="" GCC=clang CXX=clang++ CLANG=clang \
+        run: make -j2 all VIXC_RUN="" VIXC="./build/vixc-seed-gc.exe" \
+          GCC=clang CXX=clang++ CLANG=clang \
           GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCommon -lz -lzstd"
 
       - name: Package compiler
