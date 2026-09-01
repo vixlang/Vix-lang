@@ -115,16 +115,9 @@ jobs:
             cp -a vstd "$package_root/"
           fi
           cp -a core lib runtime "$package_root/"
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            if [ -d libc ]; then
-              cp -a libc "$package_root/"
-            elif [ -d vstd/libc ]; then
-              cp -a vstd/libc "$package_root/"
-            else
-              echo "Windows package requires a libc/ directory" >&2
-              exit 1
-            fi
-          fi
+          # Windows builds use the MSYS2/MinGW runtime installed during the
+          # build job.  This repository and the vstd submodule do not ship a
+          # separate libc/ tree, so do not require one while staging releases.
           cat > "$package_root/VERSION" <<EOF
           Vixc ${VIXC_VERSION}
           Release channel: ${VIXC_CHANNEL}
