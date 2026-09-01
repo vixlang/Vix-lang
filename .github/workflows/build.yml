@@ -63,8 +63,6 @@ jobs:
             mingw-w64-clang-x86_64-clang
             mingw-w64-clang-x86_64-llvm
             mingw-w64-clang-x86_64-lld
-            mingw-w64-clang-x86_64-libc++
-            mingw-w64-clang-x86_64-libunwind
             mingw-w64-clang-x86_64-gc
             mingw-w64-clang-x86_64-zlib
             mingw-w64-clang-x86_64-zstd
@@ -87,8 +85,10 @@ jobs:
       - name: Build vixc (Windows)
         if: runner.os == 'Windows'
         shell: msys2 {0}
-        run: make -j2 all VIXC_RUN="" VIXC="./build/vixc-seed-gc.exe" \
+        run: |
+          make -j2 all VIXC_RUN="" VIXC="./build/vixc-seed-gc.exe" \
           GCC=clang CXX=clang++ CLANG=clang \
+          LLVM_CXXFLAGS="$(llvm-config --cxxflags | sed 's/-stdlib=libc++//g')" \
           GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCommon -lz -lzstd"
 
       - name: Package compiler
