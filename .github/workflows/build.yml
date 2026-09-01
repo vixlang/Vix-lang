@@ -105,9 +105,16 @@ jobs:
           cp "$compiler_path" "$package_root/"
           # vstd is maintained in its own repository and is shipped beside
           # the compiler. The native runtime sources remain available too.
-          # Preserve vstd's repository symlinks instead of dereferencing them
-          # (some example/test links intentionally point outside the checkout).
-          cp -a vstd core lib runtime "$package_root/"
+          # MSYS2 cannot reliably recreate vstd's directory symlinks in the
+          # Windows staging directory.  Materialize them there so the archive
+          # is usable after extraction without symlink privileges.  Keep the
+          # links intact on Unix targets.
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp -aL vstd "$package_root/"
+          else
+            cp -a vstd "$package_root/"
+          fi
+          cp -a core lib runtime "$package_root/"
           if [ "${{ runner.os }}" = "Windows" ]; then
             if [ -d libc ]; then
               cp -a libc "$package_root/"
