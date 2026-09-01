@@ -64,7 +64,6 @@ jobs:
             mingw-w64-clang-x86_64-llvm
             mingw-w64-clang-x86_64-lld
             mingw-w64-clang-x86_64-libc++
-            mingw-w64-clang-x86_64-libc++abi
             mingw-w64-clang-x86_64-libunwind
             mingw-w64-clang-x86_64-gc
             mingw-w64-clang-x86_64-zlib
