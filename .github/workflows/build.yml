@@ -8,9 +8,14 @@ on:
 permissions:
   contents: read
 
+env:
+  # Semantic pre-release identifier: 0.5.0 Beta Candidate（Beta 预选版）
+  VIXC_VERSION: 0.5.0-beta.1
+  VIXC_CHANNEL: beta-candidate
+
 jobs:
   build:
-    name: Build (${{ matrix.os }})
+    name: Build vixc 0.5.0-beta.1 (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
@@ -26,7 +31,16 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang lld llvm-dev libgc-dev pkg-config make
+          sudo apt-get install -y ca-certificates curl gpg build-essential pkg-config zlib1g-dev libzstd-dev
+          curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key \
+            | sudo gpg --dearmor -o /usr/share/keyrings/llvm-snapshot.gpg
+          echo "deb [signed-by=/usr/share/keyrings/llvm-snapshot.gpg] https://apt.llvm.org/noble/ llvm-toolchain-noble-21 main" \
+            | sudo tee /etc/apt/sources.list.d/llvm-21.list
+          sudo apt-get update
+          sudo apt-get install -y clang-21 lld-21 llvm-21-dev liblld-21-dev libgc-dev
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-21 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-21 100
+          sudo ln -sf /usr/bin/llvm-config-21 /usr/bin/llvm-config
 
       - name: Install macOS dependencies
         if: runner.os == 'macOS'
@@ -67,18 +81,31 @@ jobs:
       - name: Package compiler
         shell: bash
         run: |
-          mkdir -p dist
+          set -euo pipefail
+          package_root="package/vixc-${VIXC_VERSION}-${{ runner.os }}"
+          mkdir -p "$package_root"
+          cp build/vixc "$package_root/"
+          # These directories are the Vix runtime/standard library shipped
+          # with the compiler. Include libc as well when a branch provides it.
+          cp -r core std lib runtime "$package_root/"
+          if [ -d libc ]; then cp -r libc "$package_root/"; fi
+          cat > "$package_root/VERSION" <<EOF
+          Vixc ${VIXC_VERSION}
+          Release channel: ${VIXC_CHANNEL}
+          English: Beta Candidate
+          中文：Beta 预选版
+          EOF
           if [ "${{ runner.os }}" = "Windows" ]; then
-            cp build/vixc dist/vixc-windows-x86_64.exe
+            7z a -tzip "vixc-${VIXC_VERSION}-windows-x86_64.zip" "./${package_root}"/*
           elif [ "${{ runner.os }}" = "macOS" ]; then
-            cp build/vixc dist/vixc-macos-arm64
+            tar -czf "vixc-${VIXC_VERSION}-macos-arm64.tar.gz" -C package "vixc-${VIXC_VERSION}-macOS"
           else
-            cp build/vixc dist/vixc-linux-x86_64
+            tar -czf "vixc-${VIXC_VERSION}-linux-x86_64.tar.gz" -C package "vixc-${VIXC_VERSION}-Linux"
           fi
 
       - name: Upload compiler artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vixc-${{ runner.os }}
-          path: dist/*
+          name: vixc-${{ env.VIXC_VERSION }}-${{ runner.os }}
+          path: vixc-*
           if-no-files-found: error
