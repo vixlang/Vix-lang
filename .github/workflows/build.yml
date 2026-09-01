@@ -105,12 +105,14 @@ jobs:
           cp "$compiler_path" "$package_root/"
           # vstd is maintained in its own repository and is shipped beside
           # the compiler. The native runtime sources remain available too.
-          cp -r vstd core lib runtime "$package_root/"
+          # Preserve vstd's repository symlinks instead of dereferencing them
+          # (some example/test links intentionally point outside the checkout).
+          cp -a vstd core lib runtime "$package_root/"
           if [ "${{ runner.os }}" = "Windows" ]; then
             if [ -d libc ]; then
-              cp -r libc "$package_root/"
+              cp -a libc "$package_root/"
             elif [ -d vstd/libc ]; then
-              cp -r vstd/libc "$package_root/"
+              cp -a vstd/libc "$package_root/"
             else
               echo "Windows package requires a libc/ directory" >&2
               exit 1
