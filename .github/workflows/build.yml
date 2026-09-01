@@ -1,0 +1,84 @@
+name: Build vixc
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-14]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld llvm-dev libgc-dev pkg-config make
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install llvm lld libatomic_ops bdw-gc pkg-config make
+          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix lld)/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix make)/libexec/gnubin" >> "$GITHUB_PATH"
+
+      - name: Set up MSYS2
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANG64
+          update: true
+          install: >-
+            make
+            mingw-w64-clang-x86_64-clang
+            mingw-w64-clang-x86_64-llvm
+            mingw-w64-clang-x86_64-lld
+            mingw-w64-clang-x86_64-boehm-gc
+            mingw-w64-clang-x86_64-pkgconf
+
+      - name: Build vixc (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            make -j2 all VIXC_RUN="" GC_WRAP_LDFLAGS="" LLD_LIBS=""
+          else
+            make -j2 all VIXC_RUN=""
+          fi
+
+      - name: Build vixc (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: make -j2 all VIXC_RUN="" GC_WRAP_LDFLAGS="" LLD_LIBS=""
+
+      - name: Package compiler
+        shell: bash
+        run: |
+          mkdir -p dist
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp build/vixc dist/vixc-windows-x86_64.exe
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            cp build/vixc dist/vixc-macos-arm64
+          else
+            cp build/vixc dist/vixc-linux-x86_64
+          fi
+
+      - name: Upload compiler artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vixc-${{ runner.os }}
+          path: dist/*
+          if-no-files-found: error
