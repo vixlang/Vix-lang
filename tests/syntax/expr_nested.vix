@@ -1,0 +1,19 @@
+fn nested(first: bool, second: bool): i32 =>
+    if (first) =>
+        if (second) => 1 else => 2
+    else => 3
+
+fn main(): i32 {
+    let mut count = 0
+    while (count < 2) => count = count + 1
+    if (count == 2) => for_helper() else {
+        return 1
+    }
+    return nested(true, false) - 2
+}
+
+fn for_helper(): void {
+    for (index in 0 .. 1) => consume(index)
+}
+
+fn consume(value: i32): void {}

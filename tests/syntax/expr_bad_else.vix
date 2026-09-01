@@ -1,0 +1,3 @@
+fn choose(flag: bool): i32 => if (flag) => 1
+
+fn main(): i32 => choose(true)

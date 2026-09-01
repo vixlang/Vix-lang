@@ -182,10 +182,7 @@ pub type OwnershipCheckState = struct {
     terminated: i32
 }
 
-pub fn ownership_state_new(): OwnershipCheckState
-{
-    return OwnershipCheckState{ names: [], types: [], mutable: [], status: [], active: [], is_param: [], shared_borrows: [], mut_borrow: [], borrow_source: [], borrow_kind: [], borrow_end_line: [], diagnostics: [], error_count: 0, terminated: 0 }
-}
+pub fn ownership_state_new(): OwnershipCheckState => OwnershipCheckState{ names: [], types: [], mutable: [], status: [], active: [], is_param: [], shared_borrows: [], mut_borrow: [], borrow_source: [], borrow_kind: [], borrow_end_line: [], diagnostics: [], error_count: 0, terminated: 0 }
 
 pub fn ownership_state_clone(state: &OwnershipCheckState): OwnershipCheckState
 {
@@ -918,10 +915,7 @@ pub fn ownership_check_function(program: AstProgram, facts: &OwnershipFacts, fun
     return state
 }
 
-pub fn typed_analysis_ir_new(): TypedAnalysisIR
-{
-    return TypedAnalysisIR{ functions: [], blocks: [], instructions: [], values: [], places: [], scopes: [] }
-}
+pub fn typed_analysis_ir_new(): TypedAnalysisIR => TypedAnalysisIR{ functions: [], blocks: [], instructions: [], values: [], places: [], scopes: [] }
 
 pub fn ownership_facts_new(expr_count: i32): OwnershipFacts
 {
@@ -935,15 +929,9 @@ pub fn ownership_facts_new(expr_count: i32): OwnershipFacts
     return OwnershipFacts{ expr_actions: actions, expr_types: types, stmt_moves: [], expr_borrows: [], block_borrows: [] }
 }
 
-pub fn drop_plan_new(): DropPlan
-{
-    return DropPlan{ events: [], block_heads: [], next_in_block: [] }
-}
+pub fn drop_plan_new(): DropPlan => DropPlan{ events: [], block_heads: [], next_in_block: [] }
 
-pub fn analysis_env_new(): AnalysisEnv
-{
-    return AnalysisEnv{ names: [], types: [], mutable: [] }
-}
+pub fn analysis_env_new(): AnalysisEnv => AnalysisEnv{ names: [], types: [], mutable: [] }
 
 pub fn analysis_env_clone(env: &AnalysisEnv): AnalysisEnv
 {
@@ -1130,15 +1118,9 @@ pub fn analysis_expr_type(program: AstProgram, env: &AnalysisEnv, idx: i32): str
     }
 }
 
-pub fn analysis_span(filename: string, line: i32, column: i32, length: i32): AnalysisSpan
-{
-    return AnalysisSpan{ file: filename, line: if (line > 0) { line } else { 1 }, column: if (column > 0) { column } else { 1 }, length: if (length > 0) { length } else { 1 } }
-}
+pub fn analysis_span(filename: string, line: i32, column: i32, length: i32): AnalysisSpan => AnalysisSpan{ file: filename, line: if (line > 0) { line } else { 1 }, column: if (column > 0) { column } else { 1 }, length: if (length > 0) { length } else { 1 } }
 
-pub fn analysis_expr_span(filename: string, expr: AstExpr): AnalysisSpan
-{
-    return analysis_span(filename, expr.line, expr.col, if (expr.text.length > 0) { expr.text.length } else { 1 })
-}
+pub fn analysis_expr_span(filename: string, expr: AstExpr): AnalysisSpan => analysis_span(filename, expr.line, expr.col, if (expr.text.length > 0) { expr.text.length } else { 1 })
 
 pub fn analysis_expr_source_id(program: AstProgram, idx: i32): i32
 {
@@ -2300,15 +2282,9 @@ pub fn typed_analysis_program_with_ownership(program: AstProgram, source: string
     return TypedAnalysisResult{ ok: 1, ownership_ok: if (error_count == 0) { 1 } else { 0 }, error: error, ir: ir, facts: facts, drops: final_drops }
 }
 
-pub fn typed_analysis_program(program: AstProgram, source: string, filename: string): TypedAnalysisResult
-{
-    return typed_analysis_program_with_ownership(program, source, filename, 1)
-}
+pub fn typed_analysis_program(program: AstProgram, source: string, filename: string): TypedAnalysisResult => typed_analysis_program_with_ownership(program, source, filename, 1)
 
-pub fn typed_analysis_span_debug(file: string, line: i32, column: i32): string
-{
-    return file + ":" + ast_i32(line) + ":" + ast_i32(column)
-}
+pub fn typed_analysis_span_debug(file: string, line: i32, column: i32): string => file + ":" + ast_i32(line) + ":" + ast_i32(column)
 
 pub fn typed_analysis_projection_debug(projection: AnalysisProjection): string
 {

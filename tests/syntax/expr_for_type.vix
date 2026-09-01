@@ -1,0 +1,4 @@
+fn main(): i32 {
+    for (index in [1, 2] .. 3) => index
+    return 0
+}

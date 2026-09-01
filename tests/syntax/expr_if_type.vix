@@ -1,0 +1,3 @@
+fn bad(flag: bool): i32 => if (flag) => 1 else => "wrong"
+
+fn main(): i32 => bad(true)

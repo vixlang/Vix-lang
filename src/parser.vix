@@ -19,40 +19,19 @@ pub type Parser = struct {
     lambda_functions: [AstFunction]
 }
 
-pub fn parser_new(src: string, filename: string): Parser
-{
-    return parser_new_stream(src, filename, tokenize(src))
-}
+pub fn parser_new(src: string, filename: string): Parser => parser_new_stream(src, filename, tokenize(src))
 
-pub fn parser_new_stream(src: string, filename: string, stream: TokenStream): Parser
-{
-    return Parser{ stream: stream, pos: 0, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, ""), expr_store: expr_store_new(), store: stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
-}
+pub fn parser_new_stream(src: string, filename: string, stream: TokenStream): Parser => Parser{ stream: stream, pos: 0, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, ""), expr_store: expr_store_new(), store: stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
 
-pub fn parser_kind(parser: &Parser): i32
-{
-    return stream_kind_at(parser.stream, parser.pos)
-}
+pub fn parser_kind(parser: &Parser): i32 => stream_kind_at(parser.stream, parser.pos)
 
-pub fn parser_text(parser: &Parser): string
-{
-    return stream_text_at(parser.stream, parser.pos)
-}
+pub fn parser_text(parser: &Parser): string => stream_text_at(parser.stream, parser.pos)
 
-pub fn parser_int(parser: &Parser): i32
-{
-    return stream_int_at(parser.stream, parser.pos)
-}
+pub fn parser_int(parser: &Parser): i32 => stream_int_at(parser.stream, parser.pos)
 
-pub fn parser_line(parser: &Parser): i32
-{
-    return stream_line_at(parser.stream, parser.pos)
-}
+pub fn parser_line(parser: &Parser): i32 => stream_line_at(parser.stream, parser.pos)
 
-pub fn parser_col(parser: &Parser): i32
-{
-    return stream_col_at(parser.stream, parser.pos)
-}
+pub fn parser_col(parser: &Parser): i32 => stream_col_at(parser.stream, parser.pos)
 
 pub fn parser_expr_at(parser: &Parser, idx: i32, line: i32, col: i32): i32
 {
@@ -72,10 +51,7 @@ pub fn parser_stmt_at(parser: &Parser, idx: i32, line: i32, col: i32): i32
     return idx
 }
 
-pub fn parser_float(parser: &Parser): f64
-{
-    return stream_float_at(parser.stream, parser.pos)
-}
+pub fn parser_float(parser: &Parser): f64 => stream_float_at(parser.stream, parser.pos)
 
 pub fn parser_at_end(parser: &Parser): i32
 {
@@ -423,10 +399,7 @@ pub fn parse_postfix(parser: &Parser): i32
     return parse_postfix_continue(parser, expr)
 }
 
-pub fn parse_postfix_from(parser: &Parser, expr_idx: i32): i32
-{
-    return parse_postfix_continue(parser, expr_idx)
-}
+pub fn parse_postfix_from(parser: &Parser, expr_idx: i32): i32 => parse_postfix_continue(parser, expr_idx)
 
 pub fn parser_generic_call_ahead(parser: &Parser): i32
 {
@@ -634,6 +607,20 @@ pub fn parse_if_expr_body(parser: &Parser): i32
     {
         return parse_block_expression(parser)
     }
+    if (parser_text(parser) == "->")
+    {
+        parser_fail_code(parser, "E1001", "expected '=>' for an expression body, got '->'; replace '->' with '=>'")
+        return -1
+    }
+    if (parser_text(parser) == "=>")
+    {
+        parser_advance(parser)
+        if (parser_text(parser) == ";" or parser_text(parser) == "else" or parser_text(parser) == "elif" or parser_text(parser) == "}" or parser_at_end(parser) == 1)
+        {
+            parser_fail_code(parser, "E1001", "expected expression after '=>', got '" + parser_text(parser) + "'; add one expression after '=>' or use '{ ... }' for statements")
+            return -1
+        }
+    }
     return parse_expression(parser)
 }
 
@@ -657,14 +644,19 @@ pub fn parse_if_expr(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     let then_idx = parse_if_expr_body(parser)
     if (parser.ok == 0) { return -1 }
+    while (parser_text(parser) == ";") { parser_advance(parser) }
     if (parser_text(parser) == "elif")
     {
         let else_idx = parse_if_expr(parser)
         if (parser.ok == 0) { return -1 }
         return parser_expr_at(parser, ast_expr_if(parser.expr_store, cond_idx, then_idx, else_idx), line, col)
     }
-    parser_expect_text(parser, "else")
-    if (parser.ok == 0) { return -1 }
+    if (parser_text(parser) != "else")
+    {
+        parser_fail_code(parser, "E1001", "expected 'else' after if expression body, got '" + parser_text(parser) + "'; add 'else => expression' or use the if as a statement")
+        return -1
+    }
+    parser_advance(parser)
     let else_idx = parse_if_expr_body(parser)
     if (parser.ok == 0) { return -1 }
     return parser_expr_at(parser, ast_expr_if(parser.expr_store, cond_idx, then_idx, else_idx), line, col)
@@ -1297,11 +1289,61 @@ pub fn parse_block_statement(parser: &Parser): i32
     return parser_stmt_at(parser, ast_stmt_block_indices(parser.store, indices), line, col)
 }
 
+// Parse the one expression-like operation allowed after `=>` in statement
+// context and normalize it to the existing block statement representation.
+// Assignment and print remain statements in the Vix AST, so accept exactly
+// one of those operations here as well; declarations and control statements
+// still require a braced block.
+pub fn parse_arrow_statement_body(parser: &Parser): i32
+{
+    let arrow_line = parser_line(parser)
+    let arrow_col = parser_col(parser)
+    if (parser_text(parser) == "->")
+    {
+        parser_fail_code(parser, "E1001", "expected '=>' for an expression body, got '->'; replace '->' with '=>'")
+        return -1
+    }
+    if (parser_expect_text(parser, "=>") == 0) { return -1 }
+    let text = parser_text(parser)
+    if (text == ";" or text == "else" or text == "elif" or text == "}" or parser_at_end(parser) == 1)
+    {
+        parser_fail_code(parser, "E1001", "expected expression after '=>', got '" + text + "'; add one expression after '=>' or use '{ ... }' for statements")
+        return -1
+    }
+    if (text == "let" or text == "return" or text == "break" or text == "continue" or text == "while" or text == "for" or text == "pub" or text == "type" or text == "struct" or text == "extern" or text == "mod" or text == "import")
+    {
+        parser_fail_code(parser, "E1002", "expected one expression after '=>', got declaration or statement '" + text + "'; use '{ ... }' for multiple statements")
+        return -1
+    }
+
+    let body_line = parser_line(parser)
+    let body_col = parser_col(parser)
+    let mut stmt_idx = -1
+    let next = stream_text_at(parser.stream, parser.pos + 1)
+    if (text == "print" or (parser_kind(parser) == tk_ident() and (next == "=" or next == "+=" or next == "-=")))
+    {
+        stmt_idx = parse_statement(parser)
+    }
+    else
+    {
+        let expr_idx = parse_expression(parser)
+        if (parser.ok == 0) { return -1 }
+        parser_accept_text(parser, ";")
+        stmt_idx = parser_stmt_at(parser, ast_stmt_expr(parser.store, expr_idx), body_line, body_col)
+    }
+    if (parser.ok == 0) { return -1 }
+    return parser_stmt_at(parser, ast_stmt_block_indices(parser.store, [stmt_idx]), arrow_line, arrow_col)
+}
+
 pub fn parse_if_statement_body(parser: &Parser): i32
 {
     if (parser_text(parser) == "{")
     {
         return parse_block_statement(parser)
+    }
+    if (parser_text(parser) == "=>" or parser_text(parser) == "->")
+    {
+        return parse_arrow_statement_body(parser)
     }
     let line = parser_line(parser)
     let col = parser_col(parser)
@@ -1372,7 +1414,7 @@ pub fn parse_for_statement(parser: &Parser): i32
     if (parser_text(parser) == ")")
     {
         parser_advance(parser)
-        let body_idx = parse_block_statement(parser)
+        let body_idx = if (parser_text(parser) == "=>" or parser_text(parser) == "->") parse_arrow_statement_body(parser) else parse_block_statement(parser)
         if (parser.ok == 0) { return -1 }
         let synthetic = "__for_each_i" + ast_i32(parser.store.stmts.length)
         let zero_idx = ast_expr_int(parser.expr_store, 0)
@@ -1399,7 +1441,7 @@ pub fn parse_for_statement(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     parser_expect_text(parser, ")")
     if (parser.ok == 0) { return -1 }
-    let body_idx = parse_block_statement(parser)
+    let body_idx = if (parser_text(parser) == "=>" or parser_text(parser) == "->") parse_arrow_statement_body(parser) else parse_block_statement(parser)
     if (parser.ok == 0) { return -1 }
     return parser_stmt_at(parser, ast_stmt_for_range(parser.store, name, start_idx, end_idx, body_idx), name_line, name_col)
 }
@@ -1635,7 +1677,7 @@ pub fn parse_statement(parser: &Parser): i32
         if (parser.ok == 0) { return -1 }
         parser_expect_text(parser, ")")
         if (parser.ok == 0) { return -1 }
-        let body_idx = parse_block_statement(parser)
+        let body_idx = if (parser_text(parser) == "=>" or parser_text(parser) == "->") parse_arrow_statement_body(parser) else parse_block_statement(parser)
         if (parser.ok == 0) { return -1 }
         return parser_stmt_at(parser, ast_stmt_while(parser.store, cond_idx, body_idx), line, col)
     }
@@ -1785,7 +1827,12 @@ pub fn parse_function(parser: &Parser): AstFunction
     if (parser_text(parser) == "pub") { parser_advance(parser) }
     if (parser_expect_text(parser, "fn") == 0) { return ast_function("main", "i32", -1) }
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return ast_function("main", "i32", -1) }
+    if (parser_kind(parser) != tk_ident())
+    {
+        parser_fail_code(parser, "E1001", "expected function name after 'fn', got '" + parser_text(parser) + "'; name the function, for example 'fn add(...) => expression'")
+        return ast_function("main", "i32", -1)
+    }
+    parser_advance(parser)
     parser.current_function = name
     let type_params = parse_type_params_after_name(parser)
     if (parser.ok == 0) { return ast_function("main", "i32", -1) }
@@ -1821,7 +1868,37 @@ pub fn parse_function(parser: &Parser): AstFunction
         parser_advance(parser)
         ret_ty = parse_type_text(parser)
     }
-    let mut body_idx = parse_block_statement(parser)
+    let mut body_idx = -1
+    if (parser_text(parser) == "->")
+    {
+        parser_fail_code(parser, "E1001", "expected '=>' or '{' for function body, got '->'; replace '->' with '=>' for an expression body")
+        return ast_function("main", "i32", -1)
+    }
+    if (parser_text(parser) == "=>")
+    {
+        parser_advance(parser)
+        let body_line = parser_line(parser)
+        let body_col = parser_col(parser)
+        let text = parser_text(parser)
+        if (text == ";" or text == "}" or parser_at_end(parser) == 1)
+        {
+            parser_fail_code(parser, "E1001", "expected expression after '=>', got '" + text + "'; add one return expression after '=>'")
+            return ast_function("main", "i32", -1)
+        }
+        if (text == "{" or text == "let" or text == "return" or text == "break" or text == "continue" or text == "while" or text == "for" or text == "pub" or text == "type" or text == "struct" or text == "extern" or text == "mod" or text == "import" or text == "print")
+        {
+            parser_fail_code(parser, "E1002", "expected one return expression after '=>', got '" + text + "'; use a function body '{ ... }' for statements")
+            return ast_function("main", "i32", -1)
+        }
+        let body_expr = parse_expression(parser)
+        if (parser.ok == 0) { return ast_function("main", "i32", -1) }
+        parser_accept_text(parser, ";")
+        body_idx = parser_stmt_at(parser, ast_stmt_return_expr(parser.store, body_expr), body_line, body_col)
+    }
+    else
+    {
+        body_idx = parse_block_statement(parser)
+    }
     if (parser.ok == 0) { return ast_function("main", "i32", -1) }
     if (body_idx < 0)
     {
@@ -1964,10 +2041,7 @@ pub fn parse_struct_decl_abi(parser: &Parser, is_c_abi: i32): AstStructDecl
     return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, line: line, col: col }
 }
 
-pub fn parse_struct_decl(parser: &Parser): AstStructDecl
-{
-    return parse_struct_decl_abi(parser, 0)
-}
+pub fn parse_struct_decl(parser: &Parser): AstStructDecl => parse_struct_decl_abi(parser, 0)
 
 pub fn parse_type_params_after_name(parser: &Parser): [string]
 {
@@ -2095,10 +2169,7 @@ pub fn parse_stream_uses_result_ctor(stream: &TokenStream): i32
     return 0
 }
 
-pub fn parse_builtin_result_decl(): AstAdtDecl
-{
-    return AstAdtDecl{ name: "Result", type_params: [], variant_names: ["Ok", "Err"], variant_payload_types: ["i32", "string"], line: 0, col: 0 }
-}
+pub fn parse_builtin_result_decl(): AstAdtDecl => AstAdtDecl{ name: "Result", type_params: [], variant_names: ["Ok", "Err"], variant_payload_types: ["i32", "string"], line: 0, col: 0 }
 
 // Parse a module path: ident (:: ident)*  -> returns ["math", "add"]
 // Keywords are accepted as segment names (e.g. `utils::string::trim`)
@@ -2353,15 +2424,9 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
     return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store)
 }
 
-pub fn parse_program(src: string, filename: string): AstProgram
-{
-    return parse_program_impl(src, filename, 1)
-}
+pub fn parse_program(src: string, filename: string): AstProgram => parse_program_impl(src, filename, 1)
 
-pub fn parse_program_raw(src: string, filename: string): AstProgram
-{
-    return parse_program_impl(src, filename, 0)
-}
+pub fn parse_program_raw(src: string, filename: string): AstProgram => parse_program_impl(src, filename, 0)
 
 pub fn parse_program_stats(src: string, filename: string): string
 {

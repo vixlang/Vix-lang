@@ -28,15 +28,9 @@ pub type MachineModule = struct {
     functions: [MachineFunction]
 }
 
-pub fn machine_empty_inst(): MachineInst
-{
-    return MachineInst{ opcode: "", dest: "", ty: "", operands: [], text: "", line_no: 0 }
-}
+pub fn machine_empty_inst(): MachineInst => MachineInst{ opcode: "", dest: "", ty: "", operands: [], text: "", line_no: 0 }
 
-pub fn machine_empty_function(): MachineFunction
-{
-    return MachineFunction{ name: "", ret_ty: "void", header: "", line_no: 0, blocks: [] }
-}
+pub fn machine_empty_function(): MachineFunction => MachineFunction{ name: "", ret_ty: "void", header: "", line_no: 0, blocks: [] }
 
 pub fn machine_first_word(text: string): string
 {

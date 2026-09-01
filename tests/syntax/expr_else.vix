@@ -1,0 +1,11 @@
+fn mixed(flag: bool): i32 => if (flag) => 10 else {
+    let value = 2
+    value + 3
+}
+
+fn sink(value: i32): void {}
+
+fn main(): i32 {
+    if (false) => sink(1) else => sink(2)
+    return mixed(false) - 5
+}

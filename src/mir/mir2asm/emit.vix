@@ -1,12 +1,6 @@
 #[no_main]
 import "x86_64/mod.vix"
 
-pub fn mir2asm_debug(mir: string): string
-{
-    return mir2asm_x86_64_debug(mir, 1)
-}
+pub fn mir2asm_debug(mir: string): string => mir2asm_x86_64_debug(mir, 1)
 
-pub fn mir2asm_write_file(mir: string, path: string): i32
-{
-    return mir2asm_x86_64_write(mir, path)
-}
+pub fn mir2asm_write_file(mir: string, path: string): i32 => mir2asm_x86_64_write(mir, path)

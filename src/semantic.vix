@@ -16,15 +16,9 @@ pub type SemanticResult = struct {
     type_result: TypeInferResult
 }
 
-pub fn semantic_result_new(): SemanticResult
-{
-    return semantic_result_new_with_warnings(1)
-}
+pub fn semantic_result_new(): SemanticResult => semantic_result_new_with_warnings(1)
 
-pub fn semantic_result_new_with_warnings(emit_warnings: i32): SemanticResult
-{
-    return SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, emit_warnings: emit_warnings, bag: diag_bag_new(), source: "", filename: "", type_result: typeinfer_ok("unknown") }
-}
+pub fn semantic_result_new_with_warnings(emit_warnings: i32): SemanticResult => SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, emit_warnings: emit_warnings, bag: diag_bag_new(), source: "", filename: "", type_result: typeinfer_ok("unknown") }
 
 pub fn semantic_phase(error_type: string): DiagPhase
 {
@@ -117,10 +111,7 @@ pub type SemanticScope = struct {
     depth: i32
 }
 
-pub fn semantic_scope_new(): SemanticScope
-{
-    return SemanticScope{ names: [], depths: [], used: [], mutable: [], lines: [], cols: [], warn_unused: [], active_len: 0, depth: 0 }
-}
+pub fn semantic_scope_new(): SemanticScope => SemanticScope{ names: [], depths: [], used: [], mutable: [], lines: [], cols: [], warn_unused: [], active_len: 0, depth: 0 }
 
 pub fn semantic_scope_push(scope: &SemanticScope)
 {
@@ -965,10 +956,7 @@ pub fn semantic_check_main(funcs: [AstFunction], result: &SemanticResult, filena
     }
 }
 
-pub fn semantic_check_program(program: AstProgram, source: string, filename: string): SemanticResult
-{
-    return semantic_check_program_with_warnings(program, source, filename, 1)
-}
+pub fn semantic_check_program(program: AstProgram, source: string, filename: string): SemanticResult => semantic_check_program_with_warnings(program, source, filename, 1)
 
 pub fn semantic_check_program_with_warnings(program: AstProgram, source: string, filename: string, emit_warnings: i32): SemanticResult
 {

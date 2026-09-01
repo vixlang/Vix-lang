@@ -1,0 +1,3 @@
+fn bad(value: i32): i32 -> value + 1
+
+fn main(): i32 => bad(1)

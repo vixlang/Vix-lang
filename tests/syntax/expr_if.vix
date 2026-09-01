@@ -1,0 +1,11 @@
+fn choose(flag: bool): i32 => if (flag) => 7 else => 9
+
+fn sink(value: i32): void {}
+
+fn main(): i32 {
+    if (true) => sink(1)
+    if (false) {
+        sink(2)
+    }
+    return choose(true) - 7
+}

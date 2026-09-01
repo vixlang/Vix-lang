@@ -100,20 +100,14 @@ pub fn mir_type_option_inner(ty: string): string
     return "unknown"
 }
 
-pub fn mir_var_addr(name: string): string
-{
-    return "%" + name + "_addr"
-}
+pub fn mir_var_addr(name: string): string => "%" + name + "_addr"
 
 pub fn mir_define_local(name: string, ty: string)
 {
     set_local_var_type(name, ty)
 }
 
-pub fn mir_get_local_ty(name: string): string
-{
-    return get_local_var_type(name)
-}
+pub fn mir_get_local_ty(name: string): string => get_local_var_type(name)
 
 macro mir_register_builtin_function_sigs() {
     register_function_sig_vararg("printf", "i32", ["ptr"], 1)
@@ -915,10 +909,7 @@ pub fn mir_binop_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: 
     return MirValue{ name: out, ty: "bool" }
 }
 
-pub fn mir_expr_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr): MirValue
-{
-    return mir_expr_value_typed(b, es, store, expr, mir_expr_type(es, expr))
-}
+pub fn mir_expr_value(b: &MirBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr): MirValue => mir_expr_value_typed(b, es, store, expr, mir_expr_type(es, expr))
 
 pub fn mir_store_expr_to_name(b: &MirBuilder, es: &ExprStore, store: &StmtStore, name: string, expr_idx: i32, ty: string)
 {

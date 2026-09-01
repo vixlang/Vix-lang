@@ -10,10 +10,7 @@ extern "C"
     fn vix_clean_symbol_name(name: string): string
 }
 
-pub fn mir2asm_trim(text: string): string
-{
-    return vix_trim_ascii(text)
-}
+pub fn mir2asm_trim(text: string): string => vix_trim_ascii(text)
 
 pub fn mir2asm_starts_with(text: string, prefix: string): i32
 {
@@ -72,20 +69,11 @@ pub fn mir2asm_find_matching_paren(text: string, lp: i32): i32
     return -1
 }
 
-pub fn mir2asm_slice(text: string, start: i32, end: i32): string
-{
-    return vix_substr(text, start, end)
-}
+pub fn mir2asm_slice(text: string, start: i32, end: i32): string => vix_substr(text, start, end)
 
-pub fn mir2asm_after(text: string, start: i32): string
-{
-    return mir2asm_slice(text, start, text.length)
-}
+pub fn mir2asm_after(text: string, start: i32): string => mir2asm_slice(text, start, text.length)
 
-pub fn mir2asm_clean_name(name: string): string
-{
-    return vix_clean_symbol_name(name)
-}
+pub fn mir2asm_clean_name(name: string): string => vix_clean_symbol_name(name)
 
 pub fn mir2asm_dest(line: string): string
 {

@@ -1,0 +1,3 @@
+fn bad(): i32 => "not an integer"
+
+fn main(): i32 => bad()

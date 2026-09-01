@@ -4,3 +4,7 @@ build/vixc-seed-gc
 /test
 /test.vix
 /tests/bin/
+.agents
+.codex
+.pytest_cache
+.venv

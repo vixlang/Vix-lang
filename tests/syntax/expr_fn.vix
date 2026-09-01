@@ -1,0 +1,11 @@
+fn add(a: i32, b: i32): i32 => a + b
+
+fn identity(value: i32): i32
+=>
+value
+
+fn legacy(value: i32): i32 {
+    return value
+}
+
+fn main(): i32 => add(identity(20), legacy(22)) - 42

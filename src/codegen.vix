@@ -50,10 +50,7 @@ pub fn codegen_lambda_expr_for_name(es: &ExprStore, name: string): AstExpr
     return es.exprs[0]
 }
 
-pub fn codegen_function_value_wrapper_name(name: string): string
-{
-    return "__fn_value_" + mangle_flat_name(name)
-}
+pub fn codegen_function_value_wrapper_name(name: string): string => "__fn_value_" + mangle_flat_name(name)
 
 // Function values always use { code, env }.  The wrapper lets a named
 // function retain its ordinary ABI while also being passed where a fn value
@@ -827,10 +824,7 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
     return llvm_const_i32(0)
 }
 
-pub fn codegen_expr_value(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr): ptr
-{
-    return codegen_expr_value_typed(b, es, store, expr, codegen_expr_type(b, es, expr))
-}
+pub fn codegen_expr_value(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, expr: AstExpr): ptr => codegen_expr_value_typed(b, es, store, expr, codegen_expr_type(b, es, expr))
 
 pub fn codegen_match_compare(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, subject_val: ptr, subject_ty: string, pattern_idx: i32): ptr
 {
@@ -1252,10 +1246,7 @@ pub fn codegen_stmt(b: &LlvmBuilder, es: &ExprStore, store: &StmtStore, stmt_idx
     codegen_stmt_in_loop(b, es, store, stmt_idx, nil, nil, return_is_void)
 }
 
-pub fn codegen_program(program: AstProgram): string
-{
-    return codegen_program_target(program, "")
-}
+pub fn codegen_program(program: AstProgram): string => codegen_program_target(program, "")
 
 pub fn codegen_program_target(program: AstProgram, target_triple: string): string
 {

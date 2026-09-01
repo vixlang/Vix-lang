@@ -157,6 +157,7 @@ test: all
 		fi; \
 	done
 	python3 tests/diagnostics.py $(TARGET)
+	python3 tests/syntax_tests.py $(TARGET)
 	python3 tests/entry_alloca.py --compiler $(TARGET)
 	$(PYTHON) tests/complex_tests.py --compiler $(TARGET)
 

@@ -1,0 +1,2 @@
+fn bad(): i32 => let value = 1
+return value

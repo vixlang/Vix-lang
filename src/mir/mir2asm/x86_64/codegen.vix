@@ -145,10 +145,7 @@ pub fn mir2asm_lir_has_callee(mask: i32, reg: string): i32
     return if ((mask / 8) % 2 == 1) { 1 } else { 0 }
 }
 
-pub fn mir2asm_lir_callee_count(mask: i32): i32
-{
-    return mir2asm_lir_has_callee(mask, "r12") + mir2asm_lir_has_callee(mask, "r13") + mir2asm_lir_has_callee(mask, "r14") + mir2asm_lir_has_callee(mask, "r15")
-}
+pub fn mir2asm_lir_callee_count(mask: i32): i32 => mir2asm_lir_has_callee(mask, "r12") + mir2asm_lir_has_callee(mask, "r13") + mir2asm_lir_has_callee(mask, "r14") + mir2asm_lir_has_callee(mask, "r15")
 
 pub fn mir2asm_emit_unsupported(b: &MirAsm, line: string)
 {

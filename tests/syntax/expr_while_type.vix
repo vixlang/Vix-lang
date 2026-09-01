@@ -1,0 +1,4 @@
+fn main(): i32 {
+    while ("not a condition") => 2
+    return 0
+}

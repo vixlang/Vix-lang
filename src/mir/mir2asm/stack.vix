@@ -3,10 +3,7 @@ import "types.vix"
 import "target.vix"
 import "registers.vix"
 
-pub fn mir2asm_label(b: &MirAsm, name: string): string
-{
-    return b.fn_name + "__" + mir2asm_clean_name(name)
-}
+pub fn mir2asm_label(b: &MirAsm, name: string): string => b.fn_name + "__" + mir2asm_clean_name(name)
 
 pub fn mir2asm_find_name(b: &MirAsm, name: string): i32
 {
@@ -31,10 +28,7 @@ pub fn mir2asm_alloc_slot_typed(b: &MirAsm, name: string, addr: i32, ty: string)
     return b.stack_next
 }
 
-pub fn mir2asm_mem(offset: i32): string
-{
-    return "[rbp-" + i32_to_str(offset) + "]"
-}
+pub fn mir2asm_mem(offset: i32): string => "[rbp-" + i32_to_str(offset) + "]"
 
 pub fn mir2asm_slot_ty(b: &MirAsm, value: string): string
 {

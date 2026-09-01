@@ -431,10 +431,7 @@ pub fn machine_lir_build(module: MachineModule): MachineLirModule
     return out
 }
 
-pub fn mir2lir(mir: string): MachineLirModule
-{
-    return machine_lir_build(machine_parse(mir))
-}
+pub fn mir2lir(mir: string): MachineLirModule => machine_lir_build(machine_parse(mir))
 
 pub fn machine_lir_finish_frame(lir: &MachineLirFunction, names: [string], offsets: [i32], is_addr: [i32], tys: [string], frame_size: i32)
 {
