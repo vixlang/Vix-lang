@@ -756,25 +756,28 @@ pub fn diag_render_human(diag: Diagnostic, options: DiagRenderOptions): string
     let phase_color = if (diag.level == DiagWarning) level_color else diag_phase_color(diag.phase, enabled)
     let reset = diag_reset_code(enabled)
     let primary = diag_primary_span(diag)
+    let width = diag_line_width(primary.line + 1)
+    let gutter = diag_repeat(" ", width) + " |"
+    let annotation = diag_repeat(" ", width) + " = "
     let file = if (options.test_mode == 1) diag_stable_path(primary.file) else primary.file
     let mut out = level_color + diag_level_text(diag.level) + reset + "[" + phase_color + diag.code + reset + "]: " + diag.title + "\n"
     if (diag.message != "" and diag.message != diag.title) { out = out + "  " + diag.message + "\n" }
     if (file != "")
     {
         out = out + " --> " + file + ":" + diag_i32(primary.line) + ":" + diag_i32(primary.column) + "\n"
-        out = out + "  |\n"
+        out = out + gutter + "\n"
     }
     for (i in 0 .. diag.parts.length)
     {
         match diag.parts[i]
         {
             DiagLabelPart(label) -> out = out + diag_render_label(options.source, label, options.test_mode, enabled)
-            DiagNotePart(note) -> out = out + "  |\n" + diag_level_color(DiagNote, enabled) + "note:" + reset + " " + note + "\n"
-            DiagHelpPart(help) -> out = out + "  |\n" + diag_level_color(DiagHelp, enabled) + "help:" + reset + " " + help + "\n"
-            DiagSuggestionPart(suggestion) -> out = out + "  |\n" + diag_level_color(DiagHelp, enabled) + "help:" + reset + " " + suggestion.message + ": replace with `" + suggestion.replacement + "`\n"
+            DiagNotePart(note) -> out = out + gutter + "\n" + annotation + diag_level_color(DiagNote, enabled) + "note:" + reset + " " + note + "\n"
+            DiagHelpPart(help) -> out = out + gutter + "\n" + annotation + diag_level_color(DiagHelp, enabled) + "help:" + reset + " " + help + "\n"
+            DiagSuggestionPart(suggestion) -> out = out + gutter + "\n" + annotation + diag_level_color(DiagHelp, enabled) + "help:" + reset + " " + suggestion.message + ": replace with `" + suggestion.replacement + "`\n"
             DiagMacroPart(frame) -> {
                 let macro_file = if (options.test_mode == 1) diag_stable_path(frame.span.file) else frame.span.file
-                out = out + "  |\n" + diag_level_color(DiagNote, enabled) + "note:" + reset + " expanded from macro `$" + frame.name + "`\n --> " + macro_file + ":" + diag_i32(frame.span.line) + ":" + diag_i32(frame.span.column) + "\n"
+                out = out + gutter + "\n" + annotation + diag_level_color(DiagNote, enabled) + "note:" + reset + " expanded from macro `$" + frame.name + "`\n --> " + macro_file + ":" + diag_i32(frame.span.line) + ":" + diag_i32(frame.span.column) + "\n"
                 if (frame.message != "") { out = out + "  = " + frame.message + "\n" }
             }
         }
