@@ -29,18 +29,24 @@ SRC_DIR := src
 BUILD_DIR := build
 RUNTIME_DIR := runtime
 
-TARGET := $(BUILD_DIR)/vixc
+ifeq ($(OS),Windows_NT)
+EXE_EXT := .exe
+else
+EXE_EXT :=
+endif
+
+TARGET := $(BUILD_DIR)/vixc$(EXE_EXT)
 SEED_OBJ := $(BUILD_DIR)/vixc-seed.o
-SEED_GC_TARGET := $(BUILD_DIR)/vixc-seed-gc
+SEED_GC_TARGET := $(BUILD_DIR)/vixc-seed-gc$(EXE_EXT)
 BOOTSTRAP_OBJ := $(BUILD_DIR)/vixc-bootstrap.o
-BOOTSTRAP_TARGET := $(BUILD_DIR)/vixc-bootstrap
+BOOTSTRAP_TARGET := $(BUILD_DIR)/vixc-bootstrap$(EXE_EXT)
 HELPER_OBJ := $(BUILD_DIR)/helper.o
 RUNTIME_OBJ := $(RUNTIME_DIR)/runtime.o
 VIXC_OBJ := $(BUILD_DIR)/vixc.o
 SELF_STAGE_OBJ := $(BUILD_DIR)/vixc-self.o
-SELF_STAGE_TARGET := $(BUILD_DIR)/vixc-self
+SELF_STAGE_TARGET := $(BUILD_DIR)/vixc-self$(EXE_EXT)
 SELF_LIR_STAGE_OBJ := $(BUILD_DIR)/vixc-self-lir.o
-SELF_LIR_STAGE_TARGET := $(BUILD_DIR)/vixc-self-lir
+SELF_LIR_STAGE_TARGET := $(BUILD_DIR)/vixc-self-lir$(EXE_EXT)
 API_OBJ := $(BUILD_DIR)/api.o
 LLC_OBJ := $(BUILD_DIR)/Llc.o
 LINKER_OBJ := $(BUILD_DIR)/Linker.o

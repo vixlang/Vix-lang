@@ -92,7 +92,9 @@ jobs:
           set -euo pipefail
           package_root="package/vixc-${VIXC_VERSION}-${{ runner.os }}"
           mkdir -p "$package_root"
-          cp build/vixc "$package_root/"
+          compiler_path=build/vixc
+          if [ "${{ runner.os }}" = "Windows" ]; then compiler_path=build/vixc.exe; fi
+          cp "$compiler_path" "$package_root/"
           # vstd is maintained in its own repository and is shipped beside
           # the compiler. The native runtime sources remain available too.
           cp -r vstd core lib runtime "$package_root/"
