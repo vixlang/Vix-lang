@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   # Semantic pre-release identifier: 0.5.0 Beta Candidate（Beta 预选版）
@@ -139,3 +139,40 @@ jobs:
           name: vixc-${{ env.VIXC_VERSION }}-${{ runner.os }}
           path: vixc-*
           if-no-files-found: error
+
+  release:
+    name: Publish vixc ${{ github.ref_name }} release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download platform packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: vixc-*
+          path: dist
+          merge-multiple: true
+
+      - name: Verify release tag
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_TAG: ${{ env.VIXC_VERSION }}
+        run: |
+          set -euo pipefail
+          if [ "$RELEASE_TAG" != "$EXPECTED_TAG" ]; then
+            echo "Refusing to publish unexpected tag: $RELEASE_TAG (expected $EXPECTED_TAG)" >&2
+            exit 1
+          fi
+          find dist -maxdepth 1 -type f -print
+
+      - name: Create GitHub prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Vix ${{ github.ref_name }}
+          prerelease: true
+          generate_release_notes: true
+          files: dist/*
