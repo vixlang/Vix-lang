@@ -3,7 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(_WIN32) || defined(WIN32)
+#include <io.h>
+#define access _access
+#define R_OK 4
+#define X_OK 0
+#else
 #include <unistd.h>
+#endif
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096

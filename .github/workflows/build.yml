@@ -61,22 +61,27 @@ jobs:
             mingw-w64-clang-x86_64-clang
             mingw-w64-clang-x86_64-llvm
             mingw-w64-clang-x86_64-lld
-            mingw-w64-clang-x86_64-boehm-gc
+            mingw-w64-clang-x86_64-gc
             mingw-w64-clang-x86_64-pkgconf
 
       - name: Build vixc (Linux/macOS)
         if: runner.os != 'Windows'
         run: |
           if [ "${{ runner.os }}" = "macOS" ]; then
-            make -j2 all VIXC_RUN="" GC_WRAP_LDFLAGS="" LLD_LIBS=""
+            make -j2 all VIXC_RUN="" GCC=clang CXX=clang++ CLANG=clang \
+              GC_WRAP_LDFLAGS="" LLD_LIBS=""
           else
-            make -j2 all VIXC_RUN=""
+            make -j2 all VIXC_RUN="" GCC=clang-21 CXX=clang++-21 CLANG=clang-21
           fi
 
       - name: Build vixc (Windows)
         if: runner.os == 'Windows'
         shell: msys2 {0}
-        run: make -j2 all VIXC_RUN="" GC_WRAP_LDFLAGS="" LLD_LIBS=""
+        run: make -j2 all VIXC_RUN="" GCC=clang CXX=clang++ CLANG=clang GC_WRAP_LDFLAGS="" LLD_LIBS=""
+
+      - name: Fetch vstd standard library
+        shell: bash
+        run: git clone --depth 1 https://github.com/vixlang/std.git vstd
 
       - name: Package compiler
         shell: bash
@@ -85,15 +90,25 @@ jobs:
           package_root="package/vixc-${VIXC_VERSION}-${{ runner.os }}"
           mkdir -p "$package_root"
           cp build/vixc "$package_root/"
-          # These directories are the Vix runtime/standard library shipped
-          # with the compiler. Include libc as well when a branch provides it.
-          cp -r core std lib runtime "$package_root/"
-          if [ -d libc ]; then cp -r libc "$package_root/"; fi
+          # vstd is maintained in its own repository and is shipped beside
+          # the compiler. The native runtime sources remain available too.
+          cp -r vstd core lib runtime "$package_root/"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            if [ -d libc ]; then
+              cp -r libc "$package_root/"
+            elif [ -d vstd/libc ]; then
+              cp -r vstd/libc "$package_root/"
+            else
+              echo "Windows package requires a libc/ directory" >&2
+              exit 1
+            fi
+          fi
           cat > "$package_root/VERSION" <<EOF
           Vixc ${VIXC_VERSION}
           Release channel: ${VIXC_CHANNEL}
           English: Beta Candidate
           中文：Beta 预选版
+          Standard library: https://github.com/vixlang/std
           EOF
           if [ "${{ runner.os }}" = "Windows" ]; then
             7z a -tzip "vixc-${VIXC_VERSION}-windows-x86_64.zip" "./${package_root}"/*

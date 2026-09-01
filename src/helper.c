@@ -6,7 +6,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#if defined(_WIN32) || defined(WIN32)
+#include <io.h>
+#define isatty _isatty
+#define STDERR_FILENO 2
+#else
 #include <unistd.h>
+#endif
+
+/* These unlocked stdio extensions are not exposed by Apple's libc (and are
+ * not consistently available on Windows). The locked forms are portable and
+ * preserve the helper's behaviour on those targets. */
+#if defined(__APPLE__) || defined(_WIN32) || defined(WIN32)
+#define fputs_unlocked fputs
+#define fputc_unlocked fputc
+#endif
 
 void *vix_lexer_peek_char(const char *src, int pos) {
   if (src == NULL || pos < 0 || (size_t)pos >= strlen(src))
