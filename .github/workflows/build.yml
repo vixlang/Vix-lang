@@ -86,10 +86,16 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: |
+          set +e
           make -j2 all VIXC_RUN="" VIXC="./build/vixc-seed-gc.exe" \
-          GCC=clang CXX=clang++ CLANG=clang \
-          LLVM_CXXFLAGS="$(llvm-config --cxxflags | sed 's/-stdlib=libc++//g')" \
-          GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCommon -lz -lzstd"
+            GCC=clang CXX=clang++ CLANG=clang \
+            LLVM_CXXFLAGS="$(llvm-config --cxxflags | sed 's/-stdlib=libc++//g')" \
+            GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCommon -lz -lzstd"
+          status=$?
+          echo "make exit status: $status"
+          echo "vixc-seed-gc.exe runtime dependencies:"
+          ldd ./build/vixc-seed-gc.exe || true
+          exit "$status"
 
       - name: Package compiler
         shell: bash
