@@ -29,6 +29,9 @@ extern int vix_llc_compile_ir_to_asm(const char *input_path,
                                      const char *target_triple);
 extern const char *vix_llc_last_error(void);
 extern int vix_lld_link_elf(const char *args_text);
+#if defined(_WIN32) || defined(WIN32)
+extern int vix_lld_link_coff(const char *args_text);
+#endif
 extern const char *vix_lld_last_error(void);
 extern int vix_passes_optimize_ir(const char *input_path,
                                   const char *output_path,
@@ -145,6 +148,36 @@ int vix_api_link_executable(const char *object_path, const char *runtime_object,
     return 1;
   }
 
+#if defined(_WIN32) || defined(WIN32)
+  /* PE/COFF: drive lld-link in-process.  Library search relies on the %LIB%
+   * environment variable (as with link.exe) so the MSVC CRT and Windows SDK
+   * import libraries can be found. */
+  char out_arg[PATH_MAX + 16];
+  snprintf(out_arg, sizeof(out_arg), "-OUT:%s", output_path);
+  append_arg(args, sizeof(args), "-NOLOGO");
+  append_arg(args, sizeof(args), "-MACHINE:X64");
+  append_arg(args, sizeof(args), "-STACK:16777216");
+  append_arg(args, sizeof(args), out_arg);
+
+  append_arg(args, sizeof(args), object_path);
+  if (!no_std && runtime_object && runtime_object[0] != '\0')
+    append_arg(args, sizeof(args), runtime_object);
+
+  if (link_args && link_args[0] != '\0')
+    append_arg(args, sizeof(args), link_args);
+
+  if (!no_std) {
+    append_arg(args, sizeof(args), "msvcrt.lib");
+    append_arg(args, sizeof(args), "ucrt.lib");
+    append_arg(args, sizeof(args), "vcruntime.lib");
+    append_arg(args, sizeof(args), "kernel32.lib");
+  } else {
+    append_arg(args, sizeof(args), "-ENTRY:main");
+    append_arg(args, sizeof(args), "-SUBSYSTEM:CONSOLE");
+  }
+
+  return vix_lld_link_coff(args);
+#else
   append_arg(args, sizeof(args), "-o");
   append_arg(args, sizeof(args), output_path);
 
@@ -195,6 +228,7 @@ int vix_api_link_executable(const char *object_path, const char *runtime_object,
   }
 
   return vix_lld_link_elf(args);
+#endif
 }
 
 int vix_api_link_executable_std(const char *object_path,

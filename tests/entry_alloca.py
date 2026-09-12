@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import re
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -42,8 +43,13 @@ def main() -> int:
             print("\n".join(violations))
             return 1
 
+        llvm_as = shutil.which("llvm-as")
+        if llvm_as is None:
+            print("entry-alloca: all allocas are in entry blocks; llvm-as not on PATH, verifier skipped")
+            return 0
+
         verify = subprocess.run(
-            ["llvm-as", str(ir), "-o", str(Path(tmp) / "alloca.bc")],
+            [llvm_as, str(ir), "-o", str(Path(tmp) / "alloca.bc")],
             cwd=root,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

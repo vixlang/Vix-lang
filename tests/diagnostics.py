@@ -23,8 +23,11 @@ def compile_case(compiler: Path, source: str, extra: list[str]) -> str:
 
 
 def require(output: str, source: str, expected: list[str]) -> None:
+    # Windows reports backslash separators; normalize so the relative-path
+    # fragments asserted below match on every platform.
+    normalized = output.replace("\\", "/")
     for text in expected:
-        if text not in output:
+        if text not in normalized:
             raise AssertionError(f"{source}: missing {text!r}\n{output}")
 
 
