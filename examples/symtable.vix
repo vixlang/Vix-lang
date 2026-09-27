@@ -1,4 +1,4 @@
-struct SymbolTable:[T]
+type SymbolTable:[T] = struct
 {
     scopes: [ [ (string, T) ] ]
 }
@@ -28,7 +28,7 @@ fn lookup:[T](table: SymbolTable:[T], name: string): ?T
     return None
 }
 
-struct Type
+type Type = struct
 {
     name: string
 }

@@ -5,7 +5,7 @@ extern "C"
 {
 	fn printf(format: string, ...): i32
 }
-struct Box:[T]
+type Box:[T] = struct
 {
 	value: T
 }

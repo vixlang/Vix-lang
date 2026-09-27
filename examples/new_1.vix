@@ -3,19 +3,13 @@ type Point = struct
     x: i32,
     y: i32
 }
-fn add(a:i32,b:i32): i32 = a + b
+fn add(a: i32, b: i32): i32 => a + b
 
 
 fn main(): i32
 {
     let p = Point { x: 10, y: 20 }
     let a = 5
-    let b = if (a > 3){ 15 } else { 25 }
+    let b = if (a > 3) => 15 else => 25
     return add(p.x, p.y)
 }
-/*
-This syntax is 0.1.1 version , if you want to use
-struct xxx{..}
-you need you use 0.1.0 version 
-Enjoy it!
-*/
