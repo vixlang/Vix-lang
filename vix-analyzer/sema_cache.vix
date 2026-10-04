@@ -1,0 +1,285 @@
+#[no_main]
+
+import "ids.vix"
+import "diagnostics.vix"
+import "ast_fragment.vix"
+import "../src/ast.vix"
+import "../src/diag.vix"
+import "../src/semantic.vix"
+import "../src/type/typeck.vix"
+
+// Function-level cache for the semantic pass.
+//
+// Safety rule: cached results are only reused when the program's *surface* is
+// unchanged - every function signature plus every struct, ADT and global. A
+// function body cannot influence name resolution or typing in another function
+// except through that surface, so when it is stable the per-function results are
+// still valid and only the edited function has to be re-checked. When the
+// surface changes, every entry is discarded.
+//
+// Keys are content hashes of the declaring fragment, so whitespace-only edits
+// keep the same key and stay cached.
+
+pub type CachedFunctionDiagnostics = struct
+{
+    key: i32,
+    diagnostics: [AnalyzerDiagnostic]
+}
+
+pub type SemaCache = struct
+{
+    surface: i32,
+    entries: [CachedFunctionDiagnostics]
+}
+
+pub type SemaOutcome = struct
+{
+    diagnostics: [AnalyzerDiagnostic],
+    cache: SemaCache,
+    error_count: i32,
+    reused_functions: i32,
+    checked_functions: i32
+}
+
+// Matches the compiler's diagnostic bag limit.
+pub fn analyzer_diag_limit(): i32
+{
+    return 50
+}
+
+pub fn sema_cache_empty(): SemaCache
+{
+    return SemaCache{ surface: 0, entries: [] }
+}
+
+pub fn analyzer_hash_step(hash: i32, value: i32): i32
+{
+    return (hash * 31 + value) % 1000000007
+}
+
+pub fn analyzer_hash_text(hash: i32, text: string): i32
+{
+    let mut h = hash
+    for (i in 0 .. text.length)
+    {
+        h = analyzer_hash_step(h, text[i])
+    }
+    return analyzer_hash_step(h, text.length)
+}
+
+// One key per entry of program.functions, derived from the fragment texts that
+// produced them. ast_assemble appends each fragment's functions in order, so the
+// two lists line up.
+pub fn analyzer_function_keys(fragments: [AstFragment]): [i32]
+{
+    let mut keys: [i32] = []
+    for (f in 0 .. fragments.length)
+    {
+        let key = analyzer_hash_text(17, fragments[f].text)
+        for (i in 0 .. fragments[f].functions.length)
+        {
+            keys.push(key)
+        }
+    }
+    return keys
+}
+
+pub fn analyzer_surface_hash(program: AstProgram): i32
+{
+    let mut h = 7
+    for (i in 0 .. program.functions.length)
+    {
+        let f = program.functions[i]
+        h = analyzer_hash_text(h, f.name)
+        h = analyzer_hash_text(h, f.ret_ty)
+        h = analyzer_hash_step(h, f.is_var_arg)
+        for (j in 0 .. f.param_names.length)
+        {
+            h = analyzer_hash_text(h, f.param_names[j])
+            h = analyzer_hash_text(h, f.param_types[j])
+        }
+        for (j in 0 .. f.type_params.length)
+        {
+            h = analyzer_hash_text(h, f.type_params[j])
+        }
+    }
+    for (i in 0 .. program.extern_functions.length)
+    {
+        let f = program.extern_functions[i]
+        h = analyzer_hash_text(h, f.name)
+        h = analyzer_hash_text(h, f.ret_ty)
+        h = analyzer_hash_step(h, f.is_var_arg)
+        for (j in 0 .. f.param_types.length)
+        {
+            h = analyzer_hash_text(h, f.param_types[j])
+        }
+    }
+    for (i in 0 .. program.structs.length)
+    {
+        let s = program.structs[i]
+        h = analyzer_hash_text(h, s.name)
+        h = analyzer_hash_step(h, s.is_c_abi)
+        for (j in 0 .. s.field_names.length)
+        {
+            h = analyzer_hash_text(h, s.field_names[j])
+            h = analyzer_hash_text(h, s.field_types[j])
+        }
+    }
+    for (i in 0 .. program.adts.length)
+    {
+        let a = program.adts[i]
+        h = analyzer_hash_text(h, a.name)
+        for (j in 0 .. a.type_params.length)
+        {
+            h = analyzer_hash_text(h, a.type_params[j])
+        }
+        for (j in 0 .. a.variant_names.length)
+        {
+            h = analyzer_hash_text(h, a.variant_names[j])
+            h = analyzer_hash_text(h, a.variant_payload_types[j])
+        }
+    }
+    for (i in 0 .. program.globals.length)
+    {
+        h = analyzer_hash_text(h, program.globals[i].assign_name)
+        h = analyzer_hash_text(h, program.globals[i].type_text)
+    }
+    return h
+}
+
+pub fn analyzer_diagnostics_from_bag(file: FileId, bag: DiagBag): [AnalyzerDiagnostic]
+{
+    let mut out: [AnalyzerDiagnostic] = []
+    for (i in 0 .. bag.diagnostics.length)
+    {
+        out.push(analyzer_diagnostic_from_diag(file, bag.diagnostics[i]))
+    }
+    return out
+}
+
+pub fn analyzer_count_errors(diagnostics: [AnalyzerDiagnostic]): i32
+{
+    let mut count = 0
+    for (i in 0 .. diagnostics.length)
+    {
+        if (diagnostics[i].severity == SeverityError)
+        {
+            count += 1
+        }
+    }
+    return count
+}
+
+// Runs the semantic pass, reusing cached per-function diagnostics when the
+// surface allows it.
+pub fn analyzer_semantic_run(file: FileId, text: string, program: AstProgram, fragments: [AstFragment], previous: SemaCache): SemaOutcome
+{
+    let limit = analyzer_diag_limit()
+    let mut merged: [AnalyzerDiagnostic] = []
+
+    let head = semantic_result_new_with_warnings(0)
+    semantic_check_duplicate_functions(program.functions, program.extern_functions, &head, text, "")
+    semantic_check_duplicate_structs(program.structs, &head, text, "")
+    semantic_check_cabi_structs(program, &head, text, "")
+    for (i in 0 .. program.functions.length)
+    {
+        semantic_check_duplicate_params(program.functions[i], &head, text, "")
+    }
+    for (i in 0 .. program.structs.length)
+    {
+        semantic_check_duplicate_fields(program.structs[i], &head, text, "")
+    }
+    let head_diags = analyzer_diagnostics_from_bag(file, head.bag)
+    for (i in 0 .. head_diags.length)
+    {
+        merged.push(head_diags[i])
+    }
+
+    let surface = analyzer_surface_hash(program)
+    let keys = analyzer_function_keys(fragments)
+    let mut reusable = 0
+    // Keys must line up one-to-one with functions, otherwise a missing key would
+    // let unrelated functions match the same entry.
+    if (previous.surface != 0 and previous.surface == surface and previous.entries.length == program.functions.length and keys.length == program.functions.length and keys.length > 0)
+    {
+        reusable = 1
+    }
+
+    let mut entries: [CachedFunctionDiagnostics] = []
+    let mut reused = 0
+    let mut checked = 0
+    for (i in 0 .. program.functions.length)
+    {
+        let key = if (i < keys.length) keys[i] else 0
+        let mut done = 0
+        if (reusable == 1)
+        {
+            for (e in 0 .. previous.entries.length)
+            {
+                if (done == 0 and previous.entries[e].key == key)
+                {
+                    let entry = previous.entries[e]
+                    for (d in 0 .. entry.diagnostics.length)
+                    {
+                        merged.push(entry.diagnostics[d])
+                    }
+                    entries.push(entry)
+                    reused += 1
+                    done = 1
+                }
+            }
+        }
+        if (done == 0)
+        {
+            let local = semantic_result_new_with_warnings(0)
+            semantic_check_function_body(program.functions[i], program, &local, text, "")
+            let diags = analyzer_diagnostics_from_bag(file, local.bag)
+            for (d in 0 .. diags.length)
+            {
+                merged.push(diags[d])
+            }
+            entries.push(CachedFunctionDiagnostics{ key: key, diagnostics: diags })
+            checked += 1
+        }
+    }
+
+    // The bag stops accepting once its limit is reached, so a merged list has to
+    // be truncated the same way.
+    if (merged.length > limit)
+    {
+        let mut capped: [AnalyzerDiagnostic] = []
+        for (i in 0 .. limit)
+        {
+            capped.push(merged[i])
+        }
+        merged = capped
+    }
+
+    if (analyzer_count_errors(merged) == 0)
+    {
+        let type_result = typeck_check_program(program)
+        let tail = semantic_result_new_with_warnings(0)
+        semantic_add_typeck_error(&tail, text, "", type_result)
+        let tail_diags = analyzer_diagnostics_from_bag(file, tail.bag)
+        for (i in 0 .. tail_diags.length)
+        {
+            merged.push(tail_diags[i])
+        }
+    }
+
+    let main_result = semantic_result_new_with_warnings(0)
+    semantic_check_main(program.functions, &main_result, "")
+    let main_diags = analyzer_diagnostics_from_bag(file, main_result.bag)
+    for (i in 0 .. main_diags.length)
+    {
+        merged.push(main_diags[i])
+    }
+
+    return SemaOutcome{
+        diagnostics: merged,
+        cache: SemaCache{ surface: surface, entries: entries },
+        error_count: analyzer_count_errors(merged),
+        reused_functions: reused,
+        checked_functions: checked
+    }
+}

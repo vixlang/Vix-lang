@@ -1,0 +1,421 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "util.vix"
+import "stub_tree.vix"
+import "../src/ast.vix"
+import "../src/parser.vix"
+import "../src/diag.vix"
+import "../src/lexer.vix"
+
+// One top-level declaration, parsed on its own. Statement and expression indices
+// inside a fragment are local to it; ast_assemble rebases them onto the
+// capacities of the program being built.
+pub type AstFragment = struct
+{
+    start: i32,
+    end: i32,
+    start_line: i32,
+    text: string,
+    ok: i32,
+    uses_result_ctor: i32,
+    functions: [AstFunction],
+    extern_functions: [AstFunction],
+    globals: [AstStmt],
+    structs: [AstStructDecl],
+    adts: [AstAdtDecl],
+    mod_decls: [AstModDecl],
+    import_decls: [AstImportDecl],
+    exprs: [AstExpr],
+    stmts: [AstStmt]
+}
+
+pub fn ast_fragment_empty(start: i32, end: i32): AstFragment
+{
+    return AstFragment{
+        start: start,
+        end: end,
+        start_line: 0,
+        text: "",
+        ok: 1,
+        uses_result_ctor: 0,
+        functions: [],
+        extern_functions: [],
+        globals: [],
+        structs: [],
+        adts: [],
+        mod_decls: [],
+        import_decls: [],
+        exprs: [],
+        stmts: []
+    }
+}
+
+// Parses one declaration. The slice must begin at the start of a line so that
+// token columns line up with the file; line_offset is that line's 0-based index,
+// which turns the slice's 1-based token lines into file lines.
+pub fn ast_fragment_parse(slice: string, line_offset: i32, start_line: i32, start: i32, end: i32): AstFragment
+{
+    let mut stream = tokenize(slice)
+    if (line_offset > 0)
+    {
+        // Element-wise compound assignment on a struct field array
+        // (stream.lines[i] += n) currently makes the LLVM backend emit an
+        // invalid GEP, so a fresh array is built and assigned instead.
+        let mut shifted: [i32] = []
+        for (i in 0 .. stream.lines.length)
+        {
+            shifted.push(stream.lines[i] + line_offset)
+        }
+        stream.lines = shifted
+    }
+    let uses_result = parse_stream_uses_result_ctor(&stream)
+    let program = parse_declaration_fragment_stream(slice, "", stream)
+    if (program.ok == 0)
+    {
+        return AstFragment{
+            start: start,
+            end: end,
+            start_line: start_line,
+            text: slice,
+            ok: 0,
+            uses_result_ctor: uses_result,
+            functions: [],
+            extern_functions: [],
+            globals: [],
+            structs: [],
+            adts: [],
+            mod_decls: [],
+            import_decls: [],
+            exprs: [],
+            stmts: []
+        }
+    }
+    return AstFragment{
+        start: start,
+        end: end,
+        start_line: start_line,
+        text: slice,
+        ok: 1,
+        uses_result_ctor: uses_result,
+        functions: program.functions,
+        extern_functions: program.extern_functions,
+        globals: program.globals,
+        structs: program.structs,
+        adts: program.adts,
+        mod_decls: program.mod_decls,
+        import_decls: program.import_decls,
+        exprs: program.expr_store.exprs,
+        stmts: program.store.stmts
+    }
+}
+
+pub fn ast_rebase_index(value: i32, base: i32): i32
+{
+    if (value < 0)
+    {
+        return value
+    }
+    return value + base
+}
+
+pub fn ast_rebase_indices(values: [i32], base: i32): [i32]
+{
+    let mut out: [i32] = []
+    for (i in 0 .. values.length)
+    {
+        out.push(ast_rebase_index(values[i], base))
+    }
+    return out
+}
+
+pub fn ast_rebase_expr(expr: AstExpr, expr_base: i32): AstExpr
+{
+    let mut out = expr
+    out.left_idx = ast_rebase_index(out.left_idx, expr_base)
+    out.right_idx = ast_rebase_index(out.right_idx, expr_base)
+    out.args = ast_rebase_indices(out.args, expr_base)
+    return out
+}
+
+pub fn ast_rebase_arm(arm: AstMatchArm, stmt_base: i32, expr_base: i32): AstMatchArm
+{
+    return AstMatchArm{
+        pattern_idx: ast_rebase_index(arm.pattern_idx, expr_base),
+        body_idx: ast_rebase_index(arm.body_idx, stmt_base)
+    }
+}
+
+pub fn ast_rebase_arms(arms: [AstMatchArm], stmt_base: i32, expr_base: i32): [AstMatchArm]
+{
+    let mut out: [AstMatchArm] = []
+    for (i in 0 .. arms.length)
+    {
+        out.push(ast_rebase_arm(arms[i], stmt_base, expr_base))
+    }
+    return out
+}
+
+// Fields are rebased according to what the tag actually stores, because two of
+// them are overloaded in the compiler AST:
+//   assign_idx  - an expression for most tags, but the else *statement* for "if"
+//   direct_ret  - an expression for "store_index", the literal value for "return"
+// Rebasing an overloaded field with the wrong base rewires the statement graph
+// and can make the semantic pass recurse forever.
+pub fn ast_rebase_stmt(stmt: AstStmt, stmt_base: i32, expr_base: i32): AstStmt
+{
+    let mut out = stmt
+    out.value_idx = ast_rebase_index(out.value_idx, expr_base)
+    if (out.tag == "if")
+    {
+        out.assign_idx = ast_rebase_index(out.assign_idx, stmt_base)
+    }
+    else
+    {
+        out.assign_idx = ast_rebase_index(out.assign_idx, expr_base)
+    }
+    if (out.tag == "store_index")
+    {
+        out.direct_ret = ast_rebase_index(out.direct_ret, expr_base)
+    }
+    out.print_idx = ast_rebase_index(out.print_idx, expr_base)
+    out.body_idx = ast_rebase_index(out.body_idx, stmt_base)
+    out.block_start = ast_rebase_index(out.block_start, stmt_base)
+    out.stmt_indices = ast_rebase_indices(out.stmt_indices, stmt_base)
+    out.match_pattern_indices = ast_rebase_indices(out.match_pattern_indices, expr_base)
+    out.match_body_indices = ast_rebase_indices(out.match_body_indices, stmt_base)
+    out.match_arms = ast_rebase_arms(out.match_arms, stmt_base, expr_base)
+    return out
+}
+
+pub fn ast_rebase_function(function: AstFunction, stmt_base: i32): AstFunction
+{
+    let mut out = function
+    out.body_idx = ast_rebase_index(out.body_idx, stmt_base)
+    return out
+}
+
+// A reused fragment keeps its parsed AST, so every position inside it has to
+// move with the number of lines the declaration itself moved.
+pub fn ast_shift_expr_lines(exprs: [AstExpr], delta: i32): [AstExpr]
+{
+    let mut out: [AstExpr] = []
+    for (i in 0 .. exprs.length)
+    {
+        let expr = exprs[i]
+        if (expr.line > 0)
+        {
+            expr.line += delta
+        }
+        out.push(expr)
+    }
+    return out
+}
+
+pub fn ast_shift_stmt_lines(stmts: [AstStmt], delta: i32): [AstStmt]
+{
+    let mut out: [AstStmt] = []
+    for (i in 0 .. stmts.length)
+    {
+        let stmt = stmts[i]
+        if (stmt.line > 0)
+        {
+            stmt.line += delta
+        }
+        out.push(stmt)
+    }
+    return out
+}
+
+pub fn ast_shift_function_lines(functions: [AstFunction], delta: i32): [AstFunction]
+{
+    let mut out: [AstFunction] = []
+    for (i in 0 .. functions.length)
+    {
+        let function = functions[i]
+        if (function.line > 0)
+        {
+            function.line += delta
+        }
+        out.push(function)
+    }
+    return out
+}
+
+pub fn ast_fragment_moved(fragment: AstFragment, start: i32, end: i32, line: i32): AstFragment
+{
+    let delta = line - fragment.start_line
+    let mut out = fragment
+    out.start = start
+    out.end = end
+    if (delta != 0)
+    {
+        out.functions = ast_shift_function_lines(out.functions, delta)
+        out.extern_functions = ast_shift_function_lines(out.extern_functions, delta)
+        out.globals = ast_shift_stmt_lines(out.globals, delta)
+        out.stmts = ast_shift_stmt_lines(out.stmts, delta)
+        out.exprs = ast_shift_expr_lines(out.exprs, delta)
+        // Declaration records are shifted in place. A helper taking them by
+        // value cannot do this: Vix rejects compound assignment to a field of an
+        // array element reached through an immutable parameter.
+        for (i in 0 .. out.structs.length)
+        {
+            if (out.structs[i].line > 0) { out.structs[i].line += delta }
+        }
+        for (i in 0 .. out.adts.length)
+        {
+            if (out.adts[i].line > 0) { out.adts[i].line += delta }
+        }
+        for (i in 0 .. out.mod_decls.length)
+        {
+            if (out.mod_decls[i].line > 0) { out.mod_decls[i].line += delta }
+        }
+        for (i in 0 .. out.import_decls.length)
+        {
+            if (out.import_decls[i].line > 0) { out.import_decls[i].line += delta }
+        }
+        out.start_line = line
+    }
+    return out
+}
+
+// Builds one program out of fragments laid out in source order. Equivalent to
+// parsing the whole file when every fragment parsed successfully.
+pub fn ast_program_validate(program: AstProgram): string
+{
+    let expr_count = program.expr_store.exprs.length
+    let stmt_count = program.store.stmts.length
+    for (i in 0 .. program.functions.length)
+    {
+        if (program.functions[i].body_idx >= stmt_count)
+        {
+            return "function " + program.functions[i].name + " body_idx " + ast_i32(program.functions[i].body_idx) + " >= stmts " + ast_i32(stmt_count)
+        }
+    }
+    for (i in 0 .. program.extern_functions.length)
+    {
+        if (program.extern_functions[i].body_idx >= stmt_count)
+        {
+            return "extern function body_idx " + ast_i32(program.extern_functions[i].body_idx)
+        }
+    }
+    for (i in 0 .. program.globals.length)
+    {
+        if (program.globals[i].value_idx >= expr_count)
+        {
+            return "global value_idx " + ast_i32(program.globals[i].value_idx)
+        }
+    }
+    for (i in 0 .. stmt_count)
+    {
+        let s = stmt_store_get(program.store, i)
+        if (s.value_idx >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " value_idx " + ast_i32(s.value_idx) + " >= exprs " + ast_i32(expr_count) }
+        if (s.direct_ret >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " direct_ret " + ast_i32(s.direct_ret) + " >= exprs " + ast_i32(expr_count) }
+        if (s.assign_idx >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " assign_idx " + ast_i32(s.assign_idx) }
+        if (s.print_idx >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " print_idx " + ast_i32(s.print_idx) }
+        if (s.body_idx >= stmt_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " body_idx " + ast_i32(s.body_idx) + " >= stmts " + ast_i32(stmt_count) }
+        if (s.block_count > 0 and s.block_start >= stmt_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " block_start " + ast_i32(s.block_start) }
+        for (j in 0 .. s.stmt_indices.length)
+        {
+            if (s.stmt_indices[j] >= stmt_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " stmt_indices[" + ast_i32(j) + "] " + ast_i32(s.stmt_indices[j]) + " >= stmts " + ast_i32(stmt_count) }
+        }
+        for (j in 0 .. s.match_pattern_indices.length)
+        {
+            if (s.match_pattern_indices[j] >= expr_count) { return "stmt " + ast_i32(i) + " match_pattern_indices " + ast_i32(s.match_pattern_indices[j]) }
+        }
+        for (j in 0 .. s.match_body_indices.length)
+        {
+            if (s.match_body_indices[j] >= stmt_count) { return "stmt " + ast_i32(i) + " match_body_indices " + ast_i32(s.match_body_indices[j]) }
+        }
+        for (j in 0 .. s.match_arms.length)
+        {
+            if (s.match_arms[j].pattern_idx >= expr_count) { return "stmt " + ast_i32(i) + " arm pattern_idx " + ast_i32(s.match_arms[j].pattern_idx) }
+            if (s.match_arms[j].body_idx >= stmt_count) { return "stmt " + ast_i32(i) + " arm body_idx " + ast_i32(s.match_arms[j].body_idx) }
+        }
+    }
+    for (i in 0 .. expr_count)
+    {
+        let e = expr_store_get(program.expr_store, i)
+        if (e.left_idx >= expr_count) { return "expr " + ast_i32(i) + " tag=" + e.tag + " left_idx " + ast_i32(e.left_idx) + " >= exprs " + ast_i32(expr_count) }
+        if (e.right_idx >= expr_count) { return "expr " + ast_i32(i) + " tag=" + e.tag + " right_idx " + ast_i32(e.right_idx) + " >= exprs " + ast_i32(expr_count) }
+        for (j in 0 .. e.args.length)
+        {
+            if (e.args[j] >= expr_count) { return "expr " + ast_i32(i) + " tag=" + e.tag + " args[" + ast_i32(j) + "] " + ast_i32(e.args[j]) + " >= exprs " + ast_i32(expr_count) }
+        }
+    }
+    return ""
+}
+
+pub fn ast_assemble(fragments: [AstFragment]): AstProgram
+{
+    let mut functions: [AstFunction] = []
+    let mut extern_functions: [AstFunction] = []
+    let mut globals: [AstStmt] = []
+    let mut structs: [AstStructDecl] = []
+    let mut adts: [AstAdtDecl] = []
+    let mut mod_decls: [AstModDecl] = []
+    let mut import_decls: [AstImportDecl] = []
+    let mut expr_store = expr_store_new()
+    let mut stmt_store = stmt_store_new()
+    let mut uses_result = 0
+
+    for (f in 0 .. fragments.length)
+    {
+        let fragment = fragments[f]
+        if (fragment.ok == 0)
+        {
+            return ast_program_err("fragment parse failed")
+        }
+        if (fragment.uses_result_ctor == 1)
+        {
+            uses_result = 1
+        }
+        let expr_base = expr_store.exprs.length
+        let stmt_base = stmt_store.stmts.length
+        for (i in 0 .. fragment.exprs.length)
+        {
+            expr_store.exprs.push(ast_rebase_expr(fragment.exprs[i], expr_base))
+        }
+        for (i in 0 .. fragment.stmts.length)
+        {
+            stmt_store.stmts.push(ast_rebase_stmt(fragment.stmts[i], stmt_base, expr_base))
+        }
+        for (i in 0 .. fragment.functions.length)
+        {
+            functions.push(ast_rebase_function(fragment.functions[i], stmt_base))
+        }
+        for (i in 0 .. fragment.extern_functions.length)
+        {
+            extern_functions.push(ast_rebase_function(fragment.extern_functions[i], stmt_base))
+        }
+        for (i in 0 .. fragment.globals.length)
+        {
+            globals.push(ast_rebase_stmt(fragment.globals[i], stmt_base, expr_base))
+        }
+        for (i in 0 .. fragment.structs.length)
+        {
+            structs.push(fragment.structs[i])
+        }
+        for (i in 0 .. fragment.adts.length)
+        {
+            adts.push(fragment.adts[i])
+        }
+        for (i in 0 .. fragment.mod_decls.length)
+        {
+            mod_decls.push(fragment.mod_decls[i])
+        }
+        for (i in 0 .. fragment.import_decls.length)
+        {
+            import_decls.push(fragment.import_decls[i])
+        }
+    }
+
+    // parse_program_impl injects the builtin Result ADT when the source uses the
+    // Ok/Err constructors; the assembled program has to do the same.
+    if (uses_result == 1 and parse_has_adt_name(adts, "Result") == 0 and parse_has_function_name(functions, "Ok") == 0 and parse_has_function_name(functions, "Err") == 0 and parse_has_function_name(extern_functions, "Ok") == 0 and parse_has_function_name(extern_functions, "Err") == 0)
+    {
+        adts.push(parse_builtin_result_decl())
+    }
+    return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, expr_store, stmt_store)
+}

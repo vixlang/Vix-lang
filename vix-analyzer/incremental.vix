@@ -1,0 +1,107 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "util.vix"
+import "source_text.vix"
+import "stub_tree.vix"
+import "../src/lexer.vix"
+
+// Which slice of the new text has to be re-lexed and re-scanned. A change inside
+// a top-level declaration reparse just that declaration; anything else falls
+// back to the whole file.
+pub type ReparseTarget = struct
+{
+    node: StubNodeId,
+    range: TextRange,
+    full_file: i32
+}
+
+pub type IncrementalResult = struct
+{
+    tree: StubTree,
+    target: ReparseTarget,
+    reused_nodes: i32,
+    fresh_nodes: i32,
+    token_count: i32,
+    full_file: i32
+}
+
+pub fn incremental_find_target(tree: StubTree, changed: TextRange): ReparseTarget
+{
+    let node = stub_tree_declaration_body_at(tree, changed.start)
+    if (node.index < 0)
+    {
+        return ReparseTarget{ node: stub_node_id_invalid(), range: changed, full_file: 1 }
+    }
+    let declaration = stub_tree_get(tree, node)
+    return ReparseTarget{ node: node, range: declaration.range, full_file: 0 }
+}
+
+pub fn incremental_expand_lex_range(tree: StubTree, changed: TextRange, source: string): TextRange
+{
+    let target = incremental_find_target(tree, changed)
+    if (target.full_file == 0)
+    {
+        return target.range
+    }
+    return text_range(0, source.length)
+}
+
+pub fn incremental_reparse(old_tree: StubTree, old_source: SourceText, new_source: SourceText): IncrementalResult
+{
+    let changed = source_text_changed_range(old_source, new_source)
+    let target = incremental_find_target(old_tree, changed)
+
+    if (target.full_file == 1)
+    {
+        let tree = stub_tree_parse(new_source.file, new_source.text)
+        let stream = tokenize(new_source.text)
+        return IncrementalResult{
+            tree: tree,
+            target: target,
+            reused_nodes: 0,
+            fresh_nodes: tree.nodes.length,
+            token_count: stream_len(stream),
+            full_file: 1
+        }
+    }
+
+    // The edit sits inside the declaration, so the start offset is stable but
+    // the end has to move with the length delta.
+    let delta = new_source.text.length - old_source.text.length
+    let start = target.range.start
+    let mut end = target.range.end + delta
+    if (end > new_source.text.length)
+    {
+        end = new_source.text.length
+    }
+    let slice = analyzer_copy(new_source.text, start, end)
+    let fresh = stub_tree_parse(new_source.file, slice)
+    let alive_before = stub_tree_alive_count(old_tree)
+    let spliced = stub_tree_splice(old_tree, target.node, fresh, start)
+    let tree = stub_tree_shift_after(spliced, start, delta)
+    let stream = tokenize(slice)
+    return IncrementalResult{
+        tree: tree,
+        target: target,
+        reused_nodes: alive_before - 1,
+        fresh_nodes: fresh.nodes.length,
+        token_count: stream_len(stream),
+        full_file: 0
+    }
+}
+
+pub fn incremental_reparse_target(target: ReparseTarget, source: SourceText): StubTree
+{
+    return stub_tree_parse(source.file, source.text)
+}
+
+pub fn incremental_ranges_overlap(left: TextRange, right: TextRange): i32
+{
+    if (left.start <= right.end and right.start <= left.end)
+    {
+        return 1
+    }
+    return 0
+}

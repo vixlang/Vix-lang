@@ -1,0 +1,476 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "util.vix"
+import "stub_tree.vix"
+import "symbol_index.vix"
+import "diagnostics.vix"
+import "incremental.vix"
+import "ast_fragment.vix"
+import "sema_cache.vix"
+import "source_text.vix"
+import "../src/diag.vix"
+import "../src/lexer.vix"
+import "../src/parser.vix"
+import "../src/semantic.vix"
+
+pub type DocumentAnalysis = struct
+{
+    file: FileId,
+    tree: StubTree,
+    fragments: [AstFragment],
+    symbols: SymbolIndex,
+    diagnostics: [AnalyzerDiagnostic],
+    sema_cache: SemaCache,
+    ok: i32,
+    reused_nodes: i32,
+    fresh_nodes: i32,
+    full_file: i32,
+    // Semantic pass accounting: how many function bodies came from the cache.
+    reused_functions: i32,
+    checked_functions: i32
+}
+
+pub fn analyzer_function_signature(function: AstFunction): string
+{
+    let mut signature = "fn("
+    for (i in 0 .. function.param_names.length)
+    {
+        if (i > 0)
+        {
+            signature = signature + ", "
+        }
+        signature = signature + function.param_names[i] + ": " + function.param_types[i]
+    }
+    signature = signature + ") -> " + function.ret_ty
+    return signature
+}
+
+pub fn analyzer_enrich_types(symbols: &SymbolIndex, program: AstProgram)
+{
+    for (i in 0 .. program.functions.length)
+    {
+        let function = program.functions[i]
+        let signature = analyzer_function_signature(function)
+        for (d in 0 .. symbols.declarations.length)
+        {
+            if (symbols.declarations[d].kind == FunctionSymbol and symbols.declarations[d].name == function.name)
+            {
+                symbols.declarations[d].type_text = signature
+            }
+        }
+    }
+    for (i in 0 .. program.globals.length)
+    {
+        let global = program.globals[i]
+        for (d in 0 .. symbols.declarations.length)
+        {
+            if (symbols.declarations[d].name == global.assign_name and global.type_text != "")
+            {
+                symbols.declarations[d].type_text = global.type_text
+            }
+        }
+    }
+}
+
+pub fn analyzer_push_reference(symbols: &SymbolIndex, file: FileId, symbol: SymbolId, range: LspRange)
+{
+    for (i in 0 .. symbols.references.length)
+    {
+        let existing = symbols.references[i]
+        if (existing.symbol.index == symbol.index and existing.file.value == file.value and existing.range.start.line == range.start.line and existing.range.start.character == range.start.character)
+        {
+            return
+        }
+    }
+    symbols.references.push(Reference{ symbol: symbol, file: file, range: range })
+}
+
+pub fn analyzer_record_reference(symbols: &SymbolIndex, file: FileId, text: string, index: LineIndex, name: string, line: i32, column: i32)
+{
+    if (name == "")
+    {
+        return
+    }
+    for (d in 0 .. symbols.declarations.length)
+    {
+        if (symbols.declarations[d].name == name)
+        {
+            let start = diag_offset_at(text, line, column)
+            let end = start + name.length
+            analyzer_push_reference(symbols, file, symbols.declarations[d].id, text_range_to_lsp(index, text_range(start, end), text))
+        }
+    }
+}
+
+pub fn analyzer_walk_expr(symbols: &SymbolIndex, program: AstProgram, file: FileId, text: string, index: LineIndex, expr_idx: i32)
+{
+    if (expr_idx < 0 or expr_idx >= program.expr_store.exprs.length)
+    {
+        return
+    }
+    let expr = expr_store_get(program.expr_store, expr_idx)
+    if (expr.tag == "ident" or expr.tag == "call")
+    {
+        analyzer_record_reference(symbols, file, text, index, expr.text, expr.line, expr.col)
+    }
+    analyzer_walk_expr(symbols, program, file, text, index, expr.left_idx)
+    analyzer_walk_expr(symbols, program, file, text, index, expr.right_idx)
+    for (i in 0 .. expr.args.length)
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, expr.args[i])
+    }
+}
+
+// Mirrors the per-tag field usage of semantic_check_stmt. Walking every index
+// field regardless of tag would follow statement indices as expressions, and
+// vice versa.
+pub fn analyzer_walk_stmt(symbols: &SymbolIndex, program: AstProgram, file: FileId, text: string, index: LineIndex, stmt_idx: i32)
+{
+    if (stmt_idx < 0 or stmt_idx >= program.store.stmts.length)
+    {
+        return
+    }
+    let stmt = stmt_store_get(program.store, stmt_idx)
+    let tag = stmt.tag
+    if (tag == "let" or tag == "assign")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.assign_idx)
+    }
+    elif (tag == "store_deref")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.assign_idx)
+    }
+    elif (tag == "store_index")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.direct_ret)
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.assign_idx)
+    }
+    elif (tag == "field_assign")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.assign_idx)
+    }
+    elif (tag == "return_expr" or tag == "expr" or tag == "return")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+    }
+    elif (tag == "print")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.print_idx)
+    }
+    elif (tag == "block")
+    {
+        if (stmt.stmt_indices.length > 0)
+        {
+            for (i in 0 .. stmt.stmt_indices.length)
+            {
+                analyzer_walk_stmt(symbols, program, file, text, index, stmt.stmt_indices[i])
+            }
+        }
+        else
+        {
+            for (i in 0 .. stmt.block_count)
+            {
+                analyzer_walk_stmt(symbols, program, file, text, index, stmt.block_start + i)
+            }
+        }
+    }
+    elif (tag == "while")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+        analyzer_walk_stmt(symbols, program, file, text, index, stmt.body_idx)
+    }
+    elif (tag == "for_range")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.assign_idx)
+        analyzer_walk_stmt(symbols, program, file, text, index, stmt.body_idx)
+    }
+    elif (tag == "if")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+        analyzer_walk_stmt(symbols, program, file, text, index, stmt.body_idx)
+        if (stmt.assign_idx >= 0)
+        {
+            analyzer_walk_stmt(symbols, program, file, text, index, stmt.assign_idx)
+        }
+    }
+    elif (tag == "match")
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+        for (i in 0 .. stmt.match_pattern_indices.length)
+        {
+            analyzer_walk_expr(symbols, program, file, text, index, stmt.match_pattern_indices[i])
+            if (i < stmt.match_body_indices.length)
+            {
+                analyzer_walk_stmt(symbols, program, file, text, index, stmt.match_body_indices[i])
+            }
+        }
+    }
+    else
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, stmt.value_idx)
+    }
+}
+
+pub fn analyzer_collect_references(symbols: &SymbolIndex, program: AstProgram, file: FileId, text: string)
+{
+    let index = line_index_new(text)
+    for (d in 0 .. symbols.declarations.length)
+    {
+        analyzer_push_reference(symbols, file, symbols.declarations[d].id, symbols.declarations[d].selection_range)
+    }
+    for (i in 0 .. program.functions.length)
+    {
+        analyzer_walk_stmt(symbols, program, file, text, index, program.functions[i].body_idx)
+    }
+    for (i in 0 .. program.extern_functions.length)
+    {
+        analyzer_walk_stmt(symbols, program, file, text, index, program.extern_functions[i].body_idx)
+    }
+    for (i in 0 .. program.globals.length)
+    {
+        analyzer_walk_expr(symbols, program, file, text, index, program.globals[i].value_idx)
+        analyzer_walk_expr(symbols, program, file, text, index, program.globals[i].assign_idx)
+    }
+}
+
+// The compiler numbers positions against a combined source in which every
+// legacy quoted-import line has been dropped, so a line is reported one lower
+// for each such import above it. A fragment parsed on its own must reproduce
+// that numbering, otherwise its diagnostics sit one line too low per import.
+pub fn analyzer_dropped_lines_before(text: string, line: i32): i32
+{
+    let mut dropped = 0
+    let mut index = 0
+    let mut start = 0
+    while (start < text.length and index < line)
+    {
+        let mut end = start
+        while (end < text.length and analyzer_byte_at(text, end) != '\n')
+        {
+            end += 1
+        }
+        let trimmed = analyzer_trim(analyzer_copy(text, start, end))
+        if (analyzer_starts_with(trimmed, "import ") == 1 and analyzer_byte_at(trimmed, 7) == '"')
+        {
+            dropped += 1
+        }
+        index += 1
+        start = end + 1
+    }
+    return dropped
+}
+
+// Combined-source line for a physical 0-based line.
+pub fn analyzer_combined_line(text: string, line: i32): i32
+{
+    return line - analyzer_dropped_lines_before(text, line)
+}
+
+// Parses every top-level declaration on its own. Slice boundaries start at the
+// declaration's first line so token columns line up with the file.
+pub fn analyzer_build_fragments(tree: StubTree, text: string): [AstFragment]
+{
+    let index = line_index_new(text)
+    let order = stub_tree_sorted_declarations(tree)
+    let mut fragments: [AstFragment] = []
+    for (o in 0 .. order.length)
+    {
+        let node = tree.nodes[order[o]]
+        let line = line_index_position(index, node.range.start).line
+        let combined = analyzer_combined_line(text, line)
+        let start = analyzer_line_start(text, line)
+        let mut end = node.range.end
+        if (end > text.length)
+        {
+            end = text.length
+        }
+        if (end > start)
+        {
+            let slice = analyzer_copy(text, start, end)
+            fragments.push(ast_fragment_parse(slice, combined, combined, start, end))
+        }
+    }
+    return fragments
+}
+
+// Rebuilds the fragment list for the current text. A declaration whose slice text
+// is unchanged keeps its previously parsed AST, so reuse depends on content
+// rather than on offset arithmetic.
+pub fn analyzer_reuse_fragments(tree: StubTree, text: string, previous: [AstFragment]): [AstFragment]
+{
+    let index = line_index_new(text)
+    let order = stub_tree_sorted_declarations(tree)
+    let mut used: [i32] = []
+    let mut fragments: [AstFragment] = []
+    for (o in 0 .. order.length)
+    {
+        let node = tree.nodes[order[o]]
+        let line = line_index_position(index, node.range.start).line
+        let combined = analyzer_combined_line(text, line)
+        let start = analyzer_line_start(text, line)
+        let mut end = node.range.end
+        if (end > text.length)
+        {
+            end = text.length
+        }
+        if (end <= start)
+        {
+            continue
+        }
+        let slice = analyzer_copy(text, start, end)
+        let mut picked = -1
+        for (p in 0 .. previous.length)
+        {
+            if (picked < 0 and previous[p].ok == 1 and previous[p].text == slice)
+            {
+                let mut already = 0
+                for (u in 0 .. used.length)
+                {
+                    if (used[u] == p)
+                    {
+                        already = 1
+                    }
+                }
+                if (already == 0)
+                {
+                    picked = p
+                }
+            }
+        }
+        if (picked >= 0)
+        {
+            used.push(picked)
+            fragments.push(ast_fragment_moved(previous[picked], start, end, combined))
+        }
+        else
+        {
+            fragments.push(ast_fragment_parse(slice, combined, combined, start, end))
+        }
+    }
+    return fragments
+}
+
+pub fn analyzer_finish(file: FileId, text: string, tree: StubTree, fragments: [AstFragment], program: AstProgram, previous_cache: SemaCache): DocumentAnalysis
+{
+    let mut diagnostics: [AnalyzerDiagnostic] = []
+    if (program.ok == 0)
+    {
+        diagnostics.push(analyzer_diagnostic("E1000", program.error, SeverityError, file, lsp_range(lsp_position(0, 0), lsp_position(0, 0))))
+        return DocumentAnalysis{
+            file: file,
+            tree: tree,
+            fragments: fragments,
+            symbols: symbol_index_new(),
+            diagnostics: diagnostics,
+            sema_cache: sema_cache_empty(),
+            ok: 0,
+            reused_nodes: 0,
+            fresh_nodes: tree.nodes.length,
+            full_file: 1,
+            reused_functions: 0,
+            checked_functions: 0
+        }
+    }
+    let outcome = analyzer_semantic_run(file, text, program, fragments, previous_cache)
+    for (i in 0 .. outcome.diagnostics.length)
+    {
+        diagnostics.push(outcome.diagnostics[i])
+    }
+    let symbols = symbol_index_build(file, text, tree)
+    analyzer_enrich_types(&symbols, program)
+    analyzer_collect_references(&symbols, program, file, text)
+    let ok = if (outcome.error_count > 0) 0 else 1
+    return DocumentAnalysis{
+        file: file,
+        tree: tree,
+        fragments: fragments,
+        symbols: symbols,
+        diagnostics: diagnostics,
+        sema_cache: outcome.cache,
+        ok: ok,
+        reused_nodes: 0,
+        fresh_nodes: tree.nodes.length,
+        full_file: 1,
+        reused_functions: outcome.reused_functions,
+        checked_functions: outcome.checked_functions
+    }
+}
+
+// Default: incremental stub tree, whole-file parse for the AST. Verified by the
+// differential test against analyze_document_legacy.
+pub fn analyze_document(file: FileId, text: string): DocumentAnalysis
+{
+    let tree = stub_tree_parse(file, text)
+    return analyzer_finish(file, text, tree, [], parse_program_raw(text, ""), sema_cache_empty())
+}
+
+// Experimental: the AST is assembled from per-declaration fragments. Still fails
+// the differential test, so nothing uses it unless the mode is forced.
+pub fn analyze_document_fragments(file: FileId, text: string): DocumentAnalysis
+{
+    let tree = stub_tree_parse(file, text)
+    let fragments = analyzer_build_fragments(tree, text)
+    let program = ast_assemble(fragments)
+    if (program.ok == 0)
+    {
+        return analyzer_finish(file, text, tree, [], parse_program_raw(text, ""), sema_cache_empty())
+    }
+    // Safety net: if the assembled program has an out-of-range index, fall back
+    // to the whole-file parse rather than running the semantic pass on it.
+    if (ast_program_validate(program) != "")
+    {
+        return analyzer_finish(file, text, tree, [], parse_program_raw(text, ""), sema_cache_empty())
+    }
+    return analyzer_finish(file, text, tree, fragments, program, sema_cache_empty())
+}
+
+// Default: the stub tree is spliced, the AST is still parsed whole.
+pub fn analyze_document_incremental(file: FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
+{
+    let old_source = source_text_new(file, 0, old_text)
+    let new_source = source_text_new(file, 0, new_text)
+    let repair = incremental_reparse(previous.tree, old_source, new_source)
+    let analysis = analyzer_finish(file, new_text, repair.tree, [], parse_program_raw(new_text, ""), sema_cache_empty())
+    analysis.reused_nodes = repair.reused_nodes
+    analysis.fresh_nodes = repair.fresh_nodes
+    analysis.full_file = repair.full_file
+    return analysis
+}
+
+// Experimental: fragments are rebuilt from the current text, reusing every
+// declaration whose slice text did not change.
+pub fn analyze_document_incremental_fragments(file: FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
+{
+    let old_source = source_text_new(file, 0, old_text)
+    let new_source = source_text_new(file, 0, new_text)
+    let repair = incremental_reparse(previous.tree, old_source, new_source)
+    let fragments = analyzer_reuse_fragments(repair.tree, new_text, previous.fragments)
+    let program = ast_assemble(fragments)
+    if (program.ok == 0)
+    {
+        let fallback = analyzer_finish(file, new_text, repair.tree, [], parse_program_raw(new_text, ""), sema_cache_empty())
+        fallback.reused_nodes = repair.reused_nodes
+        fallback.fresh_nodes = repair.fresh_nodes
+        fallback.full_file = 1
+        return fallback
+    }
+    let analysis = analyzer_finish(file, new_text, repair.tree, fragments, program, previous.sema_cache)
+    analysis.reused_nodes = repair.reused_nodes
+    analysis.fresh_nodes = repair.fresh_nodes
+    analysis.full_file = repair.full_file
+    return analysis
+}
+
+// Ground truth for the differential test: a fresh stub tree and a fresh
+// whole-file parse on every change, with no reuse at all.
+pub fn analyze_document_legacy(file: FileId, text: string): DocumentAnalysis
+{
+    let tree = stub_tree_parse(file, text)
+    return analyzer_finish(file, text, tree, [], parse_program_raw(text, ""), sema_cache_empty())
+}

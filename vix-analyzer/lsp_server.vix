@@ -1,0 +1,149 @@
+#[no_main]
+
+import "util.vix"
+import "json.vix"
+import "workspace.vix"
+import "lsp_transport.vix"
+import "lsp_protocol.vix"
+import "lsp_handlers.vix"
+import "diagnostics.vix"
+
+pub type LspServer = struct
+{
+    transport: TransportState,
+    workspace: Workspace,
+    initialized: i32
+}
+
+pub fn lsp_server_new(root_uri: string, root_path: string): LspServer
+{
+    return LspServer{
+        transport: transport_new(),
+        workspace: workspace_new(root_uri, root_path),
+        initialized: 0
+    }
+}
+
+pub fn lsp_server_publish(server: &LspServer, uri: string)
+{
+    if (uri == "")
+    {
+        return
+    }
+    let analysis = workspace_analysis(server.workspace, uri)
+    transport_write_frame(lsp_publish_diagnostics(uri, analysis.diagnostics))
+}
+
+pub fn lsp_server_dispatch(server: &LspServer, frame: string)
+{
+    let message = lsp_parse_message(frame)
+    if (message.method == "")
+    {
+        return
+    }
+    let mut workspace = server.workspace
+    if (message.method == "initialize")
+    {
+        server.initialized = 1
+        transport_write_frame(lsp_response(message.id, lsp_initialize_result()))
+    }
+    elif (message.method == "initialized")
+    {
+        return
+    }
+    elif (message.method == "vix/setAnalysisMode")
+    {
+        let doc = json_parse(message.params)
+        let mode = json_string_at(doc, json_object_get(doc, json_root(doc), "mode"))
+        workspace.analysis_mode = 0
+        if (mode == "stub")
+        {
+            workspace.analysis_mode = 1
+        }
+        elif (mode == "legacy")
+        {
+            workspace.analysis_mode = 2
+        }
+        server.workspace = workspace
+        return
+    }
+    elif (message.method == "shutdown")
+    {
+        transport_write_frame(lsp_response(message.id, "null"))
+        server.transport.shutdown = 1
+        server.transport.running = 0
+    }
+    elif (message.method == "exit")
+    {
+        server.transport.shutdown = 1
+        server.transport.running = 0
+    }
+    elif (message.method == "textDocument/didOpen")
+    {
+        let uri = handle_did_open(&workspace, message.params)
+        server.workspace = workspace
+        lsp_server_publish(server, uri)
+    }
+    elif (message.method == "textDocument/didChange")
+    {
+        let uri = handle_did_change(&workspace, message.params)
+        server.workspace = workspace
+        if (uri != "")
+        {
+            transport_write_frame(lsp_analysis_stats(uri, workspace_analysis(server.workspace, uri)))
+        }
+        lsp_server_publish(server, uri)
+    }
+    elif (message.method == "textDocument/didClose")
+    {
+        let uri = handle_did_close(&workspace, message.params)
+        server.workspace = workspace
+        lsp_server_publish(server, uri)
+    }
+    elif (message.method == "textDocument/hover")
+    {
+        transport_write_frame(handle_hover(workspace, message.id, message.params))
+    }
+    elif (message.method == "textDocument/definition")
+    {
+        transport_write_frame(handle_definition(workspace, message.id, message.params))
+    }
+    elif (message.method == "textDocument/references")
+    {
+        transport_write_frame(handle_references(workspace, message.id, message.params))
+    }
+    elif (message.method == "textDocument/documentSymbol")
+    {
+        transport_write_frame(handle_document_symbol(workspace, message.id, message.params))
+    }
+    elif (message.method == "textDocument/completion")
+    {
+        transport_write_frame(handle_completion(workspace, message.id, message.params))
+    }
+    elif (message.method == "textDocument/formatting")
+    {
+        transport_write_frame(handle_formatting(workspace, message.id, message.params))
+    }
+    elif (message.method == "textDocument/rename")
+    {
+        transport_write_frame(handle_rename(workspace, message.id, message.params))
+    }
+    elif (message.has_id == 1)
+    {
+        transport_write_frame(lsp_error(message.id, -32601, "method not found: " + message.method))
+    }
+}
+
+pub fn lsp_server_run(server: &LspServer)
+{
+    server.transport.running = 1
+    while (server.transport.shutdown == 0)
+    {
+        let frame = transport_read_frame()
+        if (frame == "")
+        {
+            break
+        }
+        lsp_server_dispatch(server, frame)
+    }
+}

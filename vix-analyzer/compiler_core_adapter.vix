@@ -1,0 +1,86 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "stub_tree.vix"
+import "semantic_adapter.vix"
+import "../src/lexer.vix"
+import "../src/parser.vix"
+import "../src/semantic.vix"
+
+pub type CoreTokenSnapshot = struct
+{
+    file: FileId,
+    count: i32,
+    generation: i32
+}
+
+pub type CoreAstSnapshot = struct
+{
+    file: FileId,
+    ok: i32,
+    root_index: i32,
+    error: string
+}
+
+pub type CoreSemanticSnapshot = struct
+{
+    file: FileId,
+    ok: i32,
+    error_count: i32
+}
+
+pub fn core_lex(file: FileId, source: string): CoreTokenSnapshot
+{
+    let stream = tokenize(source)
+    return CoreTokenSnapshot{
+        file: file,
+        count: stream_len(stream),
+        generation: 0
+    }
+}
+
+pub fn core_parse(file: FileId, source: string, tree: StubTree): CoreAstSnapshot
+{
+    let program = parse_program_raw(source, "")
+    return CoreAstSnapshot{
+        file: file,
+        ok: program.ok,
+        root_index: 0,
+        error: program.error
+    }
+}
+
+pub fn core_semantic(input: SemanticInput): CoreSemanticSnapshot
+{
+    let program = parse_program_raw(input.source, "")
+    if (program.ok == 0)
+    {
+        return CoreSemanticSnapshot{
+            file: input.file,
+            ok: 0,
+            error_count: 1
+        }
+    }
+    let result = semantic_check_program_with_warnings(program, input.source, "", 0)
+    return CoreSemanticSnapshot{
+        file: input.file,
+        ok: result.ok,
+        error_count: result.error_count
+    }
+}
+
+pub fn core_token_snapshot_empty(file: FileId): CoreTokenSnapshot
+{
+    return CoreTokenSnapshot{ file: file, count: 0, generation: 0 }
+}
+
+pub fn core_ast_snapshot_empty(file: FileId): CoreAstSnapshot
+{
+    return CoreAstSnapshot{ file: file, ok: 0, root_index: -1, error: "" }
+}
+
+pub fn core_semantic_snapshot_empty(file: FileId): CoreSemanticSnapshot
+{
+    return CoreSemanticSnapshot{ file: file, ok: 0, error_count: 0 }
+}

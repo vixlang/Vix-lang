@@ -1,0 +1,407 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Vix",
+  "scopeName": "source.vix",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#attributes"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#chars"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#declarations"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#generics"
+    },
+    {
+      "include": "#optional"
+    },
+    {
+      "include": "#memberAccess"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#braces"
+    },
+    {
+      "include": "#punctuation"
+    },
+    {
+      "include": "#constructors"
+    },
+    {
+      "include": "#support"
+    },
+    {
+      "include": "#variables"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.documentation.vix",
+          "begin": "/\\*\\*",
+          "end": "\\*/",
+          "patterns": [
+            {
+              "include": "#todo"
+            }
+          ]
+        },
+        {
+          "name": "comment.block.vix",
+          "begin": "/\\*(?!\\*)",
+          "end": "\\*/",
+          "patterns": [
+            {
+              "include": "#todo"
+            }
+          ]
+        },
+        {
+          "name": "comment.line.double-slash.vix",
+          "match": "//.*$",
+          "patterns": [
+            {
+              "include": "#todo"
+            }
+          ]
+        }
+      ]
+    },
+    "todo": {
+      "patterns": [
+        {
+          "name": "markup.todo.vix",
+          "match": "\\b(TODO|FIXME|XXX|NOTE|HACK)\\b"
+        }
+      ]
+    },
+    "attributes": {
+      "patterns": [
+        {
+          "name": "meta.attribute.vix storage.modifier.vix",
+          "match": "#\\[[^\\]\\n]*\\]"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.vix",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.vix",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "chars": {
+      "patterns": [
+        {
+          "name": "string.quoted.single.vix",
+          "match": "'(\\\\.|[^'\\\\])'"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.vix constant.numeric.integer.vix",
+          "match": "\\b0[xX][0-9a-fA-F_]+\\b"
+        },
+        {
+          "name": "constant.numeric.float.vix",
+          "match": "\\b[0-9][0-9_]*\\.[0-9][0-9_]*\\b"
+        },
+        {
+          "name": "constant.numeric.integer.vix",
+          "match": "\\b[0-9][0-9_]*\\b"
+        }
+      ]
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "name": "meta.function.vix",
+          "match": "\\b(fn)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.function.vix"
+            },
+            "2": {
+              "name": "entity.name.function.vix"
+            }
+          }
+        },
+        {
+          "name": "meta.macro.vix",
+          "match": "\\b(macro)\\s+\\$?([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.vix"
+            },
+            "2": {
+              "name": "entity.name.function.vix"
+            }
+          }
+        },
+        {
+          "name": "meta.type.vix",
+          "match": "\\b(type|struct|impl)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.vix"
+            },
+            "2": {
+              "name": "entity.name.type.vix"
+            }
+          }
+        },
+        {
+          "name": "meta.variable.vix",
+          "match": "\\b(let)\\b(?:\\s+(mut)\\b)?\\s+([A-Za-z_][A-Za-z0-9_]*)(?:\\s*(:)\\s*([A-Za-z_][A-Za-z0-9_]*))?",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.variable.vix storage.type.variable.vix"
+            },
+            "2": {
+              "name": "storage.modifier.mutable.vix"
+            },
+            "3": {
+              "name": "variable.other.readwrite.declaration.vix"
+            },
+            "4": {
+              "name": "punctuation.separator.type.vix"
+            },
+            "5": {
+              "name": "storage.type.vix entity.name.type.vix"
+            }
+          }
+        },
+        {
+          "name": "meta.field.vix",
+          "match": "\\b([a-z_][A-Za-z0-9_]*)\\s*(:)\\s*(?=[A-Za-z_?\\[&])",
+          "captures": {
+            "1": {
+              "name": "variable.parameter.vix"
+            },
+            "2": {
+              "name": "punctuation.separator.type.vix"
+            }
+          }
+        },
+        {
+          "name": "meta.import.vix",
+          "match": "\\b(import)\\s+([A-Za-z_./\"][A-Za-z0-9_./\"]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.vix"
+            },
+            "2": {
+              "name": "string.unquoted.import.vix string.quoted.double.vix"
+            }
+          }
+        },
+        {
+          "name": "meta.module.vix",
+          "match": "\\b(mod)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.declaration.vix"
+            },
+            "2": {
+              "name": "entity.name.type.vix"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.vix",
+          "match": "\\b(if|elif|else|while|for|in|match|return|break|continue|and|or)\\b"
+        },
+        {
+          "name": "storage.modifier.extern.vix",
+          "match": "\\bextern\\b"
+        },
+        {
+          "name": "storage.modifier.mutable.vix",
+          "match": "\\bmut\\b"
+        },
+        {
+          "name": "storage.modifier.vix",
+          "match": "\\b(pub|as)\\b"
+        },
+        {
+          "name": "storage.modifier.vix",
+          "match": "\\bref\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.vix",
+          "match": "\\b(i8|i16|i32|i64|u8|u16|u32|u64|usize|isize|f32|f64|bool|string|void|char|ptr)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.vix",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.language.vix constant.language.boolean.vix",
+          "match": "\\bnil\\b"
+        }
+      ]
+    },
+    "generics": {
+      "patterns": [
+        {
+          "name": "entity.name.type.parameter.vix",
+          "match": ":[\\[][A-Za-z_][A-Za-z0-9_, ]*[\\]]"
+        }
+      ]
+    },
+    "optional": {
+      "patterns": [
+        {
+          "name": "storage.type.vix",
+          "match": "\\?[A-Za-z_][A-Za-z0-9_]*"
+        }
+      ]
+    },
+    "memberAccess": {
+      "patterns": [
+        {
+          "match": "(\\.)\\s*([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.accessor.dot.vix"
+            },
+            "2": {
+              "name": "variable.other.property.vix"
+            }
+          }
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.arrow.vix",
+          "match": "=>|->"
+        },
+        {
+          "name": "keyword.operator.address.vix",
+          "match": "&"
+        },
+        {
+          "name": "keyword.operator.at.vix",
+          "match": "@"
+        },
+        {
+          "name": "keyword.operator.multiplication.vix",
+          "match": "\\*"
+        },
+        {
+          "name": "keyword.operator.arithmetic.vix",
+          "match": "[-+/%]"
+        },
+        {
+          "name": "keyword.operator.vix",
+          "match": "==|!=|<=|>=|\\+=|-=|\\.\\.\\.|\\.\\.|[=<>!|^~?]"
+        }
+      ]
+    },
+    "braces": {
+      "patterns": [
+        {
+          "name": "meta.brace.curly.vix",
+          "match": "[{}]"
+        },
+        {
+          "name": "meta.brace.round.vix",
+          "match": "[()]"
+        },
+        {
+          "name": "meta.brace.square.vix",
+          "match": "[\\[\\]]"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.separator.comma.vix",
+          "match": ","
+        },
+        {
+          "name": "punctuation.separator.vix",
+          "match": ";"
+        },
+        {
+          "name": "punctuation.separator.type.vix",
+          "match": ":"
+        }
+      ]
+    },
+    "constructors": {
+      "patterns": [
+        {
+          "name": "entity.name.type.vix",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "support": {
+      "patterns": [
+        {
+          "name": "support.function.vix",
+          "match": "\\b(print|puts|len|clone|sizeof)\\b"
+        }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "variable.other.vix",
+          "match": "\\b[a-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    }
+  }
+}

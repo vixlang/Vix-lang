@@ -1,0 +1,262 @@
+{
+  "name": "vix-analyzer",
+  "displayName": "Vix Analyzer",
+  "description": "Vix language server: diagnostics, symbols, hover, go-to-definition, references and rename.",
+  "version": "0.8.0",
+  "publisher": "vixlang",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:vix",
+    "onView:vix.toolbar",
+    "onCommand:vix.compile",
+    "onCommand:vix.run",
+    "onCommand:vix.check"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "vix",
+        "aliases": [
+          "Vix",
+          "vix"
+        ],
+        "extensions": [
+          ".vix",
+          ".vic"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configuration": {
+      "title": "Vix",
+      "properties": {
+        "vix.compilerPath": {
+          "type": "string",
+          "default": "vixc",
+          "description": "Path to the vixc compiler executable."
+        },
+        "vix.compilerErrorFormat": {
+          "type": "string",
+          "enum": [
+            "bootstrap",
+            "c-cpp",
+            "none"
+          ],
+          "enumItemLabels": [
+            "Bootstrap Error",
+            "C/CPP Error",
+            "No Errors"
+          ],
+          "default": "bootstrap",
+          "description": "Format of vixc diagnostics parsed for the Problems panel."
+        },
+        "vix.autoCompile": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run vixc after edits to refresh compiler diagnostics."
+        },
+        "vix.autoCompileDelay": {
+          "type": "number",
+          "default": 700,
+          "minimum": 100,
+          "maximum": 5000,
+          "description": "Delay in milliseconds before auto-compiling an edited file."
+        },
+        "vix.language": {
+          "type": "string",
+          "enum": [
+            "zh-cn",
+            "en"
+          ],
+          "default": "zh-cn",
+          "description": "Language for analyzer prompts."
+        },
+        "vixAnalyzer.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the vix-analyzer executable. Leave empty to use the copy bundled with this extension."
+        }
+      }
+    },
+    "grammars": [
+      {
+        "language": "vix",
+        "scopeName": "source.vix",
+        "path": "./syntaxes/vix.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "vix.compile",
+        "title": "Vix: Compile",
+        "icon": "$(play)"
+      },
+      {
+        "command": "vix.showCompilerOutput",
+        "title": "Vix: Show Compiler Output",
+        "icon": "$(output)"
+      },
+      {
+        "command": "vix.restartLanguageServer",
+        "title": "Vix: Restart Language Server",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "vix.formatDocument",
+        "title": "Vix: Format Document",
+        "icon": "$(wand)"
+      },
+      {
+        "command": "vix.reloadWindow",
+        "title": "Vix: Reload Window",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vix.compile.l0",
+        "title": "Vix: Compile (l0)"
+      },
+      {
+        "command": "vix.compile.asm.l0",
+        "title": "Vix: Compile to Assembly (l0)"
+      },
+      {
+        "command": "vix.compile.obj.l0",
+        "title": "Vix: Compile to Object File (l0)"
+      },
+      {
+        "command": "vix.compile.l1",
+        "title": "Vix: Compile (l1)"
+      },
+      {
+        "command": "vix.compile.asm.l1",
+        "title": "Vix: Compile to Assembly (l1)"
+      },
+      {
+        "command": "vix.compile.obj.l1",
+        "title": "Vix: Compile to Object File (l1)"
+      },
+      {
+        "command": "vix.compile.l2",
+        "title": "Vix: Compile (l2)"
+      },
+      {
+        "command": "vix.compile.asm.l2",
+        "title": "Vix: Compile to Assembly (l2)"
+      },
+      {
+        "command": "vix.compile.obj.l2",
+        "title": "Vix: Compile to Object File (l2)"
+      },
+      {
+        "command": "vix.compile.l3",
+        "title": "Vix: Compile (l3)"
+      },
+      {
+        "command": "vix.compile.asm.l3",
+        "title": "Vix: Compile to Assembly (l3)"
+      },
+      {
+        "command": "vix.compile.obj.l3",
+        "title": "Vix: Compile to Object File (l3)"
+      },
+      {
+        "command": "vix.run",
+        "title": "Vix: Run",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "vix.check",
+        "title": "Vix: Check",
+        "icon": "$(check)"
+      },
+      {
+        "command": "vix.showPanel",
+        "title": "Vix: Focus Panel",
+        "icon": "$(sidebar-left)"
+      },
+      {
+        "command": "vix.selectCompiler",
+        "title": "Vix: Select Compiler Executable (vixc)"
+      },
+      {
+        "command": "vix.selectLanguageServer",
+        "title": "Vix: Select Language Server Executable"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "vix.compile",
+          "when": "resourceLangId == vix",
+          "group": "navigation"
+        },
+        {
+          "command": "vix.formatDocument",
+          "when": "resourceLangId == vix",
+          "group": "navigation@2"
+        },
+        {
+          "command": "vix.showCompilerOutput",
+          "when": "resourceLangId == vix",
+          "group": "navigation@3"
+        },
+        {
+          "command": "vix.run",
+          "when": "resourceLangId == vix",
+          "group": "navigation@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vix.compile.l0",
+          "when": "resourceLangId == vix"
+        },
+        {
+          "command": "vix.reloadWindow",
+          "when": "false"
+        }
+      ]
+    },
+    "themes": [
+      {
+        "label": "Vix Aurora Dark",
+        "uiTheme": "vs-dark",
+        "path": "./theme/theme.json"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vixPanel",
+          "title": "Vix",
+          "icon": "media/vix.svg"
+        }
+      ]
+    },
+    "views": {
+      "vixPanel": [
+        {
+          "type": "webview",
+          "id": "vix.toolbar",
+          "name": "Build & Run"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^10.1.2"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.6.0"
+  }
+}

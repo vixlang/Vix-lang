@@ -1,0 +1,259 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "util.vix"
+import "stub_tree.vix"
+
+pub type SymbolKind = ModuleSymbol | FunctionSymbol | ParameterSymbol | VariableSymbol | TypeSymbol | FieldSymbol | VariantSymbol | ImportSymbol
+
+pub type Declaration = struct
+{
+    id: SymbolId,
+    name: string,
+    kind: SymbolKind,
+    file: FileId,
+    range: LspRange,
+    selection_range: LspRange,
+    type_text: string,
+    parent: SymbolId
+}
+
+pub type Reference = struct
+{
+    symbol: SymbolId,
+    file: FileId,
+    range: LspRange
+}
+
+pub type SymbolIndex = struct
+{
+    declarations: [Declaration],
+    references: [Reference],
+    generation: i32
+}
+
+pub fn symbol_index_new(): SymbolIndex
+{
+    return SymbolIndex{ declarations: [], references: [], generation: 0 }
+}
+
+pub fn symbol_kind_for_node(kind: StubKind): SymbolKind
+{
+    if (kind == FunctionDecl)
+    {
+        return FunctionSymbol
+    }
+    if (kind == TypeDecl or kind == AdtDecl)
+    {
+        return TypeSymbol
+    }
+    if (kind == FieldDecl)
+    {
+        return FieldSymbol
+    }
+    if (kind == VariantDecl)
+    {
+        return VariantSymbol
+    }
+    if (kind == ModuleDecl)
+    {
+        return ModuleSymbol
+    }
+    if (kind == ImportDecl)
+    {
+        return ImportSymbol
+    }
+    return VariableSymbol
+}
+
+pub fn symbol_lsp_kind(kind: SymbolKind): i32
+{
+    if (kind == FunctionSymbol)
+    {
+        return 12
+    }
+    if (kind == VariableSymbol or kind == ParameterSymbol)
+    {
+        return 13
+    }
+    if (kind == TypeSymbol)
+    {
+        return 5
+    }
+    if (kind == FieldSymbol)
+    {
+        return 8
+    }
+    if (kind == VariantSymbol)
+    {
+        return 22
+    }
+    if (kind == ModuleSymbol or kind == ImportSymbol)
+    {
+        return 2
+    }
+    return 13
+}
+
+// Containment is decided by the selection range (the name), not the whole
+// declaration range, so a cursor inside a body is not captured by the
+// enclosing declaration.
+pub fn declaration_contains(declaration: Declaration, position: LspPosition): i32
+{
+    let range = declaration.selection_range
+    if (position.line < range.start.line or position.line > range.end.line)
+    {
+        return 0
+    }
+    if (position.line == range.start.line and position.character < range.start.character)
+    {
+        return 0
+    }
+    if (position.line == range.end.line and position.character > range.end.character)
+    {
+        return 0
+    }
+    return 1
+}
+
+pub fn symbol_index_build(file: FileId, source: string, tree: StubTree): SymbolIndex
+{
+    let index = line_index_new(source)
+    let symbols = symbol_index_new()
+    for (i in 0 .. tree.nodes.length)
+    {
+        let node = tree.nodes[i]
+        if (node.alive == 1 and node.name != "")
+        {
+            let range = text_range_to_lsp(index, node.range, source)
+            let selection = text_range_to_lsp(index, node.name_range, source)
+            symbols.declarations.push(Declaration{
+                id: symbol_id(symbols.declarations.length, tree.generation),
+                name: node.name,
+                kind: symbol_kind_for_node(node.kind),
+                file: file,
+                range: range,
+                selection_range: selection,
+                type_text: "",
+                parent: symbol_id_invalid()
+            })
+        }
+    }
+    symbols.generation = tree.generation
+    return symbols
+}
+
+pub fn symbol_index_declarations(index: SymbolIndex, file: FileId): [Declaration]
+{
+    let mut result: [Declaration] = []
+    for (i in 0 .. index.declarations.length)
+    {
+        if (index.declarations[i].file.value == file.value)
+        {
+            result.push(index.declarations[i])
+        }
+    }
+    return result
+}
+
+pub fn symbol_index_find_at(index: SymbolIndex, file: FileId, position: LspPosition): SymbolId
+{
+    let mut best = symbol_id_invalid()
+    let mut best_size = 0
+    for (i in 0 .. index.declarations.length)
+    {
+        let declaration = index.declarations[i]
+        if (declaration.file.value != file.value)
+        {
+            continue
+        }
+        if (declaration_contains(declaration, position) == 0)
+        {
+            continue
+        }
+        let size = (declaration.range.end.line - declaration.range.start.line) * 4096 + declaration.range.end.character - declaration.range.start.character
+        if (best.index < 0 or size < best_size)
+        {
+            best = declaration.id
+            best_size = size
+        }
+    }
+    return best
+}
+
+pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): SymbolId
+{
+    if (name == "")
+    {
+        return symbol_id_invalid()
+    }
+    for (i in 0 .. index.declarations.length)
+    {
+        if (index.declarations[i].name == name)
+        {
+            return index.declarations[i].id
+        }
+    }
+    return symbol_id_invalid()
+}
+
+pub fn symbol_index_find_definition(index: SymbolIndex, symbol: SymbolId): Declaration
+{
+    for (i in 0 .. index.declarations.length)
+    {
+        if (index.declarations[i].id.index == symbol.index and index.declarations[i].id.generation == symbol.generation)
+        {
+            return index.declarations[i]
+        }
+    }
+    return declaration_invalid()
+}
+
+pub fn declaration_invalid(): Declaration
+{
+    return Declaration{
+        id: symbol_id_invalid(),
+        name: "",
+        kind: VariableSymbol,
+        file: file_id_invalid(),
+        range: lsp_range(lsp_position(0, 0), lsp_position(0, 0)),
+        selection_range: lsp_range(lsp_position(0, 0), lsp_position(0, 0)),
+        type_text: "",
+        parent: symbol_id_invalid()
+    }
+}
+
+pub fn symbol_index_find_references(index: SymbolIndex, symbol: SymbolId): [Reference]
+{
+    let mut result: [Reference] = []
+    for (i in 0 .. index.references.length)
+    {
+        if (index.references[i].symbol.index == symbol.index)
+        {
+            result.push(index.references[i])
+        }
+    }
+    return result
+}
+
+pub fn symbol_index_add_reference(index: &SymbolIndex, reference: Reference)
+{
+    index.references.push(reference)
+}
+
+pub fn symbol_index_merge(index: &SymbolIndex, other: SymbolIndex)
+{
+    for (i in 0 .. other.declarations.length)
+    {
+        index.declarations.push(other.declarations[i])
+    }
+    for (i in 0 .. other.references.length)
+    {
+        index.references.push(other.references[i])
+    }
+    if (other.generation > index.generation)
+    {
+        index.generation = other.generation
+    }
+}

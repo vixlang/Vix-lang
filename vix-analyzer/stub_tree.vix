@@ -1,0 +1,553 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "util.vix"
+import "source_text.vix"
+import "../src/lexer.vix"
+
+pub type StubKind = SourceFile | ModuleDecl | ImportDecl | TypeDecl | FieldDecl | AdtDecl | VariantDecl | FunctionDecl | ParameterDecl | Block | Statement | Expression | ErrorStub
+
+pub type StubNode = struct
+{
+    id: StubNodeId,
+    kind: StubKind,
+    parent: StubNodeId,
+    children: [StubNodeId],
+    range: TextRange,
+    // The span of the declared name. LSP separates the full declaration range
+    // from the selection range, and cursor lookups must use the name.
+    name_range: TextRange,
+    token_start: TokenId,
+    token_end: TokenId,
+    name: string,
+    flags: i32,
+    has_error: i32,
+    ast_index: i32,
+    // Incremental splicing leaves the replaced subtree in the arena as a
+    // tombstone so the nodes that were not touched keep their index, and with
+    // it their StubNodeId. Every lookup skips nodes with alive == 0.
+    alive: i32
+}
+
+pub type StubTree = struct
+{
+    file: FileId,
+    generation: i32,
+    root: StubNodeId,
+    nodes: [StubNode],
+    tokens: [TokenId]
+}
+
+pub fn stub_node_new(id: StubNodeId, kind: StubKind, parent: StubNodeId, name: string, start: i32, end: i32, name_start: i32, name_end: i32, generation: i32): StubNode
+{
+    return StubNode{
+        id: id,
+        kind: kind,
+        parent: parent,
+        children: [],
+        range: text_range(start, end),
+        name_range: text_range(name_start, name_end),
+        token_start: token_id_invalid(),
+        token_end: token_id_invalid(),
+        name: name,
+        flags: 0,
+        has_error: 0,
+        ast_index: -1,
+        alive: 1
+    }
+}
+
+pub fn stub_tree_new(file: FileId): StubTree
+{
+    let root = stub_node_new(stub_node_id(0, 1), SourceFile, stub_node_id_invalid(), "", 0, 0, 0, 0, 1)
+    return StubTree{
+        file: file,
+        generation: 1,
+        root: root.id,
+        nodes: [root],
+        tokens: []
+    }
+}
+
+pub fn stub_tree_add_node(tree: &StubTree, kind: StubKind, name: string, start: i32, end: i32, name_start: i32, name_end: i32): StubNodeId
+{
+    let id = stub_node_id(tree.nodes.length, tree.generation)
+    tree.nodes.push(stub_node_new(id, kind, tree.root, name, start, end, name_start, name_end, tree.generation))
+    tree.nodes[0].children.push(id)
+    return id
+}
+
+pub fn stub_tree_keyword_kind(keyword: string): StubKind
+{
+    if (keyword == "fn") { return FunctionDecl }
+    if (keyword == "type") { return TypeDecl }
+    if (keyword == "mod") { return ModuleDecl }
+    if (keyword == "import") { return ImportDecl }
+    if (keyword == "impl") { return Block }
+    return Statement
+}
+
+// Brace depth before each byte, so only depth-0 keywords become declarations.
+// Without this a local binding inside a function body would look like a global.
+pub fn stub_tree_depths(source: string): [i32]
+{
+    let mut depths: [i32] = []
+    let mut depth = 0
+    for (i in 0 .. source.length)
+    {
+        depths.push(depth)
+        let byte = analyzer_byte_at(source, i)
+        if (byte == '{')
+        {
+            depth += 1
+        }
+        elif (byte == '}')
+        {
+            if (depth > 0)
+            {
+                depth -= 1
+            }
+        }
+    }
+    return depths
+}
+
+// Scans one source buffer for top-level declarations. The buffer is either the
+// whole file or the slice of a single declaration during an incremental edit,
+// which is why the keyword that introduces the slice's declaration is also
+// recorded as a declaration node when the slice starts with it.
+// A declaration owns its body. The opening brace may sit on the line after the
+// signature, so the scan has to step over the parameter list and the return
+// type instead of stopping at the first newline.
+pub fn stub_tree_next_nonspace(source: string, from: i32): i32
+{
+    let mut i = from
+    while (i < source.length and analyzer_is_space(analyzer_byte_at(source, i)) == 1)
+    {
+        i += 1
+    }
+    if (i >= source.length)
+    {
+        return -1
+    }
+    return i
+}
+
+pub fn stub_tree_match_brace(source: string, at: i32): i32
+{
+    let mut depth = 0
+    let mut i = at
+    while (i < source.length)
+    {
+        let byte = analyzer_byte_at(source, i)
+        if (byte == '{')
+        {
+            depth += 1
+        }
+        elif (byte == '}')
+        {
+            depth -= 1
+            if (depth == 0)
+            {
+                return i + 1
+            }
+        }
+        i += 1
+    }
+    return source.length
+}
+
+pub fn stub_tree_declaration_end(source: string, from: i32): i32
+{
+    let mut i = from
+    while (i < source.length and analyzer_byte_at(source, i) != '{' and analyzer_byte_at(source, i) != ';')
+    {
+        if (analyzer_byte_at(source, i) == '\n')
+        {
+            let next = stub_tree_next_nonspace(source, i + 1)
+            if (next < 0)
+            {
+                return source.length
+            }
+            let byte = analyzer_byte_at(source, next)
+            // The declaration continues when the next line opens a body or
+            // continues a signature, type union, or parameter list.
+            if (byte == '{' or byte == '|' or byte == '=' or byte == ',' or byte == ')' or byte == ':')
+            {
+                i = next
+            }
+            else
+            {
+                return i
+            }
+        }
+        else
+        {
+            i += 1
+        }
+    }
+    if (i < source.length and analyzer_byte_at(source, i) == ';')
+    {
+        return i + 1
+    }
+    if (i < source.length and analyzer_byte_at(source, i) == '{')
+    {
+        return stub_tree_match_brace(source, i)
+    }
+    return source.length
+}
+
+pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
+{
+    let keywords = ["fn", "type", "let", "extern", "impl", "mod", "import"]
+    let depths = stub_tree_depths(source)
+    for (k in 0 .. keywords.length)
+    {
+        let keyword = keywords[k]
+        let mut cursor = 0
+        while (cursor + keyword.length < source.length)
+        {
+            let mut matched = 1
+            if (depths[cursor] != 0)
+            {
+                matched = 0
+            }
+            if (cursor > 0 and analyzer_is_ident_byte(analyzer_byte_at(source, cursor - 1)) == 1)
+            {
+                matched = 0
+            }
+            if (analyzer_is_ident_byte(analyzer_byte_at(source, cursor + keyword.length)) == 1)
+            {
+                matched = 0
+            }
+            for (j in 0 .. keyword.length)
+            {
+                if (analyzer_byte_at(source, cursor + j) != analyzer_byte_at(keyword, j))
+                {
+                    matched = 0
+                }
+            }
+            if (matched == 1)
+            {
+                let mut start = cursor + keyword.length
+                while (start < source.length and analyzer_byte_at(source, start) == ' ')
+                {
+                    start += 1
+                }
+                let mut end = start
+                while (end < source.length and analyzer_byte_at(source, end) != ' ' and analyzer_byte_at(source, end) != '\n' and analyzer_byte_at(source, end) != '{' and analyzer_byte_at(source, end) != ';' and analyzer_byte_at(source, end) != '(' and analyzer_byte_at(source, end) != ':')
+                {
+                    end += 1
+                }
+                if (keyword == "extern" or keyword == "impl")
+                {
+                    // These constructs are slice boundaries, not named symbols.
+                    // impl is not accepted by the compiler parser, so fragment
+                    // parsing it will fail and trigger whole-file fallback.
+                    let boundary_end = stub_tree_declaration_end(source, cursor + keyword.length)
+                    if (boundary_end > cursor)
+                    {
+                        stub_tree_add_node(tree, Block, "", base + cursor, base + boundary_end, base + cursor, base + cursor + keyword.length)
+                        cursor = boundary_end
+                    }
+                }
+                elif (end > start)
+                {
+                    let declaration_end = stub_tree_declaration_end(source, end)
+                    stub_tree_add_node(tree, stub_tree_keyword_kind(keyword), analyzer_copy(source, start, end), base + cursor, base + declaration_end, base + start, base + end)
+                    cursor = declaration_end
+                }
+            }
+            cursor += 1
+        }
+    }
+}
+
+pub fn stub_tree_parse(file: FileId, source: string): StubTree
+{
+    let mut tree = stub_tree_new(file)
+    tree.nodes[0].range = text_range(0, source.length)
+    let stream = tokenize(source)
+    for (i in 0 .. stream_len(stream))
+    {
+        tree.tokens.push(token_id(i, tree.generation))
+    }
+    let mut depth = 0
+    for (i in 0 .. source.length)
+    {
+        if (analyzer_byte_at(source, i) == '{') { depth += 1 }
+        if (analyzer_byte_at(source, i) == '}') { depth -= 1 }
+    }
+    if (depth != 0)
+    {
+        tree.nodes[0].has_error = 1
+    }
+    stub_tree_scan(&tree, source, 0)
+    return tree
+}
+
+pub fn stub_tree_root(tree: StubTree): StubNodeId
+{
+    return tree.root
+}
+
+pub fn stub_tree_get(tree: StubTree, id: StubNodeId): StubNode
+{
+    if (id.index < 0 or id.index >= tree.nodes.length)
+    {
+        return tree.nodes[0]
+    }
+    return tree.nodes[id.index]
+}
+
+pub fn stub_tree_alive(tree: StubTree, id: StubNodeId): i32
+{
+    if (id.index < 0 or id.index >= tree.nodes.length)
+    {
+        return 0
+    }
+    return tree.nodes[id.index].alive
+}
+
+pub fn stub_tree_find_at(tree: StubTree, byte: i32): StubNodeId
+{
+    let mut result = tree.root
+    let mut best_size = 0
+    for (i in 0 .. tree.nodes.length)
+    {
+        let node = tree.nodes[i]
+        if (node.alive == 0 or node.kind == SourceFile)
+        {
+            continue
+        }
+        if (node.range.start <= byte and byte <= node.range.end)
+        {
+            let size = node.range.end - node.range.start
+            if (result.index == tree.root.index or size <= best_size)
+            {
+                result = node.id
+                best_size = size
+            }
+        }
+    }
+    return result
+}
+
+pub fn stub_tree_find_named(tree: StubTree, name: string): [StubNodeId]
+{
+    let mut result: [StubNodeId] = []
+    for (i in 0 .. tree.nodes.length)
+    {
+        if (tree.nodes[i].alive == 1 and tree.nodes[i].name == name)
+        {
+            result.push(tree.nodes[i].id)
+        }
+    }
+    return result
+}
+
+pub fn stub_tree_alive_count(tree: StubTree): i32
+{
+    let mut count = 0
+    for (i in 0 .. tree.nodes.length)
+    {
+        if (tree.nodes[i].alive == 1)
+        {
+            count += 1
+        }
+    }
+    return count
+}
+
+pub fn stub_tree_contains_range(node: StubNode, range: TextRange): i32
+{
+    if (node.range.start <= range.start and range.end <= node.range.end)
+    {
+        return 1
+    }
+    return 0
+}
+
+// The top-level declaration that contains the byte, or an invalid id when the
+// byte sits between declarations.
+// The declaration whose *body* contains the byte. Used to pick the reparse
+// slice, so it must use the full range rather than the name range.
+// Declarations in source order. The scan discovers them keyword-major, so node
+// order is not source order.
+pub fn stub_tree_sorted_declarations(tree: StubTree): [i32]
+{
+    let mut indices: [i32] = []
+    for (i in 0 .. tree.nodes.length)
+    {
+        let node = tree.nodes[i]
+        if (node.alive == 1 and node.kind != SourceFile and node.parent.index == tree.root.index)
+        {
+            indices.push(i)
+        }
+    }
+    let mut i = 1
+    while (i < indices.length)
+    {
+        let current = indices[i]
+        let mut j = i - 1
+        while (j >= 0 and tree.nodes[indices[j]].range.start > tree.nodes[current].range.start)
+        {
+            indices[j + 1] = indices[j]
+            j -= 1
+        }
+        indices[j + 1] = current
+        i += 1
+    }
+    return indices
+}
+
+pub fn stub_tree_declaration_body_at(tree: StubTree, byte: i32): StubNodeId
+{
+    let root = tree.nodes[0]
+    for (i in 0 .. root.children.length)
+    {
+        let child = root.children[i]
+        if (child.index < 0 or child.index >= tree.nodes.length)
+        {
+            continue
+        }
+        let node = tree.nodes[child.index]
+        if (node.alive == 1 and node.range.start <= byte and byte <= node.range.end)
+        {
+            return child
+        }
+    }
+    return stub_node_id_invalid()
+}
+
+pub fn stub_tree_declaration_at(tree: StubTree, byte: i32): StubNodeId
+{
+    let root = tree.nodes[0]
+    for (i in 0 .. root.children.length)
+    {
+        let child = root.children[i]
+        if (child.index < 0 or child.index >= tree.nodes.length)
+        {
+            continue
+        }
+        let node = tree.nodes[child.index]
+        if (node.alive == 1 and node.name_range.start <= byte and byte <= node.name_range.end)
+        {
+            return child
+        }
+    }
+    return stub_node_id_invalid()
+}
+
+pub fn stub_tree_kill_subtree(tree: &StubTree, id: StubNodeId)
+{
+    if (id.index < 0 or id.index >= tree.nodes.length)
+    {
+        return
+    }
+    let children = tree.nodes[id.index].children
+    tree.nodes[id.index].alive = 0
+    for (i in 0 .. children.length)
+    {
+        stub_tree_kill_subtree(tree, children[i])
+    }
+}
+
+// Replaces the subtree rooted at target with the declarations of fresh, whose
+// ranges are relative to a slice starting at offset. The replaced nodes stay in
+// the arena as tombstones, so untouched declarations keep their exact
+// StubNodeId across the edit.
+pub fn stub_tree_splice(tree: StubTree, target: StubNodeId, fresh: StubTree, offset: i32): StubTree
+{
+    let mut out = tree
+    if (target.index < 0 or target.index >= out.nodes.length)
+    {
+        return out
+    }
+    let parent = out.nodes[target.index].parent
+    let parent_index = if (parent.index < 0) out.root.index else parent.index
+    stub_tree_kill_subtree(&out, target)
+
+    let mut inserted: [StubNodeId] = []
+    let fresh_root = fresh.nodes[0]
+    for (i in 0 .. fresh_root.children.length)
+    {
+        let source_index = fresh_root.children[i].index
+        if (source_index < 0 or source_index >= fresh.nodes.length)
+        {
+            continue
+        }
+        let source = fresh.nodes[source_index]
+        let id = stub_node_id(out.nodes.length, out.generation)
+        let node = stub_node_new(id, source.kind, stub_node_id(parent_index, out.generation), source.name, source.range.start + offset, source.range.end + offset, source.name_range.start + offset, source.name_range.end + offset, out.generation)
+        out.nodes.push(node)
+        inserted.push(id)
+    }
+
+    let mut children: [StubNodeId] = []
+    for (i in 0 .. out.nodes[parent_index].children.length)
+    {
+        let child = out.nodes[parent_index].children[i]
+        if (child.index == target.index)
+        {
+            for (j in 0 .. inserted.length)
+            {
+                children.push(inserted[j])
+            }
+        }
+        else
+        {
+            children.push(child)
+        }
+    }
+    out.nodes[parent_index].children = children
+    out.generation += 1
+    return out
+}
+
+// After splicing, every declaration that sits past the edit point has to move
+// by the length delta; otherwise its byte range goes stale and the next slice
+// starts mid-token.
+pub fn stub_tree_shift_after(tree: StubTree, threshold: i32, delta: i32): StubTree
+{
+    if (delta == 0)
+    {
+        return tree
+    }
+    for (i in 0 .. tree.nodes.length)
+    {
+        if (tree.nodes[i].alive == 1 and tree.nodes[i].range.start > threshold)
+        {
+            tree.nodes[i].range.start += delta
+            tree.nodes[i].range.end += delta
+            tree.nodes[i].name_range.start += delta
+            tree.nodes[i].name_range.end += delta
+        }
+    }
+    return tree
+}
+
+pub fn stub_tree_rebase_ranges(tree: StubTree, edit: TextEdit): StubTree
+{
+    let delta = edit.replacement.length - (edit.range.end - edit.range.start)
+    for (i in 0 .. tree.nodes.length)
+    {
+        if (tree.nodes[i].range.start >= edit.range.end)
+        {
+            tree.nodes[i].range.start += delta
+            tree.nodes[i].range.end += delta
+        }
+        elif (tree.nodes[i].range.end >= edit.range.start)
+        {
+            tree.nodes[i].range.end += delta
+        }
+    }
+    tree.generation += 1
+    return tree
+}
+
+pub fn stub_tree_generation(tree: StubTree): i32
+{
+    return tree.generation
+}

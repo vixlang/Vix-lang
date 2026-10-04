@@ -2428,6 +2428,129 @@ pub fn parse_program(src: string, filename: string): AstProgram => parse_program
 
 pub fn parse_program_raw(src: string, filename: string): AstProgram => parse_program_impl(src, filename, 0)
 
+// Parses exactly one top-level declaration. This exists so the analyzer can
+// reparse a single changed declaration instead of the whole file. It duplicates
+// the top-level dispatch of parse_program_impl rather than factoring it out, so
+// the compiler's own path is left untouched.
+//
+// The result is a fragment: statement and expression indices are local to it,
+// and token line/column values are relative to src. Callers must rebase both
+// before merging the fragment with others.
+pub fn parse_declaration_fragment(src: string, filename: string): AstProgram
+{
+    return parse_declaration_fragment_stream(src, filename, tokenize(src))
+}
+
+pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: TokenStream): AstProgram
+{
+    let mut parser = parser_new_stream(src, filename, stream)
+    let mut functions: [AstFunction] = []
+    let mut extern_functions: [AstFunction] = []
+    let mut globals: [AstStmt] = []
+    let mut structs: [AstStructDecl] = []
+    let mut adts: [AstAdtDecl] = []
+    let mut mod_decls: [AstModDecl] = []
+    let mut import_decls: [AstImportDecl] = []
+
+    while (parser_text(&parser) == ";")
+    {
+        parser_advance(&parser)
+    }
+    if (parser_at_end(&parser) == 1)
+    {
+        return ast_program_err_diag("empty declaration", parser.diagnostic)
+    }
+
+    let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, parser.pos + 1) == "mod"
+    if (parser_text(&parser) == "mod" or is_pub_mod == 1)
+    {
+        let mdecl = parse_mod_decl(&parser)
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        mod_decls.push(mdecl)
+    }
+    elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
+    {
+        let idecl = parse_import_decl(&parser)
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        import_decls.push(idecl)
+    }
+    elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
+    {
+        parser_advance(&parser)
+        parser_advance(&parser)
+        parser_accept_text(&parser, ";")
+    }
+    elif (parser_text(&parser) == "extern")
+    {
+        parser_expect_text(&parser, "extern")
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        if (parser_kind(&parser) == tk_string()) { parser_advance(&parser) }
+        parser_expect_text(&parser, "{")
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        while (parser_text(&parser) != "}" and parser_at_end(&parser) == 0)
+        {
+            if (parser_text(&parser) == ";")
+            {
+                parser_advance(&parser)
+                continue
+            }
+            if (parser_text(&parser) == "type")
+            {
+                let decl = parse_struct_decl_abi(&parser, 1)
+                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                structs.push(decl)
+            }
+            else
+            {
+                let extern_func = parse_extern_function(&parser)
+                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                extern_functions.push(extern_func)
+            }
+        }
+        parser_expect_text(&parser, "}")
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+    }
+    elif (parser_text(&parser) == "type" or (parser_text(&parser) == "pub" and stream_text_at(parser.stream, parser.pos + 1) == "type"))
+    {
+        if (top_level_type_is_struct(&parser) == 1)
+        {
+            let decl = parse_struct_decl(&parser)
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            structs.push(decl)
+        }
+        else
+        {
+            let decl = parse_adt_decl(&parser)
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            adts.push(decl)
+        }
+    }
+    elif (parser_text(&parser) == "let")
+    {
+        let global_idx = parse_statement(&parser)
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        let global_stmt = stmt_store_get(parser.store, global_idx)
+        globals.push(global_stmt)
+    }
+    elif (parser_text(&parser) == "fn" or parser_text(&parser) == "pub")
+    {
+        let func = parse_function(&parser)
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        functions.push(func)
+    }
+    else
+    {
+        parser_fail(&parser, "expected top-level declaration, got '" + parser_text(&parser) + "'")
+        return ast_program_err_diag(parser.error, parser.diagnostic)
+    }
+
+    for (i in 0 .. parser.lambda_functions.length)
+    {
+        functions.push(parser.lambda_functions[i])
+    }
+    return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store)
+}
+
 pub fn parse_program_stats(src: string, filename: string): string
 {
     let mut imports = import_set_new()

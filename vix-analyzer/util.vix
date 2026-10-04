@@ -1,0 +1,190 @@
+#[no_main]
+
+import "position.vix"
+
+extern "C"
+{
+    fn malloc(size: usize): string
+    fn snprintf(buf: string, size: usize, fmt: string, ...): i32
+    fn compiler_string_byte(text: string, index: i32): i32
+}
+
+pub fn analyzer_char_string(byte: i32): string
+{
+    let text: string = malloc(2)
+    text[0] = byte
+    text[1] = 0
+    return text
+}
+
+pub fn analyzer_i32_to_str(value: i32): string
+{
+    let buf: string = malloc(64)
+    snprintf(buf, 64, "%d", value)
+    return buf
+}
+
+pub fn analyzer_byte_at(text: string, index: i32): i32
+{
+    if (index < 0 or index >= text.length)
+    {
+        return -1
+    }
+    return compiler_string_byte(text, index)
+}
+
+pub fn analyzer_starts_with(text: string, prefix: string): i32
+{
+    if (text.length < prefix.length)
+    {
+        return 0
+    }
+    for (i in 0 .. prefix.length)
+    {
+        if (compiler_string_byte(text, i) != compiler_string_byte(prefix, i))
+        {
+            return 0
+        }
+    }
+    return 1
+}
+
+pub fn analyzer_contains(text: string, needle: string): i32
+{
+    if (analyzer_index_of(text, needle, 0) >= 0)
+    {
+        return 1
+    }
+    return 0
+}
+
+pub fn analyzer_index_of(text: string, needle: string, from: i32): i32
+{
+    if (needle.length == 0)
+    {
+        return from
+    }
+    if (text.length < needle.length)
+    {
+        return -1
+    }
+    let mut start = from
+    if (start < 0)
+    {
+        start = 0
+    }
+    while (start + needle.length <= text.length)
+    {
+        let mut matched = 1
+        for (i in 0 .. needle.length)
+        {
+            if (compiler_string_byte(text, start + i) != compiler_string_byte(needle, i))
+            {
+                matched = 0
+            }
+        }
+        if (matched == 1)
+        {
+            return start
+        }
+        start += 1
+    }
+    return -1
+}
+
+pub fn analyzer_copy(text: string, start: i32, end: i32): string
+{
+    let mut out = ""
+    let safe_start = if (start < 0) 0 else start
+    let safe_end = if (end > text.length) text.length else end
+    for (i in safe_start .. safe_end)
+    {
+        out = out + analyzer_char_string(compiler_string_byte(text, i))
+    }
+    return out
+}
+
+pub fn analyzer_trim(text: string): string
+{
+    let mut start = 0
+    let mut end = text.length
+    while (start < end and analyzer_is_space(compiler_string_byte(text, start)) == 1)
+    {
+        start += 1
+    }
+    while (end > start and analyzer_is_space(compiler_string_byte(text, end - 1)) == 1)
+    {
+        end -= 1
+    }
+    return analyzer_copy(text, start, end)
+}
+
+pub fn analyzer_line_start(text: string, line: i32): i32
+{
+    let mut index = 0
+    let mut i = 0
+    while (i < text.length)
+    {
+        if (index == line)
+        {
+            return i
+        }
+        if (analyzer_byte_at(text, i) == '\n')
+        {
+            index += 1
+        }
+        i += 1
+    }
+    return text.length
+}
+
+pub fn analyzer_is_ident_byte(byte: i32): i32
+{
+    if (byte >= 'a' and byte <= 'z')
+    {
+        return 1
+    }
+    if (byte >= 'A' and byte <= 'Z')
+    {
+        return 1
+    }
+    if (byte >= '0' and byte <= '9')
+    {
+        return 1
+    }
+    if (byte == '_')
+    {
+        return 1
+    }
+    return 0
+}
+
+pub fn analyzer_word_at(text: string, position: LspPosition): string
+{
+    let index = line_index_new(text)
+    let offset = line_index_byte(index, position, text)
+    if (offset < 0 or offset > text.length)
+    {
+        return ""
+    }
+    let mut start = offset
+    while (start > 0 and analyzer_is_ident_byte(analyzer_byte_at(text, start - 1)) == 1)
+    {
+        start -= 1
+    }
+    let mut end = offset
+    while (end < text.length and analyzer_is_ident_byte(analyzer_byte_at(text, end)) == 1)
+    {
+        end += 1
+    }
+    return analyzer_copy(text, start, end)
+}
+
+pub fn analyzer_is_space(byte: i32): i32
+{
+    if (byte == ' ' or byte == '\t' or byte == '\n' or byte == '\r')
+    {
+        return 1
+    }
+    return 0
+}

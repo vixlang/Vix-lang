@@ -1,0 +1,119 @@
+#[no_main]
+
+import "util.vix"
+
+extern "C"
+{
+    fn vix_analyzer_read_byte(): i32
+    fn vix_analyzer_write(text: string, length: i32)
+}
+
+pub type TransportState = struct
+{
+    running: i32,
+    shutdown: i32
+}
+
+pub fn transport_new(): TransportState
+{
+    return TransportState{ running: 0, shutdown: 0 }
+}
+
+pub fn transport_read_header(): string
+{
+    let mut header = ""
+    while (1 == 1)
+    {
+        let byte = vix_analyzer_read_byte()
+        if (byte < 0)
+        {
+            return header
+        }
+        header = header + analyzer_char_string(byte)
+        if (header.length >= 4)
+        {
+            if (analyzer_byte_at(header, header.length - 4) == '\r' and analyzer_byte_at(header, header.length - 3) == '\n' and analyzer_byte_at(header, header.length - 2) == '\r' and analyzer_byte_at(header, header.length - 1) == '\n')
+            {
+                return header
+            }
+        }
+    }
+    return header
+}
+
+pub fn transport_decode_content_length(headers: string): i32
+{
+    let marker = "Content-Length:"
+    let at = analyzer_index_of(headers, marker, 0)
+    if (at < 0)
+    {
+        return 0
+    }
+    let mut pos = at + marker.length
+    while (pos < headers.length and analyzer_byte_at(headers, pos) == ' ')
+    {
+        pos += 1
+    }
+    let mut value = 0
+    let mut digits = 0
+    while (pos < headers.length)
+    {
+        let byte = analyzer_byte_at(headers, pos)
+        if (byte < '0' or byte > '9')
+        {
+            break
+        }
+        value = value * 10 + (byte - '0')
+        pos += 1
+        digits += 1
+    }
+    if (digits == 0)
+    {
+        return 0
+    }
+    return value
+}
+
+pub fn transport_read_frame(): string
+{
+    let header = transport_read_header()
+    if (header == "")
+    {
+        return ""
+    }
+    let length = transport_decode_content_length(header)
+    if (length <= 0)
+    {
+        return ""
+    }
+    let mut body = ""
+    let mut count = 0
+    while (count < length)
+    {
+        let byte = vix_analyzer_read_byte()
+        if (byte < 0)
+        {
+            return ""
+        }
+        body = body + analyzer_char_string(byte)
+        count += 1
+    }
+    return body
+}
+
+pub fn transport_write_frame(payload: string)
+{
+    let header = "Content-Length: " + analyzer_i32_to_str(payload.length) + "\r\n\r\n"
+    vix_analyzer_write(header + payload, header.length + payload.length)
+}
+
+pub fn transport_run(state: &TransportState)
+{
+    state.running = 1
+}
+
+pub fn transport_shutdown(state: &TransportState)
+{
+    state.shutdown = 1
+    state.running = 0
+}

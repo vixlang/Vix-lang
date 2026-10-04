@@ -1,0 +1,273 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "util.vix"
+import "stub_tree.vix"
+import "source_text.vix"
+import "../src/parser.vix"
+
+// The AST does not carry comments, so reprinting the program from the AST would
+// delete them. The formatter therefore uses the syntax tree only for structure
+// (does the file parse, where do top-level declarations start) and rewrites
+// leading indentation and trailing whitespace, leaving every other byte alone.
+pub type FormatResult = struct
+{
+    ok: i32,
+    text: string,
+    message: string
+}
+
+pub type FormatterState = struct
+{
+    depth: i32,
+    in_block_comment: i32,
+    in_string: i32
+}
+
+pub fn formatter_indent_unit(): i32
+{
+    return 4
+}
+
+pub fn formatter_line_start(text: string, line: i32): i32
+{
+    let mut index = 0
+    let mut i = 0
+    while (i < text.length)
+    {
+        if (index == line)
+        {
+            return i
+        }
+        if (analyzer_byte_at(text, i) == '\n')
+        {
+            index += 1
+        }
+        i += 1
+    }
+    return text.length
+}
+
+pub fn formatter_line_end(text: string, start: i32): i32
+{
+    let mut i = start
+    while (i < text.length and analyzer_byte_at(text, i) != '\n')
+    {
+        i += 1
+    }
+    return i
+}
+
+pub fn formatter_line_count(text: string): i32
+{
+    let mut count = 1
+    for (i in 0 .. text.length)
+    {
+        if (analyzer_byte_at(text, i) == '\n')
+        {
+            count += 1
+        }
+    }
+    return count
+}
+
+pub fn formatter_indent(level: i32): string
+{
+    let mut out = ""
+    let mut i = 0
+    while (i < level)
+    {
+        out = out + "    "
+        i += 1
+    }
+    return out
+}
+
+pub fn formatter_starts_with(text: string, byte: i32): i32
+{
+    if (text.length > 0 and analyzer_byte_at(text, 0) == byte)
+    {
+        return 1
+    }
+    return 0
+}
+
+pub fn formatter_list_contains(values: [i32], wanted: i32): i32
+{
+    for (i in 0 .. values.length)
+    {
+        if (values[i] == wanted)
+        {
+            return 1
+        }
+    }
+    return 0
+}
+
+// Start lines of the top-level declarations, used to keep exactly one blank line
+// between them.
+pub fn formatter_declaration_lines(tree: StubTree, text: string): [i32]
+{
+    let index = line_index_new(text)
+    let mut lines: [i32] = []
+    for (i in 0 .. tree.nodes.length)
+    {
+        let node = tree.nodes[i]
+        if (node.alive == 1 and node.kind != SourceFile and node.parent.index == tree.root.index)
+        {
+            lines.push(line_index_position(index, node.range.start).line)
+        }
+    }
+    return lines
+}
+
+// Tracks brace depth and lexical state across lines so that braces inside
+// strings, characters and comments do not affect indentation.
+pub fn formatter_scan_line(state: &FormatterState, content: string)
+{
+    let mut i = 0
+    while (i < content.length)
+    {
+        let byte = analyzer_byte_at(content, i)
+        if (state.in_block_comment == 1)
+        {
+            if (byte == '*' and analyzer_byte_at(content, i + 1) == '/')
+            {
+                state.in_block_comment = 0
+                i += 2
+            }
+            else
+            {
+                i += 1
+            }
+        }
+        elif (state.in_string == 1)
+        {
+            if (byte == '\\')
+            {
+                i += 2
+            }
+            elif (byte == '"')
+            {
+                state.in_string = 0
+                i += 1
+            }
+            else
+            {
+                i += 1
+            }
+        }
+        elif (byte == '/' and analyzer_byte_at(content, i + 1) == '/')
+        {
+            return
+        }
+        elif (byte == '/' and analyzer_byte_at(content, i + 1) == '*')
+        {
+            state.in_block_comment = 1
+            i += 2
+        }
+        elif (byte == '"')
+        {
+            state.in_string = 1
+            i += 1
+        }
+        elif (byte == '\'')
+        {
+            i += 1
+            while (i < content.length and analyzer_byte_at(content, i) != '\'')
+            {
+                if (analyzer_byte_at(content, i) == '\\')
+                {
+                    i += 1
+                }
+                i += 1
+            }
+            i += 1
+        }
+        elif (byte == '{')
+        {
+            state.depth += 1
+            i += 1
+        }
+        elif (byte == '}')
+        {
+            if (state.depth > 0)
+            {
+                state.depth -= 1
+            }
+            i += 1
+        }
+        else
+        {
+            i += 1
+        }
+    }
+}
+
+pub fn formatter_format(file: FileId, text: string): FormatResult
+{
+    if (text.length == 0)
+    {
+        return FormatResult{ ok: 1, text: text, message: "" }
+    }
+    // Never touch a file that does not parse: a half-written buffer would be
+    // reindented from guesses.
+    let program = parse_program_raw(text, "")
+    if (program.ok == 0)
+    {
+        return FormatResult{ ok: 0, text: text, message: "document has syntax errors" }
+    }
+    let tree = stub_tree_parse(file, text)
+    let declarations = formatter_declaration_lines(tree, text)
+
+    let state = FormatterState{ depth: 0, in_block_comment: 0, in_string: 0 }
+    let mut out = ""
+    let mut previous_blank = 0
+    let mut previous_text = ""
+    let mut line = 0
+    let total = formatter_line_count(text)
+    while (line < total)
+    {
+        let start = formatter_line_start(text, line)
+        let end = formatter_line_end(text, start)
+        let content = analyzer_copy(text, start, end)
+        let trimmed = analyzer_trim(content)
+        if (trimmed == "")
+        {
+            // Collapse runs of blank lines; a single one is kept.
+            if (previous_blank == 0 and out != "" and line + 1 < total)
+            {
+                out = out + "\n"
+                previous_blank = 1
+            }
+        }
+        else
+        {
+            if (state.in_block_comment == 1)
+            {
+                // Leave block comment bodies untouched.
+                out = out + content + "\n"
+            }
+            else
+            {
+                let starts_with_close = formatter_starts_with(trimmed, '}')
+                if (formatter_list_contains(declarations, line) == 1 and out != "" and previous_blank == 0 and formatter_starts_with(previous_text, '#') == 0)
+                {
+                    out = out + "\n"
+                }
+                let mut level = state.depth
+                if (starts_with_close == 1 and level > 0)
+                {
+                    level -= 1
+                }
+                out = out + formatter_indent(level) + trimmed + "\n"
+            }
+            previous_blank = 0
+            previous_text = trimmed
+        }
+        formatter_scan_line(&state, content)
+        line += 1
+    }
+    return FormatResult{ ok: 1, text: out, message: "" }
+}

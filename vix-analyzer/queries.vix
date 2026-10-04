@@ -1,0 +1,143 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "util.vix"
+import "workspace.vix"
+import "symbol_index.vix"
+import "analysis.vix"
+
+pub type HoverResult = struct
+{
+    contents: string,
+    range: LspRange
+}
+
+pub type CompletionItem = struct
+{
+    label: string,
+    detail: string,
+    kind: i32
+}
+
+pub type QueryResult = struct
+{
+    ok: i32,
+    message: string
+}
+
+// Resolves the symbol under the cursor. A declaration containing the position
+// wins; otherwise the identifier at the position is resolved by name, which is
+// what makes hover, definition and references work at use sites.
+pub fn query_symbol(workspace: Workspace, file: FileId, position: LspPosition): SymbolId
+{
+    let analysis = workspace_analysis_by_file(workspace, file)
+    let direct = symbol_index_find_at(analysis.symbols, file, position)
+    if (direct.index >= 0)
+    {
+        return direct
+    }
+    let text = workspace_text_by_file(workspace, file)
+    let word = analyzer_word_at(text, position)
+    return symbol_index_find_by_name(analysis.symbols, word)
+}
+
+pub fn hover_contents(declaration: Declaration): string
+{
+    if (declaration.name == "")
+    {
+        return ""
+    }
+    if (declaration.type_text != "")
+    {
+        return declaration.name + ": " + declaration.type_text
+    }
+    let kind = "symbol"
+    if (declaration.kind == FunctionSymbol)
+    {
+        kind = "function"
+    }
+    elif (declaration.kind == TypeSymbol)
+    {
+        kind = "type"
+    }
+    elif (declaration.kind == ModuleSymbol)
+    {
+        kind = "module"
+    }
+    return declaration.name + ": " + kind
+}
+
+pub fn query_hover(workspace: Workspace, file: FileId, position: LspPosition): HoverResult
+{
+    let analysis = workspace_analysis_by_file(workspace, file)
+    let symbol = query_symbol(workspace, file, position)
+    let declaration = symbol_index_find_definition(analysis.symbols, symbol)
+    return HoverResult{
+        contents: hover_contents(declaration),
+        range: declaration.range
+    }
+}
+
+pub fn query_definition(workspace: Workspace, file: FileId, position: LspPosition): Declaration
+{
+    let analysis = workspace_analysis_by_file(workspace, file)
+    let symbol = query_symbol(workspace, file, position)
+    return symbol_index_find_definition(analysis.symbols, symbol)
+}
+
+pub fn query_references(workspace: Workspace, file: FileId, position: LspPosition): [Reference]
+{
+    let analysis = workspace_analysis_by_file(workspace, file)
+    let symbol = query_symbol(workspace, file, position)
+    return symbol_index_find_references(analysis.symbols, symbol)
+}
+
+pub fn query_completion(workspace: Workspace, file: FileId, position: LspPosition): [CompletionItem]
+{
+    let analysis = workspace_analysis_by_file(workspace, file)
+    let mut result: [CompletionItem] = []
+    for (i in 0 .. analysis.symbols.declarations.length)
+    {
+        let declaration = analysis.symbols.declarations[i]
+        result.push(CompletionItem{
+            label: declaration.name,
+            detail: declaration.type_text,
+            kind: symbol_lsp_kind(declaration.kind)
+        })
+    }
+    return result
+}
+
+pub fn query_document_symbols(workspace: Workspace, file: FileId): [Declaration]
+{
+    let analysis = workspace_analysis_by_file(workspace, file)
+    return symbol_index_declarations(analysis.symbols, file)
+}
+
+pub fn query_workspace_symbols(workspace: Workspace, name: string): [Declaration]
+{
+    let mut result: [Declaration] = []
+    for (i in 0 .. workspace.documents.length)
+    {
+        let declarations = symbol_index_declarations(workspace.documents[i].analysis.symbols, workspace.documents[i].file)
+        for (j in 0 .. declarations.length)
+        {
+            if (name == "" or declarations[j].name == name)
+            {
+                result.push(declarations[j])
+            }
+        }
+    }
+    return result
+}
+
+pub fn query_rename(workspace: Workspace, file: FileId, position: LspPosition, new_name: string): QueryResult
+{
+    let references = query_references(workspace, file, position)
+    if (references.length == 0)
+    {
+        return QueryResult{ ok: 0, message: "no renameable symbol at position" }
+    }
+    return QueryResult{ ok: 1, message: new_name }
+}

@@ -1,0 +1,50 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+
+pub type TextEdit = struct
+{
+    range: TextRange,
+    replacement: string,
+}
+pub type SourceText = struct
+{
+    file: FileId,
+    version: i32,
+    text: string,
+    index: LineIndex,
+}
+pub fn source_text_new(file: FileId, version: i32, text: string): SourceText
+{
+    return SourceText{ file: file, version: version, text: text, index: line_index_new(text) }
+}
+pub fn source_text_replace(source: SourceText, text: string, version: i32): SourceText
+{
+    return source_text_new(source.file, version, text)
+}
+pub fn source_text_apply_edit(source: SourceText, edit: TextEdit, version: i32): SourceText
+{
+    let before = source.text[0 .. edit.range.start];
+    let after = source.text[edit.range.end .. source.text.length];
+    return source_text_new(source.file, version, before + edit.replacement + after)
+}
+pub fn source_text_text(source: SourceText): string
+{
+    return source.text
+}
+pub fn source_text_changed_range(old_source: SourceText, new_source: SourceText): TextRange
+{
+    let mut start = 0;
+    let limit = if (old_source.text.length < new_source.text.length) { old_source.text.length } else { new_source.text.length };
+    while (start < limit and old_source.text[start] == new_source.text[start]) { start += 1 };
+    let mut old_end = old_source.text.length;
+    let mut new_end = new_source.text.length;
+    while (old_end > start and new_end > start and old_source.text[old_end - 1] == new_source.text[new_end - 1]) { old_end -= 1;
+    new_end -= 1 };
+    return TextRange{ start: start, end: new_end }
+}
+pub fn source_text_position(source: SourceText, byte: i32): TextPosition
+{
+    return line_index_position(source.index, byte)
+}

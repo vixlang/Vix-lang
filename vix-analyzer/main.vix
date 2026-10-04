@@ -1,0 +1,15 @@
+#[no_main]
+
+import "lsp_server.vix"
+
+pub fn vix_analyzer_main(): i32
+{
+    let server = lsp_server_new("", "")
+    lsp_server_run(&server)
+    return 0
+}
+
+pub fn main(): i32
+{
+    return vix_analyzer_main()
+}

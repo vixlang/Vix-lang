@@ -1,0 +1,503 @@
+#[no_main]
+
+import "util.vix"
+
+pub type JsonKind = JsonNull | JsonBool | JsonNumber | JsonString | JsonArray | JsonObject
+
+pub type JsonNode = struct
+{
+    kind: JsonKind,
+    bool_value: i32,
+    number_value: f64,
+    string_value: string,
+    children: [i32],
+    keys: [string],
+    values: [i32],
+    start: i32,
+    end: i32
+}
+
+pub type JsonDocument = struct
+{
+    nodes: [JsonNode],
+    ok: i32
+}
+
+pub type JsonCursor = struct
+{
+    text: string,
+    pos: i32,
+    ok: i32
+}
+
+pub fn json_document_new(): JsonDocument
+{
+    return JsonDocument{ nodes: [], ok: 1 }
+}
+
+pub fn json_cursor_new(text: string): JsonCursor
+{
+    return JsonCursor{ text: text, pos: 0, ok: 1 }
+}
+
+pub fn json_add_node(doc: &JsonDocument, node: JsonNode): i32
+{
+    doc.nodes.push(node)
+    return doc.nodes.length - 1
+}
+
+pub fn json_node(kind: JsonKind, bool_value: i32, number_value: f64, string_value: string, children: [i32], keys: [string], values: [i32]): JsonNode
+{
+    return JsonNode{
+        kind: kind,
+        bool_value: bool_value,
+        number_value: number_value,
+        string_value: string_value,
+        children: children,
+        keys: keys,
+        values: values,
+        start: 0,
+        end: 0
+    }
+}
+
+pub fn json_root(doc: JsonDocument): i32
+{
+    if (doc.nodes.length == 0)
+    {
+        return -1
+    }
+    return doc.nodes.length - 1
+}
+
+pub fn json_raw(doc: JsonDocument, text: string, index: i32): string
+{
+    if (index < 0 or index >= doc.nodes.length)
+    {
+        return ""
+    }
+    let node = doc.nodes[index]
+    return analyzer_copy(text, node.start, node.end)
+}
+
+pub fn json_node_null(doc: &JsonDocument): i32
+{
+    return json_add_node(doc, json_node(JsonNull, 0, 0.0, "", [], [], [] ))
+}
+
+pub fn json_skip_space(cursor: &JsonCursor)
+{
+    while (cursor.pos < cursor.text.length)
+    {
+        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        if (byte == ' ' or byte == '\t' or byte == '\n' or byte == '\r')
+        {
+            cursor.pos += 1
+        }
+        else
+        {
+            return
+        }
+    }
+}
+
+pub fn json_utf8(codepoint: i32): string
+{
+    if (codepoint < 128)
+    {
+        return analyzer_char_string(codepoint)
+    }
+    if (codepoint < 2048)
+    {
+        return analyzer_char_string(192 + codepoint / 64) + analyzer_char_string(128 + codepoint % 64)
+    }
+    if (codepoint < 65536)
+    {
+        return analyzer_char_string(224 + codepoint / 4096) + analyzer_char_string(128 + (codepoint / 64) % 64) + analyzer_char_string(128 + codepoint % 64)
+    }
+    return analyzer_char_string(240 + codepoint / 262144) + analyzer_char_string(128 + (codepoint / 4096) % 64) + analyzer_char_string(128 + (codepoint / 64) % 64) + analyzer_char_string(128 + codepoint % 64)
+}
+
+pub fn json_hex_value(byte: i32): i32
+{
+    if (byte >= '0' and byte <= '9') { return byte - '0' }
+    if (byte >= 'a' and byte <= 'f') { return byte - 'a' + 10 }
+    if (byte >= 'A' and byte <= 'F') { return byte - 'A' + 10 }
+    return -1
+}
+
+pub fn json_read_hex4(cursor: &JsonCursor): i32
+{
+    if (cursor.pos + 4 > cursor.text.length)
+    {
+        cursor.ok = 0
+        return 0
+    }
+    let mut value = 0
+    for (i in 0 .. 4)
+    {
+        let digit = json_hex_value(analyzer_byte_at(cursor.text, cursor.pos + i))
+        if (digit < 0)
+        {
+            cursor.ok = 0
+            return 0
+        }
+        value = value * 16 + digit
+    }
+    cursor.pos += 4
+    return value
+}
+
+pub fn json_read_string(cursor: &JsonCursor): string
+{
+    if (analyzer_byte_at(cursor.text, cursor.pos) != '"')
+    {
+        cursor.ok = 0
+        return ""
+    }
+    cursor.pos += 1
+    let mut out = ""
+    while (cursor.pos < cursor.text.length)
+    {
+        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        if (byte == '"')
+        {
+            cursor.pos += 1
+            return out
+        }
+        if (byte != '\\')
+        {
+            out = out + analyzer_char_string(byte)
+            cursor.pos += 1
+        }
+        else
+        {
+            cursor.pos += 1
+            let escaped = analyzer_byte_at(cursor.text, cursor.pos)
+            if (escaped == 'n') { out = out + "\n" }
+            elif (escaped == 't') { out = out + "\t" }
+            elif (escaped == 'r') { out = out + "\r" }
+            elif (escaped == '"') { out = out + "\"" }
+            elif (escaped == '\\') { out = out + "\\" }
+            elif (escaped == '/') { out = out + "/" }
+            elif (escaped == 'b') { out = out + analyzer_char_string(8) }
+            elif (escaped == 'f') { out = out + analyzer_char_string(12) }
+            elif (escaped == 'u')
+            {
+                cursor.pos += 1
+                let mut codepoint = json_read_hex4(cursor)
+                if (codepoint >= 55296 and codepoint <= 56319 and analyzer_byte_at(cursor.text, cursor.pos) == '\\' and analyzer_byte_at(cursor.text, cursor.pos + 1) == 'u')
+                {
+                    cursor.pos += 2
+                    let low = json_read_hex4(cursor)
+                    codepoint = 65536 + (codepoint - 55296) * 1024 + (low - 56320)
+                }
+                out = out + json_utf8(codepoint)
+                cursor.pos -= 1
+            }
+            else
+            {
+                cursor.ok = 0
+                return ""
+            }
+            cursor.pos += 1
+        }
+    }
+    cursor.ok = 0
+    return ""
+}
+
+pub fn json_read_number(cursor: &JsonCursor, doc: &JsonDocument): i32
+{
+    let mut value = 0.0
+    let mut negative = 0
+    let mut digits = 0
+    if (analyzer_byte_at(cursor.text, cursor.pos) == '-')
+    {
+        negative = 1
+        cursor.pos += 1
+    }
+    while (1 == 1)
+    {
+        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        if (byte < '0' or byte > '9') { break }
+        value = value * 10.0 + (byte - '0')
+        cursor.pos += 1
+        digits += 1
+    }
+    if (analyzer_byte_at(cursor.text, cursor.pos) == '.')
+    {
+        cursor.pos += 1
+        let mut scale = 0.1
+        while (1 == 1)
+        {
+            let byte = analyzer_byte_at(cursor.text, cursor.pos)
+            if (byte < '0' or byte > '9') { break }
+            value = value + (byte - '0') * scale
+            scale = scale * 0.1
+            cursor.pos += 1
+            digits += 1
+        }
+    }
+    if (digits == 0)
+    {
+        cursor.ok = 0
+        return -1
+    }
+    if (negative == 1) { value = 0.0 - value }
+    return json_add_node(doc, json_node(JsonNumber, 0, value, "", [], [], [] ))
+}
+
+pub fn json_read_array(cursor: &JsonCursor, doc: &JsonDocument): i32
+{
+    cursor.pos += 1
+    let mut children: [i32] = []
+    json_skip_space(cursor)
+    if (analyzer_byte_at(cursor.text, cursor.pos) == ']')
+    {
+        cursor.pos += 1
+        return json_add_node(doc, json_node(JsonArray, 0, 0.0, "", children, [], [] ))
+    }
+    while (cursor.pos < cursor.text.length)
+    {
+        let value = json_read_value(cursor, doc)
+        if (cursor.ok == 0) { return -1 }
+        children.push(value)
+        json_skip_space(cursor)
+        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        if (byte == ',')
+        {
+            cursor.pos += 1
+        }
+        elif (byte == ']')
+        {
+            cursor.pos += 1
+            return json_add_node(doc, json_node(JsonArray, 0, 0.0, "", children, [], [] ))
+        }
+        else
+        {
+            cursor.ok = 0
+            return -1
+        }
+    }
+    cursor.ok = 0
+    return -1
+}
+
+pub fn json_read_object(cursor: &JsonCursor, doc: &JsonDocument): i32
+{
+    cursor.pos += 1
+    let mut keys: [string] = []
+    let mut values: [i32] = []
+    json_skip_space(cursor)
+    if (analyzer_byte_at(cursor.text, cursor.pos) == '}')
+    {
+        cursor.pos += 1
+        return json_add_node(doc, json_node(JsonObject, 0, 0.0, "", [], keys, values ))
+    }
+    while (cursor.pos < cursor.text.length)
+    {
+        json_skip_space(cursor)
+        if (analyzer_byte_at(cursor.text, cursor.pos) != '"')
+        {
+            cursor.ok = 0
+            return -1
+        }
+        let key = json_read_string(cursor)
+        if (cursor.ok == 0) { return -1 }
+        json_skip_space(cursor)
+        if (analyzer_byte_at(cursor.text, cursor.pos) != ':')
+        {
+            cursor.ok = 0
+            return -1
+        }
+        cursor.pos += 1
+        let value = json_read_value(cursor, doc)
+        if (cursor.ok == 0) { return -1 }
+        keys.push(key)
+        values.push(value)
+        json_skip_space(cursor)
+        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        if (byte == ',')
+        {
+            cursor.pos += 1
+        }
+        elif (byte == '}')
+        {
+            cursor.pos += 1
+            return json_add_node(doc, json_node(JsonObject, 0, 0.0, "", [], keys, values ))
+        }
+        else
+        {
+            cursor.ok = 0
+            return -1
+        }
+    }
+    cursor.ok = 0
+    return -1
+}
+
+pub fn json_read_literal(cursor: &JsonCursor, word: string, bool_value: i32, doc: &JsonDocument): i32
+{
+    for (i in 0 .. word.length)
+    {
+        if (analyzer_byte_at(cursor.text, cursor.pos + i) != analyzer_byte_at(word, i))
+        {
+            cursor.ok = 0
+            return -1
+        }
+    }
+    cursor.pos += word.length
+    return json_add_node(doc, json_node(JsonBool, bool_value, 0.0, "", [], [], [] ))
+}
+
+pub fn json_read_value(cursor: &JsonCursor, doc: &JsonDocument): i32
+{
+    json_skip_space(cursor)
+    let start = cursor.pos
+    let byte = analyzer_byte_at(cursor.text, cursor.pos)
+    let mut index = -1
+    if (byte == '{')
+    {
+        index = json_read_object(cursor, doc)
+    }
+    elif (byte == '[')
+    {
+        index = json_read_array(cursor, doc)
+    }
+    elif (byte == '"')
+    {
+        let words = json_read_string(cursor)
+        if (cursor.ok == 1)
+        {
+            index = json_add_node(doc, json_node(JsonString, 0, 0.0, words, [], [], []))
+        }
+    }
+    elif (byte == 't')
+    {
+        index = json_read_literal(cursor, "true", 1, doc)
+    }
+    elif (byte == 'f')
+    {
+        index = json_read_literal(cursor, "false", 0, doc)
+    }
+    elif (byte == 'n')
+    {
+        index = json_read_literal(cursor, "null", 0, doc)
+    }
+    elif (byte == -1)
+    {
+        cursor.ok = 0
+    }
+    else
+    {
+        index = json_read_number(cursor, doc)
+    }
+    if (index >= 0 and index < doc.nodes.length)
+    {
+        doc.nodes[index].start = start
+        doc.nodes[index].end = cursor.pos
+    }
+    return index
+}
+
+pub fn json_parse(text: string): JsonDocument
+{
+    let doc = json_document_new()
+    let cursor = json_cursor_new(text)
+    let root = json_read_value(&cursor, &doc)
+    json_skip_space(&cursor)
+    if (cursor.ok == 0 or root < 0)
+    {
+        doc.ok = 0
+    }
+    return doc
+}
+
+pub fn json_object_get(doc: JsonDocument, index: i32, key: string): i32
+{
+    if (index < 0 or index >= doc.nodes.length) { return -1 }
+    let node = doc.nodes[index]
+    if (node.kind != JsonObject) { return -1 }
+    for (i in 0 .. node.keys.length)
+    {
+        if (node.keys[i] == key) { return node.values[i] }
+    }
+    return -1
+}
+
+pub fn json_array_length(doc: JsonDocument, index: i32): i32
+{
+    if (index < 0 or index >= doc.nodes.length) { return 0 }
+    return doc.nodes[index].children.length
+}
+
+pub fn json_array_item(doc: JsonDocument, index: i32, item: i32): i32
+{
+    if (index < 0 or index >= doc.nodes.length) { return -1 }
+    let node = doc.nodes[index]
+    if (item < 0 or item >= node.children.length) { return -1 }
+    return node.children[item]
+}
+
+pub fn json_string_at(doc: JsonDocument, index: i32): string
+{
+    if (index < 0 or index >= doc.nodes.length) { return "" }
+    let node = doc.nodes[index]
+    if (node.kind != JsonString) { return "" }
+    return node.string_value
+}
+
+pub fn json_int_at(doc: JsonDocument, index: i32): i32
+{
+    if (index < 0 or index >= doc.nodes.length) { return 0 }
+    return node_int(doc.nodes[index])
+}
+
+pub fn node_int(node: JsonNode): i32
+{
+    if (node.kind == JsonNumber) { return trunc_i32(node.number_value) }
+    if (node.kind == JsonBool) { return node.bool_value }
+    return 0
+}
+
+pub fn trunc_i32(value: f64): i32
+{
+    if (value > 2147483647.0) { return 2147483647 }
+    if (value < -2147483648.0) { return -2147483648 }
+    let mut result = 0
+    let mut remaining = value
+    while (remaining >= 1.0)
+    {
+        remaining = remaining - 1.0
+        result += 1
+    }
+    while (remaining <= -1.0)
+    {
+        remaining = remaining + 1.0
+        result -= 1
+    }
+    return result
+}
+
+pub fn json_escape(text: string): string
+{
+    let mut out = "\""
+    for (i in 0 .. text.length)
+    {
+        let byte = analyzer_byte_at(text, i)
+        if (byte == '"') { out = out + "\\\"" }
+        elif (byte == '\\') { out = out + "\\\\" }
+        elif (byte == '\n') { out = out + "\\n" }
+        elif (byte == '\r') { out = out + "\\r" }
+        elif (byte == '\t') { out = out + "\\t" }
+        elif (byte < 32) { out = out + " " }
+        else { out = out + analyzer_char_string(byte) }
+    }
+    return out + "\""
+}
+
+pub fn json_quote(text: string): string
+{
+    return json_escape(text)
+}

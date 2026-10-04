@@ -1,0 +1,78 @@
+#[no_main]
+
+import "ids.vix"
+
+pub type TextPosition = struct
+{
+    byte: i32,
+    line: i32,
+    column: i32,
+}
+pub type LspPosition = struct
+{
+    line: i32,
+    character: i32,
+}
+pub type TextRange = struct
+{
+    start: i32,
+    end: i32,
+}
+pub type LspRange = struct
+{
+    start: LspPosition,
+    end: LspPosition,
+}
+pub type LineIndex = struct
+{
+    starts: [i32],
+    text_length: i32,
+}
+pub fn text_position(byte: i32, line: i32, column: i32): TextPosition
+{
+    return TextPosition{ byte: byte, line: line, column: column }
+}
+pub fn lsp_position(line: i32, character: i32): LspPosition
+{
+    return LspPosition{ line: line, character: character }
+}
+pub fn text_range(start: i32, end: i32): TextRange
+{
+    return TextRange{ start: start, end: end }
+}
+pub fn lsp_range(start: LspPosition, end: LspPosition): LspRange
+{
+    return LspRange{ start: start, end: end }
+}
+pub fn line_index_new(text: string): LineIndex
+{
+    let mut starts: [i32] = [0];
+    for (i in 0 .. text.length) { if (text[i] == '\n') { starts.push(i + 1) } } return LineIndex{ starts: starts, text_length: text.length }
+}
+pub fn line_index_position(index: LineIndex, byte: i32): TextPosition
+{
+    let mut b = byte;
+    if (b < 0) { b = 0 };
+    if (b > index.text_length) { b = index.text_length };
+    let mut line = 0;
+    for (i in 0 .. index.starts.length) { if (index.starts[i] <= b) { line = i } };
+    return TextPosition{ byte: b, line: line, column: b - index.starts[line] }
+}
+pub fn line_index_byte(index: LineIndex, position: LspPosition, text: string): i32
+{
+    if (position.line < 0 or position.line >= index.starts.length) { return index.text_length };
+    let start = index.starts[position.line];
+    let mut byte = start + position.character;
+    if (byte > index.text_length) { byte = index.text_length };
+    return byte
+}
+pub fn text_range_to_lsp(index: LineIndex, range: TextRange, text: string): LspRange
+{
+    let a = line_index_position(index, range.start);
+    let b = line_index_position(index, range.end);
+    return LspRange{ start: LspPosition{ line: a.line, character: a.column }, end: LspPosition{ line: b.line, character: b.column } }
+}
+pub fn lsp_range_to_text(index: LineIndex, range: LspRange, text: string): TextRange
+{
+    return TextRange{ start: line_index_byte(index, range.start, text), end: line_index_byte(index, range.end, text) }
+}

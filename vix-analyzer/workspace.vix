@@ -1,0 +1,187 @@
+#[no_main]
+
+import "ids.vix"
+import "position.vix"
+import "analysis.vix"
+
+pub type OpenDocument = struct
+{
+    file: FileId,
+    uri: string,
+    version: i32,
+    text: string,
+    analysis: DocumentAnalysis
+}
+
+pub type Workspace = struct
+{
+    root_uri: string,
+    root_path: string,
+    documents: [OpenDocument],
+    revision: Revision,
+    // 0 = assembled fragment path (default, verified against the whole-file
+    // parse by the differential test), 1 = stub tree plus whole-file parse,
+    // 2 = fresh tree plus whole-file parse (used as the differential baseline).
+    analysis_mode: i32
+}
+
+pub fn workspace_new(root_uri: string, root_path: string): Workspace
+{
+    return Workspace{
+        root_uri: root_uri,
+        root_path: root_path,
+        documents: [],
+        revision: revision_zero(),
+        analysis_mode: 0
+    }
+}
+
+pub fn workspace_find(workspace: &Workspace, uri: string): i32
+{
+    for (i in 0 .. workspace.documents.length)
+    {
+        if (workspace.documents[i].uri == uri)
+        {
+            return i
+        }
+    }
+    return -1
+}
+
+pub fn workspace_set_text(workspace: &Workspace, uri: string, version: i32, text: string)
+{
+    let at = workspace_find(workspace, uri)
+    if (at < 0)
+    {
+        let file = file_id(workspace.documents.length)
+        workspace.documents.push(OpenDocument{
+            file: file,
+            uri: uri,
+            version: version,
+            text: text,
+            analysis: workspace_analyze(workspace, file, text)
+        })
+        workspace.revision.value += 1
+        return
+    }
+    let file = workspace.documents[at].file
+    let previous = workspace.documents[at].analysis
+    let old_text = workspace.documents[at].text
+    workspace.documents[at].version = version
+    workspace.documents[at].text = text
+    if (workspace.analysis_mode == 1)
+    {
+        workspace.documents[at].analysis = analyze_document_incremental(file, previous, old_text, text)
+    }
+    elif (workspace.analysis_mode == 2)
+    {
+        workspace.documents[at].analysis = analyze_document_legacy(file, text)
+    }
+    else
+    {
+        workspace.documents[at].analysis = analyze_document_incremental_fragments(file, previous, old_text, text)
+    }
+    workspace.revision.value += 1
+}
+
+pub fn workspace_open(workspace: &Workspace, uri: string, version: i32, text: string)
+{
+    workspace_set_text(workspace, uri, version, text)
+}
+
+pub fn workspace_close(workspace: &Workspace, uri: string)
+{
+    let at = workspace_find(workspace, uri)
+    if (at < 0)
+    {
+        return
+    }
+    let mut remaining: [OpenDocument] = []
+    for (i in 0 .. workspace.documents.length)
+    {
+        if (i != at)
+        {
+            remaining.push(workspace.documents[i])
+        }
+    }
+    workspace.documents = remaining
+    workspace.revision.value += 1
+}
+
+pub fn workspace_analyze(workspace: &Workspace, file: FileId, text: string): DocumentAnalysis
+{
+    if (workspace.analysis_mode == 1)
+    {
+        return analyze_document(file, text)
+    }
+    if (workspace.analysis_mode == 2)
+    {
+        return analyze_document_legacy(file, text)
+    }
+    return analyze_document_fragments(file, text)
+}
+
+pub fn workspace_text(workspace: &Workspace, uri: string): string
+{
+    for (i in 0 .. workspace.documents.length)
+    {
+        if (workspace.documents[i].uri == uri)
+        {
+            return workspace.documents[i].text
+        }
+    }
+    return ""
+}
+
+pub fn workspace_text_by_file(workspace: &Workspace, file: FileId): string
+{
+    for (i in 0 .. workspace.documents.length)
+    {
+        if (workspace.documents[i].file.value == file.value)
+        {
+            return workspace.documents[i].text
+        }
+    }
+    return ""
+}
+
+pub fn workspace_file(workspace: &Workspace, uri: string): FileId
+{
+    for (i in 0 .. workspace.documents.length)
+    {
+        if (workspace.documents[i].uri == uri)
+        {
+            return workspace.documents[i].file
+        }
+    }
+    return file_id_invalid()
+}
+
+pub fn workspace_analysis(workspace: &Workspace, uri: string): DocumentAnalysis
+{
+    for (i in 0 .. workspace.documents.length)
+    {
+        if (workspace.documents[i].uri == uri)
+        {
+            return workspace.documents[i].analysis
+        }
+    }
+    return analyze_document(file_id_invalid(), "")
+}
+
+pub fn workspace_analysis_by_file(workspace: &Workspace, file: FileId): DocumentAnalysis
+{
+    for (i in 0 .. workspace.documents.length)
+    {
+        if (workspace.documents[i].file.value == file.value)
+        {
+            return workspace.documents[i].analysis
+        }
+    }
+    return analyze_document(file, "")
+}
+
+pub fn workspace_revision(workspace: Workspace): Revision
+{
+    return workspace.revision
+}
