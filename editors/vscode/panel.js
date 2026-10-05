@@ -238,14 +238,19 @@ function renderPanelHtml() {
     serverInput.classList.toggle("bad", !next.serverFound);
     $("server-dot").className = "dot " + (next.serverFound ? "ok" : "bad");
     $("server-status").textContent = next.serverFound ? "running from this path" : "not found";
-    hint("server-hint", (!next.serverFound || next.serverSource === "setting")
-      ? (next.serverFound
-          ? "A custom server is configured. Use the bundled one to go back to the shipped build."
-          : "The language server was not found. Point the field above at a vix-analyzer build.")
-      : "",
-      next.serverFound && next.serverSource === "setting"
-        ? [{ label: "Use bundled server", type: "useBundledServer", primary: true }]
-        : (!next.serverFound ? [{ label: "Locate vix-analyzer…", type: "browseServer", primary: true }, { label: "Use bundled", type: "useBundledServer" }] : []));
+    const libraryProblem = next.clientLibraryProblem || "";
+    hint("server-hint", libraryProblem
+      ? "This extension install is incomplete: " + libraryProblem + ". Reinstall the Vix extension."
+      : ((!next.serverFound || next.serverSource === "setting")
+        ? (next.serverFound
+            ? "A custom server is configured. Use the bundled one to go back to the shipped build."
+            : "The language server was not found. Point the field above at a vix-analyzer build.")
+        : ""),
+      libraryProblem
+        ? []
+        : (next.serverFound && next.serverSource === "setting"
+          ? [{ label: "Use bundled server", type: "useBundledServer", primary: true }]
+          : (!next.serverFound ? [{ label: "Locate vix-analyzer…", type: "browseServer", primary: true }, { label: "Use bundled", type: "useBundledServer" }] : [])));
 
     for (const b of document.querySelectorAll("#opt button")) {
       b.classList.toggle("active", Number(b.dataset.level) === next.optLevel);

@@ -150,6 +150,33 @@
     "declarations": {
       "patterns": [
         {
+          "name": "meta.function.method.vix",
+          "match": "\\b(fn)\\s+(\\()\\s*(?:(&)\\s*(?:(mut)\\s+)?)?([A-Za-z_][A-Za-z0-9_]*(?:\\[[^\\]]*\\])?)\\s*(\\))\\s*([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.function.vix"
+            },
+            "2": {
+              "name": "punctuation.definition.parameters.begin.vix"
+            },
+            "3": {
+              "name": "keyword.operator.address.vix"
+            },
+            "4": {
+              "name": "storage.modifier.mutable.vix"
+            },
+            "5": {
+              "name": "entity.name.type.vix"
+            },
+            "6": {
+              "name": "punctuation.definition.parameters.end.vix"
+            },
+            "7": {
+              "name": "entity.name.function.vix"
+            }
+          }
+        },
+        {
           "name": "meta.function.vix",
           "match": "\\b(fn)\\s+([A-Za-z_][A-Za-z0-9_]*)",
           "captures": {
@@ -175,7 +202,7 @@
         },
         {
           "name": "meta.type.vix",
-          "match": "\\b(type|struct|impl)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "match": "\\b(type|struct)\\s+([A-Za-z_][A-Za-z0-9_]*)",
           "captures": {
             "1": {
               "name": "keyword.declaration.vix"
@@ -265,6 +292,10 @@
         {
           "name": "storage.modifier.vix",
           "match": "\\bref\\b"
+        },
+        {
+          "name": "storage.type.function.vix",
+          "match": "\\bfn\\b"
         }
       ]
     },

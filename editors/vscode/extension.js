@@ -10,7 +10,33 @@ const fs = require("fs");
 const path = require("path");
 const cp = require("child_process");
 const vscode = require("vscode");
-const { LanguageClient, TransportKind } = require("vscode-languageclient/node");
+// The language client is loaded lazily on purpose. A VSIX that is missing its
+// bundled node_modules must still activate: the panel and the compile commands
+// are independent of the language server, and a top-level require failure would
+// abort activate() before the webview provider is ever registered.
+let languageClient = null;
+let languageClientLoaded = false;
+let languageClientError = "";
+
+function loadLanguageClient() {
+  if (!languageClientLoaded) {
+    languageClientLoaded = true;
+    try {
+      languageClient = require("vscode-languageclient/node");
+    } catch (error) {
+      languageClient = null;
+      languageClientError = error && error.message ? error.message : String(error);
+    }
+  }
+  return languageClient;
+}
+
+function languageClientProblem() {
+  if (loadLanguageClient()) {
+    return "";
+  }
+  return "the bundled vscode-languageclient is missing (" + languageClientError + ")";
+}
 const { VixPanelProvider } = require("./panel");
 
 const AUTO_COMPILE_ARGS = "--check";
@@ -29,6 +55,7 @@ const panelState = {
   serverPath: "",
   serverFound: false,
   serverSource: "bundled",
+  clientLibraryProblem: "",
   optLevel: 0,
   status: "idle",
   message: "Ready",
@@ -116,17 +143,21 @@ function workspaceRoot() {
 }
 
 function createClient(context) {
+  const lib = loadLanguageClient();
+  if (!lib) {
+    throw new Error(languageClientProblem());
+  }
   const command = resolveServerPath(context);
   const cwd = workspaceRoot();
   const serverOptions = {
-    run: { command: command, transport: TransportKind.stdio, options: { cwd: cwd } },
-    debug: { command: command, transport: TransportKind.stdio, options: { cwd: cwd } }
+    run: { command: command, transport: lib.TransportKind.stdio, options: { cwd: cwd } },
+    debug: { command: command, transport: lib.TransportKind.stdio, options: { cwd: cwd } }
   };
   const clientOptions = {
     documentSelector: [{ scheme: "file", language: "vix" }],
     outputChannelName: "Vix Analyzer"
   };
-  return new LanguageClient("vixAnalyzer", "Vix Analyzer", serverOptions, clientOptions);
+  return new lib.LanguageClient("vixAnalyzer", "Vix Analyzer", serverOptions, clientOptions);
 }
 
 // --- vixc diagnostics -------------------------------------------------------
@@ -433,6 +464,7 @@ function refreshServerState() {
   const target = configured && configured.length > 0 ? configured : bundledServerPath(extensionContext);
   panelState.serverPath = target;
   panelState.serverSource = configured && configured.length > 0 ? "setting" : "bundled";
+  panelState.clientLibraryProblem = languageClientProblem();
   probeCommand(target, (ok) => {
     panelState.serverFound = ok;
     pushState();
@@ -454,9 +486,26 @@ async function restartLanguageServer() {
     vscode.window.showErrorMessage("Vix: language server not found at " + target + ".");
     return;
   }
-  client = createClient(extensionContext);
-  await client.start();
+  if (languageClientProblem()) {
+    panelState.serverFound = false;
+    panelState.clientLibraryProblem = languageClientProblem();
+    pushState();
+    vscode.window.showErrorMessage("Vix: " + languageClientProblem() + ".");
+    return;
+  }
+  try {
+    client = createClient(extensionContext);
+    await client.start();
+  } catch (error) {
+    client = undefined;
+    panelState.serverFound = false;
+    panelState.clientLibraryProblem = error && error.message ? error.message : String(error);
+    pushState();
+    vscode.window.showErrorMessage("Vix: could not start the language server: " + panelState.clientLibraryProblem);
+    return;
+  }
   panelState.serverFound = true;
+  panelState.clientLibraryProblem = "";
   pushState();
 }
 
@@ -549,12 +598,28 @@ async function activate(context) {
   refreshCompilerState();
   refreshServerState();
 
+  // Starting the language server must never abort activation. The webview
+  // provider is registered above, so the panel keeps working even when the
+  // server binary or the language client library is missing.
   const serverPath = resolveServerPath(context);
-  if (fs.existsSync(serverPath)) {
-    client = createClient(context);
-    context.subscriptions.push(client);
-    await client.start();
+  const clientProblem = languageClientProblem();
+  if (clientProblem) {
+    panelState.clientLibraryProblem = clientProblem;
+    pushState();
+    vscode.window.showErrorMessage("Vix: " + clientProblem + ". Reinstall or repackage the extension.");
+  } else if (fs.existsSync(serverPath)) {
+    try {
+      client = createClient(context);
+      context.subscriptions.push(client);
+      await client.start();
+      panelState.clientLibraryProblem = "";
+    } catch (error) {
+      client = undefined;
+      panelState.clientLibraryProblem = error && error.message ? error.message : String(error);
+    }
+    pushState();
   } else {
+    panelState.clientLibraryProblem = "";
     vscode.window.showErrorMessage(
       "vix-analyzer server not found at " + serverPath +
       ". Set the path in the Vix panel, or build it with scripts/build-analyzer.sh."
