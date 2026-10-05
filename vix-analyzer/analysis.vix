@@ -107,6 +107,15 @@ pub fn analyzer_record_reference(symbols: &SymbolIndex, file: FileId, text: stri
     }
 }
 
+pub fn analyzer_record_method_reference(symbols: &SymbolIndex, file: FileId, text: string, index: LineIndex, method: string, line: i32, column: i32)
+{
+    let symbol = symbol_index_find_method(@symbols, method)
+    if (symbol.index < 0) { return }
+    let start = diag_offset_at(text, line, column)
+    let end = start + method.length
+    analyzer_push_reference(symbols, file, symbol, text_range_to_lsp(index, text_range(start, end), text))
+}
+
 pub fn analyzer_walk_expr(symbols: &SymbolIndex, program: AstProgram, file: FileId, text: string, index: LineIndex, expr_idx: i32)
 {
     if (expr_idx < 0 or expr_idx >= program.expr_store.exprs.length)
@@ -117,6 +126,10 @@ pub fn analyzer_walk_expr(symbols: &SymbolIndex, program: AstProgram, file: File
     if (expr.tag == "ident" or expr.tag == "call")
     {
         analyzer_record_reference(symbols, file, text, index, expr.text, expr.line, expr.col)
+    }
+    elif (expr.tag == "method_call")
+    {
+        analyzer_record_method_reference(symbols, file, text, index, expr.text, expr.line, expr.col)
     }
     analyzer_walk_expr(symbols, program, file, text, index, expr.left_idx)
     analyzer_walk_expr(symbols, program, file, text, index, expr.right_idx)
