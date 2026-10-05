@@ -313,8 +313,15 @@ pub fn semantic_find_function_any(funcs: [AstFunction], externs: [AstFunction], 
     return semantic_find_extern_function(externs, name)
 }
 
+pub fn semantic_is_intrinsic_method(method: string): i32
+{
+    if (method == "push") { return 1 }
+    return 0
+}
+
 pub fn semantic_has_method(program: AstProgram, method: string): i32
 {
+    if (semantic_is_intrinsic_method(method) == 1) { return 1 }
     for (i in 0 .. program.functions.length)
     {
         let name = program.functions[i].name
