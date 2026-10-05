@@ -46,6 +46,34 @@ fn main(): i32
 }
 ```
 
+## Running a program
+
+On Linux, `vixc prog.vix -o prog && ./prog` works directly. On macOS vixc's
+embedded linker only implements the ELF and COFF drivers, so the LLVM backend
+emits a Mach-O object and the platform toolchain links it:
+
+```sh
+sh scripts/run-vix.sh examples/impl2.vix
+```
+
+The self/LIR backend refuses non-x86_64 hosts, which is why the LLVM backend is
+the one used above.
+
+### From the editor
+
+The Vix Build & Run panel and the `vix.run` command invoke
+`vixc ... -o <name> <file>`, which cannot link on macOS. Point the extension at
+the shim to make those work:
+
+```json
+{
+  "vix.compilerPath": "/absolute/path/to/Vix-lang/scripts/vixc-macos.sh"
+}
+```
+
+The shim forwards every other mode (`-obj`, `-S`, `--check`, ...) to the real
+compiler unchanged, so the problems panel and the language server are unaffected.
+
 ## Documentation
 
 - LearnVix:[GitHub Link](https://github.com/vixlang/LearnVix)
