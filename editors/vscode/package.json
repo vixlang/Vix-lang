@@ -2,7 +2,7 @@
   "name": "vix-analyzer",
   "displayName": "Vix Analyzer",
   "description": "Vix language server: diagnostics, symbols, hover, go-to-definition, references and rename.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "publisher": "vixlang",
   "license": "Apache-2.0",
   "engines": {
