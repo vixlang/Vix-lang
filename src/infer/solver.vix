@@ -659,11 +659,25 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             infer_value_ok(TyPrim(ty_prim_i32()))
         }
         "method_call" -> {
-            if (expr.text == "length")
+            let receiver = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
+            if (receiver.ok == 0) { return receiver }
+            let receiver_ty = subst_apply_ty(store, subst, receiver.ty)
+            let receiver_name = hm_ty_adt_name(store, receiver_ty)
+            if (receiver_name == "") { return infer_value_fail(infer_error_other("method receiver has no named type", pos)) }
+            let method_name = receiver_name + "::" + expr.text
+            if (type_env_has(env, method_name) == 0) { return infer_value_fail(infer_error_other("unknown method '" + expr.text + "' on " + receiver_name, pos)) }
+            let callee = scheme_instantiate(store, fresh, type_env_lookup(env, method_name))
+            let mut args: [Ty] = [receiver.ty]
+            for (i in 0 .. expr.args.length)
             {
-                return infer_value_ok(TyPrim(ty_prim_i32()))
+                let arg = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.args[i])
+                if (arg.ok == 0) { return arg }
+                args.push(arg.ty)
             }
-            infer_value_ok(hm_unknown_ty())
+            let ret = ty_fresh_var(fresh)
+            let u = hm_unify(store, subst, callee, ty_fun(store, args, ret), pos)
+            if (u.ok == 0) { return infer_value_fail(u.error) }
+            infer_value_ok(subst_apply_ty(store, subst, ret))
         }
         _ -> infer_value_ok(hm_unknown_ty())
     }

@@ -39,6 +39,8 @@ pub fn query_symbol(workspace: Workspace, file: FileId, position: LspPosition): 
     }
     let text = workspace_text_by_file(workspace, file)
     let word = analyzer_word_at(text, position)
+    let method_symbol = symbol_index_find_method(analysis.symbols, word)
+    if (method_symbol.index >= 0) { return method_symbol }
     return symbol_index_find_by_name(analysis.symbols, word)
 }
 

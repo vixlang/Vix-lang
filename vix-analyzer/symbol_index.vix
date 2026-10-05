@@ -198,6 +198,21 @@ pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): SymbolId
     return symbol_id_invalid()
 }
 
+pub fn symbol_index_find_method(index: SymbolIndex, method: string): SymbolId
+{
+    let suffix = "::" + method
+    for (i in 0 .. index.declarations.length)
+    {
+        let name = index.declarations[i].name
+        let tail = if (name.length >= suffix.length) { analyzer_copy(name, name.length - suffix.length, name.length) } else { "" }
+        if (tail == suffix)
+        {
+            return index.declarations[i].id
+        }
+    }
+    return symbol_id_invalid()
+}
+
 pub fn symbol_index_find_definition(index: SymbolIndex, symbol: SymbolId): Declaration
 {
     for (i in 0 .. index.declarations.length)

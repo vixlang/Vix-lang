@@ -696,6 +696,8 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
                 param_types: f.param_types,
                 type_params: f.type_params,
                 is_var_arg: f.is_var_arg,
+                receiver_kind: f.receiver_kind,
+                receiver_type: f.receiver_type,
                 line: f.line,
                 col: f.col
             })

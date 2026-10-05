@@ -134,6 +134,8 @@ pub type AstFunction = struct {
     param_types: [string],
     type_params: [string],
     is_var_arg: i32,
+    receiver_kind: i32,
+    receiver_type: string,
     line: i32,
     col: i32
 }
@@ -463,12 +465,17 @@ pub fn ast_function_full_vararg(name: string, ret_ty: string, body_idx: i32, par
 
 pub fn ast_function_generic_full_vararg(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], is_var_arg: i32): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, $ast_default_loc_fields() }
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, receiver_kind: 0, receiver_type: "", $ast_default_loc_fields() }
+}
+
+pub fn ast_function_method(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], receiver_kind: i32, receiver_type: string): AstFunction
+{
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: 0, receiver_kind: receiver_kind, receiver_type: receiver_type, $ast_default_loc_fields() }
 }
 
 pub fn ast_function_with_loc(func: AstFunction, line: i32, col: i32): AstFunction
 {
-    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, type_params: func.type_params, is_var_arg: func.is_var_arg, line: line, col: col }
+    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, type_params: func.type_params, is_var_arg: func.is_var_arg, receiver_kind: func.receiver_kind, receiver_type: func.receiver_type, line: line, col: col }
 }
 
 pub fn ast_program_ok(function: AstFunction, expr_store: ExprStore, store: StmtStore): AstProgram

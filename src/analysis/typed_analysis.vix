@@ -465,6 +465,30 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
         ownership_release_direct(state, owner_idx, if (expr.int_value == 1) { "BorrowMut" } else { "BorrowShared" })
         return 0
     }
+    if (expr.tag == "method_call")
+    {
+        let env = ownership_state_env(state)
+        let receiver_ty = analysis_expr_type(program, &env, expr.left_idx)
+        let receiver_param = analysis_method_param_type(program, receiver_ty, expr.text, 0)
+        let receiver = expr_store_get(&es, expr.left_idx)
+        if (analysis_type_is_mut_reference(receiver_param) == 1)
+        {
+            if (receiver.tag == "ident")
+            {
+                let owner_idx = ownership_state_find(state, receiver.text)
+                if (owner_idx >= 0 and state.mutable[owner_idx] == 0) { ownership_add_error(state, source, filename, "E5006", "use a mutable reference '&mut' when the pointee must be changed", receiver.line, receiver.col, receiver.text.length) }
+            }
+            ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
+        }
+        elif (analysis_type_is_reference(receiver_param) == 1) { ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename) }
+        else { ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 1, source, filename) }
+        for (i in 0 .. expr.args.length)
+        {
+            let arg_ty = ownership_function_param_type(program, analysis_method_name(program, receiver_ty, expr.text), i + 1)
+            if (analysis_type_is_reference(arg_ty) == 1) { ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename) } else { ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 1, source, filename) }
+        }
+        return 0
+    }
     if (expr.tag == "call")
     {
         if (expr.left_idx >= 0) ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 0, source, filename)
@@ -978,6 +1002,25 @@ pub fn analysis_function_return_type(program: AstProgram, name: string): string
     return "unknown"
 }
 
+pub fn analysis_method_name(program: AstProgram, receiver_ty: string, method: string): string
+{
+    let mut base = receiver_ty
+    if (analysis_type_is_reference(base) == 1) { base = analysis_reference_inner(base) }
+    return base + "::" + method
+}
+
+pub fn analysis_method_return_type(program: AstProgram, receiver_ty: string, method: string): string
+{
+    let name = analysis_method_name(program, receiver_ty, method)
+    return analysis_function_return_type(program, name)
+}
+
+pub fn analysis_method_param_type(program: AstProgram, receiver_ty: string, method: string, index: i32): string
+{
+    let name = analysis_method_name(program, receiver_ty, method)
+    return ownership_function_param_type(program, name, index)
+}
+
 pub fn analysis_array_inner(ty: string): string
 {
     if (ty.length < 3 or compiler_string_byte(ty, 0) != '[') return "unknown"
@@ -1106,7 +1149,7 @@ pub fn analysis_expr_type(program: AstProgram, env: &AnalysisEnv, idx: i32): str
             if (expr.text == "clone" and expr.args.length > 0) return analysis_expr_type(program, env, expr.args[0])
             return analysis_function_return_type(program, expr.text)
         }
-        "method_call" -> if (expr.text == "length") { "i32" } else { "unknown" }
+        "method_call" -> analysis_method_return_type(program, analysis_expr_type(program, env, expr.left_idx), expr.text)
         "unaryop" -> if (expr.text == "!") { "bool" } else { analysis_expr_type(program, env, expr.left_idx) }
         "binop" -> {
             let left = analysis_expr_type(program, env, expr.left_idx)
@@ -1378,7 +1421,7 @@ pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedA
         if (expr.left_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, 0, filename, scope_id)
         for (i in 0 .. expr.args.length)
         {
-            let parameter_ty = ownership_function_param_type(program, expr.text, i)
+            let parameter_ty = if (expr.tag == "method_call") { analysis_method_param_type(program, analysis_expr_type(program, env, expr.left_idx), expr.text, i + 1) } else { ownership_function_param_type(program, expr.text, i) }
             let argument_consume = if (expr.text == "clone" or analysis_type_is_reference(parameter_ty) == 1) { 0 } else { 1 }
             analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.args[i], argument_consume, filename, scope_id)
         }

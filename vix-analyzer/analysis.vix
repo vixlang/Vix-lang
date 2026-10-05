@@ -34,16 +34,19 @@ pub type DocumentAnalysis = struct
 
 pub fn analyzer_function_signature(function: AstFunction): string
 {
-    let mut signature = "fn("
-    for (i in 0 .. function.param_names.length)
+    let mut signature = "fn "
+    if (function.receiver_kind != 0)
     {
-        if (i > 0)
-        {
-            signature = signature + ", "
-        }
+        signature = signature + "(" + function.receiver_type + ") "
+    }
+    signature = signature + "("
+    let start = if (function.receiver_kind != 0) { 1 } else { 0 }
+    for (i in start .. function.param_names.length)
+    {
+        if (i > start) { signature = signature + ", " }
         signature = signature + function.param_names[i] + ": " + function.param_types[i]
     }
-    signature = signature + ") -> " + function.ret_ty
+    signature = signature + "): " + function.ret_ty
     return signature
 }
 

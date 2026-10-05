@@ -258,7 +258,11 @@ pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
                         let mut method_end = method_start
                         while (method_end < source.length and analyzer_is_ident_byte(analyzer_byte_at(source, method_end)) == 1) { method_end += 1 }
                         let declaration_end = stub_tree_declaration_end(source, method_end)
-                        stub_tree_add_node(tree, FunctionDecl, analyzer_copy(source, method_start, method_end), base + cursor, base + declaration_end, base + method_start, base + method_end)
+                        let receiver_end = start + 1
+                        while (receiver_end < close and analyzer_byte_at(source, receiver_end) != ')') { receiver_end += 1 }
+                        let receiver_text = analyzer_copy(source, start + 1, receiver_end)
+                        let qualified = receiver_text + "::" + analyzer_copy(source, method_start, method_end)
+                        stub_tree_add_node(tree, FunctionDecl, qualified, base + cursor, base + declaration_end, base + method_start, base + method_end)
                         cursor = declaration_end
                     }
                 }
