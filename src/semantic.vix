@@ -2,6 +2,8 @@
 
 import "ast.vix"
 import "error.vix"
+import "intrinsic.vix"
+import "method.vix"
 import "type/typeck.vix"
 
 pub type SemanticResult = struct {
@@ -313,34 +315,14 @@ pub fn semantic_find_function_any(funcs: [AstFunction], externs: [AstFunction], 
     return semantic_find_extern_function(externs, name)
 }
 
-pub fn semantic_is_intrinsic_method(method: string): i32
-{
-    if (method == "push") { return 1 }
-    return 0
-}
-
+// The semantic pass is purely syntactic and has no type information, so it can
+// only check that a declaration or an intrinsic with this name exists at all.
+// Receiver accurate resolution is done by method_resolve, which the solver, the
+// ownership analysis and both backends all share.
 pub fn semantic_has_method(program: AstProgram, method: string): i32
 {
-    if (semantic_is_intrinsic_method(method) == 1) { return 1 }
-    for (i in 0 .. program.functions.length)
-    {
-        let name = program.functions[i].name
-        let suffix = "::" + method
-        let mut matches = 1
-        if (program.functions[i].receiver_kind == 0 or name.length < suffix.length) { matches = 0 }
-        if (matches == 1)
-        {
-            for (j in 0 .. suffix.length)
-            {
-                if (compiler_string_byte(name, name.length - suffix.length + j) != compiler_string_byte(suffix, j)) { matches = 0 }
-            }
-        }
-        if (matches == 1)
-        {
-            return 1
-        }
-    }
-    return 0
+    if (intrinsic_has_name(method) == 1) { return 1 }
+    return method_table_has_name(program.expr_store.methods, method)
 }
 
 pub fn semantic_find_struct(structs: [AstStructDecl], name: string): i32

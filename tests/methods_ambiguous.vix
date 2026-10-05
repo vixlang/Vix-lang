@@ -1,0 +1,21 @@
+type Point = struct {
+    x: i32
+}
+
+type Vector = struct {
+    n: i32
+}
+
+fn (&Point) size(): i32 {
+    return self.x
+}
+
+fn (&Vector) size(): i32 {
+    return self.n
+}
+
+fn main(): i32 {
+    let p = Point{ x: 5 }
+    let v = Vector{ n: 7 }
+    return p.size() + v.size()
+}

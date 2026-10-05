@@ -1,6 +1,8 @@
 #[no_main]
 import "ast.vix"
 import "builder.vix"
+import "method.vix"
+import "method_decl.vix"
 import "mir_builder.vix"
 import "type/typeck.vix"
 
@@ -215,8 +217,9 @@ pub fn mir_expr_type(es: &ExprStore, expr: AstExpr): string
         }
         "method_call" -> {
             let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
-            let receiver_ty = type_text_base_name_builder(strip_ptr_prefix(base_ty))
-            get_function_return_type(receiver_ty + "::" + expr.text)
+            let resolution = method_resolve(es.methods, base_ty, expr.text)
+            if (method_resolution_is_found(resolution) == 0) { return "unknown" }
+            method_resolution_ret_type(resolution)
         }
         "array_literal" -> {
             if (expr.args.length == 0) { return "[i32]" }
@@ -741,7 +744,8 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
     }
     if (expr.tag == "method_call")
     {
-        if (expr.text == "push")
+        let resolution = method_resolve(es.methods, mir_expr_type(es, expr_store_get(es, expr.left_idx)), expr.text)
+        if (method_resolution_is_array_push(resolution) == 1)
         {
             let base_expr = expr_store_get(es, expr.left_idx)
             let base_ty = mir_expr_type(es, base_expr)
@@ -755,19 +759,19 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
         }
         let base_expr = expr_store_get(es, expr.left_idx)
         let base_ty = mir_expr_type(es, base_expr)
-        let method_name = type_text_base_name_builder(strip_ptr_prefix(base_ty)) + "::" + expr.text
-        let receiver_ty = get_function_param_type(method_name, 0)
+        let method_name = method_resolution_storage_name(resolution)
+        let receiver_ty = method_resolution_receiver_param_type(resolution)
         let receiver = mir_expr_value_typed(b, es, store, base_expr, receiver_ty)
         let mut args_text = mir_type(receiver_ty) + " " + receiver.name
         for (i in 0 .. expr.args.length)
         {
             let arg_expr = expr_store_get(es, expr.args[i])
-            let arg_ty = get_function_param_type(method_name, i + 1)
+            let arg_ty = method_resolution_user_arg_type(resolution, i)
             let val = mir_expr_value_typed(b, es, store, arg_expr, arg_ty)
             if (i >= 0) { args_text = args_text + ", " }
             args_text = args_text + mir_type(arg_ty) + " " + val.name
         }
-        let ret_ty = get_function_return_type(method_name)
+        let ret_ty = method_resolution_ret_type(resolution)
         if (ret_ty == "void")
         {
             mir_inst(b, "call @" + method_name + "(" + args_text + "): void")

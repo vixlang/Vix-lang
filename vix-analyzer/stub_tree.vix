@@ -5,6 +5,7 @@ import "position.vix"
 import "util.vix"
 import "source_text.vix"
 import "../src/lexer.vix"
+import "../src/method.vix"
 
 pub type StubKind = SourceFile | ModuleDecl | ImportDecl | TypeDecl | FieldDecl | AdtDecl | VariantDecl | FunctionDecl | ParameterDecl | Block | Statement | Expression | ErrorStub
 
@@ -261,7 +262,7 @@ pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
                         let receiver_end = start + 1
                         while (receiver_end < close and analyzer_byte_at(source, receiver_end) != ')') { receiver_end += 1 }
                         let receiver_text = analyzer_copy(source, start + 1, receiver_end)
-                        let qualified = receiver_text + "::" + analyzer_copy(source, method_start, method_end)
+                        let qualified = method_qualify(receiver_text, analyzer_copy(source, method_start, method_end))
                         stub_tree_add_node(tree, FunctionDecl, qualified, base + cursor, base + declaration_end, base + method_start, base + method_end)
                         cursor = declaration_end
                     }

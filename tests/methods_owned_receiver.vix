@@ -1,0 +1,20 @@
+// Owned receiver methods take the receiver by value, exactly like an ordinary
+// function parameter of struct type.
+//
+// Note: this compiler does not currently diagnose use-after-move for by-value
+// struct arguments (a plain "fn take(p: P)" behaves the same), so this fixture
+// checks that owned receivers compile and lower consistently, not that a second
+// call is rejected.
+type Point = struct {
+    x: i32,
+    y: i32
+}
+
+fn (Point) consume(): i32 {
+    return self.x + self.y
+}
+
+fn main(): i32 {
+    let p = Point{ x: 1, y: 2 }
+    return p.consume()
+}

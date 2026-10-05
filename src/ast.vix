@@ -1,4 +1,8 @@
 #[no_main]
+
+import "method_decl.vix"
+import "receiver.vix"
+
 extern "C"
 {
     fn malloc(size: usize): string
@@ -48,10 +52,15 @@ pub type AstExpr = struct {
 }
 
 pub type ExprStore = struct {
-    exprs: [AstExpr]
+    exprs: [AstExpr],
+    // The single method declaration index for this compilation unit. The parser
+    // and every later phase share the expression store, so carrying the table
+    // here keeps one source of truth for method resolution without threading a
+    // new parameter through every expression helper.
+    methods: MethodTable
 }
 
-pub fn expr_store_new(): ExprStore => ExprStore{ exprs: [] }
+pub fn expr_store_new(): ExprStore => ExprStore{ exprs: [], methods: method_table_empty() }
 
 pub fn expr_store_add(store: &ExprStore, expr: AstExpr): i32
 {
@@ -134,7 +143,7 @@ pub type AstFunction = struct {
     param_types: [string],
     type_params: [string],
     is_var_arg: i32,
-    receiver_kind: i32,
+    receiver_kind: ReceiverKind,
     receiver_type: string,
     line: i32,
     col: i32
@@ -465,10 +474,10 @@ pub fn ast_function_full_vararg(name: string, ret_ty: string, body_idx: i32, par
 
 pub fn ast_function_generic_full_vararg(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], is_var_arg: i32): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, receiver_kind: 0, receiver_type: "", $ast_default_loc_fields() }
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, receiver_kind: ReceiverNone, receiver_type: "", $ast_default_loc_fields() }
 }
 
-pub fn ast_function_method(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], receiver_kind: i32, receiver_type: string): AstFunction
+pub fn ast_function_method(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], receiver_kind: ReceiverKind, receiver_type: string): AstFunction
 {
     return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: 0, receiver_kind: receiver_kind, receiver_type: receiver_type, $ast_default_loc_fields() }
 }

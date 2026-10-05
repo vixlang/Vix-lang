@@ -2,6 +2,7 @@
 import "lexer.vix"
 import "ast.vix"
 import "error.vix"
+import "method.vix"
 import "preprocess.vix"
 
 pub type Parser = struct {
@@ -1828,16 +1829,16 @@ pub fn parse_function(parser: &Parser): AstFunction
     if (parser_expect_text(parser, "fn") == 0) { return ast_function("main", "i32", -1) }
     let mut receiver_type = ""
     let mut receiver_param_type = ""
-    let mut receiver_kind = 0
+    let mut receiver_kind = receiver_none()
     if (parser_text(parser) == "(")
     {
         parser_advance(parser)
         if (parser_text(parser) == "&")
         {
             parser_advance(parser)
-            if (parser_text(parser) == "mut") { parser_advance(parser); receiver_kind = 3; receiver_param_type = "&mut " } else { receiver_kind = 2; receiver_param_type = "&" }
+            if (parser_text(parser) == "mut") { parser_advance(parser); receiver_kind = receiver_mut(); receiver_param_type = "&mut " } else { receiver_kind = receiver_shared(); receiver_param_type = "&" }
         }
-        if (receiver_kind == 0) { receiver_kind = 1 }
+        if (receiver_is_method(receiver_kind) == 0) { receiver_kind = receiver_owned() }
         receiver_type = parse_type_text(parser)
         if (parser.ok == 0) { return ast_function("main", "i32", -1) }
         receiver_param_type = receiver_param_type + receiver_type
@@ -1850,7 +1851,7 @@ pub fn parse_function(parser: &Parser): AstFunction
         return ast_function("main", "i32", -1)
     }
     parser_advance(parser)
-    if (receiver_type != "") { name = receiver_type + "::" + name }
+    if (receiver_type != "") { name = method_qualify(receiver_type, name) }
     parser.current_function = name
     let type_params = parse_type_params_after_name(parser)
     if (parser.ok == 0) { return ast_function("main", "i32", -1) }

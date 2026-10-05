@@ -1,0 +1,18 @@
+type Point = struct {
+    x: i32,
+    y: i32
+}
+
+fn (&mut Point) shift(dx: i32) {
+    self.x = self.x + dx
+}
+
+fn (&Point) get(): i32 {
+    return self.x
+}
+
+fn main(): i32 {
+    let mut p = Point{ x: 1, y: 2 }
+    p.shift(4)
+    return p.get()
+}

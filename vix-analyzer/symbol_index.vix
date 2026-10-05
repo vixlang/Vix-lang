@@ -198,6 +198,17 @@ pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): SymbolId
     return symbol_id_invalid()
 }
 
+// Resolves a method call when the static receiver type is known. The lookup key
+// is built by method_qualify, the same function the compiler uses to name method
+// declarations, so the analyzer cannot drift from the compiler.
+pub fn symbol_index_find_method_on_receiver(index: SymbolIndex, receiver_type: string, method: string): SymbolId
+{
+    return symbol_index_find_by_name(index, method_qualify(receiver_type, method))
+}
+
+// Fallback for call sites whose receiver type the analyzer cannot determine: it
+// scans for any method with this short name. It reports the first match, so a
+// caller that knows the receiver type must use symbol_index_find_method_on_receiver.
 pub fn symbol_index_find_method(index: SymbolIndex, method: string): SymbolId
 {
     let suffix = "::" + method

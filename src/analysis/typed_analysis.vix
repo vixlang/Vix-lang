@@ -3,6 +3,8 @@
 import "../ast.vix"
 import "../error.vix"
 import "../lexer.vix"
+import "method.vix"
+import "method_decl.vix"
 
 pub type AnalysisSpan = struct {
     file: string,
@@ -469,7 +471,7 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
     {
         let env = ownership_state_env(state)
         let receiver_ty = analysis_expr_type(program, &env, expr.left_idx)
-        let receiver_param = analysis_method_param_type(program, receiver_ty, expr.text, 0)
+        let receiver_param = analysis_method_receiver_param_type(program, receiver_ty, expr.text)
         let receiver = expr_store_get(&es, expr.left_idx)
         if (analysis_type_is_mut_reference(receiver_param) == 1)
         {
@@ -484,7 +486,7 @@ pub fn ownership_check_expr(program: AstProgram, state: &OwnershipCheckState, fa
         else { ownership_check_expr(program, state, facts, expr.left_idx, stmt_id, 1, source, filename) }
         for (i in 0 .. expr.args.length)
         {
-            let arg_ty = ownership_function_param_type(program, analysis_method_name(program, receiver_ty, expr.text), i + 1)
+            let arg_ty = analysis_method_user_arg_type(program, receiver_ty, expr.text, i)
             if (analysis_type_is_reference(arg_ty) == 1) { ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 0, source, filename) } else { ownership_check_expr(program, state, facts, expr.args[i], stmt_id, 1, source, filename) }
         }
         return 0
@@ -1002,23 +1004,37 @@ pub fn analysis_function_return_type(program: AstProgram, name: string): string
     return "unknown"
 }
 
-pub fn analysis_method_name(program: AstProgram, receiver_ty: string, method: string): string
+// The ownership analysis resolves methods through the program's shared method
+// table. There is no name building and no receiver offset arithmetic here.
+pub fn analysis_method_resolution(program: AstProgram, receiver_ty: string, method: string): MethodResolution
 {
-    let mut base = receiver_ty
-    if (analysis_type_is_reference(base) == 1) { base = analysis_reference_inner(base) }
-    return base + "::" + method
+    return method_resolve(program.expr_store.methods, receiver_ty, method)
 }
 
 pub fn analysis_method_return_type(program: AstProgram, receiver_ty: string, method: string): string
 {
-    let name = analysis_method_name(program, receiver_ty, method)
-    return analysis_function_return_type(program, name)
+    return method_resolution_ret_type(analysis_method_resolution(program, receiver_ty, method))
 }
 
-pub fn analysis_method_param_type(program: AstProgram, receiver_ty: string, method: string, index: i32): string
+// Type of the declared receiver parameter: "&mut Point" for a mutable method.
+pub fn analysis_method_receiver_param_type(program: AstProgram, receiver_ty: string, method: string): string
 {
-    let name = analysis_method_name(program, receiver_ty, method)
-    return ownership_function_param_type(program, name, index)
+    return method_resolution_receiver_param_type(analysis_method_resolution(program, receiver_ty, method))
+}
+
+// Type of user argument i, not counting the receiver.
+pub fn analysis_method_user_arg_type(program: AstProgram, receiver_ty: string, method: string, arg_index: i32): string
+{
+    return method_resolution_user_arg_type(analysis_method_resolution(program, receiver_ty, method), arg_index)
+}
+
+// True when calling the method moves a non-copy receiver into the callee.
+// Intrinsics operate on the receiver in place, so they never consume it.
+pub fn analysis_method_receiver_consumes(program: AstProgram, receiver_ty: string, method: string): i32
+{
+    let resolution = analysis_method_resolution(program, receiver_ty, method)
+    if (method_resolution_is_intrinsic(resolution) == 1) { return 0 }
+    return receiver_consumes(method_resolution_receiver_kind(resolution))
 }
 
 pub fn analysis_array_inner(ty: string): string
@@ -1418,10 +1434,16 @@ pub fn analysis_collect_expr(program: AstProgram, env: &AnalysisEnv, ir: &TypedA
     let mut match_result_ty = ""
     if (expr.tag == "call" or expr.tag == "method_call")
     {
-        if (expr.left_idx >= 0) analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, 0, filename, scope_id)
+        if (expr.left_idx >= 0)
+        {
+            // An owned receiver method moves a non-copy value; a shared or
+            // mutable receiver method only borrows it.
+            let receiver_consume = if (expr.tag == "method_call") { analysis_method_receiver_consumes(program, analysis_expr_type(program, env, expr.left_idx), expr.text) } else { 0 }
+            analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.left_idx, receiver_consume, filename, scope_id)
+        }
         for (i in 0 .. expr.args.length)
         {
-            let parameter_ty = if (expr.tag == "method_call") { analysis_method_param_type(program, analysis_expr_type(program, env, expr.left_idx), expr.text, i + 1) } else { ownership_function_param_type(program, expr.text, i) }
+            let parameter_ty = if (expr.tag == "method_call") { analysis_method_user_arg_type(program, analysis_expr_type(program, env, expr.left_idx), expr.text, i) } else { ownership_function_param_type(program, expr.text, i) }
             let argument_consume = if (expr.text == "clone" or analysis_type_is_reference(parameter_ty) == 1) { 0 } else { 1 }
             analysis_collect_expr(program, env, ir, block_id, stmt_id, expr.args[i], argument_consume, filename, scope_id)
         }
@@ -2523,6 +2545,20 @@ pub fn analysis_lower_program_for_backend(program: AstProgram): AstProgram
         for (j in 0 .. out.extern_functions[i].param_types.length)
         {
             out.extern_functions[i].param_types[j] = analysis_lower_type_for_backend(out.extern_functions[i].param_types[j])
+        }
+    }
+    // The method table is carried in the expression store, so the backends see
+    // the same lowered type strings the AST uses. Without this the declared
+    // receiver type stays in source form ("&Point") while the backend compares
+    // it against lowered text ("refptr:Point"), and borrowed receivers are
+    // passed with the wrong ABI.
+    for (i in 0 .. out.expr_store.methods.signatures.length)
+    {
+        out.expr_store.methods.signatures[i].receiver_param_type = analysis_lower_type_for_backend(out.expr_store.methods.signatures[i].receiver_param_type)
+        out.expr_store.methods.signatures[i].ret_ty = analysis_lower_type_for_backend(out.expr_store.methods.signatures[i].ret_ty)
+        for (j in 0 .. out.expr_store.methods.signatures[i].param_types.length)
+        {
+            out.expr_store.methods.signatures[i].param_types[j] = analysis_lower_type_for_backend(out.expr_store.methods.signatures[i].param_types[j])
         }
     }
     for (i in 0 .. out.structs.length)

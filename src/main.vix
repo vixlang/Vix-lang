@@ -414,6 +414,10 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         merged_program = module_graph_load_all(g, program)
     }
 
+    // One method table per compilation unit, attached after modules are merged.
+    // Semantic analysis, ownership, MIR and both backends all resolve against it.
+    merged_program = method_program_attach(merged_program)
+
     let emit_semantic_warnings = if (mode == "codegen" or mode == "debug_typed_mir" or mode == "debug_mir" or mode == "debug_lir" or mode == "debug_asm" or mode == "debug_llvm" or program.mod_decls.length > 0) { 0 } else { 1 }
     let semantic_result = semantic_check_program_with_warnings(merged_program, src, filename, emit_semantic_warnings)
     match mode

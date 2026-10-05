@@ -1,0 +1,61 @@
+// Receiver kinds for method declarations.
+//
+// A method is declared with a receiver:
+//     fn (Point) copy(): Point            owned  - consumes the receiver
+//     fn (&Point) length(): i32           shared - borrows the receiver
+//     fn (&mut Point) move(dx: i32)       mut    - mutably borrows the receiver
+//
+// The kind is a first class value instead of a numeric flag, so no call site
+// has to know what the number 1, 2 or 3 is supposed to mean.
+
+#[no_main]
+
+pub type ReceiverKind = ReceiverNone | ReceiverOwned | ReceiverShared | ReceiverMut
+
+pub fn receiver_none(): ReceiverKind
+{
+    return ReceiverNone
+}
+
+pub fn receiver_owned(): ReceiverKind
+{
+    return ReceiverOwned
+}
+
+pub fn receiver_shared(): ReceiverKind
+{
+    return ReceiverShared
+}
+
+pub fn receiver_mut(): ReceiverKind
+{
+    return ReceiverMut
+}
+
+// True for every declared method (owned, shared or mutable).
+pub fn receiver_is_method(kind: ReceiverKind): i32
+{
+    if (kind == ReceiverNone) { return 0 }
+    return 1
+}
+
+// True when calling the method borrows the receiver instead of moving it.
+pub fn receiver_is_borrow(kind: ReceiverKind): i32
+{
+    if (kind == ReceiverShared or kind == ReceiverMut) { return 1 }
+    return 0
+}
+
+// True when the receiver must be mutably borrowed by the call.
+pub fn receiver_is_mut_borrow(kind: ReceiverKind): i32
+{
+    if (kind == ReceiverMut) { return 1 }
+    return 0
+}
+
+// True when calling the method moves a non-copy receiver into the callee.
+pub fn receiver_consumes(kind: ReceiverKind): i32
+{
+    if (kind == ReceiverOwned) { return 1 }
+    return 0
+}

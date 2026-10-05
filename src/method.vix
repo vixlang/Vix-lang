@@ -1,0 +1,223 @@
+// Method tables and method resolution.
+//
+// A receiver method is declared at top level:
+//     fn (Point) copy(): Point          owned
+//     fn (&Point) length(): i32         shared
+//     fn (&mut Point) move(dx: i32)     mut
+//
+// The parser records the receiver on AstFunction and stores the declaration
+// under the qualified name built by method_qualify. Everything that reasons
+// about methods goes through this module:
+//
+//     method_table_build   the single declaration index
+//     method_resolve       the single resolution entry point
+//     method_qualify       the only place that builds "Type::method"
+//     method_signature_*   the only place that knows the receiver occupies
+//                          parameter zero
+//
+// There is deliberately no suffix scan and no method name concatenation
+// anywhere else in the compiler.
+
+#[no_main]
+
+import "ast.vix"
+import "intrinsic.vix"
+import "method_decl.vix"
+import "receiver.vix"
+
+extern "C"
+{
+    fn malloc(size: usize): string
+    fn compiler_string_byte(text: string, index: i32): i32
+}
+
+pub fn method_text_slice(text: string, start: i32, end: i32): string
+{
+    let mut out = ""
+    let mut i = start
+    while (i < end)
+    {
+        let c: string = malloc(2)
+        c[0] = compiler_string_byte(text, i)
+        c[1] = 0
+        out = out + c
+        i += 1
+    }
+    return out
+}
+
+pub fn method_text_has_prefix(text: string, prefix: string): i32
+{
+    if (text.length < prefix.length) { return 0 }
+    for (i in 0 .. prefix.length)
+    {
+        if (compiler_string_byte(text, i) != compiler_string_byte(prefix, i)) { return 0 }
+    }
+    return 1
+}
+
+pub fn method_text_trim(text: string): string
+{
+    let mut start = 0
+    let mut end = text.length
+    while (start < end)
+    {
+        let b = compiler_string_byte(text, start)
+        if (b != ' ' and b != 9) { break }
+        start += 1
+    }
+    while (end > start)
+    {
+        let b = compiler_string_byte(text, end - 1)
+        if (b != ' ' and b != 9) { break }
+        end -= 1
+    }
+    return method_text_slice(text, start, end)
+}
+
+// The receiver type without borrow markers, pointer wrappers or generic
+// arguments. "&mut Point" and "Point[i32]" both normalise to "Point", which is
+// what a call site and the declaration have to agree on.
+pub fn method_base_type(receiver_type: string): string
+{
+    let text = method_text_trim(receiver_type)
+    if (method_text_has_prefix(text, "&mut ") == 1) { return method_base_type(method_text_slice(text, 5, text.length)) }
+    if (text.length > 0 and compiler_string_byte(text, 0) == '&') { return method_base_type(method_text_slice(text, 1, text.length)) }
+    if (method_text_has_prefix(text, "refptr:") == 1) { return method_base_type(method_text_slice(text, 7, text.length)) }
+    if (method_text_has_prefix(text, "ptr:") == 1) { return method_base_type(method_text_slice(text, 4, text.length)) }
+    let mut name = ""
+    let mut i = 0
+    while (i < text.length)
+    {
+        let b = compiler_string_byte(text, i)
+        if (b == '[' or b == '<' or b == ':') { return name }
+        let c: string = malloc(2)
+        c[0] = b
+        c[1] = 0
+        name = name + c
+        i += 1
+    }
+    return name
+}
+
+// The short method name of a stored declaration name: "Point::length" -> "length".
+pub fn method_short_name(storage_name: string): string
+{
+    let mut i = storage_name.length - 2
+    while (i >= 0)
+    {
+        if (compiler_string_byte(storage_name, i) == ':' and compiler_string_byte(storage_name, i + 1) == ':')
+        {
+            return method_text_slice(storage_name, i + 2, storage_name.length)
+        }
+        i -= 1
+    }
+    return storage_name
+}
+
+// The single place that builds a method storage name. Lookup never uses this:
+// the method table is keyed by receiver type and short name.
+pub fn method_qualify(receiver_type: string, name: string): string
+{
+    if (receiver_type == "") { return name }
+    return method_base_type(receiver_type) + "::" + name
+}
+
+pub fn method_table_new(): MethodTable
+{
+    return MethodTable{ signatures: [] }
+}
+
+// Attaches the declaration index to a program. Called once per compilation unit
+// after modules are merged, so that every later phase resolves methods against
+// exactly the same table.
+pub fn method_program_attach(program: AstProgram): AstProgram
+{
+    let mut out = program
+    out.expr_store.methods = method_table_build(out.functions)
+    return out
+}
+
+pub fn method_table_build(functions: [AstFunction]): MethodTable
+{
+    let table = method_table_new()
+    for (i in 0 .. functions.length)
+    {
+        if (receiver_is_method(functions[i].receiver_kind) == 0) { continue }
+        let receiver_param_type = if (functions[i].param_types.length > 0) { functions[i].param_types[0] } else { functions[i].receiver_type }
+        table.signatures.push(MethodSignature{
+            receiver_type: method_base_type(functions[i].receiver_type),
+            receiver_kind: functions[i].receiver_kind,
+            name: method_short_name(functions[i].name),
+            storage_name: functions[i].name,
+            receiver_param_type: receiver_param_type,
+            param_names: functions[i].param_names,
+            param_types: functions[i].param_types,
+            ret_ty: functions[i].ret_ty,
+            type_params: functions[i].type_params,
+            is_var_arg: functions[i].is_var_arg,
+            function_index: i
+        })
+    }
+    return table
+}
+
+pub fn method_table_size(table: MethodTable): i32
+{
+    return table.signatures.length
+}
+
+// Returns the signature index, or -1 when no method matches.
+pub fn method_table_lookup(table: MethodTable, receiver_type: string, name: string): i32
+{
+    let base = method_base_type(receiver_type)
+    for (i in 0 .. table.signatures.length)
+    {
+        if (table.signatures[i].receiver_type == base and table.signatures[i].name == name) { return i }
+    }
+    return -1
+}
+
+// Number of declarations matching a receiver type and method name. More than one
+// is a duplicate method definition.
+pub fn method_table_count(table: MethodTable, receiver_type: string, name: string): i32
+{
+    let base = method_base_type(receiver_type)
+    let mut count = 0
+    for (i in 0 .. table.signatures.length)
+    {
+        if (table.signatures[i].receiver_type == base and table.signatures[i].name == name) { count += 1 }
+    }
+    return count
+}
+
+pub fn method_table_signature(table: MethodTable, index: i32): MethodSignature
+{
+    if (index < 0 or index >= table.signatures.length) { return method_signature_new() }
+    return table.signatures[index]
+}
+
+// Name only existence check, used by the semantic analysis, which is purely
+// syntactic and has no type information to match a receiver against.
+pub fn method_table_has_name(table: MethodTable, name: string): i32
+{
+    for (i in 0 .. table.signatures.length)
+    {
+        if (table.signatures[i].name == name) { return 1 }
+    }
+    return 0
+}
+
+// The single resolution entry point.
+//
+// Intrinsics are matched first, because they are provided by the runtime rather
+// than declared by the user. A user declaration then wins by receiver type and
+// short name.
+pub fn method_resolve(table: MethodTable, receiver_type: string, name: string): MethodResolution
+{
+    let intrinsic = intrinsic_lookup(receiver_type, name)
+    if (intrinsic >= 0) { return method_resolution_from_intrinsic(name, method_base_type(receiver_type), intrinsic_signature(intrinsic)) }
+    let index = method_table_lookup(table, receiver_type, name)
+    if (index < 0) { return method_resolution_none() }
+    return method_resolution_from_signature(table.signatures[index])
+}

@@ -1,6 +1,8 @@
 #[no_main]
 import "ast.vix"
 import "builder.vix"
+import "method.vix"
+import "method_decl.vix"
 import "semantic.vix"
 import "module.vix"
 
@@ -40,11 +42,13 @@ pub fn codegen_is_lambda_name(name: string): i32
     return 0
 }
 
-pub fn codegen_method_name(b: &LlvmBuilder, es: &ExprStore, receiver_idx: i32, method: string): string
+// Resolves a method call through the program's shared method table. There is no
+// name building here: the storage name and the parameter layout come from the
+// single MethodResolution the rest of the compiler also consumes.
+pub fn codegen_method_resolution(b: &LlvmBuilder, es: &ExprStore, receiver_idx: i32, method: string): MethodResolution
 {
-    let ty = codegen_expr_type(b, es, expr_store_get(es, receiver_idx))
-    let base = type_text_base_name_builder(strip_ptr_prefix(strip_ref_to_ptr_prefix(ty)))
-    return base + "::" + method
+    let receiver_ty = codegen_expr_type(b, es, expr_store_get(es, receiver_idx))
+    return method_resolve(es.methods, receiver_ty, method)
 }
 
 pub fn codegen_lambda_expr_for_name(es: &ExprStore, name: string): AstExpr
@@ -203,9 +207,7 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
     }
     if (expr.tag == "method_call")
     {
-        let base_ty = codegen_expr_type(b, es, expr_store_get(es, expr.left_idx))
-        let receiver_ty = type_text_base_name_builder(strip_ptr_prefix(strip_ref_to_ptr_prefix(base_ty)))
-        return get_function_return_type(receiver_ty + "::" + expr.text)
+        return method_resolution_ret_type(codegen_method_resolution(b, es, expr.left_idx, expr.text))
     }
     if (expr.tag == "call")
     {
@@ -823,7 +825,8 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
     if (expr.tag == "method_call")
     {
         let mut out = llvm_const_i32(0)
-        if (expr.text == "push")
+        let resolution = codegen_method_resolution(b, es, expr.left_idx, expr.text)
+        if (method_resolution_is_array_push(resolution) == 1)
         {
             let base_expr = expr_store_get(es, expr.left_idx)
             let base_ty = codegen_expr_type(b, es, base_expr)
@@ -853,19 +856,18 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
         }
         else
         {
-            let method_name = codegen_method_name(b, es, expr.left_idx, expr.text)
             let mut args: [ptr] = []
-            let receiver_ty = get_function_param_type(method_name, 0)
+            let receiver_ty = method_resolution_receiver_param_type(resolution)
             let receiver = codegen_expr_value_typed(b, es, store, expr_store_get(es, expr.left_idx), receiver_ty)
             args.push(receiver)
             for (i in 0 .. expr.args.length)
             {
                 let arg_expr = expr_store_get(es, expr.args[i])
-                let arg_ty = get_function_param_type(method_name, i + 1)
+                let arg_ty = method_resolution_user_arg_type(resolution, i)
                 args.push(codegen_expr_value_typed(b, es, store, arg_expr, arg_ty))
             }
-            let call_val = llvm_build_call_value(b, mangle_flat_name(method_name), args)
-            return llvm_cast_value(b, call_val, get_function_return_type(method_name), expected_ty)
+            let call_val = llvm_build_call_value(b, mangle_flat_name(method_resolution_storage_name(resolution)), args)
+            return llvm_cast_value(b, call_val, method_resolution_ret_type(resolution), expected_ty)
         }
         return out
     }

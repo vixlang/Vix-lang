@@ -1,0 +1,196 @@
+// Method value types.
+//
+// These types are deliberately free of any dependency on ast.vix so that
+// AstProgram can carry a MethodTable without creating an import cycle. The
+// algorithms that build and query them live in method.vix.
+
+#[no_main]
+
+import "intrinsic.vix"
+import "receiver.vix"
+
+// A declared receiver method, indexed by receiver type and short name.
+pub type MethodSignature = struct {
+    receiver_type: string,
+    receiver_kind: ReceiverKind,
+    name: string,
+    storage_name: string,
+    receiver_param_type: string,
+    param_names: [string],
+    param_types: [string],
+    ret_ty: string,
+    type_params: [string],
+    is_var_arg: i32,
+    function_index: i32
+}
+
+// The single declaration index for a compilation unit.
+pub type MethodTable = struct {
+    signatures: [MethodSignature]
+}
+
+pub type MethodResolutionKind = ResolutionNone | ResolutionMethod | ResolutionIntrinsic
+
+// The single resolution result every phase consumes. It carries everything a
+// consumer needs: the receiver calling convention, the storage name used for
+// symbol mangling, the declared parameter and return types, and, for intrinsics,
+// which lowering the backends must use.
+pub type MethodResolution = struct {
+    kind: MethodResolutionKind,
+    name: string,
+    receiver_type: string,
+    receiver_kind: ReceiverKind,
+    receiver_param_type: string,
+    storage_name: string,
+    ret_ty: string,
+    param_types: [string],
+    arg_count: i32,
+    intrinsic: IntrinsicKind,
+    function_index: i32
+}
+
+// An empty table. ast.vix uses this to initialise AstProgram before the pipeline
+// attaches the real table with method_table_build.
+pub fn method_table_empty(): MethodTable
+{
+    return MethodTable{ signatures: [] }
+}
+
+pub fn method_signature_new(): MethodSignature
+{
+    return MethodSignature{
+        receiver_type: "",
+        receiver_kind: ReceiverNone,
+        name: "",
+        storage_name: "",
+        receiver_param_type: "",
+        param_names: [],
+        param_types: [],
+        ret_ty: "void",
+        type_params: [],
+        is_var_arg: 0,
+        function_index: -1
+    }
+}
+
+pub fn method_resolution_none(): MethodResolution
+{
+    return MethodResolution{
+        kind: ResolutionNone,
+        name: "",
+        receiver_type: "",
+        receiver_kind: ReceiverNone,
+        receiver_param_type: "",
+        storage_name: "",
+        ret_ty: "unknown",
+        param_types: [],
+        arg_count: 0,
+        intrinsic: IntrinsicArrayPush,
+        function_index: -1
+    }
+}
+
+pub fn method_resolution_from_signature(signature: MethodSignature): MethodResolution
+{
+    return MethodResolution{
+        kind: ResolutionMethod,
+        name: signature.name,
+        receiver_type: signature.receiver_type,
+        receiver_kind: signature.receiver_kind,
+        receiver_param_type: signature.receiver_param_type,
+        storage_name: signature.storage_name,
+        ret_ty: signature.ret_ty,
+        param_types: signature.param_types,
+        arg_count: method_signature_user_arg_count(signature),
+        intrinsic: IntrinsicArrayPush,
+        function_index: signature.function_index
+    }
+}
+
+pub fn method_resolution_from_intrinsic(name: string, receiver_type: string, signature: IntrinsicSignature): MethodResolution
+{
+    return MethodResolution{
+        kind: ResolutionIntrinsic,
+        name: name,
+        receiver_type: receiver_type,
+        receiver_kind: ReceiverNone,
+        receiver_param_type: receiver_type,
+        storage_name: "",
+        ret_ty: signature.ret_ty,
+        param_types: [],
+        arg_count: signature.arity,
+        intrinsic: signature.kind,
+        function_index: -1
+    }
+}
+
+pub fn method_resolution_is_found(resolution: MethodResolution): i32
+{
+    if (resolution.kind == ResolutionNone) { return 0 }
+    return 1
+}
+
+pub fn method_resolution_is_intrinsic(resolution: MethodResolution): i32
+{
+    if (resolution.kind == ResolutionIntrinsic) { return 1 }
+    return 0
+}
+
+// True for the runtime provided array push. Backends dispatch on this instead of
+// comparing the method name to a string.
+pub fn method_resolution_is_array_push(resolution: MethodResolution): i32
+{
+    if (method_resolution_is_intrinsic(resolution) == 0) { return 0 }
+    if (resolution.intrinsic == IntrinsicArrayPush) { return 1 }
+    return 0
+}
+
+// Number of arguments a caller passes, not counting the receiver.
+pub fn method_signature_user_arg_count(signature: MethodSignature): i32
+{
+    let count = signature.param_types.length - 1
+    if (count < 0) { return 0 }
+    return count
+}
+
+// The declared type of user argument i. This is the only place that knows the
+// receiver occupies parameter zero, so callers never write i + 1.
+pub fn method_signature_user_arg_type(signature: MethodSignature, arg_index: i32): string
+{
+    let index = arg_index + 1
+    if (index < 0 or index >= signature.param_types.length) { return "unknown" }
+    return signature.param_types[index]
+}
+
+pub fn method_resolution_user_arg_type(resolution: MethodResolution, arg_index: i32): string
+{
+    let index = arg_index + 1
+    if (index < 0 or index >= resolution.param_types.length) { return "unknown" }
+    return resolution.param_types[index]
+}
+
+pub fn method_resolution_user_arg_count(resolution: MethodResolution): i32
+{
+    return resolution.arg_count
+}
+
+// The declared receiver parameter type, borrow markers included: "&mut Point".
+pub fn method_resolution_receiver_param_type(resolution: MethodResolution): string
+{
+    return resolution.receiver_param_type
+}
+
+pub fn method_resolution_storage_name(resolution: MethodResolution): string
+{
+    return resolution.storage_name
+}
+
+pub fn method_resolution_ret_type(resolution: MethodResolution): string
+{
+    return resolution.ret_ty
+}
+
+pub fn method_resolution_receiver_kind(resolution: MethodResolution): ReceiverKind
+{
+    return resolution.receiver_kind
+}

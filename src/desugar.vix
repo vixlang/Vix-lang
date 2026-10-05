@@ -1004,7 +1004,12 @@ pub fn desugar_function_with_globals(adts: [AstAdtDecl], es: &ExprStore, store: 
         }
     }
     let body_idx = desugar_stmt_env(adts, es, store, func.body_idx, names, types)
-    return ast_function_with_loc(ast_function_full_vararg(func.name, func.ret_ty, body_idx, func.param_names, param_types, func.is_var_arg), func.line, func.col)
+    let out = ast_function_with_loc(ast_function_full_vararg(func.name, func.ret_ty, body_idx, func.param_names, param_types, func.is_var_arg), func.line, func.col)
+    // Receiver metadata must survive desugaring: the method table is keyed by the
+    // receiver type, and a rebuilt program has to describe the same declarations.
+    out.receiver_kind = func.receiver_kind
+    out.receiver_type = func.receiver_type
+    return out
 }
 
 pub fn desugar_program(program: AstProgram): AstProgram

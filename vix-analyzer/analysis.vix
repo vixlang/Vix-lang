@@ -32,15 +32,18 @@ pub type DocumentAnalysis = struct
     checked_functions: i32
 }
 
+// Renders a declaration the way it was written: receiver methods show their
+// receiver, and the implicit self parameter is not repeated in the argument list.
 pub fn analyzer_function_signature(function: AstFunction): string
 {
     let mut signature = "fn "
-    if (function.receiver_kind != 0)
+    let is_method = receiver_is_method(function.receiver_kind)
+    if (is_method == 1)
     {
-        signature = signature + "(" + function.receiver_type + ") "
+        signature = signature + "(" + analyzer_receiver_text(function.receiver_kind, function.receiver_type) + ") "
     }
     signature = signature + "("
-    let start = if (function.receiver_kind != 0) { 1 } else { 0 }
+    let start = if (is_method == 1) { 1 } else { 0 }
     for (i in start .. function.param_names.length)
     {
         if (i > start) { signature = signature + ", " }
@@ -48,6 +51,14 @@ pub fn analyzer_function_signature(function: AstFunction): string
     }
     signature = signature + "): " + function.ret_ty
     return signature
+}
+
+// The receiver as written in source: "Point", "&Point" or "&mut Point".
+pub fn analyzer_receiver_text(kind: ReceiverKind, receiver_type: string): string
+{
+    if (receiver_is_mut_borrow(kind) == 1) { return "&mut " + receiver_type }
+    if (receiver_is_borrow(kind) == 1) { return "&" + receiver_type }
+    return receiver_type
 }
 
 pub fn analyzer_enrich_types(symbols: &SymbolIndex, program: AstProgram)
