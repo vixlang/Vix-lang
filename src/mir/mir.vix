@@ -213,6 +213,11 @@ pub fn mir_expr_type(es: &ExprStore, expr: AstExpr): string
             if (type_text_is_function(local_ty) == 1) { return type_function_return(local_ty) }
             get_function_return_type(expr.text)
         }
+        "method_call" -> {
+            let base_ty = mir_expr_type(es, expr_store_get(es, expr.left_idx))
+            let receiver_ty = type_text_base_name_builder(strip_ptr_prefix(base_ty))
+            get_function_return_type(receiver_ty + "::" + expr.text)
+        }
         "array_literal" -> {
             if (expr.args.length == 0) { return "[i32]" }
             return "[" + mir_expr_type(es, expr_store_get(es, expr.args[0])) + "]"
@@ -748,9 +753,29 @@ pub fn mir_expr_value_typed(b: &MirBuilder, es: &ExprStore, store: &StmtStore, e
             if (expected_ty == "ptr") { return pushed }
             return MirValue{ name: "0", ty: "i32" }
         }
+        let base_expr = expr_store_get(es, expr.left_idx)
+        let base_ty = mir_expr_type(es, base_expr)
+        let method_name = type_text_base_name_builder(strip_ptr_prefix(base_ty)) + "::" + expr.text
+        let receiver_ty = get_function_param_type(method_name, 0)
+        let receiver = mir_expr_value_typed(b, es, store, base_expr, receiver_ty)
+        let mut args_text = mir_type(receiver_ty) + " " + receiver.name
+        for (i in 0 .. expr.args.length)
+        {
+            let arg_expr = expr_store_get(es, expr.args[i])
+            let arg_ty = get_function_param_type(method_name, i + 1)
+            let val = mir_expr_value_typed(b, es, store, arg_expr, arg_ty)
+            if (i >= 0) { args_text = args_text + ", " }
+            args_text = args_text + mir_type(arg_ty) + " " + val.name
+        }
+        let ret_ty = get_function_return_type(method_name)
+        if (ret_ty == "void")
+        {
+            mir_inst(b, "call @" + method_name + "(" + args_text + "): void")
+            return MirValue{ name: "0", ty: "i32" }
+        }
         let out = mir_temp(b)
-        mir_inst(b, out + " = const i32 0")
-        return MirValue{ name: out, ty: "i32" }
+        mir_inst(b, out + " = call @" + method_name + "(" + args_text + "): " + mir_type(ret_ty))
+        return mir_cast_if_needed(b, MirValue{ name: out, ty: ret_ty }, expected_ty)
     }
     let fallback = mir_temp(b)
     mir_inst(b, fallback + " = const " + mir_type(if (expected_ty != "") { expected_ty } else { "i32" }) + " " + mir_zero_value(if (expected_ty != "") { expected_ty } else { "i32" }))

@@ -1826,13 +1826,29 @@ pub fn parse_function(parser: &Parser): AstFunction
     let col = parser_col(parser)
     if (parser_text(parser) == "pub") { parser_advance(parser) }
     if (parser_expect_text(parser, "fn") == 0) { return ast_function("main", "i32", -1) }
-    let name = parser_text(parser)
+    let mut receiver_type = ""
+    let mut receiver_param_type = ""
+    if (parser_text(parser) == "(")
+    {
+        parser_advance(parser)
+        if (parser_text(parser) == "&")
+        {
+            parser_advance(parser)
+            if (parser_text(parser) == "mut") { parser_advance(parser); receiver_param_type = "&mut " } else { receiver_param_type = "&" }
+        }
+        receiver_type = parser_text(parser)
+        if (parser_expect_kind(parser, tk_ident()) == 0) { return ast_function("main", "i32", -1) }
+        receiver_param_type = receiver_param_type + receiver_type
+        if (parser_expect_text(parser, ")") == 0) { return ast_function("main", "i32", -1) }
+    }
+    let mut name = parser_text(parser)
     if (parser_kind(parser) != tk_ident())
     {
-        parser_fail_code(parser, "E1001", "expected function name after 'fn', got '" + parser_text(parser) + "'; name the function, for example 'fn add(...) => expression'")
+        parser_fail_code(parser, "E1001", "expected function or method name after 'fn'")
         return ast_function("main", "i32", -1)
     }
     parser_advance(parser)
+    if (receiver_type != "") { name = receiver_type + "::" + name }
     parser.current_function = name
     let type_params = parse_type_params_after_name(parser)
     if (parser.ok == 0) { return ast_function("main", "i32", -1) }
@@ -1840,6 +1856,11 @@ pub fn parse_function(parser: &Parser): AstFunction
 
     let mut param_names: [string] = []
     let mut param_types: [string] = []
+    if (receiver_type != "")
+    {
+        param_names.push("self")
+        param_types.push(receiver_param_type)
+    }
     if (parser_text(parser) != ")")
     {
         let param_name = parse_param_name(parser)

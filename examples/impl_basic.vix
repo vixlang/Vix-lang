@@ -3,18 +3,16 @@ type Point = struct {
     y: i32
 }
 
-impl Point {
-    fn new(x: i32, y: i32): Point {
-        return Point{ x: x, y: y }
-    }
-    fn distance(self: &Point): f64 {
-        return 5.0
-    }
+fn make_point(x: i32, y: i32): Point {
+    return Point{ x: x, y: y }
+}
+fn (&Point) distance(): f64 {
+    return 5.0
 }
 
 fn main(): i32
 {
-    let p = Point.new(3, 4)
+    let p = make_point(3, 4)
     print(p.x)
     print(p.y)
     return 0

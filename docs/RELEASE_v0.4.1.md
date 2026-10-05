@@ -20,10 +20,8 @@ struct Box<T> { value: T }
 fn id<T>(x: T): T { return x }
 fn add<T>(a: T, b: T): T { return a + b }
 
-// Impl blocks
-impl Box<T> {
-    fn new(value: T): Box<T> { return Box:[T]{ value: value } }
-}
+// Receiver methods
+fn (Box<T>) with_value(value: T): Box:[T] { return Box:[T]{ value: value } }
 
 // Function calls
 let x = id<i32>(42)
@@ -46,10 +44,8 @@ struct Box:[T] { value: T }
 fn id:[T](x: T): T { return x }
 fn add:[T](a: T, b: T): T { return a + b }
 
-// Impl blocks
-impl Box:[T] {
-    fn new(value: T): Box:[T] { return Box:[T]{ value: value } }
-}
+// Receiver methods
+fn (Box:[T]) with_value(value: T): Box:[T] { return Box:[T]{ value: value } }
 
 // Function calls
 let x = id:[i32](42)
@@ -68,7 +64,7 @@ To migrate existing code:
 
 1. Replace all `TypeName<T>` with `TypeName:[T]`
 2. Replace all `fn name<T>` with `fn name:[T]`
-3. Replace all `impl Name<T>` with `impl Name:[T]`
+3. Replace old `impl` blocks with direct receiver declarations such as `fn (&Name) method(...)`
 4. Update type references from `Name<T>` to `Name:[T]`
 5. Ensure nested generics like `Box<Box<i32>>` become `Box:[Box:[i32]]`
 

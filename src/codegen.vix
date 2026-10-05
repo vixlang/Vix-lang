@@ -40,6 +40,13 @@ pub fn codegen_is_lambda_name(name: string): i32
     return 0
 }
 
+pub fn codegen_method_name(b: &LlvmBuilder, es: &ExprStore, receiver_idx: i32, method: string): string
+{
+    let ty = codegen_expr_type(b, es, expr_store_get(es, receiver_idx))
+    let base = type_text_base_name_builder(strip_ptr_prefix(strip_ref_to_ptr_prefix(ty)))
+    return base + "::" + method
+}
+
 pub fn codegen_lambda_expr_for_name(es: &ExprStore, name: string): AstExpr
 {
     for (i in 0 .. es.exprs.length)
@@ -193,6 +200,12 @@ pub fn codegen_expr_type(b: &LlvmBuilder, es: &ExprStore, expr: AstExpr): string
             out = out + expr.type_args[i]
         }
         return out + "): " + expr.option_value
+    }
+    if (expr.tag == "method_call")
+    {
+        let base_ty = codegen_expr_type(b, es, expr_store_get(es, expr.left_idx))
+        let receiver_ty = type_text_base_name_builder(strip_ptr_prefix(strip_ref_to_ptr_prefix(base_ty)))
+        return get_function_return_type(receiver_ty + "::" + expr.text)
     }
     if (expr.tag == "call")
     {
@@ -837,6 +850,22 @@ pub fn codegen_expr_value_typed(b: &LlvmBuilder, es: &ExprStore, store: &StmtSto
             let base_addr = codegen_field_address(b, es, store, base_expr)
             vix_LLVMBuildStore(b.builder, result, base_addr)
             if (expected_ty == "ptr") { out = result }
+        }
+        else
+        {
+            let method_name = codegen_method_name(b, es, expr.left_idx, expr.text)
+            let mut args: [ptr] = []
+            let receiver_ty = get_function_param_type(method_name, 0)
+            let receiver = codegen_expr_value_typed(b, es, store, expr_store_get(es, expr.left_idx), receiver_ty)
+            args.push(receiver)
+            for (i in 0 .. expr.args.length)
+            {
+                let arg_expr = expr_store_get(es, expr.args[i])
+                let arg_ty = get_function_param_type(method_name, i + 1)
+                args.push(codegen_expr_value_typed(b, es, store, arg_expr, arg_ty))
+            }
+            let call_val = llvm_build_call_value(b, mangle_flat_name(method_name), args)
+            return llvm_cast_value(b, call_val, get_function_return_type(method_name), expected_ty)
         }
         return out
     }
