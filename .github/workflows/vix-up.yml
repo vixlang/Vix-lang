@@ -1,0 +1,66 @@
+name: Build vix-up
+
+on:
+  push:
+    paths:
+      - "vix-up/**"
+      - ".github/workflows/vix-up.yml"
+  pull_request:
+    paths:
+      - "vix-up/**"
+      - ".github/workflows/vix-up.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            goos: linux
+            goarch: amd64
+          - os: macos-14
+            goos: darwin
+            goarch: arm64
+          - os: windows-2022
+            goos: windows
+            goarch: amd64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - run: go test ./...
+        working-directory: vix-up
+      - shell: bash
+        run: |
+          set -euo pipefail
+          ext=""
+          if [ "${{ matrix.goos }}" = "windows" ]; then ext=".exe"; fi
+          mkdir -p dist
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -trimpath -ldflags="-s -w" -o "dist/vix-up-${{ matrix.goos }}-${{ matrix.goarch }}${ext}" .
+        working-directory: vix-up
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vix-up-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: vix-up/dist/*
+  release:
+    if: startsWith(github.ref, 'refs/tags/vix-up-')
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vix-up-*
+          path: dist
+          merge-multiple: true
+      - run: sha256sum dist/* > dist/SHA256SUMS
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: dist/*
