@@ -1,0 +1,1175 @@
+// Vix source formatter.
+//
+// Design constraints, and why this is a line oriented formatter:
+//
+//   * The AST does not carry comments. Reprinting a program from the AST would
+//     delete every comment, so the formatter uses the parser only to decide
+//     whether the file is well formed. Everything else works on the raw bytes.
+//   * A line that cannot be broken safely is left long. Guessing is worse than
+//     leaving a line over the limit.
+//   * Formatting must be idempotent: fmt(fmt(x)) == fmt(x). Every rule here is
+//     written to converge in one pass.
+//
+// What it does:
+//   1. reindents by brace depth (braces inside strings, chars and comments do
+//      not count)
+//   2. strips trailing whitespace
+//   3. collapses runs of blank lines and puts exactly one blank line between
+//      top level declarations
+//   4. normalises spacing around commas, type annotations and binary operators
+//   5. wraps lines that exceed max_width at argument groups and binary
+//      operators
+//
+// Served both by the compiler CLI (--fmt) and by the language server, so the
+// editor and the command line can never disagree.
+
+#[no_main]
+
+import "parser.vix"
+
+extern "C"
+{
+    fn malloc(size: usize): string
+    fn compiler_string_byte(text: string, index: i32): i32
+}
+
+pub type FmtConfig = struct {
+    max_width: i32,
+    indent_width: i32,
+    use_tabs: i32
+}
+
+pub type FmtResult = struct {
+    ok: i32,
+    text: string,
+    error: string
+}
+
+pub type FmtState = struct {
+    depth: i32,
+    // Open ( and [ from previous lines. Wrapped argument lists are indented by
+    // this depth, which is what makes formatting idempotent.
+    bracket_depth: i32,
+    in_block_comment: i32,
+    in_string: i32
+}
+
+pub type FmtSpan = struct {
+    found: i32,
+    open: i32,
+    close: i32
+}
+
+pub fn fmt_config_default(): FmtConfig
+{
+    return FmtConfig{ max_width: 100, indent_width: 4, use_tabs: 0 }
+}
+
+// --- byte helpers -----------------------------------------------------------
+
+pub fn fmt_byte(text: string, index: i32): i32
+{
+    if (index < 0 or index >= text.length) { return -1 }
+    return compiler_string_byte(text, index)
+}
+
+pub fn fmt_char(byte: i32): string
+{
+    let out: string = malloc(2)
+    out[0] = byte
+    out[1] = 0
+    return out
+}
+
+pub fn fmt_slice(text: string, start: i32, end: i32): string
+{
+    let mut out = ""
+    let mut i = start
+    while (i < end)
+    {
+        out = out + fmt_char(fmt_byte(text, i))
+        i += 1
+    }
+    return out
+}
+
+pub fn fmt_is_space(byte: i32): i32
+{
+    if (byte == ' ' or byte == 9 or byte == 13) { return 1 }
+    return 0
+}
+
+pub fn fmt_trim(text: string): string
+{
+    let mut start = 0
+    let mut end = text.length
+    while (start < end and fmt_is_space(fmt_byte(text, start)) == 1) { start += 1 }
+    while (end > start and fmt_is_space(fmt_byte(text, end - 1)) == 1) { end -= 1 }
+    return fmt_slice(text, start, end)
+}
+
+pub fn fmt_trim_end(text: string): string
+{
+    let mut end = text.length
+    while (end > 0 and fmt_is_space(fmt_byte(text, end - 1)) == 1) { end -= 1 }
+    return fmt_slice(text, 0, end)
+}
+
+pub fn fmt_is_ident_byte(byte: i32): i32
+{
+    if (byte >= 'a' and byte <= 'z') { return 1 }
+    if (byte >= 'A' and byte <= 'Z') { return 1 }
+    if (byte >= '0' and byte <= '9') { return 1 }
+    if (byte == '_') { return 1 }
+    return 0
+}
+
+pub fn fmt_is_value_start(byte: i32): i32
+{
+    if (byte < 0) { return 0 }
+    if (fmt_is_ident_byte(byte) == 1) { return 1 }
+    if (byte == '"' or byte == '(' or byte == '[' or byte == '@' or byte == '&') { return 1 }
+    return 0
+}
+
+pub fn fmt_is_value_end(byte: i32): i32
+{
+    if (byte < 0) { return 0 }
+    if (fmt_is_ident_byte(byte) == 1) { return 1 }
+    if (byte == ')' or byte == ']' or byte == '"' or byte == '}') { return 1 }
+    return 0
+}
+
+pub fn fmt_word_at(text: string, start: i32): string
+{
+    let mut end = start
+    while (end < text.length and fmt_is_ident_byte(fmt_byte(text, end)) == 1) { end += 1 }
+    return fmt_slice(text, start, end)
+}
+
+pub fn fmt_prev_significant(text: string, index: i32): i32
+{
+    let mut i = index - 1
+    while (i >= 0)
+    {
+        if (fmt_is_space(fmt_byte(text, i)) == 0) { return i }
+        i -= 1
+    }
+    return -1
+}
+
+pub fn fmt_next_significant(text: string, index: i32): i32
+{
+    let mut i = index
+    while (i < text.length)
+    {
+        if (fmt_is_space(fmt_byte(text, i)) == 0) { return i }
+        i += 1
+    }
+    return -1
+}
+
+// Word immediately before a position, used to tell unary minus from binary.
+pub fn fmt_prev_word(text: string, index: i32): string
+{
+    let prev = fmt_prev_significant(text, index)
+    if (prev < 0) { return "" }
+    if (fmt_is_ident_byte(fmt_byte(text, prev)) == 0) { return "" }
+    let mut start = prev
+    while (start > 0 and fmt_is_ident_byte(fmt_byte(text, start - 1)) == 1) { start -= 1 }
+    return fmt_slice(text, start, prev + 1)
+}
+
+pub fn fmt_is_keyword_before_expression(word: string): i32
+{
+    if (word == "return") { return 1 }
+    if (word == "and" or word == "or") { return 1 }
+    if (word == "in") { return 1 }
+    if (word == "if" or word == "elif" or word == "while") { return 1 }
+    if (word == "match" or word == "else" or word == "let" or word == "mut") { return 1 }
+    if (word == "case") { return 1 }
+    return 0
+}
+
+// --- indentation and width --------------------------------------------------
+
+pub fn fmt_indent_unit(config: FmtConfig): string
+{
+    if (config.use_tabs == 1) { return "	" }
+    let mut out = ""
+    let mut i = 0
+    while (i < config.indent_width)
+    {
+        out = out + " "
+        i += 1
+    }
+    return out
+}
+
+pub fn fmt_indent(config: FmtConfig, level: i32): string
+{
+    let mut out = ""
+    let mut i = 0
+    while (i < level)
+    {
+        out = out + fmt_indent_unit(config)
+        i += 1
+    }
+    return out
+}
+
+// Counts characters, not bytes, so a UTF-8 comment does not look three times
+// wider than it is.
+pub fn fmt_width(text: string): i32
+{
+    let mut count = 0
+    let mut i = 0
+    while (i < text.length)
+    {
+        let byte = fmt_byte(text, i)
+        if (byte < 0) { break }
+        if (byte >= 128 and byte < 192)
+        {
+            i += 1
+        }
+        else
+        {
+            count += 1
+            i += 1
+        }
+    }
+    return count
+}
+
+// --- line helpers -----------------------------------------------------------
+
+pub fn fmt_line_start(text: string, line: i32): i32
+{
+    let mut index = 0
+    let mut i = 0
+    while (i < text.length)
+    {
+        if (index == line) { return i }
+        if (fmt_byte(text, i) == 10) { index += 1 }
+        i += 1
+    }
+    return text.length
+}
+
+pub fn fmt_line_end(text: string, start: i32): i32
+{
+    let mut i = start
+    while (i < text.length and fmt_byte(text, i) != 10) { i += 1 }
+    return i
+}
+
+pub fn fmt_line_count(text: string): i32
+{
+    let mut count = 1
+    let mut i = 0
+    while (i < text.length)
+    {
+        if (fmt_byte(text, i) == 10) { count += 1 }
+        i += 1
+    }
+    return count
+}
+
+// Tracks brace depth and lexical state so braces inside strings, chars and
+// comments never affect indentation.
+pub fn fmt_scan_line(state: &FmtState, content: string)
+{
+    let mut i = 0
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (state.in_block_comment == 1)
+        {
+            if (byte == '*' and fmt_byte(content, i + 1) == '/')
+            {
+                state.in_block_comment = 0
+                i += 2
+            }
+            else
+            {
+                i += 1
+            }
+        }
+        elif (state.in_string == 1)
+        {
+            if (byte == '\\') { i += 2 }
+            elif (byte == '"') { state.in_string = 0; i += 1 }
+            else { i += 1 }
+        }
+        elif (byte == '/' and fmt_byte(content, i + 1) == '/')
+        {
+            return
+        }
+        elif (byte == '/' and fmt_byte(content, i + 1) == '*')
+        {
+            state.in_block_comment = 1
+            i += 2
+        }
+        elif (byte == '"')
+        {
+            state.in_string = 1
+            i += 1
+        }
+        elif (byte == '\'')
+        {
+            i += 1
+            while (i < content.length and fmt_byte(content, i) != '\'')
+            {
+                if (fmt_byte(content, i) == '\\') { i += 1 }
+                i += 1
+            }
+            i += 1
+        }
+        elif (byte == '{')
+        {
+            state.depth += 1
+            i += 1
+        }
+        elif (byte == '}')
+        {
+            if (state.depth > 0) { state.depth -= 1 }
+            i += 1
+        }
+        elif (byte == '(' or byte == '[')
+        {
+            state.bracket_depth += 1
+            i += 1
+        }
+        elif (byte == ')' or byte == ']')
+        {
+            if (state.bracket_depth > 0) { state.bracket_depth -= 1 }
+            i += 1
+        }
+        else
+        {
+            i += 1
+        }
+    }
+}
+
+// A wrapped binary chain continues on lines that begin with an operator. Those
+// lines are indented one level deeper than the statement, which keeps a second
+// formatting pass from flattening them.
+pub fn fmt_is_continuation_start(trimmed: string): i32
+{
+    let byte = fmt_byte(trimmed, 0)
+    if (byte == '+' or byte == '-' or byte == '*' or byte == '/' or byte == '%') { return 1 }
+    if (byte == '|' and fmt_byte(trimmed, 1) == '>') { return 1 }
+    let word = fmt_word_at(trimmed, 0)
+    if (word == "and" or word == "or") { return 1 }
+    return 0
+}
+
+pub fn fmt_starts_with_closer(trimmed: string): i32
+{
+    let byte = fmt_byte(trimmed, 0)
+    if (byte == '}' or byte == ')' or byte == ']') { return 1 }
+    return 0
+}
+
+// A line at depth zero that opens a top level declaration gets a blank line
+// before it.
+pub fn fmt_is_declaration_start(trimmed: string): i32
+{
+    if (fmt_word_at(trimmed, 0) == "pub")
+    {
+        let rest = fmt_trim(fmt_slice(trimmed, 3, trimmed.length))
+        return fmt_is_declaration_start(rest)
+    }
+    let word = fmt_word_at(trimmed, 0)
+    if (word == "fn" or word == "type" or word == "struct" or word == "extern") { return 1 }
+    if (word == "mod" or word == "import" or word == "macro") { return 1 }
+    if (fmt_byte(trimmed, 0) == '#') { return 0 }
+    return 0
+}
+
+// --- spacing ----------------------------------------------------------------
+
+// True when a space before an opening paren must be preserved. "fn (Point)" is
+// the receiver syntax and "if (...)" is Vix style; "call(...)" gets none.
+pub fn fmt_keeps_space_before_paren(out: string): i32
+{
+    let word = fmt_prev_word(out, out.length)
+    if (word == "fn" or word == "if" or word == "elif" or word == "while" or word == "for") { return 1 }
+    if (word == "match" or word == "return") { return 1 }
+    // Operators that can be followed by a parenthesised expression. Without
+    // these the space in "a and (b)" would be dropped and the next pass would
+    // put it back, which breaks idempotence.
+    if (word == "and" or word == "or" or word == "in") { return 1 }
+    return 0
+}
+
+pub fn fmt_skip_string(content: string, start: i32): i32
+{
+    let mut i = start + 1
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '\\') { i += 2; continue }
+        if (byte == '"') { return i + 1 }
+        i += 1
+    }
+    return content.length
+}
+
+pub fn fmt_skip_char(content: string, start: i32): i32
+{
+    let mut i = start + 1
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '\\') { i += 2; continue }
+        if (byte == '\'') { return i + 1 }
+        i += 1
+    }
+    return content.length
+}
+
+pub fn fmt_skip_block_comment(content: string, start: i32): i32
+{
+    let mut i = start + 2
+    while (i < content.length)
+    {
+        if (fmt_byte(content, i) == '*' and fmt_byte(content, i + 1) == '/') { return i + 2 }
+        i += 1
+    }
+    return content.length
+}
+
+// Length of a binary operator starting at index, or 0.
+pub fn fmt_operator_length(content: string, index: i32): i32
+{
+    let byte = fmt_byte(content, index)
+    let next = fmt_byte(content, index + 1)
+    if (byte == '=' and next == '=') { return 2 }
+    if (byte == '!' and next == '=') { return 2 }
+    if (byte == '<' and next == '=') { return 2 }
+    if (byte == '>' and next == '=') { return 2 }
+    if (byte == '=' and next == '>') { return 2 }
+    if (byte == '-' and next == '>') { return 2 }
+    if (byte == '|' and next == '>') { return 2 }
+    if (byte == '+' and next == '=') { return 2 }
+    if (byte == '-' and next == '=') { return 2 }
+    if (byte == '*' and next == '=') { return 2 }
+    if (byte == '/' and next == '=') { return 2 }
+    if (byte == '=' or byte == '+' or byte == '-' or byte == '*' or byte == '/' or byte == '%') { return 1 }
+    if (byte == '<' or byte == '>') { return 1 }
+    return 0
+}
+
+pub fn fmt_operator_is_unary(content: string, index: i32, length: i32): i32
+{
+    let byte = fmt_byte(content, index)
+    if (byte == '*' or byte == '/' or byte == '%' or byte == '=') { return 0 }
+    if (length == 2) { return 0 }
+    let prev = fmt_prev_significant(content, index)
+    if (prev < 0) { return 1 }
+    let prev_byte = fmt_byte(content, prev)
+    if (prev_byte == '(' or prev_byte == '[' or prev_byte == '{' or prev_byte == ',') { return 1 }
+    if (prev_byte == ';' or prev_byte == ':') { return 1 }
+    if (fmt_operator_length(content, prev) > 0) { return 1 }
+    if (fmt_is_keyword_before_expression(fmt_prev_word(content, index)) == 1) { return 1 }
+    return 0
+}
+
+// Normalises spacing outside strings, chars and comments:
+//   comma      -> no space before, one space after
+//   colon      -> no space before, one space after (but not :: and not :[ )
+//   operators  -> one space on both sides
+//   and / or   -> one space on both sides
+//
+// A pending space flag is used instead of trimming the output. Trimming rebuilt
+// the whole accumulated string on every token, which made formatting a large
+// file quadratic; this stays linear.
+pub fn fmt_normalize_spacing(content: string): string
+{
+    let mut out = ""
+    let mut pending = 0
+    let mut i = 0
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+
+        if (byte == '"')
+        {
+            let end = fmt_skip_string(content, i)
+            if (pending == 1 and out != "") { out = out + " " }
+            pending = 0
+            out = out + fmt_slice(content, i, end)
+            i = end
+            continue
+        }
+        // Comments before chars: an apostrophe inside a comment is text.
+        if (byte == '/' and fmt_byte(content, i + 1) == '/')
+        {
+            if (pending == 1 and out != "") { out = out + " " }
+            pending = 0
+            out = out + fmt_slice(content, i, content.length)
+            break
+        }
+        if (byte == '/' and fmt_byte(content, i + 1) == '*')
+        {
+            let end = fmt_skip_block_comment(content, i)
+            if (pending == 1 and out != "") { out = out + " " }
+            pending = 0
+            out = out + fmt_slice(content, i, end)
+            i = end
+            continue
+        }
+        if (byte == '\'')
+        {
+            let end = fmt_skip_char(content, i)
+            if (pending == 1 and out != "") { out = out + " " }
+            pending = 0
+            out = out + fmt_slice(content, i, end)
+            i = end
+            continue
+        }
+        // Collapse runs of spaces. Brackets decide whether the space survives,
+        // and fn (Receiver) must keep the space that separates them.
+        if (fmt_is_space(byte) == 1)
+        {
+            while (i < content.length and fmt_is_space(fmt_byte(content, i)) == 1) { i += 1 }
+            let next = fmt_byte(content, i)
+            if (next < 0) { break }
+            let last = if (out.length > 0) { fmt_byte(out, out.length - 1) } else { -1 }
+            if (next == ',' or next == ';' or next == ')' or next == ']') { pending = 0; continue }
+            if (next == '}')
+            {
+                if (last != '{' and last != -1) { pending = 1 } else { pending = 0 }
+                continue
+            }
+            if (next == '(')
+            {
+                if (fmt_keeps_space_before_paren(out) == 1) { pending = 1 } else { pending = 0 }
+                continue
+            }
+            if (next == '[') { pending = 0; continue }
+            if (last == '(' or last == '[' or last == -1) { pending = 0; continue }
+            pending = 1
+            continue
+        }
+        if (byte == '(')
+        {
+            if (fmt_keeps_space_before_paren(out) == 1 and pending == 0 and out != "" and fmt_byte(out, out.length - 1) != ' ')
+            {
+                pending = 1
+            }
+            if (pending == 1 and out != "") { out = out + " " }
+            pending = 0
+            out = out + "("
+            i += 1
+            continue
+        }
+        if (byte == ';')
+        {
+            pending = 0
+            out = out + ";"
+            i += 1
+            while (i < content.length and fmt_is_space(fmt_byte(content, i)) == 1) { i += 1 }
+            if (i < content.length) { pending = 1 }
+            continue
+        }
+        if (byte == '}')
+        {
+            // Keep a same line closing brace separated: "{ x: 3 }" not "{ x: 3}".
+            let last = if (out.length > 0) { fmt_byte(out, out.length - 1) } else { -1 }
+            if (last != -1 and last != '{') { pending = 1 } else { pending = 0 }
+            if (pending == 1 and out != "") { out = out + " " }
+            pending = 0
+            out = out + "}"
+            i += 1
+            continue
+        }
+        if (byte == ',')
+        {
+            pending = 0
+            out = out + ","
+            i += 1
+            while (i < content.length and fmt_is_space(fmt_byte(content, i)) == 1) { i += 1 }
+            let next = fmt_byte(content, i)
+            if (next >= 0 and next != ')' and next != ']' and next != '}') { pending = 1 }
+            continue
+        }
+        if (byte == ':')
+        {
+            let prev = fmt_byte(content, i - 1)
+            let next = fmt_byte(content, i + 1)
+            if (prev == ':' or next == ':' or next == '[')
+            {
+                pending = 0
+                out = out + ":"
+                i += 1
+                continue
+            }
+            pending = 0
+            out = out + ":"
+            i += 1
+            while (i < content.length and fmt_is_space(fmt_byte(content, i)) == 1) { i += 1 }
+            pending = 1
+            continue
+        }
+        if (fmt_is_ident_byte(byte) == 1)
+        {
+            let start = i
+            while (i < content.length and fmt_is_ident_byte(fmt_byte(content, i)) == 1) { i += 1 }
+            let word = fmt_slice(content, start, i)
+            if (pending == 1 and out != "") { out = out + " " }
+            pending = 0
+            out = out + word
+            if (word == "and" or word == "or") { pending = 1 }
+            continue
+        }
+        let length = fmt_operator_length(content, i)
+        if (length > 0 and fmt_operator_is_unary(content, i, length) == 0)
+        {
+            // A binary operator always gets a space in front of it. At the start
+            // of a line there is nothing to separate, so a wrapped continuation
+            // keeps its own indentation.
+            if (out != "") { out = out + " " }
+            pending = 0
+            out = out + fmt_slice(content, i, i + length)
+            i += length
+            while (i < content.length and fmt_is_space(fmt_byte(content, i)) == 1) { i += 1 }
+            pending = 1
+            continue
+        }
+        // A closing bracket never takes a leading space, even when the previous
+        // token asked for one: "a[i + 1]" not "a[i + 1 ]".
+        if (byte == ')' or byte == ']')
+        {
+            pending = 0
+            out = out + fmt_char(byte)
+            i += 1
+            continue
+        }
+        if (pending == 1 and out != "") { out = out + " " }
+        pending = 0
+        out = out + fmt_char(byte)
+        i += 1
+    }
+    return out
+}
+
+// --- bracket structure ------------------------------------------------------
+
+pub fn fmt_match_bracket(content: string, open: i32): i32
+{
+    let open_byte = fmt_byte(content, open)
+    let mut close_byte = ')'
+    if (open_byte == '{') { close_byte = '}' }
+    elif (open_byte == '[') { close_byte = ']' }
+    let mut depth = 0
+    let mut i = open
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '"') { i = fmt_skip_string(content, i); continue }
+        if (byte == '\'') { i = fmt_skip_char(content, i); continue }
+        if (byte == '(' or byte == '{' or byte == '[')
+        {
+            depth += 1
+        }
+        elif (byte == ')' or byte == '}' or byte == ']')
+        {
+            depth -= 1
+            if (depth == 0)
+            {
+                if (byte == close_byte) { return i }
+                return -1
+            }
+        }
+        i += 1
+    }
+    return -1
+}
+
+pub fn fmt_has_top_level_comma(content: string, start: i32, end: i32): i32
+{
+    let mut depth = 0
+    let mut i = start
+    while (i < end)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '"') { i = fmt_skip_string(content, i); continue }
+        if (byte == '\'') { i = fmt_skip_char(content, i); continue }
+        if (byte == '(' or byte == '{' or byte == '[') { depth += 1 }
+        elif (byte == ')' or byte == '}' or byte == ']') { depth -= 1 }
+        elif (byte == ',' and depth == 0) { return 1 }
+        i += 1
+    }
+    return 0
+}
+
+// The last bracket group opened at nesting depth zero that contains a top level
+// comma. Taking the last one skips generic parameter lists such as :[T, U] and
+// lands on the argument list.
+pub fn fmt_find_argument_group(content: string): FmtSpan
+{
+    let mut result = FmtSpan{ found: 0, open: -1, close: -1 }
+    let mut depth = 0
+    let mut i = 0
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '"') { i = fmt_skip_string(content, i); continue }
+        if (byte == '\'') { i = fmt_skip_char(content, i); continue }
+        if (byte == '(' or byte == '{' or byte == '[')
+        {
+            if (depth == 0)
+            {
+                let close = fmt_match_bracket(content, i)
+                if (close > i and fmt_has_top_level_comma(content, i + 1, close) == 1)
+                {
+                    result = FmtSpan{ found: 1, open: i, close: close }
+                }
+            }
+            depth += 1
+            i += 1
+            continue
+        }
+        if (byte == ')' or byte == '}' or byte == ']')
+        {
+            if (depth > 0) { depth -= 1 }
+            i += 1
+            continue
+        }
+        i += 1
+    }
+    return result
+}
+
+pub fn fmt_split_top_level(content: string): [string]
+{
+    let mut parts: [string] = []
+    let mut depth = 0
+    let mut start = 0
+    let mut i = 0
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '"') { i = fmt_skip_string(content, i); continue }
+        if (byte == '\'') { i = fmt_skip_char(content, i); continue }
+        if (byte == '(' or byte == '{' or byte == '[') { depth += 1 }
+        elif (byte == ')' or byte == '}' or byte == ']') { depth -= 1 }
+        elif (byte == ',' and depth == 0)
+        {
+            parts.push(fmt_slice(content, start, i))
+            start = i + 1
+        }
+        i += 1
+    }
+    parts.push(fmt_slice(content, start, content.length))
+    return parts
+}
+
+// --- width aware wrapping ---------------------------------------------------
+
+// Number of brackets opened in content[0 .. index). Strings, chars and comments
+// are skipped, and it is measured relative to the start of content, which is one
+// logical line.
+//
+// This is what makes wrapping idempotent: the indentation emitted for a
+// continuation line is the same value a later pass computes from the bracket
+// depth it has accumulated at that line.
+pub fn fmt_open_brackets_at(content: string, index: i32): i32
+{
+    let mut depth = 0
+    let mut i = 0
+    while (i < index and i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '"') { i = fmt_skip_string(content, i); continue }
+        if (byte == ''') { i = fmt_skip_char(content, i); continue }
+        if (byte == '/' and fmt_byte(content, i + 1) == '/') { break }
+        if (byte == '/' and fmt_byte(content, i + 1) == '*') { i = fmt_skip_block_comment(content, i); continue }
+        if (byte == '(' or byte == '[' or byte == '{') { depth += 1 }
+        elif (byte == ')' or byte == ']' or byte == '}') { if (depth > 0) { depth -= 1 } }
+        i += 1
+    }
+    return depth
+}
+
+// Rank of a binary operator for splitting. Lower binds looser, so it splits
+// first.
+pub fn fmt_operator_rank(content: string, index: i32): i32
+{
+    let length = fmt_operator_length(content, index)
+    if (length == 0) { return -1 }
+    let text = fmt_slice(content, index, index + length)
+    if (text == "==" or text == "!=" or text == "<" or text == ">" or text == "<=" or text == ">=") { return 2 }
+    if (text == "|>") { return 3 }
+    if (text == "+" or text == "-") { return 4 }
+    if (text == "*" or text == "/" or text == "%") { return 5 }
+    return -1
+}
+
+pub fn fmt_find_binary_split(content: string): i32
+{
+    let mut best = -1
+    let mut best_rank = 99
+    let mut depth = 0
+    let mut i = 0
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '"') { i = fmt_skip_string(content, i); continue }
+        if (byte == '\'') { i = fmt_skip_char(content, i); continue }
+        if (byte == '(' or byte == '{' or byte == '[') { depth += 1; i += 1; continue }
+        if (byte == ')' or byte == '}' or byte == ']') { depth -= 1; i += 1; continue }
+        if (fmt_is_ident_byte(byte) == 1)
+        {
+            let start = i
+            while (i < content.length and fmt_is_ident_byte(fmt_byte(content, i)) == 1) { i += 1 }
+            let word = fmt_slice(content, start, i)
+            if (word == "or" and best_rank > 1)
+            {
+                best = start
+                best_rank = 1
+            }
+            elif (word == "and" and best_rank > 1)
+            {
+                best = start
+                best_rank = 1
+            }
+            continue
+        }
+        let rank = fmt_operator_rank(content, i)
+        if (rank > 0 and fmt_operator_is_unary(content, i, fmt_operator_length(content, i)) == 0)
+        {
+            if (rank < best_rank)
+            {
+                best = i
+                best_rank = rank
+            }
+        }
+        i += 1
+    }
+    return best
+}
+
+// Returns the content for one logical line, with newlines inserted when it does
+// not fit. The caller indents the first line; continuation lines are indented
+// here.
+pub fn fmt_wrap(content: string, level: i32, config: FmtConfig): string
+{
+    if (config.max_width <= 0) { return content }
+    if (fmt_width(fmt_indent(config, level)) + fmt_width(content) <= config.max_width) { return content }
+
+    let group = fmt_find_argument_group(content)
+    if (group.found == 1)
+    {
+        let head = fmt_slice(content, 0, group.open + 1)
+        let body = fmt_slice(content, group.open + 1, group.close)
+        let tail = fmt_slice(content, group.close, content.length)
+        let parts = fmt_split_top_level(body)
+        let mut items: [string] = []
+        for (i in 0 .. parts.length)
+        {
+            let item = fmt_trim(parts[i])
+            if (item != "") { items.push(item) }
+        }
+        if (items.length > 0)
+        {
+            // The item lines sit inside the group, so their indentation is the
+            // logical level plus every bracket opened up to that point. A later
+            // pass computes exactly the same number from its bracket depth.
+            let item_level = level + fmt_open_brackets_at(content, group.open + 1)
+            let mut close_level = level + fmt_open_brackets_at(content, group.close) - 1
+            if (close_level < 0) { close_level = 0 }
+            let inner = fmt_indent(config, item_level)
+            // The text before the opening bracket and after the closing bracket
+            // can still be too long, so it is wrapped as well.
+            let mut out = fmt_wrap(head, level, config)
+            for (i in 0 .. items.length)
+            {
+                let mut indent_here = item_level
+                if (fmt_is_continuation_start(items[i]) == 1) { indent_here += 1 }
+                out = out + "\n" + fmt_indent(config, indent_here) + fmt_wrap(items[i], indent_here, config)
+                if (i + 1 < items.length) { out = out + "," }
+            }
+            out = out + "\n" + fmt_indent(config, close_level) + fmt_wrap(tail, close_level, config)
+            return out
+        }
+    }
+
+    // Binary chains: every continuation line uses the same indent, so a long
+    // chain does not staircase to the right.
+    let split = fmt_find_binary_split(content)
+    if (split > 0)
+    {
+        let head = fmt_trim(fmt_slice(content, 0, split))
+        if (head != "" and split < content.length)
+        {
+            let mut out = fmt_wrap(head, level, config)
+            // Every continuation line is indented by the logical level plus the
+            // brackets opened before it, plus one for the continuation itself.
+            // That is exactly the level a later pass derives from its accrued
+            // bracket depth, so a second format does not move the line.
+            let mut rest_start = split
+            let mut guard = 0
+            while (rest_start < content.length and guard < 128)
+            {
+                guard += 1
+                let rest = fmt_slice(content, rest_start, content.length)
+                let next = fmt_find_binary_split(rest)
+                let indent_here = level + fmt_open_brackets_at(content, rest_start) + 1
+                let continuation = fmt_indent(config, indent_here)
+                // Wrap each continuation piece as well: a piece can still be too
+                // long, and leaving it long here would make the next pass split
+                // it and produce a different layout.
+                if (next <= 0)
+                {
+                    out = out + "\n" + continuation + fmt_wrap(fmt_trim(rest), indent_here, config)
+                    break
+                }
+                out = out + "\n" + continuation + fmt_wrap(fmt_trim(fmt_slice(rest, 0, next)), indent_here, config)
+                rest_start = rest_start + next
+            }
+            return out
+        }
+    }
+    return content
+}
+
+pub fn fmt_parse_int(text: string, fallback: i32): i32
+{
+    let trimmed = fmt_trim(text)
+    let mut i = 0
+    let mut negative = 0
+    if (i < trimmed.length and (fmt_byte(trimmed, i) == '-' or fmt_byte(trimmed, i) == '+'))
+    {
+        if (fmt_byte(trimmed, i) == '-') { negative = 1 }
+        i += 1
+    }
+    let mut value = 0
+    let mut digits = 0
+    while (i < trimmed.length)
+    {
+        let byte = fmt_byte(trimmed, i)
+        if (byte < '0' or byte > '9') { break }
+        value = value * 10 + (byte - '0')
+        digits += 1
+        i += 1
+    }
+    if (digits == 0) { return fallback }
+    if (negative == 1) { return 0 - value }
+    return value
+}
+
+pub fn fmt_read_file(path: string): string
+{
+    let file = fopen(path, "r")
+    if (file == 0) { return "" }
+    fseek(file, 0, 2)
+    let size = ftell(file)
+    fseek(file, 0, 0)
+    let buffer = malloc(size + 1)
+    let read = fread(buffer, 1, size, file)
+    buffer[read] = 0
+    fclose(file)
+    return buffer
+}
+
+// Clamps a configuration into the supported range. Zero max_width means "do not
+// wrap"; an unset max_width is also treated as no limit.
+pub fn fmt_config_normalize(config: FmtConfig): FmtConfig
+{
+    let mut out = config
+    if (out.max_width < 0) { out.max_width = 0 }
+    if (out.indent_width < 1) { out.indent_width = 1 }
+    if (out.indent_width > 16) { out.indent_width = 16 }
+    if (out.use_tabs != 1) { out.use_tabs = 0 }
+    return out
+}
+
+// Reads a vix-fmt.toml style file of key = value lines. Unknown keys and
+// unreadable files are ignored, so a project without a config file still works.
+pub fn fmt_config_load(base: FmtConfig, path: string): FmtConfig
+{
+    let text = fmt_read_file(path)
+    if (text == "") { return base }
+    let mut out = base
+    let total = fmt_line_count(text)
+    let mut line = 0
+    while (line < total)
+    {
+        let start = fmt_line_start(text, line)
+        let end = fmt_line_end(text, start)
+        let content = fmt_trim(fmt_slice(text, start, end))
+        line += 1
+        if (content == "") { continue }
+        if (fmt_byte(content, 0) == '#') { continue }
+        if (fmt_byte(content, 0) == '[') { continue }
+        let mut equals = -1
+        let mut i = 0
+        while (i < content.length)
+        {
+            if (fmt_byte(content, i) == '=' and equals < 0) { equals = i }
+            i += 1
+        }
+        if (equals <= 0) { continue }
+        let key = fmt_trim(fmt_slice(content, 0, equals))
+        let value = fmt_trim(fmt_slice(content, equals + 1, content.length))
+        if (key == "max_width") { out.max_width = fmt_parse_int(value, out.max_width) }
+        elif (key == "indent_width") { out.indent_width = fmt_parse_int(value, out.indent_width) }
+        elif (key == "use_tabs")
+        {
+            if (value == "true" or value == "1") { out.use_tabs = 1 } else { out.use_tabs = 0 }
+        }
+    }
+    return out
+}
+
+// Config file for a source file: "vix-fmt.toml" next to it.
+pub fn fmt_config_path_for(source_path: string): string
+{
+    let mut cut = -1
+    let mut i = 0
+    while (i < source_path.length)
+    {
+        if (fmt_byte(source_path, i) == '/') { cut = i }
+        i += 1
+    }
+    if (cut < 0) { return "vix-fmt.toml" }
+    return fmt_slice(source_path, 0, cut + 1) + "vix-fmt.toml"
+}
+
+// --- entry point ------------------------------------------------------------
+
+// Formats a source file.
+//
+// The pass below is line oriented and its rules interact: reindenting can make a
+// line too long, wrapping can move text to a new line, and the indentation of
+// that new line is derived from what the previous lines opened. The pass is
+// therefore applied until its own output stops changing, which is what makes the
+// result canonical and makes fmt(fmt(x)) == fmt(x) hold by construction. The
+// loop is bounded; a stable result is normally reached after one extra pass.
+pub fn fmt_format(source: string, config: FmtConfig): FmtResult
+{
+    if (source.length == 0)
+    {
+        return FmtResult{ ok: 1, text: source, error: "" }
+    }
+    // Never touch a file that does not parse: a half written buffer would be
+    // reindented from guesses. Declaration free files are the exception, since
+    // the parser calls them empty rather than broken.
+    if (parse_program_raw(source, "").ok == 0 and fmt_source_is_declaration_free(source) == 0)
+    {
+        return FmtResult{ ok: 0, text: source, error: "document has syntax errors" }
+    }
+    let mut current = fmt_format_once(source, config)
+    let mut rounds = 1
+    while (rounds < 4)
+    {
+        let next = fmt_format_once(current, config)
+        if (next == current) { break }
+        current = next
+        rounds += 1
+    }
+    return FmtResult{ ok: 1, text: current, error: "" }
+}
+
+// One formatting pass. Callers should use fmt_format, which returns a fixed
+// point.
+pub fn fmt_format_once(source: string, config: FmtConfig): string
+{
+    let state = FmtState{ depth: 0, bracket_depth: 0, in_block_comment: 0, in_string: 0 }
+    let mut out = ""
+    let mut previous_blank = 0
+    let mut position = 0
+    // Walk the source once. Recomputing the start of line N by scanning from
+    // byte zero would make formatting quadratic in the file size, which is
+    // unusable on the compiler's own sources.
+    while (position < source.length)
+    {
+        let end = fmt_line_end(source, position)
+        let content = fmt_slice(source, position, end)
+        let trimmed = fmt_trim(content)
+        let has_more = end + 1 < source.length
+        if (trimmed == "")
+        {
+            // Collapse runs of blank lines; a single one is kept.
+            if (previous_blank == 0 and out != "" and has_more)
+            {
+                out = out + "\n"
+                previous_blank = 1
+            }
+        }
+        else
+        {
+            if (state.in_block_comment == 1)
+            {
+                // Leave block comment bodies untouched.
+                out = out + content + "\n"
+            }
+            else
+            {
+                // Indentation is the sum of open braces and open argument
+                // brackets, so a wrapped argument list reindents to the same
+                // place on the next pass.
+                let mut level = state.depth + state.bracket_depth
+                if (fmt_starts_with_closer(trimmed) == 1 and level > 0) { level -= 1 }
+                if (fmt_is_continuation_start(trimmed) == 1) { level += 1 }
+                // Exactly one blank line between top level declarations.
+                if (fmt_is_declaration_start(trimmed) == 1 and state.depth == 0 and out != "" and previous_blank == 0)
+                {
+                    out = out + "\n"
+                }
+                // A line that opens a block comment keeps its interior bytes:
+                // only indentation is rewritten.
+                if (fmt_contains_block_comment(content) == 1)
+                {
+                    out = out + fmt_indent(config, level) + trimmed + "\n"
+                }
+                else
+                {
+                    let normalized = fmt_normalize_spacing(trimmed)
+                    out = out + fmt_indent(config, level) + fmt_wrap(normalized, level, config) + "\n"
+                }
+            }
+            previous_blank = 0
+        }
+        fmt_scan_line(&state, content)
+        position = end + 1
+    }
+    return out
+}
+
+// A file that only contains attributes, imports and comments has no
+// declarations at all, and the parser reports it as an empty source. Such a
+// file is still worth whitespace normalisation, so it is not treated as a
+// syntax error.
+pub fn fmt_source_is_declaration_free(source: string): i32
+{
+    let mut position = 0
+    while (position < source.length)
+    {
+        let end = fmt_line_end(source, position)
+        let trimmed = fmt_trim(fmt_slice(source, position, end))
+        let word = fmt_word_at(trimmed, 0)
+        if (word == "fn" or word == "type" or word == "struct" or word == "extern") { return 0 }
+        if (word == "pub" or word == "macro" or word == "let" or word == "mod") { return 0 }
+        position = end + 1
+    }
+    return 1
+}
+
+pub fn fmt_contains_block_comment(content: string): i32
+{
+    let mut i = 0
+    while (i < content.length)
+    {
+        let byte = fmt_byte(content, i)
+        if (byte == '"') { i = fmt_skip_string(content, i); continue }
+        if (byte == '/' and fmt_byte(content, i + 1) == '*') { return 1 }
+        if (byte == '/' and fmt_byte(content, i + 1) == '/') { return 0 }
+        i += 1
+    }
+    return 0
+}

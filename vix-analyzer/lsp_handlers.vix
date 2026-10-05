@@ -7,7 +7,7 @@ import "json.vix"
 import "workspace.vix"
 import "queries.vix"
 import "lsp_protocol.vix"
-import "formatter.vix"
+import "../src/fmt.vix"
 
 pub type TextDocumentParams = struct
 {
@@ -238,6 +238,43 @@ pub fn handle_rename(workspace: Workspace, id: i32, params: string): string
     }
     return lsp_response(id, "null")
 }
+// A "file://" URI as a filesystem path, so a vix-fmt.toml next to the document
+// can be found.
+pub fn lsp_uri_to_path(uri: string): string
+{
+    if (analyzer_starts_with(uri, "file://") == 1)
+    {
+        return analyzer_copy(uri, 7, uri.length)
+    }
+    return uri
+}
+
+// Indentation comes from the editor's own settings, max width from vix-fmt.toml.
+// This is the same configuration the compiler CLI uses, so the editor and
+// "vixc --fmt" cannot disagree.
+pub fn lsp_format_config(document: TextDocumentParams, params: string): FmtConfig
+{
+    let mut config = fmt_config_default()
+    config = fmt_config_load(config, fmt_config_path_for(lsp_uri_to_path(document.uri)))
+    let doc = json_parse(params)
+    let root = json_root(doc)
+    if (root >= 0)
+    {
+        let options = json_object_get(doc, root, "options")
+        if (options >= 0)
+        {
+            let tab_size = json_int_at(doc, json_object_get(doc, options, "tabSize"))
+            if (tab_size > 0) { config.indent_width = tab_size }
+            let insert_spaces = json_object_get(doc, options, "insertSpaces")
+            if (insert_spaces >= 0)
+            {
+                if (json_int_at(doc, insert_spaces) == 1) { config.use_tabs = 0 } else { config.use_tabs = 1 }
+            }
+        }
+    }
+    return fmt_config_normalize(config)
+}
+
 pub fn handle_formatting(workspace: Workspace, id: i32, params: string): string
 {
     match lsp_params_document(params)
@@ -248,8 +285,7 @@ pub fn handle_formatting(workspace: Workspace, id: i32, params: string): string
             {
                 return lsp_response(id, "[]")
             }
-            let file = workspace_file(workspace, document.uri)
-            let result = formatter_format(file, text)
+            let result = fmt_format(text, lsp_format_config(document, params))
             if (result.ok == 0 or result.text == text)
             {
                 return lsp_response(id, "[]")

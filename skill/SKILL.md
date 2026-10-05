@@ -23,6 +23,18 @@ AI 写 Vix 时缓存命中率低，根因通常不是模型，而是**每次会�
 3. 固定的**加载顺序**写在 [guides/agent-context.md](guides/agent-context.md)，
    照做可以让多次会话的前缀一致。
 
+## 写 Vix 代码的固定动作
+
+写完先跑这两条，不要靠肉眼检查：
+
+```sh
+build/vixc-patched file.vix --check     # 语法与类型
+sh scripts/vix-fmt.sh file.vix          # 格式（等价于 rustfmt）
+```
+
+格式化器会把多余空格折叠成一个，所以**不要手工对齐**。
+详见 [../docs/FORMATTING.md](../docs/FORMATTING.md)。
+
 ## 五条铁律
 
 1. **先验证再断言。** Vix 的语法和编译器行为有明确边界，写完必须跑
@@ -52,7 +64,7 @@ AI 写 Vix 时缓存命中率低，根因通常不是模型，而是**每次会�
 | 文件 | 内容 |
 | --- | --- |
 | [guides/conventions.md](guides/conventions.md) | 命名、结构、代码规范 |
-| [guides/compile.md](guides/compile.md) | 编译器 CLI、后端、macOS 链接 |
+| [guides/compile.md](guides/compile.md) | 编译器 CLI、后端、macOS 链接、格式化 |
 | [guides/test.md](guides/test.md) | 测试入口与怎么写回归 |
 | [guides/debug.md](guides/debug.md) | 诊断格式、错误码、调试手段 |
 | [guides/reading.md](guides/reading.md) | 怎么读这个仓库（含编译管线地图） |

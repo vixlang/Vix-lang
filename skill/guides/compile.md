@@ -85,6 +85,25 @@ sh scripts/build-analyzer.sh
 `mod` 会触发模块图构建与合并；`--module-graph` 可以先看依赖关系。
 编译器的聚合入口是 `src/main.vix`（内部 `mod sys` 指向 `src/sys.vix`）。
 
+## 格式化
+
+```sh
+sh scripts/vix-fmt.sh file.vix          # 就地格式化
+sh scripts/vix-fmt.sh src/              # 整个目录
+sh scripts/vix-fmt.sh --check src/      # CI：只报告，退出码非 0 表示需要格式化
+
+build/vixc-patched file.vix --fmt -o -             # 输出到 stdout
+build/vixc-patched file.vix --fmt --max-width=80   # 行宽
+build/vixc-patched file.vix --fmt --indent=2       # 缩进
+build/vixc-patched file.vix --fmt --use-tabs
+```
+
+配置写在源文件旁边的 `vix-fmt.toml`：`max_width`、`indent_width`、`use_tabs`。
+命令行参数优先。编辑器里走同一个实现，缩进取 VS Code 的 `editor.tabSize`。
+
+写代码时**不要手工对齐空格**：格式化器会把多余空格折叠成一个。
+详细规则见 [../../docs/FORMATTING.md](../../docs/FORMATTING.md)。
+
 ## 常见编译失败
 
 | 现象 | 处理 |

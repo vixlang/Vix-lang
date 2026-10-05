@@ -77,7 +77,9 @@ pub fn lsp_notification(method: string, params: string): string
 pub fn lsp_initialize_result(): string
 {
     let capabilities = lsp_initialize_capabilities()
-    return "{\"capabilities\":{\"textDocumentSync\":" + analyzer_i32_to_str(capabilities.text_document_sync) + ",\"hoverProvider\":true,\"definitionProvider\":true,\"completionProvider\":{},\"documentSymbolProvider\":true,\"referencesProvider\":true,\"renameProvider\":true},\"serverInfo\":{\"name\":\"vix-analyzer\",\"version\":\"0.1.0\"}}"
+    // documentFormattingProvider must be advertised, otherwise the editor never
+    // sends textDocument/formatting and "Format Document" silently does nothing.
+    return "{\"capabilities\":{\"textDocumentSync\":" + analyzer_i32_to_str(capabilities.text_document_sync) + ",\"hoverProvider\":true,\"definitionProvider\":true,\"completionProvider\":{},\"documentSymbolProvider\":true,\"referencesProvider\":true,\"renameProvider\":true,\"documentFormattingProvider\":true},\"serverInfo\":{\"name\":\"vix-analyzer\",\"version\":\"0.1.0\"}}"
 }
 
 pub fn lsp_publish_diagnostics(uri: string, diagnostics: [AnalyzerDiagnostic]): string

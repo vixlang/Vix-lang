@@ -66,33 +66,26 @@ python3 vix-analyzer/tests/lsp_differential.py ./build/vix-analyzer 200
 `textDocument/formatting` 由 analyzer 提供，扩展的 `vix.formatDocument` 与 VS Code 内置的
 Format Document 都走它。
 
+**实现位置**：格式化核心在 `src/fmt.vix`，与 `vixc --fmt` **共用同一份代码**，
+所以编辑器和命令行不可能给出不同结果。analyzer 只负责把 LSP 请求翻译成配置：
+
+- 缩进宽度/制表符来自请求里的 `options.tabSize` / `options.insertSpaces`
+  （也就是 VS Code 的 `editor.tabSize` / `editor.insertSpaces`）
+- 行宽来自源文件旁边的 `vix-fmt.toml`
+
 **取舍说明**：AST 不保留注释，所以"从 AST 重新打印整个程序"会把注释全部删掉。因此格式化器
-只把语法树用于**结构判断**（文件能否解析、顶层声明从哪里开始、空行插在哪），实际只重写
-**行首缩进与行尾空白**，其余字节原样保留。
+只用 parser 判断文件能否解析，实际工作在原始字节上做。
 
-规则：
-
-- 每层缩进 4 个空格，与仓库既有风格一致
-- `}` 开头的行回退一级
-- 连续空行折叠为一个；顶层声明之间保证一个空行
-- 紧跟在 `#[...]` 属性后的声明不再插空行
-- 块注释内部不做改动
-
-实测：
-
-    输入（乱缩进 + 空注释）        -> 输出
-    fn add(a: i32, b: i32): i32      fn add(a: i32, b: i32): i32
-    {                                {
-    return a + b                         return a + b
-    }                                }
-    （两个空行）                     （一个空行）
+完整规则与配置见 [../docs/FORMATTING.md](../docs/FORMATTING.md)。
 
 安全性质（都有测试）：
 
+- initialize 结果声明了 `documentFormattingProvider`，否则编辑器根本不会发请求
 - 语法错误的文件**返回空编辑**，不动它（避免把半成品按猜测重排）
 - **幂等**：格式化两次，第二次返回 0 个编辑
 - 注释、字符串字面量逐字节保留
 
+    python3 vix-analyzer/tests/lsp_formatting.py ./build/vix-analyzer
     python3 vix-analyzer/tests/lsp_format.py ./build/vix-analyzer
     python3 vix-analyzer/tests/lsp_format_safety.py ./build/vix-analyzer
 
@@ -123,7 +116,7 @@ Format Document 都走它。
     workspace.vix           文档集合
     queries.vix             hover / definition / references / completion / rename
     symbol_index.vix        符号与引用索引
-    formatter.vix           缩进与空行规范化（AST 决定结构）
+                           （格式化实现已移到 src/fmt.vix，与 CLI 共用）
     diagnostics.vix         诊断转换与序列化
     lsp_protocol.vix        LSP 编解码
     lsp_transport.vix       stdio 帧
