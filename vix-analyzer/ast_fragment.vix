@@ -5,6 +5,7 @@ import "position.vix"
 import "util.vix"
 import "stub_tree.vix"
 import "../src/ast.vix"
+import "../src/method.vix"
 import "../src/parser.vix"
 import "../src/diag.vix"
 import "../src/lexer.vix"
@@ -417,5 +418,8 @@ pub fn ast_assemble(fragments: [AstFragment]): AstProgram
     {
         adts.push(parse_builtin_result_decl())
     }
-    return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, expr_store, stmt_store)
+    // The assembled program is type checked directly, so it needs its own method
+    // table: an empty one makes the semantic pass report every method call as
+    // unknown.
+    return method_program_attach(ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, expr_store, stmt_store))
 }

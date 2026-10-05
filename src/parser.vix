@@ -2446,7 +2446,11 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
     {
         functions.push(parser.lambda_functions[i])
     }
-    return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store)
+    // Every entry point gets a populated method table here, not only the main
+    // compiler pipeline. The analyzer parses and type checks without going
+    // through main.vix, and an empty table made its semantic pass report every
+    // method call as unknown.
+    return method_program_attach(ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store))
 }
 
 pub fn parse_program(src: string, filename: string): AstProgram => parse_program_impl(src, filename, 1)
@@ -2573,7 +2577,11 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
     {
         functions.push(parser.lambda_functions[i])
     }
-    return ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store)
+    // Every entry point gets a populated method table here, not only the main
+    // compiler pipeline. The analyzer parses and type checks without going
+    // through main.vix, and an empty table made its semantic pass report every
+    // method call as unknown.
+    return method_program_attach(ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store))
 }
 
 pub fn parse_program_stats(src: string, filename: string): string
