@@ -1,7 +1,7 @@
 #[no_main]
 
 import "util.vix"
-import "json.vix"
+import "../src/json.vix"
 import "workspace.vix"
 import "lsp_transport.vix"
 import "lsp_protocol.vix"

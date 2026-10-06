@@ -3,7 +3,7 @@
 import "ids.vix"
 import "position.vix"
 import "util.vix"
-import "json.vix"
+import "../src/json.vix"
 import "queries.vix"
 import "symbol_index.vix"
 import "diagnostics.vix"

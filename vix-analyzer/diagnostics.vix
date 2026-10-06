@@ -3,7 +3,7 @@
 import "ids.vix"
 import "position.vix"
 import "util.vix"
-import "json.vix"
+import "../src/json.vix"
 import "../src/diag.vix"
 
 pub type DiagnosticSeverity = SeverityError | SeverityWarning | SeverityInformation | SeverityHint

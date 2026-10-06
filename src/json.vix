@@ -1,6 +1,40 @@
 #[no_main]
 
-import "util.vix"
+// JSON reader shared by the compiler and the language server.
+//
+// It used to live in vix-analyzer/json.vix and was the only JSON reader in the
+// tree; the compiler could write JSON (src/json_ast.vix) but not read it.  The
+// interface files described in docs/MODULES.md are JSON, so the reader has to be
+// available to the compiler as well.  The three helpers it used from the
+// analyser are inlined below so this file has no dependency of its own.
+
+extern "C"
+{
+    fn compiler_string_byte(text: string, index: i32): i32
+    fn malloc(size: usize): string
+}
+
+pub fn json_char_string(byte: i32): string
+{
+    let out = malloc(2)
+    out[0] = byte
+    out[1] = 0
+    return out
+}
+
+pub fn json_slice(text: string, start: i32, end: i32): string
+{
+    let length = end - start
+    let out = malloc(length + 4)
+    let mut j = 0
+    for (i in start .. end)
+    {
+        out[j] = compiler_string_byte(text, i)
+        j += 1
+    }
+    out[length] = 0
+    return out
+}
 
 pub type JsonKind = JsonNull | JsonBool | JsonNumber | JsonString | JsonArray | JsonObject
 
@@ -77,7 +111,7 @@ pub fn json_raw(doc: JsonDocument, text: string, index: i32): string
         return ""
     }
     let node = doc.nodes[index]
-    return analyzer_copy(text, node.start, node.end)
+    return json_slice(text, node.start, node.end)
 }
 
 pub fn json_node_null(doc: &JsonDocument): i32
@@ -89,7 +123,7 @@ pub fn json_skip_space(cursor: &JsonCursor)
 {
     while (cursor.pos < cursor.text.length)
     {
-        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        let byte = compiler_string_byte(cursor.text, cursor.pos)
         if (byte == ' ' or byte == '\t' or byte == '\n' or byte == '\r')
         {
             cursor.pos += 1
@@ -105,17 +139,17 @@ pub fn json_utf8(codepoint: i32): string
 {
     if (codepoint < 128)
     {
-        return analyzer_char_string(codepoint)
+        return json_char_string(codepoint)
     }
     if (codepoint < 2048)
     {
-        return analyzer_char_string(192 + codepoint / 64) + analyzer_char_string(128 + codepoint % 64)
+        return json_char_string(192 + codepoint / 64) + json_char_string(128 + codepoint % 64)
     }
     if (codepoint < 65536)
     {
-        return analyzer_char_string(224 + codepoint / 4096) + analyzer_char_string(128 + (codepoint / 64) % 64) + analyzer_char_string(128 + codepoint % 64)
+        return json_char_string(224 + codepoint / 4096) + json_char_string(128 + (codepoint / 64) % 64) + json_char_string(128 + codepoint % 64)
     }
-    return analyzer_char_string(240 + codepoint / 262144) + analyzer_char_string(128 + (codepoint / 4096) % 64) + analyzer_char_string(128 + (codepoint / 64) % 64) + analyzer_char_string(128 + codepoint % 64)
+    return json_char_string(240 + codepoint / 262144) + json_char_string(128 + (codepoint / 4096) % 64) + json_char_string(128 + (codepoint / 64) % 64) + json_char_string(128 + codepoint % 64)
 }
 
 pub fn json_hex_value(byte: i32): i32
@@ -136,7 +170,7 @@ pub fn json_read_hex4(cursor: &JsonCursor): i32
     let mut value = 0
     for (i in 0 .. 4)
     {
-        let digit = json_hex_value(analyzer_byte_at(cursor.text, cursor.pos + i))
+        let digit = json_hex_value(compiler_string_byte(cursor.text, cursor.pos + i))
         if (digit < 0)
         {
             cursor.ok = 0
@@ -150,7 +184,7 @@ pub fn json_read_hex4(cursor: &JsonCursor): i32
 
 pub fn json_read_string(cursor: &JsonCursor): string
 {
-    if (analyzer_byte_at(cursor.text, cursor.pos) != '"')
+    if (compiler_string_byte(cursor.text, cursor.pos) != '"')
     {
         cursor.ok = 0
         return ""
@@ -159,7 +193,7 @@ pub fn json_read_string(cursor: &JsonCursor): string
     let mut out = ""
     while (cursor.pos < cursor.text.length)
     {
-        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        let byte = compiler_string_byte(cursor.text, cursor.pos)
         if (byte == '"')
         {
             cursor.pos += 1
@@ -167,26 +201,26 @@ pub fn json_read_string(cursor: &JsonCursor): string
         }
         if (byte != '\\')
         {
-            out = out + analyzer_char_string(byte)
+            out = out + json_char_string(byte)
             cursor.pos += 1
         }
         else
         {
             cursor.pos += 1
-            let escaped = analyzer_byte_at(cursor.text, cursor.pos)
+            let escaped = compiler_string_byte(cursor.text, cursor.pos)
             if (escaped == 'n') { out = out + "\n" }
             elif (escaped == 't') { out = out + "\t" }
             elif (escaped == 'r') { out = out + "\r" }
             elif (escaped == '"') { out = out + "\"" }
             elif (escaped == '\\') { out = out + "\\" }
             elif (escaped == '/') { out = out + "/" }
-            elif (escaped == 'b') { out = out + analyzer_char_string(8) }
-            elif (escaped == 'f') { out = out + analyzer_char_string(12) }
+            elif (escaped == 'b') { out = out + json_char_string(8) }
+            elif (escaped == 'f') { out = out + json_char_string(12) }
             elif (escaped == 'u')
             {
                 cursor.pos += 1
                 let mut codepoint = json_read_hex4(cursor)
-                if (codepoint >= 55296 and codepoint <= 56319 and analyzer_byte_at(cursor.text, cursor.pos) == '\\' and analyzer_byte_at(cursor.text, cursor.pos + 1) == 'u')
+                if (codepoint >= 55296 and codepoint <= 56319 and compiler_string_byte(cursor.text, cursor.pos) == '\\' and compiler_string_byte(cursor.text, cursor.pos + 1) == 'u')
                 {
                     cursor.pos += 2
                     let low = json_read_hex4(cursor)
@@ -212,26 +246,26 @@ pub fn json_read_number(cursor: &JsonCursor, doc: &JsonDocument): i32
     let mut value = 0.0
     let mut negative = 0
     let mut digits = 0
-    if (analyzer_byte_at(cursor.text, cursor.pos) == '-')
+    if (compiler_string_byte(cursor.text, cursor.pos) == '-')
     {
         negative = 1
         cursor.pos += 1
     }
     while (1 == 1)
     {
-        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        let byte = compiler_string_byte(cursor.text, cursor.pos)
         if (byte < '0' or byte > '9') { break }
         value = value * 10.0 + (byte - '0')
         cursor.pos += 1
         digits += 1
     }
-    if (analyzer_byte_at(cursor.text, cursor.pos) == '.')
+    if (compiler_string_byte(cursor.text, cursor.pos) == '.')
     {
         cursor.pos += 1
         let mut scale = 0.1
         while (1 == 1)
         {
-            let byte = analyzer_byte_at(cursor.text, cursor.pos)
+            let byte = compiler_string_byte(cursor.text, cursor.pos)
             if (byte < '0' or byte > '9') { break }
             value = value + (byte - '0') * scale
             scale = scale * 0.1
@@ -253,7 +287,7 @@ pub fn json_read_array(cursor: &JsonCursor, doc: &JsonDocument): i32
     cursor.pos += 1
     let mut children: [i32] = []
     json_skip_space(cursor)
-    if (analyzer_byte_at(cursor.text, cursor.pos) == ']')
+    if (compiler_string_byte(cursor.text, cursor.pos) == ']')
     {
         cursor.pos += 1
         return json_add_node(doc, json_node(JsonArray, 0, 0.0, "", children, [], [] ))
@@ -264,7 +298,7 @@ pub fn json_read_array(cursor: &JsonCursor, doc: &JsonDocument): i32
         if (cursor.ok == 0) { return -1 }
         children.push(value)
         json_skip_space(cursor)
-        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        let byte = compiler_string_byte(cursor.text, cursor.pos)
         if (byte == ',')
         {
             cursor.pos += 1
@@ -290,7 +324,7 @@ pub fn json_read_object(cursor: &JsonCursor, doc: &JsonDocument): i32
     let mut keys: [string] = []
     let mut values: [i32] = []
     json_skip_space(cursor)
-    if (analyzer_byte_at(cursor.text, cursor.pos) == '}')
+    if (compiler_string_byte(cursor.text, cursor.pos) == '}')
     {
         cursor.pos += 1
         return json_add_node(doc, json_node(JsonObject, 0, 0.0, "", [], keys, values ))
@@ -298,7 +332,7 @@ pub fn json_read_object(cursor: &JsonCursor, doc: &JsonDocument): i32
     while (cursor.pos < cursor.text.length)
     {
         json_skip_space(cursor)
-        if (analyzer_byte_at(cursor.text, cursor.pos) != '"')
+        if (compiler_string_byte(cursor.text, cursor.pos) != '"')
         {
             cursor.ok = 0
             return -1
@@ -306,7 +340,7 @@ pub fn json_read_object(cursor: &JsonCursor, doc: &JsonDocument): i32
         let key = json_read_string(cursor)
         if (cursor.ok == 0) { return -1 }
         json_skip_space(cursor)
-        if (analyzer_byte_at(cursor.text, cursor.pos) != ':')
+        if (compiler_string_byte(cursor.text, cursor.pos) != ':')
         {
             cursor.ok = 0
             return -1
@@ -317,7 +351,7 @@ pub fn json_read_object(cursor: &JsonCursor, doc: &JsonDocument): i32
         keys.push(key)
         values.push(value)
         json_skip_space(cursor)
-        let byte = analyzer_byte_at(cursor.text, cursor.pos)
+        let byte = compiler_string_byte(cursor.text, cursor.pos)
         if (byte == ',')
         {
             cursor.pos += 1
@@ -341,7 +375,7 @@ pub fn json_read_literal(cursor: &JsonCursor, word: string, bool_value: i32, doc
 {
     for (i in 0 .. word.length)
     {
-        if (analyzer_byte_at(cursor.text, cursor.pos + i) != analyzer_byte_at(word, i))
+        if (compiler_string_byte(cursor.text, cursor.pos + i) != compiler_string_byte(word, i))
         {
             cursor.ok = 0
             return -1
@@ -355,7 +389,7 @@ pub fn json_read_value(cursor: &JsonCursor, doc: &JsonDocument): i32
 {
     json_skip_space(cursor)
     let start = cursor.pos
-    let byte = analyzer_byte_at(cursor.text, cursor.pos)
+    let byte = compiler_string_byte(cursor.text, cursor.pos)
     let mut index = -1
     if (byte == '{')
     {
@@ -485,14 +519,14 @@ pub fn json_escape(text: string): string
     let mut out = "\""
     for (i in 0 .. text.length)
     {
-        let byte = analyzer_byte_at(text, i)
+        let byte = compiler_string_byte(text, i)
         if (byte == '"') { out = out + "\\\"" }
         elif (byte == '\\') { out = out + "\\\\" }
         elif (byte == '\n') { out = out + "\\n" }
         elif (byte == '\r') { out = out + "\\r" }
         elif (byte == '\t') { out = out + "\\t" }
         elif (byte < 32) { out = out + " " }
-        else { out = out + analyzer_char_string(byte) }
+        else { out = out + json_char_string(byte) }
     }
     return out + "\""
 }
