@@ -45,7 +45,8 @@ pub type VixiFunction = struct {
     param_names: [string],
     param_types: [string],
     ret_ty: string,
-    is_var_arg: i32
+    is_var_arg: i32,
+    is_pub: i32
 }
 
 pub type VixiType = struct {
@@ -55,13 +56,15 @@ pub type VixiType = struct {
     field_names: [string],
     field_types: [string],
     variant_names: [string],
-    variant_payload_types: [string]
+    variant_payload_types: [string],
+    is_pub: i32
 }
 
 pub type VixiModule = struct {
     format: i32,
     path: string,
     source_hash: string,
+    interface_hash: string,
     compiler: string,
     dep_paths: [string],
     dep_hashes: [string],
@@ -92,6 +95,7 @@ pub fn vixi_module_new(): VixiModule
         format: vixi_format(),
         path: "",
         source_hash: "",
+        interface_hash: "",
         compiler: "",
         dep_paths: [],
         dep_hashes: [],
@@ -157,6 +161,7 @@ pub fn vixi_signature_text(m: VixiModule): string
     for (i in 0 .. m.functions.length)
     {
         let f = m.functions[i]
+        if (f.is_pub == 0) { out = out + "priv " }
         if (f.is_var_arg == 1) { out = out + "vararg " }
         out = out + "fn " + f.name + ":["
         for (t in 0 .. f.type_params.length)
@@ -175,6 +180,7 @@ pub fn vixi_signature_text(m: VixiModule): string
     for (j in 0 .. m.types.length)
     {
         let t = m.types[j]
+        if (t.is_pub == 0) { out = out + "priv " }
         out = out + t.kind + " " + t.name + ":["
         for (g in 0 .. t.type_params.length)
         {
@@ -250,7 +256,8 @@ pub fn vixi_json_function(func: VixiFunction): string
     out = out + "," + q + "param_names" + q + ":" + vixi_json_string_array(func.param_names)
     out = out + "," + q + "param_types" + q + ":" + vixi_json_string_array(func.param_types)
     out = out + "," + q + "ret_ty" + q + ":" + vixi_json_quote(func.ret_ty)
-    out = out + "," + q + "is_var_arg" + q + ":" + i32_to_str(func.is_var_arg) + "}"
+    out = out + "," + q + "is_var_arg" + q + ":" + i32_to_str(func.is_var_arg)
+    out = out + "," + q + "is_pub" + q + ":" + i32_to_str(func.is_pub) + "}"
     return out
 }
 
@@ -264,6 +271,7 @@ pub fn vixi_json_type(ty: VixiType): string
     out = out + "," + q + "field_types" + q + ":" + vixi_json_string_array(ty.field_types)
     out = out + "," + q + "variant_names" + q + ":" + vixi_json_string_array(ty.variant_names)
     out = out + "," + q + "variant_payload_types" + q + ":" + vixi_json_string_array(ty.variant_payload_types)
+    out = out + "," + q + "is_pub" + q + ":" + i32_to_str(ty.is_pub)
     return out + "}"
 }
 
@@ -324,7 +332,8 @@ pub fn vixi_parse_functions(doc: JsonDocument, root: i32): [VixiFunction]
             param_names: vixi_json_strings(doc, json_object_get(doc, node, "param_names")),
             param_types: vixi_json_strings(doc, json_object_get(doc, node, "param_types")),
             ret_ty: json_string_at(doc, json_object_get(doc, node, "ret_ty")),
-            is_var_arg: json_int_at(doc, json_object_get(doc, node, "is_var_arg"))
+            is_var_arg: json_int_at(doc, json_object_get(doc, node, "is_var_arg")),
+            is_pub: json_int_at(doc, json_object_get(doc, node, "is_pub"))
         })
     }
     return out
@@ -346,7 +355,8 @@ pub fn vixi_parse_types(doc: JsonDocument, root: i32): [VixiType]
             field_names: vixi_json_strings(doc, json_object_get(doc, node, "field_names")),
             field_types: vixi_json_strings(doc, json_object_get(doc, node, "field_types")),
             variant_names: vixi_json_strings(doc, json_object_get(doc, node, "variant_names")),
-            variant_payload_types: vixi_json_strings(doc, json_object_get(doc, node, "variant_payload_types"))
+            variant_payload_types: vixi_json_strings(doc, json_object_get(doc, node, "variant_payload_types")),
+            is_pub: json_int_at(doc, json_object_get(doc, node, "is_pub"))
         })
     }
     return out
@@ -373,6 +383,7 @@ pub fn vixi_parse(text: string): VixiModule
     m.format = json_int_at(doc, json_object_get(doc, root, "vixi"))
     m.path = json_string_at(doc, json_object_get(doc, root, "path"))
     m.source_hash = json_string_at(doc, json_object_get(doc, root, "source_hash"))
+    m.interface_hash = json_string_at(doc, json_object_get(doc, root, "interface_hash"))
     m.compiler = json_string_at(doc, json_object_get(doc, root, "compiler"))
     m.dep_paths = vixi_json_strings(doc, json_object_get(doc, root, "dep_paths"))
     m.dep_hashes = vixi_json_strings(doc, json_object_get(doc, root, "dep_hashes"))
@@ -390,14 +401,17 @@ pub fn vixi_parse(text: string): VixiModule
 
 // Validity: all three ways a cached interface can go stale.
 
-pub fn vixi_is_valid(m: VixiModule, source_hash: string, compiler: string,
-                     dep_paths: [string], dep_hashes: [string]): i32
+pub fn vixi_is_valid(m: VixiModule, expected_path: string, source_hash: string,
+                     compiler: string, dep_paths: [string], dep_hashes: [string]): i32
 {
     if (m.ok == 0) { return 0 }
     if (m.format != vixi_format()) { return 0 }
+    if (m.path != expected_path) { return 0 }
     if (m.source_hash != source_hash) { return 0 }
     if (m.compiler != compiler) { return 0 }
-    if (m.dep_paths.length != dep_paths.length) { return 0 }
+    if (m.interface_hash == "") { return 0 }
+    if (m.interface_hash != vixi_interface_hash(m)) { return 0 }
+    if (m.dep_paths.length != dep_paths.length or m.dep_hashes.length != dep_hashes.length) { return 0 }
     for (i in 0 .. dep_paths.length)
     {
         let mut found = 0
@@ -446,19 +460,22 @@ pub fn vixi_collect(program: AstProgram, path: string, compiler: string,
     for (i in 0 .. program.functions.length)
     {
         let f = program.functions[i]
+        if (f.is_pub == 0) { continue }
         m.functions.push(VixiFunction{
             name: f.name,
             type_params: f.type_params,
             param_names: f.param_names,
             param_types: f.param_types,
             ret_ty: f.ret_ty,
-            is_var_arg: f.is_var_arg
+            is_var_arg: f.is_var_arg,
+            is_pub: f.is_pub
         })
     }
 
     for (s in 0 .. program.structs.length)
     {
         let st = program.structs[s]
+        if (st.is_pub == 0) { continue }
         m.types.push(VixiType{
             kind: "struct",
             name: st.name,
@@ -466,13 +483,15 @@ pub fn vixi_collect(program: AstProgram, path: string, compiler: string,
             field_names: st.field_names,
             field_types: st.field_types,
             variant_names: [],
-            variant_payload_types: []
+            variant_payload_types: [],
+            is_pub: st.is_pub
         })
     }
 
     for (a in 0 .. program.adts.length)
     {
         let ad = program.adts[a]
+        if (ad.is_pub == 0) { continue }
         m.types.push(VixiType{
             kind: "adt",
             name: ad.name,
@@ -480,7 +499,8 @@ pub fn vixi_collect(program: AstProgram, path: string, compiler: string,
             field_names: [],
             field_types: [],
             variant_names: ad.variant_names,
-            variant_payload_types: ad.variant_payload_types
+            variant_payload_types: ad.variant_payload_types,
+            is_pub: ad.is_pub
         })
     }
 

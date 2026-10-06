@@ -18,17 +18,21 @@ import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MODULE_A = """type Point = struct {
+MODULE_A = """pub type Point = struct {
     x: i32,
     y: i32
 }
 
-type Colour = Red | Green
+pub type Colour = Red | Green
+
+type Secret = Hidden | Gone
 
 pub fn add(a: i32, b: i32): i32
 {
     return a + b
 }
+
+fn hidden(value: i32): i32 { return value }
 
 pub fn id:[T](value: T): T
 {
@@ -42,14 +46,14 @@ MODULE_A_REORDERED = """pub fn id:[T](value: T): T
     return value
 }
 
-type Colour = Red | Green
+pub type Colour = Red | Green
 
 pub fn add(a: i32, b: i32): i32
 {
     return a + b
 }
 
-type Point = struct {
+pub type Point = struct {
     x: i32,
     y: i32
 }
@@ -105,6 +109,21 @@ def main():
             print("vixi e2e: FAIL generics not preserved")
             failed += 1
 
+        if any(f["name"] == "hidden" for f in first["functions"]):
+            print("vixi e2e: FAIL private function leaked into interface")
+            failed += 1
+        if any(t["name"] == "Secret" for t in first["types"]):
+            print("vixi e2e: FAIL private type leaked into interface")
+            failed += 1
+        if any(f["name"] == "hidden" for f in first["functions"]):
+            print("vixi e2e: FAIL private function leaked")
+            failed += 1
+        if any(t["name"] == "Secret" for t in first["types"]):
+            print("vixi e2e: FAIL private type leaked")
+            failed += 1
+        if any(f["is_pub"] != 1 for f in first["functions"]):
+            print("vixi e2e: FAIL exported function is not marked pub")
+            failed += 1
         kinds = sorted(t["kind"] for t in first["types"])
         if kinds != ["adt", "struct"]:
             print("vixi e2e: FAIL type kinds are %r" % (kinds,))

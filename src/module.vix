@@ -394,7 +394,7 @@ pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name:
     if (cached_text != "" and deps_complete == 1)
     {
         let cached = vixi_parse(cached_text)
-        if (vixi_is_valid(cached, vixi_source_hash(src), vixi_compiler_id(), dep_paths, dep_hashes) == 1)
+        if (vixi_is_valid(cached, path_normalize(located), vixi_source_hash(src), vixi_compiler_id(), dep_paths, dep_hashes) == 1)
         {
             loader.graph.modules[mod_idx].vixi_valid = 1
             loader.graph.modules[mod_idx].interface_hash = vixi_interface_hash(cached)
@@ -879,6 +879,7 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
                 param_types: f.param_types,
                 type_params: f.type_params,
                 is_var_arg: f.is_var_arg,
+                is_pub: f.is_pub,
                 receiver_kind: f.receiver_kind,
                 receiver_type: f.receiver_type,
                 line: f.line,

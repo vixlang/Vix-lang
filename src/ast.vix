@@ -147,6 +147,7 @@ pub type AstFunction = struct {
     receiver_type: string,
     line: i32,
     col: i32
+    is_pub: i32,
 }
 
 pub type AstStructDecl = struct {
@@ -156,6 +157,7 @@ pub type AstStructDecl = struct {
     is_c_abi: i32,
     line: i32,
     col: i32
+    is_pub: i32,
 }
 
 pub type AstAdtDecl = struct {
@@ -165,6 +167,7 @@ pub type AstAdtDecl = struct {
     variant_payload_types: [string],
     line: i32,
     col: i32
+    is_pub: i32,
 }
 
 // Module declaration: `mod math` or `pub mod math`
@@ -474,17 +477,26 @@ pub fn ast_function_full_vararg(name: string, ret_ty: string, body_idx: i32, par
 
 pub fn ast_function_generic_full_vararg(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], is_var_arg: i32): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, receiver_kind: ReceiverNone, receiver_type: "", $ast_default_loc_fields() }
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, receiver_kind: ReceiverNone, receiver_type: "", is_pub: 0, $ast_default_loc_fields() }
 }
 
 pub fn ast_function_method(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], receiver_kind: ReceiverKind, receiver_type: string): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: 0, receiver_kind: receiver_kind, receiver_type: receiver_type, $ast_default_loc_fields() }
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: 0, receiver_kind: receiver_kind, receiver_type: receiver_type, is_pub: 0, $ast_default_loc_fields() }
 }
 
 pub fn ast_function_with_loc(func: AstFunction, line: i32, col: i32): AstFunction
 {
-    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, type_params: func.type_params, is_var_arg: func.is_var_arg, receiver_kind: func.receiver_kind, receiver_type: func.receiver_type, line: line, col: col }
+    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, type_params: func.type_params, is_var_arg: func.is_var_arg, receiver_kind: func.receiver_kind, receiver_type: func.receiver_type, is_pub: func.is_pub, line: line, col: col }
+}
+
+// pub is kept on the declaration rather than dropped, so an interface file can
+// say what a module actually exports and a later pass can enforce it.
+pub fn ast_function_mark_pub(func: AstFunction, is_pub: i32): AstFunction
+{
+    let mut marked = func
+    marked.is_pub = is_pub
+    return marked
 }
 
 pub fn ast_program_ok(function: AstFunction, expr_store: ExprStore, store: StmtStore): AstProgram
