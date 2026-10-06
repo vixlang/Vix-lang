@@ -1,5 +1,5 @@
 #[no_main]
-include "builder.vix"
+use "builder.vix" as __inc_builder_1
 
 extern "C"
 {

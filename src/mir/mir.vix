@@ -1,10 +1,10 @@
 #[no_main]
-include "ast.vix"
-include "builder.vix"
-include "method.vix"
-include "method_decl.vix"
-include "mir_builder.vix"
-include "type/typeck.vix"
+use "ast.vix" as __inc_ast_1
+use "builder.vix" as __inc_builder_2
+use "method.vix" as __inc_method_3
+use "method_decl.vix" as __inc_method_decl_4
+use "mir_builder.vix" as __inc_mir_builder_5
+use "type/typeck.vix" as __inc_type_typeck_6
 
 pub type MirValue = struct {
     name: string,

@@ -1,4 +1,4 @@
-include "ast.vix"
+use "ast.vix" as __inc_ast_1
 
 fn json_ast_escape(text: string): string
 {

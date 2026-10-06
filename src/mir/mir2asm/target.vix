@@ -1,5 +1,5 @@
 #[no_main]
-include "types.vix"
+use "types.vix" as __inc_types_1
 
 extern "C"
 {

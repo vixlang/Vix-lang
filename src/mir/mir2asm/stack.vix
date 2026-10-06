@@ -1,7 +1,7 @@
 #[no_main]
-include "types.vix"
-include "target.vix"
-include "registers.vix"
+use "types.vix" as __inc_types_1
+use "target.vix" as __inc_target_2
+use "registers.vix" as __inc_registers_3
 
 pub fn mir2asm_label(b: &MirAsm, name: string): string => b.fn_name + "__" + mir2asm_clean_name(name)
 

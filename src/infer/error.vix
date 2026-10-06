@@ -1,7 +1,7 @@
 #[no_main]
 
-include "../util/pos.vix"
-include "../type/ty.vix"
+use "../util/pos.vix" as __inc____util_pos_1
+use "../type/ty.vix" as __inc____type_ty_2
 
 pub type InferErrorKind = InferUnboundName | InferMismatch | InferOccursCheck | InferArity | InferNotCallable | InferNoField | InferOther
 

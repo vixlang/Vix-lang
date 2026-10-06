@@ -1,5 +1,5 @@
 #[no_main]
-include "lexer.vix"
+use "lexer.vix" as __inc_lexer_1
 
 pub type ImportSet = struct {
     paths: [string]

@@ -1,7 +1,7 @@
 #[no_main]
 
-include "lexer.vix"
-include "diag.vix"
+use "lexer.vix" as __inc_lexer_1
+use "diag.vix" as __inc_diag_2
 
 extern "C"
 {

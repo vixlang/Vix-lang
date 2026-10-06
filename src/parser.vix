@@ -1,9 +1,9 @@
 #[no_main]
-include "lexer.vix"
-include "ast.vix"
-include "error.vix"
-include "method.vix"
-include "preprocess.vix"
+use "lexer.vix" as __inc_lexer_1
+use "ast.vix" as __inc_ast_2
+use "error.vix" as __inc_error_3
+use "method.vix" as __inc_method_4
+use "preprocess.vix" as __inc_preprocess_5
 
 pub type Parser = struct {
     stream: TokenStream,

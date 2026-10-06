@@ -1,7 +1,7 @@
 #[no_main]
-include "../mir2asm/mod.vix"
-include "../lir/mod.vix"
-include "x86_64/mod.vix"
+use "../mir2asm/mod.vix" as __inc____mir2asm_mod_1
+use "../lir/mod.vix" as __inc____lir_mod_2
+use "x86_64/mod.vix" as __inc_x86_64_mod_3
 
 extern "C" { fn vix_print_stderr(s: string) }
 

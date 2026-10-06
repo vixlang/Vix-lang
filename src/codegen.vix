@@ -1,10 +1,10 @@
 #[no_main]
-include "ast.vix"
-include "builder.vix"
-include "method.vix"
-include "method_decl.vix"
-include "semantic.vix"
-include "module.vix"
+use "ast.vix" as __inc_ast_1
+use "builder.vix" as __inc_builder_2
+use "method.vix" as __inc_method_3
+use "method_decl.vix" as __inc_method_decl_4
+use "semantic.vix" as __inc_semantic_5
+use "module.vix" as __inc_module_6
 
 extern "C"
 {

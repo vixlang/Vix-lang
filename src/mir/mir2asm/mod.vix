@@ -1,8 +1,8 @@
 #[no_main]
-include "types.vix"
-include "target.vix"
-include "registers.vix"
-include "stack.vix"
-include "machine.vix"
-include "x86_64/mod.vix"
-include "emit.vix"
+use "types.vix" as __inc_types_1
+use "target.vix" as __inc_target_2
+use "registers.vix" as __inc_registers_3
+use "stack.vix" as __inc_stack_4
+use "machine.vix" as __inc_machine_5
+use "x86_64/mod.vix" as __inc_x86_64_mod_6
+use "emit.vix" as __inc_emit_7

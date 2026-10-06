@@ -1,7 +1,7 @@
 #[no_main]
 
-include "method_decl.vix"
-include "receiver.vix"
+use "method_decl.vix" as __inc_method_decl_1
+use "receiver.vix" as __inc_receiver_2
 
 extern "C"
 {

@@ -1,6 +1,6 @@
 #[no_main]
 
-include "../infer/solver.vix"
+use "../infer/solver.vix" as __inc____infer_solver_1
 
 extern "C"
 {

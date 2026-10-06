@@ -1,5 +1,5 @@
 #[no_main]
-include "ast.vix"
+use "ast.vix" as __inc_ast_1
 
 pub fn desugar_type_base(ty: string): string
 {

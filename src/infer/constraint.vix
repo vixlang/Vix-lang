@@ -1,7 +1,7 @@
 #[no_main]
 
-include "../type/ty.vix"
-include "../util/pos.vix"
+use "../type/ty.vix" as __inc____type_ty_1
+use "../util/pos.vix" as __inc____util_pos_2
 
 pub type Constraint = ConstraintEq(i32)
 

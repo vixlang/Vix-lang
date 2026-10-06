@@ -6,8 +6,8 @@
 
 #[no_main]
 
-include "intrinsic.vix"
-include "receiver.vix"
+use "intrinsic.vix" as __inc_intrinsic_1
+use "receiver.vix" as __inc_receiver_2
 
 // A declared receiver method, indexed by receiver type and short name.
 pub type MethodSignature = struct {

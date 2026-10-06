@@ -1,5 +1,5 @@
 #[no_main]
-include "x86_64/mod.vix"
+use "x86_64/mod.vix" as __inc_x86_64_mod_1
 
 pub fn mir2asm_debug(mir: string): string => mir2asm_x86_64_debug(mir, 1)
 

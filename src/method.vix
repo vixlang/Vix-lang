@@ -20,10 +20,10 @@
 
 #[no_main]
 
-include "ast.vix"
-include "intrinsic.vix"
-include "method_decl.vix"
-include "receiver.vix"
+use "ast.vix" as __inc_ast_1
+use "intrinsic.vix" as __inc_intrinsic_2
+use "method_decl.vix" as __inc_method_decl_3
+use "receiver.vix" as __inc_receiver_4
 
 extern "C"
 {

@@ -1,10 +1,10 @@
 #[no_main]
 
-include "../type/ty.vix"
-include "../type/subst.vix"
-include "../util/pos.vix"
-include "constraint.vix"
-include "error.vix"
+use "../type/ty.vix" as __inc____type_ty_1
+use "../type/subst.vix" as __inc____type_subst_2
+use "../util/pos.vix" as __inc____util_pos_3
+use "constraint.vix" as __inc_constraint_4
+use "error.vix" as __inc_error_5
 
 pub type UnifyResult = struct {
     ok: i32,
