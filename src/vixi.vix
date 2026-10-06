@@ -1,0 +1,468 @@
+#[no_main]
+
+// Vix interface files (.vixi)
+//
+// One .vixi describes one module: the signatures of its declarations plus the
+// hashes that decide whether the file is still usable.  It is a cache, never a
+// build input -- deleting every .vixi must not change a single byte of the
+// compiler's output.
+//
+// Validity is a three-way question:
+//   1. the module source changed            -> source_hash
+//   2. the compiler changed                 -> compiler
+//   3. any module this one depends on
+//      changed its interface                 -> dep_paths / dep_hashes
+//
+// (3) is the one that is easy to forget and expensive to get wrong: without it a
+// stale interface is accepted whenever the dependent file itself is untouched.
+
+import "json.vix"
+import "lexer.vix"
+import "ast.vix"
+
+extern "C"
+{
+    fn compiler_string_byte(text: string, index: i32): i32
+    fn malloc(size: usize): string
+}
+
+pub type VixiFunction = struct {
+    name: string,
+    type_params: [string],
+    param_names: [string],
+    param_types: [string],
+    ret_ty: string,
+    is_var_arg: i32
+}
+
+pub type VixiType = struct {
+    kind: string,
+    name: string,
+    type_params: [string],
+    field_names: [string],
+    field_types: [string],
+    variant_names: [string],
+    variant_payload_types: [string]
+}
+
+pub type VixiModule = struct {
+    format: i32,
+    path: string,
+    source_hash: string,
+    compiler: string,
+    dep_paths: [string],
+    dep_hashes: [string],
+    functions: [VixiFunction],
+    types: [VixiType],
+    ok: i32,
+    error: string
+}
+
+pub fn vixi_quote_mark(): string { return char_string(34) }
+pub fn vixi_backslash(): string { return char_string(92) }
+
+pub fn vixi_format(): i32
+{
+    return 1
+}
+
+pub fn vixi_module_new(): VixiModule
+{
+    return VixiModule{
+        format: vixi_format(),
+        path: "",
+        source_hash: "",
+        compiler: "",
+        dep_paths: [],
+        dep_hashes: [],
+        functions: [],
+        types: [],
+        ok: 1,
+        error: ""
+    }
+}
+
+// Hashing: Adler-32.  Every intermediate value stays far below 2^31, so it
+// cannot overflow a Vix i32.  A cache key does not need to be cryptographic, it
+// needs to never be wrong about "did this change".
+
+pub fn vixi_hex_digit(value: i32): string
+{
+    if (value < 10) { return char_string(48 + value) }
+    return char_string(87 + value)
+}
+
+pub fn vixi_hex_byte(value: i32): string
+{
+    let v = if (value < 0) { value + 256 } else { value }
+    return vixi_hex_digit((v / 16) % 16) + vixi_hex_digit(v % 16)
+}
+
+pub fn vixi_hex32(value: i32): string
+{
+    let v = if (value < 0) { value * (-1) } else { value }
+    return vixi_hex_byte((v / 16777216) % 256)
+        + vixi_hex_byte((v / 65536) % 256)
+        + vixi_hex_byte((v / 256) % 256)
+        + vixi_hex_byte(v % 256)
+}
+
+pub fn vixi_hash_text(text: string): string
+{
+    let mut a = 1
+    let mut b = 0
+    for (i in 0 .. text.length)
+    {
+        a = (a + compiler_string_byte(text, i)) % 65521
+        b = (b + a) % 65521
+    }
+    return vixi_hex32(b * 65536 + a)
+}
+
+pub fn vixi_source_hash(source: string): string
+{
+    return vixi_hash_text(source)
+}
+
+// Canonical text of everything a consumer of this module can reach.  The
+// interface hash is the hash of this text.
+//
+// The text keeps declaration order, so reordering a module also invalidates its
+// dependents.  That is deliberately conservative: over-invalidating a cache
+// costs a re-check, while under-invalidating it silently accepts a stale
+// interface.
+pub fn vixi_signature_text(m: VixiModule): string
+{
+    let mut out = "vixi " + i32_to_str(m.format) + "|"
+    for (i in 0 .. m.functions.length)
+    {
+        let f = m.functions[i]
+        if (f.is_var_arg == 1) { out = out + "vararg " }
+        out = out + "fn " + f.name + ":["
+        for (t in 0 .. f.type_params.length)
+        {
+            if (t > 0) { out = out + "," }
+            out = out + f.type_params[t]
+        }
+        out = out + "]("
+        for (p in 0 .. f.param_names.length)
+        {
+            if (p > 0) { out = out + "," }
+            out = out + f.param_names[p] + ":" + f.param_types[p]
+        }
+        out = out + ")->" + f.ret_ty + ";"
+    }
+    for (j in 0 .. m.types.length)
+    {
+        let t = m.types[j]
+        out = out + t.kind + " " + t.name + ":["
+        for (g in 0 .. t.type_params.length)
+        {
+            if (g > 0) { out = out + "," }
+            out = out + t.type_params[g]
+        }
+        out = out + "]"
+        if (t.kind == "struct")
+        {
+            out = out + "{"
+            for (k in 0 .. t.field_names.length)
+            {
+                if (k > 0) { out = out + "," }
+                out = out + t.field_names[k] + ":" + t.field_types[k]
+            }
+            out = out + "}"
+        }
+        else
+        {
+            for (v in 0 .. t.variant_names.length)
+            {
+                out = out + "|" + t.variant_names[v]
+                if (t.variant_payload_types[v] != "") { out = out + "(" + t.variant_payload_types[v] + ")" }
+            }
+        }
+        out = out + ";"
+    }
+    return out
+}
+
+pub fn vixi_interface_hash(m: VixiModule): string
+{
+    return vixi_hash_text(vixi_signature_text(m))
+}
+
+// JSON emission (compact).
+
+pub fn vixi_json_quote(text: string): string
+{
+    let q = vixi_quote_mark()
+    let bs = vixi_backslash()
+    let mut out = q
+    for (i in 0 .. text.length)
+    {
+        let byte = compiler_string_byte(text, i)
+        if (byte == 34) { out = out + bs + q }
+        elif (byte == 92) { out = out + bs + bs }
+        elif (byte == 10) { out = out + bs + char_string(110) }
+        elif (byte == 13) { out = out + bs + char_string(114) }
+        elif (byte == 9) { out = out + bs + char_string(116) }
+        elif (byte < 32) { out = out + bs + char_string(117) + "00" + vixi_hex_byte(byte) }
+        else { out = out + char_string(byte) }
+    }
+    return out + q
+}
+
+pub fn vixi_json_string_array(items: [string]): string
+{
+    let mut out = "["
+    for (i in 0 .. items.length)
+    {
+        if (i > 0) { out = out + "," }
+        out = out + vixi_json_quote(items[i])
+    }
+    return out + "]"
+}
+
+pub fn vixi_json_function(func: VixiFunction): string
+{
+    let q = vixi_quote_mark()
+    let mut out = "{" + q + "name" + q + ":" + vixi_json_quote(func.name)
+    out = out + "," + q + "type_params" + q + ":" + vixi_json_string_array(func.type_params)
+    out = out + "," + q + "param_names" + q + ":" + vixi_json_string_array(func.param_names)
+    out = out + "," + q + "param_types" + q + ":" + vixi_json_string_array(func.param_types)
+    out = out + "," + q + "ret_ty" + q + ":" + vixi_json_quote(func.ret_ty)
+    out = out + "," + q + "is_var_arg" + q + ":" + i32_to_str(func.is_var_arg) + "}"
+    return out
+}
+
+pub fn vixi_json_type(ty: VixiType): string
+{
+    let q = vixi_quote_mark()
+    let mut out = "{" + q + "kind" + q + ":" + vixi_json_quote(ty.kind)
+    out = out + "," + q + "name" + q + ":" + vixi_json_quote(ty.name)
+    out = out + "," + q + "type_params" + q + ":" + vixi_json_string_array(ty.type_params)
+    out = out + "," + q + "field_names" + q + ":" + vixi_json_string_array(ty.field_names)
+    out = out + "," + q + "field_types" + q + ":" + vixi_json_string_array(ty.field_types)
+    out = out + "," + q + "variant_names" + q + ":" + vixi_json_string_array(ty.variant_names)
+    out = out + "," + q + "variant_payload_types" + q + ":" + vixi_json_string_array(ty.variant_payload_types)
+    return out + "}"
+}
+
+pub fn vixi_emit(m: VixiModule): string
+{
+    let q = vixi_quote_mark()
+    let mut out = "{" + q + "vixi" + q + ":" + i32_to_str(m.format)
+    out = out + "," + q + "path" + q + ":" + vixi_json_quote(m.path)
+    out = out + "," + q + "source_hash" + q + ":" + vixi_json_quote(m.source_hash)
+    out = out + "," + q + "compiler" + q + ":" + vixi_json_quote(m.compiler)
+    out = out + "," + q + "interface_hash" + q + ":" + vixi_json_quote(vixi_interface_hash(m))
+    out = out + "," + q + "dep_paths" + q + ":" + vixi_json_string_array(m.dep_paths)
+    out = out + "," + q + "dep_hashes" + q + ":" + vixi_json_string_array(m.dep_hashes)
+
+    out = out + "," + q + "functions" + q + ":["
+    for (f in 0 .. m.functions.length)
+    {
+        if (f > 0) { out = out + "," }
+        out = out + vixi_json_function(m.functions[f])
+    }
+    out = out + "]"
+
+    out = out + "," + q + "types" + q + ":["
+    for (t in 0 .. m.types.length)
+    {
+        if (t > 0) { out = out + "," }
+        out = out + vixi_json_type(m.types[t])
+    }
+    out = out + "]}"
+    return out
+}
+
+// JSON parsing.
+
+pub fn vixi_json_strings(doc: JsonDocument, index: i32): [string]
+{
+    let mut out: [string] = []
+    if (index < 0) { return out }
+    for (i in 0 .. json_array_length(doc, index))
+    {
+        out.push(json_string_at(doc, json_array_item(doc, index, i)))
+    }
+    return out
+}
+
+pub fn vixi_parse_functions(doc: JsonDocument, root: i32): [VixiFunction]
+{
+    let mut out: [VixiFunction] = []
+    let fns = json_object_get(doc, root, "functions")
+    if (fns < 0) { return out }
+    for (i in 0 .. json_array_length(doc, fns))
+    {
+        let node = json_array_item(doc, fns, i)
+        if (node < 0) { continue }
+        out.push(VixiFunction{
+            name: json_string_at(doc, json_object_get(doc, node, "name")),
+            type_params: vixi_json_strings(doc, json_object_get(doc, node, "type_params")),
+            param_names: vixi_json_strings(doc, json_object_get(doc, node, "param_names")),
+            param_types: vixi_json_strings(doc, json_object_get(doc, node, "param_types")),
+            ret_ty: json_string_at(doc, json_object_get(doc, node, "ret_ty")),
+            is_var_arg: json_int_at(doc, json_object_get(doc, node, "is_var_arg"))
+        })
+    }
+    return out
+}
+
+pub fn vixi_parse_types(doc: JsonDocument, root: i32): [VixiType]
+{
+    let mut out: [VixiType] = []
+    let tys = json_object_get(doc, root, "types")
+    if (tys < 0) { return out }
+    for (j in 0 .. json_array_length(doc, tys))
+    {
+        let node = json_array_item(doc, tys, j)
+        if (node < 0) { continue }
+        out.push(VixiType{
+            kind: json_string_at(doc, json_object_get(doc, node, "kind")),
+            name: json_string_at(doc, json_object_get(doc, node, "name")),
+            type_params: vixi_json_strings(doc, json_object_get(doc, node, "type_params")),
+            field_names: vixi_json_strings(doc, json_object_get(doc, node, "field_names")),
+            field_types: vixi_json_strings(doc, json_object_get(doc, node, "field_types")),
+            variant_names: vixi_json_strings(doc, json_object_get(doc, node, "variant_names")),
+            variant_payload_types: vixi_json_strings(doc, json_object_get(doc, node, "variant_payload_types"))
+        })
+    }
+    return out
+}
+
+pub fn vixi_parse(text: string): VixiModule
+{
+    let mut m = vixi_module_new()
+    let doc = json_parse(text)
+    if (doc.ok == 0)
+    {
+        m.ok = 0
+        m.error = "not valid JSON"
+        return m
+    }
+    let root = json_root(doc)
+    if (root < 0)
+    {
+        m.ok = 0
+        m.error = "empty interface file"
+        return m
+    }
+
+    m.format = json_int_at(doc, json_object_get(doc, root, "vixi"))
+    m.path = json_string_at(doc, json_object_get(doc, root, "path"))
+    m.source_hash = json_string_at(doc, json_object_get(doc, root, "source_hash"))
+    m.compiler = json_string_at(doc, json_object_get(doc, root, "compiler"))
+    m.dep_paths = vixi_json_strings(doc, json_object_get(doc, root, "dep_paths"))
+    m.dep_hashes = vixi_json_strings(doc, json_object_get(doc, root, "dep_hashes"))
+    m.functions = vixi_parse_functions(doc, root)
+    m.types = vixi_parse_types(doc, root)
+
+    if (m.format != vixi_format())
+    {
+        m.ok = 0
+        m.error = "interface format " + i32_to_str(m.format) + " is not supported (expected " + i32_to_str(vixi_format()) + ")"
+        return m
+    }
+    return m
+}
+
+// Validity: all three ways a cached interface can go stale.
+
+pub fn vixi_is_valid(m: VixiModule, source_hash: string, compiler: string,
+                     dep_paths: [string], dep_hashes: [string]): i32
+{
+    if (m.ok == 0) { return 0 }
+    if (m.format != vixi_format()) { return 0 }
+    if (m.source_hash != source_hash) { return 0 }
+    if (m.compiler != compiler) { return 0 }
+    if (m.dep_paths.length != dep_paths.length) { return 0 }
+    for (i in 0 .. dep_paths.length)
+    {
+        let mut found = 0
+        for (j in 0 .. m.dep_paths.length)
+        {
+            if (m.dep_paths[j] == dep_paths[i] and m.dep_hashes[j] == dep_hashes[i]) { found = 1 }
+        }
+        if (found == 0) { return 0 }
+    }
+    return 1
+}
+
+pub fn vixi_path_for(source_path: string): string
+{
+    if (source_path.length >= 4)
+    {
+        let tail = source_path.length - 4
+        if (compiler_string_byte(source_path, tail) == '.'
+            and compiler_string_byte(source_path, tail + 1) == 'v'
+            and compiler_string_byte(source_path, tail + 2) == 'i'
+            and compiler_string_byte(source_path, tail + 3) == 'x')
+        {
+            let mut out = ""
+            for (i in 0 .. tail) { out = out + char_string(compiler_string_byte(source_path, i)) }
+            return out + ".vixi"
+        }
+    }
+    return source_path + ".vixi"
+}
+
+// Collecting an interface from a checked program.
+//
+// Visibility is not enforced yet: "pub" is parsed and then dropped, so every
+// top-level declaration is reachable.  Listing all of them is therefore the
+// honest answer, and it is exactly what a consumer can use.
+pub fn vixi_collect(program: AstProgram, path: string, compiler: string,
+                    source: string, dep_paths: [string], dep_hashes: [string]): VixiModule
+{
+    let mut m = vixi_module_new()
+    m.path = path
+    m.compiler = compiler
+    m.source_hash = vixi_source_hash(source)
+    m.dep_paths = dep_paths
+    m.dep_hashes = dep_hashes
+
+    for (i in 0 .. program.functions.length)
+    {
+        let f = program.functions[i]
+        m.functions.push(VixiFunction{
+            name: f.name,
+            type_params: f.type_params,
+            param_names: f.param_names,
+            param_types: f.param_types,
+            ret_ty: f.ret_ty,
+            is_var_arg: f.is_var_arg
+        })
+    }
+
+    for (s in 0 .. program.structs.length)
+    {
+        let st = program.structs[s]
+        m.types.push(VixiType{
+            kind: "struct",
+            name: st.name,
+            type_params: [],
+            field_names: st.field_names,
+            field_types: st.field_types,
+            variant_names: [],
+            variant_payload_types: []
+        })
+    }
+
+    for (a in 0 .. program.adts.length)
+    {
+        let ad = program.adts[a]
+        m.types.push(VixiType{
+            kind: "adt",
+            name: ad.name,
+            type_params: ad.type_params,
+            field_names: [],
+            field_types: [],
+            variant_names: ad.variant_names,
+            variant_payload_types: ad.variant_payload_types
+        })
+    }
+
+    return m
+}

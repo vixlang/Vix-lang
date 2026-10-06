@@ -8,3 +8,5 @@ build/vixc-seed-gc
 .codex
 .pytest_cache
 .venv
+# module interface files (cache)
+*.vixi

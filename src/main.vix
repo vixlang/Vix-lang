@@ -36,7 +36,7 @@ fn compiler_mode(arg: string): CompilerModeResult
     return match arg {
         "-h" | "--help" -> CompilerModeName("--help")
         "-v" | "--version" -> CompilerModeName("--version")
-        "--lex" | "--parse-stats" | "--parser" | "--ast" | "-ast" | "--ast-json" | "--typeinfer" | "--tyinfer" | "--semantic" | "--check" | "--ownership-check" | "--module-graph" | "-ll" | "-obj" | "-S" -> CompilerModeName(arg)
+        "--lex" | "--parse-stats" | "--parser" | "--ast" | "-ast" | "--ast-json" | "--typeinfer" | "--tyinfer" | "--semantic" | "--check" | "--ownership-check" | "--module-graph" | "--emit-vixi" | "-ll" | "-obj" | "-S" -> CompilerModeName(arg)
         "--fmt" | "--fmt-check" -> CompilerModeName(arg)
         _ -> CompilerModeUnknown
     }
@@ -182,6 +182,7 @@ fn print_help(): i32
     print("  --semantic             Print semantic analysis to stdout")
     print("  --debug=<typed-mir|mir|lir|asm|llvm> Print selected intermediate output to stdout")
     print("  --module-graph         Print the module dependency graph and exit")
+    print("  --emit-vixi            Write the module interface file (<src>.vixi) and exit")
     print("  --explan=ERRORCODE     Explain a compiler error code, for example E3001")
     print("  --fmt                  Format the input file in place (use -o for another path, -o - for stdout)")
     print("  --fmt-check            Exit non zero when the input file is not formatted")
@@ -194,9 +195,16 @@ fn print_help(): i32
     return 0
 }
 
+// Identity of the compiler that produced an interface file.  A .vixi written by
+// a different compiler is not trusted, so this string is part of its validity.
+fn compiler_id(): string
+{
+    return "vixc 0.5.1"
+}
+
 fn print_version(): i32
 {
-    print("vixc 0.5.1")
+    print(compiler_id())
     return 0
 }
 
@@ -351,6 +359,23 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         "--module-graph" -> {
             let g = module_graph_build(filename)
             info_print(module_graph_debug(g))
+            return mode_success()
+        }
+        "--emit-vixi" -> {
+            let prog = parse_program(src, filename)
+            if (prog.ok == 0)
+            {
+                diag_print(prog.error)
+                return mode_failure()
+            }
+            let interface_path = if (output != "") { output } else { vixi_path_for(filename) }
+            let interface_module = vixi_collect(prog, filename, compiler_id(), src, [], [])
+            if (write_text_file(interface_path, vixi_emit(interface_module)) != 0)
+            {
+                diag_print("vixc: error: cannot write interface file '" + interface_path + "'")
+                return mode_failure()
+            }
+            print(interface_path)
             return mode_success()
         }
         _ -> {}
