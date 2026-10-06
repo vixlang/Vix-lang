@@ -2254,6 +2254,34 @@ pub fn parse_mod_decl(parser: &Parser): AstModDecl
 
 // `import math` or `import math::add` or `import math::add as plus`
 // Note: quoted imports are legacy preprocessor imports and are ignored in raw mode.
+// use "path.vix" as name
+//
+// The path identifies the module, the alias names it.  Neither is derived from
+// the other, which is the point: five files in this tree are called mod.vix, so
+// guessing a namespace from a file name cannot work.
+pub fn parse_use_decl(parser: &Parser): AstImportDecl
+{
+    let line = parser_line(parser)
+    let col  = parser_col(parser)
+    let empty = AstImportDecl{ path: [], alias: "", line: line, col: col }
+    if (parser_expect_text(parser, "use") == 0) { return empty }
+    if (stream_kind_at(parser.stream, parser.pos) != tk_string())
+    {
+        parser_fail(parser, "expected a quoted module path after 'use'")
+        return empty
+    }
+    let path = parser_text(parser)
+    parser_advance(parser)
+    if (parser_expect_text(parser, "as") == 0)
+    {
+        parser_fail(parser, "the 'use' statement needs an explicit alias: use <path> as <name>")
+        return empty
+    }
+    let alias = parser_text(parser)
+    if (parser_expect_kind(parser, tk_ident()) == 0) { return empty }
+    return AstImportDecl{ path: [path], alias: alias, line: line, col: col }
+}
+
 pub fn parse_import_decl(parser: &Parser): AstImportDecl
 {
     let line = parser_line(parser)
@@ -2347,6 +2375,13 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
             let mdecl = parse_mod_decl(&parser)
             if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             mod_decls.push(mdecl)
+        }
+        // use "path.vix" as alias
+        elif (parser_text(&parser) == "use")
+        {
+            let udecl = parse_use_decl(&parser)
+            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            import_decls.push(udecl)
         }
         // `import module::symbol` used to be parsed and then dropped without a
         // word, so it looked like it worked.  Reject it instead: the symbol is
@@ -2497,6 +2532,12 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
         let mdecl = parse_mod_decl(&parser)
         if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
         mod_decls.push(mdecl)
+    }
+    elif (parser_text(&parser) == "use")
+    {
+        let udecl = parse_use_decl(&parser)
+        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        import_decls.push(udecl)
     }
     elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
     {

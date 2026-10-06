@@ -231,6 +231,14 @@ pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, s
         let text = stream_text_at(stream, i)
         let mut is_pub = 0
         let mut at     = i
+        if (text == "use" and i + 3 < len and stream_kind_at(stream, i + 1) == tk_string()
+            and stream_text_at(stream, i + 2) == "as" and stream_kind_at(stream, i + 3) == tk_ident())
+        {
+            ml_load_module_named(loader, parent_idx, stream_text_at(stream, i + 1),
+                                 stream_text_at(stream, i + 3), 0, src_path)
+            i = i + 4
+            continue
+        }
         if (text == "pub" and i + 1 < len and stream_text_at(stream, i + 1) == "mod")
         {
             is_pub = 1
@@ -260,6 +268,18 @@ pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, s
 
 pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_pub: i32, parent_path: string)
 {
+    ml_load_module_named(loader, parent_idx, name, name, is_pub, parent_path)
+}
+
+// Loads a module whose on-disk name and namespace name differ.
+//
+//   mod "utils/string.vix"      -> both are the path, namespace follows it
+//   use "utils/string.vix" as s -> locate is the path, namespace is "s"
+//
+// Separating them is what lets use pick its own namespace instead of inheriting
+// one from the file name (five files in this tree are called mod.vix).
+pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name: string, ns_name: string, is_pub: i32, parent_path: string)
+{
     let parent_qname = if (parent_idx < 0)
     {
         "root"
@@ -268,7 +288,7 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
     {
         loader.graph.modules[parent_idx].id.qualified_name
     }
-    let qname    = parent_qname + "::" + name
+    let qname    = parent_qname + "::" + ns_name
     let base_dir = ml_dirname(parent_path)
 
     // cycle check
@@ -290,13 +310,13 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
     }
 
     // locate file
-    let located = ml_locate(base_dir, name)
+    let located = ml_locate(base_dir, locate_name)
     if (located == "")
     {
         ml_add_error(loader,
             "error: module not found: '" + qname + "'\n" +
-            "  tried: " + ml_join_dir(base_dir, name + ".vix") + "\n" +
-            "  tried: " + ml_join_dir(ml_join_dir(base_dir, name), "mod.vix"))
+            "  tried: " + ml_join_dir(base_dir, locate_name + ".vix") + "\n" +
+            "  tried: " + ml_join_dir(ml_join_dir(base_dir, locate_name), "mod.vix"))
         return
     }
     if (located.length >= 9 and compiler_string_byte(located, 0) == 'A' and compiler_string_byte(located, 1) == 'M' and compiler_string_byte(located, 2) == 'B')

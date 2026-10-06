@@ -1,0 +1,7 @@
+// Same file, a different alias: the namespace is whatever was written.
+use "lib.vix" as zz
+
+fn main(): i32
+{
+    return zz::add(10, 5)
+}
