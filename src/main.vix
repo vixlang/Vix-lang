@@ -459,7 +459,16 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     merged_program = method_program_attach(merged_program)
 
     let emit_semantic_warnings = if (mode == "codegen" or mode == "debug_typed_mir" or mode == "debug_mir" or mode == "debug_lir" or mode == "debug_asm" or mode == "debug_llvm" or program.mod_decls.length > 0 or program.import_decls.length > 0) { 0 } else { 1 }
-    let semantic_result = semantic_check_program_with_warnings(merged_program, src, filename, emit_semantic_warnings)
+    // Modules whose interface files are still valid were checked by this
+    // compiler from this source before, so their bodies are not checked again.
+    // The environment still receives every signature; only per-body work is
+    // skipped, which is where the time goes.
+    let mut checked_prefixes: [string] = []
+    if (early_graph.ok == 1 and early_graph.modules.length > 1)
+    {
+        checked_prefixes = module_graph_checked_prefixes(early_graph)
+    }
+    let semantic_result = semantic_check_program_skipping(merged_program, src, filename, emit_semantic_warnings, checked_prefixes)
     match mode
     {
         "--semantic" -> {
@@ -508,6 +517,14 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         diag_print(typeck_result_debug(infer_result, src, filename))
         diag_protocol_finish(1, 0)
         return mode_failure()
+    }
+
+    // The program checked out, so every module's interface may now be recorded.
+    // A .vixi therefore means "this source was checked by this compiler", which
+    // is what makes skipping the module next time sound.
+    if (early_graph.ok == 1 and early_graph.modules.length > 1)
+    {
+        module_graph_write_interfaces(early_graph)
     }
 
     let analysis_program = desugar_program(merged_program)

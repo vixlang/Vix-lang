@@ -976,6 +976,14 @@ pub fn semantic_check_program(program: AstProgram, source: string, filename: str
 
 pub fn semantic_check_program_with_warnings(program: AstProgram, source: string, filename: string, emit_warnings: i32): SemanticResult
 {
+    return semantic_check_program_skipping(program, source, filename, emit_warnings, [])
+}
+
+// checked_prefixes names modules whose interface files prove they were already
+// checked; their bodies are skipped.  Duplicate and C-ABI checks still run over
+// everything, because those are about the merged program, not about one body.
+pub fn semantic_check_program_skipping(program: AstProgram, source: string, filename: string, emit_warnings: i32, checked_prefixes: [string]): SemanticResult
+{
     let mut result = semantic_result_new_with_warnings(emit_warnings)
     result.source = source
     result.filename = filename
@@ -996,11 +1004,12 @@ pub fn semantic_check_program_with_warnings(program: AstProgram, source: string,
     }
     for (i in 0 .. program.functions.length)
     {
+        if (module_name_is_checked(program.functions[i].name, checked_prefixes) == 1) { continue }
         semantic_check_function_body(program.functions[i], program, &result, source, filename)
     }
     if (result.error_count == 0)
     {
-        let type_result = typeck_check_program(program)
+        let type_result = typeck_check_program_skipping(program, checked_prefixes)
         result.type_result = type_result
         semantic_add_typeck_error(&result, source, filename, type_result)
     }

@@ -280,8 +280,12 @@ pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename:
 
 pub fn typeck_check_program(program: AstProgram): TypeInferResult
 {
-    let hm = program
-        |> hm_check_program
+    return typeck_check_program_skipping(program, [])
+}
+
+pub fn typeck_check_program_skipping(program: AstProgram, checked_prefixes: [string]): TypeInferResult
+{
+    let hm = hm_check_program_skipping(program, checked_prefixes)
     if (hm.ok == 1)
     {
         return typeinfer_ok(hm.return_type)

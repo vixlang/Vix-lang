@@ -28,7 +28,19 @@ pub type Module = struct {
     parent_id:   i32,
     child_ids:   [i32],
     source_path: string,
-    is_pub:      i32
+    is_pub:      i32,
+    // 1 when a .vixi for this module exists and matches its source, this
+    // compiler and every dependency's interface.  Such a module was already
+    // checked, so its function bodies do not have to be checked again.
+    vixi_valid:  i32,
+    // Interface hash of this module, used by dependents to detect changes.
+    interface_hash: string,
+    // For each child: the alias it was imported under here.  References inside
+    // this module are written with that alias, while definitions are prefixed
+    // with the child's full namespace path, so the merge has to map one to the
+    // other.  use_targets holds the module each alias resolves to.
+    use_aliases: [string],
+    use_targets: [i32]
 }
 
 pub fn module_new(id: ModuleId, parent_id: i32, source_path: string, is_pub: i32): Module
@@ -38,7 +50,11 @@ pub fn module_new(id: ModuleId, parent_id: i32, source_path: string, is_pub: i32
         parent_id:   parent_id,
         child_ids:   [],
         source_path: source_path,
-        is_pub:      is_pub
+        is_pub:      is_pub,
+        vixi_valid:  0,
+        interface_hash: "",
+        use_aliases: [],
+        use_targets: []
     }
 }
 
@@ -287,6 +303,8 @@ pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name:
         if (parent_idx >= 0)
         {
             loader.graph.modules[parent_idx].child_ids.push(existing)
+            loader.graph.modules[parent_idx].use_aliases.push(ns_name)
+            loader.graph.modules[parent_idx].use_targets.push(existing)
         }
         return
     }
@@ -316,6 +334,24 @@ pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name:
         return
     }
 
+    // A file reached from two different modules is still one module: loading it
+    // twice would duplicate every declaration in it.  The namespace it already
+    // has wins, and the second importer's references are rewritten to it.
+    let normalized = path_normalize(located)
+    for (seen in 0 .. loader.graph.modules.length)
+    {
+        if (path_normalize(loader.graph.modules[seen].source_path) == normalized)
+        {
+            if (parent_idx >= 0)
+            {
+                loader.graph.modules[parent_idx].child_ids.push(seen)
+                loader.graph.modules[parent_idx].use_aliases.push(ns_name)
+                loader.graph.modules[parent_idx].use_targets.push(seen)
+            }
+            return
+        }
+    }
+
     // register node
     let new_id  = ml_alloc_id(loader)
     let mid     = module_id_new(new_id, qname, located)
@@ -325,6 +361,8 @@ pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name:
     if (parent_idx >= 0)
     {
         loader.graph.modules[parent_idx].child_ids.push(mod_idx)
+        loader.graph.modules[parent_idx].use_aliases.push(ns_name)
+        loader.graph.modules[parent_idx].use_targets.push(mod_idx)
     }
 
     // DFS push
@@ -332,6 +370,36 @@ pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name:
 
     // recurse
     ml_scan_child_mods(loader, mod_idx, src, located)
+
+    // Interface cache.
+    //
+    // A .vixi that matches this source, this compiler and every dependency's
+    // interface means the module was already checked, so its bodies can be
+    // skipped later.  Dependents are collected first, which is why this runs
+    // after the children have been loaded: a parent's interface names the
+    // interfaces it was built against, and that is what stops a stale interface
+    // from being accepted when only the dependency changed.
+    let mut dep_paths: [string] = []
+    let mut dep_hashes: [string] = []
+    let mut deps_complete = 1
+    for (c in 0 .. loader.graph.modules[mod_idx].child_ids.length)
+    {
+        let child = loader.graph.modules[mod_idx].child_ids[c]
+        dep_paths.push(path_normalize(loader.graph.modules[child].source_path))
+        let child_hash = loader.graph.modules[child].interface_hash
+        dep_hashes.push(child_hash)
+        if (child_hash == "") { deps_complete = 0 }
+    }
+    let cached_text = read_file_content(vixi_path_for(located))
+    if (cached_text != "" and deps_complete == 1)
+    {
+        let cached = vixi_parse(cached_text)
+        if (vixi_is_valid(cached, vixi_source_hash(src), vixi_compiler_id(), dep_paths, dep_hashes) == 1)
+        {
+            loader.graph.modules[mod_idx].vixi_valid = 1
+            loader.graph.modules[mod_idx].interface_hash = vixi_interface_hash(cached)
+        }
+    }
 
     // DFS pop
     ml_pop_stack(loader, qname)
@@ -592,6 +660,101 @@ pub fn module_graph_loaded_paths(g: ModuleGraph): [string]
     return out
 }
 
+// Namespace prefixes of the modules whose interfaces are already valid, and
+// whose function bodies therefore do not have to be checked again.  A function
+// belongs to a module when its merged name starts with "<prefix>::".
+pub fn module_graph_checked_prefixes(g: ModuleGraph): [string]
+{
+    let mut out: [string] = []
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].vixi_valid == 1 and g.modules[i].id.qualified_name != "root")
+        {
+            out.push(module_strip_root_prefix(g.modules[i].id.qualified_name))
+        }
+    }
+    return out
+}
+
+// Records the interface of every module that does not have a valid one yet.
+//
+// This is the other half of the cache: a .vixi exists only for a module that was
+// actually checked, which is what makes skipping it next time sound.  Modules
+// are visited in reverse because children are appended after their parent, so a
+// dependency is written and hashed before the module that names it.
+// Rewrites a reference written with a local alias into the referenced module's
+// full namespace path.
+//
+// Definitions are prefixed when modules merge, but a reference inside a module
+// is written the way its author sees it: a module that does
+//   use "dep.vix" as dep
+// writes dep::value, while the merged definition is mid::dep::value.  Without
+// this rewrite the call resolves to nothing.
+pub fn module_rewrite_reference(text: string, aliases: [string], prefixes: [string]): string
+{
+    for (i in 0 .. aliases.length)
+    {
+        let alias = aliases[i]
+        let prefix = prefixes[i]
+        if (alias == prefix or prefix == "") { continue }
+        if (text.length > alias.length + 2)
+        {
+            let mut same = 1
+            for (k in 0 .. alias.length)
+            {
+                if (compiler_string_byte(text, k) != compiler_string_byte(alias, k)) { same = 0 }
+            }
+            if (same == 1
+                and compiler_string_byte(text, alias.length) == ':'
+                and compiler_string_byte(text, alias.length + 1) == ':')
+            {
+                let mut out = prefix + "::"
+                for (j in alias.length + 2 .. text.length)
+                {
+                    out = out + char_string(compiler_string_byte(text, j))
+                }
+                return out
+            }
+        }
+    }
+    return text
+}
+
+pub fn module_graph_write_interfaces(g: ModuleGraph)
+{
+    let mut hashes: [string] = []
+    for (i in 0 .. g.modules.length) { hashes.push(g.modules[i].interface_hash) }
+
+    let mut index = g.modules.length
+    while (index > 0)
+    {
+        index -= 1
+        if (g.modules[index].id.qualified_name == "root") { continue }
+        if (g.modules[index].vixi_valid == 1) { continue }
+
+        let path = g.modules[index].source_path
+        let source = read_file_content(path)
+        if (source == "") { continue }
+
+        let mut dep_paths: [string] = []
+        let mut dep_hashes: [string] = []
+        for (c in 0 .. g.modules[index].child_ids.length)
+        {
+            let child = g.modules[index].child_ids[c]
+            dep_paths.push(path_normalize(g.modules[child].source_path))
+            dep_hashes.push(hashes[child])
+        }
+
+        let parsed = parse_program_raw(source, path)
+        if (parsed.ok == 0) { continue }
+        let m = vixi_collect(parsed, path, vixi_compiler_id(), source, dep_paths, dep_hashes)
+        if (vixi_write_file(vixi_path_for(path), vixi_emit(m)) == 0)
+        {
+            hashes[index] = vixi_interface_hash(m)
+        }
+    }
+}
+
 pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgram
 {
     if (g.ok == 0 or g.modules.length == 0)
@@ -614,6 +777,33 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
     
     module_merge_exprs(root_program.expr_store, merged_es, 0, 0)
     module_merge_stmts(root_program.store, merged_store, 0, 0)
+    let root_expr_end = merged_es.exprs.length
+    let root_stmt_end = merged_store.stmts.length
+
+    // The entry file needs the same alias mapping as any other module: when a
+    // file it uses was already loaded under another namespace (a diamond), the
+    // entry's own reference has to be pointed at where the definition landed.
+    if (g.modules[0].use_aliases.length > 0)
+    {
+        let mut root_aliases: [string] = []
+        let mut root_prefixes: [string] = []
+        for (u in 0 .. g.modules[0].use_aliases.length)
+        {
+            let target = g.modules[g.modules[0].use_targets[u]]
+            let target_prefix = if (module_is_sys_member(target.id.qualified_name) == 1) { "" } else { module_strip_root_prefix(target.id.qualified_name) }
+            root_aliases.push(g.modules[0].use_aliases[u])
+            root_prefixes.push(target_prefix)
+        }
+        for (re in 0 .. root_expr_end)
+        {
+            merged_es.exprs[re].text = module_rewrite_reference(merged_es.exprs[re].text, root_aliases, root_prefixes)
+        }
+        for (rt in 0 .. root_stmt_end)
+        {
+            merged_store.stmts[rt].assign_name = module_rewrite_reference(merged_store.stmts[rt].assign_name, root_aliases, root_prefixes)
+            merged_store.stmts[rt].type_text = module_rewrite_reference(merged_store.stmts[rt].type_text, root_aliases, root_prefixes)
+        }
+    }
     
     for (i in 0 .. root_program.functions.length)
     {
@@ -651,7 +841,31 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
         
         module_merge_exprs(prog.expr_store, merged_es, expr_off, stmt_off)
         module_merge_stmts(prog.store, merged_store, expr_off, stmt_off)
-        
+
+        // References this module wrote with its own aliases have to be pointed
+        // at the namespace the definitions ended up in.
+        let mut alias_names: [string] = []
+        let mut alias_prefixes: [string] = []
+        for (u in 0 .. mnode.use_aliases.length)
+        {
+            let target = g.modules[mnode.use_targets[u]]
+            let target_prefix = if (module_is_sys_member(target.id.qualified_name) == 1) { "" } else { module_strip_root_prefix(target.id.qualified_name) }
+            alias_names.push(mnode.use_aliases[u])
+            alias_prefixes.push(target_prefix)
+        }
+        if (alias_names.length > 0)
+        {
+            for (e in expr_off .. merged_es.exprs.length)
+            {
+                merged_es.exprs[e].text = module_rewrite_reference(merged_es.exprs[e].text, alias_names, alias_prefixes)
+            }
+            for (t in stmt_off .. merged_store.stmts.length)
+            {
+                merged_store.stmts[t].assign_name = module_rewrite_reference(merged_store.stmts[t].assign_name, alias_names, alias_prefixes)
+                merged_store.stmts[t].type_text = module_rewrite_reference(merged_store.stmts[t].type_text, alias_names, alias_prefixes)
+            }
+        }
+
         for (i in 0 .. prog.functions.length)
         {
             let f = prog.functions[i]

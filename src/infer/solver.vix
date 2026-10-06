@@ -887,6 +887,14 @@ pub fn hm_check_function(func: AstFunction, base_env: &TypeEnv, store: &TyStore,
 
 pub fn hm_check_program(program: AstProgram): HmCheckResult
 {
+    return hm_check_program_skipping(program, [])
+}
+
+// checked_prefixes names the modules whose interface files say they were already
+// checked by this compiler from this source.  Their bodies are skipped; the
+// environment is still built from every function, so signatures resolve.
+pub fn hm_check_program_skipping(program: AstProgram, checked_prefixes: [string]): HmCheckResult
+{
     if (program.ok == 0)
     {
         return HmCheckResult{ ok: 0, code: "E1000", title: "parse error", phase: DiagParser, error: program.error, return_type: "unknown", error_func: "", line: 0, col: 0, span_len: 1 }
@@ -929,6 +937,7 @@ pub fn hm_check_program(program: AstProgram): HmCheckResult
     type_env_mark_closed_prefix(&store, &env)
     for (i in 0 .. program.functions.length)
     {
+        if (module_name_is_checked(program.functions[i].name, checked_prefixes) == 1) { continue }
         let r = hm_check_function(program.functions[i], &env, &store, &fresh, program.structs, &expr_store, &stmt_store)
         if (r.ok == 0) { return r }
     }

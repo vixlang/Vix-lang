@@ -1,0 +1,8 @@
+// A module that itself uses another module: its reference is written with its
+// own alias, while the merged definition is prefixed mid::dep.
+use "dep.vix" as dep
+
+pub fn call(): i32
+{
+    return dep::value()
+}

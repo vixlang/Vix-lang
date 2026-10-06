@@ -1208,3 +1208,27 @@ pub fn ast(program: AstProgram): string
     }
     return out
 }
+// True when a merged symbol name belongs to one of the checked modules.
+//
+// A module's symbols are prefixed with its namespace when modules merge, so
+// "<prefix>::" is the whole test.  This lives here rather than beside the module
+// graph because the type checker needs it and does not include the graph -- the
+// language server checks programs without ever building one.
+pub fn module_name_is_checked(name: string, prefixes: [string]): i32
+{
+    for (i in 0 .. prefixes.length)
+    {
+        let prefix = prefixes[i] + "::"
+        if (name.length > prefix.length)
+        {
+            let mut same = 1
+            for (k in 0 .. prefix.length)
+            {
+                if (compiler_string_byte(name, k) != compiler_string_byte(prefix, k)) { same = 0 }
+            }
+            if (same == 1) { return 1 }
+        }
+    }
+    return 0
+}
+

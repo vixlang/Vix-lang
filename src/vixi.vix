@@ -24,6 +24,19 @@ extern "C"
 {
     fn compiler_string_byte(text: string, index: i32): i32
     fn malloc(size: usize): string
+    // fopen/fputs/fclose are declared once for the whole compilation unit
+    // (lexer.vix and main.vix); declaring them again here is a duplicate.
+}
+
+// Writing lives here rather than in main.vix so the interface layer does not
+// depend on a private function of the driver.
+pub fn vixi_write_file(path: string, content: string): i32
+{
+    let file = fopen(path, "w")
+    if (file == 0) { return 1 }
+    fputs(content, file)
+    fclose(file)
+    return 0
 }
 
 pub type VixiFunction = struct {
@@ -60,6 +73,13 @@ pub type VixiModule = struct {
 
 pub fn vixi_quote_mark(): string { return char_string(34) }
 pub fn vixi_backslash(): string { return char_string(92) }
+
+// Identity of the compiler that produced an interface file.  A .vixi written by
+// a different compiler is not trusted, so this string is part of its validity.
+pub fn vixi_compiler_id(): string
+{
+    return "vixc 0.5.1"
+}
 
 pub fn vixi_format(): i32
 {
@@ -465,4 +485,14 @@ pub fn vixi_collect(program: AstProgram, path: string, compiler: string,
     }
 
     return m
+}
+
+// Writes the interface for one module.  Called only after the module has been
+// checked, because a .vixi is also the statement "this source was validated by
+// this compiler" -- that is what makes skipping its body check sound.
+pub fn vixi_write(path: string, program: AstProgram, source: string,
+                  dep_paths: [string], dep_hashes: [string]): i32
+{
+    let m = vixi_collect(program, path, vixi_compiler_id(), source, dep_paths, dep_hashes)
+    return vixi_write_file(vixi_path_for(path), vixi_emit(m))
 }
