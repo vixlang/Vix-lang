@@ -591,6 +591,25 @@ fn module_merge_stmts(src_store: StmtStore, dst_store: &StmtStore, expr_off: i32
 }
 
 // Load and merge all modules in the graph into a single AstProgram
+// Source paths the graph has claimed.
+//
+// The preprocessor keeps its own set of included files, and the two used to be
+// independent: a file reached through both mod and import was loaded twice and
+// every declaration in it collided.  The graph is the authority, so its paths
+// are handed to the preprocessor and quoted imports of them are skipped.
+pub fn module_graph_loaded_paths(g: ModuleGraph): [string]
+{
+    let mut out: [string] = []
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].id.qualified_name != "root")
+        {
+            out.push(path_normalize(g.modules[i].source_path))
+        }
+    }
+    return out
+}
+
 pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgram
 {
     if (g.ok == 0 or g.modules.length == 0)

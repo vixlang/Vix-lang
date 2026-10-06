@@ -1,0 +1,12 @@
+// The same file reached through a module declaration AND a quoted import.
+//
+// The two used to keep independent dedup sets, so y.vix was included twice and
+// its declarations collided (E2006 duplicate struct).  The module graph is now
+// the single authority and the preprocessor skips what the graph owns.
+mod y
+import "y.vix"
+
+fn main(): i32
+{
+    return y::yv()
+}

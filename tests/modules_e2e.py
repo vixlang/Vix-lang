@@ -25,7 +25,8 @@ CASES = [
     ("tests/module/main.vix", 17),                    # two modules, qualified calls
     ("tests/modules_generics/main.vix", 49),
     ("tests/use_modules/main.vix", 7),
-    ("tests/use_modules/alias_arbitrary.vix", 15),          # cross-module generics
+    ("tests/use_modules/alias_arbitrary.vix", 15),
+    ("tests/dual_mechanism/main.vix", 2),         # mod and import of one file          # cross-module generics
     ("examples/modules/basic_example.vix", 17),       # two modules
     ("examples/modules/multi_module.vix", 0),         # three modules, struct across modules
     ("examples/modules/nested_module.vix", 5),        # directory module + submodule

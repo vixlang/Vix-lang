@@ -2334,7 +2334,15 @@ fn parse_strip_attr_lines(src: string): string
 
 pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): AstProgram
 {
+    return parse_program_seeded(src, filename, do_preprocess, [])
+}
+
+// already_loaded holds files another loader has claimed (the module graph), so
+// a quoted import of one of them is not inlined a second time.
+pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, already_loaded: [string]): AstProgram
+{
     let mut imports = import_set_new()
+    for (pre in 0 .. already_loaded.length) { import_set_add(&imports, already_loaded[pre]) }
     let preprocess = if (do_preprocess == 1) preprocess_source_result(src, filename, &imports) else preprocess_source_local_result(src, filename)
     if (preprocess.ok == 0)
     {

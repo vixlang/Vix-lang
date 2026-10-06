@@ -1,0 +1,11 @@
+// A struct is what makes the double inclusion visible: functions get a namespace
+// prefix when modules are merged, structs do not, so a second copy of this file
+// collides on Thing.
+type Thing = struct {
+    v: i32
+}
+
+pub fn yv(): i32
+{
+    return 2
+}

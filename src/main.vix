@@ -381,7 +381,15 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         _ -> {}
     }
 
-    let program = parse_program(src, filename)
+    // The module graph is the single authority on which files a program
+    // contains.  It is built before parsing so the preprocessor can be told what
+    // the graph already owns: a file reached through both a module declaration
+    // and a quoted import used to be included twice, and every declaration in it
+    // collided.
+    let early_graph = module_graph_build(filename)
+    let mut loaded_paths: [string] = []
+    if (early_graph.ok == 1) { loaded_paths = module_graph_loaded_paths(early_graph) }
+    let program = parse_program_seeded(src, filename, 1, loaded_paths)
 
     match mode
     {
@@ -437,7 +445,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     let mut merged_program = program
     if (program.mod_decls.length > 0 or program.import_decls.length > 0)
     {
-        let g = module_graph_build(filename)
+        let g = early_graph
         if (g.ok == 0)
         {
             diag_print(module_graph_debug(g))
