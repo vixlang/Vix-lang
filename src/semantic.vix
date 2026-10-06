@@ -1,10 +1,10 @@
 #[no_main]
 
-import "ast.vix"
-import "error.vix"
-import "intrinsic.vix"
-import "method.vix"
-import "type/typeck.vix"
+include "ast.vix"
+include "error.vix"
+include "intrinsic.vix"
+include "method.vix"
+include "type/typeck.vix"
 
 pub type SemanticResult = struct {
     ok: i32,

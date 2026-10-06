@@ -1,4 +1,4 @@
-import "io.vix"
+include "io.vix"
 fn main(): i32
 {
     let a = readln("Input Your Name: ")

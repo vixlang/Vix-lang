@@ -1,7 +1,7 @@
 #[no_main]
 
-import "lexer.vix"
-import "diag.vix"
+include "lexer.vix"
+include "diag.vix"
 
 extern "C"
 {

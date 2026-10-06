@@ -1,6 +1,6 @@
 #[no_main]
 
-import "../util/fresh.vix"
+include "../util/fresh.vix"
 
 extern "C"
 {

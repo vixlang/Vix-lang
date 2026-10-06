@@ -1,11 +1,11 @@
 #[no_main]
 
-import "ids.vix"
-import "source_db.vix"
-import "stub_tree.vix"
-import "semantic_adapter.vix"
-import "symbol_index.vix"
-import "module_resolution.vix"
+include "ids.vix"
+include "source_db.vix"
+include "stub_tree.vix"
+include "semantic_adapter.vix"
+include "symbol_index.vix"
+include "module_resolution.vix"
 
 pub type AnalysisDatabase = struct
 {

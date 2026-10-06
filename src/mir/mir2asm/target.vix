@@ -1,5 +1,5 @@
 #[no_main]
-import "types.vix"
+include "types.vix"
 
 extern "C"
 {

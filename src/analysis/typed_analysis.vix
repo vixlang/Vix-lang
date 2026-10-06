@@ -1,10 +1,10 @@
 #[no_main]
 
-import "../ast.vix"
-import "../error.vix"
-import "../lexer.vix"
-import "method.vix"
-import "method_decl.vix"
+include "../ast.vix"
+include "../error.vix"
+include "../lexer.vix"
+include "method.vix"
+include "method_decl.vix"
 
 pub type AnalysisSpan = struct {
     file: string,

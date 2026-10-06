@@ -1,39 +1,38 @@
 # Vix Module System Examples
 
-This directory demonstrates the multi-file module system.
+This directory demonstrates the two ways one file joins another.
 
 ## Overview
 
-- **Module declaration**: `mod name` / `mod "path.vix"`
-- **Qualified calls**: `module::function()`
-- **Textual inclusion**: `import "path.vix"` splices another file in (flat namespace)
+- `include "path.vix"` splices a file in (flat namespace)
+- `use "path.vix" as name` loads a module; call it as `name::item`
 
-There is no `import module::symbol` form: it used to be parsed and then silently
-dropped, and it is now rejected. Call cross-module symbols by their qualified
-name instead.
+The path identifies the module and the alias names it. Neither is derived
+from the other, and `as` is required: five files in this tree are
+called `mod.vix`, so a namespace guessed from a file name cannot work.
+
+There is no `import` and no `mod` any more; both report a
+migration message rather than failing as unknown syntax.
 
 ## File Resolution
 
-`mod math` looks for, in the directory of the importing file:
-
-1. `math.vix`
-2. `math/mod.vix`
-
-If both exist the compiler reports an ambiguity.
+`use "math.vix" as math` resolves relative to the file containing it, and
+the path is normalised lexically. A directory module is reached with
+`use "utils" as utils`, which finds `utils.vix` or `utils/mod.vix`.
 
 ## Examples
 
 | File | Shows |
 |------|-------|
 | `basic_example.vix` | Two modules, qualified calls. Exit code 17 |
-| `multi_module.vix` | Three modules, structs defined in one and used from another |
-| `nested_module.vix` | Directory module (`utils/mod.vix`) with a submodule |
-| `qualified_calls.vix` | Cross-module calls, all through `module::function` |
+| `multi_module.vix` | Three modules, a struct defined in one and used from another |
+| `nested_module.vix` | Directory module with a submodule |
+| `qualified_calls.vix` | Cross-module calls through `module::function` |
 
 ## Compiling and running
 
-`vixc -o` cannot link on macOS: the embedded linker only implements the ELF and
-COFF drivers. Emit an object file and link it yourself, or use
+`vixc -o` cannot link on macOS: the embedded linker only implements the
+ELF and COFF drivers. Emit an object and link it yourself, or use
 `sh scripts/run-vix.sh`:
 
 ```bash
@@ -42,22 +41,13 @@ clang++ output.o runtime/runtime.o -o output
 ./output                    # exit code 17
 ```
 
-`python3 tests/modules_e2e.py` builds, links and runs every multi-module example
-in this directory and checks the exit code.
-
-## Inspecting
-
-```bash
-vixc your_file.vix --module-graph     # module tree
-vixc your_file.vix --debug=llvm       # generated LLVM IR
-```
+`python3 tests/modules_e2e.py` builds, links and runs every multi-module
+program in the repository and checks the exit code.
 
 ## Syntax Reference
 
-### Entry file
-
 ```vix
-mod math
+use "math.vix" as math
 
 fn main(): i32
 {
@@ -65,24 +55,19 @@ fn main(): i32
 }
 ```
 
-### Module file (math.vix)
+A module file:
 
 ```vix
 pub fn add(a: i32, b: i32): i32
 {
     return a + b
 }
-
-pub fn multiply(x: i32, y: i32): i32
-{
-    return x * y
-}
 ```
 
-### Directory module (utils/mod.vix)
+A directory module, `utils/mod.vix`:
 
 ```vix
-pub mod string_helpers
+use "string_helpers.vix" as string_helpers
 
 pub fn greet(name: string): i32
 {
@@ -91,12 +76,10 @@ pub fn greet(name: string): i32
 }
 ```
 
-`utils::string_helpers::length(...)` then reaches inside `utils/string_helpers.vix`.
-
 ## Known Limitations
 
 - `pub` is **not** enforced: every declaration is visible after merging.
 - Structs and ADTs are merged **without** a module namespace prefix, so two
-  modules that declare the same struct/ADT name collide (or, for ADTs, the
-  second is silently dropped).
+  modules declaring the same struct or ADT name collide (for ADTs the second
+  is silently dropped).
 - The `self` backends are x86_64 only and refuse to run on arm64.

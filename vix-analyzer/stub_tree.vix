@@ -1,11 +1,11 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "util.vix"
-import "source_text.vix"
-import "../src/lexer.vix"
-import "../src/method.vix"
+include "ids.vix"
+include "position.vix"
+include "util.vix"
+include "source_text.vix"
+include "../src/lexer.vix"
+include "../src/method.vix"
 
 pub type StubKind = SourceFile | ModuleDecl | ImportDecl | TypeDecl | FieldDecl | AdtDecl | VariantDecl | FunctionDecl | ParameterDecl | Block | Statement | Expression | ErrorStub
 

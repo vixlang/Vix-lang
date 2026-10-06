@@ -9,9 +9,7 @@
 //   vixc examples/modules/basic_example.vix --backend=self -o basic_example
 //   ./basic_example     # exit code: 17
 
-mod math
-
-
+use "math.vix" as math
 fn main(): i32
 {
     // 使用限定名调用

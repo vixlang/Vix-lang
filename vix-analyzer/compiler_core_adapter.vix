@@ -1,12 +1,12 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "stub_tree.vix"
-import "semantic_adapter.vix"
-import "../src/lexer.vix"
-import "../src/parser.vix"
-import "../src/semantic.vix"
+include "ids.vix"
+include "position.vix"
+include "stub_tree.vix"
+include "semantic_adapter.vix"
+include "../src/lexer.vix"
+include "../src/parser.vix"
+include "../src/semantic.vix"
 
 pub type CoreTokenSnapshot = struct
 {

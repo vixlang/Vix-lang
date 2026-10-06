@@ -1,7 +1,7 @@
 #[no_main]
 
-import "../type/ty.vix"
-import "../util/pos.vix"
+include "../type/ty.vix"
+include "../util/pos.vix"
 
 pub type Constraint = ConstraintEq(i32)
 

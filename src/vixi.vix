@@ -16,9 +16,9 @@
 // (3) is the one that is easy to forget and expensive to get wrong: without it a
 // stale interface is accepted whenever the dependent file itself is untouched.
 
-import "json.vix"
-import "lexer.vix"
-import "ast.vix"
+include "json.vix"
+include "lexer.vix"
+include "ast.vix"
 
 extern "C"
 {

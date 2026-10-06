@@ -1,4 +1,4 @@
-import "../../std/String.vix"
+include "../../std/String.vix"
 extern "C"
 {
     fn printf(format:ptr,...): i32

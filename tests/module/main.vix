@@ -1,6 +1,4 @@
-mod math
-
-
+use "math.vix" as math
 fn main(): i32
 {
     let a = math::add(3, 4)

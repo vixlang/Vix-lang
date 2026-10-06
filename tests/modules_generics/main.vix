@@ -1,5 +1,4 @@
-mod gen
-
+use "gen.vix" as gen
 fn main(): i32
 {
     let a = gen::id[i32](42)

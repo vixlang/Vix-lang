@@ -1,7 +1,7 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
+include "ids.vix"
+include "position.vix"
 
 pub type TextEdit = struct
 {

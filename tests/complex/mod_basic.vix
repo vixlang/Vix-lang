@@ -1,2 +1,2 @@
-mod mod_math
+use "mod_math.vix" as mod_math
 fn main(): i32 { return mod_math::add(2, 3) - 5 }

@@ -1,1 +1,1 @@
-import "../core/io.vix"
+include "../core/io.vix"

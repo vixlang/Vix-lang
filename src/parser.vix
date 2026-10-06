@@ -1,9 +1,9 @@
 #[no_main]
-import "lexer.vix"
-import "ast.vix"
-import "error.vix"
-import "method.vix"
-import "preprocess.vix"
+include "lexer.vix"
+include "ast.vix"
+include "error.vix"
+include "method.vix"
+include "preprocess.vix"
 
 pub type Parser = struct {
     stream: TokenStream,
@@ -2380,9 +2380,8 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
         let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, parser.pos + 1) == "mod"
         if (parser_text(&parser) == "mod" or is_pub_mod == 1)
         {
-            let mdecl = parse_mod_decl(&parser)
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-            mod_decls.push(mdecl)
+            parser_fail(&parser, "'mod' has been removed: declare the module with 'use <path> as <name>'")
+            return ast_program_err_diag(parser.error, parser.diagnostic)
         }
         // use "path.vix" as alias
         elif (parser_text(&parser) == "use")
@@ -2394,12 +2393,12 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
         // `import module::symbol` used to be parsed and then dropped without a
         // word, so it looked like it worked.  Reject it instead: the symbol is
         // already reachable through its qualified name.
-        elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
+        elif (parser_text(&parser) == "import")
         {
-            parser_fail(&parser, "unsupported import: call the symbol by its qualified name, as in 'module::function(...)'")
+            parser_fail(&parser, "'import' has been removed: use 'include <path>' to splice a file, or 'use <path> as <name>' for a module")
             return ast_program_err_diag(parser.error, parser.diagnostic)
         }
-        elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
+        elif (parser_text(&parser) == "include" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
         {
             parser_advance(&parser)
             parser_advance(&parser)
@@ -2537,9 +2536,8 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
     let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, parser.pos + 1) == "mod"
     if (parser_text(&parser) == "mod" or is_pub_mod == 1)
     {
-        let mdecl = parse_mod_decl(&parser)
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-        mod_decls.push(mdecl)
+        parser_fail(&parser, "'mod' has been removed: declare the module with 'use <path> as <name>'")
+        return ast_program_err_diag(parser.error, parser.diagnostic)
     }
     elif (parser_text(&parser) == "use")
     {
@@ -2547,12 +2545,12 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
         if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
         import_decls.push(udecl)
     }
-    elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
+    elif (parser_text(&parser) == "import")
     {
-        parser_fail(&parser, "unsupported import: call the symbol by its qualified name, as in 'module::function(...)'")
+        parser_fail(&parser, "'import' has been removed: use 'include <path>' to splice a file, or 'use <path> as <name>' for a module")
         return ast_program_err_diag(parser.error, parser.diagnostic)
     }
-    elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
+    elif (parser_text(&parser) == "include" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
     {
         parser_advance(&parser)
         parser_advance(&parser)

@@ -1,6 +1,6 @@
 #[no_main]
 
-import "position.vix"
+include "position.vix"
 
 extern "C"
 {

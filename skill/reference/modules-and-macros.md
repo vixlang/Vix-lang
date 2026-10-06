@@ -5,24 +5,25 @@ description: Vix imports, modules, visibility and the macro system.
 
 # 模块与宏
 
-## 导入
+## 包含与模块
+
+两种机制，两个关键字：
 
 ```vix
-import "util/fresh.vix"    // 文本包含，相对导入文件所在目录
-mod "parser.vix"           // 聚合：把文件并入当前编译单元
-mod sys                    // 具名模块（查找 sys.vix 或 sys/mod.vix）
+include "util/fresh.vix"        // 把文件源码拼进来，扁平命名空间
+use "lib/math.vix" as math      // 加载模块，符号加 math:: 前缀
 ```
 
-- 带引号的 `import` 走预处理器：目标文件处理后的源码**文本拼进来**，
-  共享扁平命名空间。`mod "x.vix"` 走模块图，会加命名空间前缀。
-- 路径只按**相对导入文件的目录**解析。**没有包管理器**：裸名展开、
-  `$VIX_HOME`、`.vix/libs` 这套搜索顺序**在实现里不存在**（历史上文档写过，
-  但从未实现，现已删除该文档）。
-- 路径会被词法规范化：`./a.vix`、`sub/../a.vix`、`a//b.vix` 与 `a.vix`
-  视为同一文件，只包含一次。
-- `import module::symbol` **不是有效语法**，解析阶段直接报错。跨模块调用
-  一律写限定名 `module::symbol(...)`。
-- 编译器的聚合文件是 `src/sys.vix`，新增编译器源文件要加一行 `mod "x.vix"`。
+- `include` 走预处理器文本拼接；`use` 走模块图并加命名空间前缀。
+- **模块身份是路径，命名空间是别名**，两者互不推导。`as` 必写，省略报错。
+- 路径按声明所在文件的目录解析，并做词法规范化（`./a.vix`、`sub/../a.vix`
+  与 `a.vix` 同为一个文件，只包含一次）。
+- 同一文件可以用不同别名多次 `use`，只加载一次。
+- **没有包管理器**：没有裸名展开、没有 `$VIX_HOME`、没有 `.vix/libs`。
+  完整规则见 [../../docs/MODULES.md](../../docs/MODULES.md)。
+- 编译器的聚合入口是 `src/main.vix`，它 `include "sys.vix"`，后者列出全部源
+  文件。新增编译器源文件要在 `src/sys.vix` 加一行 `include "x.vix"`。
+- 旧语法（`mod` / `import`）已删除，但会给出迁移提示而不是语法错误。
 
 ## 可见性
 

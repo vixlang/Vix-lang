@@ -1,6 +1,6 @@
 #[no_main]
 
-import "../infer/solver.vix"
+include "../infer/solver.vix"
 
 extern "C"
 {

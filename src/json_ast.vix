@@ -1,4 +1,4 @@
-import "ast.vix"
+include "ast.vix"
 
 fn json_ast_escape(text: string): string
 {

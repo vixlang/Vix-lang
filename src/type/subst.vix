@@ -1,6 +1,6 @@
 #[no_main]
 
-import "ty.vix"
+include "ty.vix"
 
 pub type TyBinding = struct {
     var_id: i32,

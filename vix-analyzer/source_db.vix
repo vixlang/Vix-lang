@@ -1,7 +1,7 @@
 #[no_main]
 
-import "ids.vix"
-import "source_text.vix"
+include "ids.vix"
+include "source_text.vix"
 
  pub type SourceFile = struct
 {

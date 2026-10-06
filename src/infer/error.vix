@@ -1,7 +1,7 @@
 #[no_main]
 
-import "../util/pos.vix"
-import "../type/ty.vix"
+include "../util/pos.vix"
+include "../type/ty.vix"
 
 pub type InferErrorKind = InferUnboundName | InferMismatch | InferOccursCheck | InferArity | InferNotCallable | InferNoField | InferOther
 

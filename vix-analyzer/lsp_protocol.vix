@@ -1,13 +1,13 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "util.vix"
-import "../src/json.vix"
-import "queries.vix"
-import "symbol_index.vix"
-import "diagnostics.vix"
-import "analysis.vix"
+include "ids.vix"
+include "position.vix"
+include "util.vix"
+include "../src/json.vix"
+include "queries.vix"
+include "symbol_index.vix"
+include "diagnostics.vix"
+include "analysis.vix"
 
 pub type LspMessage = struct
 {

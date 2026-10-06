@@ -1,7 +1,7 @@
 #[no_main]
 
-import "method_decl.vix"
-import "receiver.vix"
+include "method_decl.vix"
+include "receiver.vix"
 
 extern "C"
 {

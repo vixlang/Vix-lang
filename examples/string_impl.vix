@@ -1,4 +1,4 @@
-import "../std/String.vix"
+include "../std/String.vix"
 
 fn main(): i32
 {

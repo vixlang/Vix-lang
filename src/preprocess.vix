@@ -1,5 +1,5 @@
 #[no_main]
-import "lexer.vix"
+include "lexer.vix"
 
 pub type ImportSet = struct {
     paths: [string]
@@ -453,6 +453,26 @@ pub fn skip_attr_line(src: string, start: i32): i32
     return i
 }
 
+// Length of the leading keyword of a source inclusion line: 6 for "import",
+// 7 for "include", 0 when the line starts with neither.  "include" names the
+// operation for what it is -- splicing one file into another -- while "import"
+// reads like bringing a module into scope, which is what a use declaration does.
+pub fn include_matches(src: string, start: i32, keyword: string): i32
+{
+    if (start + keyword.length > src.length) { return 0 }
+    for (k in 0 .. keyword.length)
+    {
+        if (compiler_string_byte(src, start + k) != compiler_string_byte(keyword, k)) { return 0 }
+    }
+    return 1
+}
+
+pub fn include_keyword_length(src: string, start: i32): i32
+{
+    if (include_matches(src, start, "include") == 1) { return 7 }
+    return 0
+}
+
 pub fn scan_import_line(src: string, start: i32): i32
 {
     if (start > 0)
@@ -464,14 +484,9 @@ pub fn scan_import_line(src: string, start: i32): i32
             j -= 1
         }
     }
-    let mut i = start
-    if (i + 6 > src.length) { return -1 }
-    let keyword = "import"
-    for (k in 0 .. 6)
-    {
-        if (compiler_string_byte(src, i + k) != compiler_string_byte(keyword, k)) return -1
-    }
-    i += 6
+    let keyword_length = include_keyword_length(src, start)
+    if (keyword_length == 0) { return -1 }
+    let mut i = start + keyword_length
     while (i < src.length and (compiler_string_byte(src, i) == 32 or compiler_string_byte(src, i) == 9)) { i += 1 }
     if (i >= src.length or compiler_string_byte(src, i) != '"') return -1
     i += 1
@@ -485,7 +500,9 @@ pub fn scan_import_line(src: string, start: i32): i32
 
 pub fn extract_import_path(src: string, start: i32): string
 {
-    let mut i = start + 6
+    let keyword_length = include_keyword_length(src, start)
+    if (keyword_length == 0) { return "" }
+    let mut i = start + keyword_length
     while (i < src.length and (compiler_string_byte(src, i) == 32 or compiler_string_byte(src, i) == 9)) { i += 1 }
     if (i >= src.length or compiler_string_byte(src, i) != '"') return ""
     i += 1

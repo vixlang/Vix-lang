@@ -1,8 +1,8 @@
 #[no_main]
 
-import "ty.vix"
-import "subst.vix"
-import "../util/fresh.vix"
+include "ty.vix"
+include "subst.vix"
+include "../util/fresh.vix"
 
 pub type Scheme = struct {
     vars: [i32],

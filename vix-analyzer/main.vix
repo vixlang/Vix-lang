@@ -1,6 +1,6 @@
 #[no_main]
 
-import "lsp_server.vix"
+include "lsp_server.vix"
 
 pub fn vix_analyzer_main(): i32
 {

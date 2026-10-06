@@ -83,7 +83,7 @@ sh scripts/build-analyzer.sh
 ## 多文件
 
 `mod` 会触发模块图构建与合并；`--module-graph` 可以先看依赖关系。
-编译器的聚合入口是 `src/main.vix`（内部 `mod sys` 指向 `src/sys.vix`）。
+编译器的聚合入口是 `src/main.vix`（内部 `include "sys.vix"` 指向 `src/sys.vix`）。
 
 ## 格式化
 

@@ -1,4 +1,4 @@
-import "adt_import_defs.vix"
+include "adt_import_defs.vix"
 
 fn eval(e: ImportedExpr): i32
 {

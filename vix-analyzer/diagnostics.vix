@@ -1,10 +1,10 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "util.vix"
-import "../src/json.vix"
-import "../src/diag.vix"
+include "ids.vix"
+include "position.vix"
+include "util.vix"
+include "../src/json.vix"
+include "../src/diag.vix"
 
 pub type DiagnosticSeverity = SeverityError | SeverityWarning | SeverityInformation | SeverityHint
 

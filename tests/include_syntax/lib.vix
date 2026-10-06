@@ -1,0 +1,4 @@
+pub fn v(): i32
+{
+    return 9
+}

@@ -1,8 +1,8 @@
 #[no_main]
-import "ast.vix"
-import "lexer.vix"
-import "preprocess.vix"
-import "parser.vix"
+include "ast.vix"
+include "lexer.vix"
+include "preprocess.vix"
+include "parser.vix"
 
 // ---------------------------------------------------------------------------
 // ModuleId
@@ -218,7 +218,10 @@ pub fn ml_locate(base_dir: string, name: string): string
 }
 
 // ---------------------------------------------------------------------------
-// Scan child mods  (token-level, no full parse)
+// Scan use declarations (token-level, no full parse).
+//
+// The graph is the only thing that loads files now: mod was removed and quoted
+// imports are handled by the preprocessor, which skips whatever this claims.
 // ---------------------------------------------------------------------------
 
 pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, src_path: string)
@@ -229,8 +232,6 @@ pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, s
     while (i < len)
     {
         let text = stream_text_at(stream, i)
-        let mut is_pub = 0
-        let mut at     = i
         if (text == "use" and i + 3 < len and stream_kind_at(stream, i + 1) == tk_string()
             and stream_text_at(stream, i + 2) == "as" and stream_kind_at(stream, i + 3) == tk_ident())
         {
@@ -239,26 +240,7 @@ pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, s
             i = i + 4
             continue
         }
-        if (text == "pub" and i + 1 < len and stream_text_at(stream, i + 1) == "mod")
-        {
-            is_pub = 1
-            at     = i + 1
-        }
-        elif (text != "mod")
-        {
-            i += 1
-            continue
-        }
-        if (at + 1 < len and (stream_kind_at(stream, at + 1) == tk_ident() or stream_kind_at(stream, at + 1) == tk_string()))
-        {
-            let name = stream_text_at(stream, at + 1)
-            ml_load_module(loader, parent_idx, name, is_pub, src_path)
-            i = at + 2
-        }
-        else
-        {
-            i += 1
-        }
+        i += 1
     }
 }
 

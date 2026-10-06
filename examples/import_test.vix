@@ -1,4 +1,4 @@
-import "std/io.vix"
+include "std/io.vix"
 
 fn main(): i32 {
     puts("Import test passed!")

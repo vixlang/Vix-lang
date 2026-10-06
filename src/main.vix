@@ -1,4 +1,4 @@
-mod sys
+include "sys.vix"
 
 extern "C"
 {

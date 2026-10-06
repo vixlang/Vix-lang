@@ -1,12 +1,12 @@
 #[no_main]
 
-import "util.vix"
-import "../src/json.vix"
-import "workspace.vix"
-import "lsp_transport.vix"
-import "lsp_protocol.vix"
-import "lsp_handlers.vix"
-import "diagnostics.vix"
+include "util.vix"
+include "../src/json.vix"
+include "workspace.vix"
+include "lsp_transport.vix"
+include "lsp_protocol.vix"
+include "lsp_handlers.vix"
+include "diagnostics.vix"
 
 pub type LspServer = struct
 {

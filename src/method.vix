@@ -20,10 +20,10 @@
 
 #[no_main]
 
-import "ast.vix"
-import "intrinsic.vix"
-import "method_decl.vix"
-import "receiver.vix"
+include "ast.vix"
+include "intrinsic.vix"
+include "method_decl.vix"
+include "receiver.vix"
 
 extern "C"
 {

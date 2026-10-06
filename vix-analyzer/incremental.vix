@@ -1,11 +1,11 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "util.vix"
-import "source_text.vix"
-import "stub_tree.vix"
-import "../src/lexer.vix"
+include "ids.vix"
+include "position.vix"
+include "util.vix"
+include "source_text.vix"
+include "stub_tree.vix"
+include "../src/lexer.vix"
 
 // Which slice of the new text has to be re-lexed and re-scanned. A change inside
 // a top-level declaration reparse just that declaration; anything else falls

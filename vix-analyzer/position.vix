@@ -1,6 +1,6 @@
 #[no_main]
 
-import "ids.vix"
+include "ids.vix"
 
 pub type TextPosition = struct
 {

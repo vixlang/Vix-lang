@@ -1,12 +1,12 @@
 #[no_main]
 
-import "ids.vix"
-import "diagnostics.vix"
-import "ast_fragment.vix"
-import "../src/ast.vix"
-import "../src/diag.vix"
-import "../src/semantic.vix"
-import "../src/type/typeck.vix"
+include "ids.vix"
+include "diagnostics.vix"
+include "ast_fragment.vix"
+include "../src/ast.vix"
+include "../src/diag.vix"
+include "../src/semantic.vix"
+include "../src/type/typeck.vix"
 
 // Function-level cache for the semantic pass.
 //

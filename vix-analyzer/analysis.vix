@@ -1,19 +1,19 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "util.vix"
-import "stub_tree.vix"
-import "symbol_index.vix"
-import "diagnostics.vix"
-import "incremental.vix"
-import "ast_fragment.vix"
-import "sema_cache.vix"
-import "source_text.vix"
-import "../src/diag.vix"
-import "../src/lexer.vix"
-import "../src/parser.vix"
-import "../src/semantic.vix"
+include "ids.vix"
+include "position.vix"
+include "util.vix"
+include "stub_tree.vix"
+include "symbol_index.vix"
+include "diagnostics.vix"
+include "incremental.vix"
+include "ast_fragment.vix"
+include "sema_cache.vix"
+include "source_text.vix"
+include "../src/diag.vix"
+include "../src/lexer.vix"
+include "../src/parser.vix"
+include "../src/semantic.vix"
 
 pub type DocumentAnalysis = struct
 {

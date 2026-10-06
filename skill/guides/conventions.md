@@ -25,13 +25,13 @@ description: Naming, structure and code conventions used across the Vix language
 ```vix
 #[no_main]
 
-import "ast.vix"
-import "lexer.vix"
+include "ast.vix"
+include "lexer.vix"
 ```
 
 - `#[no_main]` 表示这是库文件。
 - import 顺序按依赖层次，不要形成环。
-- 新增文件要在 `src/sys.vix` 里加 `mod "..."`，否则不参与编译。
+- 新增文件要在 `src/sys.vix` 里加 `include "..."`，否则不参与编译。
 
 ## 风格
 

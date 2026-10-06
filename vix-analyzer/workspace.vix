@@ -1,8 +1,8 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "analysis.vix"
+include "ids.vix"
+include "position.vix"
+include "analysis.vix"
 
 pub type OpenDocument = struct
 {

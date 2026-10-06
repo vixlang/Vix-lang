@@ -5,8 +5,7 @@
 //   clang++ qc.o runtime/runtime.o -o qc
 //   ./qc        # exit code: 0
 
-mod math
-
+use "math.vix" as math
 fn main(): i32
 {
     // 跨模块调用一律写限定名：module::function(...)

@@ -1,10 +1,10 @@
 #[no_main]
-import "ast.vix"
-import "builder.vix"
-import "method.vix"
-import "method_decl.vix"
-import "semantic.vix"
-import "module.vix"
+include "ast.vix"
+include "builder.vix"
+include "method.vix"
+include "method_decl.vix"
+include "semantic.vix"
+include "module.vix"
 
 extern "C"
 {

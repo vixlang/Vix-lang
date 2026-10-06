@@ -1,9 +1,9 @@
 #[no_main]
 
-import "ids.vix"
-import "position.vix"
-import "util.vix"
-import "stub_tree.vix"
+include "ids.vix"
+include "position.vix"
+include "util.vix"
+include "stub_tree.vix"
 
 pub type SymbolKind = ModuleSymbol | FunctionSymbol | ParameterSymbol | VariableSymbol | TypeSymbol | FieldSymbol | VariantSymbol | ImportSymbol
 

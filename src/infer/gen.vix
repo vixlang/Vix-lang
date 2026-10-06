@@ -1,6 +1,6 @@
 #[no_main]
 
-import "env.vix"
+include "env.vix"
 
 // Both the environment and binding type must include constraints collected
 // while inferring the initializer before quantifying its free variables.

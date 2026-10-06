@@ -1,7 +1,7 @@
 #[no_main]
-import "abi.vix"
-import "instructions.vix"
-import "codegen.vix"
+include "abi.vix"
+include "instructions.vix"
+include "codegen.vix"
 
 extern "C"
 {

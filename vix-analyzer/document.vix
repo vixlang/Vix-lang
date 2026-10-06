@@ -1,9 +1,9 @@
 #[no_main]
 
-import "ids.vix"
-import "source_text.vix"
-import "stub_tree.vix"
-import "incremental.vix"
+include "ids.vix"
+include "source_text.vix"
+include "stub_tree.vix"
+include "incremental.vix"
 
 pub type DocumentState = struct
 {
