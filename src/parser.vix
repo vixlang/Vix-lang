@@ -2348,12 +2348,13 @@ pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): As
             if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
             mod_decls.push(mdecl)
         }
-        // `import ident...`; quoted imports are legacy no-ops in raw module mode.
+        // `import module::symbol` used to be parsed and then dropped without a
+        // word, so it looked like it worked.  Reject it instead: the symbol is
+        // already reachable through its qualified name.
         elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
         {
-            let idecl = parse_import_decl(&parser)
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-            import_decls.push(idecl)
+            parser_fail(&parser, "unsupported import: call the symbol by its qualified name, as in 'module::function(...)'")
+            return ast_program_err_diag(parser.error, parser.diagnostic)
         }
         elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
         {
@@ -2499,9 +2500,8 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
     }
     elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
     {
-        let idecl = parse_import_decl(&parser)
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-        import_decls.push(idecl)
+        parser_fail(&parser, "unsupported import: call the symbol by its qualified name, as in 'module::function(...)'")
+        return ast_program_err_diag(parser.error, parser.diagnostic)
     }
     elif (parser_text(&parser) == "import" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
     {

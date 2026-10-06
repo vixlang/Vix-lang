@@ -1,0 +1,24 @@
+// qualified_calls.vix — 跨模块限定名调用
+//
+// 编译：
+//   vixc examples/modules/qualified_calls.vix -obj -o qc.o
+//   clang++ qc.o runtime/runtime.o -o qc
+//   ./qc        # exit code: 0
+
+mod math
+
+fn main(): i32
+{
+    // 跨模块调用一律写限定名：module::function(...)
+    let a = math::add(10, 3)     // 13
+    let b = math::mul(4, 5)      // 20
+    let c = math::sub(b, a)      // 7
+    let d = math::abs_val(0 - 6) // 6
+
+    print(a)  // 13
+    print(b)  // 20
+    print(c)  // 7
+    print(d)  // 6
+
+    return 0
+}

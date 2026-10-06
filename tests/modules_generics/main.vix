@@ -1,0 +1,12 @@
+mod gen
+
+fn main(): i32
+{
+    let a = gen::id[i32](42)
+    let b = gen::add[i32](3, 4)
+    let c = gen::id[f64](0.5)
+    if (a != 42) { return 1 }
+    if (b != 7) { return 2 }
+    if (c != 0.5) { return 3 }
+    return a + b
+}

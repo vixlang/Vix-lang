@@ -1,106 +1,102 @@
 # Vix Module System Examples
 
-This directory demonstrates the multi-file module system in Vix.
+This directory demonstrates the multi-file module system.
 
 ## Overview
 
-The Vix module system allows you to organize code across multiple files:
-- **Module declaration**: `mod module_name` or `pub mod module_name`
-- **Import statement**: `import module::function` or `import module::Type as Alias`
-- **Qualified calls**: `module::function()` for functions from imported modules
+- **Module declaration**: `mod name` / `mod "path.vix"`
+- **Qualified calls**: `module::function()`
+- **Textual inclusion**: `import "path.vix"` splices another file in (flat namespace)
+
+There is no `import module::symbol` form: it used to be parsed and then silently
+dropped, and it is now rejected. Call cross-module symbols by their qualified
+name instead.
 
 ## File Resolution
 
-When you declare `mod math`, the compiler looks for:
-1. `math.vix` in the same directory
-2. `math/mod.vix` as a subdirectory module
+`mod math` looks for, in the directory of the importing file:
+
+1. `math.vix`
+2. `math/mod.vix`
+
+If both exist the compiler reports an ambiguity.
 
 ## Examples
 
-### 1. Basic Module (`basic_example.vix`)
-Simple two-file program with a math module.
+| File | Shows |
+|------|-------|
+| `basic_example.vix` | Two modules, qualified calls. Exit code 17 |
+| `multi_module.vix` | Three modules, structs defined in one and used from another |
+| `nested_module.vix` | Directory module (`utils/mod.vix`) with a submodule |
+| `qualified_calls.vix` | Cross-module calls, all through `module::function` |
+
+## Compiling and running
+
+`vixc -o` cannot link on macOS: the embedded linker only implements the ELF and
+COFF drivers. Emit an object file and link it yourself, or use
+`sh scripts/run-vix.sh`:
 
 ```bash
-# Compile with self backend (recommended)
-vixc examples/modules/basic_example.vix --backend=self -o output
-./output  # Returns 17
+vixc examples/modules/basic_example.vix -obj -o output.o
+clang++ output.o runtime/runtime.o -o output
+./output                    # exit code 17
 ```
 
-### 2. Multiple Modules (`multi_module.vix`)
-Demonstrates importing multiple modules.
+`python3 tests/modules_e2e.py` builds, links and runs every multi-module example
+in this directory and checks the exit code.
 
-### 3. Module with Structs (`structs_example.vix`)
-Shows how to define and use structs across modules.
+## Inspecting
 
-## Compilation
-
-**Using Self Backend (Recommended)**:
 ```bash
-vixc your_file.vix --backend=self -o output
+vixc your_file.vix --module-graph     # module tree
+vixc your_file.vix --debug=llvm       # generated LLVM IR
 ```
-
-**View Module Graph**:
-```bash
-vixc your_file.vix --module-graph
-```
-
-**Debug MIR Output**:
-```bash
-vixc your_file.vix --debug=mir
-```
-
-## Known Limitations
-
-- LLVM backend currently has issues with multi-file compilation
-- Use `--backend=self` or `--backend=self-lir` for multi-file programs
-- Import statements are parsed but full error checking is pending
 
 ## Syntax Reference
 
-### Module Declaration
-```vix
-// In main.vix
-mod math              // Private module (not re-exported)
-pub mod utilities     // Public module (can be re-exported)
+### Entry file
 
-fn main(): i32 {
-    return 0
+```vix
+mod math
+
+fn main(): i32
+{
+    return math::add(3, 4)
 }
 ```
 
-### Module File (math.vix)
+### Module file (math.vix)
+
 ```vix
-// All top-level functions are public by default
-pub fn add(a: i32, b: i32): i32 {
+pub fn add(a: i32, b: i32): i32
+{
     return a + b
 }
 
-pub fn multiply(x: i32, y: i32): i32 {
+pub fn multiply(x: i32, y: i32): i32
+{
     return x * y
 }
 ```
 
-### Import and Usage
+### Directory module (utils/mod.vix)
+
 ```vix
-mod math
+pub mod string_helpers
 
-import math::add
-import math::multiply as mul
-
-fn main(): i32 {
-    let sum = math::add(3, 4)      // Qualified call
-    let product = math::mul(2, 5)  // Using alias
-    return sum + product           // Returns 17
+pub fn greet(name: string): i32
+{
+    print(name)
+    return 0
 }
 ```
 
-### Nested Modules (utils/mod.vix)
-```vix
-mod utils
+`utils::string_helpers::length(...)` then reaches inside `utils/string_helpers.vix`.
 
-import utils::string_helpers
+## Known Limitations
 
-fn main(): i32 {
-    return utils::string_helpers::length("hello")
-}
-```
+- `pub` is **not** enforced: every declaration is visible after merging.
+- Structs and ADTs are merged **without** a module namespace prefix, so two
+  modules that declare the same struct/ADT name collide (or, for ADTs, the
+  second is silently dropped).
+- The `self` backends are x86_64 only and refuse to run on arm64.

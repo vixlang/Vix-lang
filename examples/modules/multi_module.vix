@@ -13,12 +13,6 @@
 mod math
 mod counter
 
-import math::add
-import math::mul
-import math::abs_val
-import counter::counter_new
-import counter::counter_inc
-import counter::counter_get
 
 fn main(): i32
 {

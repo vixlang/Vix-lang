@@ -8,16 +8,20 @@ description: Vix imports, modules, visibility and the macro system.
 ## 导入
 
 ```vix
-import "std/io.vix"        // 相对/搜索路径文件
-import "os"                // 裸名，按包规则展开
+import "util/fresh.vix"    // 文本包含，相对导入文件所在目录
 mod "parser.vix"           // 聚合：把文件并入当前编译单元
-mod sys                    // 具名模块
+mod sys                    // 具名模块（查找 sys.vix 或 sys/mod.vix）
 ```
 
-- `import` 走预处理器和文件搜索，`mod "x.vix"` 直接并入（不预处理）。
-- 路径解析优先级见 [../../docs/import-resolution.md](../../docs/import-resolution.md)。
-  裸名会先做包名展开（`name` 变成 `github.com/vixlang/vlib-name` 之类），
-  再依次找 `.vix/libs/`、`$VIX_HOME/libs/`、`$VIX_HOME/std/`。
+- 带引号的 `import` 走预处理器：目标文件处理后的源码**文本拼进来**，
+  共享扁平命名空间。`mod "x.vix"` 走模块图，会加命名空间前缀。
+- 路径只按**相对导入文件的目录**解析。**没有包管理器**：裸名展开、
+  `$VIX_HOME`、`.vix/libs` 这套搜索顺序**在实现里不存在**（历史上文档写过，
+  但从未实现，现已删除该文档）。
+- 路径会被词法规范化：`./a.vix`、`sub/../a.vix`、`a//b.vix` 与 `a.vix`
+  视为同一文件，只包含一次。
+- `import module::symbol` **不是有效语法**，解析阶段直接报错。跨模块调用
+  一律写限定名 `module::symbol(...)`。
 - 编译器的聚合文件是 `src/sys.vix`，新增编译器源文件要加一行 `mod "x.vix"`。
 
 ## 可见性
@@ -30,15 +34,14 @@ mod sys                    // 具名模块
 所以文件里可以调用别处定义的函数而不再单独 import；但为了
 `--check` 单文件和 analyzer 聚合能解析，**新文件仍要显式 import 依赖**。
 
-跨目录 import 的拼写要一致，否则同一文件会被当成两份包含进来，
-报 `duplicate struct`。仓库现状：
+路径已做词法规范化（见上），所以 `"ast.vix"` 和 `"../ast.vix"` 不会再被当成
+两份。但**建议全仓库保持同一种拼写**，可读性更好：
 
 - `src/*.vix` 之间用裸名 `import "ast.vix"`；
-- `src/*/**.vix` 引用新方法模块时也用裸名 `import "method.vix"`
-  （依赖搜索路径回退）；
-- 老文件里 `src/analysis/typed_analysis.vix` 用 `"../ast.vix"` 这种写法。
+- `src/*/**.vix` 引用新方法模块时用 `import "method.vix"`，
+  跨目录用相对路径（如 `src/infer/solver.vix` 里的 `import "../ast.vix"`）。
 
-加新模块时**全仓库用同一种拼写**，改完全量编译 + analyzer 编译都过一遍。
+加新模块时改完全量编译 + analyzer 编译都过一遍。
 
 ## 宏
 

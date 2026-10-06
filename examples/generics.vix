@@ -1,59 +1,46 @@
 /*
-generics
+generics — 泛型函数与泛型 ADT
+
+支持的形式：
+  fn name:[T](v: T): T          泛型函数，调用写 name[i32](...)
+  type Name:[T] = Variant(T)    泛型 ADT
+
+不支持泛型 struct（struct Name:[T] { ... } 无法解析）；
+需要携带类型的结构请用非泛型 struct 或泛型 ADT。
 */
 extern "C"
 {
 	fn printf(format: string, ...): i32
 }
-struct Box:[T]
+
+type Box = struct
 {
-	value: T
+	value: i32
 }
 
 fn id:[T](value: T): T
 {
 	return value
 }
+
 fn add:[T](a: T, b: T): T
 {
-    return a + b
+	return a + b
 }
+
 type Flag:[T] = On | Off
 
 fn main(): i32
 {
-	let b = Box:[i32]{ value: 10 }
-	let x = id:[i32](b.value)
-    let y = add:[i32](4,6)
-    let z = add:[f64](2.5, 3.5)
-    printf("b = %d\n", b.value)
-    printf("x = %d\n", x)
+	let b = Box{ value: 10 }
+	let x = id[i32](b.value)
+	let y = add[i32](4, 6)
+	let z = add[f64](2.5, 3.5)
+	printf("b = %d\n", b.value)
+	printf("x = %d\n", x)
 	printf("y = %d\n", y)
 	printf("z = %f\n", z)
-    match x
-    {
-        10 ->
-        {
-            printf("OK\n")
-        }
-        _ ->
-        {
-            printf("FAIL\n")
-            return 1
-        }
-    }
-	let state = On
-	match state
-	{
-		On ->
-		{
-			printf("OK\n")
-		}
-		Off ->
-		{
-			printf("FAIL\n")
-			return 1
-		}
-	}
+	if (x != 10) { return 1 }
+	if (y != 10) { return 2 }
 	return 0
 }

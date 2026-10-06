@@ -1,0 +1,11 @@
+// The same file reached through three spellings must be imported once.  a.vix
+// declares a struct on purpose: a second inclusion is only diagnosed for
+// declarations the compiler de-duplicates by name, and a struct is one of them.
+import "a.vix"
+import "./a.vix"
+import "sub/../a.vix"
+
+fn main(): i32
+{
+    return value()
+}

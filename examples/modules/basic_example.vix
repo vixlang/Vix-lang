@@ -11,8 +11,6 @@
 
 mod math
 
-import math::add
-import math::mul
 
 fn main(): i32
 {

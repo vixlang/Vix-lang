@@ -24,29 +24,21 @@ pub fn module_id_new(id: i32, qualified_name: string, source_path: string): Modu
 // ---------------------------------------------------------------------------
 
 pub type Module = struct {
-    id:              ModuleId,
-    parent_id:       i32,
-    child_ids:       [i32],
-    source_path:     string,
-    public_symbols:  [string],
-    private_symbols: [string],
-    import_paths:    [string],
-    import_aliases:  [string],
-    is_pub:          i32
+    id:          ModuleId,
+    parent_id:   i32,
+    child_ids:   [i32],
+    source_path: string,
+    is_pub:      i32
 }
 
 pub fn module_new(id: ModuleId, parent_id: i32, source_path: string, is_pub: i32): Module
 {
     return Module{
-        id:              id,
-        parent_id:       parent_id,
-        child_ids:       [],
-        source_path:     source_path,
-        public_symbols:  [],
-        private_symbols: [],
-        import_paths:    [],
-        import_aliases:  [],
-        is_pub:          is_pub
+        id:          id,
+        parent_id:   parent_id,
+        child_ids:   [],
+        source_path: source_path,
+        is_pub:      is_pub
     }
 }
 
@@ -431,50 +423,6 @@ pub fn mangle_flat_name(flat: string): string
     let mut sym      = ""
     for (j in last_sep + 2 .. flat.length) { sym = sym + char_string(compiler_string_byte(flat, j)) }
     return mangle_name(mod_path, sym)
-}
-
-// ---------------------------------------------------------------------------
-// Import / symbol resolution helpers
-// ---------------------------------------------------------------------------
-
-// Collect all public function/type names declared in a program.
-pub fn module_collect_public_symbols(m: &Module, prog: AstProgram)
-{
-    for (i in 0 .. prog.functions.length)
-    {
-        m.public_symbols.push(prog.functions[i].name)
-    }
-    for (i in 0 .. prog.structs.length)
-    {
-        m.public_symbols.push(prog.structs[i].name)
-    }
-    for (i in 0 .. prog.adts.length)
-    {
-        m.public_symbols.push(prog.adts[i].name)
-    }
-}
-
-// Resolve an import declaration path to a qualified name string.
-// e.g. ["math", "add"] -> "math::add"
-pub fn import_path_to_qname(path: [string]): string
-{
-    let mut out = ""
-    for (i in 0 .. path.length)
-    {
-        if (i > 0) { out = out + "::" }
-        out = out + path[i]
-    }
-    return out
-}
-
-// Check whether `name` is a duplicate in `names`.
-pub fn symbol_is_duplicate(names: [string], name: string): i32
-{
-    for (i in 0 .. names.length)
-    {
-        if (names[i] == name) { return 1 }
-    }
-    return 0
 }
 
 // ---------------------------------------------------------------------------

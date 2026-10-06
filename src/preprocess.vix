@@ -291,19 +291,108 @@ pub fn macro_set_find(macros: &MacroSet, name: string): i32
     return found
 }
 
+// ---------------------------------------------------------------------------
+// Lexical path normalisation
+//
+// Two spellings of one file used to count as two imports, so "method.vix" and
+// "../method.vix" were both pulled in and every declaration in them collided.
+// This is purely lexical: the file does not have to exist for the result to be
+// meaningful, which is what makes it usable as an import identity.
+// ---------------------------------------------------------------------------
+
+pub fn path_append_segment(out: string, segment: string): string
+{
+    if (out == "") { return segment }
+    if (compiler_string_byte(out, out.length - 1) == '/') { return out + segment }
+    return out + "/" + segment
+}
+
+pub fn path_last_slash(text: string): i32
+{
+    let mut last = -1
+    for (i in 0 .. text.length)
+    {
+        if (compiler_string_byte(text, i) == '/') { last = i }
+    }
+    return last
+}
+
+// Segment after the final slash, i.e. the last path component.
+pub fn path_last_segment(text: string): string
+{
+    let last = path_last_slash(text)
+    if (last < 0) { return text }
+    let mut out = ""
+    for (i in last + 1 .. text.length)
+    {
+        out = out + char_string(compiler_string_byte(text, i))
+    }
+    return out
+}
+
+pub fn path_normalize(path: string): string
+{
+    if (path == "") { return "" }
+    let absolute = if (compiler_string_byte(path, 0) == '/') { 1 } else { 0 }
+    let mut out = if (absolute == 1) { "/" } else { "" }
+    let mut current = ""
+    let mut i = 0
+    while (i <= path.length)
+    {
+        let at_end = if (i == path.length) { 1 } else { 0 }
+        let byte = if (at_end == 1) { 0 } else { compiler_string_byte(path, i) }
+        if (at_end == 1 or byte == '/')
+        {
+            if (current == "..")
+            {
+                if (out == "" or out == "/")
+                {
+                    // Nothing above the root: ".." only survives in a relative path.
+                    if (absolute == 0) { out = path_append_segment(out, "..") }
+                }
+                elif (path_last_segment(out) == "..")
+                {
+                    out = path_append_segment(out, "..")
+                }
+                else
+                {
+                    let last = path_last_slash(out)
+                    let mut truncated = if (last < 0) { "" } else { slice_text(out, 0, last) }
+                    if (truncated == "" and absolute == 1) { truncated = "/" }
+                    out = truncated
+                }
+            }
+            elif (current != "" and current != ".")
+            {
+                out = path_append_segment(out, current)
+            }
+            current = ""
+        }
+        else
+        {
+            current = current + char_string(byte)
+        }
+        i += 1
+    }
+    if (out == "") { return "." }
+    return out
+}
+
 pub fn import_set_contains(imports: &ImportSet, path: string): i32
 {
+    let wanted = path_normalize(path)
     for (i in 0 .. imports.paths.length)
     {
-        if (imports.paths[i] == path) { return 1 }
+        if (imports.paths[i] == wanted) { return 1 }
     }
     return 0
 }
 
 pub fn import_set_add(imports: &ImportSet, path: string)
 {
-    if (import_set_contains(imports, path) == 1) { return }
-    imports.paths.push(path)
+    let normalized = path_normalize(path)
+    if (import_set_contains(imports, normalized) == 1) { return }
+    imports.paths.push(normalized)
 }
 
 pub fn read_file_content(path: string): string
@@ -1192,12 +1281,14 @@ pub fn preprocess_source_with_macros(src: string, filename: string, imports: &Im
             let path = extract_import_path(src, i)
             if (path != "")
             {
-                let resolved = resolve_import_path(filename, path)
+                // Normalise before reading: a spelling such as "sub/../a.vix"
+                // only becomes readable once the redundant segment is gone.
+                let resolved = path_normalize(resolve_import_path(filename, path))
                 let mut actual = resolved
                 let mut content = read_file_content(actual)
                 if (content == "" and path != resolved)
                 {
-                    actual = path
+                    actual = path_normalize(path)
                     content = read_file_content(actual)
                 }
                 if (content != "" and import_set_contains(imports, actual) == 0)

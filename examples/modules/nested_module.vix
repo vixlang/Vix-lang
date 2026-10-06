@@ -12,9 +12,6 @@
 
 mod utils
 
-import utils::greet
-import utils::string_helpers::length
-import utils::string_helpers::is_empty
 
 fn main(): i32
 {
