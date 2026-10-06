@@ -1,5 +1,5 @@
 #[no_main]
-use "types.vix" as __inc_types_1
+use "types.vix" as machine_types
 
 extern "C"
 {

@@ -20,10 +20,10 @@
 
 #[no_main]
 
-use "ast.vix" as __inc_ast_1
-use "intrinsic.vix" as __inc_intrinsic_2
-use "method_decl.vix" as __inc_method_decl_3
-use "receiver.vix" as __inc_receiver_4
+use "ast.vix" as ast
+use "intrinsic.vix" as intrinsic
+use "method_decl.vix" as method_decl
+use "receiver.vix" as receiver
 
 extern "C"
 {

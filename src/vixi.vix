@@ -16,9 +16,9 @@
 // (3) is the one that is easy to forget and expensive to get wrong: without it a
 // stale interface is accepted whenever the dependent file itself is untouched.
 
-use "json.vix" as __inc_json_1
-use "lexer.vix" as __inc_lexer_2
-use "ast.vix" as __inc_ast_3
+use "json.vix" as json
+use "lexer.vix" as lexer
+use "ast.vix" as ast
 
 extern "C"
 {

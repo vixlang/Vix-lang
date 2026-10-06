@@ -25,7 +25,7 @@
 
 #[no_main]
 
-use "parser.vix" as __inc_parser_1
+use "parser.vix" as parser
 
 extern "C"
 {

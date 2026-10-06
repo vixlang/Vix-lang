@@ -1,8 +1,8 @@
 #[no_main]
 
-use "ty.vix" as __inc_ty_1
-use "subst.vix" as __inc_subst_2
-use "../util/fresh.vix" as __inc____util_fresh_3
+use "ty.vix" as ty
+use "subst.vix" as subst
+use "../util/fresh.vix" as fresh
 
 pub type Scheme = struct {
     vars: [i32],

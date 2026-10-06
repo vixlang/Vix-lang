@@ -1,7 +1,7 @@
 #[no_main]
-use "abi.vix" as __inc_abi_1
-use "instructions.vix" as __inc_instructions_2
-use "codegen.vix" as __inc_codegen_3
+use "abi.vix" as abi
+use "instructions.vix" as instructions
+use "codegen.vix" as codegen
 
 extern "C"
 {

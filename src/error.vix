@@ -1,7 +1,7 @@
 #[no_main]
 
-use "lexer.vix" as __inc_lexer_1
-use "diag.vix" as __inc_diag_2
+use "lexer.vix" as lexer
+use "diag.vix" as diag
 
 extern "C"
 {

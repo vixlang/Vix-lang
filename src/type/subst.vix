@@ -1,6 +1,6 @@
 #[no_main]
 
-use "ty.vix" as __inc_ty_1
+use "ty.vix" as ty
 
 pub type TyBinding = struct {
     var_id: i32,

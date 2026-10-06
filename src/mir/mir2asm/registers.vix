@@ -1,5 +1,5 @@
 #[no_main]
-use "target.vix" as __inc_target_1
+use "target.vix" as target
 
 pub fn mir2asm_acc(ty: string): string
 {

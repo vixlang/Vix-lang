@@ -1,9 +1,9 @@
 #[no_main]
 
-use "gen.vix" as __inc_gen_1
-use "method.vix" as __inc_method_2
-use "method_decl.vix" as __inc_method_decl_3
-use "unify.vix" as __inc_unify_4
+use "gen.vix" as gen
+use "method.vix" as methods
+use "method_decl.vix" as method_decl
+use "unify.vix" as unify
 
 pub type InferValue = struct {
     ok: i32,

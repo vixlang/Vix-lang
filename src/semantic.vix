@@ -1,10 +1,10 @@
 #[no_main]
 
-use "ast.vix" as __inc_ast_1
-use "error.vix" as __inc_error_2
-use "intrinsic.vix" as __inc_intrinsic_3
-use "method.vix" as __inc_method_4
-use "type/typeck.vix" as __inc_type_typeck_5
+use "ast.vix" as ast
+use "error.vix" as error
+use "intrinsic.vix" as intrinsic
+use "method.vix" as methods
+use "type/typeck.vix" as typeck
 
 pub type SemanticResult = struct {
     ok: i32,

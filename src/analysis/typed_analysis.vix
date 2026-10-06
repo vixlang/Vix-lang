@@ -1,10 +1,10 @@
 #[no_main]
 
-use "../ast.vix" as __inc____ast_1
-use "../error.vix" as __inc____error_2
-use "../lexer.vix" as __inc____lexer_3
-use "method.vix" as __inc_method_4
-use "method_decl.vix" as __inc_method_decl_5
+use "../ast.vix" as ast
+use "../error.vix" as error
+use "../lexer.vix" as lexer
+use "method.vix" as methods
+use "method_decl.vix" as method_decl
 
 pub type AnalysisSpan = struct {
     file: string,

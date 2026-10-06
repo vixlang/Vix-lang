@@ -1,6 +1,6 @@
 #[no_main]
 
-use "env.vix" as __inc_env_1
+use "env.vix" as env
 
 // Both the environment and binding type must include constraints collected
 // while inferring the initializer before quantifying its free variables.

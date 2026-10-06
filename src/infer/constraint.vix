@@ -1,7 +1,7 @@
 #[no_main]
 
-use "../type/ty.vix" as __inc____type_ty_1
-use "../util/pos.vix" as __inc____util_pos_2
+use "../type/ty.vix" as ty
+use "../util/pos.vix" as pos
 
 pub type Constraint = ConstraintEq(i32)
 

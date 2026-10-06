@@ -1,7 +1,7 @@
 #[no_main]
-use "types.vix" as __inc_types_1
-use "target.vix" as __inc_target_2
-use "registers.vix" as __inc_registers_3
+use "types.vix" as machine_types
+use "target.vix" as target
+use "registers.vix" as registers
 
 pub fn mir2asm_label(b: &MirAsm, name: string): string => b.fn_name + "__" + mir2asm_clean_name(name)
 
