@@ -1,4 +1,4 @@
-include "sys.vix"
+use "sys.vix" as sys
 
 extern "C"
 {
