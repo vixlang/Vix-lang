@@ -60,22 +60,13 @@ $CLANGXX -c lib/llvm/Linker.cpp -o build/Linker.o $LLVM_CXXFLAGS -I"$LLD_INCLUDE
 COMPILER_SUPPORT="build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o"
 
 echo "== bootstrap compiler through module graph =="
-MAIN_BACKUP=$(mktemp)
-cp src/main.vix "$MAIN_BACKUP"
-restore_main() { cp "$MAIN_BACKUP" src/main.vix; rm -f "$MAIN_BACKUP"; }
-trap restore_main EXIT
-python3 - <<'PY'
-p = "src/main.vix"
-s = open(p, encoding="utf-8").read()
-if not s.startswith('use "sys.vix" as sys'):
-    raise SystemExit("src/main.vix must use sys module")
-open(p, "w", encoding="utf-8").write('include "sys.vix"' + s[len('use "sys.vix" as sys'):])
-PY
-build/vixc src/main.vix -obj -o build/vixc-stage1.o
+# The checked-in compiler sources now use the module graph directly.  The
+# patched seed understands those imports; do not rewrite main.vix to legacy
+# include syntax because sys.vix is itself a real module manifest.
+build/vixc-patched src/main.vix -obj -o build/vixc-stage1.o
 $CLANGXX -o build/vixc-stage1 build/vixc-stage1.o $COMPILER_SUPPORT \
   -L"$LLD_LIBDIR" -llldELF -llldCommon -l"$LLVM_LINK_LIB" \
   -L"$GC_LIBDIR" -lgc -lz -lzstd -Wl,-rpath,"$LLD_LIBDIR"
-cp "$MAIN_BACKUP" src/main.vix
 build/vixc-stage1 src/main.vix -obj -o build/vixc-patched.o
 $CLANGXX -o build/vixc-patched build/vixc-patched.o $COMPILER_SUPPORT \
   -L"$LLD_LIBDIR" -llldELF -llldCommon -l"$LLVM_LINK_LIB" \

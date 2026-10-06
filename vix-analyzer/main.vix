@@ -1,5 +1,7 @@
 #[no_main]
 
+extern "C" { fn fputs(s: string, file: ptr): i32 }
+
 include "lsp_server.vix"
 
 pub fn vix_analyzer_main(): i32
