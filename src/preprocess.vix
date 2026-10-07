@@ -1,5 +1,6 @@
 #[no_main]
 use "lexer.vix" as lexer
+use "diag.vix" as diag
 
 pub type ImportSet = struct {
     paths: [string]
@@ -41,7 +42,7 @@ pub type MacroSourceMap = struct {
 pub type PreprocessResult = struct {
     ok: i32,
     source: string,
-    diagnostic: Diagnostic,
+    diagnostic: diag::Diagnostic,
     source_map: MacroSourceMap
 }
 
@@ -100,9 +101,9 @@ pub fn macro_set_add(macros: &MacroSet, name: string, param: string, param_kind:
 
 pub fn macro_source_map_new(): MacroSourceMap { return MacroSourceMap{ entries: [] } }
 
-pub fn macro_origin_rank(origin: TokenOrigin): i32
+pub fn macro_origin_rank(origin: lexer::TokenOrigin): i32
 {
-    return match origin { TokenCallSite -> 0 TokenDefinitionSite -> 1 TokenGenerated -> 2 }
+    return match origin { lexer::TokenCallSite -> 0 lexer::TokenDefinitionSite -> 1 lexer::TokenGenerated -> 2 }
 }
 
 pub fn macro_token_kind_rank(kind: MacroTokenKind): i32
@@ -110,9 +111,9 @@ pub fn macro_token_kind_rank(kind: MacroTokenKind): i32
     return match kind { MacroText -> 0 MacroIdentifier -> 1 MacroParameter -> 2 MacroCapture -> 3 MacroRaw -> 4 MacroRepeat -> 5 }
 }
 
-pub fn macro_origin_from_rank(origin: i32): TokenOrigin
+pub fn macro_origin_from_rank(origin: i32): lexer::TokenOrigin
 {
-    return match origin { 1 -> TokenDefinitionSite 2 -> TokenGenerated _ -> TokenCallSite }
+    return match origin { 1 -> lexer::TokenDefinitionSite 2 -> lexer::TokenGenerated _ -> lexer::TokenCallSite }
 }
 
 pub fn macro_source_map_add(macros: &MacroSet, output_start: i32, output_end: i32, token: MacroToken, macro_name: string, source_file: string)
@@ -163,22 +164,22 @@ pub fn macro_error_help(code: string): string
     }
 }
 
-pub fn macro_error_diagnostic(macros: &MacroSet): Diagnostic
+pub fn macro_error_diagnostic(macros: &MacroSet): diag::Diagnostic
 {
-    let span = diag_span(macros.error_file, macros.error_start, macros.error_end, macros.error_line, macros.error_column)
-    let mut diagnostic = diag_new(macros.error_code, DiagError, DiagParser, macros.error_title)
-        |> diag_message(macros.error_message)
-        |> diag_primary(span, "macro invocation")
+    let span = diag::diag_span(macros.error_file, macros.error_start, macros.error_end, macros.error_line, macros.error_column)
+    let mut diagnostic = diag::diag_new(macros.error_code, diag::DiagError, diag::DiagParser, macros.error_title)
+        |> diag::diag_message(macros.error_message)
+        |> diag::diag_primary(span, "macro invocation")
     for (i in 0 .. macros.error_macro_indices.length)
     {
         let idx = macros.error_macro_indices[i]
-        let def_span = diag_span(macros.files[idx], macros.definition_starts[idx], macros.definition_ends[idx], macros.definition_lines[idx], macros.definition_columns[idx])
-        diagnostic = diag_macro_frame(diagnostic, macros.error_macro_names[i], def_span, "macro defined here")
+        let def_span = diag::diag_span(macros.files[idx], macros.definition_starts[idx], macros.definition_ends[idx], macros.definition_lines[idx], macros.definition_columns[idx])
+        diagnostic = diag::diag_macro_frame(diagnostic, macros.error_macro_names[i], def_span, "macro defined here")
     }
     let note = macro_error_note(macros.error_code)
     let help = macro_error_help(macros.error_code)
-    if (note != "") { diagnostic = diag_note(diagnostic, note) }
-    if (help != "") { diagnostic = diag_help(diagnostic, help) }
+    if (note != "") { diagnostic = diag::diag_note(diagnostic, note) }
+    if (help != "") { diagnostic = diag::diag_help(diagnostic, help) }
     return diagnostic
 }
 
@@ -220,17 +221,17 @@ pub fn macro_definition_keyword_at(source: string, offset: i32): i32
     return 1
 }
 
-pub fn tokenize_with_macro_origins(source: string, source_map: &MacroSourceMap): TokenStream
+pub fn tokenize_with_macro_origins(source: string, source_map: &MacroSourceMap): lexer::TokenStream
 {
     // Most compiler sources do not expand a macro.  Avoid rebuilding the
     // entire token stream in that case: the bootstrap backend keeps loop
     // temporaries on its stack until the function returns, so this otherwise
     // needlessly turns a large source file into a stack overflow.
-    if (source_map.entries.length == 0) { return tokenize(source) }
-    let original = tokenize(source)
-    let mapped = stream_new()
+    if (source_map.entries.length == 0) { return lexer::tokenize(source) }
+    let original = lexer::tokenize(source)
+    let mapped = lexer::stream_new()
     let mut i = 0
-    let token_count = stream_len(&original)
+    let token_count = lexer::stream_len(&original)
     let entry_count = source_map.entries.length
     let mut start = 0
     let mut origin_rank = 0
@@ -238,7 +239,7 @@ pub fn tokenize_with_macro_origins(source: string, source_map: &MacroSourceMap):
     let mut j = 0
     while (i < token_count)
     {
-        start = stream_start_at(&original, i)
+        start = lexer::stream_start_at(&original, i)
         origin_rank = original.origins[i]
         hygiene_id = original.hygiene_ids[i]
         j = 0
@@ -251,7 +252,7 @@ pub fn tokenize_with_macro_origins(source: string, source_map: &MacroSourceMap):
             }
             j += 1
         }
-        stream_push_origin_rank(&mapped, stream_kind_at(&original, i), stream_text_at(&original, i), stream_int_at(&original, i), stream_float_at(&original, i), stream_line_at(&original, i), stream_col_at(&original, i), start, stream_end_at(&original, i), origin_rank, hygiene_id)
+        lexer::stream_push_origin_rank(&mapped, lexer::stream_kind_at(&original, i), lexer::stream_text_at(&original, i), lexer::stream_int_at(&original, i), lexer::stream_float_at(&original, i), lexer::stream_line_at(&original, i), lexer::stream_col_at(&original, i), start, lexer::stream_end_at(&original, i), origin_rank, hygiene_id)
         i += 1
     }
     return mapped
@@ -325,7 +326,7 @@ pub fn path_last_segment(text: string): string
     let mut out = ""
     for (i in last + 1 .. text.length)
     {
-        out = out + char_string(compiler_string_byte(text, i))
+        out = out + lexer::char_string(compiler_string_byte(text, i))
     }
     return out
 }
@@ -370,7 +371,7 @@ pub fn path_normalize(path: string): string
         }
         else
         {
-            current = current + char_string(byte)
+            current = current + lexer::char_string(byte)
         }
         i += 1
     }
@@ -423,7 +424,7 @@ pub fn resolve_import_path(importer: string, import_path: string): string
     let mut dir = ""
     for (i in 0 .. (last_slash + 1))
     {
-        dir = dir + char_string(compiler_string_byte(importer, i))
+        dir = dir + lexer::char_string(compiler_string_byte(importer, i))
     }
     return dir + import_path
 }
@@ -509,7 +510,7 @@ pub fn extract_import_path(src: string, start: i32): string
     let mut path = ""
     while (i < src.length and compiler_string_byte(src, i) != '"')
     {
-        path = path + char_string(compiler_string_byte(src, i))
+        path = path + lexer::char_string(compiler_string_byte(src, i))
         i += 1
     }
     return path
@@ -534,7 +535,7 @@ pub fn newline_padding(src: string, start: i32, end: i32): string
     let mut out = ""
     for (i in start .. end)
     {
-        if (compiler_string_byte(src, i) == 10) out = out + char_string(10)
+        if (compiler_string_byte(src, i) == 10) out = out + lexer::char_string(10)
     }
     return out
 }
@@ -556,7 +557,7 @@ pub fn is_space_or_newline(c: i32): i32
 
 pub fn is_macro_ident_char(c: i32): i32
 {
-    if (is_alpha(c) == 1 or is_digit(c) == 1 or c == '_') { return 1 }
+    if (lexer::is_alpha(c) == 1 or lexer::is_digit(c) == 1 or c == '_') { return 1 }
     return 0
 }
 
@@ -779,19 +780,19 @@ pub fn skip_macro_definition(src: string, filename: string, start: i32, macros: 
     return body_end
 }
 
-pub fn macro_token(kind: MacroTokenKind, text: string, start: i32, end: i32, line: i32, column: i32, origin: TokenOrigin, hygiene_id: i32): MacroToken
+pub fn macro_token(kind: MacroTokenKind, text: string, start: i32, end: i32, line: i32, column: i32, origin: lexer::TokenOrigin, hygiene_id: i32): MacroToken
 {
     return MacroToken{ kind: macro_token_kind_rank(kind), text: text, start: start, end: end, line: line, column: column, origin: macro_origin_rank(origin), hygiene_id: hygiene_id }
 }
 
 pub fn macro_is_identifier_text(text: string): i32
 {
-    if (text.length == 0 or is_alpha(compiler_string_byte(text, 0)) == 0) { return 0 }
+    if (text.length == 0 or lexer::is_alpha(compiler_string_byte(text, 0)) == 0) { return 0 }
     for (i in 1 .. text.length) { if (is_macro_ident_char(compiler_string_byte(text, i)) == 0) { return 0 } }
     return 1
 }
 
-pub fn macro_tokenize_text(text: string, origin: TokenOrigin, hygiene_id: i32, start: i32, line: i32, column: i32): [MacroToken]
+pub fn macro_tokenize_text(text: string, origin: lexer::TokenOrigin, hygiene_id: i32, start: i32, line: i32, column: i32): [MacroToken]
 {
     let mut tokens: [MacroToken] = []
     let mut i = 0
@@ -815,7 +816,7 @@ pub fn macro_tokenize_text(text: string, origin: TokenOrigin, hygiene_id: i32, s
             current_column += i - token_start
             tokens.push(macro_token(MacroText, slice_text(text, token_start, i), start + token_start, start + i, token_line, token_column, origin, hygiene_id))
         }
-        elif (is_alpha(byte) == 1)
+        elif (lexer::is_alpha(byte) == 1)
         {
             i += 1
             while (i < text.length and is_macro_ident_char(compiler_string_byte(text, i)) == 1) { i += 1 }
@@ -882,7 +883,7 @@ pub fn macro_local_names(tokens: &[MacroToken]): [string]
 
 pub fn macro_gensym(hygiene_id: i32, name: string): string
 {
-    return "__vix_m" + i32_to_str(hygiene_id) + "_" + name
+    return "__vix_m" + lexer::i32_to_str(hygiene_id) + "_" + name
 }
 
 pub fn macro_tokens_remove_trailing_separator(tokens: [MacroToken]): [MacroToken]
@@ -906,7 +907,7 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
     {
         if (repeat_param == 1 and text_at(body, i, paren_spread_pat) == 1)
         {
-            let appended = macro_tokenize_text(repeat_arg, TokenCallSite, 0, 0, body_line, body_column)
+            let appended = macro_tokenize_text(repeat_arg, lexer::TokenCallSite, 0, 0, body_line, body_column)
             for (j in 0 .. appended.length) { tokens.push(appended[j]) }
             i += paren_spread_pat.length
         }
@@ -918,7 +919,7 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
             }
             else
             {
-                let appended = macro_tokenize_text(repeat_arg, TokenCallSite, 0, 0, body_line, body_column)
+                let appended = macro_tokenize_text(repeat_arg, lexer::TokenCallSite, 0, 0, body_line, body_column)
                 for (j in 0 .. appended.length) { tokens.push(appended[j]) }
             }
             i += spread_pat.length
@@ -931,7 +932,7 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
             let name = slice_text(body, name_start, name_end)
             if (param != "" and name == param)
             {
-                let appended = macro_tokenize_text(arg, TokenCallSite, 0, 0, body_line, body_column)
+                let appended = macro_tokenize_text(arg, lexer::TokenCallSite, 0, 0, body_line, body_column)
                 for (j in 0 .. appended.length) { tokens.push(appended[j]) }
                 i = name_end
             }
@@ -943,20 +944,20 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
                 if (close < 0 or macro_is_identifier_text(inner) == 0)
                 {
                     macro_set_error(macros, "E1106", "invalid capture/raw usage", "`$" + name + "` expects exactly one identifier", file, body_start + i, body_start + name_end, body_line, body_column)
-                    tokens.push(macro_token(MacroText, slice_text(body, i, name_end), body_start + i, body_start + name_end, body_line, body_column, TokenDefinitionSite, hygiene_id))
+                    tokens.push(macro_token(MacroText, slice_text(body, i, name_end), body_start + i, body_start + name_end, body_line, body_column, lexer::TokenDefinitionSite, hygiene_id))
                     i = name_end
                 }
                 else
                 {
                     let kind = if (name == "capture") MacroCapture else MacroRaw
-                    let origin = if (name == "capture") TokenCallSite else TokenGenerated
+                    let origin = if (name == "capture") lexer::TokenCallSite else lexer::TokenGenerated
                     tokens.push(macro_token(kind, inner, body_start + i, body_start + close, body_line, body_column, origin, if (name == "capture") 0 else hygiene_id))
                     i = close
                 }
             }
             else
             {
-                tokens.push(macro_token(MacroText, "$", body_start + i, body_start + i + 1, body_line, body_column, TokenDefinitionSite, hygiene_id))
+                tokens.push(macro_token(MacroText, "$", body_start + i, body_start + i + 1, body_line, body_column, lexer::TokenDefinitionSite, hygiene_id))
                 i += 1
             }
         }
@@ -972,7 +973,7 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
                 }
                 if (i < body.length) { i += 1 }
             }
-            elif (is_alpha(compiler_string_byte(body, i)) == 1)
+            elif (lexer::is_alpha(compiler_string_byte(body, i)) == 1)
             {
                 i += 1
                 while (i < body.length and is_macro_ident_char(compiler_string_byte(body, i)) == 1) { i += 1 }
@@ -980,7 +981,7 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
             else { i += 1 }
             let text = slice_text(body, start, i)
             let kind = if (macro_is_identifier_text(text) == 1) MacroIdentifier else MacroText
-            tokens.push(macro_token(kind, text, body_start + start, body_start + i, body_line, body_column, TokenDefinitionSite, hygiene_id))
+            tokens.push(macro_token(kind, text, body_start + start, body_start + i, body_line, body_column, lexer::TokenDefinitionSite, hygiene_id))
         }
     }
     let locals = macro_local_names(&tokens)
@@ -992,7 +993,7 @@ pub fn macro_tokenize_expansion(body: string, param: string, arg: string, repeat
             // `_` is a discard rather than a bindable local and is therefore
             // intentionally excluded from hygienic renaming.
             token.text = macro_gensym(hygiene_id, token.text)
-            token.origin = macro_origin_rank(TokenGenerated)
+            token.origin = macro_origin_rank(lexer::TokenGenerated)
             token.hygiene_id = hygiene_id
             tokens[k] = token
         }
@@ -1060,7 +1061,7 @@ pub fn replace_macro_param(body: string, param: string, arg: string, repeat_para
         }
         else
         {
-            out = out + char_string(compiler_string_byte(body, i))
+            out = out + lexer::char_string(compiler_string_byte(body, i))
             i += 1
         }
     }
@@ -1343,7 +1344,7 @@ pub fn preprocess_source_result(src: string, filename: string, imports: &ImportS
     {
         return PreprocessResult{ ok: 0, source: expanded, diagnostic: macro_error_diagnostic(&macros), source_map: MacroSourceMap{ entries: macros.source_entries } }
     }
-    return PreprocessResult{ ok: 1, source: expanded, diagnostic: diag_new("E0000", DiagError, DiagParser, ""), source_map: MacroSourceMap{ entries: macros.source_entries } }
+    return PreprocessResult{ ok: 1, source: expanded, diagnostic: diag::diag_new("E0000", diag::DiagError, diag::DiagParser, ""), source_map: MacroSourceMap{ entries: macros.source_entries } }
 }
 
 // Process attributes, local macro declarations, and local macro calls without
@@ -1417,5 +1418,5 @@ pub fn preprocess_source_local_result(src: string, filename: string): Preprocess
     {
         return PreprocessResult{ ok: 0, source: expanded, diagnostic: macro_error_diagnostic(&macros), source_map: MacroSourceMap{ entries: macros.source_entries } }
     }
-    return PreprocessResult{ ok: 1, source: expanded, diagnostic: diag_new("E0000", DiagError, DiagParser, ""), source_map: MacroSourceMap{ entries: macros.source_entries } }
+    return PreprocessResult{ ok: 1, source: expanded, diagnostic: diag::diag_new("E0000", diag::DiagError, diag::DiagParser, ""), source_map: MacroSourceMap{ entries: macros.source_entries } }
 }

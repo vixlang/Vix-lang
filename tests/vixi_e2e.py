@@ -146,7 +146,8 @@ def main():
             print("vixi e2e: FAIL a changed signature kept the interface hash")
             failed += 1
 
-        if first["vixi"] != 1 or "vixc" not in first["compiler"]:
+        # Interface format 2: type names are module qualified.
+        if first["vixi"] != 2 or "vixc" not in first["compiler"]:
             print("vixi e2e: FAIL format/compiler header is %r/%r"
                   % (first["vixi"], first["compiler"]))
             failed += 1

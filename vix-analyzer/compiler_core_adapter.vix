@@ -32,17 +32,17 @@ pub type CoreSemanticSnapshot = struct
 
 pub fn core_lex(file: FileId, source: string): CoreTokenSnapshot
 {
-    let stream = tokenize(source)
+    let stream = lexer::tokenize(source)
     return CoreTokenSnapshot{
         file: file,
-        count: stream_len(stream),
+        count: lexer::stream_len(stream),
         generation: 0
     }
 }
 
 pub fn core_parse(file: FileId, source: string, tree: StubTree): CoreAstSnapshot
 {
-    let program = parse_program_raw(source, "")
+    let program = parser::parse_program_raw(source, "")
     return CoreAstSnapshot{
         file: file,
         ok: program.ok,
@@ -53,7 +53,7 @@ pub fn core_parse(file: FileId, source: string, tree: StubTree): CoreAstSnapshot
 
 pub fn core_semantic(input: SemanticInput): CoreSemanticSnapshot
 {
-    let program = parse_program_raw(input.source, "")
+    let program = parser::parse_program_raw(input.source, "")
     if (program.ok == 0)
     {
         return CoreSemanticSnapshot{
@@ -62,7 +62,7 @@ pub fn core_semantic(input: SemanticInput): CoreSemanticSnapshot
             error_count: 1
         }
     }
-    let result = semantic_check_program_with_warnings(program, input.source, "", 0)
+    let result = semantic::semantic_check_program_with_warnings(program, input.source, "", 0)
     return CoreSemanticSnapshot{
         file: input.file,
         ok: result.ok,

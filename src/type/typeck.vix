@@ -1,6 +1,10 @@
 #[no_main]
 
 use "../infer/solver.vix" as solver
+use "../type/typepool.vix" as typepool
+use "../ast.vix" as ast
+use "../diag.vix" as diag
+use "../error.vix" as error
 
 extern "C"
 {
@@ -106,18 +110,36 @@ pub fn type_numeric_result(left_ty: string, right_ty: string): string
 
 pub fn type_is_option_text(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        if (typepool::kind(node) == typepool::kind_option()) { return 1 }
+        return 0
+    }
     if (ty.length > 7 and compiler_string_byte(ty, 0) == 'O' and compiler_string_byte(ty, 1) == 'p' and compiler_string_byte(ty, 2) == 't' and compiler_string_byte(ty, 3) == 'i' and compiler_string_byte(ty, 4) == 'o' and compiler_string_byte(ty, 5) == 'n' and compiler_string_byte(ty, 6) == '[') return 1
     return 0
 }
 
 pub fn type_is_array_text_semantic(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        let k = typepool::kind(node)
+        if (k == typepool::kind_array() or k == typepool::kind_slice()) { return 1 }
+        return 0
+    }
     if (ty.length > 2 and compiler_string_byte(ty, 0) == '[') return 1
     return 0
 }
 
 pub fn type_option_inner(ty: string): string
 {
+    let node = typepool::find(ty)
+    if (node >= 0 and typepool::kind(node) == typepool::kind_option())
+    {
+        return typepool::text(typepool::arg(node, 0))
+    }
     if (type_is_option_text(ty) == 0) return "unknown"
     let mut result = ""
     for (i in 7 .. ty.length - 1)
@@ -132,12 +154,25 @@ pub fn type_option_inner(ty: string): string
 
 pub fn type_text_is_array_typeinfer(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        let k = typepool::kind(node)
+        if (k == typepool::kind_array() or k == typepool::kind_slice()) { return 1 }
+        return 0
+    }
     if (ty.length > 0 and compiler_string_byte(ty, 0) == '[') return 1
     return 0
 }
 
 pub fn type_array_element_typeinfer(ty: string): string
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        let k = typepool::kind(node)
+        if (k == typepool::kind_array() or k == typepool::kind_slice()) { return typepool::text(typepool::arg(node, 0)) }
+    }
     if (type_text_is_array_typeinfer(ty) == 0 or ty.length <= 2) return "unknown"
     let mut result = ""
     let mut end = ty.length - 1
@@ -179,7 +214,7 @@ pub fn type_can_assign(target_ty: string, value_ty: string): i32
 {
     if (target_ty == "" or target_ty == "unknown" or value_ty == "unknown") return 1
     if (target_ty == value_ty) return 1
-    if (ast_type_base_name(target_ty) != "" and ast_type_base_name(target_ty) == ast_type_base_name(value_ty)) return 1
+    if (ast::ast_type_base_name(target_ty) != "" and ast::ast_type_base_name(target_ty) == ast::ast_type_base_name(value_ty)) return 1
     if (type_is_array_text_semantic(target_ty) == 1 and value_ty == "[unknown]") return 1
     if (type_is_option_text(target_ty) == 1 and type_is_option_text(value_ty) == 1)
     {
@@ -212,7 +247,7 @@ pub fn type_accepts_null_literal(target_ty: string): i32
     return 0
 }
 
-pub fn type_can_assign_expr(target_ty: string, value_ty: string, expr: AstExpr): i32
+pub fn type_can_assign_expr(target_ty: string, value_ty: string, expr: ast::AstExpr): i32
 {
     if (type_can_assign(target_ty, value_ty) == 1) return 1
     if (type_accepts_null_literal(target_ty) == 1 and expr.tag == "int" and expr.int_value == 0) return 1
@@ -236,7 +271,7 @@ pub type TypeInferResult = struct {
     ok: i32,
     code: string,
     title: string,
-    phase: DiagPhase,
+    phase: diag::DiagPhase,
     error: string,
     return_type: string,
     error_func: string,
@@ -247,12 +282,12 @@ pub type TypeInferResult = struct {
 
 pub fn typeinfer_ok(return_type: string): TypeInferResult
 {
-    return TypeInferResult{ ok: 1, code: "", title: "", phase: DiagType, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
+    return TypeInferResult{ ok: 1, code: "", title: "", phase: diag::DiagType, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
 }
 
 pub fn typeinfer_error(message: string, return_type: string, error_func: string, line: i32, col: i32): TypeInferResult
 {
-    return TypeInferResult{ ok: 0, code: "E3000", title: "type error", phase: DiagType, error: message, return_type: return_type, error_func: error_func, line: line, col: col, span_len: 1 }
+    return TypeInferResult{ ok: 0, code: "E3000", title: "type error", phase: diag::DiagType, error: message, return_type: return_type, error_func: error_func, line: line, col: col, span_len: 1 }
 }
 
 pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename: string): string
@@ -262,30 +297,30 @@ pub fn typeinfer_result_debug(result: TypeInferResult, source: string, filename:
         let message = if (result.error_func != "") "in function " + result.error_func + ": " + result.error else result.error
         if (result.line > 0)
         {
-            let span = diag_span_at(source, filename, result.line, result.col, result.span_len)
-            let mut diagnostic = diag_new(result.code, DiagError, result.phase, result.title)
-                |> diag_message(message)
-                |> diag_primary(span, result.error)
-            diagnostic = diagnostic_with_guidance(diagnostic)
-            return diag_render(diagnostic, diag_render_options(source, filename))
+            let span = diag::diag_span_at(source, filename, result.line, result.col, result.span_len)
+            let mut diagnostic = diag::diag_new(result.code, diag::DiagError, result.phase, result.title)
+                |> diag::diag_message(message)
+                |> diag::diag_primary(span, result.error)
+            diagnostic = error::diagnostic_with_guidance(diagnostic)
+            return diag::diag_render(diagnostic, diag::diag_render_options(source, filename))
         }
         if (result.error_func != "")
         {
-            return format_diagnostic_no_loc(diag_error_level(), "TypeError", "in function " + result.error_func + ": " + result.error, filename)
+            return error::format_diagnostic_no_loc(error::diag_error_level(), "TypeError", "in function " + result.error_func + ": " + result.error, filename)
         }
-        return format_diagnostic_no_loc(diag_error_level(), "TypeError", result.error, filename)
+        return error::format_diagnostic_no_loc(error::diag_error_level(), "TypeError", result.error, filename)
     }
     return "TypeOk(return_type=" + result.return_type + ")"
 }
 
-pub fn typeck_check_program(program: AstProgram): TypeInferResult
+pub fn typeck_check_program(program: ast::AstProgram): TypeInferResult
 {
     return typeck_check_program_skipping(program, [])
 }
 
-pub fn typeck_check_program_skipping(program: AstProgram, checked_prefixes: [string]): TypeInferResult
+pub fn typeck_check_program_skipping(program: ast::AstProgram, checked_prefixes: [string]): TypeInferResult
 {
-    let hm = hm_check_program_skipping(program, checked_prefixes)
+    let hm = solver::hm_check_program_skipping(program, checked_prefixes)
     if (hm.ok == 1)
     {
         return typeinfer_ok(hm.return_type)

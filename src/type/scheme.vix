@@ -6,66 +6,66 @@ use "../util/fresh.vix" as fresh
 
 pub type Scheme = struct {
     vars: [i32],
-    ty: Ty
+    ty: ty::Ty
 }
 
-pub fn scheme_mono(ty: Ty): Scheme
+pub fn scheme_mono(ty: ty::Ty): Scheme
 {
     return Scheme{ vars: [], ty: ty }
 }
 
-pub fn scheme_forall(vars: [i32], ty: Ty): Scheme
+pub fn scheme_forall(vars: [i32], ty: ty::Ty): Scheme
 {
     return Scheme{ vars: vars, ty: ty }
 }
 
-pub fn scheme_free_vars(store: &TyStore, scheme: Scheme): [i32]
+pub fn scheme_free_vars(store: &ty::TyStore, scheme: Scheme): [i32]
 {
     let out: [i32] = []
     scheme_collect_free_vars(store, scheme, &out)
     return out
 }
 
-pub fn scheme_collect_free_vars(store: &TyStore, scheme: Scheme, out: &[i32]): i32
+pub fn scheme_collect_free_vars(store: &ty::TyStore, scheme: Scheme, out: &[i32]): i32
 {
     let excluded = scheme.vars
-    return ty_collect_free_vars_except(store, scheme.ty, &excluded, out)
+    return ty::ty_collect_free_vars_except(store, scheme.ty, &excluded, out)
 }
 
-pub fn scheme_apply(store: &TyStore, subst: &Subst, scheme: Scheme): Scheme
+pub fn scheme_apply(store: &ty::TyStore, subst: &subst::Subst, scheme: Scheme): Scheme
 {
     // A substitution cannot change a closed scheme.  Most entries in the
     // compiler's base environment have fully explicit signatures; avoiding a
     // filtered copy of every binding here removes the dominant bootstrap cost.
-    if (subst.bindings.length == 0 or ty_has_free_vars(store, scheme.ty) == 0) { return scheme }
-    let filtered = subst_empty()
+    if (subst.bindings.length == 0 or ty::ty_has_free_vars(store, scheme.ty) == 0) { return scheme }
+    let filtered = subst::subst_empty()
     for (i in 0 .. subst.bindings.length)
     {
-        if (ty_array_contains_i32(scheme.vars, subst.bindings[i].var_id) == 0)
+        if (ty::ty_array_contains_i32(scheme.vars, subst.bindings[i].var_id) == 0)
         {
-            subst_extend(&filtered, subst.bindings[i].var_id, subst.bindings[i].ty)
+            subst::subst_extend(&filtered, subst.bindings[i].var_id, subst.bindings[i].ty)
         }
     }
-    return Scheme{ vars: scheme.vars, ty: subst_apply_ty(store, &filtered, scheme.ty) }
+    return Scheme{ vars: scheme.vars, ty: subst::subst_apply_ty(store, &filtered, scheme.ty) }
 }
 
-pub fn scheme_instantiate(store: &TyStore, fresh: &Fresh, scheme: Scheme): Ty
+pub fn scheme_instantiate(store: &ty::TyStore, fresh: &fresh::Fresh, scheme: Scheme): ty::Ty
 {
-    let subst = subst_empty()
+    let subst = subst::subst_empty()
     for (i in 0 .. scheme.vars.length)
     {
-        subst_extend(&subst, scheme.vars[i], ty_fresh_var(fresh))
+        subst::subst_extend(&subst, scheme.vars[i], ty::ty_fresh_var(fresh))
     }
-    return subst_apply_ty(store, &subst, scheme.ty)
+    return subst::subst_apply_ty(store, &subst, scheme.ty)
 }
 
-pub fn scheme_instantiate_with(store: &TyStore, fresh: &Fresh, scheme: Scheme, args: [Ty]): Ty
+pub fn scheme_instantiate_with(store: &ty::TyStore, fresh: &fresh::Fresh, scheme: Scheme, args: [ty::Ty]): ty::Ty
 {
-    let subst = subst_empty()
+    let subst = subst::subst_empty()
     for (i in 0 .. scheme.vars.length)
     {
-        let replacement = if (i < args.length) args[i] else ty_fresh_var(fresh)
-        subst_extend(&subst, scheme.vars[i], replacement)
+        let replacement = if (i < args.length) args[i] else ty::ty_fresh_var(fresh)
+        subst::subst_extend(&subst, scheme.vars[i], replacement)
     }
-    return subst_apply_ty(store, &subst, scheme.ty)
+    return subst::subst_apply_ty(store, &subst, scheme.ty)
 }

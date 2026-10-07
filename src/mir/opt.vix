@@ -1,4 +1,5 @@
 #[no_main]
+use "../lexer.vix" as lexer
 
 extern "C"
 {
@@ -85,7 +86,7 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
         if (in_string == 1)
         {
             let c = compiler_string_byte(text, i)
-            out = out + char_string(c)
+            out = out + lexer::char_string(c)
             if (escaped == 1) { escaped = 0 }
             elif (c == 92) { escaped = 1 }
             elif (c == '"') { in_string = 0 }
@@ -94,7 +95,7 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
         }
         if (compiler_string_byte(text, i) == '"')
         {
-            out = out + char_string(compiler_string_byte(text, i))
+            out = out + lexer::char_string(compiler_string_byte(text, i))
             in_string = 1
             i += 1
             continue
@@ -122,7 +123,7 @@ pub fn mir_opt_replace_name(text: string, name: string, replacement: string): st
         }
         else
         {
-            out = out + char_string(compiler_string_byte(text, i))
+            out = out + lexer::char_string(compiler_string_byte(text, i))
             i += 1
         }
     }

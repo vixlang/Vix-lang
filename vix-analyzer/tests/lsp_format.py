@@ -10,7 +10,7 @@ URI = "file:///tmp/format.vix"
 
 SOURCE = """#[no_main]
 
-import "std/io.vix"
+use "std/io.vix" as io
 fn add(a: i32, b: i32): i32
 {
 return a + b

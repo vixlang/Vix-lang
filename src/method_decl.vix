@@ -12,7 +12,7 @@ use "receiver.vix" as receiver
 // A declared receiver method, indexed by receiver type and short name.
 pub type MethodSignature = struct {
     receiver_type: string,
-    receiver_kind: ReceiverKind,
+    receiver_kind: receiver::ReceiverKind,
     name: string,
     storage_name: string,
     receiver_param_type: string,
@@ -39,13 +39,13 @@ pub type MethodResolution = struct {
     kind: MethodResolutionKind,
     name: string,
     receiver_type: string,
-    receiver_kind: ReceiverKind,
+    receiver_kind: receiver::ReceiverKind,
     receiver_param_type: string,
     storage_name: string,
     ret_ty: string,
     param_types: [string],
     arg_count: i32,
-    intrinsic: IntrinsicKind,
+    intrinsic: intrinsic::IntrinsicKind,
     function_index: i32
 }
 
@@ -60,7 +60,7 @@ pub fn method_signature_new(): MethodSignature
 {
     return MethodSignature{
         receiver_type: "",
-        receiver_kind: ReceiverNone,
+        receiver_kind: receiver::ReceiverNone,
         name: "",
         storage_name: "",
         receiver_param_type: "",
@@ -79,13 +79,13 @@ pub fn method_resolution_none(): MethodResolution
         kind: ResolutionNone,
         name: "",
         receiver_type: "",
-        receiver_kind: ReceiverNone,
+        receiver_kind: receiver::ReceiverNone,
         receiver_param_type: "",
         storage_name: "",
         ret_ty: "unknown",
         param_types: [],
         arg_count: 0,
-        intrinsic: IntrinsicArrayPush,
+        intrinsic: intrinsic::IntrinsicArrayPush,
         function_index: -1
     }
 }
@@ -102,18 +102,18 @@ pub fn method_resolution_from_signature(signature: MethodSignature): MethodResol
         ret_ty: signature.ret_ty,
         param_types: signature.param_types,
         arg_count: method_signature_user_arg_count(signature),
-        intrinsic: IntrinsicArrayPush,
+        intrinsic: intrinsic::IntrinsicArrayPush,
         function_index: signature.function_index
     }
 }
 
-pub fn method_resolution_from_intrinsic(name: string, receiver_type: string, signature: IntrinsicSignature): MethodResolution
+pub fn method_resolution_from_intrinsic(name: string, receiver_type: string, signature: intrinsic::IntrinsicSignature): MethodResolution
 {
     return MethodResolution{
         kind: ResolutionIntrinsic,
         name: name,
         receiver_type: receiver_type,
-        receiver_kind: ReceiverNone,
+        receiver_kind: receiver::ReceiverNone,
         receiver_param_type: receiver_type,
         storage_name: "",
         ret_ty: signature.ret_ty,
@@ -141,7 +141,7 @@ pub fn method_resolution_is_intrinsic(resolution: MethodResolution): i32
 pub fn method_resolution_is_array_push(resolution: MethodResolution): i32
 {
     if (method_resolution_is_intrinsic(resolution) == 0) { return 0 }
-    if (resolution.intrinsic == IntrinsicArrayPush) { return 1 }
+    if (resolution.intrinsic == intrinsic::IntrinsicArrayPush) { return 1 }
     return 0
 }
 
@@ -190,7 +190,7 @@ pub fn method_resolution_ret_type(resolution: MethodResolution): string
     return resolution.ret_ty
 }
 
-pub fn method_resolution_receiver_kind(resolution: MethodResolution): ReceiverKind
+pub fn method_resolution_receiver_kind(resolution: MethodResolution): receiver::ReceiverKind
 {
     return resolution.receiver_kind
 }

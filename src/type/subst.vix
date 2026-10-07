@@ -4,7 +4,7 @@ use "ty.vix" as ty
 
 pub type TyBinding = struct {
     var_id: i32,
-    ty: Ty
+    ty: ty::Ty
 }
 
 pub type Subst = struct {
@@ -26,18 +26,18 @@ pub fn subst_clone(subst: &Subst): Subst
     return Subst{ bindings: bindings }
 }
 
-pub fn subst_single(var_id: i32, ty: Ty): Subst
+pub fn subst_single(var_id: i32, ty: ty::Ty): Subst
 {
     return Subst{ bindings: [TyBinding{ var_id: var_id, ty: ty }] }
 }
 
-pub fn subst_lookup(subst: &Subst, var_id: i32): Ty
+pub fn subst_lookup(subst: &Subst, var_id: i32): ty::Ty
 {
     for (i in 0 .. subst.bindings.length)
     {
         if (subst.bindings[i].var_id == var_id) { return subst.bindings[i].ty }
     }
-    return TyVar(var_id)
+    return ty::TyVar(var_id)
 }
 
 pub fn subst_has(subst: &Subst, var_id: i32): i32
@@ -49,7 +49,7 @@ pub fn subst_has(subst: &Subst, var_id: i32): i32
     return 0
 }
 
-pub fn subst_extend(subst: &Subst, var_id: i32, ty: Ty)
+pub fn subst_extend(subst: &Subst, var_id: i32, ty: ty::Ty)
 {
     for (i in 0 .. subst.bindings.length)
     {
@@ -62,51 +62,51 @@ pub fn subst_extend(subst: &Subst, var_id: i32, ty: Ty)
     subst.bindings.push(TyBinding{ var_id: var_id, ty: ty })
 }
 
-pub fn subst_apply_ty(store: &TyStore, subst: &Subst, ty: Ty): Ty
+pub fn subst_apply_ty(store: &ty::TyStore, subst: &Subst, ty: ty::Ty): ty::Ty
 {
     if (subst.bindings.length == 0) { return ty }
-    if (ty_has_free_vars(store, ty) == 0) { return ty }
+    if (ty::ty_has_free_vars(store, ty) == 0) { return ty }
     match ty
     {
-        TyVar(id) -> {
+        ty::TyVar(id) -> {
             let mapped = subst_lookup(subst, id)
             match mapped
             {
-                TyVar(id2) -> {
+                ty::TyVar(id2) -> {
                     if (id2 == id) { return mapped }
                     return subst_apply_ty(store, subst, mapped)
                 }
                 _ -> { return subst_apply_ty(store, subst, mapped) }
             }
         }
-        TyFun(idx) -> {
+        ty::TyFun(idx) -> {
             let data = store.funs[idx]
-            let mut params: [Ty] = []
+            let mut params: [ty::Ty] = []
             for (i in 0 .. data.params.length)
             {
                 params.push(subst_apply_ty(store, subst, data.params[i]))
             }
-            return ty_fun_vararg(store, params, subst_apply_ty(store, subst, data.ret), data.is_var_arg)
+            return ty::ty_fun_vararg(store, params, subst_apply_ty(store, subst, data.ret), data.is_var_arg)
         }
-        TyTuple(idx) -> {
+        ty::TyTuple(idx) -> {
             let data = store.tuples[idx]
-            let mut elems: [Ty] = []
+            let mut elems: [ty::Ty] = []
             for (i in 0 .. data.elems.length)
             {
                 elems.push(subst_apply_ty(store, subst, data.elems[i]))
             }
-            return ty_tuple(store, elems)
+            return ty::ty_tuple(store, elems)
         }
-        TyArray(idx) -> { return ty_array(store, subst_apply_ty(store, subst, store.arrays[idx].elem)) }
-        TyPtr(idx) -> { return ty_ptr(store, subst_apply_ty(store, subst, store.ptrs[idx].elem)) }
-        TyAdt(idx) -> {
+        ty::TyArray(idx) -> { return ty::ty_array(store, subst_apply_ty(store, subst, store.arrays[idx].elem)) }
+        ty::TyPtr(idx) -> { return ty::ty_ptr(store, subst_apply_ty(store, subst, store.ptrs[idx].elem)) }
+        ty::TyAdt(idx) -> {
             let data = store.adts[idx]
-            let mut args: [Ty] = []
+            let mut args: [ty::Ty] = []
             for (i in 0 .. data.args.length)
             {
                 args.push(subst_apply_ty(store, subst, data.args[i]))
             }
-            return ty_adt(store, data.name, args)
+            return ty::ty_adt(store, data.name, args)
         }
         _ -> {}
     }
@@ -118,7 +118,7 @@ pub fn subst_apply_vars(subst: &Subst, vars: [i32]): [i32]
     let mut out: [i32] = []
     for (i in 0 .. vars.length)
     {
-        if (subst_has(subst, vars[i]) == 0 and ty_array_contains_i32(out, vars[i]) == 0)
+        if (subst_has(subst, vars[i]) == 0 and ty::ty_array_contains_i32(out, vars[i]) == 0)
         {
             out.push(vars[i])
         }
@@ -126,7 +126,7 @@ pub fn subst_apply_vars(subst: &Subst, vars: [i32]): [i32]
     return out
 }
 
-pub fn subst_compose(store: &TyStore, newer: &Subst, older: &Subst): Subst
+pub fn subst_compose(store: &ty::TyStore, newer: &Subst, older: &Subst): Subst
 {
     let out = subst_empty()
     for (i in 0 .. older.bindings.length)

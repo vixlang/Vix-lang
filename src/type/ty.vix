@@ -1,6 +1,7 @@
 #[no_main]
 
 use "../util/fresh.vix" as fresh
+use "typepool.vix" as typepool
 
 extern "C"
 {
@@ -30,6 +31,9 @@ pub type TyPtrData = struct {
 
 pub type TyAdtData = struct {
     name: string,
+    // Identity: -1 when the spelling never resolved to a declared type (a
+    // builtin or a hand-built name), in which case the name is compared.
+    sym: i32,
     args: [Ty]
 }
 
@@ -135,9 +139,9 @@ pub fn ty_prim_can_assign(target_code: i32, value_code: i32): i32
     return 0
 }
 
-pub fn ty_fresh_var(fresh: &Fresh): Ty
+pub fn ty_fresh_var(fresh: &fresh::Fresh): Ty
 {
-    return TyVar(fresh_tyvar_id(fresh))
+    return TyVar(fresh::fresh_tyvar_id(fresh))
 }
 
 pub fn ty_unknown(): Ty
@@ -185,8 +189,11 @@ pub fn ty_ptr(store: &TyStore, elem: Ty): Ty
 
 pub fn ty_adt(store: &TyStore, name: string, args: [Ty]): Ty
 {
+    let mut sym = -1
+    let node = typepool::find(name)
+    if (node >= 0) { sym = typepool::sym(node) }
     let idx = store.adts.length
-    store.adts.push(TyAdtData{ name: name, args: args })
+    store.adts.push(TyAdtData{ name: name, sym: sym, args: args })
     return TyAdt(idx)
 }
 
@@ -512,7 +519,9 @@ pub fn ty_eq(store: &TyStore, left: Ty, right: Ty): i32
                 TyAdt(bidx) -> {
                     let a = store.adts[aidx]
                     let b = store.adts[bidx]
-                    if (a.name != b.name or a.args.length != b.args.length) return 0
+                    let mut same = a.name == b.name
+                    if (a.sym >= 0 and b.sym >= 0) { same = if (a.sym == b.sym) { 1 } else { 0 } }
+                    if (same == 0 or a.args.length != b.args.length) return 0
                     for (i in 0 .. a.args.length)
                     {
                         if (ty_eq(store, a.args[i], b.args[i]) == 0) return 0
@@ -573,8 +582,48 @@ pub fn ty_to_string(store: &TyStore, ty: Ty): string
     return "unknown"
 }
 
+// The parser interns every type it reads, so a type text resolves to its pool
+// node instead of being re-parsed here.  Texts built by hand (never parsed)
+// fall through to the textual path below.
+fn ty_from_type_node(store: &TyStore, idx: i32): Ty
+{
+    let k = typepool::kind(idx)
+    if (k == typepool::kind_unknown() or k == typepool::kind_error()) { return TyUnknown }
+    if (k == typepool::kind_named())
+    {
+        let base = typepool::base(idx)
+        if (typepool::arg_count(idx) == 0)
+        {
+            let prim = ty_prim_from_name(base)
+            if (ty_is_unknown(prim) == 0) { return prim }
+            return ty_adt(store, base, [])
+        }
+        let mut args: [Ty] = []
+        for (i in 0 .. typepool::arg_count(idx)) { args.push(ty_from_text(store, typepool::text(typepool::arg(idx, i)))) }
+        return ty_adt(store, base, args)
+    }
+    if (k == typepool::kind_ptr()) { return ty_ptr(store, ty_from_text(store, typepool::text(typepool::arg(idx, 0)))) }
+    if (k == typepool::kind_array() or k == typepool::kind_slice()) { return ty_array(store, ty_from_text(store, typepool::text(typepool::arg(idx, 0)))) }
+    if (k == typepool::kind_option()) { return ty_adt(store, "Option", [ty_from_text(store, typepool::text(typepool::arg(idx, 0)))]) }
+    if (k == typepool::kind_fn())
+    {
+        let mut params: [Ty] = []
+        for (i in 0 .. typepool::arg_count(idx)) { params.push(ty_from_text(store, typepool::text(typepool::arg(idx, i)))) }
+        return ty_fun(store, params, ty_from_text(store, typepool::text(typepool::ret(idx))))
+    }
+    if (k == typepool::kind_tuple())
+    {
+        let mut elems: [Ty] = []
+        for (i in 0 .. typepool::arg_count(idx)) { elems.push(ty_from_text(store, typepool::text(typepool::arg(idx, i)))) }
+        return ty_tuple(store, elems)
+    }
+    return TyUnknown
+}
+
 pub fn ty_from_text(store: &TyStore, text: string): Ty
 {
+    let node = typepool::find(text)
+    if (node >= 0) { return ty_from_type_node(store, node) }
     let prim = text
         |> ty_prim_from_name
     if (ty_is_unknown(prim) == 0) return prim

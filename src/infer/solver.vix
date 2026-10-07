@@ -1,21 +1,30 @@
 #[no_main]
 
 use "gen.vix" as gen
-use "method.vix" as methods
-use "method_decl.vix" as method_decl
+use "env.vix" as env
+use "../method.vix" as methods
+use "../method_decl.vix" as method_decl
 use "unify.vix" as unify
+use "../type/ty.vix" as ty
+use "../type/subst.vix" as subst
+use "../type/scheme.vix" as scheme
+use "error.vix" as error
+use "../util/pos.vix" as pos
+use "../util/fresh.vix" as fresh
+use "../ast.vix" as ast
+use "../diag.vix" as diag
 
 pub type InferValue = struct {
     ok: i32,
-    ty: Ty,
-    error: InferError
+    ty: ty::Ty,
+    error: error::InferError
 }
 
 pub type HmCheckResult = struct {
     ok: i32,
     code: string,
     title: string,
-    phase: DiagPhase,
+    phase: diag::DiagPhase,
     error: string,
     return_type: string,
     error_func: string,
@@ -34,73 +43,73 @@ pub fn hm_type_params(names: [string], vars: [i32]): HmTypeParams
     return HmTypeParams{ names: names, vars: vars }
 }
 
-pub fn infer_value_ok(ty: Ty): InferValue
+pub fn infer_value_ok(ty: ty::Ty): InferValue
 {
-    return InferValue{ ok: 1, ty: ty, error: infer_error_ok() }
+    return InferValue{ ok: 1, ty: ty, error: error::infer_error_ok() }
 }
 
-pub fn infer_value_fail(error: InferError): InferValue
+pub fn infer_value_fail(error: error::InferError): InferValue
 {
-    return InferValue{ ok: 0, ty: ty_error(), error: error }
+    return InferValue{ ok: 0, ty: ty::ty_error(), error: error }
 }
 
-pub fn hm_unknown_ty(): Ty
+pub fn hm_unknown_ty(): ty::Ty
 {
-    return ty_unknown()
+    return ty::ty_unknown()
 }
 
 pub fn hm_ok(return_type: string): HmCheckResult
 {
-    return HmCheckResult{ ok: 1, code: "", title: "", phase: DiagType, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
+    return HmCheckResult{ ok: 1, code: "", title: "", phase: diag::DiagType, error: "", return_type: return_type, error_func: "", line: 0, col: 0, span_len: 1 }
 }
 
-pub fn hm_fail(error: InferError, error_func: string): HmCheckResult
+pub fn hm_fail(error: error::InferError, error_func: string): HmCheckResult
 {
     return HmCheckResult{ ok: 0, code: error.code, title: error.title, phase: error.phase, error: error.message, return_type: "unknown", error_func: error_func, line: error.pos.line, col: error.pos.col, span_len: error.pos.span_len }
 }
 
-pub fn hm_expr_pos(expr: AstExpr): SourcePos
+pub fn hm_expr_pos(expr: ast::AstExpr): pos::SourcePos
 {
-    return pos_span(expr.line, expr.col, if (expr.text.length > 0) { expr.text.length } else { 1 })
+    return pos::pos_span(expr.line, expr.col, if (expr.text.length > 0) { expr.text.length } else { 1 })
 }
 
-pub fn hm_stmt_pos(stmt: AstStmt): SourcePos
+pub fn hm_stmt_pos(stmt: ast::AstStmt): pos::SourcePos
 {
-    return pos_span(stmt.line, stmt.col, if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 })
+    return pos::pos_span(stmt.line, stmt.col, if (stmt.assign_name.length > 0) { stmt.assign_name.length } else { 1 })
 }
 
-pub fn hm_unify(store: &TyStore, subst: &Subst, left: Ty, right: Ty, pos: SourcePos): InferValue
+pub fn hm_unify(store: &ty::TyStore, subst: &subst::Subst, left: ty::Ty, right: ty::Ty, pos: pos::SourcePos): InferValue
 {
-    let r = unify_ty(store, subst, left, right, pos)
+    let r = unify::unify_ty(store, subst, left, right, pos)
     if (r.ok == 0) { return infer_value_fail(r.error) }
-    return infer_value_ok(subst_apply_ty(store, subst, left))
+    return infer_value_ok(subst::subst_apply_ty(store, subst, left))
 }
 
-pub fn hm_numeric_result_ty(store: &TyStore, subst: &Subst, left: Ty, right: Ty): Ty
+pub fn hm_numeric_result_ty(store: &ty::TyStore, subst: &subst::Subst, left: ty::Ty, right: ty::Ty): ty::Ty
 {
-    let a = subst_apply_ty(store, subst, left)
-    let b = subst_apply_ty(store, subst, right)
+    let a = subst::subst_apply_ty(store, subst, left)
+    let b = subst::subst_apply_ty(store, subst, right)
     match a
     {
-        TyPrim(ap) -> {
+        ty::TyPrim(ap) -> {
             match b
             {
-                TyPrim(bp) -> {
-                    if (ty_prim_is_numeric(ap) == 0 or ty_prim_is_numeric(bp) == 0) { return TyUnknown }
-                    if (ap == ty_prim_f64() or bp == ty_prim_f64()) { return TyPrim(ty_prim_f64()) }
-                    if (ap == ty_prim_f32() or bp == ty_prim_f32()) { return TyPrim(ty_prim_f32()) }
-                    if (ty_prim_is_int64(ap) == 1 or ty_prim_is_int64(bp) == 1) { return TyPrim(ty_prim_i64()) }
-                    return TyPrim(ty_prim_i32())
+                ty::TyPrim(bp) -> {
+                    if (ty::ty_prim_is_numeric(ap) == 0 or ty::ty_prim_is_numeric(bp) == 0) { return ty::TyUnknown }
+                    if (ap == ty::ty_prim_f64() or bp == ty::ty_prim_f64()) { return ty::TyPrim(ty::ty_prim_f64()) }
+                    if (ap == ty::ty_prim_f32() or bp == ty::ty_prim_f32()) { return ty::TyPrim(ty::ty_prim_f32()) }
+                    if (ty::ty_prim_is_int64(ap) == 1 or ty::ty_prim_is_int64(bp) == 1) { return ty::TyPrim(ty::ty_prim_i64()) }
+                    return ty::TyPrim(ty::ty_prim_i32())
                 }
                 _ -> {}
             }
         }
         _ -> {}
     }
-    return TyUnknown
+    return ty::TyUnknown
 }
 
-pub fn hm_struct_field_type(store: &TyStore, structs: [AstStructDecl], struct_name: string, field_name: string): Ty
+pub fn hm_struct_field_type(store: &ty::TyStore, structs: [ast::AstStructDecl], struct_name: string, field_name: string): ty::Ty
 {
     for (i in 0 .. structs.length)
     {
@@ -110,112 +119,112 @@ pub fn hm_struct_field_type(store: &TyStore, structs: [AstStructDecl], struct_na
             {
                 if (structs[i].field_names[j] == field_name)
                 {
-                    return ty_from_text(store, structs[i].field_types[j])
+                    return ty::ty_from_text(store, structs[i].field_types[j])
                 }
             }
         }
     }
-    return TyUnknown
+    return ty::TyUnknown
 }
 
-pub fn hm_ty_adt_name(store: &TyStore, ty: Ty): string
+pub fn hm_ty_adt_name(store: &ty::TyStore, ty: ty::Ty): string
 {
     match ty
     {
-        TyAdt(idx) -> { return store.adts[idx].name }
-        TyPtr(idx) -> { return hm_ty_adt_name(store, store.ptrs[idx].elem) }
+        ty::TyAdt(idx) -> { return store.adts[idx].name }
+        ty::TyPtr(idx) -> { return hm_ty_adt_name(store, store.ptrs[idx].elem) }
         _ -> {}
     }
     return ""
 }
 
-pub fn hm_option_inner(store: &TyStore, ty: Ty): Ty
+pub fn hm_option_inner(store: &ty::TyStore, ty: ty::Ty): ty::Ty
 {
     match ty
     {
-        TyAdt(idx) -> {
+        ty::TyAdt(idx) -> {
             let data = store.adts[idx]
             if (data.name == "Option" and data.args.length == 1) return data.args[0]
         }
         _ -> {}
     }
-    return TyUnknown
+    return ty::TyUnknown
 }
 
-pub fn hm_ptr_array_elem(store: &TyStore, ty: Ty): Ty
+pub fn hm_ptr_array_elem(store: &ty::TyStore, ty: ty::Ty): ty::Ty
 {
     match ty
     {
-        TyPtr(ptr_idx) -> {
+        ty::TyPtr(ptr_idx) -> {
             let inner_ty = store.ptrs[ptr_idx].elem
             match inner_ty
             {
-                TyArray(arr_idx) -> { return store.arrays[arr_idx].elem }
+                ty::TyArray(arr_idx) -> { return store.arrays[arr_idx].elem }
                 _ -> {}
             }
         }
         _ -> {}
     }
-    return TyUnknown
+    return ty::TyUnknown
 }
 
-pub fn hm_replace_type_params(store: &TyStore, names: [string], vars: [i32], ty: Ty): Ty
+pub fn hm_replace_type_params(store: &ty::TyStore, names: [string], vars: [i32], ty: ty::Ty): ty::Ty
 {
     return match ty
     {
-        TyFun(idx) -> {
+        ty::TyFun(idx) -> {
             let data = store.funs[idx]
-            let mut params: [Ty] = []
+            let mut params: [ty::Ty] = []
             for (i in 0 .. data.params.length)
             {
                 params.push(hm_replace_type_params(store, names, vars, data.params[i]))
             }
-            ty_fun_vararg(store, params, hm_replace_type_params(store, names, vars, data.ret), data.is_var_arg)
+            ty::ty_fun_vararg(store, params, hm_replace_type_params(store, names, vars, data.ret), data.is_var_arg)
         }
-        TyTuple(idx) -> {
+        ty::TyTuple(idx) -> {
             let data = store.tuples[idx]
-            let mut elems: [Ty] = []
+            let mut elems: [ty::Ty] = []
             for (i in 0 .. data.elems.length)
             {
                 elems.push(hm_replace_type_params(store, names, vars, data.elems[i]))
             }
-            ty_tuple(store, elems)
+            ty::ty_tuple(store, elems)
         }
-        TyArray(idx) -> ty_array(store, hm_replace_type_params(store, names, vars, store.arrays[idx].elem))
-        TyPtr(idx) -> ty_ptr(store, hm_replace_type_params(store, names, vars, store.ptrs[idx].elem))
-        TyAdt(idx) -> {
+        ty::TyArray(idx) -> ty::ty_array(store, hm_replace_type_params(store, names, vars, store.arrays[idx].elem))
+        ty::TyPtr(idx) -> ty::ty_ptr(store, hm_replace_type_params(store, names, vars, store.ptrs[idx].elem))
+        ty::TyAdt(idx) -> {
             let data = store.adts[idx]
             if (data.args.length == 0)
             {
                 for (i in 0 .. names.length)
                 {
-                    if (names[i] == data.name) { return TyVar(vars[i]) }
+                    if (names[i] == data.name) { return ty::TyVar(vars[i]) }
                 }
             }
-            let mut args: [Ty] = []
+            let mut args: [ty::Ty] = []
             for (i in 0 .. data.args.length)
             {
                 args.push(hm_replace_type_params(store, names, vars, data.args[i]))
             }
-            ty_adt(store, data.name, args)
+            ty::ty_adt(store, data.name, args)
         }
         _ -> ty
     }
 }
 
-pub fn hm_type_param_ty(store: &TyStore, names: [string], vars: [i32], text: string): Ty
+pub fn hm_type_param_ty(store: &ty::TyStore, names: [string], vars: [i32], text: string): ty::Ty
 {
-    return hm_replace_type_params(store, names, vars, ty_from_text(store, text))
+    return hm_replace_type_params(store, names, vars, ty::ty_from_text(store, text))
 }
 
-pub fn hm_is_null_ptr_literal(store: &TyStore, expected: Ty, expr: AstExpr): i32
+pub fn hm_is_null_ptr_literal(store: &ty::TyStore, expected: ty::Ty, expr: ast::AstExpr): i32
 {
     match expected
     {
-        TyPrim(code) -> {
-            if (code == ty_prim_ptr() and expr.tag == "int" and expr.int_value == 0) { return 1 }
+        ty::TyPrim(code) -> {
+            if (code == ty::ty_prim_ptr() and expr.tag == "int" and expr.int_value == 0) { return 1 }
         }
-        TyPtr(idx) -> {
+        ty::TyPtr(idx) -> {
             if (expr.tag == "int" and expr.int_value == 0) { return 1 }
         }
         _ -> {}
@@ -223,22 +232,22 @@ pub fn hm_is_null_ptr_literal(store: &TyStore, expected: Ty, expr: AstExpr): i32
     return 0
 }
 
-pub fn hm_infer_pattern(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subst, type_params: &HmTypeParams, structs: [AstStructDecl], es: &ExprStore, ss: &StmtStore, pattern_idx: i32, subject_ty: Ty, pos: SourcePos): InferValue
+pub fn hm_infer_pattern(env: &env::TypeEnv, store: &ty::TyStore, fresh: &fresh::Fresh, subst: &subst::Subst, type_params: &HmTypeParams, structs: [ast::AstStructDecl], es: &ast::ExprStore, ss: &ast::StmtStore, pattern_idx: i32, subject_ty: ty::Ty, pos: pos::SourcePos): InferValue
 {
     if (pattern_idx < 0) { return infer_value_ok(subject_ty) }
-    let pattern = expr_store_get(es, pattern_idx)
+    let pattern = ast::expr_store_get(es, pattern_idx)
     if (pattern.tag == "option")
     {
-        let inner = ty_fresh_var(fresh)
-        let expected = ty_adt(store, "Option", [inner])
+        let inner = ty::ty_fresh_var(fresh)
+        let expected = ty::ty_adt(store, "Option", [inner])
         let u = hm_unify(store, subst, subject_ty, expected, pos)
         if (u.ok == 0) { return u }
         if (pattern.option_has_value == 1 and pattern.left_idx >= 0)
         {
-            let bind = expr_store_get(es, pattern.left_idx)
+            let bind = ast::expr_store_get(es, pattern.left_idx)
             if (bind.tag == "ident" and bind.text != "_")
             {
-                type_env_extend(env, bind.text, scheme_mono(subst_apply_ty(store, subst, inner)))
+                env::type_env_extend(env, bind.text, scheme::scheme_mono(subst::subst_apply_ty(store, subst, inner)))
             }
             elif (bind.tag != "ident")
             {
@@ -248,18 +257,18 @@ pub fn hm_infer_pattern(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &S
                 if (nu.ok == 0) { return nu }
             }
         }
-        return infer_value_ok(subst_apply_ty(store, subst, expected))
+        return infer_value_ok(subst::subst_apply_ty(store, subst, expected))
     }
     if (pattern.tag == "call")
     {
         let callee = hm_infer_ident(env, store, fresh, pattern.text, pos)
         if (callee.ok == 0) { return callee }
-        let ctor_ty = subst_apply_ty(store, subst, callee.ty)
-        let mut param_tys: [Ty] = []
+        let ctor_ty = subst::subst_apply_ty(store, subst, callee.ty)
+        let mut param_tys: [ty::Ty] = []
         let mut result_ty = ctor_ty
         match ctor_ty
         {
-            TyFun(fn_idx) -> {
+            ty::TyFun(fn_idx) -> {
                 let fn_ty = store.funs[fn_idx]
                 for (i in 0 .. fn_ty.params.length)
                 {
@@ -270,26 +279,26 @@ pub fn hm_infer_pattern(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &S
             _ -> {}
         }
         let mut is_adt_ctor = 0
-        match subst_apply_ty(store, subst, result_ty)
+        match subst::subst_apply_ty(store, subst, result_ty)
         {
-            TyAdt(idx) -> { is_adt_ctor = 1 }
+            ty::TyAdt(idx) -> { is_adt_ctor = 1 }
             _ -> {}
         }
         if (is_adt_ctor == 1)
         {
             if (param_tys.length != pattern.args.length)
             {
-                return infer_value_fail(infer_error_arity(param_tys.length, pattern.args.length, pos))
+                return infer_value_fail(error::infer_error_arity(param_tys.length, pattern.args.length, pos))
             }
             let u = hm_unify(store, subst, subject_ty, result_ty, pos)
             if (u.ok == 0) { return u }
             for (i in 0 .. pattern.args.length)
             {
-                let arg = expr_store_get(es, pattern.args[i])
-                let param_ty = subst_apply_ty(store, subst, param_tys[i])
+                let arg = ast::expr_store_get(es, pattern.args[i])
+                let param_ty = subst::subst_apply_ty(store, subst, param_tys[i])
                 if (arg.tag == "ident" and arg.text != "_")
                 {
-                    type_env_extend(env, arg.text, scheme_mono(param_ty))
+                    env::type_env_extend(env, arg.text, scheme::scheme_mono(param_ty))
                 }
                 elif (arg.tag != "ident")
                 {
@@ -297,7 +306,7 @@ pub fn hm_infer_pattern(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &S
                     if (nested.ok == 0) { return nested }
                 }
             }
-            return infer_value_ok(subst_apply_ty(store, subst, result_ty))
+            return infer_value_ok(subst::subst_apply_ty(store, subst, result_ty))
         }
     }
     let pat = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, pattern_idx)
@@ -305,20 +314,20 @@ pub fn hm_infer_pattern(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &S
     return hm_unify(store, subst, subject_ty, pat.ty, pos)
 }
 
-pub fn hm_add_adt_ctors(env: &TypeEnv, store: &TyStore, fresh: &Fresh, adts: [AstAdtDecl])
+pub fn hm_add_adt_ctors(env: &env::TypeEnv, store: &ty::TyStore, fresh: &fresh::Fresh, adts: [ast::AstAdtDecl])
 {
     for (i in 0 .. adts.length)
     {
         let decl = adts[i]
         let mut vars: [i32] = []
-        let mut args: [Ty] = []
+        let mut args: [ty::Ty] = []
         for (p in 0 .. decl.type_params.length)
         {
-            let id = fresh_tyvar_id(fresh)
+            let id = fresh::fresh_tyvar_id(fresh)
             vars.push(id)
-            args.push(TyVar(id))
+            args.push(ty::TyVar(id))
         }
-        let result_ty = ty_adt(store, decl.name, args)
+        let result_ty = ty::ty_adt(store, decl.name, args)
         for (v in 0 .. decl.variant_names.length)
         {
             let payload = decl.variant_payload_types[v]
@@ -328,66 +337,66 @@ pub fn hm_add_adt_ctors(env: &TypeEnv, store: &TyStore, fresh: &Fresh, adts: [As
             }
             else
             {
-                ty_fun(store, [hm_type_param_ty(store, decl.type_params, vars, payload)], result_ty)
+                ty::ty_fun(store, [hm_type_param_ty(store, decl.type_params, vars, payload)], result_ty)
             }
-            type_env_extend(env, decl.variant_names[v], scheme_forall(vars, ctor_ty))
+            env::type_env_extend(env, decl.variant_names[v], scheme::scheme_forall(vars, ctor_ty))
         }
     }
 }
 
-pub fn hm_add_functions(env: &TypeEnv, store: &TyStore, fresh: &Fresh, functions: [AstFunction])
+pub fn hm_add_functions(env: &env::TypeEnv, store: &ty::TyStore, fresh: &fresh::Fresh, functions: [ast::AstFunction])
 {
     for (i in 0 .. functions.length)
     {
         let mut vars: [i32] = []
         for (t in 0 .. functions[i].type_params.length)
         {
-            vars.push(fresh_tyvar_id(fresh))
+            vars.push(fresh::fresh_tyvar_id(fresh))
         }
-        let mut params: [Ty] = []
+        let mut params: [ty::Ty] = []
         for (p in 0 .. functions[i].param_types.length)
         {
             params.push(hm_type_param_ty(store, functions[i].type_params, vars, functions[i].param_types[p]))
         }
         let ret = hm_type_param_ty(store, functions[i].type_params, vars, functions[i].ret_ty)
-        type_env_set(env, functions[i].name, scheme_forall(vars, ty_fun_vararg(store, params, ret, functions[i].is_var_arg)))
+        env::type_env_set(env, functions[i].name, scheme::scheme_forall(vars, ty::ty_fun_vararg(store, params, ret, functions[i].is_var_arg)))
     }
 }
 
-pub fn hm_infer_ident(env: &TypeEnv, store: &TyStore, fresh: &Fresh, name: string, pos: SourcePos): InferValue
+pub fn hm_infer_ident(env: &env::TypeEnv, store: &ty::TyStore, fresh: &fresh::Fresh, name: string, pos: pos::SourcePos): InferValue
 {
-    if (type_env_has(env, name) == 0)
+    if (env::type_env_has(env, name) == 0)
     {
-        return infer_value_fail(infer_error_unbound(name, pos))
+        return infer_value_fail(error::infer_error_unbound(name, pos))
     }
-    let scheme = type_env_lookup(env, name)
-    return infer_value_ok(scheme_instantiate(store, fresh, scheme))
+    let scheme = env::type_env_lookup(env, name)
+    return infer_value_ok(scheme::scheme_instantiate(store, fresh, scheme))
 }
 
-pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subst, type_params: &HmTypeParams, structs: [AstStructDecl], es: &ExprStore, ss: &StmtStore, idx: i32): InferValue
+pub fn hm_infer_expr(env: &env::TypeEnv, store: &ty::TyStore, fresh: &fresh::Fresh, subst: &subst::Subst, type_params: &HmTypeParams, structs: [ast::AstStructDecl], es: &ast::ExprStore, ss: &ast::StmtStore, idx: i32): InferValue
 {
-    if (idx < 0) { return infer_value_ok(TyPrim(ty_prim_void())) }
-    let expr = expr_store_get(es, idx)
+    if (idx < 0) { return infer_value_ok(ty::TyPrim(ty::ty_prim_void())) }
+    let expr = ast::expr_store_get(es, idx)
     let pos = hm_expr_pos(expr)
     return match expr.tag
     {
-        "int" -> infer_value_ok(TyPrim(ty_prim_i32()))
-        "bool" -> infer_value_ok(TyPrim(ty_prim_bool()))
-        "float" -> infer_value_ok(TyPrim(ty_prim_f64()))
-        "string" -> infer_value_ok(TyPrim(ty_prim_string()))
+        "int" -> infer_value_ok(ty::TyPrim(ty::ty_prim_i32()))
+        "bool" -> infer_value_ok(ty::TyPrim(ty::ty_prim_bool()))
+        "float" -> infer_value_ok(ty::TyPrim(ty::ty_prim_f64()))
+        "string" -> infer_value_ok(ty::TyPrim(ty::ty_prim_string()))
         "ident" -> hm_infer_ident(env, store, fresh, expr.text, pos)
         "option" -> {
-            let mut inner = ty_fresh_var(fresh)
+            let mut inner = ty::ty_fresh_var(fresh)
             if (expr.option_has_value == 1)
             {
                 let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
                 if (v.ok == 0) { return v }
                 inner = v.ty
             }
-            infer_value_ok(ty_adt(store, "Option", [inner]))
+            infer_value_ok(ty::ty_adt(store, "Option", [inner]))
         }
         "array_literal" -> {
-            let elem = ty_fresh_var(fresh)
+            let elem = ty::ty_fresh_var(fresh)
             for (i in 0 .. expr.args.length)
             {
                 let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.args[i])
@@ -395,7 +404,7 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 let u = hm_unify(store, subst, elem, v.ty, pos)
                 if (u.ok == 0) { return u }
             }
-            infer_value_ok(ty_array(store, subst_apply_ty(store, subst, elem)))
+            infer_value_ok(ty::ty_array(store, subst::subst_apply_ty(store, subst, elem)))
         }
         "binop" -> {
             let l = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
@@ -404,54 +413,54 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (r.ok == 0) { return r }
             if (expr.text == "??")
             {
-                let left_ty = subst_apply_ty(store, subst, l.ty)
+                let left_ty = subst::subst_apply_ty(store, subst, l.ty)
                 let inner_ty = hm_option_inner(store, left_ty)
-                if (ty_is_unknown(inner_ty) == 1) return infer_value_fail(infer_error_other("left operand of ?? must be Option", pos))
+                if (ty::ty_is_unknown(inner_ty) == 1) return infer_value_fail(error::infer_error_other("left operand of ?? must be Option", pos))
                 let u = hm_unify(store, subst, inner_ty, r.ty, pos)
                 if (u.ok == 0) return u
-                return infer_value_ok(subst_apply_ty(store, subst, inner_ty))
+                return infer_value_ok(subst::subst_apply_ty(store, subst, inner_ty))
             }
             let numeric_ty = hm_numeric_result_ty(store, subst, l.ty, r.ty)
             if (expr.text == "==" or expr.text == "!=" or expr.text == "<" or expr.text == ">" or expr.text == "<=" or expr.text == ">=")
             {
-                if (ty_is_unknown(numeric_ty) == 1)
+                if (ty::ty_is_unknown(numeric_ty) == 1)
                 {
                     let u = hm_unify(store, subst, l.ty, r.ty, pos)
                     if (u.ok == 0) { return u }
                 }
-                return infer_value_ok(TyPrim(ty_prim_bool()))
+                return infer_value_ok(ty::TyPrim(ty::ty_prim_bool()))
             }
             if (expr.text == "and" or expr.text == "or")
             {
-                let u1 = hm_unify(store, subst, TyPrim(ty_prim_bool()), l.ty, pos)
+                let u1 = hm_unify(store, subst, ty::TyPrim(ty::ty_prim_bool()), l.ty, pos)
                 if (u1.ok == 0) { return u1 }
-                let u2 = hm_unify(store, subst, TyPrim(ty_prim_bool()), r.ty, pos)
+                let u2 = hm_unify(store, subst, ty::TyPrim(ty::ty_prim_bool()), r.ty, pos)
                 if (u2.ok == 0) { return u2 }
-                return infer_value_ok(TyPrim(ty_prim_bool()))
+                return infer_value_ok(ty::TyPrim(ty::ty_prim_bool()))
             }
-            if (ty_is_unknown(numeric_ty) == 0) { return infer_value_ok(numeric_ty) }
+            if (ty::ty_is_unknown(numeric_ty) == 0) { return infer_value_ok(numeric_ty) }
             let u3 = hm_unify(store, subst, l.ty, r.ty, pos)
             if (u3.ok == 0) { return u3 }
-            infer_value_ok(subst_apply_ty(store, subst, l.ty))
+            infer_value_ok(subst::subst_apply_ty(store, subst, l.ty))
         }
         "unaryop" -> {
             let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
             if (v.ok == 0) { return v }
             if (expr.text == "!")
             {
-                let u = hm_unify(store, subst, TyPrim(ty_prim_bool()), v.ty, pos)
+                let u = hm_unify(store, subst, ty::TyPrim(ty::ty_prim_bool()), v.ty, pos)
                 if (u.ok == 0) { return u }
-                return infer_value_ok(TyPrim(ty_prim_bool()))
+                return infer_value_ok(ty::TyPrim(ty::ty_prim_bool()))
             }
             infer_value_ok(v.ty)
         }
         "lambda" -> {
-            let mut params: [Ty] = []
+            let mut params: [ty::Ty] = []
             for (i in 0 .. expr.type_args.length)
             {
                 params.push(hm_type_param_ty(store, type_params.names, type_params.vars, expr.type_args[i]))
             }
-            infer_value_ok(ty_fun(store, params, hm_type_param_ty(store, type_params.names, type_params.vars, expr.option_value)))
+            infer_value_ok(ty::ty_fun(store, params, hm_type_param_ty(store, type_params.names, type_params.vars, expr.option_value)))
         }
         "call" -> {
             if (expr.text == "clone" and expr.args.length == 1)
@@ -459,49 +468,49 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 return hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.args[0])
             }
             let callee = if (expr.left_idx >= 0) hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
-            elif (expr.type_args.length > 0 and type_env_has(env, expr.text) == 1)
+            elif (expr.type_args.length > 0 and env::type_env_has(env, expr.text) == 1)
             {
-                let scheme = type_env_lookup(env, expr.text)
-                let mut explicit_args: [Ty] = []
+                let scheme = env::type_env_lookup(env, expr.text)
+                let mut explicit_args: [ty::Ty] = []
                 for (i in 0 .. expr.type_args.length)
                 {
                     explicit_args.push(hm_type_param_ty(store, type_params.names, type_params.vars, expr.type_args[i]))
                 }
-                infer_value_ok(scheme_instantiate_with(store, fresh, scheme, explicit_args))
+                infer_value_ok(scheme::scheme_instantiate_with(store, fresh, scheme, explicit_args))
             }
             else hm_infer_ident(env, store, fresh, expr.text, pos)
             if (callee.ok == 0) { return callee }
-            let mut args: [Ty] = []
+            let mut args: [ty::Ty] = []
             for (i in 0 .. expr.args.length)
             {
                 let arg = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.args[i])
                 if (arg.ok == 0) { return arg }
                 args.push(arg.ty)
             }
-            let ret = ty_fresh_var(fresh)
-            let expected = ty_fun(store, args, ret)
+            let ret = ty::ty_fresh_var(fresh)
+            let expected = ty::ty_fun(store, args, ret)
             let u = hm_unify(store, subst, callee.ty, expected, pos)
             if (u.ok == 0) { return u }
-            infer_value_ok(subst_apply_ty(store, subst, ret))
+            infer_value_ok(subst::subst_apply_ty(store, subst, ret))
         }
         "index" -> {
             let base = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
             if (base.ok == 0) return base
             let index = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.right_idx)
             if (index.ok == 0) return index
-            let uidx = hm_unify(store, subst, index.ty, TyPrim(ty_prim_i32()), pos)
+            let uidx = hm_unify(store, subst, index.ty, ty::TyPrim(ty::ty_prim_i32()), pos)
             if (uidx.ok == 0) return uidx
-            let base_ty = subst_apply_ty(store, subst, base.ty)
-            if (ty_eq(store, base_ty, TyPrim(ty_prim_string())) == 1)
+            let base_ty = subst::subst_apply_ty(store, subst, base.ty)
+            if (ty::ty_eq(store, base_ty, ty::TyPrim(ty::ty_prim_string())) == 1)
             {
-                return infer_value_ok(TyPrim(ty_prim_i8()))
+                return infer_value_ok(ty::TyPrim(ty::ty_prim_i8()))
             }
             let ptr_elem = hm_ptr_array_elem(store, base_ty)
-            if (ty_is_unknown(ptr_elem) == 0) { return infer_value_ok(subst_apply_ty(store, subst, ptr_elem)) }
-            let elem = ty_fresh_var(fresh)
-            let ubase = hm_unify(store, subst, base.ty, ty_array(store, elem), pos)
+            if (ty::ty_is_unknown(ptr_elem) == 0) { return infer_value_ok(subst::subst_apply_ty(store, subst, ptr_elem)) }
+            let elem = ty::ty_fresh_var(fresh)
+            let ubase = hm_unify(store, subst, base.ty, ty::ty_array(store, elem), pos)
             if (ubase.ok == 0) { return ubase }
-            infer_value_ok(subst_apply_ty(store, subst, elem))
+            infer_value_ok(subst::subst_apply_ty(store, subst, elem))
         }
         "slice" -> {
             let base = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
@@ -510,46 +519,46 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (start.ok == 0) { return start }
             let finish = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.args[0])
             if (finish.ok == 0) { return finish }
-            let u1 = hm_unify(store, subst, start.ty, TyPrim(ty_prim_i32()), pos)
+            let u1 = hm_unify(store, subst, start.ty, ty::TyPrim(ty::ty_prim_i32()), pos)
             if (u1.ok == 0) { return u1 }
-            let u2 = hm_unify(store, subst, finish.ty, TyPrim(ty_prim_i32()), pos)
+            let u2 = hm_unify(store, subst, finish.ty, ty::TyPrim(ty::ty_prim_i32()), pos)
             if (u2.ok == 0) { return u2 }
-            let base_ty = subst_apply_ty(store, subst, base.ty)
-            if (ty_is_array(base_ty) == 1) { return infer_value_ok(base_ty) }
-            let ubase = hm_unify(store, subst, base.ty, TyPrim(ty_prim_string()), pos)
+            let base_ty = subst::subst_apply_ty(store, subst, base.ty)
+            if (ty::ty_is_array(base_ty) == 1) { return infer_value_ok(base_ty) }
+            let ubase = hm_unify(store, subst, base.ty, ty::TyPrim(ty::ty_prim_string()), pos)
             if (ubase.ok == 0) { return ubase }
-            infer_value_ok(TyPrim(ty_prim_string()))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_string()))
         }
         "addr" -> {
             let v = hm_infer_ident(env, store, fresh, expr.text, pos)
             if (v.ok == 0) { return v }
-            infer_value_ok(ty_ptr(store, v.ty))
+            infer_value_ok(ty::ty_ptr(store, v.ty))
         }
         "deref" -> {
             let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
             if (v.ok == 0) { return v }
-            let inner = ty_fresh_var(fresh)
-            let u = hm_unify(store, subst, v.ty, ty_ptr(store, inner), pos)
+            let inner = ty::ty_fresh_var(fresh)
+            let u = hm_unify(store, subst, v.ty, ty::ty_ptr(store, inner), pos)
             if (u.ok == 0) { return u }
-            infer_value_ok(subst_apply_ty(store, subst, inner))
+            infer_value_ok(subst::subst_apply_ty(store, subst, inner))
         }
         "field" -> {
             let base = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
             if (base.ok == 0) { return base }
-            let base_ty = subst_apply_ty(store, subst, base.ty)
+            let base_ty = subst::subst_apply_ty(store, subst, base.ty)
             let name = hm_ty_adt_name(store, base_ty)
             if (name == "") { return infer_value_ok(hm_unknown_ty()) }
             let field_ty = hm_struct_field_type(store, structs, name, expr.text)
-            if (ty_is_unknown(field_ty) == 1) { return infer_value_fail(infer_error_other("unknown field '" + expr.text + "' on " + name, pos)) }
+            if (ty::ty_is_unknown(field_ty) == 1) { return infer_value_fail(error::infer_error_other("unknown field '" + expr.text + "' on " + name, pos)) }
             infer_value_ok(field_ty)
         }
         "struct_literal" -> {
             for (i in 0 .. expr.field_names.length)
             {
                 let expected = hm_struct_field_type(store, structs, expr.text, expr.field_names[i])
-                if (ty_is_unknown(expected) == 0 and i < expr.args.length)
+                if (ty::ty_is_unknown(expected) == 0 and i < expr.args.length)
                 {
-                    let actual_expr = expr_store_get(es, expr.args[i])
+                    let actual_expr = ast::expr_store_get(es, expr.args[i])
                     if (hm_is_null_ptr_literal(store, expected, actual_expr) == 1)
                     {
                         continue
@@ -560,12 +569,12 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                     if (u.ok == 0) { return u }
                 }
             }
-            infer_value_ok(ty_adt(store, expr.text, []))
+            infer_value_ok(ty::ty_adt(store, expr.text, []))
         }
         "if_expr" -> {
             let cond = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
             if (cond.ok == 0) { return cond }
-            let cu = hm_unify(store, subst, TyPrim(ty_prim_bool()), cond.ty, pos)
+            let cu = hm_unify(store, subst, ty::TyPrim(ty::ty_prim_bool()), cond.ty, pos)
             if (cu.ok == 0) { return cu }
             let then_v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.right_idx)
             if (then_v.ok == 0) { return then_v }
@@ -573,7 +582,7 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (else_v.ok == 0) { return else_v }
             let bu = hm_unify(store, subst, then_v.ty, else_v.ty, pos)
             if (bu.ok == 0) { return bu }
-            infer_value_ok(subst_apply_ty(store, subst, then_v.ty))
+            infer_value_ok(subst::subst_apply_ty(store, subst, then_v.ty))
         }
         "match_expr" -> {
             let subject = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
@@ -584,7 +593,7 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             {
                 let pattern_idx = expr.args[i * 2]
                 let body_idx = expr.args[i * 2 + 1]
-                let body_env = type_env_clone(env)
+                let body_env = env::type_env_clone(env)
                 if (pattern_idx >= 0)
                 {
                     let pu = hm_infer_pattern(&body_env, store, fresh, subst, type_params, structs, es, ss, pattern_idx, subject.ty, pos)
@@ -594,7 +603,7 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 {
                     let body = hm_infer_expr(&body_env, store, fresh, subst, type_params, structs, es, ss, body_idx)
                     if (body.ok == 0) { return body }
-                    if (ty_is_unknown(result_ty) == 1)
+                    if (ty::ty_is_unknown(result_ty) == 1)
                     {
                         result_ty = body.ty
                     }
@@ -602,17 +611,17 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                     {
                         let bu = hm_unify(store, subst, result_ty, body.ty, pos)
                         if (bu.ok == 0) { return bu }
-                        result_ty = subst_apply_ty(store, subst, result_ty)
+                        result_ty = subst::subst_apply_ty(store, subst, result_ty)
                     }
                 }
             }
-            infer_value_ok(subst_apply_ty(store, subst, result_ty))
+            infer_value_ok(subst::subst_apply_ty(store, subst, result_ty))
         }
         "block_expr" -> {
-            let block_env = type_env_clone(env)
+            let block_env = env::type_env_clone(env)
             if (expr.left_idx >= 0)
             {
-                let block_stmt = stmt_store_get(ss, expr.left_idx)
+                let block_stmt = ast::stmt_store_get(ss, expr.left_idx)
                 if (block_stmt.tag == "block")
                 {
                     let mut last_expr_idx = -1
@@ -620,7 +629,7 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                     {
                         for (i in 0 .. block_stmt.stmt_indices.length)
                         {
-                            let child_stmt = stmt_store_get(ss, block_stmt.stmt_indices[i])
+                            let child_stmt = ast::stmt_store_get(ss, block_stmt.stmt_indices[i])
                             if (i == block_stmt.stmt_indices.length - 1 and child_stmt.tag == "expr")
                             {
                                 last_expr_idx = child_stmt.value_idx
@@ -637,7 +646,7 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                         for (i in 0 .. block_stmt.block_count)
                         {
                             let child_idx = block_stmt.block_start + i
-                            let child_stmt2 = stmt_store_get(ss, child_idx)
+                            let child_stmt2 = ast::stmt_store_get(ss, child_idx)
                             if (i == block_stmt.block_count - 1 and child_stmt2.tag == "expr")
                             {
                                 last_expr_idx = child_stmt2.value_idx
@@ -658,53 +667,53 @@ pub fn hm_infer_expr(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 }
             }
             if (expr.right_idx >= 0) { return hm_infer_expr(&block_env, store, fresh, subst, type_params, structs, es, ss, expr.right_idx) }
-            infer_value_ok(TyPrim(ty_prim_i32()))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_i32()))
         }
         "method_call" -> {
             let receiver = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.left_idx)
             if (receiver.ok == 0) { return receiver }
-            let receiver_ty = subst_apply_ty(store, subst, receiver.ty)
-            let receiver_text = ty_to_string(store, receiver_ty)
+            let receiver_ty = subst::subst_apply_ty(store, subst, receiver.ty)
+            let receiver_text = ty::ty_to_string(store, receiver_ty)
             // One resolution covers user methods and runtime intrinsics alike.
-            let resolution = method_resolve(env.methods, receiver_text, expr.text)
-            if (method_resolution_is_found(resolution) == 0)
+            let resolution = methods::method_resolve(env.methods, receiver_text, expr.text)
+            if (method_decl::method_resolution_is_found(resolution) == 0)
             {
-                return infer_value_fail(infer_error_other("unknown method '" + expr.text + "' on " + receiver_text, pos))
+                return infer_value_fail(error::infer_error_other("unknown method '" + expr.text + "' on " + receiver_text, pos))
             }
-            let mut args: [Ty] = []
+            let mut args: [ty::Ty] = []
             for (i in 0 .. expr.args.length)
             {
                 let arg = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, expr.args[i])
                 if (arg.ok == 0) { return arg }
                 args.push(arg.ty)
             }
-            if (method_resolution_is_intrinsic(resolution) == 1)
+            if (method_decl::method_resolution_is_intrinsic(resolution) == 1)
             {
-                return infer_value_ok(ty_from_text(store, method_resolution_ret_type(resolution)))
+                return infer_value_ok(ty::ty_from_text(store, method_decl::method_resolution_ret_type(resolution)))
             }
-            let callee = scheme_instantiate(store, fresh, type_env_lookup(env, method_resolution_storage_name(resolution)))
-            let mut call_args: [Ty] = [receiver.ty]
+            let callee = scheme::scheme_instantiate(store, fresh, env::type_env_lookup(env, method_decl::method_resolution_storage_name(resolution)))
+            let mut call_args: [ty::Ty] = [receiver.ty]
             for (i in 0 .. args.length)
             {
                 call_args.push(args[i])
             }
-            let ret = ty_fresh_var(fresh)
-            let u = hm_unify(store, subst, callee, ty_fun(store, call_args, ret), pos)
+            let ret = ty::ty_fresh_var(fresh)
+            let u = hm_unify(store, subst, callee, ty::ty_fun(store, call_args, ret), pos)
             if (u.ok == 0) { return infer_value_fail(u.error) }
-            infer_value_ok(subst_apply_ty(store, subst, ret))
+            infer_value_ok(subst::subst_apply_ty(store, subst, ret))
         }
         _ -> infer_value_ok(hm_unknown_ty())
     }
 }
 
-pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subst, type_params: &HmTypeParams, structs: [AstStructDecl], es: &ExprStore, ss: &StmtStore, idx: i32, ret_ty: Ty): InferValue
+pub fn hm_infer_stmt(env: &env::TypeEnv, store: &ty::TyStore, fresh: &fresh::Fresh, subst: &subst::Subst, type_params: &HmTypeParams, structs: [ast::AstStructDecl], es: &ast::ExprStore, ss: &ast::StmtStore, idx: i32, ret_ty: ty::Ty): InferValue
 {
-    if (idx < 0) { return infer_value_ok(TyPrim(ty_prim_void())) }
-    let stmt = stmt_store_get(ss, idx)
+    if (idx < 0) { return infer_value_ok(ty::TyPrim(ty::ty_prim_void())) }
+    let stmt = ast::stmt_store_get(ss, idx)
     let pos = hm_stmt_pos(stmt)
     return match stmt.tag
     {
-        "return" -> hm_unify(store, subst, TyPrim(ty_prim_void()), ret_ty, pos)
+        "return" -> hm_unify(store, subst, ty::TyPrim(ty::ty_prim_void()), ret_ty, pos)
         "return_expr" -> {
             let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.value_idx)
             if (v.ok == 0) { return v }
@@ -713,16 +722,16 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
         "let" -> {
             let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
             if (v.ok == 0) { return v }
-            let mut final_ty = subst_apply_ty(store, subst, v.ty)
+            let mut final_ty = subst::subst_apply_ty(store, subst, v.ty)
             if (stmt.type_text != "")
             {
                 let declared = hm_type_param_ty(store, type_params.names, type_params.vars, stmt.type_text)
                 let u = hm_unify(store, subst, declared, final_ty, pos)
                 if (u.ok == 0) { return u }
-                final_ty = subst_apply_ty(store, subst, declared)
+                final_ty = subst::subst_apply_ty(store, subst, declared)
             }
-            type_env_extend(env, stmt.assign_name, hm_generalize_let(store, env, subst, final_ty))
-            infer_value_ok(TyPrim(ty_prim_void()))
+            env::type_env_extend(env, stmt.assign_name, gen::hm_generalize_let(store, env, subst, final_ty))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_void()))
         }
         "assign" -> {
             let lhs = hm_infer_ident(env, store, fresh, stmt.assign_name, pos)
@@ -736,44 +745,44 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (base.ok == 0) return base
             let index = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.direct_ret)
             if (index.ok == 0) return index
-            let uidx = hm_unify(store, subst, index.ty, TyPrim(ty_prim_i32()), pos)
+            let uidx = hm_unify(store, subst, index.ty, ty::TyPrim(ty::ty_prim_i32()), pos)
             if (uidx.ok == 0) return uidx
 
-            let base_ty = subst_apply_ty(store, subst, base.ty)
-            if (ty_eq(store, base_ty, TyPrim(ty_prim_string())) == 1)
+            let base_ty = subst::subst_apply_ty(store, subst, base.ty)
+            if (ty::ty_eq(store, base_ty, ty::TyPrim(ty::ty_prim_string())) == 1)
             {
                 let string_value = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
                 if (string_value.ok == 0) return string_value
-                return hm_unify(store, subst, TyPrim(ty_prim_i8()), string_value.ty, pos)
+                return hm_unify(store, subst, ty::TyPrim(ty::ty_prim_i8()), string_value.ty, pos)
             }
 
             let ptr_elem = hm_ptr_array_elem(store, base_ty)
-            if (ty_is_unknown(ptr_elem) == 0)
+            if (ty::ty_is_unknown(ptr_elem) == 0)
             {
                 let ptr_value = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
                 if (ptr_value.ok == 0) return ptr_value
-                return hm_unify(store, subst, subst_apply_ty(store, subst, ptr_elem), ptr_value.ty, pos)
+                return hm_unify(store, subst, subst::subst_apply_ty(store, subst, ptr_elem), ptr_value.ty, pos)
             }
 
-            let elem_ty = ty_fresh_var(fresh)
-            let ubase = hm_unify(store, subst, base.ty, ty_array(store, elem_ty), pos)
+            let elem_ty = ty::ty_fresh_var(fresh)
+            let ubase = hm_unify(store, subst, base.ty, ty::ty_array(store, elem_ty), pos)
             if (ubase.ok == 0) return ubase
             let value = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
             if (value.ok == 0) return value
-            hm_unify(store, subst, subst_apply_ty(store, subst, elem_ty), value.ty, pos)
+            hm_unify(store, subst, subst::subst_apply_ty(store, subst, elem_ty), value.ty, pos)
         }
         "print" -> {
             let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.print_idx)
             if (v.ok == 0) { return v }
-            infer_value_ok(TyPrim(ty_prim_void()))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_void()))
         }
         "expr" -> {
             let v = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.value_idx)
             if (v.ok == 0) { return v }
-            infer_value_ok(TyPrim(ty_prim_void()))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_void()))
         }
         "block" -> {
-            let block_env = type_env_clone(env)
+            let block_env = env::type_env_clone(env)
             if (stmt.stmt_indices.length > 0)
             {
                 for (i in 0 .. stmt.stmt_indices.length)
@@ -790,12 +799,12 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                     if (r2.ok == 0) { return r2 }
                 }
             }
-            infer_value_ok(TyPrim(ty_prim_void()))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_void()))
         }
         "if" -> {
             let cond = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.value_idx)
             if (cond.ok == 0) { return cond }
-            let cu = hm_unify(store, subst, TyPrim(ty_prim_bool()), cond.ty, pos)
+            let cu = hm_unify(store, subst, ty::TyPrim(ty::ty_prim_bool()), cond.ty, pos)
             if (cu.ok == 0) { return cu }
             let then_r = hm_infer_stmt(env, store, fresh, subst, type_params, structs, es, ss, stmt.body_idx, ret_ty)
             if (then_r.ok == 0) { return then_r }
@@ -804,12 +813,12 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 let else_r = hm_infer_stmt(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx, ret_ty)
                 if (else_r.ok == 0) { return else_r }
             }
-            infer_value_ok(TyPrim(ty_prim_void()))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_void()))
         }
         "while" -> {
             let cond = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.value_idx)
             if (cond.ok == 0) { return cond }
-            let cu = hm_unify(store, subst, TyPrim(ty_prim_bool()), cond.ty, pos)
+            let cu = hm_unify(store, subst, ty::TyPrim(ty::ty_prim_bool()), cond.ty, pos)
             if (cu.ok == 0) { return cu }
             hm_infer_stmt(env, store, fresh, subst, type_params, structs, es, ss, stmt.body_idx, ret_ty)
         }
@@ -818,12 +827,12 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (start.ok == 0) { return start }
             let endv = hm_infer_expr(env, store, fresh, subst, type_params, structs, es, ss, stmt.assign_idx)
             if (endv.ok == 0) { return endv }
-            let u1 = hm_unify(store, subst, start.ty, TyPrim(ty_prim_i32()), pos)
+            let u1 = hm_unify(store, subst, start.ty, ty::TyPrim(ty::ty_prim_i32()), pos)
             if (u1.ok == 0) { return u1 }
-            let u2 = hm_unify(store, subst, endv.ty, TyPrim(ty_prim_i32()), pos)
+            let u2 = hm_unify(store, subst, endv.ty, ty::TyPrim(ty::ty_prim_i32()), pos)
             if (u2.ok == 0) { return u2 }
-            let loop_env = type_env_clone(env)
-            type_env_extend(&loop_env, stmt.assign_name, scheme_mono(TyPrim(ty_prim_i32())))
+            let loop_env = env::type_env_clone(env)
+            env::type_env_extend(&loop_env, stmt.assign_name, scheme::scheme_mono(ty::TyPrim(ty::ty_prim_i32())))
             hm_infer_stmt(&loop_env, store, fresh, subst, type_params, structs, es, ss, stmt.body_idx, ret_ty)
         }
         "match" -> {
@@ -831,7 +840,7 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
             if (subject.ok == 0) { return subject }
             for (i in 0 .. stmt.match_body_indices.length)
             {
-                let body_env = type_env_clone(env)
+                let body_env = env::type_env_clone(env)
                 if (i < stmt.match_pattern_indices.length and stmt.match_pattern_indices[i] >= 0)
                 {
                     let pu = hm_infer_pattern(&body_env, store, fresh, subst, type_params, structs, es, ss, stmt.match_pattern_indices[i], subject.ty, pos)
@@ -840,24 +849,24 @@ pub fn hm_infer_stmt(env: &TypeEnv, store: &TyStore, fresh: &Fresh, subst: &Subs
                 let br = hm_infer_stmt(&body_env, store, fresh, subst, type_params, structs, es, ss, stmt.match_body_indices[i], ret_ty)
                 if (br.ok == 0) { return br }
             }
-            infer_value_ok(TyPrim(ty_prim_void()))
+            infer_value_ok(ty::TyPrim(ty::ty_prim_void()))
         }
-        "break" | "continue" -> infer_value_ok(TyPrim(ty_prim_void()))
-        _ -> infer_value_ok(TyUnknown)
+        "break" | "continue" -> infer_value_ok(ty::TyPrim(ty::ty_prim_void()))
+        _ -> infer_value_ok(ty::TyUnknown)
     }
 }
 
-pub fn hm_check_function(func: AstFunction, base_env: &TypeEnv, store: &TyStore, fresh: &Fresh, structs: [AstStructDecl], es: &ExprStore, ss: &StmtStore): HmCheckResult
+pub fn hm_check_function(func: ast::AstFunction, base_env: &env::TypeEnv, store: &ty::TyStore, fresh: &fresh::Fresh, structs: [ast::AstStructDecl], es: &ast::ExprStore, ss: &ast::StmtStore): HmCheckResult
 {
-    let env = type_env_clone(base_env)
+    let env = env::type_env_clone(base_env)
     let mut vars: [i32] = []
     for (t in 0 .. func.type_params.length)
     {
-        vars.push(fresh_tyvar_id(fresh))
+        vars.push(fresh::fresh_tyvar_id(fresh))
     }
     for (i in 0 .. func.param_names.length)
     {
-        type_env_extend(&env, func.param_names[i], scheme_mono(hm_type_param_ty(store, func.type_params, vars, func.param_types[i])))
+        env::type_env_extend(&env, func.param_names[i], scheme::scheme_mono(hm_type_param_ty(store, func.type_params, vars, func.param_types[i])))
     }
     // Synthetic lambdas keep their explicit capture names in the lambda AST.
     // Expose those names as unknown locals so their uses participate in the
@@ -871,13 +880,13 @@ pub fn hm_check_function(func: AstFunction, base_env: &TypeEnv, store: &TyStore,
             {
                 for (c in 0 .. lambda_expr.capture_names.length)
                 {
-                    type_env_extend(&env, lambda_expr.capture_names[c], scheme_mono(TyUnknown))
+                    env::type_env_extend(&env, lambda_expr.capture_names[c], scheme::scheme_mono(ty::TyUnknown))
                 }
                 break
             }
         }
     }
-    let subst = subst_empty()
+    let subst = subst::subst_empty()
     let type_params = hm_type_params(func.type_params, vars)
     let ret_ty = hm_type_param_ty(store, func.type_params, vars, func.ret_ty)
     let r = hm_infer_stmt(&env, store, fresh, &subst, &type_params, structs, es, ss, func.body_idx, ret_ty)
@@ -885,7 +894,7 @@ pub fn hm_check_function(func: AstFunction, base_env: &TypeEnv, store: &TyStore,
     return hm_ok(func.ret_ty)
 }
 
-pub fn hm_check_program(program: AstProgram): HmCheckResult
+pub fn hm_check_program(program: ast::AstProgram): HmCheckResult
 {
     return hm_check_program_skipping(program, [])
 }
@@ -893,15 +902,15 @@ pub fn hm_check_program(program: AstProgram): HmCheckResult
 // checked_prefixes names the modules whose interface files say they were already
 // checked by this compiler from this source.  Their bodies are skipped; the
 // environment is still built from every function, so signatures resolve.
-pub fn hm_check_program_skipping(program: AstProgram, checked_prefixes: [string]): HmCheckResult
+pub fn hm_check_program_skipping(program: ast::AstProgram, checked_prefixes: [string]): HmCheckResult
 {
     if (program.ok == 0)
     {
-        return HmCheckResult{ ok: 0, code: "E1000", title: "parse error", phase: DiagParser, error: program.error, return_type: "unknown", error_func: "", line: 0, col: 0, span_len: 1 }
+        return HmCheckResult{ ok: 0, code: "E1000", title: "parse error", phase: diag::DiagParser, error: program.error, return_type: "unknown", error_func: "", line: 0, col: 0, span_len: 1 }
     }
-    let store = ty_store_new()
-    let fresh = fresh_new()
-    let env = type_env_new()
+    let store = ty::ty_store_new()
+    let fresh = fresh::fresh_new()
+    let env = env::type_env_new()
     // Method calls resolve against the program's own declaration index. It is
     // attached once by the pipeline, so the solver never scans function names.
     env.methods = program.expr_store.methods
@@ -910,34 +919,34 @@ pub fn hm_check_program_skipping(program: AstProgram, checked_prefixes: [string]
     hm_add_functions(&env, &store, &fresh, program.functions)
     let expr_store = program.expr_store
     let stmt_store = program.store
-    let global_subst = subst_empty()
+    let global_subst = subst::subst_empty()
     let global_type_params = hm_type_params([], [])
     for (i in 0 .. program.globals.length)
     {
         let global = program.globals[i]
         let value = hm_infer_expr(&env, &store, &fresh, &global_subst, &global_type_params, program.structs, &expr_store, &stmt_store, global.assign_idx)
         if (value.ok == 0) { return hm_fail(value.error, "") }
-        let mut global_ty = subst_apply_ty(&store, &global_subst, value.ty)
+        let mut global_ty = subst::subst_apply_ty(&store, &global_subst, value.ty)
         if (global.type_text != "")
         {
-            let declared = ty_from_text(&store, global.type_text)
-            let unified = hm_unify(&store, &global_subst, declared, global_ty, pos_at(global.line, global.col))
+            let declared = ty::ty_from_text(&store, global.type_text)
+            let unified = hm_unify(&store, &global_subst, declared, global_ty, pos::pos_at(global.line, global.col))
             if (unified.ok == 0) { return hm_fail(unified.error, "") }
-            global_ty = subst_apply_ty(&store, &global_subst, declared)
+            global_ty = subst::subst_apply_ty(&store, &global_subst, declared)
         }
         if (global.is_mut == 1)
         {
-            type_env_extend(&env, global.assign_name, scheme_mono(global_ty))
+            env::type_env_extend(&env, global.assign_name, scheme::scheme_mono(global_ty))
         }
         else
         {
-            type_env_extend(&env, global.assign_name, hm_generalize_let(&store, &env, &global_subst, global_ty))
+            env::type_env_extend(&env, global.assign_name, gen::hm_generalize_let(&store, &env, &global_subst, global_ty))
         }
     }
-    type_env_mark_closed_prefix(&store, &env)
+    env::type_env_mark_closed_prefix(&store, &env)
     for (i in 0 .. program.functions.length)
     {
-        if (module_name_is_checked(program.functions[i].name, checked_prefixes) == 1) { continue }
+        if (ast::module_name_is_checked(program.functions[i].name, checked_prefixes) == 1) { continue }
         let r = hm_check_function(program.functions[i], &env, &store, &fresh, program.structs, &expr_store, &stmt_store)
         if (r.ok == 0) { return r }
     }

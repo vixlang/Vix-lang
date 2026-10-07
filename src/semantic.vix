@@ -2,6 +2,8 @@
 
 use "ast.vix" as ast
 use "error.vix" as error
+use "diag.vix" as diag
+use "lexer.vix" as lexer
 use "intrinsic.vix" as intrinsic
 use "method.vix" as methods
 use "type/typeck.vix" as typeck
@@ -12,51 +14,51 @@ pub type SemanticResult = struct {
     type_error_count: i32,
     warning_count: i32,
     emit_warnings: i32,
-    bag: DiagBag,
+    bag: diag::DiagBag,
     source: string,
     filename: string,
-    type_result: TypeInferResult
+    type_result: typeck::TypeInferResult
 }
 
 pub fn semantic_result_new(): SemanticResult => semantic_result_new_with_warnings(1)
 
-pub fn semantic_result_new_with_warnings(emit_warnings: i32): SemanticResult => SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, emit_warnings: emit_warnings, bag: diag_bag_new(), source: "", filename: "", type_result: typeinfer_ok("unknown") }
+pub fn semantic_result_new_with_warnings(emit_warnings: i32): SemanticResult => SemanticResult{ ok: 1, error_count: 0, type_error_count: 0, warning_count: 0, emit_warnings: emit_warnings, bag: diag::diag_bag_new(), source: "", filename: "", type_result: typeck::typeinfer_ok("unknown") }
 
-pub fn semantic_phase(error_type: string): DiagPhase
+pub fn semantic_phase(error_type: string): diag::DiagPhase
 {
     return match error_type {
-        "NameError" -> DiagName
-        "TypeError" -> DiagType
-        "OwnershipError" -> DiagOwnership
-        _ -> DiagSemantic
+        "NameError" -> diag::DiagName
+        "TypeError" -> diag::DiagType
+        "OwnershipError" -> diag::DiagOwnership
+        _ -> diag::DiagSemantic
     }
 }
 
-pub fn semantic_diagnostic(source: string, filename: string, code: string, level: DiagLevel, phase: DiagPhase, title: string, message: string, func_name: string, line: i32, col: i32, length: i32): Diagnostic
+pub fn semantic_diagnostic(source: string, filename: string, code: string, level: diag::DiagLevel, phase: diag::DiagPhase, title: string, message: string, func_name: string, line: i32, col: i32, length: i32): diag::Diagnostic
 {
     let full_message = if (func_name != "") "in function " + func_name + ": " + message else message
-    let mut diagnostic = diag_new(code, level, phase, title)
-        |> diag_message(full_message)
-        |> diag_function(func_name)
+    let mut diagnostic = diag::diag_new(code, level, phase, title)
+        |> diag::diag_message(full_message)
+        |> diag::diag_function(func_name)
     if (line > 0)
     {
-        diagnostic = diag_primary(diagnostic, diag_span_at(source, filename, line, col, length), message)
+        diagnostic = diag::diag_primary(diagnostic, diag::diag_span_at(source, filename, line, col, length), message)
     }
-    return diagnostic_with_guidance(diagnostic)
+    return error::diagnostic_with_guidance(diagnostic)
 }
 
-pub fn semantic_emit_diag(result: &SemanticResult, diagnostic: Diagnostic): i32
+pub fn semantic_emit_diag(result: &SemanticResult, diagnostic: diag::Diagnostic): i32
 {
     let mut bag = result.bag
-    let emitted = diag_emit(&bag, diagnostic)
+    let emitted = diag::diag_emit(&bag, diagnostic)
     result.bag = bag
     return emitted
 }
 
 pub fn semantic_add_error(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, func_name: string)
 {
-    let code = error_code_for_type(error_type, message)
-    let diagnostic = semantic_diagnostic(source, filename, code, DiagError, semantic_phase(error_type), diagnostic_title(code, message), message, func_name, 0, 0, 1)
+    let code = error::error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic(source, filename, code, diag::DiagError, semantic_phase(error_type), error::diagnostic_title(code, message), message, func_name, 0, 0, 1)
     if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.error_count += 1
     if (error_type == "TypeError") { result.type_error_count += 1 }
@@ -65,8 +67,8 @@ pub fn semantic_add_error(result: &SemanticResult, source: string, filename: str
 
 pub fn semantic_add_error_loc(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, func_name: string, line: i32, col: i32, length: i32)
 {
-    let code = error_code_for_type(error_type, message)
-    let diagnostic = semantic_diagnostic(source, filename, code, DiagError, semantic_phase(error_type), diagnostic_title(code, message), message, func_name, line, col, length)
+    let code = error::error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic(source, filename, code, diag::DiagError, semantic_phase(error_type), error::diagnostic_title(code, message), message, func_name, line, col, length)
     if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.error_count += 1
     if (error_type == "TypeError") { result.type_error_count += 1 }
@@ -76,8 +78,8 @@ pub fn semantic_add_error_loc(result: &SemanticResult, source: string, filename:
 pub fn semantic_add_warning(result: &SemanticResult, filename: string, error_type: string, message: string)
 {
     if (result.emit_warnings == 0) { return }
-    let code = error_code_for_type(error_type, message)
-    let diagnostic = semantic_diagnostic("", filename, code, DiagWarning, DiagSemantic, diagnostic_title(code, message), message, "", 0, 0, 1)
+    let code = error::error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic("", filename, code, diag::DiagWarning, diag::DiagSemantic, error::diagnostic_title(code, message), message, "", 0, 0, 1)
     if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.warning_count += 1
 }
@@ -85,16 +87,16 @@ pub fn semantic_add_warning(result: &SemanticResult, filename: string, error_typ
 pub fn semantic_add_warning_loc(result: &SemanticResult, source: string, filename: string, error_type: string, message: string, line: i32, col: i32, length: i32)
 {
     if (result.emit_warnings == 0) { return }
-    let code = error_code_for_type(error_type, message)
-    let diagnostic = semantic_diagnostic(source, filename, code, DiagWarning, DiagSemantic, diagnostic_title(code, message), message, "", line, col, length)
+    let code = error::error_code_for_type(error_type, message)
+    let diagnostic = semantic_diagnostic(source, filename, code, diag::DiagWarning, diag::DiagSemantic, error::diagnostic_title(code, message), message, "", line, col, length)
     if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.warning_count += 1
 }
 
-pub fn semantic_add_typeck_error(result: &SemanticResult, source: string, filename: string, check: TypeInferResult)
+pub fn semantic_add_typeck_error(result: &SemanticResult, source: string, filename: string, check: typeck::TypeInferResult)
 {
     if (check.ok == 1) { return }
-    let diagnostic = semantic_diagnostic(source, filename, check.code, DiagError, check.phase, check.title, check.error, check.error_func, check.line, check.col, check.span_len)
+    let diagnostic = semantic_diagnostic(source, filename, check.code, diag::DiagError, check.phase, check.title, check.error, check.error_func, check.line, check.col, check.span_len)
     if (semantic_emit_diag(result, diagnostic) == 0) { return }
     result.error_count += 1
     result.type_error_count += 1
@@ -133,7 +135,7 @@ pub fn semantic_scope_warn_unused_current(scope: &SemanticScope, result: &Semant
         if (scope.depths[i] < scope.depth) { return }
         if (scope.depths[i] == scope.depth and scope.warn_unused[i] == 1 and scope.used[i] == 0)
         {
-            semantic_add_warning_loc(result, source, filename, "SemanticWarning", "unused variable '" + scope.names[i] + "'", scope.lines[i], scope.cols[i], diag_strlen(scope.names[i]))
+            semantic_add_warning_loc(result, source, filename, "SemanticWarning", "unused variable '" + scope.names[i] + "'", scope.lines[i], scope.cols[i], error::diag_strlen(scope.names[i]))
         }
         i -= 1
     }
@@ -205,7 +207,7 @@ pub fn semantic_scope_declare(scope: &SemanticScope, result: &SemanticResult, so
     match semantic_scope_find_current(scope, name)
     {
         Some(_) -> {
-            semantic_add_error_loc(result, source, filename, "NameError", "duplicate symbol '" + name + "'", func_name, line, col, diag_strlen(name))
+            semantic_add_error_loc(result, source, filename, "NameError", "duplicate symbol '" + name + "'", func_name, line, col, error::diag_strlen(name))
             return 0
         }
         None -> {}
@@ -285,6 +287,22 @@ pub fn semantic_scope_mark_used(scope: &SemanticScope, name: string)
     }
 }
 
+// Synthetic lambda functions are prefixed with their module path when modules
+// merge, so the marker is only meaningful in the name's last segment.
+pub fn semantic_is_lambda_name(func_name: string): i32
+{
+    let mut start = 0
+    let mut i = 0
+    while (i + 1 < func_name.length)
+    {
+        if (compiler_string_byte(func_name, i) == ':' and compiler_string_byte(func_name, i + 1) == ':') { start = i + 2 }
+        i += 1
+    }
+    if (func_name.length - start < 9) { return 0 }
+    if (compiler_string_byte(func_name, start) == '_' and compiler_string_byte(func_name, start + 1) == '_' and compiler_string_byte(func_name, start + 2) == 'l' and compiler_string_byte(func_name, start + 3) == 'a' and compiler_string_byte(func_name, start + 4) == 'm' and compiler_string_byte(func_name, start + 5) == 'b' and compiler_string_byte(func_name, start + 6) == 'd' and compiler_string_byte(func_name, start + 7) == 'a' and compiler_string_byte(func_name, start + 8) == '_') return 1
+    return 0
+}
+
 pub fn semantic_scope_require(scope: &SemanticScope, result: &SemanticResult, source: string, filename: string, func_name: string, name: string, line: i32, col: i32)
 {
     if (name == "_") { return }
@@ -292,14 +310,14 @@ pub fn semantic_scope_require(scope: &SemanticScope, result: &SemanticResult, so
     {
         Some(_) -> {}
         None -> {
-            let is_lambda = func_name.length >= 9 and compiler_string_byte(func_name, 0) == '_' and compiler_string_byte(func_name, 1) == '_' and compiler_string_byte(func_name, 2) == 'l' and compiler_string_byte(func_name, 3) == 'a' and compiler_string_byte(func_name, 4) == 'm' and compiler_string_byte(func_name, 5) == 'b' and compiler_string_byte(func_name, 6) == 'd' and compiler_string_byte(func_name, 7) == 'a' and compiler_string_byte(func_name, 8) == '_'
-            if (is_lambda) semantic_add_error_loc(result, source, filename, "NameError", "variable `" + name + "` must be explicitly captured", func_name, line, col, diag_strlen(name))
-            else semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, diag_strlen(name))
+            let is_lambda = semantic_is_lambda_name(func_name)
+            if (is_lambda) semantic_add_error_loc(result, source, filename, "NameError", "variable `" + name + "` must be explicitly captured", func_name, line, col, error::diag_strlen(name))
+            else semantic_add_error_loc(result, source, filename, "NameError", "undefined symbol '" + name + "'", func_name, line, col, error::diag_strlen(name))
         }
     }
 }
 
-pub fn semantic_find_extern_function(funcs: [AstFunction], name: string): i32
+pub fn semantic_find_extern_function(funcs: [ast::AstFunction], name: string): i32
 {
     for (i in 0 .. funcs.length)
     {
@@ -308,7 +326,7 @@ pub fn semantic_find_extern_function(funcs: [AstFunction], name: string): i32
     return -1
 }
 
-pub fn semantic_find_function_any(funcs: [AstFunction], externs: [AstFunction], name: string): i32
+pub fn semantic_find_function_any(funcs: [ast::AstFunction], externs: [ast::AstFunction], name: string): i32
 {
     let idx = semantic_find_function(funcs, name)
     if (idx >= 0) { return idx }
@@ -319,13 +337,13 @@ pub fn semantic_find_function_any(funcs: [AstFunction], externs: [AstFunction], 
 // only check that a declaration or an intrinsic with this name exists at all.
 // Receiver accurate resolution is done by method_resolve, which the solver, the
 // ownership analysis and both backends all share.
-pub fn semantic_has_method(program: AstProgram, method: string): i32
+pub fn semantic_has_method(program: ast::AstProgram, method: string): i32
 {
-    if (intrinsic_has_name(method) == 1) { return 1 }
-    return method_table_has_name(program.expr_store.methods, method)
+    if (intrinsic::intrinsic_has_name(method) == 1) { return 1 }
+    return methods::method_table_has_name(program.expr_store.methods, method)
 }
 
-pub fn semantic_find_struct(structs: [AstStructDecl], name: string): i32
+pub fn semantic_find_struct(structs: [ast::AstStructDecl], name: string): i32
 {
     for (i in 0 .. structs.length)
     {
@@ -334,7 +352,7 @@ pub fn semantic_find_struct(structs: [AstStructDecl], name: string): i32
     return -1
 }
 
-pub fn semantic_find_adt_variant(adts: [AstAdtDecl], name: string): i32
+pub fn semantic_find_adt_variant(adts: [ast::AstAdtDecl], name: string): i32
 {
     for (i in 0 .. adts.length)
     {
@@ -346,7 +364,7 @@ pub fn semantic_find_adt_variant(adts: [AstAdtDecl], name: string): i32
     return -1
 }
 
-pub fn semantic_check_generic_call(program: AstProgram, expr: AstExpr, result: &SemanticResult, source: string, filename: string, func_name: string)
+pub fn semantic_check_generic_call(program: ast::AstProgram, expr: ast::AstExpr, result: &SemanticResult, source: string, filename: string, func_name: string)
 {
     let function_idx = semantic_find_function(program.functions, expr.text)
     if (function_idx < 0) { return }
@@ -355,24 +373,24 @@ pub fn semantic_check_generic_call(program: AstProgram, expr: AstExpr, result: &
     {
         if (expr.type_args.length > 0)
         {
-            semantic_add_error_loc(result, source, filename, "TypeError", "function '" + expr.text + "' is not generic", func_name, expr.line, expr.col, diag_strlen(expr.text))
+            semantic_add_error_loc(result, source, filename, "TypeError", "function '" + expr.text + "' is not generic", func_name, expr.line, expr.col, error::diag_strlen(expr.text))
         }
         return
     }
     if (expr.type_args.length != function.type_params.length)
     {
-        semantic_add_error_loc(result, source, filename, "TypeError", "generic function '" + expr.text + "' requires " + ast_i32(function.type_params.length) + " type arguments", func_name, expr.line, expr.col, diag_strlen(expr.text))
+        semantic_add_error_loc(result, source, filename, "TypeError", "generic function '" + expr.text + "' requires " + ast::ast_i32(function.type_params.length) + " type arguments", func_name, expr.line, expr.col, error::diag_strlen(expr.text))
     }
 }
 
-pub fn semantic_match_check_exhaustive(program: AstProgram, patterns: [i32], result: &SemanticResult, source: string, filename: string, func_name: string, line: i32, col: i32)
+pub fn semantic_match_check_exhaustive(program: ast::AstProgram, patterns: [i32], result: &SemanticResult, source: string, filename: string, func_name: string, line: i32, col: i32)
 {
     let es = program.expr_store
     let mut adt_idx = -1
     for (i in 0 .. patterns.length)
     {
         if (patterns[i] < 0) { return }
-        let pattern = expr_store_get(&es, patterns[i])
+        let pattern = ast::expr_store_get(&es, patterns[i])
         let candidate = semantic_find_adt_variant(program.adts, pattern.text)
         if (candidate >= 0 and adt_idx < 0) { adt_idx = candidate }
     }
@@ -384,7 +402,7 @@ pub fn semantic_match_check_exhaustive(program: AstProgram, patterns: [i32], res
         let mut found = 0
         for (p in 0 .. patterns.length)
         {
-            let pattern2 = expr_store_get(&es, patterns[p])
+            let pattern2 = ast::expr_store_get(&es, patterns[p])
             if (pattern2.text == decl.variant_names[v]) { found = 1 }
         }
         if (found == 0)
@@ -399,7 +417,7 @@ pub fn semantic_match_check_exhaustive(program: AstProgram, patterns: [i32], res
     }
 }
 
-pub fn semantic_struct_find_field(decl: AstStructDecl, field_name: string): i32
+pub fn semantic_struct_find_field(decl: ast::AstStructDecl, field_name: string): i32
 {
     for (i in 0 .. decl.field_names.length)
     {
@@ -408,12 +426,12 @@ pub fn semantic_struct_find_field(decl: AstStructDecl, field_name: string): i32
     return -1
 }
 
-pub fn semantic_check_struct_literal_fields(expr: AstExpr, structs: [AstStructDecl], result: &SemanticResult, source: string, filename: string, func_name: string)
+pub fn semantic_check_struct_literal_fields(expr: ast::AstExpr, structs: [ast::AstStructDecl], result: &SemanticResult, source: string, filename: string, func_name: string)
 {
     let struct_idx = semantic_find_struct(structs, expr.text)
     if (struct_idx < 0)
     {
-        semantic_add_error_loc(result, source, filename, "NameError", "unknown struct '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(expr.text))
+        semantic_add_error_loc(result, source, filename, "NameError", "unknown struct '" + expr.text + "'", func_name, expr.line, expr.col, error::diag_strlen(expr.text))
         return
     }
     let decl = structs[struct_idx]
@@ -424,12 +442,12 @@ pub fn semantic_check_struct_literal_fields(expr: AstExpr, structs: [AstStructDe
         {
             if (field_name == expr.field_names[j])
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "duplicate initializer field '" + field_name + "' in struct '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(field_name))
+                semantic_add_error_loc(result, source, filename, "NameError", "duplicate initializer field '" + field_name + "' in struct '" + expr.text + "'", func_name, expr.line, expr.col, error::diag_strlen(field_name))
             }
         }
         if (semantic_struct_find_field(decl, field_name) < 0)
         {
-            semantic_add_error_loc(result, source, filename, "NameError", "unknown field '" + field_name + "' on struct '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(field_name))
+            semantic_add_error_loc(result, source, filename, "NameError", "unknown field '" + field_name + "' on struct '" + expr.text + "'", func_name, expr.line, expr.col, error::diag_strlen(field_name))
         }
     }
     for (i in 0 .. decl.field_names.length)
@@ -441,16 +459,16 @@ pub fn semantic_check_struct_literal_fields(expr: AstExpr, structs: [AstStructDe
         }
         if (found == 0)
         {
-            semantic_add_error_loc(result, source, filename, "NameError", "missing field '" + decl.field_names[i] + "' in struct '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(decl.field_names[i]))
+            semantic_add_error_loc(result, source, filename, "NameError", "missing field '" + decl.field_names[i] + "' in struct '" + expr.text + "'", func_name, expr.line, expr.col, error::diag_strlen(decl.field_names[i]))
         }
     }
 }
 
-pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
+pub fn semantic_check_expr(scope: &SemanticScope, program: ast::AstProgram, idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
 {
     if (idx < 0) { return }
     let expr_store = program.expr_store
-    let expr = expr_store_get(&expr_store, idx)
+    let expr = ast::expr_store_get(&expr_store, idx)
     match expr.tag
     {
         "ident" -> {
@@ -484,7 +502,7 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             }
             elif (expr.text != "clone" and semantic_find_function_any(program.functions, program.extern_functions, expr.text) < 0 and semantic_find_adt_variant(program.adts, expr.text) < 0 and semantic_scope_contains(scope, expr.text) == 0)
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "undefined function '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(expr.text))
+                semantic_add_error_loc(result, source, filename, "NameError", "undefined function '" + expr.text + "'", func_name, expr.line, expr.col, error::diag_strlen(expr.text))
             }
             if (expr.left_idx < 0 and expr.text != "clone") semantic_check_generic_call(program, expr, result, source, filename, func_name)
             for (i in 0 .. expr.args.length)
@@ -501,7 +519,7 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
                     Some(capture_idx) -> {
                         if (scope.mutable[capture_idx] == 1)
                         {
-                            semantic_add_error_loc(result, source, filename, "TypeError", "mutable capture '" + capture + "' is not supported", func_name, expr.line, expr.col, diag_strlen(capture))
+                            semantic_add_error_loc(result, source, filename, "TypeError", "mutable capture '" + capture + "' is not supported", func_name, expr.line, expr.col, error::diag_strlen(capture))
                         }
                         else
                         {
@@ -511,7 +529,7 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
                     None -> {
                         if (semantic_find_function_any(program.functions, program.extern_functions, capture) < 0 and semantic_find_adt_variant(program.adts, capture) < 0)
                         {
-                            semantic_add_error_loc(result, source, filename, "NameError", "undefined capture '" + capture + "'", func_name, expr.line, expr.col, diag_strlen(capture))
+                            semantic_add_error_loc(result, source, filename, "NameError", "undefined capture '" + capture + "'", func_name, expr.line, expr.col, error::diag_strlen(capture))
                         }
                         else
                         {
@@ -553,7 +571,7 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
             semantic_check_expr(scope, program, expr.left_idx, result, source, filename, func_name)
             if (semantic_has_method(program, expr.text) == 0)
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "unknown method '" + expr.text + "'", func_name, expr.line, expr.col, diag_strlen(expr.text))
+                semantic_add_error_loc(result, source, filename, "NameError", "unknown method '" + expr.text + "'", func_name, expr.line, expr.col, error::diag_strlen(expr.text))
             }
             for (i in 0 .. expr.args.length)
             {
@@ -607,14 +625,14 @@ pub fn semantic_check_expr(scope: &SemanticScope, program: AstProgram, idx: i32,
     }
 }
 
-pub fn semantic_check_match_pattern(scope: &SemanticScope, program: AstProgram, idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
+pub fn semantic_check_match_pattern(scope: &SemanticScope, program: ast::AstProgram, idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
 {
     if (idx < 0) { return }
     let expr_store = program.expr_store
-    let expr = expr_store_get(&expr_store, idx)
+    let expr = ast::expr_store_get(&expr_store, idx)
     if (expr.tag == "option" and expr.option_has_value == 1 and expr.left_idx >= 0)
     {
-        let bind_expr = expr_store_get(&expr_store, expr.left_idx)
+        let bind_expr = ast::expr_store_get(&expr_store, expr.left_idx)
         if (bind_expr.tag == "ident")
         {
             return
@@ -624,7 +642,7 @@ pub fn semantic_check_match_pattern(scope: &SemanticScope, program: AstProgram, 
     {
         for (i in 0 .. expr.args.length)
         {
-            let arg = expr_store_get(&expr_store, expr.args[i])
+            let arg = ast::expr_store_get(&expr_store, expr.args[i])
             if (arg.tag != "ident")
             {
                 semantic_check_match_pattern(scope, program, expr.args[i], result, source, filename, func_name)
@@ -635,14 +653,14 @@ pub fn semantic_check_match_pattern(scope: &SemanticScope, program: AstProgram, 
     semantic_check_expr(scope, program, idx, result, source, filename, func_name)
 }
 
-pub fn semantic_declare_match_binding(scope: &SemanticScope, program: AstProgram, pattern_idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
+pub fn semantic_declare_match_binding(scope: &SemanticScope, program: ast::AstProgram, pattern_idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
 {
     if (pattern_idx < 0) { return }
     let expr_store = program.expr_store
-    let pattern_expr = expr_store_get(&expr_store, pattern_idx)
+    let pattern_expr = ast::expr_store_get(&expr_store, pattern_idx)
     if (pattern_expr.tag == "option" and pattern_expr.option_has_value == 1 and pattern_expr.left_idx >= 0)
     {
-        let bind_expr = expr_store_get(&expr_store, pattern_expr.left_idx)
+        let bind_expr = ast::expr_store_get(&expr_store, pattern_expr.left_idx)
         if (bind_expr.tag == "ident" and bind_expr.text != "_")
         {
             let __decl = semantic_scope_declare(scope, result, source, filename, func_name, bind_expr.text, bind_expr.line, bind_expr.col)
@@ -652,7 +670,7 @@ pub fn semantic_declare_match_binding(scope: &SemanticScope, program: AstProgram
     {
         for (i in 0 .. pattern_expr.args.length)
         {
-            let bind_expr2 = expr_store_get(&expr_store, pattern_expr.args[i])
+            let bind_expr2 = ast::expr_store_get(&expr_store, pattern_expr.args[i])
             if (bind_expr2.tag == "ident" and bind_expr2.text != "_")
             {
                 let __decl2 = semantic_scope_declare(scope, result, source, filename, func_name, bind_expr2.text, bind_expr2.line, bind_expr2.col)
@@ -661,11 +679,11 @@ pub fn semantic_declare_match_binding(scope: &SemanticScope, program: AstProgram
     }
 }
 
-pub fn semantic_check_stmt(scope: &SemanticScope, program: AstProgram, stmt_idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
+pub fn semantic_check_stmt(scope: &SemanticScope, program: ast::AstProgram, stmt_idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
 {
     if (stmt_idx < 0) { return }
     let stmt_store = program.store
-    let stmt = stmt_store_get(&stmt_store, stmt_idx)
+    let stmt = ast::stmt_store_get(&stmt_store, stmt_idx)
     match stmt.tag
     {
         "let" -> {
@@ -726,7 +744,7 @@ pub fn semantic_check_stmt(scope: &SemanticScope, program: AstProgram, stmt_idx:
             semantic_check_expr(scope, program, stmt.assign_idx, result, source, filename, func_name)
             if (semantic_scope_contains(scope, stmt.assign_name) == 1)
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "for iterator '" + stmt.assign_name + "' conflicts with existing symbol", func_name, stmt.line, stmt.col, diag_strlen(stmt.assign_name))
+                semantic_add_error_loc(result, source, filename, "NameError", "for iterator '" + stmt.assign_name + "' conflicts with existing symbol", func_name, stmt.line, stmt.col, error::diag_strlen(stmt.assign_name))
             }
             semantic_scope_push(scope)
             semantic_scope_declare(scope, result, source, filename, func_name, stmt.assign_name, stmt.line, stmt.col)
@@ -761,11 +779,11 @@ pub fn semantic_check_stmt(scope: &SemanticScope, program: AstProgram, stmt_idx:
     }
 }
 
-pub fn semantic_check_block_stmt_in_current_scope(scope: &SemanticScope, program: AstProgram, stmt_idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
+pub fn semantic_check_block_stmt_in_current_scope(scope: &SemanticScope, program: ast::AstProgram, stmt_idx: i32, result: &SemanticResult, source: string, filename: string, func_name: string)
 {
     if (stmt_idx < 0) { return }
     let stmt_store = program.store
-    let stmt = stmt_store_get(&stmt_store, stmt_idx)
+    let stmt = ast::stmt_store_get(&stmt_store, stmt_idx)
     if (stmt.tag != "block")
     {
         semantic_check_stmt(scope, program, stmt_idx, result, source, filename, func_name)
@@ -787,7 +805,7 @@ pub fn semantic_check_block_stmt_in_current_scope(scope: &SemanticScope, program
     }
 }
 
-pub fn semantic_check_function_body(func: AstFunction, program: AstProgram, result: &SemanticResult, source: string, filename: string)
+pub fn semantic_check_function_body(func: ast::AstFunction, program: ast::AstProgram, result: &SemanticResult, source: string, filename: string)
 {
     let scope = semantic_scope_new()
     for (i in 0 .. program.globals.length)
@@ -820,7 +838,7 @@ pub fn semantic_check_function_body(func: AstFunction, program: AstProgram, resu
     semantic_check_stmt(&scope, program, func.body_idx, result, source, filename, func.name)
 }
 
-pub fn semantic_function_signature_equal(a: AstFunction, b: AstFunction): i32
+pub fn semantic_function_signature_equal(a: ast::AstFunction, b: ast::AstFunction): i32
 {
     if (a.ret_ty != b.ret_ty) { return 0 }
     if (a.type_params.length != b.type_params.length) { return 0 }
@@ -833,7 +851,7 @@ pub fn semantic_function_signature_equal(a: AstFunction, b: AstFunction): i32
     return 1
 }
 
-pub fn semantic_check_duplicate_functions(funcs: [AstFunction], externs: [AstFunction], result: &SemanticResult, source: string, filename: string)
+pub fn semantic_check_duplicate_functions(funcs: [ast::AstFunction], externs: [ast::AstFunction], result: &SemanticResult, source: string, filename: string)
 {
     for (i in 0 .. funcs.length)
     {
@@ -841,7 +859,7 @@ pub fn semantic_check_duplicate_functions(funcs: [AstFunction], externs: [AstFun
         {
             if (funcs[i].name == funcs[j].name and semantic_function_signature_equal(funcs[i], funcs[j]) == 0)
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "duplicate function '" + funcs[i].name + "'", "", funcs[j].line, funcs[j].col, diag_strlen(funcs[j].name))
+                semantic_add_error_loc(result, source, filename, "NameError", "duplicate function '" + funcs[i].name + "'", "", funcs[j].line, funcs[j].col, error::diag_strlen(funcs[j].name))
             }
         }
     }
@@ -851,7 +869,7 @@ pub fn semantic_check_duplicate_functions(funcs: [AstFunction], externs: [AstFun
         {
             if (externs[i].name == externs[j].name and semantic_function_signature_equal(externs[i], externs[j]) == 0)
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "duplicate function '" + externs[i].name + "'", "", externs[j].line, externs[j].col, diag_strlen(externs[j].name))
+                semantic_add_error_loc(result, source, filename, "NameError", "duplicate function '" + externs[i].name + "'", "", externs[j].line, externs[j].col, error::diag_strlen(externs[j].name))
             }
         }
     }
@@ -861,13 +879,13 @@ pub fn semantic_check_duplicate_functions(funcs: [AstFunction], externs: [AstFun
         {
             if (funcs[i].name == externs[j].name)
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "function '" + funcs[i].name + "' redeclared as extern", "", funcs[i].line, funcs[i].col, diag_strlen(funcs[i].name))
+                semantic_add_error_loc(result, source, filename, "NameError", "function '" + funcs[i].name + "' redeclared as extern", "", funcs[i].line, funcs[i].col, error::diag_strlen(funcs[i].name))
             }
         }
     }
 }
 
-pub fn semantic_check_duplicate_structs(structs: [AstStructDecl], result: &SemanticResult, source: string, filename: string)
+pub fn semantic_check_duplicate_structs(structs: [ast::AstStructDecl], result: &SemanticResult, source: string, filename: string)
 {
     for (i in 0 .. structs.length)
     {
@@ -875,13 +893,130 @@ pub fn semantic_check_duplicate_structs(structs: [AstStructDecl], result: &Seman
         {
             if (structs[i].name == structs[j].name)
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "duplicate struct '" + structs[i].name + "'", "", structs[j].line, structs[j].col, diag_strlen(structs[j].name))
+                semantic_add_error_loc(result, source, filename, "NameError", "duplicate struct '" + structs[i].name + "'", "", structs[j].line, structs[j].col, error::diag_strlen(structs[j].name))
             }
         }
     }
 }
 
-pub fn semantic_check_duplicate_params(func: AstFunction, result: &SemanticResult, source: string, filename: string)
+
+// A type name that resolves to nothing used to be silent: ty_from_text turned
+// any unknown spelling into an opaque ADT, so a typo or a missing import only
+// showed up as wrong machine code.  Every type position is checked here.
+pub fn semantic_check_type_text(text: string, known: [string], builtins: [string], params: [string], result: &SemanticResult, source: string, filename: string, line: i32, col: i32)
+{
+    if (text == "") { return }
+    let mut i = 0
+    while (i < text.length)
+    {
+        let c = compiler_string_byte(text, i)
+        let is_start = (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or c == '_'
+        if (is_start == 0)
+        {
+            i += 1
+        }
+        else
+        {
+            let start = i
+            while (i < text.length)
+            {
+                let d = compiler_string_byte(text, i)
+                if ((d >= 'a' and d <= 'z') or (d >= 'A' and d <= 'Z') or (d >= '0' and d <= '9') or d == '_') { i += 1 }
+                else { break }
+            }
+            // Keep "mod::Name" together: a qualified name is one type.
+            while (i + 2 < text.length and compiler_string_byte(text, i) == ':' and compiler_string_byte(text, i + 1) == ':')
+            {
+                let e = compiler_string_byte(text, i + 2)
+                let e_start = (e >= 'a' and e <= 'z') or (e >= 'A' and e <= 'Z') or e == '_'
+                if (e_start == 0) { break }
+                i += 2
+                while (i < text.length)
+                {
+                    let d = compiler_string_byte(text, i)
+                    if ((d >= 'a' and d <= 'z') or (d >= 'A' and d <= 'Z') or (d >= '0' and d <= '9') or d == '_') { i += 1 }
+                    else { break }
+                }
+            }
+            let mut token = ""
+            for (j in start .. i) { token = token + lexer::char_string(compiler_string_byte(text, j)) }
+            let mut is_lifetime = 0
+            if (start > 0 and compiler_string_byte(text, start - 1) == 39) { is_lifetime = 1 }
+            if (is_lifetime == 0 and token != "")
+            {
+                let mut ok = 0
+                for (k in 0 .. known.length) { if (known[k] == token) { ok = 1 } }
+                for (k in 0 .. builtins.length) { if (builtins[k] == token) { ok = 1 } }
+                for (k in 0 .. params.length) { if (params[k] == token) { ok = 1 } }
+                if (ok == 0)
+                {
+                    semantic_add_error_loc(result, source, filename, "NameError", "unknown type '" + token + "'", "", line, col, error::diag_strlen(token))
+                }
+            }
+        }
+    }
+}
+
+pub fn semantic_check_known_types(program: ast::AstProgram, result: &SemanticResult, source: string, filename: string)
+{
+    let mut known: [string] = []
+    let mut params: [string] = []
+    for (i in 0 .. program.structs.length) { known.push(program.structs[i].name) }
+    for (i in 0 .. program.adts.length)
+    {
+        known.push(program.adts[i].name)
+        for (v in 0 .. program.adts[i].variant_names.length) { known.push(program.adts[i].variant_names[v]) }
+        for (v in 0 .. program.adts[i].type_params.length) { params.push(program.adts[i].type_params[v]) }
+    }
+    for (i in 0 .. program.functions.length)
+    {
+        for (v in 0 .. program.functions[i].type_params.length) { params.push(program.functions[i].type_params[v]) }
+    }
+    let builtins: [string] = ["i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "usize", "isize", "f32", "f64", "bool", "string", "void", "char", "ptr", "unknown", "fn", "mut", "ref", "Option", "Result", "Some", "None", "Ok", "Err"]
+    for (i in 0 .. program.functions.length)
+    {
+        let f = program.functions[i]
+        for (p in 0 .. f.param_types.length) { semantic_check_type_text(f.param_types[p], known, builtins, params, result, source, filename, f.line, f.col) }
+        semantic_check_type_text(f.ret_ty, known, builtins, params, result, source, filename, f.line, f.col)
+        semantic_check_type_text(f.receiver_type, known, builtins, params, result, source, filename, f.line, f.col)
+    }
+    for (i in 0 .. program.structs.length)
+    {
+        for (k in 0 .. program.structs[i].field_types.length)
+        {
+            semantic_check_type_text(program.structs[i].field_types[k], known, builtins, params, result, source, filename, program.structs[i].line, program.structs[i].col)
+        }
+    }
+    for (i in 0 .. program.adts.length)
+    {
+        for (k in 0 .. program.adts[i].variant_payload_types.length)
+        {
+            semantic_check_type_text(program.adts[i].variant_payload_types[k], known, builtins, params, result, source, filename, program.adts[i].line, program.adts[i].col)
+        }
+    }
+    for (s in 0 .. program.store.stmts.length)
+    {
+        semantic_check_type_text(program.store.stmts[s].type_text, known, builtins, params, result, source, filename, program.store.stmts[s].line, program.store.stmts[s].col)
+    }
+}
+
+pub fn semantic_check_duplicate_adts(adts: [ast::AstAdtDecl], result: &SemanticResult, source: string, filename: string)
+{
+    for (i in 0 .. adts.length)
+    {
+        if (adts[i].line == 0) { continue }
+        for (j in (i + 1) .. adts.length)
+        {
+            if (adts[j].line == 0) { continue }
+            if (adts[i].name == adts[j].name)
+            {
+                semantic_add_error_loc(result, source, filename, "NameError", "duplicate type '" + adts[i].name + "'", "", adts[j].line, adts[j].col, error::diag_strlen(adts[j].name))
+            }
+        }
+    }
+}
+
+pub fn semantic_check_duplicate_params(func: ast::AstFunction, result: &SemanticResult, source: string, filename: string)
 {
     for (i in 0 .. func.param_names.length)
     {
@@ -889,13 +1024,13 @@ pub fn semantic_check_duplicate_params(func: AstFunction, result: &SemanticResul
         {
             if (func.param_names[i] == func.param_names[j])
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "duplicate parameter '" + func.param_names[i] + "' in function '" + func.name + "'", "", func.line, func.col, diag_strlen(func.param_names[i]))
+                semantic_add_error_loc(result, source, filename, "NameError", "duplicate parameter '" + func.param_names[i] + "' in function '" + func.name + "'", "", func.line, func.col, error::diag_strlen(func.param_names[i]))
             }
         }
     }
 }
 
-pub fn semantic_check_duplicate_fields(decl: AstStructDecl, result: &SemanticResult, source: string, filename: string)
+pub fn semantic_check_duplicate_fields(decl: ast::AstStructDecl, result: &SemanticResult, source: string, filename: string)
 {
     for (i in 0 .. decl.field_names.length)
     {
@@ -903,13 +1038,13 @@ pub fn semantic_check_duplicate_fields(decl: AstStructDecl, result: &SemanticRes
         {
             if (decl.field_names[i] == decl.field_names[j])
             {
-                semantic_add_error_loc(result, source, filename, "NameError", "duplicate field '" + decl.field_names[i] + "' in struct '" + decl.name + "'", "", decl.line, decl.col, diag_strlen(decl.field_names[i]))
+                semantic_add_error_loc(result, source, filename, "NameError", "duplicate field '" + decl.field_names[i] + "' in struct '" + decl.name + "'", "", decl.line, decl.col, error::diag_strlen(decl.field_names[i]))
             }
         }
     }
 }
 
-pub fn semantic_cabi_type_allowed(program: AstProgram, ty: string): i32
+pub fn semantic_cabi_type_allowed(program: ast::AstProgram, ty: string): i32
 {
     if (ty == "i8" or ty == "u8" or ty == "i16" or ty == "u16" or ty == "i32" or ty == "u32" or ty == "i64" or ty == "u64" or ty == "f32" or ty == "f64" or ty == "ptr") return 1
     if (ty == "bool") return 0
@@ -928,7 +1063,7 @@ pub fn semantic_cabi_type_allowed(program: AstProgram, ty: string): i32
     return 0
 }
 
-pub fn semantic_check_cabi_structs(program: AstProgram, result: &SemanticResult, source: string, filename: string)
+pub fn semantic_check_cabi_structs(program: ast::AstProgram, result: &SemanticResult, source: string, filename: string)
 {
     for (i in 0 .. program.structs.length)
     {
@@ -949,7 +1084,7 @@ pub fn semantic_check_cabi_structs(program: AstProgram, result: &SemanticResult,
     }
 }
 
-pub fn semantic_find_function(funcs: [AstFunction], name: string): i32
+pub fn semantic_find_function(funcs: [ast::AstFunction], name: string): i32
 {
     for (i in 0 .. funcs.length)
     {
@@ -958,7 +1093,7 @@ pub fn semantic_find_function(funcs: [AstFunction], name: string): i32
     return -1
 }
 
-pub fn semantic_check_main(funcs: [AstFunction], result: &SemanticResult, filename: string)
+pub fn semantic_check_main(funcs: [ast::AstFunction], result: &SemanticResult, filename: string)
 {
     let idx = semantic_find_function(funcs, "main")
     if (idx < 0)
@@ -972,9 +1107,9 @@ pub fn semantic_check_main(funcs: [AstFunction], result: &SemanticResult, filena
     }
 }
 
-pub fn semantic_check_program(program: AstProgram, source: string, filename: string): SemanticResult => semantic_check_program_with_warnings(program, source, filename, 1)
+pub fn semantic_check_program(program: ast::AstProgram, source: string, filename: string): SemanticResult => semantic_check_program_with_warnings(program, source, filename, 1)
 
-pub fn semantic_check_program_with_warnings(program: AstProgram, source: string, filename: string, emit_warnings: i32): SemanticResult
+pub fn semantic_check_program_with_warnings(program: ast::AstProgram, source: string, filename: string, emit_warnings: i32): SemanticResult
 {
     return semantic_check_program_skipping(program, source, filename, emit_warnings, [])
 }
@@ -982,7 +1117,7 @@ pub fn semantic_check_program_with_warnings(program: AstProgram, source: string,
 // checked_prefixes names modules whose interface files prove they were already
 // checked; their bodies are skipped.  Duplicate and C-ABI checks still run over
 // everything, because those are about the merged program, not about one body.
-pub fn semantic_check_program_skipping(program: AstProgram, source: string, filename: string, emit_warnings: i32, checked_prefixes: [string]): SemanticResult
+pub fn semantic_check_program_skipping(program: ast::AstProgram, source: string, filename: string, emit_warnings: i32, checked_prefixes: [string]): SemanticResult
 {
     let mut result = semantic_result_new_with_warnings(emit_warnings)
     result.source = source
@@ -993,6 +1128,8 @@ pub fn semantic_check_program_skipping(program: AstProgram, source: string, file
     }
     semantic_check_duplicate_functions(program.functions, program.extern_functions, &result, source, filename)
     semantic_check_duplicate_structs(program.structs, &result, source, filename)
+    semantic_check_duplicate_adts(program.adts, &result, source, filename)
+    semantic_check_known_types(program, &result, source, filename)
     semantic_check_cabi_structs(program, &result, source, filename)
     for (i in 0 .. program.functions.length)
     {
@@ -1004,12 +1141,12 @@ pub fn semantic_check_program_skipping(program: AstProgram, source: string, file
     }
     for (i in 0 .. program.functions.length)
     {
-        if (module_name_is_checked(program.functions[i].name, checked_prefixes) == 1) { continue }
+        if (ast::module_name_is_checked(program.functions[i].name, checked_prefixes) == 1) { continue }
         semantic_check_function_body(program.functions[i], program, &result, source, filename)
     }
     if (result.error_count == 0)
     {
-        let type_result = typeck_check_program_skipping(program, checked_prefixes)
+        let type_result = typeck::typeck_check_program_skipping(program, checked_prefixes)
         result.type_result = type_result
         semantic_add_typeck_error(&result, source, filename, type_result)
     }
@@ -1024,5 +1161,5 @@ pub fn semantic_result_debug(result: SemanticResult): string
         return "SemanticOk"
     }
     let mut bag = result.bag
-    return diag_render_bag_body(&bag, diag_render_options(result.source, result.filename))
+    return diag::diag_render_bag_body(&bag, diag::diag_render_options(result.source, result.filename))
 }

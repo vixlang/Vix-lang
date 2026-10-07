@@ -203,7 +203,7 @@ pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): SymbolId
 // declarations, so the analyzer cannot drift from the compiler.
 pub fn symbol_index_find_method_on_receiver(index: SymbolIndex, receiver_type: string, method: string): SymbolId
 {
-    return symbol_index_find_by_name(index, method_qualify(receiver_type, method))
+    return symbol_index_find_by_name(index, method::method_qualify(receiver_type, method))
 }
 
 // Fallback for call sites whose receiver type the analyzer cannot determine: it

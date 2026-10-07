@@ -6,9 +6,9 @@ use "../util/pos.vix" as pos
 pub type Constraint = ConstraintEq(i32)
 
 pub type ConstraintEqData = struct {
-    left: Ty,
-    right: Ty,
-    pos: SourcePos,
+    left: ty::Ty,
+    right: ty::Ty,
+    pos: pos::SourcePos,
     reason: string
 }
 
@@ -22,7 +22,7 @@ pub fn constraint_store_new(): ConstraintStore
     return ConstraintStore{ eqs: [], constraints: [] }
 }
 
-pub fn constraint_eq(store: &ConstraintStore, left: Ty, right: Ty, pos: SourcePos, reason: string): Constraint
+pub fn constraint_eq(store: &ConstraintStore, left: ty::Ty, right: ty::Ty, pos: pos::SourcePos, reason: string): Constraint
 {
     let idx = store.eqs.length
     store.eqs.push(ConstraintEqData{ left: left, right: right, pos: pos, reason: reason })
@@ -31,7 +31,7 @@ pub fn constraint_eq(store: &ConstraintStore, left: Ty, right: Ty, pos: SourcePo
     return c
 }
 
-pub fn constraint_store_add_eq(store: &ConstraintStore, left: Ty, right: Ty, pos: SourcePos, reason: string)
+pub fn constraint_store_add_eq(store: &ConstraintStore, left: ty::Ty, right: ty::Ty, pos: pos::SourcePos, reason: string)
 {
     constraint_eq(store, left, right, pos, reason)
 }

@@ -3,26 +3,26 @@ use "target.vix" as target
 
 pub fn mir2asm_acc(ty: string): string
 {
-    if (mir2asm_type_is_64(ty) == 1) { return "rax" }
+    if (target::mir2asm_type_is_64(ty) == 1) { return "rax" }
     if (ty == "i8" or ty == "u8" or ty == "char") { return "al" }
     return "eax"
 }
 
 pub fn mir2asm_dx(ty: string): string
 {
-    if (mir2asm_type_is_64(ty) == 1) { return "rdx" }
+    if (target::mir2asm_type_is_64(ty) == 1) { return "rdx" }
     return "edx"
 }
 
 pub fn mir2asm_cx(ty: string): string
 {
-    if (mir2asm_type_is_64(ty) == 1) { return "rcx" }
+    if (target::mir2asm_type_is_64(ty) == 1) { return "rcx" }
     return "ecx"
 }
 
 pub fn mir2asm_arg_reg_typed(index: i32, ty: string): string
 {
-    if (mir2asm_type_is_float(ty) == 1)
+    if (target::mir2asm_type_is_float(ty) == 1)
     {
         return match index {
             0 -> "xmm0"
@@ -48,7 +48,7 @@ pub fn mir2asm_arg_reg_typed(index: i32, ty: string): string
             _ -> "al"
         }
     }
-    if (mir2asm_type_is_64(ty) == 1)
+    if (target::mir2asm_type_is_64(ty) == 1)
     {
         return match index {
             0 -> "rdi"
@@ -80,7 +80,7 @@ pub fn mir2asm_callee_reg_typed(reg: string, ty: string): string
         if (reg == "r14") { return "r14b" }
         return "r15b"
     }
-    if (mir2asm_type_is_64(ty) == 0)
+    if (target::mir2asm_type_is_64(ty) == 0)
     {
         if (reg == "r12") { return "r12d" }
         if (reg == "r13") { return "r13d" }

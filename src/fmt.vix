@@ -1059,7 +1059,7 @@ pub fn fmt_format(source: string, config: FmtConfig): FmtResult
     // Never touch a file that does not parse: a half written buffer would be
     // reindented from guesses. Declaration free files are the exception, since
     // the parser calls them empty rather than broken.
-    if (parse_program_raw(source, "").ok == 0 and fmt_source_is_declaration_free(source) == 0)
+    if (parser::parse_program_raw(source, "").ok == 0 and fmt_source_is_declaration_free(source) == 0)
     {
         return FmtResult{ ok: 0, text: source, error: "document has syntax errors" }
     }

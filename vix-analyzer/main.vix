@@ -1,5 +1,16 @@
 #[no_main]
 
+use "../src/ast.vix" as ast
+use "../src/diag.vix" as diag
+use "../src/fmt.vix" as fmt
+use "../src/json.vix" as json
+use "../src/lexer.vix" as lexer
+use "../src/method.vix" as method
+use "../src/parser.vix" as parser
+use "../src/receiver.vix" as receiver
+use "../src/semantic.vix" as semantic
+use "../src/type/typeck.vix" as typeck
+
 extern "C" { fn fputs(s: string, file: ptr): i32 }
 
 include "lsp_server.vix"

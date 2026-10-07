@@ -1,5 +1,6 @@
 #[no_main]
 use "types.vix" as machine_types
+use "../../lexer.vix" as lexer
 
 extern "C"
 {
@@ -121,7 +122,7 @@ pub fn mir2asm_is_reverse_stack_move(previous: string, current: string): i32
     return 1
 }
 
-pub fn mir2asm_line(b: &MirAsm, text: string)
+pub fn mir2asm_line(b: &machine_types::MirAsm, text: string)
 {
     if (b.sink.discard_output == 1) { return }
     if (mir2asm_is_reverse_stack_move(b.last_asm_line, text) == 1) { return }
@@ -133,7 +134,7 @@ pub fn mir2asm_line(b: &MirAsm, text: string)
     b.last_asm_line = text
 }
 
-pub fn mir2asm_data_line(b: &MirAsm, text: string)
+pub fn mir2asm_data_line(b: &machine_types::MirAsm, text: string)
 {
     if (b.sink.streaming == 1)
     {
@@ -151,16 +152,16 @@ pub fn mir2asm_comment_text(text: string): string
     for (i in 0 .. text.length)
     {
         if (compiler_string_byte(text, i) == 10 or compiler_string_byte(text, i) == 13) out = out + " "
-        else out = out + char_string(compiler_string_byte(text, i))
+        else out = out + lexer::char_string(compiler_string_byte(text, i))
     }
     return out
 }
 
-pub fn mir2asm_mir_comment(b: &MirAsm, line: string, line_no: i32)
+pub fn mir2asm_mir_comment(b: &machine_types::MirAsm, line: string, line_no: i32)
 {
     if (b.debug_mir_comments == 1 and line != "")
     {
-        mir2asm_line(b, "    ; MIR: " + mir2asm_comment_text(line) + " (line " + i32_to_str(line_no) + ")")
+        mir2asm_line(b, "    ; MIR: " + mir2asm_comment_text(line) + " (line " + lexer::i32_to_str(line_no) + ")")
     }
 }
 
@@ -216,7 +217,7 @@ pub fn mir2asm_align_to(n: i32, align: i32): i32
     return n + (align - rem)
 }
 
-pub fn mir2asm_struct_index(b: &MirAsm, ty: string): i32
+pub fn mir2asm_struct_index(b: &machine_types::MirAsm, ty: string): i32
 {
     let clean = mir2asm_clean_name(ty)
     for (i in 0 .. b.struct_names.length)
@@ -228,28 +229,28 @@ pub fn mir2asm_struct_index(b: &MirAsm, ty: string): i32
     return -1
 }
 
-pub fn mir2asm_type_is_struct_value(b: &MirAsm, ty: string): i32
+pub fn mir2asm_type_is_struct_value(b: &machine_types::MirAsm, ty: string): i32
 {
     if (ty.length > 0 and compiler_string_byte(ty, 0) == '@') return 1
     if (mir2asm_struct_index(b, ty) >= 0) { return 1 }
     return 0
 }
 
-pub fn mir2asm_type_size_for(b: &MirAsm, ty: string): i32
+pub fn mir2asm_type_size_for(b: &machine_types::MirAsm, ty: string): i32
 {
     let idx = mir2asm_struct_index(b, ty)
     if (idx >= 0) { return b.struct_sizes[idx] }
     return mir2asm_type_size(ty)
 }
 
-pub fn mir2asm_slot_size_for(b: &MirAsm, ty: string): i32
+pub fn mir2asm_slot_size_for(b: &machine_types::MirAsm, ty: string): i32
 {
     let size = mir2asm_type_size_for(b, ty)
     if (size < 8) { return 8 }
     return mir2asm_align_to(size, 8)
 }
 
-pub fn mir2asm_struct_field_base(b: &MirAsm, ty: string): i32
+pub fn mir2asm_struct_field_base(b: &machine_types::MirAsm, ty: string): i32
 {
     let clean = mir2asm_clean_name(ty)
     let mut base = 0
@@ -261,7 +262,7 @@ pub fn mir2asm_struct_field_base(b: &MirAsm, ty: string): i32
     return -1
 }
 
-pub fn mir2asm_struct_field_ty(b: &MirAsm, ty: string, field_index: i32): string
+pub fn mir2asm_struct_field_ty(b: &machine_types::MirAsm, ty: string, field_index: i32): string
 {
     let base = mir2asm_struct_field_base(b, ty)
     let sidx = mir2asm_struct_index(b, ty)
@@ -269,7 +270,7 @@ pub fn mir2asm_struct_field_ty(b: &MirAsm, ty: string, field_index: i32): string
     return b.struct_field_tys[base + field_index]
 }
 
-pub fn mir2asm_struct_field_offset(b: &MirAsm, ty: string, field_index: i32): i32
+pub fn mir2asm_struct_field_offset(b: &machine_types::MirAsm, ty: string, field_index: i32): i32
 {
     let base = mir2asm_struct_field_base(b, ty)
     let sidx = mir2asm_struct_index(b, ty)
@@ -281,8 +282,8 @@ pub fn mir2asm_mem_at(offset: i32, field_offset: i32): string
 {
     let effective = offset - field_offset
     if (effective == 0) { return "[rbp]" }
-    if (effective > 0) { return "[rbp-" + i32_to_str(effective) + "]" }
-    return "[rbp+" + i32_to_str(0 - effective) + "]"
+    if (effective > 0) { return "[rbp-" + lexer::i32_to_str(effective) + "]" }
+    return "[rbp+" + lexer::i32_to_str(0 - effective) + "]"
 }
 
 pub fn mir2asm_unescape_string(text: string): string
@@ -295,30 +296,30 @@ pub fn mir2asm_unescape_string(text: string): string
         if (c == 92 and i + 1 < text.length)
         {
             let n = compiler_string_byte(text, i + 1)
-            if (n == 'n') { out = out + char_string(10) }
-            elif (n == 't') { out = out + char_string(9) }
-            elif (n == 'r') { out = out + char_string(13) }
-            elif (n == '"') { out = out + char_string('"') }
-            elif (n == 92) { out = out + char_string(92) }
-            else { out = out + char_string(n) }
+            if (n == 'n') { out = out + lexer::char_string(10) }
+            elif (n == 't') { out = out + lexer::char_string(9) }
+            elif (n == 'r') { out = out + lexer::char_string(13) }
+            elif (n == '"') { out = out + lexer::char_string('"') }
+            elif (n == 92) { out = out + lexer::char_string(92) }
+            else { out = out + lexer::char_string(n) }
             i += 2
         }
         else
         {
-            out = out + char_string(c)
+            out = out + lexer::char_string(c)
             i += 1
         }
     }
     return out
 }
 
-pub fn mir2asm_string_label(b: &MirAsm, text: string): string
+pub fn mir2asm_string_label(b: &machine_types::MirAsm, text: string): string
 {
     for (i in 0 .. b.string_values.length)
     {
         if (b.string_values[i] == text) { return b.string_labels[i] }
     }
-    let label = "Lstr" + i32_to_str(b.string_counter)
+    let label = "Lstr" + lexer::i32_to_str(b.string_counter)
     b.string_counter += 1
     b.string_values.push(text)
     b.string_labels.push(label)
@@ -326,7 +327,7 @@ pub fn mir2asm_string_label(b: &MirAsm, text: string): string
     for (i in 0 .. text.length)
     {
         if (i > 0) { bytes = bytes + ", " }
-        bytes = bytes + i32_to_str(compiler_string_byte(text, i))
+        bytes = bytes + lexer::i32_to_str(compiler_string_byte(text, i))
     }
     if (bytes != "") { bytes = bytes + ", " }
     mir2asm_data_line(b, label + ": db " + bytes + "0")

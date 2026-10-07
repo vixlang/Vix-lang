@@ -21,15 +21,15 @@ pub type AstFragment = struct
     text: string,
     ok: i32,
     uses_result_ctor: i32,
-    functions: [AstFunction],
-    extern_functions: [AstFunction],
-    globals: [AstStmt],
-    structs: [AstStructDecl],
-    adts: [AstAdtDecl],
-    mod_decls: [AstModDecl],
-    import_decls: [AstImportDecl],
-    exprs: [AstExpr],
-    stmts: [AstStmt]
+    functions: [ast::AstFunction],
+    extern_functions: [ast::AstFunction],
+    globals: [ast::AstStmt],
+    structs: [ast::AstStructDecl],
+    adts: [ast::AstAdtDecl],
+    mod_decls: [ast::AstModDecl],
+    import_decls: [ast::AstImportDecl],
+    exprs: [ast::AstExpr],
+    stmts: [ast::AstStmt]
 }
 
 pub fn ast_fragment_empty(start: i32, end: i32): AstFragment
@@ -58,7 +58,7 @@ pub fn ast_fragment_empty(start: i32, end: i32): AstFragment
 // which turns the slice's 1-based token lines into file lines.
 pub fn ast_fragment_parse(slice: string, line_offset: i32, start_line: i32, start: i32, end: i32): AstFragment
 {
-    let mut stream = tokenize(slice)
+    let mut stream = lexer::tokenize(slice)
     if (line_offset > 0)
     {
         // Element-wise compound assignment on a struct field array
@@ -71,8 +71,8 @@ pub fn ast_fragment_parse(slice: string, line_offset: i32, start_line: i32, star
         }
         stream.lines = shifted
     }
-    let uses_result = parse_stream_uses_result_ctor(&stream)
-    let program = parse_declaration_fragment_stream(slice, "", stream)
+    let uses_result = parser::parse_stream_uses_result_ctor(&stream)
+    let program = parser::parse_declaration_fragment_stream(slice, "", stream)
     if (program.ok == 0)
     {
         return AstFragment{
@@ -131,7 +131,7 @@ pub fn ast_rebase_indices(values: [i32], base: i32): [i32]
     return out
 }
 
-pub fn ast_rebase_expr(expr: AstExpr, expr_base: i32): AstExpr
+pub fn ast_rebase_expr(expr: ast::AstExpr, expr_base: i32): ast::AstExpr
 {
     let mut out = expr
     out.left_idx = ast_rebase_index(out.left_idx, expr_base)
@@ -140,17 +140,17 @@ pub fn ast_rebase_expr(expr: AstExpr, expr_base: i32): AstExpr
     return out
 }
 
-pub fn ast_rebase_arm(arm: AstMatchArm, stmt_base: i32, expr_base: i32): AstMatchArm
+pub fn ast_rebase_arm(arm: ast::AstMatchArm, stmt_base: i32, expr_base: i32): ast::AstMatchArm
 {
-    return AstMatchArm{
+    return ast::AstMatchArm{
         pattern_idx: ast_rebase_index(arm.pattern_idx, expr_base),
         body_idx: ast_rebase_index(arm.body_idx, stmt_base)
     }
 }
 
-pub fn ast_rebase_arms(arms: [AstMatchArm], stmt_base: i32, expr_base: i32): [AstMatchArm]
+pub fn ast_rebase_arms(arms: [ast::AstMatchArm], stmt_base: i32, expr_base: i32): [ast::AstMatchArm]
 {
-    let mut out: [AstMatchArm] = []
+    let mut out: [ast::AstMatchArm] = []
     for (i in 0 .. arms.length)
     {
         out.push(ast_rebase_arm(arms[i], stmt_base, expr_base))
@@ -164,7 +164,7 @@ pub fn ast_rebase_arms(arms: [AstMatchArm], stmt_base: i32, expr_base: i32): [As
 //   direct_ret  - an expression for "store_index", the literal value for "return"
 // Rebasing an overloaded field with the wrong base rewires the statement graph
 // and can make the semantic pass recurse forever.
-pub fn ast_rebase_stmt(stmt: AstStmt, stmt_base: i32, expr_base: i32): AstStmt
+pub fn ast_rebase_stmt(stmt: ast::AstStmt, stmt_base: i32, expr_base: i32): ast::AstStmt
 {
     let mut out = stmt
     out.value_idx = ast_rebase_index(out.value_idx, expr_base)
@@ -190,7 +190,7 @@ pub fn ast_rebase_stmt(stmt: AstStmt, stmt_base: i32, expr_base: i32): AstStmt
     return out
 }
 
-pub fn ast_rebase_function(function: AstFunction, stmt_base: i32): AstFunction
+pub fn ast_rebase_function(function: ast::AstFunction, stmt_base: i32): ast::AstFunction
 {
     let mut out = function
     out.body_idx = ast_rebase_index(out.body_idx, stmt_base)
@@ -199,9 +199,9 @@ pub fn ast_rebase_function(function: AstFunction, stmt_base: i32): AstFunction
 
 // A reused fragment keeps its parsed AST, so every position inside it has to
 // move with the number of lines the declaration itself moved.
-pub fn ast_shift_expr_lines(exprs: [AstExpr], delta: i32): [AstExpr]
+pub fn ast_shift_expr_lines(exprs: [ast::AstExpr], delta: i32): [ast::AstExpr]
 {
-    let mut out: [AstExpr] = []
+    let mut out: [ast::AstExpr] = []
     for (i in 0 .. exprs.length)
     {
         let expr = exprs[i]
@@ -214,9 +214,9 @@ pub fn ast_shift_expr_lines(exprs: [AstExpr], delta: i32): [AstExpr]
     return out
 }
 
-pub fn ast_shift_stmt_lines(stmts: [AstStmt], delta: i32): [AstStmt]
+pub fn ast_shift_stmt_lines(stmts: [ast::AstStmt], delta: i32): [ast::AstStmt]
 {
-    let mut out: [AstStmt] = []
+    let mut out: [ast::AstStmt] = []
     for (i in 0 .. stmts.length)
     {
         let stmt = stmts[i]
@@ -229,9 +229,9 @@ pub fn ast_shift_stmt_lines(stmts: [AstStmt], delta: i32): [AstStmt]
     return out
 }
 
-pub fn ast_shift_function_lines(functions: [AstFunction], delta: i32): [AstFunction]
+pub fn ast_shift_function_lines(functions: [ast::AstFunction], delta: i32): [ast::AstFunction]
 {
-    let mut out: [AstFunction] = []
+    let mut out: [ast::AstFunction] = []
     for (i in 0 .. functions.length)
     {
         let function = functions[i]
@@ -283,7 +283,7 @@ pub fn ast_fragment_moved(fragment: AstFragment, start: i32, end: i32, line: i32
 
 // Builds one program out of fragments laid out in source order. Equivalent to
 // parsing the whole file when every fragment parsed successfully.
-pub fn ast_program_validate(program: AstProgram): string
+pub fn ast_program_validate(program: ast::AstProgram): string
 {
     let expr_count = program.expr_store.exprs.length
     let stmt_count = program.store.stmts.length
@@ -291,74 +291,74 @@ pub fn ast_program_validate(program: AstProgram): string
     {
         if (program.functions[i].body_idx >= stmt_count)
         {
-            return "function " + program.functions[i].name + " body_idx " + ast_i32(program.functions[i].body_idx) + " >= stmts " + ast_i32(stmt_count)
+            return "function " + program.functions[i].name + " body_idx " + ast::ast_i32(program.functions[i].body_idx) + " >= stmts " + ast::ast_i32(stmt_count)
         }
     }
     for (i in 0 .. program.extern_functions.length)
     {
         if (program.extern_functions[i].body_idx >= stmt_count)
         {
-            return "extern function body_idx " + ast_i32(program.extern_functions[i].body_idx)
+            return "extern function body_idx " + ast::ast_i32(program.extern_functions[i].body_idx)
         }
     }
     for (i in 0 .. program.globals.length)
     {
         if (program.globals[i].value_idx >= expr_count)
         {
-            return "global value_idx " + ast_i32(program.globals[i].value_idx)
+            return "global value_idx " + ast::ast_i32(program.globals[i].value_idx)
         }
     }
     for (i in 0 .. stmt_count)
     {
-        let s = stmt_store_get(program.store, i)
-        if (s.value_idx >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " value_idx " + ast_i32(s.value_idx) + " >= exprs " + ast_i32(expr_count) }
-        if (s.direct_ret >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " direct_ret " + ast_i32(s.direct_ret) + " >= exprs " + ast_i32(expr_count) }
-        if (s.assign_idx >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " assign_idx " + ast_i32(s.assign_idx) }
-        if (s.print_idx >= expr_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " print_idx " + ast_i32(s.print_idx) }
-        if (s.body_idx >= stmt_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " body_idx " + ast_i32(s.body_idx) + " >= stmts " + ast_i32(stmt_count) }
-        if (s.block_count > 0 and s.block_start >= stmt_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " block_start " + ast_i32(s.block_start) }
+        let s = ast::stmt_store_get(program.store, i)
+        if (s.value_idx >= expr_count) { return "stmt " + ast::ast_i32(i) + " tag=" + s.tag + " value_idx " + ast::ast_i32(s.value_idx) + " >= exprs " + ast::ast_i32(expr_count) }
+        if (s.direct_ret >= expr_count) { return "stmt " + ast::ast_i32(i) + " tag=" + s.tag + " direct_ret " + ast::ast_i32(s.direct_ret) + " >= exprs " + ast::ast_i32(expr_count) }
+        if (s.assign_idx >= expr_count) { return "stmt " + ast::ast_i32(i) + " tag=" + s.tag + " assign_idx " + ast::ast_i32(s.assign_idx) }
+        if (s.print_idx >= expr_count) { return "stmt " + ast::ast_i32(i) + " tag=" + s.tag + " print_idx " + ast::ast_i32(s.print_idx) }
+        if (s.body_idx >= stmt_count) { return "stmt " + ast::ast_i32(i) + " tag=" + s.tag + " body_idx " + ast::ast_i32(s.body_idx) + " >= stmts " + ast::ast_i32(stmt_count) }
+        if (s.block_count > 0 and s.block_start >= stmt_count) { return "stmt " + ast::ast_i32(i) + " tag=" + s.tag + " block_start " + ast::ast_i32(s.block_start) }
         for (j in 0 .. s.stmt_indices.length)
         {
-            if (s.stmt_indices[j] >= stmt_count) { return "stmt " + ast_i32(i) + " tag=" + s.tag + " stmt_indices[" + ast_i32(j) + "] " + ast_i32(s.stmt_indices[j]) + " >= stmts " + ast_i32(stmt_count) }
+            if (s.stmt_indices[j] >= stmt_count) { return "stmt " + ast::ast_i32(i) + " tag=" + s.tag + " stmt_indices[" + ast::ast_i32(j) + "] " + ast::ast_i32(s.stmt_indices[j]) + " >= stmts " + ast::ast_i32(stmt_count) }
         }
         for (j in 0 .. s.match_pattern_indices.length)
         {
-            if (s.match_pattern_indices[j] >= expr_count) { return "stmt " + ast_i32(i) + " match_pattern_indices " + ast_i32(s.match_pattern_indices[j]) }
+            if (s.match_pattern_indices[j] >= expr_count) { return "stmt " + ast::ast_i32(i) + " match_pattern_indices " + ast::ast_i32(s.match_pattern_indices[j]) }
         }
         for (j in 0 .. s.match_body_indices.length)
         {
-            if (s.match_body_indices[j] >= stmt_count) { return "stmt " + ast_i32(i) + " match_body_indices " + ast_i32(s.match_body_indices[j]) }
+            if (s.match_body_indices[j] >= stmt_count) { return "stmt " + ast::ast_i32(i) + " match_body_indices " + ast::ast_i32(s.match_body_indices[j]) }
         }
         for (j in 0 .. s.match_arms.length)
         {
-            if (s.match_arms[j].pattern_idx >= expr_count) { return "stmt " + ast_i32(i) + " arm pattern_idx " + ast_i32(s.match_arms[j].pattern_idx) }
-            if (s.match_arms[j].body_idx >= stmt_count) { return "stmt " + ast_i32(i) + " arm body_idx " + ast_i32(s.match_arms[j].body_idx) }
+            if (s.match_arms[j].pattern_idx >= expr_count) { return "stmt " + ast::ast_i32(i) + " arm pattern_idx " + ast::ast_i32(s.match_arms[j].pattern_idx) }
+            if (s.match_arms[j].body_idx >= stmt_count) { return "stmt " + ast::ast_i32(i) + " arm body_idx " + ast::ast_i32(s.match_arms[j].body_idx) }
         }
     }
     for (i in 0 .. expr_count)
     {
-        let e = expr_store_get(program.expr_store, i)
-        if (e.left_idx >= expr_count) { return "expr " + ast_i32(i) + " tag=" + e.tag + " left_idx " + ast_i32(e.left_idx) + " >= exprs " + ast_i32(expr_count) }
-        if (e.right_idx >= expr_count) { return "expr " + ast_i32(i) + " tag=" + e.tag + " right_idx " + ast_i32(e.right_idx) + " >= exprs " + ast_i32(expr_count) }
+        let e = ast::expr_store_get(program.expr_store, i)
+        if (e.left_idx >= expr_count) { return "expr " + ast::ast_i32(i) + " tag=" + e.tag + " left_idx " + ast::ast_i32(e.left_idx) + " >= exprs " + ast::ast_i32(expr_count) }
+        if (e.right_idx >= expr_count) { return "expr " + ast::ast_i32(i) + " tag=" + e.tag + " right_idx " + ast::ast_i32(e.right_idx) + " >= exprs " + ast::ast_i32(expr_count) }
         for (j in 0 .. e.args.length)
         {
-            if (e.args[j] >= expr_count) { return "expr " + ast_i32(i) + " tag=" + e.tag + " args[" + ast_i32(j) + "] " + ast_i32(e.args[j]) + " >= exprs " + ast_i32(expr_count) }
+            if (e.args[j] >= expr_count) { return "expr " + ast::ast_i32(i) + " tag=" + e.tag + " args[" + ast::ast_i32(j) + "] " + ast::ast_i32(e.args[j]) + " >= exprs " + ast::ast_i32(expr_count) }
         }
     }
     return ""
 }
 
-pub fn ast_assemble(fragments: [AstFragment]): AstProgram
+pub fn ast_assemble(fragments: [AstFragment]): ast::AstProgram
 {
-    let mut functions: [AstFunction] = []
-    let mut extern_functions: [AstFunction] = []
-    let mut globals: [AstStmt] = []
-    let mut structs: [AstStructDecl] = []
-    let mut adts: [AstAdtDecl] = []
-    let mut mod_decls: [AstModDecl] = []
-    let mut import_decls: [AstImportDecl] = []
-    let mut expr_store = expr_store_new()
-    let mut stmt_store = stmt_store_new()
+    let mut functions: [ast::AstFunction] = []
+    let mut extern_functions: [ast::AstFunction] = []
+    let mut globals: [ast::AstStmt] = []
+    let mut structs: [ast::AstStructDecl] = []
+    let mut adts: [ast::AstAdtDecl] = []
+    let mut mod_decls: [ast::AstModDecl] = []
+    let mut import_decls: [ast::AstImportDecl] = []
+    let mut expr_store = ast::expr_store_new()
+    let mut stmt_store = ast::stmt_store_new()
     let mut uses_result = 0
 
     for (f in 0 .. fragments.length)
@@ -366,7 +366,7 @@ pub fn ast_assemble(fragments: [AstFragment]): AstProgram
         let fragment = fragments[f]
         if (fragment.ok == 0)
         {
-            return ast_program_err("fragment parse failed")
+            return ast::ast_program_err("fragment parse failed")
         }
         if (fragment.uses_result_ctor == 1)
         {
@@ -414,12 +414,12 @@ pub fn ast_assemble(fragments: [AstFragment]): AstProgram
 
     // parse_program_impl injects the builtin Result ADT when the source uses the
     // Ok/Err constructors; the assembled program has to do the same.
-    if (uses_result == 1 and parse_has_adt_name(adts, "Result") == 0 and parse_has_function_name(functions, "Ok") == 0 and parse_has_function_name(functions, "Err") == 0 and parse_has_function_name(extern_functions, "Ok") == 0 and parse_has_function_name(extern_functions, "Err") == 0)
+    if (uses_result == 1 and parser::parse_has_adt_name(adts, "Result") == 0 and parser::parse_has_function_name(functions, "Ok") == 0 and parser::parse_has_function_name(functions, "Err") == 0 and parser::parse_has_function_name(extern_functions, "Ok") == 0 and parser::parse_has_function_name(extern_functions, "Err") == 0)
     {
-        adts.push(parse_builtin_result_decl())
+        adts.push(parser::parse_builtin_result_decl())
     }
     // The assembled program is type checked directly, so it needs its own method
     // table: an empty one makes the semantic pass report every method call as
     // unknown.
-    return method_program_attach(ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, expr_store, stmt_store))
+    return method::method_program_attach(ast::ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, expr_store, stmt_store))
 }

@@ -35,7 +35,7 @@ pub fn semantic_input_new(file: FileId, source: string, tree: StubTree, module_r
 
 pub fn semantic_analyze(input: SemanticInput): SemanticSnapshot
 {
-    let program = parse_program_raw(input.source, "")
+    let program = parser::parse_program_raw(input.source, "")
     if (program.ok == 0)
     {
         return SemanticSnapshot{
@@ -46,7 +46,7 @@ pub fn semantic_analyze(input: SemanticInput): SemanticSnapshot
             diagnostics: []
         }
     }
-    let result = semantic_check_program_with_warnings(program, input.source, "", 0)
+    let result = semantic::semantic_check_program_with_warnings(program, input.source, "", 0)
     return SemanticSnapshot{
         file: input.file,
         revision: input.module_revision,

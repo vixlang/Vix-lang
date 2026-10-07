@@ -90,7 +90,18 @@ pub fn method_base_type(receiver_type: string): string
     while (i < text.length)
     {
         let b = compiler_string_byte(text, i)
-        if (b == '[' or b == '<' or b == ':') { return name }
+        if (b == '[' or b == '<') { return name }
+        if (b == ':')
+        {
+            // Part of a module qualifier: it belongs to the name.
+            if (i + 1 < text.length and compiler_string_byte(text, i + 1) == ':')
+            {
+                name = name + "::"
+                i += 2
+                continue
+            }
+            return name
+        }
         let c: string = malloc(2)
         c[0] = b
         c[1] = 0
@@ -123,29 +134,29 @@ pub fn method_qualify(receiver_type: string, name: string): string
     return method_base_type(receiver_type) + "::" + name
 }
 
-pub fn method_table_new(): MethodTable
+pub fn method_table_new(): method_decl::MethodTable
 {
-    return MethodTable{ signatures: [] }
+    return method_decl::MethodTable{ signatures: [] }
 }
 
 // Attaches the declaration index to a program. Called once per compilation unit
 // after modules are merged, so that every later phase resolves methods against
 // exactly the same table.
-pub fn method_program_attach(program: AstProgram): AstProgram
+pub fn method_program_attach(program: ast::AstProgram): ast::AstProgram
 {
     let mut out = program
     out.expr_store.methods = method_table_build(out.functions)
     return out
 }
 
-pub fn method_table_build(functions: [AstFunction]): MethodTable
+pub fn method_table_build(functions: [ast::AstFunction]): method_decl::MethodTable
 {
     let table = method_table_new()
     for (i in 0 .. functions.length)
     {
-        if (receiver_is_method(functions[i].receiver_kind) == 0) { continue }
+        if (receiver::receiver_is_method(functions[i].receiver_kind) == 0) { continue }
         let receiver_param_type = if (functions[i].param_types.length > 0) { functions[i].param_types[0] } else { functions[i].receiver_type }
-        table.signatures.push(MethodSignature{
+        table.signatures.push(method_decl::MethodSignature{
             receiver_type: method_base_type(functions[i].receiver_type),
             receiver_kind: functions[i].receiver_kind,
             name: method_short_name(functions[i].name),
@@ -162,13 +173,13 @@ pub fn method_table_build(functions: [AstFunction]): MethodTable
     return table
 }
 
-pub fn method_table_size(table: MethodTable): i32
+pub fn method_table_size(table: method_decl::MethodTable): i32
 {
     return table.signatures.length
 }
 
 // Returns the signature index, or -1 when no method matches.
-pub fn method_table_lookup(table: MethodTable, receiver_type: string, name: string): i32
+pub fn method_table_lookup(table: method_decl::MethodTable, receiver_type: string, name: string): i32
 {
     let base = method_base_type(receiver_type)
     for (i in 0 .. table.signatures.length)
@@ -180,7 +191,7 @@ pub fn method_table_lookup(table: MethodTable, receiver_type: string, name: stri
 
 // Number of declarations matching a receiver type and method name. More than one
 // is a duplicate method definition.
-pub fn method_table_count(table: MethodTable, receiver_type: string, name: string): i32
+pub fn method_table_count(table: method_decl::MethodTable, receiver_type: string, name: string): i32
 {
     let base = method_base_type(receiver_type)
     let mut count = 0
@@ -191,15 +202,15 @@ pub fn method_table_count(table: MethodTable, receiver_type: string, name: strin
     return count
 }
 
-pub fn method_table_signature(table: MethodTable, index: i32): MethodSignature
+pub fn method_table_signature(table: method_decl::MethodTable, index: i32): method_decl::MethodSignature
 {
-    if (index < 0 or index >= table.signatures.length) { return method_signature_new() }
+    if (index < 0 or index >= table.signatures.length) { return method_decl::method_signature_new() }
     return table.signatures[index]
 }
 
 // Name only existence check, used by the semantic analysis, which is purely
 // syntactic and has no type information to match a receiver against.
-pub fn method_table_has_name(table: MethodTable, name: string): i32
+pub fn method_table_has_name(table: method_decl::MethodTable, name: string): i32
 {
     for (i in 0 .. table.signatures.length)
     {
@@ -213,11 +224,11 @@ pub fn method_table_has_name(table: MethodTable, name: string): i32
 // Intrinsics are matched first, because they are provided by the runtime rather
 // than declared by the user. A user declaration then wins by receiver type and
 // short name.
-pub fn method_resolve(table: MethodTable, receiver_type: string, name: string): MethodResolution
+pub fn method_resolve(table: method_decl::MethodTable, receiver_type: string, name: string): method_decl::MethodResolution
 {
-    let intrinsic = intrinsic_lookup(receiver_type, name)
-    if (intrinsic >= 0) { return method_resolution_from_intrinsic(name, method_base_type(receiver_type), intrinsic_signature(intrinsic)) }
+    let intrinsic = intrinsic::intrinsic_lookup(receiver_type, name)
+    if (intrinsic >= 0) { return method_decl::method_resolution_from_intrinsic(name, method_base_type(receiver_type), intrinsic::intrinsic_signature(intrinsic)) }
     let index = method_table_lookup(table, receiver_type, name)
-    if (index < 0) { return method_resolution_none() }
-    return method_resolution_from_signature(table.signatures[index])
+    if (index < 0) { return method_decl::method_resolution_none() }
+    return method_decl::method_resolution_from_signature(table.signatures[index])
 }

@@ -84,7 +84,7 @@ pub fn analyzer_function_keys(fragments: [AstFragment]): [i32]
     return keys
 }
 
-pub fn analyzer_surface_hash(program: AstProgram): i32
+pub fn analyzer_surface_hash(program: ast::AstProgram): i32
 {
     let mut h = 7
     for (i in 0 .. program.functions.length)
@@ -147,7 +147,7 @@ pub fn analyzer_surface_hash(program: AstProgram): i32
     return h
 }
 
-pub fn analyzer_diagnostics_from_bag(file: FileId, bag: DiagBag): [AnalyzerDiagnostic]
+pub fn analyzer_diagnostics_from_bag(file: FileId, bag: diag::DiagBag): [AnalyzerDiagnostic]
 {
     let mut out: [AnalyzerDiagnostic] = []
     for (i in 0 .. bag.diagnostics.length)
@@ -172,22 +172,22 @@ pub fn analyzer_count_errors(diagnostics: [AnalyzerDiagnostic]): i32
 
 // Runs the semantic pass, reusing cached per-function diagnostics when the
 // surface allows it.
-pub fn analyzer_semantic_run(file: FileId, text: string, program: AstProgram, fragments: [AstFragment], previous: SemaCache): SemaOutcome
+pub fn analyzer_semantic_run(file: FileId, text: string, program: ast::AstProgram, fragments: [AstFragment], previous: SemaCache): SemaOutcome
 {
     let limit = analyzer_diag_limit()
     let mut merged: [AnalyzerDiagnostic] = []
 
-    let head = semantic_result_new_with_warnings(0)
-    semantic_check_duplicate_functions(program.functions, program.extern_functions, &head, text, "")
-    semantic_check_duplicate_structs(program.structs, &head, text, "")
-    semantic_check_cabi_structs(program, &head, text, "")
+    let head = semantic::semantic_result_new_with_warnings(0)
+    semantic::semantic_check_duplicate_functions(program.functions, program.extern_functions, &head, text, "")
+    semantic::semantic_check_duplicate_structs(program.structs, &head, text, "")
+    semantic::semantic_check_cabi_structs(program, &head, text, "")
     for (i in 0 .. program.functions.length)
     {
-        semantic_check_duplicate_params(program.functions[i], &head, text, "")
+        semantic::semantic_check_duplicate_params(program.functions[i], &head, text, "")
     }
     for (i in 0 .. program.structs.length)
     {
-        semantic_check_duplicate_fields(program.structs[i], &head, text, "")
+        semantic::semantic_check_duplicate_fields(program.structs[i], &head, text, "")
     }
     let head_diags = analyzer_diagnostics_from_bag(file, head.bag)
     for (i in 0 .. head_diags.length)
@@ -231,8 +231,8 @@ pub fn analyzer_semantic_run(file: FileId, text: string, program: AstProgram, fr
         }
         if (done == 0)
         {
-            let local = semantic_result_new_with_warnings(0)
-            semantic_check_function_body(program.functions[i], program, &local, text, "")
+            let local = semantic::semantic_result_new_with_warnings(0)
+            semantic::semantic_check_function_body(program.functions[i], program, &local, text, "")
             let diags = analyzer_diagnostics_from_bag(file, local.bag)
             for (d in 0 .. diags.length)
             {
@@ -257,9 +257,9 @@ pub fn analyzer_semantic_run(file: FileId, text: string, program: AstProgram, fr
 
     if (analyzer_count_errors(merged) == 0)
     {
-        let type_result = typeck_check_program(program)
-        let tail = semantic_result_new_with_warnings(0)
-        semantic_add_typeck_error(&tail, text, "", type_result)
+        let type_result = typeck::typeck_check_program(program)
+        let tail = semantic::semantic_result_new_with_warnings(0)
+        semantic::semantic_add_typeck_error(&tail, text, "", type_result)
         let tail_diags = analyzer_diagnostics_from_bag(file, tail.bag)
         for (i in 0 .. tail_diags.length)
         {
@@ -267,8 +267,8 @@ pub fn analyzer_semantic_run(file: FileId, text: string, program: AstProgram, fr
         }
     }
 
-    let main_result = semantic_result_new_with_warnings(0)
-    semantic_check_main(program.functions, &main_result, "")
+    let main_result = semantic::semantic_result_new_with_warnings(0)
+    semantic::semantic_check_main(program.functions, &main_result, "")
     let main_diags = analyzer_diagnostics_from_bag(file, main_result.bag)
     for (i in 0 .. main_diags.length)
     {

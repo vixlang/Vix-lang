@@ -74,8 +74,8 @@ pub type VixiModule = struct {
     error: string
 }
 
-pub fn vixi_quote_mark(): string { return char_string(34) }
-pub fn vixi_backslash(): string { return char_string(92) }
+pub fn vixi_quote_mark(): string { return lexer::char_string(34) }
+pub fn vixi_backslash(): string { return lexer::char_string(92) }
 
 // Identity of the compiler that produced an interface file.  A .vixi written by
 // a different compiler is not trusted, so this string is part of its validity.
@@ -86,7 +86,9 @@ pub fn vixi_compiler_id(): string
 
 pub fn vixi_format(): i32
 {
-    return 1
+    // 2: type names are module qualified, so a cached signature from the flat
+    // namespace is no longer comparable and must not be reused.
+    return 2
 }
 
 pub fn vixi_module_new(): VixiModule
@@ -112,8 +114,8 @@ pub fn vixi_module_new(): VixiModule
 
 pub fn vixi_hex_digit(value: i32): string
 {
-    if (value < 10) { return char_string(48 + value) }
-    return char_string(87 + value)
+    if (value < 10) { return lexer::char_string(48 + value) }
+    return lexer::char_string(87 + value)
 }
 
 pub fn vixi_hex_byte(value: i32): string
@@ -157,7 +159,7 @@ pub fn vixi_source_hash(source: string): string
 // interface.
 pub fn vixi_signature_text(m: VixiModule): string
 {
-    let mut out = "vixi " + i32_to_str(m.format) + "|"
+    let mut out = "vixi " + lexer::i32_to_str(m.format) + "|"
     for (i in 0 .. m.functions.length)
     {
         let f = m.functions[i]
@@ -228,11 +230,11 @@ pub fn vixi_json_quote(text: string): string
         let byte = compiler_string_byte(text, i)
         if (byte == 34) { out = out + bs + q }
         elif (byte == 92) { out = out + bs + bs }
-        elif (byte == 10) { out = out + bs + char_string(110) }
-        elif (byte == 13) { out = out + bs + char_string(114) }
-        elif (byte == 9) { out = out + bs + char_string(116) }
-        elif (byte < 32) { out = out + bs + char_string(117) + "00" + vixi_hex_byte(byte) }
-        else { out = out + char_string(byte) }
+        elif (byte == 10) { out = out + bs + lexer::char_string(110) }
+        elif (byte == 13) { out = out + bs + lexer::char_string(114) }
+        elif (byte == 9) { out = out + bs + lexer::char_string(116) }
+        elif (byte < 32) { out = out + bs + lexer::char_string(117) + "00" + vixi_hex_byte(byte) }
+        else { out = out + lexer::char_string(byte) }
     }
     return out + q
 }
@@ -256,8 +258,8 @@ pub fn vixi_json_function(func: VixiFunction): string
     out = out + "," + q + "param_names" + q + ":" + vixi_json_string_array(func.param_names)
     out = out + "," + q + "param_types" + q + ":" + vixi_json_string_array(func.param_types)
     out = out + "," + q + "ret_ty" + q + ":" + vixi_json_quote(func.ret_ty)
-    out = out + "," + q + "is_var_arg" + q + ":" + i32_to_str(func.is_var_arg)
-    out = out + "," + q + "is_pub" + q + ":" + i32_to_str(func.is_pub) + "}"
+    out = out + "," + q + "is_var_arg" + q + ":" + lexer::i32_to_str(func.is_var_arg)
+    out = out + "," + q + "is_pub" + q + ":" + lexer::i32_to_str(func.is_pub) + "}"
     return out
 }
 
@@ -271,14 +273,14 @@ pub fn vixi_json_type(ty: VixiType): string
     out = out + "," + q + "field_types" + q + ":" + vixi_json_string_array(ty.field_types)
     out = out + "," + q + "variant_names" + q + ":" + vixi_json_string_array(ty.variant_names)
     out = out + "," + q + "variant_payload_types" + q + ":" + vixi_json_string_array(ty.variant_payload_types)
-    out = out + "," + q + "is_pub" + q + ":" + i32_to_str(ty.is_pub)
+    out = out + "," + q + "is_pub" + q + ":" + lexer::i32_to_str(ty.is_pub)
     return out + "}"
 }
 
 pub fn vixi_emit(m: VixiModule): string
 {
     let q = vixi_quote_mark()
-    let mut out = "{" + q + "vixi" + q + ":" + i32_to_str(m.format)
+    let mut out = "{" + q + "vixi" + q + ":" + lexer::i32_to_str(m.format)
     out = out + "," + q + "path" + q + ":" + vixi_json_quote(m.path)
     out = out + "," + q + "source_hash" + q + ":" + vixi_json_quote(m.source_hash)
     out = out + "," + q + "compiler" + q + ":" + vixi_json_quote(m.compiler)
@@ -306,57 +308,57 @@ pub fn vixi_emit(m: VixiModule): string
 
 // JSON parsing.
 
-pub fn vixi_json_strings(doc: JsonDocument, index: i32): [string]
+pub fn vixi_json_strings(doc: json::JsonDocument, index: i32): [string]
 {
     let mut out: [string] = []
     if (index < 0) { return out }
-    for (i in 0 .. json_array_length(doc, index))
+    for (i in 0 .. json::json_array_length(doc, index))
     {
-        out.push(json_string_at(doc, json_array_item(doc, index, i)))
+        out.push(json::json_string_at(doc, json::json_array_item(doc, index, i)))
     }
     return out
 }
 
-pub fn vixi_parse_functions(doc: JsonDocument, root: i32): [VixiFunction]
+pub fn vixi_parse_functions(doc: json::JsonDocument, root: i32): [VixiFunction]
 {
     let mut out: [VixiFunction] = []
-    let fns = json_object_get(doc, root, "functions")
+    let fns = json::json_object_get(doc, root, "functions")
     if (fns < 0) { return out }
-    for (i in 0 .. json_array_length(doc, fns))
+    for (i in 0 .. json::json_array_length(doc, fns))
     {
-        let node = json_array_item(doc, fns, i)
+        let node = json::json_array_item(doc, fns, i)
         if (node < 0) { continue }
         out.push(VixiFunction{
-            name: json_string_at(doc, json_object_get(doc, node, "name")),
-            type_params: vixi_json_strings(doc, json_object_get(doc, node, "type_params")),
-            param_names: vixi_json_strings(doc, json_object_get(doc, node, "param_names")),
-            param_types: vixi_json_strings(doc, json_object_get(doc, node, "param_types")),
-            ret_ty: json_string_at(doc, json_object_get(doc, node, "ret_ty")),
-            is_var_arg: json_int_at(doc, json_object_get(doc, node, "is_var_arg")),
-            is_pub: json_int_at(doc, json_object_get(doc, node, "is_pub"))
+            name: json::json_string_at(doc, json::json_object_get(doc, node, "name")),
+            type_params: vixi_json_strings(doc, json::json_object_get(doc, node, "type_params")),
+            param_names: vixi_json_strings(doc, json::json_object_get(doc, node, "param_names")),
+            param_types: vixi_json_strings(doc, json::json_object_get(doc, node, "param_types")),
+            ret_ty: json::json_string_at(doc, json::json_object_get(doc, node, "ret_ty")),
+            is_var_arg: json::json_int_at(doc, json::json_object_get(doc, node, "is_var_arg")),
+            is_pub: json::json_int_at(doc, json::json_object_get(doc, node, "is_pub"))
         })
     }
     return out
 }
 
-pub fn vixi_parse_types(doc: JsonDocument, root: i32): [VixiType]
+pub fn vixi_parse_types(doc: json::JsonDocument, root: i32): [VixiType]
 {
     let mut out: [VixiType] = []
-    let tys = json_object_get(doc, root, "types")
+    let tys = json::json_object_get(doc, root, "types")
     if (tys < 0) { return out }
-    for (j in 0 .. json_array_length(doc, tys))
+    for (j in 0 .. json::json_array_length(doc, tys))
     {
-        let node = json_array_item(doc, tys, j)
+        let node = json::json_array_item(doc, tys, j)
         if (node < 0) { continue }
         out.push(VixiType{
-            kind: json_string_at(doc, json_object_get(doc, node, "kind")),
-            name: json_string_at(doc, json_object_get(doc, node, "name")),
-            type_params: vixi_json_strings(doc, json_object_get(doc, node, "type_params")),
-            field_names: vixi_json_strings(doc, json_object_get(doc, node, "field_names")),
-            field_types: vixi_json_strings(doc, json_object_get(doc, node, "field_types")),
-            variant_names: vixi_json_strings(doc, json_object_get(doc, node, "variant_names")),
-            variant_payload_types: vixi_json_strings(doc, json_object_get(doc, node, "variant_payload_types")),
-            is_pub: json_int_at(doc, json_object_get(doc, node, "is_pub"))
+            kind: json::json_string_at(doc, json::json_object_get(doc, node, "kind")),
+            name: json::json_string_at(doc, json::json_object_get(doc, node, "name")),
+            type_params: vixi_json_strings(doc, json::json_object_get(doc, node, "type_params")),
+            field_names: vixi_json_strings(doc, json::json_object_get(doc, node, "field_names")),
+            field_types: vixi_json_strings(doc, json::json_object_get(doc, node, "field_types")),
+            variant_names: vixi_json_strings(doc, json::json_object_get(doc, node, "variant_names")),
+            variant_payload_types: vixi_json_strings(doc, json::json_object_get(doc, node, "variant_payload_types")),
+            is_pub: json::json_int_at(doc, json::json_object_get(doc, node, "is_pub"))
         })
     }
     return out
@@ -365,14 +367,14 @@ pub fn vixi_parse_types(doc: JsonDocument, root: i32): [VixiType]
 pub fn vixi_parse(text: string): VixiModule
 {
     let mut m = vixi_module_new()
-    let doc = json_parse(text)
+    let doc = json::json_parse(text)
     if (doc.ok == 0)
     {
         m.ok = 0
         m.error = "not valid JSON"
         return m
     }
-    let root = json_root(doc)
+    let root = json::json_root(doc)
     if (root < 0)
     {
         m.ok = 0
@@ -380,20 +382,20 @@ pub fn vixi_parse(text: string): VixiModule
         return m
     }
 
-    m.format = json_int_at(doc, json_object_get(doc, root, "vixi"))
-    m.path = json_string_at(doc, json_object_get(doc, root, "path"))
-    m.source_hash = json_string_at(doc, json_object_get(doc, root, "source_hash"))
-    m.interface_hash = json_string_at(doc, json_object_get(doc, root, "interface_hash"))
-    m.compiler = json_string_at(doc, json_object_get(doc, root, "compiler"))
-    m.dep_paths = vixi_json_strings(doc, json_object_get(doc, root, "dep_paths"))
-    m.dep_hashes = vixi_json_strings(doc, json_object_get(doc, root, "dep_hashes"))
+    m.format = json::json_int_at(doc, json::json_object_get(doc, root, "vixi"))
+    m.path = json::json_string_at(doc, json::json_object_get(doc, root, "path"))
+    m.source_hash = json::json_string_at(doc, json::json_object_get(doc, root, "source_hash"))
+    m.interface_hash = json::json_string_at(doc, json::json_object_get(doc, root, "interface_hash"))
+    m.compiler = json::json_string_at(doc, json::json_object_get(doc, root, "compiler"))
+    m.dep_paths = vixi_json_strings(doc, json::json_object_get(doc, root, "dep_paths"))
+    m.dep_hashes = vixi_json_strings(doc, json::json_object_get(doc, root, "dep_hashes"))
     m.functions = vixi_parse_functions(doc, root)
     m.types = vixi_parse_types(doc, root)
 
     if (m.format != vixi_format())
     {
         m.ok = 0
-        m.error = "interface format " + i32_to_str(m.format) + " is not supported (expected " + i32_to_str(vixi_format()) + ")"
+        m.error = "interface format " + lexer::i32_to_str(m.format) + " is not supported (expected " + lexer::i32_to_str(vixi_format()) + ")"
         return m
     }
     return m
@@ -435,7 +437,7 @@ pub fn vixi_path_for(source_path: string): string
             and compiler_string_byte(source_path, tail + 3) == 'x')
         {
             let mut out = ""
-            for (i in 0 .. tail) { out = out + char_string(compiler_string_byte(source_path, i)) }
+            for (i in 0 .. tail) { out = out + lexer::char_string(compiler_string_byte(source_path, i)) }
             return out + ".vixi"
         }
     }
@@ -447,7 +449,7 @@ pub fn vixi_path_for(source_path: string): string
 // Visibility is not enforced yet: "pub" is parsed and then dropped, so every
 // top-level declaration is reachable.  Listing all of them is therefore the
 // honest answer, and it is exactly what a consumer can use.
-pub fn vixi_collect(program: AstProgram, path: string, compiler: string,
+pub fn vixi_collect(program: ast::AstProgram, path: string, compiler: string,
                     source: string, dep_paths: [string], dep_hashes: [string]): VixiModule
 {
     let mut m = vixi_module_new()
@@ -510,7 +512,7 @@ pub fn vixi_collect(program: AstProgram, path: string, compiler: string,
 // Writes the interface for one module.  Called only after the module has been
 // checked, because a .vixi is also the statement "this source was validated by
 // this compiler" -- that is what makes skipping its body check sound.
-pub fn vixi_write(path: string, program: AstProgram, source: string,
+pub fn vixi_write(path: string, program: ast::AstProgram, source: string,
                   dep_paths: [string], dep_hashes: [string]): i32
 {
     let m = vixi_collect(program, path, vixi_compiler_id(), source, dep_paths, dep_hashes)

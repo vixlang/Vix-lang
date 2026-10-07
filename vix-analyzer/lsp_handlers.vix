@@ -19,50 +19,50 @@ pub type TextDocumentParams = struct
 
 pub fn lsp_params_document(params: string): ?TextDocumentParams
 {
-    let doc = json_parse(params)
-    let root = json_root(doc)
+    let doc = json::json_parse(params)
+    let root = json::json_root(doc)
     if (root < 0)
     {
         return None
     }
-    let text_document = json_object_get(doc, root, "textDocument")
+    let text_document = json::json_object_get(doc, root, "textDocument")
     if (text_document < 0)
     {
         return None
     }
     let mut position = lsp_position(0, 0)
-    let position_node = json_object_get(doc, root, "position")
+    let position_node = json::json_object_get(doc, root, "position")
     if (position_node >= 0)
     {
         position = lsp_position(
-            json_int_at(doc, json_object_get(doc, position_node, "line")),
-            json_int_at(doc, json_object_get(doc, position_node, "character"))
+            json::json_int_at(doc, json::json_object_get(doc, position_node, "line")),
+            json::json_int_at(doc, json::json_object_get(doc, position_node, "character"))
         )
     }
     return Some(TextDocumentParams{
-        uri: json_string_at(doc, json_object_get(doc, text_document, "uri")),
-        version: json_int_at(doc, json_object_get(doc, text_document, "version")),
-        text: json_string_at(doc, json_object_get(doc, text_document, "text")),
+        uri: json::json_string_at(doc, json::json_object_get(doc, text_document, "uri")),
+        version: json::json_int_at(doc, json::json_object_get(doc, text_document, "version")),
+        text: json::json_string_at(doc, json::json_object_get(doc, text_document, "text")),
         position: position
     })
 }
 
 pub fn lsp_apply_changes(current: string, params: string): string
 {
-    let doc = json_parse(params)
-    let root = json_root(doc)
+    let doc = json::json_parse(params)
+    let root = json::json_root(doc)
     if (root < 0)
     {
         return current
     }
-    let changes = json_object_get(doc, root, "contentChanges")
-    let count = json_array_length(doc, changes)
+    let changes = json::json_object_get(doc, root, "contentChanges")
+    let count = json::json_array_length(doc, changes)
     let mut text = current
     for (i in 0 .. count)
     {
-        let change = json_array_item(doc, changes, i)
-        let replacement = json_string_at(doc, json_object_get(doc, change, "text"))
-        let range = json_object_get(doc, change, "range")
+        let change = json::json_array_item(doc, changes, i)
+        let replacement = json::json_string_at(doc, json::json_object_get(doc, change, "text"))
+        let range = json::json_object_get(doc, change, "range")
         if (range < 0)
         {
             text = replacement
@@ -70,15 +70,15 @@ pub fn lsp_apply_changes(current: string, params: string): string
         else
         {
             let index = line_index_new(text)
-            let start_node = json_object_get(doc, range, "start")
-            let end_node = json_object_get(doc, range, "end")
+            let start_node = json::json_object_get(doc, range, "start")
+            let end_node = json::json_object_get(doc, range, "end")
             let start_position = lsp_position(
-                json_int_at(doc, json_object_get(doc, start_node, "line")),
-                json_int_at(doc, json_object_get(doc, start_node, "character"))
+                json::json_int_at(doc, json::json_object_get(doc, start_node, "line")),
+                json::json_int_at(doc, json::json_object_get(doc, start_node, "character"))
             )
             let end_position = lsp_position(
-                json_int_at(doc, json_object_get(doc, end_node, "line")),
-                json_int_at(doc, json_object_get(doc, end_node, "character"))
+                json::json_int_at(doc, json::json_object_get(doc, end_node, "line")),
+                json::json_int_at(doc, json::json_object_get(doc, end_node, "character"))
             )
             let mut start_byte = line_index_byte(index, start_position, text)
             let mut end_byte = line_index_byte(index, end_position, text)
@@ -216,9 +216,9 @@ pub fn handle_completion(workspace: Workspace, id: i32, params: string): string
 
 pub fn handle_rename(workspace: Workspace, id: i32, params: string): string
 {
-    let doc = json_parse(params)
-    let root = json_root(doc)
-    let new_name = json_string_at(doc, json_object_get(doc, root, "newName"))
+    let doc = json::json_parse(params)
+    let root = json::json_root(doc)
+    let new_name = json::json_string_at(doc, json::json_object_get(doc, root, "newName"))
     match lsp_params_document(params)
     {
         Some(document) -> {
@@ -252,27 +252,27 @@ pub fn lsp_uri_to_path(uri: string): string
 // Indentation comes from the editor's own settings, max width from vix-fmt.toml.
 // This is the same configuration the compiler CLI uses, so the editor and
 // "vixc --fmt" cannot disagree.
-pub fn lsp_format_config(document: TextDocumentParams, params: string): FmtConfig
+pub fn lsp_format_config(document: TextDocumentParams, params: string): fmt::FmtConfig
 {
-    let mut config = fmt_config_default()
-    config = fmt_config_load(config, fmt_config_path_for(lsp_uri_to_path(document.uri)))
-    let doc = json_parse(params)
-    let root = json_root(doc)
+    let mut config = fmt::fmt_config_default()
+    config = fmt::fmt_config_load(config, fmt::fmt_config_path_for(lsp_uri_to_path(document.uri)))
+    let doc = json::json_parse(params)
+    let root = json::json_root(doc)
     if (root >= 0)
     {
-        let options = json_object_get(doc, root, "options")
+        let options = json::json_object_get(doc, root, "options")
         if (options >= 0)
         {
-            let tab_size = json_int_at(doc, json_object_get(doc, options, "tabSize"))
+            let tab_size = json::json_int_at(doc, json::json_object_get(doc, options, "tabSize"))
             if (tab_size > 0) { config.indent_width = tab_size }
-            let insert_spaces = json_object_get(doc, options, "insertSpaces")
+            let insert_spaces = json::json_object_get(doc, options, "insertSpaces")
             if (insert_spaces >= 0)
             {
-                if (json_int_at(doc, insert_spaces) == 1) { config.use_tabs = 0 } else { config.use_tabs = 1 }
+                if (json::json_int_at(doc, insert_spaces) == 1) { config.use_tabs = 0 } else { config.use_tabs = 1 }
             }
         }
     }
-    return fmt_config_normalize(config)
+    return fmt::fmt_config_normalize(config)
 }
 
 pub fn handle_formatting(workspace: Workspace, id: i32, params: string): string
@@ -285,7 +285,7 @@ pub fn handle_formatting(workspace: Workspace, id: i32, params: string): string
             {
                 return lsp_response(id, "[]")
             }
-            let result = fmt_format(text, lsp_format_config(document, params))
+            let result = fmt::fmt_format(text, lsp_format_config(document, params))
             if (result.ok == 0 or result.text == text)
             {
                 return lsp_response(id, "[]")

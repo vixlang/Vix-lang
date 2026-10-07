@@ -1,4 +1,27 @@
-use "sys.vix" as sys
+use "lexer.vix" as lexer
+use "ast.vix" as ast
+use "error.vix" as error
+use "parser.vix" as parser
+use "module.vix" as module
+use "semantic.vix" as semantic
+use "type/typeck.vix" as typeck
+use "analysis/typed_analysis.vix" as analysis
+use "desugar.vix" as desugar
+use "vixi.vix" as vixi
+use "json_ast.vix" as json_ast
+use "method.vix" as methods
+use "backend/boot16.vix" as boot16
+use "backend/linker.vix" as linker
+use "backend/llc.vix" as llc
+use "fmt.vix" as fmt
+use "backend/passes.vix" as passes
+use "codegen.vix" as codegen
+use "mir/mir.vix" as mir
+use "mir/lir/mod.vix" as lir
+use "mir/opt.vix" as mir_opt
+use "mir/lir2asm/mod.vix" as lir2asm
+use "mir/mir2asm/mod.vix" as mir2asm
+use "mir/mir2asm/emit.vix" as mir2asm_emit
 
 extern "C"
 {
@@ -36,7 +59,7 @@ fn compiler_mode(arg: string): CompilerModeResult
     return match arg {
         "-h" | "--help" -> CompilerModeName("--help")
         "-v" | "--version" -> CompilerModeName("--version")
-        "--lex" | "--parse-stats" | "--parser" | "--ast" | "-ast" | "--ast-json" | "--typeinfer" | "--tyinfer" | "--semantic" | "--check" | "--ownership-check" | "--module-graph" | "--emit-vixi" | "-ll" | "-obj" | "-S" -> CompilerModeName(arg)
+        "--lex" | "--parse-stats" | "--parser" | "--ast" | "-ast" | "--ast-json" | "--typeinfer" | "--tyinfer" | "--semantic" | "--check" | "--ownership-check" | "--module-graph" | "--type-symbols" | "--emit-vixi" | "-ll" | "-obj" | "-S" -> CompilerModeName(arg)
         "--fmt" | "--fmt-check" -> CompilerModeName(arg)
         _ -> CompilerModeUnknown
     }
@@ -50,7 +73,7 @@ fn strip_vix_ext(name: string): string
         let end = name.length - 4
         for (i in 0 .. end)
         {
-            out = out + char_string(compiler_string_byte(name, i))
+            out = out + lexer::char_string(compiler_string_byte(name, i))
         }
         return out
     }
@@ -72,7 +95,7 @@ fn slice_string(text: string, start: i32, end: i32): string
     let mut out = ""
     for (i in start .. end)
     {
-        out = out + char_string(compiler_string_byte(text, i))
+        out = out + lexer::char_string(compiler_string_byte(text, i))
     }
     return out
 }
@@ -104,18 +127,18 @@ fn diag_protocol_finish(error_count: i32, warning_count: i32)
     if (vix_diag_format() == 2)
     {
         let aborting = match error_count { 0 -> "false" _ -> "true" }
-        diag_print("\n{\"summary\":{\"errors\":" + i32_to_str(error_count) + ",\"warnings\":" + i32_to_str(warning_count) + ",\"aborting\":" + aborting + "}}\n")
+        diag_print("\n{\"summary\":{\"errors\":" + lexer::i32_to_str(error_count) + ",\"warnings\":" + lexer::i32_to_str(warning_count) + ",\"aborting\":" + aborting + "}}\n")
         return
     }
     if (error_count > 0)
     {
         let suffix = match error_count { 1 -> " previous error" _ -> " previous errors" }
-        diag_print("\nerror: aborting due to " + i32_to_str(error_count) + suffix + "\n")
+        diag_print("\nerror: aborting due to " + lexer::i32_to_str(error_count) + suffix + "\n")
     }
     else
     {
         let suffix = match warning_count { 1 -> " warning" _ -> " warnings" }
-        diag_print("\nwarning: emitted " + i32_to_str(warning_count) + suffix + "\n")
+        diag_print("\nwarning: emitted " + lexer::i32_to_str(warning_count) + suffix + "\n")
     }
 }
 
@@ -210,7 +233,7 @@ fn print_version(): i32
 
 fn print_error_explanation(code: string): i32
 {
-    let explanation = error_explanation(code)
+    let explanation = error::error_explanation(code)
     if (explanation == "")
     {
         diag_print("vixc: error: unknown error code '" + code + "'")
@@ -240,11 +263,11 @@ fn host_target_triple(): string
 fn self_backend_target_supported(target_triple: string): i32
 {
     if (target_triple == "") { return 1 }
-    if (str_starts_with(target_triple, "x86_64") == 1) { return 1 }
+    if (error::str_starts_with(target_triple, "x86_64") == 1) { return 1 }
     return 0
 }
 
-fn run_boot16(program: AstProgram, filename: string, output: string, emit: string): ?i32
+fn run_boot16(program: ast::AstProgram, filename: string, output: string, emit: string): ?i32
 {
     if (emit != "bin" and emit != "exe")
     {
@@ -253,7 +276,7 @@ fn run_boot16(program: AstProgram, filename: string, output: string, emit: strin
     }
     let artifact_path = artifact_output_path(filename, output, "bin")
     let asm_path = artifact_path + ".tmp.asm"
-    if (write_text_file(asm_path, boot16_assembly()) != 0) { return mode_failure() }
+    if (write_text_file(asm_path, boot16::boot16_assembly()) != 0) { return mode_failure() }
     let asm_result = shell_command("nasm -f bin " + asm_path + " -o " + artifact_path)
     delete_file(asm_path)
     if (asm_result != 0)
@@ -277,20 +300,20 @@ fn run_mode_mir(mode: string, mir: string, filename: string, emit: string, outpu
     {
         if (backend == "self-lir")
         {
-            let lir = mir2lir(mir)
-            let lir_error = lir2asm_validate_lir(lir)
+            let lir = lir::mir2lir(mir)
+            let lir_error = lir2asm::lir2asm_validate_lir(lir)
             if (lir_error != "") { diag_print(lir_error); return mode_failure() }
-            if (mode == "debug_lir") { info_print(lir2asm_debug_machine_lir(lir)); return mode_success() }
-            info_print(lir2asm_debug_lir_built(lir)); return mode_success()
+            if (mode == "debug_lir") { info_print(lir2asm::lir2asm_debug_machine_lir(lir)); return mode_success() }
+            info_print(lir2asm::lir2asm_debug_lir_built(lir)); return mode_success()
         }
     }
     let no_std = vix_api_source_has_no_std(mir)
     match mode
     {
         "debug_mir" -> { info_print(mir); return mode_success() }
-        "debug_lir" -> { info_print(lir2asm_debug_lir(mir)); return mode_success() }
+        "debug_lir" -> { info_print(lir2asm::lir2asm_debug_lir(mir)); return mode_success() }
         "debug_asm" -> {
-            let asm = if (backend == "self-lir") { lir2asm_debug(mir) } else { mir2asm_debug(mir) }
+            let asm = if (backend == "self-lir") { lir2asm::lir2asm_debug(mir) } else { mir2asm_emit::mir2asm_debug(mir) }
             info_print(asm)
             return mode_success()
         }
@@ -300,7 +323,7 @@ fn run_mode_mir(mode: string, mir: string, filename: string, emit: string, outpu
     let artifact_path = artifact_output_path(filename, output, emit)
     if (emit == "asm")
     {
-        let write_result = if (backend == "self-lir") { lir2asm_write_file(mir, artifact_path) } else { mir2asm_write_file(mir, artifact_path) }
+        let write_result = if (backend == "self-lir") { lir2asm::lir2asm_write_file(mir, artifact_path) } else { mir2asm_emit::mir2asm_write_file(mir, artifact_path) }
         if (write_result != 0)
         {
             if (write_result != 2) { diag_print("vixc: error: cannot write file '" + artifact_path + "'") }
@@ -311,7 +334,7 @@ fn run_mode_mir(mode: string, mir: string, filename: string, emit: string, outpu
     }
     let asm_path = artifact_path + ".tmp.asm"
     let obj_path = if (emit == "-obj") { artifact_path } else { artifact_path + ".tmp.o" }
-    let write_result2 = if (backend == "self-lir") { lir2asm_write_file(mir, asm_path) } else { mir2asm_write_file(mir, asm_path) }
+    let write_result2 = if (backend == "self-lir") { lir2asm::lir2asm_write_file(mir, asm_path) } else { mir2asm_emit::mir2asm_write_file(mir, asm_path) }
     if (write_result2 != 0)
     {
         if (write_result2 != 2) { diag_print("vixc: error: cannot write file '" + asm_path + "'") }
@@ -329,11 +352,11 @@ fn run_mode_mir(mode: string, mir: string, filename: string, emit: string, outpu
         print(obj_path)
         return mode_success()
     }
-    let link_result = if (no_std == 1) { linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
+    let link_result = if (no_std == 1) { linker::linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker::linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
     delete_file(obj_path)
     if (link_result != 0)
     {
-        let link_err = linker_last_error()
+        let link_err = linker::linker_last_error()
         if (link_err != "") { diag_print(link_err) }
         diag_print("vixc: error: failed to link '" + artifact_path + "'")
         return mode_failure()
@@ -349,28 +372,28 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     match mode
     {
         "--lex" -> {
-            info_print(tokenize_debug(src))
+            info_print(lexer::tokenize_debug(src))
             return mode_success()
         }
         "--parse-stats" -> {
-            info_print(parse_program_stats(src, filename))
+            info_print(parser::parse_program_stats(src, filename))
             return mode_success()
         }
         "--module-graph" -> {
-            let g = module_graph_build(filename)
-            info_print(module_graph_debug(g))
+            let g = module::module_graph_build(filename)
+            info_print(module::module_graph_debug(g))
             return mode_success()
         }
         "--emit-vixi" -> {
-            let prog = parse_program(src, filename)
+            let prog = parser::parse_program(src, filename)
             if (prog.ok == 0)
             {
                 diag_print(prog.error)
                 return mode_failure()
             }
-            let interface_path = if (output != "") { output } else { vixi_path_for(filename) }
-            let interface_module = vixi_collect(prog, filename, compiler_id(), src, [], [])
-            if (write_text_file(interface_path, vixi_emit(interface_module)) != 0)
+            let interface_path = if (output != "") { output } else { vixi::vixi_path_for(filename) }
+            let interface_module = vixi::vixi_collect(prog, filename, compiler_id(), src, [], [])
+            if (write_text_file(interface_path, vixi::vixi_emit(interface_module)) != 0)
             {
                 diag_print("vixc: error: cannot write interface file '" + interface_path + "'")
                 return mode_failure()
@@ -386,10 +409,10 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     // the graph already owns: a file reached through both a module declaration
     // and a quoted import used to be included twice, and every declaration in it
     // collided.
-    let early_graph = module_graph_build(filename)
+    let early_graph = module::module_graph_build(filename)
     let mut loaded_paths: [string] = []
-    if (early_graph.ok == 1) { loaded_paths = module_graph_loaded_paths(early_graph) }
-    let program = parse_program_seeded(src, filename, 1, loaded_paths)
+    if (early_graph.ok == 1) { loaded_paths = module::module_graph_loaded_paths(early_graph) }
+    let program = parser::parse_program_seeded(src, filename, 1, loaded_paths)
 
     match mode
     {
@@ -400,7 +423,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             }
             else
             {
-                info_print(ast_program_debug(program))
+                info_print(ast::ast_program_debug(program))
             }
             return mode_success()
         }
@@ -411,12 +434,12 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             }
             else
             {
-                info_print(ast(program))
+                info_print(ast::ast_program_debug(program))
             }
             return mode_success()
         }
         "--ast-json" -> {
-            info_print(json_ast(program))
+            info_print(json_ast::json_ast(program))
             return mode_success()
         }
         _ -> {}
@@ -436,27 +459,39 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             diag_print("vixc: error: boot16 currently supports code generation only")
             return mode_failure()
         }
-        let boot_error = boot16_validate(program, no_std)
+        let boot_error = boot16::boot16_validate(program, no_std)
         if (boot_error != "") { diag_print(boot_error); return mode_failure() }
         return run_boot16(program, filename, output, emit)
     }
 
     // Multi-file: build module graph and merge all modules into one AstProgram
-    let mut merged_program = program
+    let mut merged_program = module::module_program_with_type_symbols(program)
     if (program.mod_decls.length > 0 or program.import_decls.length > 0)
     {
         let g = early_graph
         if (g.ok == 0)
         {
-            diag_print(module_graph_debug(g))
+            diag_print(module::module_graph_debug(g))
             return mode_failure()
         }
-        merged_program = module_graph_load_all(g, program)
+        merged_program = module::module_graph_load_all(g, program)
     }
 
     // One method table per compilation unit, attached after modules are merged.
     // Semantic analysis, ownership, MIR and both backends all resolve against it.
-    merged_program = method_program_attach(merged_program)
+    merged_program = methods::method_program_attach(merged_program)
+
+    if (mode == "--type-symbols")
+    {
+        for (i in 0 .. merged_program.type_symbols.length)
+        {
+            let sym = merged_program.type_symbols[i]
+            let kind = if (sym.kind == 0) { "struct" } else { "adt" }
+            let vis = if (sym.is_pub == 1) { "pub" } else { "priv" }
+            info_print(lexer::i32_to_str(sym.id) + "\t" + sym.qualified + "\t" + kind + "\t" + vis)
+        }
+        return mode_success()
+    }
 
     let emit_semantic_warnings = if (mode == "codegen" or mode == "debug_typed_mir" or mode == "debug_mir" or mode == "debug_lir" or mode == "debug_asm" or mode == "debug_llvm" or program.mod_decls.length > 0 or program.import_decls.length > 0) { 0 } else { 1 }
     // Modules whose interface files are still valid were checked by this
@@ -466,13 +501,13 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     let mut checked_prefixes: [string] = []
     if (early_graph.ok == 1 and early_graph.modules.length > 1)
     {
-        checked_prefixes = module_graph_checked_prefixes(early_graph)
+        checked_prefixes = module::module_graph_checked_prefixes(early_graph)
     }
-    let semantic_result = semantic_check_program_skipping(merged_program, src, filename, emit_semantic_warnings, checked_prefixes)
+    let semantic_result = semantic::semantic_check_program_skipping(merged_program, src, filename, emit_semantic_warnings, checked_prefixes)
     match mode
     {
         "--semantic" -> {
-            info_print(semantic_result_debug(semantic_result))
+            info_print(semantic::semantic_result_debug(semantic_result))
             return mode_success()
         }
         _ -> {}
@@ -483,7 +518,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         match mode
         {
             "--typeinfer" | "--tyinfer" -> {
-                info_print(semantic_result_debug(semantic_result))
+                info_print(semantic::semantic_result_debug(semantic_result))
                 if (semantic_result.error_count == semantic_result.type_error_count)
                 {
                     return mode_success()
@@ -492,13 +527,13 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             }
             _ -> {}
         }
-        diag_print(semantic_result_debug(semantic_result))
+        diag_print(semantic::semantic_result_debug(semantic_result))
         diag_protocol_finish(semantic_result.error_count, semantic_result.warning_count)
         return mode_failure()
     }
     if (semantic_result.warning_count > 0)
     {
-        diag_print(semantic_result_debug(semantic_result))
+        diag_print(semantic::semantic_result_debug(semantic_result))
         diag_protocol_finish(0, semantic_result.warning_count)
     }
 
@@ -506,7 +541,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     match mode
     {
         "--typeinfer" | "--tyinfer" -> {
-            info_print(typeck_result_debug(infer_result, src, filename))
+            info_print(typeck::typeck_result_debug(infer_result, src, filename))
             return mode_success()
         }
         _ -> {}
@@ -514,7 +549,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
 
     if (infer_result.ok == 0)
     {
-        diag_print(typeck_result_debug(infer_result, src, filename))
+        diag_print(typeck::typeck_result_debug(infer_result, src, filename))
         diag_protocol_finish(1, 0)
         return mode_failure()
     }
@@ -524,11 +559,11 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     // is what makes skipping the module next time sound.
     if (early_graph.ok == 1 and early_graph.modules.length > 1)
     {
-        module_graph_write_interfaces(early_graph)
+        module::module_graph_write_interfaces(early_graph)
     }
 
-    let analysis_program = desugar_program(merged_program)
-    let analysis_result = typed_analysis_program_with_ownership(analysis_program, src, filename, if (mode == "--ownership-check") { 1 } else { 0 })
+    let analysis_program = desugar::desugar_program(merged_program)
+    let analysis_result = analysis::typed_analysis_program_with_ownership(analysis_program, src, filename, if (mode == "--ownership-check") { 1 } else { 0 })
     if (analysis_result.ok == 0)
     {
         diag_print(analysis_result.error)
@@ -543,14 +578,14 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     }
     if (mode == "debug_typed_mir")
     {
-        info_print(typed_analysis_ir_debug(&analysis_result))
+        info_print(analysis::typed_analysis_ir_debug(&analysis_result))
         return mode_success()
     }
-    let lowered_program = analysis_lower_program_for_backend(analysis_program)
+    let lowered_program = analysis::analysis_lower_program_for_backend(analysis_program)
 
     if (mode == "debug_llvm")
     {
-        let ir = codegen_program_target(lowered_program, target_triple)
+        let ir = codegen::codegen_program_target(lowered_program, target_triple)
         info_print(ir)
         return mode_success()
     }
@@ -558,35 +593,35 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     match mode
     {
         "debug_mir" -> {
-            let mir = mir_program(lowered_program)
-            info_print(if (optimize_mir == 1) { mir_opt_program(mir) } else { mir })
+            let mir = mir::mir_program(lowered_program)
+            info_print(if (optimize_mir == 1) { mir_opt::mir_opt_program(mir) } else { mir })
             return mode_success()
         }
         "debug_lir" -> {
-            let raw_mir = mir_program(lowered_program)
-            let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
+            let raw_mir = mir::mir_program(lowered_program)
+            let mir = if (optimize_mir == 1) { mir_opt::mir_opt_program(raw_mir) } else { raw_mir }
             if (backend == "self-lir")
             {
-                let lir = mir2lir(mir)
-                let lir_error = lir2asm_validate_lir(lir)
+                let lir = lir::mir2lir(mir)
+                let lir_error = lir2asm::lir2asm_validate_lir(lir)
                 if (lir_error != "") { diag_print(lir_error); return mode_failure() }
-                info_print(lir2asm_debug_machine_lir(lir))
+                info_print(lir2asm::lir2asm_debug_machine_lir(lir))
             }
-            else { info_print(lir2asm_debug_lir(mir)) }
+            else { info_print(lir2asm::lir2asm_debug_lir(mir)) }
             return mode_success()
         }
         "debug_asm" -> {
-            let raw_mir = mir_program(lowered_program)
-            let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
+            let raw_mir = mir::mir_program(lowered_program)
+            let mir = if (optimize_mir == 1) { mir_opt::mir_opt_program(raw_mir) } else { raw_mir }
             if (backend == "self-lir")
             {
-                let lir = mir2lir(mir)
-                let lir_error = lir2asm_validate_lir(lir)
+                let lir = lir::mir2lir(mir)
+                let lir_error = lir2asm::lir2asm_validate_lir(lir)
                 if (lir_error != "") { diag_print(lir_error); return mode_failure() }
-                info_print(lir2asm_debug_lir_built(lir))
+                info_print(lir2asm::lir2asm_debug_lir_built(lir))
                 return mode_success()
             }
-            let asm = mir2asm_debug(mir)
+            let asm = mir2asm_emit::mir2asm_debug(mir)
             info_print(asm)
             return mode_success()
         }
@@ -601,12 +636,12 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
 
     if ((backend == "self" or backend == "self-lir") and emit != "ir" and emit != "stdout")
     {
-        let raw_mir = mir_program(lowered_program)
-        let mir = if (optimize_mir == 1) { mir_opt_program(raw_mir) } else { raw_mir }
+        let raw_mir = mir::mir_program(lowered_program)
+        let mir = if (optimize_mir == 1) { mir_opt::mir_opt_program(raw_mir) } else { raw_mir }
         let artifact_path = artifact_output_path(filename, output, emit)
         if (emit == "asm")
         {
-            let write_result = if (backend == "self-lir") { lir2asm_write_file(mir, artifact_path) } else { mir2asm_write_file(mir, artifact_path) }
+            let write_result = if (backend == "self-lir") { lir2asm::lir2asm_write_file(mir, artifact_path) } else { mir2asm_emit::mir2asm_write_file(mir, artifact_path) }
             if (write_result != 0)
             {
                 if (write_result != 2) { diag_print("vixc: error: cannot write file '" + artifact_path + "'") }
@@ -617,7 +652,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         }
         let asm_path = artifact_path + ".tmp.asm"
         let obj_path = if (emit == "-obj") { artifact_path } else { artifact_path + ".tmp.o" }
-        let write_result2 = if (backend == "self-lir") { lir2asm_write_file(mir, asm_path) } else { mir2asm_write_file(mir, asm_path) }
+        let write_result2 = if (backend == "self-lir") { lir2asm::lir2asm_write_file(mir, asm_path) } else { mir2asm_emit::mir2asm_write_file(mir, asm_path) }
         if (write_result2 != 0)
         {
             if (write_result2 != 2) { diag_print("vixc: error: cannot write file '" + asm_path + "'") }
@@ -635,11 +670,11 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             print(obj_path)
             return mode_success()
         }
-        let link_result = if (no_std == 1) { linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
+        let link_result = if (no_std == 1) { linker::linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker::linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
         delete_file(obj_path)
         if (link_result != 0)
         {
-            let link_err = linker_last_error()
+            let link_err = linker::linker_last_error()
             if (link_err != "") { diag_print(link_err) }
             diag_print("vixc: error: failed to link '" + artifact_path + "'")
             return mode_failure()
@@ -648,7 +683,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         return mode_success()
     }
 
-    let ir = codegen_program_target(lowered_program, target_triple)
+    let ir = codegen::codegen_program_target(lowered_program, target_triple)
     if (emit == "stdout")
     {
         print(ir)
@@ -669,11 +704,11 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
         ir_path = artifact_path + ".tmp.ll"
     }
     if (write_text_file(raw_ir_path, ir) != 0) { return mode_failure() }
-    let pass_result = passes_optimize_ir(raw_ir_path, ir_path, target_triple, opt_level)
+    let pass_result = passes::passes_optimize_ir(raw_ir_path, ir_path, target_triple, opt_level)
     delete_file(raw_ir_path)
     if (pass_result != 0)
     {
-        let pass_err = passes_last_error()
+        let pass_err = passes::passes_last_error()
         if (pass_err != "") { diag_print(pass_err) }
         diag_print("vixc: error: failed to optimize LLVM IR '" + ir_path + "'")
         return mode_failure()
@@ -691,19 +726,19 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     let mut build_result = 0
     if (emit == "asm")
     {
-        build_result = llc_compile_asm(ir_path, artifact_path, target_triple)
+        build_result = llc::llc_compile_asm(ir_path, artifact_path, target_triple)
     }
     elif (emit == "-obj")
     {
-        build_result = llc_compile_object(ir_path, artifact_path, target_triple)
+        build_result = llc::llc_compile_object(ir_path, artifact_path, target_triple)
     }
     else
     {
         let obj_path = artifact_path + ".tmp.o"
-        build_result = llc_compile_object(ir_path, obj_path, target_triple)
+        build_result = llc::llc_compile_object(ir_path, obj_path, target_triple)
         if (build_result == 0)
         {
-            build_result = if (no_std == 1) { linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
+            build_result = if (no_std == 1) { linker::linker_link_executable_nostd(obj_path, artifact_path, link_args) } else { linker::linker_link_executable_std(obj_path, runtime_object, artifact_path, link_args) }
         }
         delete_file(obj_path)
     }
@@ -713,9 +748,9 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     }
     if (build_result != 0)
     {
-        let llc_err = llc_last_error()
-        let link_err = linker_last_error()
-        let pass_err = passes_last_error()
+        let llc_err = llc::llc_last_error()
+        let link_err = linker::linker_last_error()
+        let pass_err = passes::passes_last_error()
         if (pass_err != "") { diag_print(pass_err) }
         if (llc_err != "") { diag_print(llc_err) }
         if (link_err != "") { diag_print(link_err) }
@@ -766,9 +801,9 @@ fn read_source_file(path: ptr): string
 
 // --fmt        rewrite the file in place, or to -o
 // --fmt-check  report files that are not formatted, exit non zero
-fn run_format_mode(check_only: i32, src: string, filename: string, output: string, config: FmtConfig): ?i32
+fn run_format_mode(check_only: i32, src: string, filename: string, output: string, config: fmt::FmtConfig): ?i32
 {
-    let result = fmt_format(src, config)
+    let result = fmt::fmt_format(src, config)
     if (result.ok == 0)
     {
         diag_print("vixc: error: " + filename + ": " + result.error)
@@ -842,7 +877,7 @@ fn main(argc: i32, argv: &string): i32
             diag_color = 2
             vix_diag_configure(diag_format, diag_color, diag_test_mode)
         }
-        elif (str_starts_with(arg, "--diag-format=") == 1)
+        elif (error::str_starts_with(arg, "--diag-format=") == 1)
         {
             let value = slice_string(arg, 14, arg.length)
             if (value == "human") { diag_format = 0 }
@@ -855,7 +890,7 @@ fn main(argc: i32, argv: &string): i32
             }
             vix_diag_configure(diag_format, diag_color, diag_test_mode)
         }
-        elif (str_starts_with(arg, "--color=") == 1)
+        elif (error::str_starts_with(arg, "--color=") == 1)
         {
             let value = slice_string(arg, 8, arg.length)
             if (value == "auto") { diag_color = 0 }
@@ -869,7 +904,7 @@ fn main(argc: i32, argv: &string): i32
             if (diag_test_mode == 1) { diag_color = 2 }
             vix_diag_configure(diag_format, diag_color, diag_test_mode)
         }
-        elif (str_starts_with(arg, "--explan=") == 1)
+        elif (error::str_starts_with(arg, "--explan=") == 1)
         {
             explain_code = slice_string(arg, 9, arg.length)
             if (explain_code == "")
@@ -891,13 +926,13 @@ fn main(argc: i32, argv: &string): i32
                 return 1
             }
         }
-        elif (str_starts_with(arg, "--max-width=") == 1)
+        elif (error::str_starts_with(arg, "--max-width=") == 1)
         {
-            fmt_max_width_flag = fmt_parse_int(slice_string(arg, 12, arg.length), -1)
+            fmt_max_width_flag = fmt::fmt_parse_int(slice_string(arg, 12, arg.length), -1)
         }
-        elif (str_starts_with(arg, "--indent=") == 1)
+        elif (error::str_starts_with(arg, "--indent=") == 1)
         {
-            fmt_indent_flag = fmt_parse_int(slice_string(arg, 9, arg.length), -1)
+            fmt_indent_flag = fmt::fmt_parse_int(slice_string(arg, 9, arg.length), -1)
         }
         elif (arg == "--use-tabs")
         {
@@ -928,7 +963,7 @@ fn main(argc: i32, argv: &string): i32
         {
             emit = "bin"
         }
-        elif (str_starts_with(arg, "-opt=") == 1)
+        elif (error::str_starts_with(arg, "-opt=") == 1)
         {
             match opt_level_arg(arg)
             {
@@ -943,7 +978,7 @@ fn main(argc: i32, argv: &string): i32
         {
             emit = "asm"
         }
-        elif (str_starts_with(arg, "--debug=") == 1)
+        elif (error::str_starts_with(arg, "--debug=") == 1)
         {
             let debug_mode = slice_string(arg, 8, arg.length)
             if (debug_mode == "typed-mir") { mode = "debug_typed_mir" }
@@ -970,7 +1005,7 @@ fn main(argc: i32, argv: &string): i32
                 return 1
             }
         }
-        elif (str_starts_with(arg, "--target=") == 1)
+        elif (error::str_starts_with(arg, "--target=") == 1)
         {
             target_triple = slice_string(arg, 9, arg.length)
             if (target_triple == "")
@@ -1032,7 +1067,7 @@ fn main(argc: i32, argv: &string): i32
                 return 1
             }
         }
-        elif (str_starts_with(arg, "-l") == 1 or str_starts_with(arg, "-L") == 1)
+        elif (error::str_starts_with(arg, "-l") == 1 or error::str_starts_with(arg, "-L") == 1)
         {
             link_args = link_args + " " + arg
         }
@@ -1093,12 +1128,12 @@ fn main(argc: i32, argv: &string): i32
             diag_print("vixc: error: cannot read file '" + filename + "'")
             return 1
         }
-        let mut config = fmt_config_default()
-        config = fmt_config_load(config, fmt_config_path_for(filename))
+        let mut config = fmt::fmt_config_default()
+        config = fmt::fmt_config_load(config, fmt::fmt_config_path_for(filename))
         if (fmt_max_width_flag >= 0) { config.max_width = fmt_max_width_flag }
         if (fmt_indent_flag > 0) { config.indent_width = fmt_indent_flag }
         if (fmt_tabs_flag >= 0) { config.use_tabs = fmt_tabs_flag }
-        config = fmt_config_normalize(config)
+        config = fmt::fmt_config_normalize(config)
         match run_format_mode(if (mode == "--fmt-check") { 1 } else { 0 }, src, filename, output, config)
         {
             Some(code) -> return code

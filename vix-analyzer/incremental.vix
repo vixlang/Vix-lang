@@ -56,13 +56,13 @@ pub fn incremental_reparse(old_tree: StubTree, old_source: SourceText, new_sourc
     if (target.full_file == 1)
     {
         let tree = stub_tree_parse(new_source.file, new_source.text)
-        let stream = tokenize(new_source.text)
+        let stream = lexer::tokenize(new_source.text)
         return IncrementalResult{
             tree: tree,
             target: target,
             reused_nodes: 0,
             fresh_nodes: tree.nodes.length,
-            token_count: stream_len(stream),
+            token_count: lexer::stream_len(stream),
             full_file: 1
         }
     }
@@ -81,13 +81,13 @@ pub fn incremental_reparse(old_tree: StubTree, old_source: SourceText, new_sourc
     let alive_before = stub_tree_alive_count(old_tree)
     let spliced = stub_tree_splice(old_tree, target.node, fresh, start)
     let tree = stub_tree_shift_after(spliced, start, delta)
-    let stream = tokenize(slice)
+    let stream = lexer::tokenize(slice)
     return IncrementalResult{
         tree: tree,
         target: target,
         reused_nodes: alive_before - 1,
         fresh_nodes: fresh.nodes.length,
-        token_count: stream_len(stream),
+        token_count: lexer::stream_len(stream),
         full_file: 0
     }
 }

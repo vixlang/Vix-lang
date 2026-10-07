@@ -80,8 +80,12 @@ int vix_asm_write_line(void *file, const char *text) {
 
 #define MAX_VARS 4096
 #define MAX_FIELDS 32
-#define NAME_SIZE 64
-#define TYPE_SIZE 64
+/* Module-qualified symbols are emitted as length-prefixed mangled names, so a
+   name can be far longer than the bare identifier it came from.  These tables
+   truncate to the sizes below, and a truncated key silently loses its
+   signature, which makes callers fall back to i32. */
+#define NAME_SIZE 256
+#define TYPE_SIZE 128
 
 typedef struct {
   char name[NAME_SIZE];
@@ -973,6 +977,7 @@ void vix_register_function_sig_vararg(const char *name, const char *return_type,
     funcs[idx].param_types[i][TYPE_SIZE - 1] = '\0';
   }
 }
+
 
 const char *vix_get_function_return_type(const char *name) {
   for (int i = func_count - 1; i >= 0; i--) {

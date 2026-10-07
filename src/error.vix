@@ -32,7 +32,7 @@ pub fn str_from(text: string, start: i32): string
     let text_len = diag_strlen(text)
     while (i < text_len)
     {
-        out = out + char_string(compiler_string_byte(text, i))
+        out = out + lexer::char_string(compiler_string_byte(text, i))
         i += 1
     }
     return out
@@ -341,47 +341,47 @@ pub fn diagnostic_help_for_code(code: string): string
     }
 }
 
-pub fn diagnostic_with_guidance(diagnostic: Diagnostic): Diagnostic
+pub fn diagnostic_with_guidance(diagnostic: diag::Diagnostic): diag::Diagnostic
 {
     let mut out = diagnostic
     let note = diagnostic_note_for_code(diagnostic.code)
     let help = diagnostic_help_for_code(diagnostic.code)
-    if (note != "") { out = diag_note(out, note) }
-    if (help != "") { out = diag_help(out, help) }
+    if (note != "") { out = diag::diag_note(out, note) }
+    if (help != "") { out = diag::diag_help(out, help) }
     return out
 }
 
-pub fn diagnostic_new(code: string, level: i32, error_type: string, message: string): Diagnostic
+pub fn diagnostic_new(code: string, level: i32, error_type: string, message: string): diag::Diagnostic
 {
-    let diag_level = if (level == diag_warning_level()) DiagWarning else DiagError
+    let diag_level = if (level == diag_warning_level()) diag::DiagWarning else diag::DiagError
     let phase = match diagnostic_kind(error_type) {
-        ParseDiagnostic -> DiagParser
-        NameDiagnostic -> DiagName
-        TypeDiagnostic -> DiagType
-        SemanticDiagnostic -> DiagSemantic
-        WarningDiagnostic -> DiagSemantic
-        UnknownDiagnostic -> DiagBackend
+        ParseDiagnostic -> diag::DiagParser
+        NameDiagnostic -> diag::DiagName
+        TypeDiagnostic -> diag::DiagType
+        SemanticDiagnostic -> diag::DiagSemantic
+        WarningDiagnostic -> diag::DiagSemantic
+        UnknownDiagnostic -> diag::DiagBackend
     }
-    return diag_new(code, diag_level, phase, diagnostic_title(code, message))
-        |> diag_message(message)
+    return diag::diag_new(code, diag_level, phase, diagnostic_title(code, message))
+        |> diag::diag_message(message)
 }
 
 pub fn format_diagnostic(src: string, filename: string, level: i32, error_type: string, message: string, line: i32, col: i32, length: i32): string
 {
     let code = error_code_for_type(error_type, message)
-    let span = diag_span_at(src, filename, line, col, length)
+    let span = diag::diag_span_at(src, filename, line, col, length)
     let mut diagnostic = diagnostic_new(code, level, error_type, strip_func_prefix(message))
-        |> diag_message(message)
-        |> diag_primary(span, strip_func_prefix(message))
+        |> diag::diag_message(message)
+        |> diag::diag_primary(span, strip_func_prefix(message))
     diagnostic = diagnostic_with_guidance(diagnostic)
-    return diag_render(diagnostic, diag_render_options(src, filename))
+    return diag::diag_render(diagnostic, diag::diag_render_options(src, filename))
 }
 
 pub fn format_diagnostic_no_loc(level: i32, error_type: string, message: string, filename: string): string
 {
     let code = error_code_for_type(error_type, message)
     let diagnostic = diagnostic_new(code, level, error_type, strip_func_prefix(message))
-        |> diag_message(message)
+        |> diag::diag_message(message)
         |> diagnostic_with_guidance
-    return diag_render(diagnostic, diag_render_options("", filename))
+    return diag::diag_render(diagnostic, diag::diag_render_options("", filename))
 }

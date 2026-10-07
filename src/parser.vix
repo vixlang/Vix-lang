@@ -1,44 +1,47 @@
 #[no_main]
 use "lexer.vix" as lexer
+use "type/typepool.vix" as typepool
 use "ast.vix" as ast
 use "error.vix" as error
 use "method.vix" as methods
 use "preprocess.vix" as preprocess
+use "diag.vix" as diag
+use "receiver.vix" as receiver
 
 pub type Parser = struct {
-    stream: TokenStream,
+    stream: lexer::TokenStream,
     pos: i32,
     ok: i32,
     error: string,
-    diagnostic: Diagnostic,
-    expr_store: ExprStore,
-    store: StmtStore,
+    diagnostic: diag::Diagnostic,
+    expr_store: ast::ExprStore,
+    store: ast::StmtStore,
     source: string,
     filename: string,
     current_function: string,
     lambda_counter: i32,
-    lambda_functions: [AstFunction]
+    lambda_functions: [ast::AstFunction]
 }
 
-pub fn parser_new(src: string, filename: string): Parser => parser_new_stream(src, filename, tokenize(src))
+pub fn parser_new(src: string, filename: string): Parser => parser_new_stream(src, filename, lexer::tokenize(src))
 
-pub fn parser_new_stream(src: string, filename: string, stream: TokenStream): Parser => Parser{ stream: stream, pos: 0, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, ""), expr_store: expr_store_new(), store: stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
+pub fn parser_new_stream(src: string, filename: string, stream: lexer::TokenStream): Parser => Parser{ stream: stream, pos: 0, ok: 1, error: "", diagnostic: diag::diag_new("E0000", diag::DiagError, diag::DiagParser, ""), expr_store: ast::expr_store_new(), store: ast::stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
 
-pub fn parser_kind(parser: &Parser): i32 => stream_kind_at(parser.stream, parser.pos)
+pub fn parser_kind(parser: &Parser): i32 => lexer::stream_kind_at(parser.stream, parser.pos)
 
-pub fn parser_text(parser: &Parser): string => stream_text_at(parser.stream, parser.pos)
+pub fn parser_text(parser: &Parser): string => lexer::stream_text_at(parser.stream, parser.pos)
 
-pub fn parser_int(parser: &Parser): i32 => stream_int_at(parser.stream, parser.pos)
+pub fn parser_int(parser: &Parser): i32 => lexer::stream_int_at(parser.stream, parser.pos)
 
-pub fn parser_line(parser: &Parser): i32 => stream_line_at(parser.stream, parser.pos)
+pub fn parser_line(parser: &Parser): i32 => lexer::stream_line_at(parser.stream, parser.pos)
 
-pub fn parser_col(parser: &Parser): i32 => stream_col_at(parser.stream, parser.pos)
+pub fn parser_col(parser: &Parser): i32 => lexer::stream_col_at(parser.stream, parser.pos)
 
 pub fn parser_expr_at(parser: &Parser, idx: i32, line: i32, col: i32): i32
 {
     if (idx >= 0)
     {
-        expr_store_set_loc(parser.expr_store, idx, line, col)
+        ast::expr_store_set_loc(parser.expr_store, idx, line, col)
     }
     return idx
 }
@@ -47,22 +50,22 @@ pub fn parser_stmt_at(parser: &Parser, idx: i32, line: i32, col: i32): i32
 {
     if (idx >= 0)
     {
-        stmt_store_set_loc(parser.store, idx, line, col)
+        ast::stmt_store_set_loc(parser.store, idx, line, col)
     }
     return idx
 }
 
-pub fn parser_float(parser: &Parser): f64 => stream_float_at(parser.stream, parser.pos)
+pub fn parser_float(parser: &Parser): f64 => lexer::stream_float_at(parser.stream, parser.pos)
 
 pub fn parser_at_end(parser: &Parser): i32
 {
-    if (parser_kind(parser) == tk_eof()) { return 1 }
+    if (parser_kind(parser) == lexer::tk_eof()) { return 1 }
     return 0
 }
 
 pub fn parser_advance(parser: &Parser)
 {
-    if (parser.pos + 1 < stream_len(parser.stream))
+    if (parser.pos + 1 < lexer::stream_len(parser.stream))
     {
         parser.pos += 1
     }
@@ -70,7 +73,7 @@ pub fn parser_advance(parser: &Parser)
 
 pub fn parser_fail(parser: &Parser, message: string)
 {
-    parser_fail_code(parser, parse_error_code(message), message)
+    parser_fail_code(parser, error::parse_error_code(message), message)
 }
 
 pub fn parser_fail_code(parser: &Parser, code: string, message: string)
@@ -84,22 +87,22 @@ pub fn parser_fail_code(parser: &Parser, code: string, message: string)
         let mut length = 1
         if (text != "" and text != ";" and text != "," and text != "{" and text != "}" and text != "(" and text != ")" and text != "[" and text != "]" and text != "=>" and text != "->" and text != ".." and text != "..." and text != "==" and text != "!=" and text != "<=" and text != ">=" and text != "+=" and text != "-=" and text != "<<" and text != ">>")
         {
-            length = diag_strlen(text)
+            length = error::diag_strlen(text)
         }
-        let mut start = stream_start_at(parser.stream, parser.pos)
-        let mut end = stream_end_at(parser.stream, parser.pos)
+        let mut start = lexer::stream_start_at(parser.stream, parser.pos)
+        let mut end = lexer::stream_end_at(parser.stream, parser.pos)
         if (start < 0)
         {
-            let fallback = diag_span_at(parser.source, parser.filename, line, col, length)
+            let fallback = diag::diag_span_at(parser.source, parser.filename, line, col, length)
             start = fallback.start
             end = fallback.end
         }
-        let span = diag_span(parser.filename, start, end, line, col)
-        parser.diagnostic = diag_new(code, DiagError, DiagParser, diagnostic_title(code, message))
-            |> diag_message(message)
-            |> diag_primary(span, message)
-            |> diagnostic_with_guidance
-        parser.error = diag_render(parser.diagnostic, diag_render_options(parser.source, parser.filename))
+        let span = diag::diag_span(parser.filename, start, end, line, col)
+        parser.diagnostic = diag::diag_new(code, diag::DiagError, diag::DiagParser, error::diagnostic_title(code, message))
+            |> diag::diag_message(message)
+            |> diag::diag_primary(span, message)
+            |> error::diagnostic_with_guidance
+        parser.error = diag::diag_render(parser.diagnostic, diag::diag_render_options(parser.source, parser.filename))
     }
 }
 
@@ -144,7 +147,7 @@ pub fn parse_expression(parser: &Parser): i32
         let col = parser_col(parser)
         parser_advance(parser)
         let mut right = -1
-        if (parser_kind(parser) == tk_ident() and stream_text_at(parser.stream, parser.pos + 1) == "[")
+        if (parser_kind(parser) == lexer::tk_ident() and lexer::stream_text_at(parser.stream, parser.pos + 1) == "[")
         {
             let name = parser_text(parser)
             parser_advance(parser)
@@ -168,23 +171,23 @@ pub fn parse_expression(parser: &Parser): i32
                 parser_expect_text(parser, ")")
                 if (parser.ok == 0) { return -1 }
             }
-            right = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, explicit_args), line, col)
+            right = parser_expr_at(parser, ast::ast_expr_call_generic(parser.expr_store, name, type_args, explicit_args), line, col)
         }
         else
         {
             right = parse_postfix(parser)
             if (parser.ok == 0) { return -1 }
         }
-        let target = expr_store_get(parser.expr_store, right)
+        let target = ast::expr_store_get(parser.expr_store, right)
         if (target.tag == "call")
         {
             let mut args: [i32] = [left]
             for (i in 0 .. target.args.length) { args.push(target.args[i]) }
-            left = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, target.text, target.type_args, args), line, col)
+            left = parser_expr_at(parser, ast::ast_expr_call_generic(parser.expr_store, target.text, target.type_args, args), line, col)
         }
         elif (target.tag == "ident")
         {
-            left = parser_expr_at(parser, ast_expr_call(parser.expr_store, target.text, [left]), line, col)
+            left = parser_expr_at(parser, ast::ast_expr_call(parser.expr_store, target.text, [left]), line, col)
         }
         else
         {
@@ -199,14 +202,14 @@ pub fn parse_logical_or(parser: &Parser): i32
 {
     let mut left = parse_logical_and(parser)
     if (parser.ok == 0) { return -1 }
-    while (parser_kind(parser) == tk_keyword() and parser_text(parser) == "or")
+    while (parser_kind(parser) == lexer::tk_keyword() and parser_text(parser) == "or")
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
         let right = parse_logical_and(parser)
         if (parser.ok == 0) { return -1 }
-        left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "or", left, right), line, col)
+        left = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "or", left, right), line, col)
     }
     return left
 }
@@ -215,14 +218,14 @@ pub fn parse_logical_and(parser: &Parser): i32
 {
     let mut left = parse_bitwise_or(parser)
     if (parser.ok == 0) { return -1 }
-    while (parser_kind(parser) == tk_keyword() and parser_text(parser) == "and")
+    while (parser_kind(parser) == lexer::tk_keyword() and parser_text(parser) == "and")
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
         let right = parse_bitwise_or(parser)
         if (parser.ok == 0) { return -1 }
-        left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "and", left, right), line, col)
+        left = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "and", left, right), line, col)
     }
     return left
 }
@@ -231,14 +234,14 @@ pub fn parse_bitwise_or(parser: &Parser): i32
 {
     let mut left = parse_bitwise_and(parser)
     if (parser.ok == 0) { return -1 }
-    while (parser_kind(parser) == tk_symbol() and parser_text(parser) == "|")
+    while (parser_kind(parser) == lexer::tk_symbol() and parser_text(parser) == "|")
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
         let right = parse_bitwise_and(parser)
         if (parser.ok == 0) { return -1 }
-        left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "|", left, right), line, col)
+        left = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "|", left, right), line, col)
     }
     return left
 }
@@ -247,14 +250,14 @@ pub fn parse_bitwise_and(parser: &Parser): i32
 {
     let mut left = parse_coalesce(parser)
     if (parser.ok == 0) { return -1 }
-    while (parser_kind(parser) == tk_symbol() and parser_text(parser) == "&")
+    while (parser_kind(parser) == lexer::tk_symbol() and parser_text(parser) == "&")
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
         let right = parse_coalesce(parser)
         if (parser.ok == 0) { return -1 }
-        left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "&", left, right), line, col)
+        left = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "&", left, right), line, col)
     }
     return left
 }
@@ -263,14 +266,14 @@ pub fn parse_coalesce(parser: &Parser): i32
 {
     let left = parse_comparison(parser)
     if (parser.ok == 0) { return -1 }
-    if (parser_kind(parser) == tk_symbol() and parser_text(parser) == "??")
+    if (parser_kind(parser) == lexer::tk_symbol() and parser_text(parser) == "??")
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
         let right = parse_coalesce(parser)
         if (parser.ok == 0) { return -1 }
-        return parser_expr_at(parser, ast_expr_binop(parser.expr_store, "??", left, right), line, col)
+        return parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "??", left, right), line, col)
     }
     return left
 }
@@ -279,7 +282,7 @@ pub fn parse_comparison(parser: &Parser): i32
 {
     let left = parse_shift(parser)
     if (parser.ok == 0) { return -1 }
-    if (parser_kind(parser) == tk_symbol() and (parser_text(parser) == "==" or parser_text(parser) == "!=" or parser_text(parser) == "<" or parser_text(parser) == "<=" or parser_text(parser) == ">" or parser_text(parser) == ">="))
+    if (parser_kind(parser) == lexer::tk_symbol() and (parser_text(parser) == "==" or parser_text(parser) == "!=" or parser_text(parser) == "<" or parser_text(parser) == "<=" or parser_text(parser) == ">" or parser_text(parser) == ">="))
     {
         let op = parser_text(parser)
         let line = parser_line(parser)
@@ -287,7 +290,7 @@ pub fn parse_comparison(parser: &Parser): i32
         parser_advance(parser)
         let right = parse_shift(parser)
         if (parser.ok == 0) { return -1 }
-        return parser_expr_at(parser, ast_expr_binop(parser.expr_store, op, left, right), line, col)
+        return parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, op, left, right), line, col)
     }
     return left
 }
@@ -296,7 +299,7 @@ pub fn parse_shift(parser: &Parser): i32
 {
     let mut left = parse_additive(parser)
     if (parser.ok == 0) { return -1 }
-    while (parser_kind(parser) == tk_symbol() and (parser_text(parser) == "<<" or parser_text(parser) == ">>"))
+    while (parser_kind(parser) == lexer::tk_symbol() and (parser_text(parser) == "<<" or parser_text(parser) == ">>"))
     {
         let op = parser_text(parser)
         let line = parser_line(parser)
@@ -304,7 +307,7 @@ pub fn parse_shift(parser: &Parser): i32
         parser_advance(parser)
         let right = parse_additive(parser)
         if (parser.ok == 0) { return -1 }
-        left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, op, left, right), line, col)
+        left = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, op, left, right), line, col)
     }
     return left
 }
@@ -313,7 +316,7 @@ pub fn parse_additive(parser: &Parser): i32
 {
     let mut left = parse_multiplicative(parser)
     if (parser.ok == 0) { return -1 }
-    while (parser_kind(parser) == tk_symbol() and (parser_text(parser) == "+" or parser_text(parser) == "-"))
+    while (parser_kind(parser) == lexer::tk_symbol() and (parser_text(parser) == "+" or parser_text(parser) == "-"))
     {
         let op = parser_text(parser)
         let line = parser_line(parser)
@@ -321,7 +324,7 @@ pub fn parse_additive(parser: &Parser): i32
         parser_advance(parser)
         let right = parse_multiplicative(parser)
         if (parser.ok == 0) { return -1 }
-        left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, op, left, right), line, col)
+        left = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, op, left, right), line, col)
     }
     return left
 }
@@ -330,7 +333,7 @@ pub fn parse_multiplicative(parser: &Parser): i32
 {
     let mut left = parse_unary(parser)
     if (parser.ok == 0) { return -1 }
-    while (parser_kind(parser) == tk_symbol() and (parser_text(parser) == "*" or parser_text(parser) == "/" or parser_text(parser) == "%"))
+    while (parser_kind(parser) == lexer::tk_symbol() and (parser_text(parser) == "*" or parser_text(parser) == "/" or parser_text(parser) == "%"))
     {
         let op = parser_text(parser)
         let line = parser_line(parser)
@@ -338,14 +341,14 @@ pub fn parse_multiplicative(parser: &Parser): i32
         parser_advance(parser)
         let right = parse_unary(parser)
         if (parser.ok == 0) { return -1 }
-        left = parser_expr_at(parser, ast_expr_binop(parser.expr_store, op, left, right), line, col)
+        left = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, op, left, right), line, col)
     }
     return left
 }
 
 pub fn parse_unary(parser: &Parser): i32
 {
-    if (parser_kind(parser) == tk_string())
+    if (parser_kind(parser) == lexer::tk_string())
     {
         return parse_postfix(parser)
     }
@@ -361,8 +364,8 @@ pub fn parse_unary(parser: &Parser): i32
             parser_advance(parser)
         }
         let name = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0) return -1
-        return parser_expr_at(parser, ast_expr_borrow(parser.expr_store, name, is_mut), line, col)
+        if (parser_expect_kind(parser, lexer::tk_ident()) == 0) return -1
+        return parser_expr_at(parser, ast::ast_expr_borrow(parser.expr_store, name, is_mut), line, col)
     }
     return match parser_text(parser) {
         "@" -> {
@@ -371,7 +374,7 @@ pub fn parse_unary(parser: &Parser): i32
             parser_advance(parser)
             let operand = parse_unary(parser)
             if (parser.ok == 0) { return -1 }
-            parser_expr_at(parser, ast_expr_deref(parser.expr_store, operand), line, col)
+            parser_expr_at(parser, ast::ast_expr_deref(parser.expr_store, operand), line, col)
         }
         "-" -> {
             let line = parser_line(parser)
@@ -379,7 +382,7 @@ pub fn parse_unary(parser: &Parser): i32
             parser_advance(parser)
             let operand = parse_unary(parser)
             if (parser.ok == 0) { return -1 }
-            parser_expr_at(parser, ast_expr_unaryop(parser.expr_store, "-", operand), line, col)
+            parser_expr_at(parser, ast::ast_expr_unaryop(parser.expr_store, "-", operand), line, col)
         }
         "!" -> {
             let line = parser_line(parser)
@@ -387,7 +390,7 @@ pub fn parse_unary(parser: &Parser): i32
             parser_advance(parser)
             let operand = parse_unary(parser)
             if (parser.ok == 0) { return -1 }
-            parser_expr_at(parser, ast_expr_unaryop(parser.expr_store, "!", operand), line, col)
+            parser_expr_at(parser, ast::ast_expr_unaryop(parser.expr_store, "!", operand), line, col)
         }
         _ -> parse_postfix(parser)
     }
@@ -405,19 +408,19 @@ pub fn parse_postfix_from(parser: &Parser, expr_idx: i32): i32 => parse_postfix_
 pub fn parser_generic_call_ahead(parser: &Parser): i32
 {
     let mut pos = parser.pos
-    if (stream_text_at(parser.stream, pos) == ":") { pos += 1 }
-    if (stream_text_at(parser.stream, pos) != "[") { return 0 }
+    if (lexer::stream_text_at(parser.stream, pos) == ":") { pos += 1 }
+    if (lexer::stream_text_at(parser.stream, pos) != "[") { return 0 }
     let mut depth = 0
-    while (pos < stream_len(parser.stream))
+    while (pos < lexer::stream_len(parser.stream))
     {
-        let text = stream_text_at(parser.stream, pos)
+        let text = lexer::stream_text_at(parser.stream, pos)
         if (text == "[") { depth += 1 }
         elif (text == "]")
         {
             depth -= 1
             if (depth == 0)
             {
-                return if (stream_text_at(parser.stream, pos + 1) == "(") { 1 } else { 0 }
+                return if (lexer::stream_text_at(parser.stream, pos + 1) == "(") { 1 } else { 0 }
             }
         }
         pos += 1
@@ -460,12 +463,12 @@ pub fn parse_postfix_continue(parser: &Parser, expr_idx: i32): i32
                 if (parser.ok == 0) { return -1 }
                 parser_expect_text(parser, "]")
                 if (parser.ok == 0) { return -1 }
-                expr = parser_expr_at(parser, ast_expr_slice(parser.expr_store, expr, index_idx, end_idx), line, col)
+                expr = parser_expr_at(parser, ast::ast_expr_slice(parser.expr_store, expr, index_idx, end_idx), line, col)
                 continue
             }
             parser_expect_text(parser, "]")
             if (parser.ok == 0) { return -1 }
-            expr = parser_expr_at(parser, ast_expr_index(parser.expr_store, expr, index_idx), line, col)
+            expr = parser_expr_at(parser, ast::ast_expr_index(parser.expr_store, expr, index_idx), line, col)
         }
         elif (parser_text(parser) == ".")
         {
@@ -473,8 +476,8 @@ pub fn parse_postfix_continue(parser: &Parser, expr_idx: i32): i32
             let col = parser_col(parser)
             parser_advance(parser)
             let field_name = parser_text(parser)
-            if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
-            expr = parser_expr_at(parser, ast_expr_field(parser.expr_store, expr, field_name), line, col)
+            if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return -1 }
+            expr = parser_expr_at(parser, ast::ast_expr_field(parser.expr_store, expr, field_name), line, col)
         }
         elif (parser_text(parser) == "(")
         {
@@ -497,18 +500,18 @@ pub fn parse_postfix_continue(parser: &Parser, expr_idx: i32): i32
             }
             parser_expect_text(parser, ")")
             if (parser.ok == 0) { return -1 }
-            let func_expr = expr_store_get(parser.expr_store, expr)
+            let func_expr = ast::expr_store_get(parser.expr_store, expr)
             if (func_expr.tag == "field")
             {
-                expr = parser_expr_at(parser, ast_expr_method_call(parser.expr_store, func_expr.left_idx, func_expr.text, args), line, col)
+                expr = parser_expr_at(parser, ast::ast_expr_method_call(parser.expr_store, func_expr.left_idx, func_expr.text, args), line, col)
             }
             elif (func_expr.tag == "ident")
             {
-                expr = parser_expr_at(parser, ast_expr_call(parser.expr_store, func_expr.text, args), line, col)
+                expr = parser_expr_at(parser, ast::ast_expr_call(parser.expr_store, func_expr.text, args), line, col)
             }
             else
             {
-                expr = parser_expr_at(parser, ast_expr_call_expr(parser.expr_store, expr, args), line, col)
+                expr = parser_expr_at(parser, ast::ast_expr_call_expr(parser.expr_store, expr, args), line, col)
             }
         }
     }
@@ -523,11 +526,11 @@ pub fn parse_match_expr(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     
     let mut subject_idx = -1
-    if ((parser_kind(parser) == tk_ident() or parser_kind(parser) == tk_keyword()) and stream_text_at(parser.stream, parser.pos + 1) == "{")
+    if ((parser_kind(parser) == lexer::tk_ident() or parser_kind(parser) == lexer::tk_keyword()) and lexer::stream_text_at(parser.stream, parser.pos + 1) == "{")
     {
         let subject_name = parser_text(parser)
         parser_advance(parser)
-        subject_idx = ast_expr_identifier(parser.expr_store, subject_name)
+        subject_idx = ast::ast_expr_identifier(parser.expr_store, subject_name)
     }
     else
     {
@@ -599,7 +602,7 @@ pub fn parse_match_expr(parser: &Parser): i32
     parser_expect_text(parser, "}")
     if (parser.ok == 0) { return -1 }
     
-    return parser_expr_at(parser, ast_expr_match(parser.expr_store, subject_idx, patterns, bodies), line, col)
+    return parser_expr_at(parser, ast::ast_expr_match(parser.expr_store, subject_idx, patterns, bodies), line, col)
 }
 
 pub fn parse_if_expr_body(parser: &Parser): i32
@@ -650,7 +653,7 @@ pub fn parse_if_expr(parser: &Parser): i32
     {
         let else_idx = parse_if_expr(parser)
         if (parser.ok == 0) { return -1 }
-        return parser_expr_at(parser, ast_expr_if(parser.expr_store, cond_idx, then_idx, else_idx), line, col)
+        return parser_expr_at(parser, ast::ast_expr_if(parser.expr_store, cond_idx, then_idx, else_idx), line, col)
     }
     if (parser_text(parser) != "else")
     {
@@ -660,7 +663,7 @@ pub fn parse_if_expr(parser: &Parser): i32
     parser_advance(parser)
     let else_idx = parse_if_expr_body(parser)
     if (parser.ok == 0) { return -1 }
-    return parser_expr_at(parser, ast_expr_if(parser.expr_store, cond_idx, then_idx, else_idx), line, col)
+    return parser_expr_at(parser, ast::ast_expr_if(parser.expr_store, cond_idx, then_idx, else_idx), line, col)
 }
 
 pub fn parse_block_expression(parser: &Parser): i32
@@ -675,17 +678,17 @@ pub fn parse_block_expression(parser: &Parser): i32
         if (parser_text(parser) == "}" or parser_at_end(parser) == 1) { break }
         let text = parser_text(parser)
         let mut is_stmt_start = if (text == "let" or text == "return" or text == "print" or text == "while" or text == "for" or text == "break" or text == "continue" or text == "if" or text == "match" or text == "@") { 1 } else { 0 }
-        if (parser_kind(parser) == tk_ident())
+        if (parser_kind(parser) == lexer::tk_ident())
         {
             let mut next_text = ""
             let mut next_next_text = ""
-            if (parser.pos + 1 < stream_len(parser.stream))
+            if (parser.pos + 1 < lexer::stream_len(parser.stream))
             {
-                next_text = stream_text_at(parser.stream, parser.pos + 1)
+                next_text = lexer::stream_text_at(parser.stream, parser.pos + 1)
             }
-            if (parser.pos + 2 < stream_len(parser.stream))
+            if (parser.pos + 2 < lexer::stream_len(parser.stream))
             {
-                next_next_text = stream_text_at(parser.stream, parser.pos + 2)
+                next_next_text = lexer::stream_text_at(parser.stream, parser.pos + 2)
             }
             if (next_text == "=" or next_text == "+=" or next_text == "-=") { is_stmt_start = 1 }
             if (next_text == "}" or next_text == "else" or (next_text == ";" and (next_next_text == "}" or next_next_text == "else")))
@@ -696,36 +699,36 @@ pub fn parse_block_expression(parser: &Parser): i32
             {
                 // scan past the full module path to find what follows
                 let mut scan_pos = parser.pos + 2
-                while (scan_pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, scan_pos + 1) == "::")
+                while (scan_pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_text_at(parser.stream, scan_pos + 1) == "::")
                 {
                     scan_pos += 2
                 }
                 let mut after_path = ""
-                if (scan_pos + 1 < stream_len(parser.stream))
+                if (scan_pos + 1 < lexer::stream_len(parser.stream))
                 {
-                    after_path = stream_text_at(parser.stream, scan_pos + 1)
+                    after_path = lexer::stream_text_at(parser.stream, scan_pos + 1)
                 }
                 if (after_path == "(")
                 {
                     let mut scan_pos2 = scan_pos + 2
                     let mut paren_depth2 = 1
-                    while (scan_pos2 < stream_len(parser.stream) and paren_depth2 > 0)
+                    while (scan_pos2 < lexer::stream_len(parser.stream) and paren_depth2 > 0)
                     {
-                        let scan_text2 = stream_text_at(parser.stream, scan_pos2)
+                        let scan_text2 = lexer::stream_text_at(parser.stream, scan_pos2)
                         if (scan_text2 == "(") { paren_depth2 += 1 }
                         elif (scan_text2 == ")") { paren_depth2 -= 1 }
                         scan_pos2 += 1
                     }
                     let mut after_call2 = ""
-                    if (scan_pos2 < stream_len(parser.stream))
+                    if (scan_pos2 < lexer::stream_len(parser.stream))
                     {
-                        after_call2 = stream_text_at(parser.stream, scan_pos2)
+                        after_call2 = lexer::stream_text_at(parser.stream, scan_pos2)
                     }
                     if (after_call2 == "+" or after_call2 == "-" or after_call2 == "*" or after_call2 == "/" or after_call2 == "==" or after_call2 == "!=" or after_call2 == "<" or after_call2 == "<=" or after_call2 == ">" or after_call2 == ">=" or after_call2 == "and" or after_call2 == "or")
                     {
                         is_stmt_start = 0
                     }
-                    elif (scan_pos2 >= stream_len(parser.stream) or (after_call2 != "}" and after_call2 != "else"))
+                    elif (scan_pos2 >= lexer::stream_len(parser.stream) or (after_call2 != "}" and after_call2 != "else"))
                     {
                         is_stmt_start = 1
                     }
@@ -739,23 +742,23 @@ pub fn parse_block_expression(parser: &Parser): i32
             {
                 let mut scan_pos = parser.pos + 2
                 let mut paren_depth = 1
-                while (scan_pos < stream_len(parser.stream) and paren_depth > 0)
+                while (scan_pos < lexer::stream_len(parser.stream) and paren_depth > 0)
                 {
-                    let scan_text = stream_text_at(parser.stream, scan_pos)
+                    let scan_text = lexer::stream_text_at(parser.stream, scan_pos)
                     if (scan_text == "(") { paren_depth += 1 }
                     elif (scan_text == ")") { paren_depth -= 1 }
                     scan_pos += 1
                 }
                 let mut after_call = ""
-                if (scan_pos < stream_len(parser.stream))
+                if (scan_pos < lexer::stream_len(parser.stream))
                 {
-                    after_call = stream_text_at(parser.stream, scan_pos)
+                    after_call = lexer::stream_text_at(parser.stream, scan_pos)
                 }
                 if (after_call == "+" or after_call == "-" or after_call == "*" or after_call == "/" or after_call == "==" or after_call == "!=" or after_call == "<" or after_call == "<=" or after_call == ">" or after_call == ">=" or after_call == "and" or after_call == "or")
                 {
                     is_stmt_start = 0
                 }
-                elif (scan_pos >= stream_len(parser.stream) or (after_call != "}" and after_call != "else"))
+                elif (scan_pos >= lexer::stream_len(parser.stream) or (after_call != "}" and after_call != "else"))
                 {
                     is_stmt_start = 1
                 }
@@ -768,8 +771,8 @@ pub fn parse_block_expression(parser: &Parser): i32
             parser_accept_text(parser, ";")
             parser_expect_text(parser, "}")
             if (parser.ok == 0) { return -1 }
-            let block_idx = parser_stmt_at(parser, ast_stmt_block_indices(parser.store, indices), line, col)
-            return parser_expr_at(parser, ast_expr_block_value(parser.expr_store, block_idx, value_idx), line, col)
+            let block_idx = parser_stmt_at(parser, ast::ast_stmt_block_indices(parser.store, indices), line, col)
+            return parser_expr_at(parser, ast::ast_expr_block_value(parser.expr_store, block_idx, value_idx), line, col)
         }
         let before_pos = parser.pos
         let stmt_idx = parse_statement(parser)
@@ -783,44 +786,44 @@ pub fn parse_block_expression(parser: &Parser): i32
     }
     parser_expect_text(parser, "}")
     if (parser.ok == 0) { return -1 }
-    let block_idx = parser_stmt_at(parser, ast_stmt_block_indices(parser.store, indices), line, col)
-    return parser_expr_at(parser, ast_expr_block(parser.expr_store, block_idx), line, col)
+    let block_idx = parser_stmt_at(parser, ast::ast_stmt_block_indices(parser.store, indices), line, col)
+    return parser_expr_at(parser, ast::ast_expr_block(parser.expr_store, block_idx), line, col)
 }
 
 pub fn parse_primary(parser: &Parser): i32
 {
     let kind = parser_kind(parser)
-    if (kind == tk_number())
+    if (kind == lexer::tk_number())
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         let val = parser_int(parser)
         parser_advance(parser)
-        return parser_expr_at(parser, ast_expr_int(parser.expr_store, val), line, col)
+        return parser_expr_at(parser, ast::ast_expr_int(parser.expr_store, val), line, col)
     }
-    if (kind == tk_float())
+    if (kind == lexer::tk_float())
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         let val = parser_float(parser)
         parser_advance(parser)
-        return parser_expr_at(parser, ast_expr_float(parser.expr_store, val), line, col)
+        return parser_expr_at(parser, ast::ast_expr_float(parser.expr_store, val), line, col)
     }
-    if (kind == tk_bool())
+    if (kind == lexer::tk_bool())
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         let val = parser_int(parser)
         parser_advance(parser)
-        return parser_expr_at(parser, ast_expr_bool(parser.expr_store, val), line, col)
+        return parser_expr_at(parser, ast::ast_expr_bool(parser.expr_store, val), line, col)
     }
-    if (kind == tk_string())
+    if (kind == lexer::tk_string())
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
         let text = parser_text(parser)
         parser_advance(parser)
-        return parser_expr_at(parser, ast_expr_string(parser.expr_store, text), line, col)
+        return parser_expr_at(parser, ast::ast_expr_string(parser.expr_store, text), line, col)
     }
     if (parser_text(parser) == "fn")
     {
@@ -835,7 +838,7 @@ pub fn parse_primary(parser: &Parser): i32
             {
                 while (1 == 1)
                 {
-                    if (parser_kind(parser) != tk_ident())
+                    if (parser_kind(parser) != lexer::tk_ident())
                     {
                         parser_fail(parser, "expected capture identifier, got '" + parser_text(parser) + "'")
                         return -1
@@ -904,16 +907,16 @@ pub fn parse_primary(parser: &Parser): i32
         if (parser.ok == 0) return -1
         let body_expr = if (parser_text(parser) == "{") parse_block_expression(parser) else parse_expression(parser)
         if (parser.ok == 0) return -1
-        let fn_name = "__lambda_" + parser.current_function + "_" + ast_i32(parser.lambda_counter)
+        let fn_name = "__lambda_" + parser.current_function + "_" + ast::ast_i32(parser.lambda_counter)
         parser.lambda_counter += 1
-        let body_ast = expr_store_get(parser.expr_store, body_expr)
+        let body_ast = ast::expr_store_get(parser.expr_store, body_expr)
         let mut body_stmt = -1
         if (body_ast.tag == "block_expr")
         {
             body_stmt = body_ast.left_idx
             if (body_ast.right_idx >= 0)
             {
-                let block_stmt = stmt_store_get(parser.store, body_ast.left_idx)
+                let block_stmt = ast::stmt_store_get(parser.store, body_ast.left_idx)
                 let mut indices: [i32] = []
                 if (block_stmt.stmt_indices.length > 0)
                 {
@@ -929,15 +932,15 @@ pub fn parse_primary(parser: &Parser): i32
                         indices.push(block_stmt.block_start + i)
                     }
                 }
-                indices.push(ast_stmt_return_expr(parser.store, body_ast.right_idx))
-                body_stmt = ast_stmt_block_indices(parser.store, indices)
+                indices.push(ast::ast_stmt_return_expr(parser.store, body_ast.right_idx))
+                body_stmt = ast::ast_stmt_block_indices(parser.store, indices)
             }
         }
-        else body_stmt = ast_stmt_return_expr(parser.store, body_expr)
-        parser.lambda_functions.push(ast_function_with_loc(ast_function_full(fn_name, ret_ty, body_stmt, param_names, param_types), line, col))
-        return parser_expr_at(parser, ast_expr_lambda_captured(parser.expr_store, fn_name, param_names, param_types, ret_ty, body_expr, capture_names), line, col)
+        else body_stmt = ast::ast_stmt_return_expr(parser.store, body_expr)
+        parser.lambda_functions.push(ast::ast_function_with_loc(ast::ast_function_full(fn_name, ret_ty, body_stmt, param_names, param_types), line, col))
+        return parser_expr_at(parser, ast::ast_expr_lambda_captured(parser.expr_store, fn_name, param_names, param_types, ret_ty, body_expr, capture_names), line, col)
     }
-    if (kind == tk_ident())
+    if (kind == lexer::tk_ident())
     {
         let line = parser_line(parser)
         let col = parser_col(parser)
@@ -960,7 +963,7 @@ pub fn parse_primary(parser: &Parser): i32
         }
         if (name == "None")
         {
-            return parser_expr_at(parser, ast_expr_none(parser.expr_store), line, col)
+            return parser_expr_at(parser, ast::ast_expr_none(parser.expr_store), line, col)
         }
         if (parser_generic_call_ahead(parser) == 1)
         {
@@ -982,7 +985,7 @@ pub fn parse_primary(parser: &Parser): i32
             }
             parser_expect_text(parser, ")")
             if (parser.ok == 0) { return -1 }
-            return parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, args), line, col)
+            return parser_expr_at(parser, ast::ast_expr_call_generic(parser.expr_store, name, type_args, args), line, col)
         }
         if (parser_text(parser) == "{")
         {
@@ -997,7 +1000,7 @@ pub fn parse_primary(parser: &Parser): i32
                     continue
                 }
                 let field_name = parser_text(parser)
-                if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
+                if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return -1 }
                 if (parser_text(parser) != ":" and parser_text(parser) != "=")
                 {
                     parser_fail(parser, "expected ':' or '=' in struct field initializer, got '" + parser_text(parser) + "'")
@@ -1012,7 +1015,7 @@ pub fn parse_primary(parser: &Parser): i32
             }
             parser_expect_text(parser, "}")
             if (parser.ok == 0) { return -1 }
-            return parser_expr_at(parser, ast_expr_struct_literal(parser.expr_store, name, field_names, field_values), line, col)
+            return parser_expr_at(parser, ast::ast_expr_struct_literal(parser.expr_store, name, field_names, field_values), line, col)
         }
         if (parser_text(parser) == "(")
         {
@@ -1040,11 +1043,11 @@ pub fn parse_primary(parser: &Parser): i32
                     parser_fail(parser, "Some expects one argument")
                     return -1
                 }
-                return parser_expr_at(parser, ast_expr_some(parser.expr_store, args[0]), line, col)
+                return parser_expr_at(parser, ast::ast_expr_some(parser.expr_store, args[0]), line, col)
             }
-            return parser_expr_at(parser, ast_expr_call(parser.expr_store, name, args), line, col)
+            return parser_expr_at(parser, ast::ast_expr_call(parser.expr_store, name, args), line, col)
         }
-        return parser_expr_at(parser, ast_expr_identifier(parser.expr_store, name), line, col)
+        return parser_expr_at(parser, ast::ast_expr_identifier(parser.expr_store, name), line, col)
     }
     
     if (parser_text(parser) == "nil")
@@ -1052,7 +1055,7 @@ pub fn parse_primary(parser: &Parser): i32
         let line = parser_line(parser)
         let col = parser_col(parser)
         parser_advance(parser)
-        return parser_expr_at(parser, ast_expr_int(parser.expr_store, 0), line, col)
+        return parser_expr_at(parser, ast::ast_expr_int(parser.expr_store, 0), line, col)
     }
     if (parser_text(parser) == "(")
     {
@@ -1083,7 +1086,7 @@ pub fn parse_primary(parser: &Parser): i32
         }
         parser_expect_text(parser, "]")
         if (parser.ok == 0) { return -1 }
-        return parser_expr_at(parser, ast_expr_array(parser.expr_store, elements), line, col)
+        return parser_expr_at(parser, ast::ast_expr_array(parser.expr_store, elements), line, col)
     }
     if (parser_text(parser) == "match")
     {
@@ -1103,7 +1106,7 @@ pub fn parse_primary(parser: &Parser): i32
 
 pub fn parse_statement_ident(parser: &Parser): i32
 {
-    if (parser_kind(parser) != tk_ident())
+    if (parser_kind(parser) != lexer::tk_ident())
     {
         parser_fail(parser, "unexpected statement: '" + parser_text(parser) + "'")
         return -1
@@ -1148,13 +1151,13 @@ pub fn parse_statement_ident(parser: &Parser): i32
         parser_expect_text(parser, ")")
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        let call_idx = parser_expr_at(parser, ast_expr_call_generic(parser.expr_store, name, type_args, args), line, col)
-        return parser_stmt_at(parser, ast_stmt_expr(parser.store, call_idx), line, col)
+        let call_idx = parser_expr_at(parser, ast::ast_expr_call_generic(parser.expr_store, name, type_args, args), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_expr(parser.store, call_idx), line, col)
     }
     let op = parser_text(parser)
     if (op == ".")
     {
-        let ident_idx = parser_expr_at(parser, ast_expr_identifier(parser.expr_store, name), line, col)
+        let ident_idx = parser_expr_at(parser, ast::ast_expr_identifier(parser.expr_store, name), line, col)
         let expr_idx = parse_postfix_from(parser, ident_idx)
         if (parser.ok == 0) { return -1 }
         if (parser_text(parser) == "=")
@@ -1163,12 +1166,12 @@ pub fn parse_statement_ident(parser: &Parser): i32
             let val_idx = parse_expression(parser)
             if (parser.ok == 0) { return -1 }
             parser_accept_text(parser, ";")
-            let field_expr = expr_store_get(parser.expr_store, expr_idx)
+            let field_expr = ast::expr_store_get(parser.expr_store, expr_idx)
             if (field_expr.tag == "index")
             {
-                return parser_stmt_at(parser, ast_stmt_store_index(parser.store, field_expr.left_idx, field_expr.right_idx, val_idx), line, col)
+                return parser_stmt_at(parser, ast::ast_stmt_store_index(parser.store, field_expr.left_idx, field_expr.right_idx, val_idx), line, col)
             }
-            return parser_stmt_at(parser, ast_stmt_field_assign(parser.store, field_expr.left_idx, field_expr.text, val_idx), line, col)
+            return parser_stmt_at(parser, ast::ast_stmt_field_assign(parser.store, field_expr.left_idx, field_expr.text, val_idx), line, col)
         }
         if (parser_text(parser) == "+=")
         {
@@ -1176,9 +1179,9 @@ pub fn parse_statement_ident(parser: &Parser): i32
             let rhs_idx = parse_expression(parser)
             if (parser.ok == 0) { return -1 }
             parser_accept_text(parser, ";")
-            let field_expr = expr_store_get(parser.expr_store, expr_idx)
-            let add_idx = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "+", expr_idx, rhs_idx), line, col)
-            return parser_stmt_at(parser, ast_stmt_field_assign(parser.store, field_expr.left_idx, field_expr.text, add_idx), line, col)
+            let field_expr = ast::expr_store_get(parser.expr_store, expr_idx)
+            let add_idx = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "+", expr_idx, rhs_idx), line, col)
+            return parser_stmt_at(parser, ast::ast_stmt_field_assign(parser.store, field_expr.left_idx, field_expr.text, add_idx), line, col)
         }
         if (parser_text(parser) == "-=")
         {
@@ -1186,12 +1189,12 @@ pub fn parse_statement_ident(parser: &Parser): i32
             let rhs_idx = parse_expression(parser)
             if (parser.ok == 0) { return -1 }
             parser_accept_text(parser, ";")
-            let field_expr = expr_store_get(parser.expr_store, expr_idx)
-            let sub_idx = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "-", expr_idx, rhs_idx), line, col)
-            return parser_stmt_at(parser, ast_stmt_field_assign(parser.store, field_expr.left_idx, field_expr.text, sub_idx), line, col)
+            let field_expr = ast::expr_store_get(parser.expr_store, expr_idx)
+            let sub_idx = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "-", expr_idx, rhs_idx), line, col)
+            return parser_stmt_at(parser, ast::ast_stmt_field_assign(parser.store, field_expr.left_idx, field_expr.text, sub_idx), line, col)
         }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_expr(parser.store, expr_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_expr(parser.store, expr_idx), line, col)
     }
     if (op == "[")
     {
@@ -1200,13 +1203,13 @@ pub fn parse_statement_ident(parser: &Parser): i32
         if (parser.ok == 0) { return -1 }
         parser_expect_text(parser, "]")
         if (parser.ok == 0) { return -1 }
-        let ident_idx = parser_expr_at(parser, ast_expr_identifier(parser.expr_store, name), line, col)
+        let ident_idx = parser_expr_at(parser, ast::ast_expr_identifier(parser.expr_store, name), line, col)
         parser_expect_text(parser, "=")
         if (parser.ok == 0) { return -1 }
         let expr_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_store_index(parser.store, ident_idx, index_idx, expr_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_store_index(parser.store, ident_idx, index_idx, expr_idx), line, col)
     }
     if (op == "=")
     {
@@ -1214,7 +1217,7 @@ pub fn parse_statement_ident(parser: &Parser): i32
         let expr_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_assign(parser.store, name, expr_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_assign(parser.store, name, expr_idx), line, col)
     }
     if (op == "+=")
     {
@@ -1222,9 +1225,9 @@ pub fn parse_statement_ident(parser: &Parser): i32
         let rhs_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        let ident_idx = parser_expr_at(parser, ast_expr_identifier(parser.expr_store, name), line, col)
-        let binop_idx = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "+", ident_idx, rhs_idx), line, col)
-        return parser_stmt_at(parser, ast_stmt_assign(parser.store, name, binop_idx), line, col)
+        let ident_idx = parser_expr_at(parser, ast::ast_expr_identifier(parser.expr_store, name), line, col)
+        let binop_idx = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "+", ident_idx, rhs_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_assign(parser.store, name, binop_idx), line, col)
     }
     if (op == "-=")
     {
@@ -1232,9 +1235,9 @@ pub fn parse_statement_ident(parser: &Parser): i32
         let rhs_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        let ident_idx = parser_expr_at(parser, ast_expr_identifier(parser.expr_store, name), line, col)
-        let binop_idx = parser_expr_at(parser, ast_expr_binop(parser.expr_store, "-", ident_idx, rhs_idx), line, col)
-        return parser_stmt_at(parser, ast_stmt_assign(parser.store, name, binop_idx), line, col)
+        let ident_idx = parser_expr_at(parser, ast::ast_expr_identifier(parser.expr_store, name), line, col)
+        let binop_idx = parser_expr_at(parser, ast::ast_expr_binop(parser.expr_store, "-", ident_idx, rhs_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_assign(parser.store, name, binop_idx), line, col)
     }
     if (op == "(")
     {
@@ -1256,8 +1259,8 @@ pub fn parse_statement_ident(parser: &Parser): i32
         parser_expect_text(parser, ")")
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        let call_idx = parser_expr_at(parser, ast_expr_call(parser.expr_store, name, args), line, col)
-        return parser_stmt_at(parser, ast_stmt_expr(parser.store, call_idx), line, col)
+        let call_idx = parser_expr_at(parser, ast::ast_expr_call(parser.expr_store, name, args), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_expr(parser.store, call_idx), line, col)
     }
     parser_fail(parser, "unexpected token after identifier: '" + op + "'")
     return -1
@@ -1287,7 +1290,7 @@ pub fn parse_block_statement(parser: &Parser): i32
         indices.push(stmt_idx)
     }
     if (parser_expect_text(parser, "}") == 0) { return -1 }
-    return parser_stmt_at(parser, ast_stmt_block_indices(parser.store, indices), line, col)
+    return parser_stmt_at(parser, ast::ast_stmt_block_indices(parser.store, indices), line, col)
 }
 
 // Parse the one expression-like operation allowed after `=>` in statement
@@ -1320,8 +1323,8 @@ pub fn parse_arrow_statement_body(parser: &Parser): i32
     let body_line = parser_line(parser)
     let body_col = parser_col(parser)
     let mut stmt_idx = -1
-    let next = stream_text_at(parser.stream, parser.pos + 1)
-    if (text == "print" or (parser_kind(parser) == tk_ident() and (next == "=" or next == "+=" or next == "-=")))
+    let next = lexer::stream_text_at(parser.stream, parser.pos + 1)
+    if (text == "print" or (parser_kind(parser) == lexer::tk_ident() and (next == "=" or next == "+=" or next == "-=")))
     {
         stmt_idx = parse_statement(parser)
     }
@@ -1330,10 +1333,10 @@ pub fn parse_arrow_statement_body(parser: &Parser): i32
         let expr_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        stmt_idx = parser_stmt_at(parser, ast_stmt_expr(parser.store, expr_idx), body_line, body_col)
+        stmt_idx = parser_stmt_at(parser, ast::ast_stmt_expr(parser.store, expr_idx), body_line, body_col)
     }
     if (parser.ok == 0) { return -1 }
-    return parser_stmt_at(parser, ast_stmt_block_indices(parser.store, [stmt_idx]), arrow_line, arrow_col)
+    return parser_stmt_at(parser, ast::ast_stmt_block_indices(parser.store, [stmt_idx]), arrow_line, arrow_col)
 }
 
 pub fn parse_if_statement_body(parser: &Parser): i32
@@ -1350,7 +1353,7 @@ pub fn parse_if_statement_body(parser: &Parser): i32
     let col = parser_col(parser)
     let stmt_idx = parse_statement(parser)
     if (parser.ok == 0) { return -1 }
-    return parser_stmt_at(parser, ast_stmt_block_indices(parser.store, [stmt_idx]), line, col)
+    return parser_stmt_at(parser, ast::ast_stmt_block_indices(parser.store, [stmt_idx]), line, col)
 }
 
 pub fn parse_if_rest(parser: &Parser): i32
@@ -1394,7 +1397,7 @@ pub fn parse_if_statement(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     let else_idx = parse_if_rest(parser)
     if (parser.ok == 0) { return -1 }
-    return parser_stmt_at(parser, ast_stmt_if(parser.store, cond_idx, then_idx, else_idx), line, col)
+    return parser_stmt_at(parser, ast::ast_stmt_if(parser.store, cond_idx, then_idx, else_idx), line, col)
 }
 
 pub fn parse_for_statement(parser: &Parser): i32
@@ -1407,7 +1410,7 @@ pub fn parse_for_statement(parser: &Parser): i32
     let name_line = parser_line(parser)
     let name_col = parser_col(parser)
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
+    if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return -1 }
     parser_expect_text(parser, "in")
     if (parser.ok == 0) { return -1 }
     let start_idx = parse_expression(parser)
@@ -1417,13 +1420,13 @@ pub fn parse_for_statement(parser: &Parser): i32
         parser_advance(parser)
         let body_idx = if (parser_text(parser) == "=>" or parser_text(parser) == "->") parse_arrow_statement_body(parser) else parse_block_statement(parser)
         if (parser.ok == 0) { return -1 }
-        let synthetic = "__for_each_i" + ast_i32(parser.store.stmts.length)
-        let zero_idx = ast_expr_int(parser.expr_store, 0)
-        let length_idx = ast_expr_field(parser.expr_store, start_idx, "length")
-        let iter_idx = ast_expr_identifier(parser.expr_store, synthetic)
-        let item_idx = ast_expr_index(parser.expr_store, start_idx, iter_idx)
-        let bind_idx = ast_stmt_let_typed_mut(parser.store, name, "", item_idx, 0)
-        let body = stmt_store_get(parser.store, body_idx)
+        let synthetic = "__for_each_i" + ast::ast_i32(parser.store.stmts.length)
+        let zero_idx = ast::ast_expr_int(parser.expr_store, 0)
+        let length_idx = ast::ast_expr_field(parser.expr_store, start_idx, "length")
+        let iter_idx = ast::ast_expr_identifier(parser.expr_store, synthetic)
+        let item_idx = ast::ast_expr_index(parser.expr_store, start_idx, iter_idx)
+        let bind_idx = ast::ast_stmt_let_typed_mut(parser.store, name, "", item_idx, 0)
+        let body = ast::stmt_store_get(parser.store, body_idx)
         let mut body_indices: [i32] = [bind_idx]
         if (body.stmt_indices.length > 0)
         {
@@ -1433,8 +1436,8 @@ pub fn parse_for_statement(parser: &Parser): i32
         {
             for (i in 0 .. body.block_count) { body_indices.push(body.block_start + i) }
         }
-        let combined_body = ast_stmt_block_indices(parser.store, body_indices)
-        return parser_stmt_at(parser, ast_stmt_for_range(parser.store, synthetic, zero_idx, length_idx, combined_body), name_line, name_col)
+        let combined_body = ast::ast_stmt_block_indices(parser.store, body_indices)
+        return parser_stmt_at(parser, ast::ast_stmt_for_range(parser.store, synthetic, zero_idx, length_idx, combined_body), name_line, name_col)
     }
     parser_expect_text(parser, "..")
     if (parser.ok == 0) { return -1 }
@@ -1444,7 +1447,7 @@ pub fn parse_for_statement(parser: &Parser): i32
     if (parser.ok == 0) { return -1 }
     let body_idx = if (parser_text(parser) == "=>" or parser_text(parser) == "->") parse_arrow_statement_body(parser) else parse_block_statement(parser)
     if (parser.ok == 0) { return -1 }
-    return parser_stmt_at(parser, ast_stmt_for_range(parser.store, name, start_idx, end_idx, body_idx), name_line, name_col)
+    return parser_stmt_at(parser, ast::ast_stmt_for_range(parser.store, name, start_idx, end_idx, body_idx), name_line, name_col)
 }
 
 pub fn parse_match_pattern(parser: &Parser): i32
@@ -1474,18 +1477,18 @@ pub fn parse_match_arms_desugared(parser: &Parser, subject_name: string): i32
     }
     if (parser_text(parser) == "}" or parser_at_end(parser) == 1)
     {
-        return ast_stmt_block_indices(parser.store, [])
+        return ast::ast_stmt_block_indices(parser.store, [])
     }
 
     let first_pattern = parse_match_pattern(parser)
     if (parser.ok == 0) { return -1 }
     let mut is_default = 0
     if (first_pattern < 0) { is_default = 1 }
-    let subject_expr = ast_expr_identifier(parser.expr_store, subject_name)
+    let subject_expr = ast::ast_expr_identifier(parser.expr_store, subject_name)
     let mut cond_idx = -1
     if (is_default == 0)
     {
-        cond_idx = ast_expr_binop(parser.expr_store, "==", subject_expr, first_pattern)
+        cond_idx = ast::ast_expr_binop(parser.expr_store, "==", subject_expr, first_pattern)
     }
     while (parser_text(parser) == "|")
     {
@@ -1498,15 +1501,15 @@ pub fn parse_match_arms_desugared(parser: &Parser, subject_name: string): i32
         }
         else
         {
-            let next_subject_expr = ast_expr_identifier(parser.expr_store, subject_name)
-            let next_cond = ast_expr_binop(parser.expr_store, "==", next_subject_expr, next_pattern)
+            let next_subject_expr = ast::ast_expr_identifier(parser.expr_store, subject_name)
+            let next_cond = ast::ast_expr_binop(parser.expr_store, "==", next_subject_expr, next_pattern)
             if (cond_idx < 0)
             {
                 cond_idx = next_cond
             }
             else
             {
-                cond_idx = ast_expr_binop(parser.expr_store, "or", cond_idx, next_cond)
+                cond_idx = ast::ast_expr_binop(parser.expr_store, "or", cond_idx, next_cond)
             }
         }
     }
@@ -1525,8 +1528,8 @@ pub fn parse_match_arms_desugared(parser: &Parser, subject_name: string): i32
     }
     let else_idx = parse_match_arms_desugared(parser, subject_name)
     if (parser.ok == 0) { return -1 }
-    let cond = expr_store_get(parser.expr_store, cond_idx)
-    return parser_stmt_at(parser, ast_stmt_if(parser.store, cond_idx, body_idx, else_idx), cond.line, cond.col)
+    let cond = ast::expr_store_get(parser.expr_store, cond_idx)
+    return parser_stmt_at(parser, ast::ast_stmt_if(parser.store, cond_idx, body_idx, else_idx), cond.line, cond.col)
 }
 
 pub fn parse_match_statement(parser: &Parser): i32
@@ -1536,11 +1539,11 @@ pub fn parse_match_statement(parser: &Parser): i32
     parser_expect_text(parser, "match")
     if (parser.ok == 0) { return -1 }
     let mut subject_idx = -1
-    if ((parser_kind(parser) == tk_ident() or parser_kind(parser) == tk_keyword()) and stream_text_at(parser.stream, parser.pos + 1) == "{")
+    if ((parser_kind(parser) == lexer::tk_ident() or parser_kind(parser) == lexer::tk_keyword()) and lexer::stream_text_at(parser.stream, parser.pos + 1) == "{")
     {
         let subject_name = parser_text(parser)
         parser_advance(parser)
-        subject_idx = ast_expr_identifier(parser.expr_store, subject_name)
+        subject_idx = ast::ast_expr_identifier(parser.expr_store, subject_name)
     }
     else
     {
@@ -1579,7 +1582,7 @@ pub fn parse_match_statement(parser: &Parser): i32
     }
     parser_expect_text(parser, "}")
     if (parser.ok == 0) { return -1 }
-    return parser_stmt_at(parser, ast_stmt_match_indices(parser.store, subject_idx, patterns, bodies), line, col)
+    return parser_stmt_at(parser, ast::ast_stmt_match_indices(parser.store, subject_idx, patterns, bodies), line, col)
 }
 
 pub fn parse_statement(parser: &Parser): i32
@@ -1602,7 +1605,7 @@ pub fn parse_statement(parser: &Parser): i32
         let expr_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_store_deref(parser.store, pointer_idx, expr_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_store_deref(parser.store, pointer_idx, expr_idx), line, col)
     }
     if (stmt_text == "let")
     {
@@ -1616,7 +1619,7 @@ pub fn parse_statement(parser: &Parser): i32
         let name_line = parser_line(parser)
         let name_col = parser_col(parser)
         let name = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0) { return -1 }
+        if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return -1 }
         let mut type_text = ""
         let mut has_type = 0
         if (parser_text(parser) == ":")
@@ -1629,7 +1632,7 @@ pub fn parse_statement(parser: &Parser): i32
         if (parser_text(parser) != "=" and has_type == 1)
         {
             parser_accept_text(parser, ";")
-            return parser_stmt_at(parser, ast_stmt_let_typed_mut(parser.store, name, type_text, ast_expr_array(parser.expr_store, []), is_mut), name_line, name_col)
+            return parser_stmt_at(parser, ast::ast_stmt_let_typed_mut(parser.store, name, type_text, ast::ast_expr_array(parser.expr_store, []), is_mut), name_line, name_col)
         }
         parser_expect_text(parser, "=")
         if (parser.ok == 0) { return -1 }
@@ -1642,7 +1645,7 @@ pub fn parse_statement(parser: &Parser): i32
             if (parser.ok == 0) { return -1 }
         }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_let_typed_mut(parser.store, name, type_text, expr_idx, is_mut), name_line, name_col)
+        return parser_stmt_at(parser, ast::ast_stmt_let_typed_mut(parser.store, name, type_text, expr_idx, is_mut), name_line, name_col)
     }
     if (stmt_text == "return")
     {
@@ -1650,12 +1653,12 @@ pub fn parse_statement(parser: &Parser): i32
         if (parser_text(parser) == ";" or parser_text(parser) == "}" or parser_at_end(parser) == 1)
         {
             parser_accept_text(parser, ";")
-            return parser_stmt_at(parser, ast_stmt_return(parser.store, parser.expr_store, 0), line, col)
+            return parser_stmt_at(parser, ast::ast_stmt_return(parser.store, parser.expr_store, 0), line, col)
         }
         let expr_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_return_expr(parser.store, expr_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_return_expr(parser.store, expr_idx), line, col)
     }
     if (stmt_text == "print")
     {
@@ -1667,7 +1670,7 @@ pub fn parse_statement(parser: &Parser): i32
         parser_expect_text(parser, ")")
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_print(parser.store, expr_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_print(parser.store, expr_idx), line, col)
     }
     if (stmt_text == "while")
     {
@@ -1680,7 +1683,7 @@ pub fn parse_statement(parser: &Parser): i32
         if (parser.ok == 0) { return -1 }
         let body_idx = if (parser_text(parser) == "=>" or parser_text(parser) == "->") parse_arrow_statement_body(parser) else parse_block_statement(parser)
         if (parser.ok == 0) { return -1 }
-        return parser_stmt_at(parser, ast_stmt_while(parser.store, cond_idx, body_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_while(parser.store, cond_idx, body_idx), line, col)
     }
     if (stmt_text == "if") { return parse_if_statement(parser) }
     if (stmt_text == "for") { return parse_for_statement(parser) }
@@ -1688,39 +1691,45 @@ pub fn parse_statement(parser: &Parser): i32
     {
         parser_advance(parser)
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_loop_control(parser.store, stmt_text), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_loop_control(parser.store, stmt_text), line, col)
     }
-    if (parser_kind(parser) == tk_number() or parser_kind(parser) == tk_string() or parser_kind(parser) == tk_float() or parser_kind(parser) == tk_bool() or parser_text(parser) == "nil" or parser_text(parser) == "(" or parser_text(parser) == "-" or parser_text(parser) == "!" or parser_text(parser) == "match" or parser_text(parser) == "if")
+    if (parser_kind(parser) == lexer::tk_number() or parser_kind(parser) == lexer::tk_string() or parser_kind(parser) == lexer::tk_float() or parser_kind(parser) == lexer::tk_bool() or parser_text(parser) == "nil" or parser_text(parser) == "(" or parser_text(parser) == "-" or parser_text(parser) == "!" or parser_text(parser) == "match" or parser_text(parser) == "if")
     {
         let expr_idx = parse_expression(parser)
         if (parser.ok == 0) { return -1 }
         parser_accept_text(parser, ";")
-        return parser_stmt_at(parser, ast_stmt_expr(parser.store, expr_idx), line, col)
+        return parser_stmt_at(parser, ast::ast_stmt_expr(parser.store, expr_idx), line, col)
     }
     return parse_statement_ident(parser)
 }
 
-pub fn parse_type_text(parser: &Parser): string
+pub fn parse_type(parser: &Parser): i32
 {
     if (parser_text(parser) == "fn")
     {
         parser_advance(parser)
         parser_expect_text(parser, "(")
-        if (parser.ok == 0) return "unknown"
+        if (parser.ok == 0) { return typepool::unknown() }
         let mut out = "fn("
+        let mut params: [i32] = []
         if (parser_text(parser) != ")")
         {
-            out = out + parse_type_text(parser)
+            let first = parse_type(parser)
+            out = out + typepool::text(first)
+            params.push(first)
             while (parser_text(parser) == ",")
             {
                 parser_advance(parser)
-                out = out + ", " + parse_type_text(parser)
+                let next = parse_type(parser)
+                out = out + ", " + typepool::text(next)
+                params.push(next)
             }
         }
         parser_expect_text(parser, ")")
         parser_expect_text(parser, ":")
-        if (parser.ok == 0) return "unknown"
-        return out + "): " + parse_type_text(parser)
+        if (parser.ok == 0) { return typepool::unknown() }
+        let result = parse_type(parser)
+        return typepool::function_type(out + "): " + typepool::text(result), params, result)
     }
     if (parser_text(parser) == "&" or parser_text(parser) == "ref")
     {
@@ -1731,7 +1740,7 @@ pub fn parse_type_text(parser: &Parser): string
         {
             parser_advance(parser)
             lifetime = parser_text(parser)
-            if (parser_expect_kind(parser, tk_ident()) == 0) return "unknown"
+            if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return typepool::unknown() }
         }
         let mut is_mut = 0
         if (parser_text(parser) == "mut")
@@ -1739,48 +1748,50 @@ pub fn parse_type_text(parser: &Parser): string
             is_mut = 1
             parser_advance(parser)
         }
-        let inner = parse_type_text(parser)
-        if (parser.ok == 0) return "unknown"
-        if (legacy_ref == 1) return "ptr:" + inner
+        let inner = parse_type(parser)
+        if (parser.ok == 0) { return typepool::unknown() }
+        if (legacy_ref == 1) { return typepool::pointer("ptr:" + typepool::text(inner), inner, 0) }
         let mut prefix = "&"
         if (lifetime != "") prefix = prefix + "'" + lifetime + " "
         if (is_mut == 1) prefix = prefix + "mut "
-        return prefix + inner
+        let node = typepool::pointer(prefix + typepool::text(inner), inner, is_mut)
+        typepool::set_ref_info(node, 1, lifetime)
+        return node
     }
     if (parser_text(parser) == "[")
     {
         parser_advance(parser)
-        let inner = parse_type_text(parser)
-        if (parser.ok == 0) { return "unknown" }
+        let inner = parse_type(parser)
+        if (parser.ok == 0) { return typepool::unknown() }
         if (parser_text(parser) == "*")
         {
             parser_advance(parser)
             let count = parser_int(parser)
-            if (parser_expect_kind(parser, tk_number()) == 0) { return "unknown" }
+            if (parser_expect_kind(parser, lexer::tk_number()) == 0) { return typepool::unknown() }
             parser_expect_text(parser, "]")
-            if (parser.ok == 0) { return "unknown" }
-            return "[" + inner + "*" + ast_i32(count) + "]"
+            if (parser.ok == 0) { return typepool::unknown() }
+            return typepool::array("[" + typepool::text(inner) + "*" + ast::ast_i32(count) + "]", inner, count)
         }
         parser_expect_text(parser, "]")
-        if (parser.ok == 0) { return "unknown" }
-        return "[" + inner + "]"
+        if (parser.ok == 0) { return typepool::unknown() }
+        return typepool::slice("[" + typepool::text(inner) + "]", inner)
     }
     if (parser_text(parser) == "?")
     {
         parser_advance(parser)
-        let inner = parse_type_text(parser)
-        if (parser.ok == 0) { return "unknown" }
-        return "Option[" + inner + "]"
+        let inner = parse_type(parser)
+        if (parser.ok == 0) { return typepool::unknown() }
+        return typepool::option_type("Option[" + typepool::text(inner) + "]", inner)
     }
     let mut ty = parser_text(parser)
-    if (parser_kind(parser) != tk_ident() and parser_kind(parser) != tk_keyword())
+    if (parser_kind(parser) != lexer::tk_ident() and parser_kind(parser) != lexer::tk_keyword())
     {
         parser_fail(parser, "expected type name, got '" + ty + "'")
-        return "unknown"
+        return typepool::unknown()
     }
     parser_advance(parser)
     // collect module path segments: math::Vector
-    while (parser_text(parser) == "::" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_ident())
+    while (parser_text(parser) == "::" and parser.pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_kind_at(parser.stream, parser.pos + 1) == lexer::tk_ident())
     {
         parser_advance(parser)
         ty = ty + "::" + parser_text(parser)
@@ -1790,24 +1801,35 @@ pub fn parse_type_text(parser: &Parser): string
     {
         if (parser_text(parser) == ":") { parser_advance(parser) }
         parser_expect_text(parser, "[")
-        if (parser.ok == 0) { return ty }
+        if (parser.ok == 0) { return typepool::named(ty, ty, []) }
         let mut out = ty + ":["
+        let mut args: [i32] = []
         if (parser_text(parser) != "]")
         {
-            out = out + parse_type_text(parser)
-            if (parser.ok == 0) { return "unknown" }
+            let first = parse_type(parser)
+            out = out + typepool::text(first)
+            args.push(first)
+            if (parser.ok == 0) { return typepool::unknown() }
             while (parser_text(parser) == ",")
             {
                 parser_advance(parser)
-                out = out + ", " + parse_type_text(parser)
-                if (parser.ok == 0) { return "unknown" }
+                let next = parse_type(parser)
+                out = out + ", " + typepool::text(next)
+                args.push(next)
+                if (parser.ok == 0) { return typepool::unknown() }
             }
         }
         parser_expect_text(parser, "]")
-        if (parser.ok == 0) { return "unknown" }
-        return out + "]"
+        if (parser.ok == 0) { return typepool::unknown() }
+        return typepool::named(out + "]", ty, args)
     }
-    return ty
+    return typepool::named(ty, ty, [])
+}
+
+// The textual spelling is derived from the pool node, so a type is parsed once.
+pub fn parse_type_text(parser: &Parser): string
+{
+    return typepool::text(parse_type(parser))
 }
 
 pub fn parse_param_name(parser: &Parser): string
@@ -1817,46 +1839,46 @@ pub fn parse_param_name(parser: &Parser): string
         parser_advance(parser)
     }
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return "" }
+    if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return "" }
     return name
 }
 
-pub fn parse_function(parser: &Parser): AstFunction
+pub fn parse_function(parser: &Parser): ast::AstFunction
 {
     let line = parser_line(parser)
     let col = parser_col(parser)
     let mut is_pub = 0
     if (parser_text(parser) == "pub") { is_pub = 1; parser_advance(parser) }
-    if (parser_expect_text(parser, "fn") == 0) { return ast_function("main", "i32", -1) }
+    if (parser_expect_text(parser, "fn") == 0) { return ast::ast_function("main", "i32", -1) }
     let mut receiver_type = ""
     let mut receiver_param_type = ""
-    let mut receiver_kind = receiver_none()
+    let mut receiver_kind = receiver::receiver_none()
     if (parser_text(parser) == "(")
     {
         parser_advance(parser)
         if (parser_text(parser) == "&")
         {
             parser_advance(parser)
-            if (parser_text(parser) == "mut") { parser_advance(parser); receiver_kind = receiver_mut(); receiver_param_type = "&mut " } else { receiver_kind = receiver_shared(); receiver_param_type = "&" }
+            if (parser_text(parser) == "mut") { parser_advance(parser); receiver_kind = receiver::receiver_mut(); receiver_param_type = "&mut " } else { receiver_kind = receiver::receiver_shared(); receiver_param_type = "&" }
         }
-        if (receiver_is_method(receiver_kind) == 0) { receiver_kind = receiver_owned() }
+        if (receiver::receiver_is_method(receiver_kind) == 0) { receiver_kind = receiver::receiver_owned() }
         receiver_type = parse_type_text(parser)
-        if (parser.ok == 0) { return ast_function("main", "i32", -1) }
+        if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
         receiver_param_type = receiver_param_type + receiver_type
-        if (parser_expect_text(parser, ")") == 0) { return ast_function("main", "i32", -1) }
+        if (parser_expect_text(parser, ")") == 0) { return ast::ast_function("main", "i32", -1) }
     }
     let mut name = parser_text(parser)
-    if (parser_kind(parser) != tk_ident())
+    if (parser_kind(parser) != lexer::tk_ident())
     {
         parser_fail_code(parser, "E1001", "expected function or method name after 'fn'")
-        return ast_function("main", "i32", -1)
+        return ast::ast_function("main", "i32", -1)
     }
     parser_advance(parser)
-    if (receiver_type != "") { name = method_qualify(receiver_type, name) }
+    if (receiver_type != "") { name = methods::method_qualify(receiver_type, name) }
     parser.current_function = name
     let type_params = parse_type_params_after_name(parser)
-    if (parser.ok == 0) { return ast_function("main", "i32", -1) }
-    if (parser_expect_text(parser, "(") == 0) { return ast_function("main", "i32", -1) }
+    if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
+    if (parser_expect_text(parser, "(") == 0) { return ast::ast_function("main", "i32", -1) }
 
     let mut param_names: [string] = []
     let mut param_types: [string] = []
@@ -1868,25 +1890,25 @@ pub fn parse_function(parser: &Parser): AstFunction
     if (parser_text(parser) != ")")
     {
         let param_name = parse_param_name(parser)
-        if (parser.ok == 0) { return ast_function("main", "i32", -1) }
-        if (parser_expect_text(parser, ":") == 0) { return ast_function("main", "i32", -1) }
+        if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
+        if (parser_expect_text(parser, ":") == 0) { return ast::ast_function("main", "i32", -1) }
         let param_ty = parse_type_text(parser)
-        if (parser.ok == 0) { return ast_function("main", "i32", -1) }
+        if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
         param_names.push(param_name)
         param_types.push(param_ty)
         while (parser_text(parser) == ",")
         {
             parser_advance(parser)
             let next_name = parse_param_name(parser)
-            if (parser.ok == 0) { return ast_function("main", "i32", -1) }
-            if (parser_expect_text(parser, ":") == 0) { return ast_function("main", "i32", -1) }
+            if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
+            if (parser_expect_text(parser, ":") == 0) { return ast::ast_function("main", "i32", -1) }
             let next_ty = parse_type_text(parser)
-            if (parser.ok == 0) { return ast_function("main", "i32", -1) }
+            if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
             param_names.push(next_name)
             param_types.push(next_ty)
         }
     }
-    if (parser_expect_text(parser, ")") == 0) { return ast_function("main", "i32", -1) }
+    if (parser_expect_text(parser, ")") == 0) { return ast::ast_function("main", "i32", -1) }
     let mut ret_ty = "void"
     if (parser_text(parser) == ":")
     {
@@ -1897,7 +1919,7 @@ pub fn parse_function(parser: &Parser): AstFunction
     if (parser_text(parser) == "->")
     {
         parser_fail_code(parser, "E1001", "expected '=>' or '{' for function body, got '->'; replace '->' with '=>' for an expression body")
-        return ast_function("main", "i32", -1)
+        return ast::ast_function("main", "i32", -1)
     }
     if (parser_text(parser) == "=>")
     {
@@ -1908,32 +1930,32 @@ pub fn parse_function(parser: &Parser): AstFunction
         if (text == ";" or text == "}" or parser_at_end(parser) == 1)
         {
             parser_fail_code(parser, "E1001", "expected expression after '=>', got '" + text + "'; add one return expression after '=>'")
-            return ast_function("main", "i32", -1)
+            return ast::ast_function("main", "i32", -1)
         }
         if (text == "{" or text == "let" or text == "return" or text == "break" or text == "continue" or text == "while" or text == "for" or text == "pub" or text == "type" or text == "struct" or text == "extern" or text == "mod" or text == "import" or text == "print")
         {
             parser_fail_code(parser, "E1002", "expected one return expression after '=>', got '" + text + "'; use a function body '{ ... }' for statements")
-            return ast_function("main", "i32", -1)
+            return ast::ast_function("main", "i32", -1)
         }
         let body_expr = parse_expression(parser)
-        if (parser.ok == 0) { return ast_function("main", "i32", -1) }
+        if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
         parser_accept_text(parser, ";")
-        body_idx = parser_stmt_at(parser, ast_stmt_return_expr(parser.store, body_expr), body_line, body_col)
+        body_idx = parser_stmt_at(parser, ast::ast_stmt_return_expr(parser.store, body_expr), body_line, body_col)
     }
     else
     {
         body_idx = parse_block_statement(parser)
     }
-    if (parser.ok == 0) { return ast_function("main", "i32", -1) }
+    if (parser.ok == 0) { return ast::ast_function("main", "i32", -1) }
     if (body_idx < 0)
     {
-        body_idx = ast_stmt_return(parser.store, parser.expr_store, 0)
+        body_idx = ast::ast_stmt_return(parser.store, parser.expr_store, 0)
     }
-    let function = if (receiver_type == "") { ast_function_generic_full_vararg(name, ret_ty, body_idx, param_names, param_types, type_params, 0) } else { ast_function_method(name, ret_ty, body_idx, param_names, param_types, type_params, receiver_kind, receiver_type) }
-    return ast_function_mark_pub(ast_function_with_loc(function, line, col), is_pub)
+    let function = if (receiver_type == "") { ast::ast_function_generic_full_vararg(name, ret_ty, body_idx, param_names, param_types, type_params, 0) } else { ast::ast_function_method(name, ret_ty, body_idx, param_names, param_types, type_params, receiver_kind, receiver_type) }
+    return ast::ast_function_mark_pub(ast::ast_function_with_loc(function, line, col), is_pub)
 }
 
-pub fn parse_function_params_and_return(parser: &Parser, name: string): AstFunction
+pub fn parse_function_params_and_return(parser: &Parser, name: string): ast::AstFunction
 {
     let mut param_names: [string] = []
     let mut param_types: [string] = []
@@ -1948,10 +1970,10 @@ pub fn parse_function_params_and_return(parser: &Parser, name: string): AstFunct
         else
         {
             let param_name = parse_param_name(parser)
-            if (parser.ok == 0) { return ast_function(name, "i32", -1) }
-            if (parser_expect_text(parser, ":") == 0) { return ast_function(name, "i32", -1) }
+            if (parser.ok == 0) { return ast::ast_function(name, "i32", -1) }
+            if (parser_expect_text(parser, ":") == 0) { return ast::ast_function(name, "i32", -1) }
             let param_ty = parse_type_text(parser)
-            if (parser.ok == 0) { return ast_function(name, "i32", -1) }
+            if (parser.ok == 0) { return ast::ast_function(name, "i32", -1) }
             param_names.push(param_name)
             param_types.push(param_ty)
             while (parser_text(parser) == ",")
@@ -1964,56 +1986,56 @@ pub fn parse_function_params_and_return(parser: &Parser, name: string): AstFunct
                     break
                 }
                 let next_name = parse_param_name(parser)
-                if (parser.ok == 0) { return ast_function(name, "i32", -1) }
-                if (parser_expect_text(parser, ":") == 0) { return ast_function(name, "i32", -1) }
+                if (parser.ok == 0) { return ast::ast_function(name, "i32", -1) }
+                if (parser_expect_text(parser, ":") == 0) { return ast::ast_function(name, "i32", -1) }
                 let next_ty = parse_type_text(parser)
-                if (parser.ok == 0) { return ast_function(name, "i32", -1) }
+                if (parser.ok == 0) { return ast::ast_function(name, "i32", -1) }
                 param_names.push(next_name)
                 param_types.push(next_ty)
             }
         }
     }
-    if (parser_expect_text(parser, ")") == 0) { return ast_function(name, "i32", -1) }
+    if (parser_expect_text(parser, ")") == 0) { return ast::ast_function(name, "i32", -1) }
     let mut ret_ty = "void"
     if (parser_text(parser) == ":")
     {
         parser_advance(parser)
         ret_ty = parse_type_text(parser)
     }
-    return ast_function_full_vararg(name, ret_ty, -1, param_names, param_types, is_var_arg)
+    return ast::ast_function_full_vararg(name, ret_ty, -1, param_names, param_types, is_var_arg)
 }
 
-pub fn parse_extern_function(parser: &Parser): AstFunction
+pub fn parse_extern_function(parser: &Parser): ast::AstFunction
 {
     let line = parser_line(parser)
     let col = parser_col(parser)
-    if (parser_expect_text(parser, "fn") == 0) { return ast_function("", "i32", -1) }
+    if (parser_expect_text(parser, "fn") == 0) { return ast::ast_function("", "i32", -1) }
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return ast_function("", "i32", -1) }
+    if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return ast::ast_function("", "i32", -1) }
     let type_params = parse_type_params_after_name(parser)
-    if (parser.ok == 0) return ast_function(name, "i32", -1)
-    if (parser_expect_text(parser, "(") == 0) { return ast_function(name, "i32", -1) }
+    if (parser.ok == 0) return ast::ast_function(name, "i32", -1)
+    if (parser_expect_text(parser, "(") == 0) { return ast::ast_function(name, "i32", -1) }
     let func = parse_function_params_and_return(parser, name)
     parser_accept_text(parser, ";")
-    return ast_function_with_loc(ast_function_generic_full_vararg(func.name, func.ret_ty, func.body_idx, func.param_names, func.param_types, type_params, func.is_var_arg), line, col)
+    return ast::ast_function_with_loc(ast::ast_function_generic_full_vararg(func.name, func.ret_ty, func.body_idx, func.param_names, func.param_types, type_params, func.is_var_arg), line, col)
 }
 
-pub fn parse_extern_block(parser: &Parser): AstFunction
+pub fn parse_extern_block(parser: &Parser): ast::AstFunction
 {
     parser_expect_text(parser, "extern")
-    if (parser.ok == 0) { return ast_function("", "i32", -1) }
-    if (parser_kind(parser) == tk_string())
+    if (parser.ok == 0) { return ast::ast_function("", "i32", -1) }
+    if (parser_kind(parser) == lexer::tk_string())
     {
         parser_advance(parser)
     }
     parser_expect_text(parser, "{")
-    if (parser.ok == 0) { return ast_function("", "i32", -1) }
+    if (parser.ok == 0) { return ast::ast_function("", "i32", -1) }
     if (parser_text(parser) == ";")
     {
         parser_advance(parser)
     }
     let func = parse_extern_function(parser)
-    if (parser.ok == 0) { return ast_function("", "i32", -1) }
+    if (parser.ok == 0) { return ast::ast_function("", "i32", -1) }
     while (parser_text(parser) == ";")
     {
         parser_advance(parser)
@@ -2022,29 +2044,29 @@ pub fn parse_extern_block(parser: &Parser): AstFunction
     return func
 }
 
-pub fn parse_struct_decl_abi(parser: &Parser, is_c_abi: i32): AstStructDecl
+pub fn parse_struct_decl_abi(parser: &Parser, is_c_abi: i32): ast::AstStructDecl
 {
     let line = parser_line(parser)
     let col = parser_col(parser)
     let mut is_pub = 0
     if (parser_text(parser) == "pub") { is_pub = 1; parser_advance(parser) }
     parser_expect_text(parser, "type")
-    if (parser.ok == 0) { return AstStructDecl{ name: "", field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstStructDecl{ name: "", field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return AstStructDecl{ name: "", field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+    if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return ast::AstStructDecl{ name: "", field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
     let ignored_type_params = parse_type_params_after_name(parser)
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
     parser_expect_text(parser, "=")
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
     parser_expect_text(parser, "struct")
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
     if (is_c_abi == 1 and parser_text(parser) == "packed")
     {
         parser_fail(parser, "packed C ABI structs are not supported")
-        return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col }
+        return ast::AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col }
     }
     parser_expect_text(parser, "{")
-    if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstStructDecl{ name: name, field_names: [], field_types: [], is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
     let mut field_names: [string] = []
     let mut field_types: [string] = []
     while (parser_text(parser) != "}" and parser_at_end(parser) == 0)
@@ -2055,20 +2077,20 @@ pub fn parse_struct_decl_abi(parser: &Parser, is_c_abi: i32): AstStructDecl
             continue
         }
         let field_name = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+        if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return ast::AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
         parser_expect_text(parser, ":")
-        if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+        if (parser.ok == 0) { return ast::AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
         let field_type = parse_type_text(parser)
-        if (parser.ok == 0) { return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
+        if (parser.ok == 0) { return ast::AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col } }
         field_names.push(field_name)
         field_types.push(field_type)
         parser_accept_text(parser, ",")
     }
     parser_expect_text(parser, "}")
-    return AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col }
+    return ast::AstStructDecl{ name: name, field_names: field_names, field_types: field_types, is_c_abi: is_c_abi, is_pub: is_pub, line: line, col: col }
 }
 
-pub fn parse_struct_decl(parser: &Parser): AstStructDecl => parse_struct_decl_abi(parser, 0)
+pub fn parse_struct_decl(parser: &Parser): ast::AstStructDecl => parse_struct_decl_abi(parser, 0)
 
 pub fn parse_type_params_after_name(parser: &Parser): [string]
 {
@@ -2095,7 +2117,7 @@ pub fn parse_type_params_after_name(parser: &Parser): [string]
             param = "'" + parser_text(parser)
             is_lifetime = 1
         }
-        if (parser_expect_kind(parser, tk_ident()) == 0) return params
+        if (parser_expect_kind(parser, lexer::tk_ident()) == 0) return params
         if (is_lifetime == 0) params.push(param)
         parser_accept_text(parser, ",")
     }
@@ -2103,34 +2125,34 @@ pub fn parse_type_params_after_name(parser: &Parser): [string]
     return params
 }
 
-pub fn parse_adt_decl(parser: &Parser): AstAdtDecl
+pub fn parse_adt_decl(parser: &Parser): ast::AstAdtDecl
 {
     let line = parser_line(parser)
     let col = parser_col(parser)
     let mut is_pub = 0
     if (parser_text(parser) == "pub") { is_pub = 1; parser_advance(parser) }
     parser_expect_text(parser, "type")
-    if (parser.ok == 0) { return AstAdtDecl{ name: "", type_params: [], variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstAdtDecl{ name: "", type_params: [], variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
     let name = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return AstAdtDecl{ name: "", type_params: [], variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
+    if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return ast::AstAdtDecl{ name: "", type_params: [], variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
     let type_params = parse_type_params_after_name(parser)
-    if (parser.ok == 0) { return AstAdtDecl{ name: name, type_params: type_params, variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstAdtDecl{ name: name, type_params: type_params, variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
     parser_expect_text(parser, "=")
-    if (parser.ok == 0) { return AstAdtDecl{ name: name, type_params: type_params, variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
+    if (parser.ok == 0) { return ast::AstAdtDecl{ name: name, type_params: type_params, variant_names: [], variant_payload_types: [], is_pub: is_pub, line: line, col: col } }
     let mut variant_names: [string] = []
     let mut variant_payload_types: [string] = []
     while (parser_at_end(parser) == 0)
     {
         let variant_name = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0) { return AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col } }
+        if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return ast::AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col } }
         let mut payload_ty = ""
         if (parser_text(parser) == "(")
         {
             parser_advance(parser)
             payload_ty = parse_type_text(parser)
-            if (parser.ok == 0) { return AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col } }
+            if (parser.ok == 0) { return ast::AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col } }
             parser_expect_text(parser, ")")
-            if (parser.ok == 0) { return AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col } }
+            if (parser.ok == 0) { return ast::AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col } }
         }
         variant_names.push(variant_name)
         variant_payload_types.push(payload_ty)
@@ -2142,31 +2164,31 @@ pub fn parse_adt_decl(parser: &Parser): AstAdtDecl
         break
     }
     parser_accept_text(parser, ";")
-    return AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col }
+    return ast::AstAdtDecl{ name: name, type_params: type_params, variant_names: variant_names, variant_payload_types: variant_payload_types, is_pub: is_pub, line: line, col: col }
 }
 
 pub fn top_level_type_is_struct(parser: &Parser): i32
 {
     let mut pos = parser.pos
-    if (stream_text_at(parser.stream, pos) == "pub") { pos += 1 }
-    if (stream_text_at(parser.stream, pos) != "type") { return 0 }
+    if (lexer::stream_text_at(parser.stream, pos) == "pub") { pos += 1 }
+    if (lexer::stream_text_at(parser.stream, pos) != "type") { return 0 }
     pos += 1
-    if (stream_kind_at(parser.stream, pos) != tk_ident()) { return 0 }
+    if (lexer::stream_kind_at(parser.stream, pos) != lexer::tk_ident()) { return 0 }
     pos += 1
-    if (stream_text_at(parser.stream, pos) == ":")
+    if (lexer::stream_text_at(parser.stream, pos) == ":")
     {
-        while (pos < stream_len(parser.stream) and stream_text_at(parser.stream, pos) != "=")
+        while (pos < lexer::stream_len(parser.stream) and lexer::stream_text_at(parser.stream, pos) != "=")
         {
             pos += 1
         }
     }
-    if (stream_text_at(parser.stream, pos) != "=") { return 0 }
+    if (lexer::stream_text_at(parser.stream, pos) != "=") { return 0 }
     pos += 1
-    if (stream_text_at(parser.stream, pos) == "struct") { return 1 }
+    if (lexer::stream_text_at(parser.stream, pos) == "struct") { return 1 }
     return 0
 }
 
-pub fn parse_has_adt_name(adts: [AstAdtDecl], name: string): i32
+pub fn parse_has_adt_name(adts: [ast::AstAdtDecl], name: string): i32
 {
     for (i in 0 .. adts.length)
     {
@@ -2175,7 +2197,7 @@ pub fn parse_has_adt_name(adts: [AstAdtDecl], name: string): i32
     return 0
 }
 
-pub fn parse_has_function_name(functions: [AstFunction], name: string): i32
+pub fn parse_has_function_name(functions: [ast::AstFunction], name: string): i32
 {
     for (i in 0 .. functions.length)
     {
@@ -2184,12 +2206,12 @@ pub fn parse_has_function_name(functions: [AstFunction], name: string): i32
     return 0
 }
 
-pub fn parse_stream_uses_result_ctor(stream: &TokenStream): i32
+pub fn parse_stream_uses_result_ctor(stream: &lexer::TokenStream): i32
 {
-    for (i in 0 .. stream_len(stream) - 1)
+    for (i in 0 .. lexer::stream_len(stream) - 1)
     {
-        let text = stream_text_at(stream, i)
-        if ((text == "Ok" or text == "Err") and stream_text_at(stream, i + 1) == "(")
+        let text = lexer::stream_text_at(stream, i)
+        if ((text == "Ok" or text == "Err") and lexer::stream_text_at(stream, i + 1) == "(")
         {
             return 1
         }
@@ -2197,7 +2219,7 @@ pub fn parse_stream_uses_result_ctor(stream: &TokenStream): i32
     return 0
 }
 
-pub fn parse_builtin_result_decl(): AstAdtDecl => AstAdtDecl{ name: "Result", type_params: [], variant_names: ["Ok", "Err"], variant_payload_types: ["i32", "string"], is_pub: 0, line: 0, col: 0 }
+pub fn parse_builtin_result_decl(): ast::AstAdtDecl => ast::AstAdtDecl{ name: "Result", type_params: [], variant_names: ["Ok", "Err"], variant_payload_types: ["i32", "string"], is_pub: 0, line: 0, col: 0 }
 
 // Parse a module path: ident (:: ident)*  -> returns ["math", "add"]
 // Keywords are accepted as segment names (e.g. `utils::string::trim`)
@@ -2205,7 +2227,7 @@ pub fn parse_module_path(parser: &Parser): [string]
 {
     let mut segments: [string] = []
     let first = parser_text(parser)
-    if (parser_kind(parser) != tk_ident() and parser_kind(parser) != tk_keyword())
+    if (parser_kind(parser) != lexer::tk_ident() and parser_kind(parser) != lexer::tk_keyword())
     {
         parser_fail(parser, "expected module name, got '" + first + "'")
         return segments
@@ -2216,7 +2238,7 @@ pub fn parse_module_path(parser: &Parser): [string]
     {
         parser_advance(parser)
         let seg = parser_text(parser)
-        if (parser_kind(parser) != tk_ident() and parser_kind(parser) != tk_keyword())
+        if (parser_kind(parser) != lexer::tk_ident() and parser_kind(parser) != lexer::tk_keyword())
         {
             parser_fail(parser, "expected identifier after '::', got '" + seg + "'")
             return segments
@@ -2228,7 +2250,7 @@ pub fn parse_module_path(parser: &Parser): [string]
 }
 
 // `mod math` or `pub mod math`
-pub fn parse_mod_decl(parser: &Parser): AstModDecl
+pub fn parse_mod_decl(parser: &Parser): ast::AstModDecl
 {
     let line = parser_line(parser)
     let col  = parser_col(parser)
@@ -2240,19 +2262,19 @@ pub fn parse_mod_decl(parser: &Parser): AstModDecl
     }
     if (parser_expect_text(parser, "mod") == 0)
     {
-        return AstModDecl{ name: "", is_pub: 0, line: line, col: col }
+        return ast::AstModDecl{ name: "", is_pub: 0, line: line, col: col }
     }
     let name = parser_text(parser)
-    if (parser_kind(parser) == tk_string())
+    if (parser_kind(parser) == lexer::tk_string())
     {
         parser_advance(parser)
     }
-    elif (parser_expect_kind(parser, tk_ident()) == 0)
+    elif (parser_expect_kind(parser, lexer::tk_ident()) == 0)
     {
-        return AstModDecl{ name: "", is_pub: 0, line: line, col: col }
+        return ast::AstModDecl{ name: "", is_pub: 0, line: line, col: col }
     }
     parser_accept_text(parser, ";")
-    return AstModDecl{ name: name, is_pub: is_pub, line: line, col: col }
+    return ast::AstModDecl{ name: name, is_pub: is_pub, line: line, col: col }
 }
 
 // `import math` or `import math::add` or `import math::add as plus`
@@ -2262,13 +2284,13 @@ pub fn parse_mod_decl(parser: &Parser): AstModDecl
 // The path identifies the module, the alias names it.  Neither is derived from
 // the other, which is the point: five files in this tree are called mod.vix, so
 // guessing a namespace from a file name cannot work.
-pub fn parse_use_decl(parser: &Parser): AstImportDecl
+pub fn parse_use_decl(parser: &Parser): ast::AstImportDecl
 {
     let line = parser_line(parser)
     let col  = parser_col(parser)
-    let empty = AstImportDecl{ path: [], alias: "", line: line, col: col }
+    let empty = ast::AstImportDecl{ path: [], alias: "", line: line, col: col }
     if (parser_expect_text(parser, "use") == 0) { return empty }
-    if (stream_kind_at(parser.stream, parser.pos) != tk_string())
+    if (lexer::stream_kind_at(parser.stream, parser.pos) != lexer::tk_string())
     {
         parser_fail(parser, "expected a quoted module path after 'use'")
         return empty
@@ -2281,35 +2303,35 @@ pub fn parse_use_decl(parser: &Parser): AstImportDecl
         return empty
     }
     let alias = parser_text(parser)
-    if (parser_expect_kind(parser, tk_ident()) == 0) { return empty }
-    return AstImportDecl{ path: [path], alias: alias, line: line, col: col }
+    if (parser_expect_kind(parser, lexer::tk_ident()) == 0) { return empty }
+    return ast::AstImportDecl{ path: [path], alias: alias, line: line, col: col }
 }
 
-pub fn parse_import_decl(parser: &Parser): AstImportDecl
+pub fn parse_import_decl(parser: &Parser): ast::AstImportDecl
 {
     let line = parser_line(parser)
     let col  = parser_col(parser)
     if (parser_expect_text(parser, "import") == 0)
     {
-        return AstImportDecl{ path: [], alias: "", line: line, col: col }
+        return ast::AstImportDecl{ path: [], alias: "", line: line, col: col }
     }
     let path = parse_module_path(parser)
     if (parser.ok == 0)
     {
-        return AstImportDecl{ path: [], alias: "", line: line, col: col }
+        return ast::AstImportDecl{ path: [], alias: "", line: line, col: col }
     }
     let mut alias = ""
     if (parser_text(parser) == "as")
     {
         parser_advance(parser)
         alias = parser_text(parser)
-        if (parser_expect_kind(parser, tk_ident()) == 0)
+        if (parser_expect_kind(parser, lexer::tk_ident()) == 0)
         {
-            return AstImportDecl{ path: [], alias: "", line: line, col: col }
+            return ast::AstImportDecl{ path: [], alias: "", line: line, col: col }
         }
     }
     parser_accept_text(parser, ";")
-    return AstImportDecl{ path: path, alias: alias, line: line, col: col }
+    return ast::AstImportDecl{ path: path, alias: alias, line: line, col: col }
 }
 
 fn parse_strip_attr_lines(src: string): string
@@ -2324,54 +2346,54 @@ fn parse_strip_attr_lines(src: string): string
             while (i < src.length and compiler_string_byte(src, i) != ']') { i += 1 }
             if (i < src.length) { i += 1 }
             while (i < src.length and compiler_string_byte(src, i) != 10) { i += 1 }
-            if (i < src.length) { out = out + char_string(10); i += 1 }
+            if (i < src.length) { out = out + lexer::char_string(10); i += 1 }
         }
         else
         {
-            out = out + char_string(compiler_string_byte(src, i))
+            out = out + lexer::char_string(compiler_string_byte(src, i))
             i += 1
         }
     }
     return out
 }
 
-pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): AstProgram
+pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): ast::AstProgram
 {
     return parse_program_seeded(src, filename, do_preprocess, [])
 }
 
 // already_loaded holds files another loader has claimed (the module graph), so
 // a quoted import of one of them is not inlined a second time.
-pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, already_loaded: [string]): AstProgram
+pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, already_loaded: [string]): ast::AstProgram
 {
-    let mut imports = import_set_new()
-    for (pre in 0 .. already_loaded.length) { import_set_add(&imports, already_loaded[pre]) }
-    let preprocess = if (do_preprocess == 1) preprocess_source_result(src, filename, &imports) else preprocess_source_local_result(src, filename)
+    let mut imports = preprocess::import_set_new()
+    for (pre in 0 .. already_loaded.length) { preprocess::import_set_add(&imports, already_loaded[pre]) }
+    let preprocess = if (do_preprocess == 1) preprocess::preprocess_source_result(src, filename, &imports) else preprocess::preprocess_source_local_result(src, filename)
     if (preprocess.ok == 0)
     {
-        return ast_program_err_diag(diag_render(preprocess.diagnostic, diag_render_options(src, filename)), preprocess.diagnostic)
+        return ast::ast_program_err_diag(diag::diag_render(preprocess.diagnostic, diag::diag_render_options(src, filename)), preprocess.diagnostic)
     }
     let combined = preprocess.source
 
     let mut source_map = preprocess.source_map
-    let mut parser = parser_new_stream(combined, filename, tokenize_with_macro_origins(combined, &source_map))
+    let mut parser = parser_new_stream(combined, filename, preprocess::tokenize_with_macro_origins(combined, &source_map))
     if (parser_at_end(&parser) == 1)
     {
-        let diagnostic = diag_new("E1004", DiagError, DiagParser, "empty source")
-            |> diag_message("the input file is empty")
-            |> diag_primary(diag_span(filename, 0, 0, 1, 1), "expected a declaration")
-            |> diagnostic_with_guidance
-        return ast_program_err_diag(diag_render(diagnostic, diag_render_options(src, filename)), diagnostic)
+        let diagnostic = diag::diag_new("E1004", diag::DiagError, diag::DiagParser, "empty source")
+            |> diag::diag_message("the input file is empty")
+            |> diag::diag_primary(diag::diag_span(filename, 0, 0, 1, 1), "expected a declaration")
+            |> error::diagnostic_with_guidance
+        return ast::ast_program_err_diag(diag::diag_render(diagnostic, diag::diag_render_options(src, filename)), diagnostic)
     }
     let parser_stream = parser.stream
     let uses_builtin_result = parse_stream_uses_result_ctor(&parser_stream)
-    let mut functions: [AstFunction] = []
-    let mut extern_functions: [AstFunction] = []
-    let mut globals: [AstStmt] = []
-    let mut structs: [AstStructDecl] = []
-    let mut adts: [AstAdtDecl] = []
-    let mut mod_decls: [AstModDecl] = []
-    let mut import_decls: [AstImportDecl] = []
+    let mut functions: [ast::AstFunction] = []
+    let mut extern_functions: [ast::AstFunction] = []
+    let mut globals: [ast::AstStmt] = []
+    let mut structs: [ast::AstStructDecl] = []
+    let mut adts: [ast::AstAdtDecl] = []
+    let mut mod_decls: [ast::AstModDecl] = []
+    let mut import_decls: [ast::AstImportDecl] = []
 
     while (parser_at_end(&parser) == 0)
     {
@@ -2380,17 +2402,17 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
         let before_pos = parser.pos
 
         // `mod math` or `pub mod math`
-        let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, parser.pos + 1) == "mod"
+        let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_text_at(parser.stream, parser.pos + 1) == "mod"
         if (parser_text(&parser) == "mod" or is_pub_mod == 1)
         {
             parser_fail(&parser, "'mod' has been removed: declare the module with 'use <path> as <name>'")
-            return ast_program_err_diag(parser.error, parser.diagnostic)
+            return ast::ast_program_err_diag(parser.error, parser.diagnostic)
         }
         // use "path.vix" as alias
         elif (parser_text(&parser) == "use")
         {
             let udecl = parse_use_decl(&parser)
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
             import_decls.push(udecl)
         }
         // `import module::symbol` used to be parsed and then dropped without a
@@ -2399,9 +2421,9 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
         elif (parser_text(&parser) == "import")
         {
             parser_fail(&parser, "'import' has been removed: use 'include <path>' to splice a file, or 'use <path> as <name>' for a module")
-            return ast_program_err_diag(parser.error, parser.diagnostic)
+            return ast::ast_program_err_diag(parser.error, parser.diagnostic)
         }
-        elif (parser_text(&parser) == "include" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
+        elif (parser_text(&parser) == "include" and parser.pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_kind_at(parser.stream, parser.pos + 1) == lexer::tk_string())
         {
             parser_advance(&parser)
             parser_advance(&parser)
@@ -2410,10 +2432,10 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
         elif (parser_text(&parser) == "extern")
         {
             parser_expect_text(&parser, "extern")
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-            if (parser_kind(&parser) == tk_string()) { parser_advance(&parser) }
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
+            if (parser_kind(&parser) == lexer::tk_string()) { parser_advance(&parser) }
             parser_expect_text(&parser, "{")
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
             while (parser_text(&parser) != "}" and parser_at_end(&parser) == 0)
             {
                 if (parser_text(&parser) == ";")
@@ -2424,65 +2446,65 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
                 if (parser_text(&parser) == "type")
                 {
                     let decl = parse_struct_decl_abi(&parser, 1)
-                    if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                    if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
                     structs.push(decl)
                 }
                 else
                 {
                     let extern_func = parse_extern_function(&parser)
-                    if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                    if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
                     extern_functions.push(extern_func)
                 }
             }
             parser_expect_text(&parser, "}")
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
         }
-        elif (parser_text(&parser) == "type" or (parser_text(&parser) == "pub" and stream_text_at(parser.stream, parser.pos + 1) == "type"))
+        elif (parser_text(&parser) == "type" or (parser_text(&parser) == "pub" and lexer::stream_text_at(parser.stream, parser.pos + 1) == "type"))
         {
             if (top_level_type_is_struct(&parser) == 1)
             {
                 let decl = parse_struct_decl(&parser)
-                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
                 structs.push(decl)
             }
             else
             {
                 let decl = parse_adt_decl(&parser)
-                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
                 adts.push(decl)
             }
         }
         elif (parser_text(&parser) == "let")
         {
             let global_idx = parse_statement(&parser)
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-            let global_stmt = stmt_store_get(parser.store, global_idx)
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
+            let global_stmt = ast::stmt_store_get(parser.store, global_idx)
             globals.push(global_stmt)
         }
         elif (parser_text(&parser) == "fn" or parser_text(&parser) == "pub")
         {
             let func = parse_function(&parser)
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
             functions.push(func)
         }
         else
         {
             parser_fail(&parser, "expected top-level declaration, got '" + parser_text(&parser) + "'")
-            return ast_program_err_diag(parser.error, parser.diagnostic)
+            return ast::ast_program_err_diag(parser.error, parser.diagnostic)
         }
         if (parser.pos == before_pos)
         {
             parser_fail(&parser, "parser made no progress at top-level declaration")
-            return ast_program_err_diag(parser.error, parser.diagnostic)
+            return ast::ast_program_err_diag(parser.error, parser.diagnostic)
         }
     }
     if (functions.length == 0 and extern_functions.length == 0 and globals.length == 0 and structs.length == 0 and adts.length == 0 and mod_decls.length == 0 and import_decls.length == 0)
     {
-        let diagnostic = diag_new("E1005", DiagError, DiagParser, "expected function")
-            |> diag_message("expected a top-level function or declaration")
-            |> diag_primary(diag_span(filename, combined.length, combined.length, parser_line(&parser), parser_col(&parser)), "expected function")
-            |> diagnostic_with_guidance
-        return ast_program_err_diag(diag_render(diagnostic, diag_render_options(combined, filename)), diagnostic)
+        let diagnostic = diag::diag_new("E1005", diag::DiagError, diag::DiagParser, "expected function")
+            |> diag::diag_message("expected a top-level function or declaration")
+            |> diag::diag_primary(diag::diag_span(filename, combined.length, combined.length, parser_line(&parser), parser_col(&parser)), "expected function")
+            |> error::diagnostic_with_guidance
+        return ast::ast_program_err_diag(diag::diag_render(diagnostic, diag::diag_render_options(combined, filename)), diagnostic)
     }
     if (uses_builtin_result == 1 and parse_has_adt_name(adts, "Result") == 0 and parse_has_function_name(functions, "Ok") == 0 and parse_has_function_name(functions, "Err") == 0 and parse_has_function_name(extern_functions, "Ok") == 0 and parse_has_function_name(extern_functions, "Err") == 0)
     {
@@ -2496,12 +2518,12 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
     // compiler pipeline. The analyzer parses and type checks without going
     // through main.vix, and an empty table made its semantic pass report every
     // method call as unknown.
-    return method_program_attach(ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store))
+    return methods::method_program_attach(ast::ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store))
 }
 
-pub fn parse_program(src: string, filename: string): AstProgram => parse_program_impl(src, filename, 1)
+pub fn parse_program(src: string, filename: string): ast::AstProgram => parse_program_impl(src, filename, 1)
 
-pub fn parse_program_raw(src: string, filename: string): AstProgram => parse_program_impl(src, filename, 0)
+pub fn parse_program_raw(src: string, filename: string): ast::AstProgram => parse_program_impl(src, filename, 0)
 
 // Parses exactly one top-level declaration. This exists so the analyzer can
 // reparse a single changed declaration instead of the whole file. It duplicates
@@ -2511,21 +2533,21 @@ pub fn parse_program_raw(src: string, filename: string): AstProgram => parse_pro
 // The result is a fragment: statement and expression indices are local to it,
 // and token line/column values are relative to src. Callers must rebase both
 // before merging the fragment with others.
-pub fn parse_declaration_fragment(src: string, filename: string): AstProgram
+pub fn parse_declaration_fragment(src: string, filename: string): ast::AstProgram
 {
-    return parse_declaration_fragment_stream(src, filename, tokenize(src))
+    return parse_declaration_fragment_stream(src, filename, lexer::tokenize(src))
 }
 
-pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: TokenStream): AstProgram
+pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: lexer::TokenStream): ast::AstProgram
 {
     let mut parser = parser_new_stream(src, filename, stream)
-    let mut functions: [AstFunction] = []
-    let mut extern_functions: [AstFunction] = []
-    let mut globals: [AstStmt] = []
-    let mut structs: [AstStructDecl] = []
-    let mut adts: [AstAdtDecl] = []
-    let mut mod_decls: [AstModDecl] = []
-    let mut import_decls: [AstImportDecl] = []
+    let mut functions: [ast::AstFunction] = []
+    let mut extern_functions: [ast::AstFunction] = []
+    let mut globals: [ast::AstStmt] = []
+    let mut structs: [ast::AstStructDecl] = []
+    let mut adts: [ast::AstAdtDecl] = []
+    let mut mod_decls: [ast::AstModDecl] = []
+    let mut import_decls: [ast::AstImportDecl] = []
 
     while (parser_text(&parser) == ";")
     {
@@ -2533,27 +2555,27 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
     }
     if (parser_at_end(&parser) == 1)
     {
-        return ast_program_err_diag("empty declaration", parser.diagnostic)
+        return ast::ast_program_err_diag("empty declaration", parser.diagnostic)
     }
 
-    let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < stream_len(parser.stream) and stream_text_at(parser.stream, parser.pos + 1) == "mod"
+    let is_pub_mod = parser_text(&parser) == "pub" and parser.pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_text_at(parser.stream, parser.pos + 1) == "mod"
     if (parser_text(&parser) == "mod" or is_pub_mod == 1)
     {
         parser_fail(&parser, "'mod' has been removed: declare the module with 'use <path> as <name>'")
-        return ast_program_err_diag(parser.error, parser.diagnostic)
+        return ast::ast_program_err_diag(parser.error, parser.diagnostic)
     }
     elif (parser_text(&parser) == "use")
     {
         let udecl = parse_use_decl(&parser)
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
         import_decls.push(udecl)
     }
     elif (parser_text(&parser) == "import")
     {
         parser_fail(&parser, "'import' has been removed: use 'include <path>' to splice a file, or 'use <path> as <name>' for a module")
-        return ast_program_err_diag(parser.error, parser.diagnostic)
+        return ast::ast_program_err_diag(parser.error, parser.diagnostic)
     }
-    elif (parser_text(&parser) == "include" and parser.pos + 1 < stream_len(parser.stream) and stream_kind_at(parser.stream, parser.pos + 1) == tk_string())
+    elif (parser_text(&parser) == "include" and parser.pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_kind_at(parser.stream, parser.pos + 1) == lexer::tk_string())
     {
         parser_advance(&parser)
         parser_advance(&parser)
@@ -2562,10 +2584,10 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
     elif (parser_text(&parser) == "extern")
     {
         parser_expect_text(&parser, "extern")
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-        if (parser_kind(&parser) == tk_string()) { parser_advance(&parser) }
+        if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
+        if (parser_kind(&parser) == lexer::tk_string()) { parser_advance(&parser) }
         parser_expect_text(&parser, "{")
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
         while (parser_text(&parser) != "}" and parser_at_end(&parser) == 0)
         {
             if (parser_text(&parser) == ";")
@@ -2576,51 +2598,51 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
             if (parser_text(&parser) == "type")
             {
                 let decl = parse_struct_decl_abi(&parser, 1)
-                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
                 structs.push(decl)
             }
             else
             {
                 let extern_func = parse_extern_function(&parser)
-                if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+                if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
                 extern_functions.push(extern_func)
             }
         }
         parser_expect_text(&parser, "}")
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
     }
-    elif (parser_text(&parser) == "type" or (parser_text(&parser) == "pub" and stream_text_at(parser.stream, parser.pos + 1) == "type"))
+    elif (parser_text(&parser) == "type" or (parser_text(&parser) == "pub" and lexer::stream_text_at(parser.stream, parser.pos + 1) == "type"))
     {
         if (top_level_type_is_struct(&parser) == 1)
         {
             let decl = parse_struct_decl(&parser)
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
             structs.push(decl)
         }
         else
         {
             let decl = parse_adt_decl(&parser)
-            if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+            if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
             adts.push(decl)
         }
     }
     elif (parser_text(&parser) == "let")
     {
         let global_idx = parse_statement(&parser)
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
-        let global_stmt = stmt_store_get(parser.store, global_idx)
+        if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
+        let global_stmt = ast::stmt_store_get(parser.store, global_idx)
         globals.push(global_stmt)
     }
     elif (parser_text(&parser) == "fn" or parser_text(&parser) == "pub")
     {
         let func = parse_function(&parser)
-        if (parser.ok == 0) { return ast_program_err_diag(parser.error, parser.diagnostic) }
+        if (parser.ok == 0) { return ast::ast_program_err_diag(parser.error, parser.diagnostic) }
         functions.push(func)
     }
     else
     {
         parser_fail(&parser, "expected top-level declaration, got '" + parser_text(&parser) + "'")
-        return ast_program_err_diag(parser.error, parser.diagnostic)
+        return ast::ast_program_err_diag(parser.error, parser.diagnostic)
     }
 
     for (i in 0 .. parser.lambda_functions.length)
@@ -2631,16 +2653,16 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
     // compiler pipeline. The analyzer parses and type checks without going
     // through main.vix, and an empty table made its semantic pass report every
     // method call as unknown.
-    return method_program_attach(ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store))
+    return methods::method_program_attach(ast::ast_program_full(functions, extern_functions, globals, structs, adts, mod_decls, import_decls, parser.expr_store, parser.store))
 }
 
 pub fn parse_program_stats(src: string, filename: string): string
 {
-    let mut imports = import_set_new()
+    let mut imports = preprocess::import_set_new()
     return parse_program_stats_source(src, filename, &imports)
 }
 
-pub fn parse_program_stats_source(src: string, filename: string, imports: &ImportSet): string
+pub fn parse_program_stats_source(src: string, filename: string, imports: &preprocess::ImportSet): string
 {
     let mut extern_count = 0
     let mut type_count = 0
@@ -2651,26 +2673,26 @@ pub fn parse_program_stats_source(src: string, filename: string, imports: &Impor
     {
         if (compiler_string_byte(src, i) == '#')
         {
-            i = skip_attr_line(src, i)
+            i = preprocess::skip_attr_line(src, i)
             continue
         }
-        let import_end = scan_import_line(src, i)
+        let import_end = preprocess::scan_import_line(src, i)
         if (import_end > i)
         {
-            let path = extract_import_path(src, i)
+            let path = preprocess::extract_import_path(src, i)
             if (path != "")
             {
-                let resolved = resolve_import_path(filename, path)
+                let resolved = preprocess::resolve_import_path(filename, path)
                 let mut actual = resolved
-                let mut content = read_file_content(actual)
+                let mut content = preprocess::read_file_content(actual)
                 if (content == "" and path != resolved)
                 {
                     actual = path
-                    content = read_file_content(actual)
+                    content = preprocess::read_file_content(actual)
                 }
-                if (content != "" and import_set_contains(imports, actual) == 0)
+                if (content != "" and preprocess::import_set_contains(imports, actual) == 0)
                 {
-                    import_set_add(imports, actual)
+                    preprocess::import_set_add(imports, actual)
                     let child = parse_program_stats_source(content, actual, imports)
                 }
             }
@@ -2679,14 +2701,14 @@ pub fn parse_program_stats_source(src: string, filename: string, imports: &Impor
         }
         i += 1
     }
-    let stream = tokenize(src)
-    for (k in 0 .. stream_len(&stream))
+    let stream = lexer::tokenize(src)
+    for (k in 0 .. lexer::stream_len(&stream))
     {
-        let text = stream_text_at(&stream, k)
+        let text = lexer::stream_text_at(&stream, k)
         if (text == "extern") { extern_count += 1 }
         elif (text == "type") { type_count += 1 }
         elif (text == "fn") { fn_count += 1 }
         token_count += 1
     }
-    return "ParseStats(tokens=" + ast_i32(token_count) + ", imports=" + ast_i32(imports.paths.length) + ", externs=" + ast_i32(extern_count) + ", types=" + ast_i32(type_count) + ", functions=" + ast_i32(fn_count) + ")"
+    return "ParseStats(tokens=" + ast::ast_i32(token_count) + ", imports=" + ast::ast_i32(imports.paths.length) + ", externs=" + ast::ast_i32(extern_count) + ", types=" + ast::ast_i32(type_count) + ", functions=" + ast::ast_i32(fn_count) + ")"
 }

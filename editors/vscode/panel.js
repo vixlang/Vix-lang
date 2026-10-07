@@ -71,9 +71,9 @@ function renderPanelHtml() {
   button:hover { background: var(--vscode-button-secondaryHoverBackground, rgba(128,128,128,.26)); }
   button.icon { padding: 5px 7px; }
   button.primary {
-    background: var(--vscode-button-background); color: var(--vscode-button-foreground); font-weight: 600;
+    background: #7C5CFF; color: #FFFFFF; font-weight: 600;
   }
-  button.primary:hover { background: var(--vscode-button-hoverBackground); }
+  button.primary:hover { background: #8F73FF; }
   button[disabled] { opacity: .5; cursor: default; }
 
   .status { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 11px; }
@@ -93,7 +93,7 @@ function renderPanelHtml() {
 
   .seg { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--vscode-panel-border, rgba(128,128,128,.25)); }
   .seg button { flex: 1; border: 0; border-radius: 0; padding: 6px 0; background: transparent; }
-  .seg button.active { background: var(--vscode-button-background); color: var(--vscode-button-foreground); font-weight: 600; }
+  .seg button.active { background: #7C5CFF; color: #FFFFFF; font-weight: 600; }
 
   .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .actions .wide { grid-column: 1 / -1; }

@@ -43,19 +43,19 @@ pub fn lsp_initialize_capabilities(): ServerCapabilities
 
 pub fn lsp_parse_message(json_text: string): LspMessage
 {
-    let doc = json_parse(json_text)
-    let root = json_root(doc)
+    let doc = json::json_parse(json_text)
+    let root = json::json_root(doc)
     if (root < 0)
     {
         return LspMessage{ id: 0, has_id: 0, method: "", params: "" }
     }
-    let id_node = json_object_get(doc, root, "id")
-    let params_node = json_object_get(doc, root, "params")
+    let id_node = json::json_object_get(doc, root, "id")
+    let params_node = json::json_object_get(doc, root, "params")
     return LspMessage{
-        id: json_int_at(doc, id_node),
+        id: json::json_int_at(doc, id_node),
         has_id: if (id_node >= 0) 1 else 0,
-        method: json_string_at(doc, json_object_get(doc, root, "method")),
-        params: json_raw(doc, json_text, params_node)
+        method: json::json_string_at(doc, json::json_object_get(doc, root, "method")),
+        params: json::json_raw(doc, json_text, params_node)
     }
 }
 
@@ -66,12 +66,12 @@ pub fn lsp_response(id: i32, result: string): string
 
 pub fn lsp_error(id: i32, code: i32, message: string): string
 {
-    return "{\"jsonrpc\":\"2.0\",\"id\":" + analyzer_i32_to_str(id) + ",\"error\":{\"code\":" + analyzer_i32_to_str(code) + ",\"message\":" + json_quote(message) + "}}"
+    return "{\"jsonrpc\":\"2.0\",\"id\":" + analyzer_i32_to_str(id) + ",\"error\":{\"code\":" + analyzer_i32_to_str(code) + ",\"message\":" + json::json_quote(message) + "}}"
 }
 
 pub fn lsp_notification(method: string, params: string): string
 {
-    return "{\"jsonrpc\":\"2.0\",\"method\":" + json_quote(method) + ",\"params\":" + params + "}"
+    return "{\"jsonrpc\":\"2.0\",\"method\":" + json::json_quote(method) + ",\"params\":" + params + "}"
 }
 
 pub fn lsp_initialize_result(): string
@@ -84,7 +84,7 @@ pub fn lsp_initialize_result(): string
 
 pub fn lsp_publish_diagnostics(uri: string, diagnostics: [AnalyzerDiagnostic]): string
 {
-    let params = "{\"uri\":" + json_quote(uri) + ",\"diagnostics\":" + diagnostics_to_json(diagnostics) + "}"
+    let params = "{\"uri\":" + json::json_quote(uri) + ",\"diagnostics\":" + diagnostics_to_json(diagnostics) + "}"
     return lsp_notification("textDocument/publishDiagnostics", params)
 }
 
@@ -95,12 +95,12 @@ pub fn lsp_encode_range(range: LspRange): string
 
 pub fn lsp_encode_location(uri: string, range: LspRange): string
 {
-    return "{\"uri\":" + json_quote(uri) + ",\"range\":" + lsp_encode_range(range) + "}"
+    return "{\"uri\":" + json::json_quote(uri) + ",\"range\":" + lsp_encode_range(range) + "}"
 }
 
 pub fn lsp_encode_hover(result: HoverResult): string
 {
-    return "{\"contents\":{\"kind\":\"markdown\",\"value\":" + json_quote(result.contents) + "},\"range\":" + lsp_encode_range(result.range) + "}"
+    return "{\"contents\":{\"kind\":\"markdown\",\"value\":" + json::json_quote(result.contents) + "},\"range\":" + lsp_encode_range(result.range) + "}"
 }
 
 pub fn lsp_encode_completion(items: [CompletionItem]): string
@@ -112,7 +112,7 @@ pub fn lsp_encode_completion(items: [CompletionItem]): string
         {
             out = out + ","
         }
-        out = out + "{\"label\":" + json_quote(items[i].label) + ",\"detail\":" + json_quote(items[i].detail) + ",\"kind\":" + analyzer_i32_to_str(items[i].kind) + "}"
+        out = out + "{\"label\":" + json::json_quote(items[i].label) + ",\"detail\":" + json::json_quote(items[i].detail) + ",\"kind\":" + analyzer_i32_to_str(items[i].kind) + "}"
     }
     return out + "]"
 }
@@ -126,7 +126,7 @@ pub fn lsp_encode_symbols(declarations: [Declaration]): string
         {
             out = out + ","
         }
-        out = out + "{\"name\":" + json_quote(declarations[i].name)
+        out = out + "{\"name\":" + json::json_quote(declarations[i].name)
         out = out + ",\"kind\":" + analyzer_i32_to_str(symbol_lsp_kind(declarations[i].kind))
         out = out + ",\"range\":" + lsp_encode_range(declarations[i].range)
         out = out + ",\"selectionRange\":" + lsp_encode_range(declarations[i].selection_range) + "}"
@@ -157,17 +157,17 @@ pub fn lsp_encode_rename(uri: string, references: [Reference], new_name: string)
         {
             edits = edits + ","
         }
-        edits = edits + "{\"range\":" + lsp_encode_range(references[i].range) + ",\"newText\":" + json_quote(new_name) + "}"
+        edits = edits + "{\"range\":" + lsp_encode_range(references[i].range) + ",\"newText\":" + json::json_quote(new_name) + "}"
     }
     edits = edits + "]"
-    return "{\"changes\":{" + json_quote(uri) + ":" + edits + "}}"
+    return "{\"changes\":{" + json::json_quote(uri) + ":" + edits + "}}"
 }
 // Reports how much of the syntax layer was reused by the last edit. This is the
 // observable proof that a change inside one declaration does not re-scan the
 // others; it is a notification so clients can ignore it.
 pub fn lsp_analysis_stats(uri: string, analysis: DocumentAnalysis): string
 {
-    let params = "{\"uri\":" + json_quote(uri)
+    let params = "{\"uri\":" + json::json_quote(uri)
     params = params + ",\"reusedNodes\":" + analyzer_i32_to_str(analysis.reused_nodes)
     params = params + ",\"freshNodes\":" + analyzer_i32_to_str(analysis.fresh_nodes)
     params = params + ",\"aliveNodes\":" + analyzer_i32_to_str(stub_tree_alive_count(analysis.tree))
@@ -187,5 +187,5 @@ pub fn lsp_full_range(text: string): LspRange
 
 pub fn lsp_encode_format_edits(text: string, formatted: string): string
 {
-    return "[{\"range\":" + lsp_encode_range(lsp_full_range(text)) + ",\"newText\":" + json_quote(formatted) + "}]"
+    return "[{\"range\":" + lsp_encode_range(lsp_full_range(text)) + ",\"newText\":" + json::json_quote(formatted) + "}]"
 }

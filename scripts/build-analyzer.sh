@@ -50,6 +50,7 @@ LLVM_LIBDIR=$($LLVM_CONFIG --libdir)
 
 echo "== support objects (LLVM 21) =="
 $CLANG -c lib/api.c -o build/api.o
+$CLANG -c src/typepool.c -o build/typepool.o
 $CLANG -c src/helper.c -o build/helper.o $LLVM_CFLAGS -Wno-deprecated-declarations
 $CLANG -c src/runtime.c -o runtime/runtime.o
 $CLANG -c src/compiler_gc.c -o build/compiler_gc.o
@@ -57,7 +58,7 @@ $CLANGXX -c lib/llvm/Llc.cpp -o build/Llc.o $LLVM_CXXFLAGS -Wno-deprecated-decla
 $CLANGXX -c lib/llvm/Passes.cpp -o build/Passes.o $LLVM_CXXFLAGS -Wno-deprecated-declarations
 $CLANGXX -c lib/llvm/Linker.cpp -o build/Linker.o $LLVM_CXXFLAGS -I"$LLD_INCLUDE" -Wno-deprecated-declarations
 
-COMPILER_SUPPORT="build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o"
+COMPILER_SUPPORT="build/typepool.o build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o"
 
 echo "== bootstrap compiler through module graph =="
 # The checked-in compiler sources now use the module graph directly.  The
@@ -76,7 +77,10 @@ build/vixc-patched --version
 echo "== analyzer =="
 build/vixc-patched vix-analyzer/main.vix -obj -o build/vix-analyzer.o
 $CLANG -c vix-analyzer/support.c -o build/vix-analyzer-support.o
-$CLANG build/vix-analyzer.o build/vix-analyzer-support.o runtime/runtime.o -o build/vix-analyzer
+# The front end's interned type pool lives in its own object precisely so that
+# the analyzer can link it without the LLVM wrappers in helper.o.
+$CLANG build/vix-analyzer.o build/vix-analyzer-support.o runtime/runtime.o \
+  build/typepool.o -o build/vix-analyzer
 
 echo "== done =="
 file build/vix-analyzer

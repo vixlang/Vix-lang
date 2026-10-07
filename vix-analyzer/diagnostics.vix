@@ -17,13 +17,13 @@ pub type AnalyzerDiagnostic = struct
     range: LspRange
 }
 
-pub fn analyzer_severity(level: DiagLevel): DiagnosticSeverity
+pub fn analyzer_severity(level: diag::DiagLevel): DiagnosticSeverity
 {
-    if (level == DiagError)
+    if (level == diag::DiagError)
     {
         return SeverityError
     }
-    if (level == DiagWarning)
+    if (level == diag::DiagWarning)
     {
         return SeverityWarning
     }
@@ -47,7 +47,7 @@ pub fn analyzer_severity_code(severity: DiagnosticSeverity): string
     return "4"
 }
 
-pub fn analyzer_span_range(span: DiagSpan): LspRange
+pub fn analyzer_span_range(span: diag::DiagSpan): LspRange
 {
     let line = if (span.line < 1) 0 else span.line - 1
     let character = if (span.column < 1) 0 else span.column - 1
@@ -68,7 +68,7 @@ pub fn analyzer_diagnostic(code: string, message: string, severity: DiagnosticSe
     }
 }
 
-pub fn analyzer_diagnostic_from_diag(file: FileId, diag: Diagnostic): AnalyzerDiagnostic
+pub fn analyzer_diagnostic_from_diag(file: FileId, diag: diag::Diagnostic): AnalyzerDiagnostic
 {
     let message = if (diag.message != "") diag.message else diag.title
     return AnalyzerDiagnostic{
@@ -76,7 +76,7 @@ pub fn analyzer_diagnostic_from_diag(file: FileId, diag: Diagnostic): AnalyzerDi
         message: message,
         severity: analyzer_severity(diag.level),
         file: file,
-        range: analyzer_span_range(diag_primary_span(diag))
+        range: analyzer_span_range(diag::diag_primary_span(diag))
     }
 }
 
@@ -109,9 +109,9 @@ pub fn diagnostics_to_json(diagnostics: [AnalyzerDiagnostic]): string
         out = out + "\"end\":{\"line\":" + analyzer_i32_to_str(item.range.end.line)
         out = out + ",\"character\":" + analyzer_i32_to_str(item.range.end.character) + "}},"
         out = out + "\"severity\":" + analyzer_severity_code(item.severity) + ","
-        out = out + "\"code\":" + json_quote(item.code) + ","
+        out = out + "\"code\":" + json::json_quote(item.code) + ","
         out = out + "\"source\":\"vix-analyzer\","
-        out = out + "\"message\":" + json_quote(item.message) + "}"
+        out = out + "\"message\":" + json::json_quote(item.message) + "}"
     }
     return out + "]"
 }

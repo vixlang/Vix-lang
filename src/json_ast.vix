@@ -1,4 +1,5 @@
 use "ast.vix" as ast
+use "lexer.vix" as lexer
 
 fn json_ast_escape(text: string): string
 {
@@ -53,7 +54,7 @@ fn json_ast_bool(value: i32): string
 
 fn json_ast_loc(line: i32, col: i32): string
 {
-    return "\"location\":{\"line\":" + ast_i32(line) + ",\"column\":" + ast_i32(col) + "}"
+    return "\"location\":{\"line\":" + ast::ast_i32(line) + ",\"column\":" + ast::ast_i32(col) + "}"
 }
 
 fn json_ast_string_array(values: [string]): string
@@ -67,7 +68,7 @@ fn json_ast_string_array(values: [string]): string
     return out + "]"
 }
 
-fn json_ast_expr_array(es: &ExprStore, store: &StmtStore, indices: [i32]): string
+fn json_ast_expr_array(es: &ast::ExprStore, store: &ast::StmtStore, indices: [i32]): string
 {
     let mut out = "["
     for (i in 0 .. indices.length)
@@ -78,7 +79,7 @@ fn json_ast_expr_array(es: &ExprStore, store: &StmtStore, indices: [i32]): strin
     return out + "]"
 }
 
-fn json_ast_struct_fields(es: &ExprStore, store: &StmtStore, expr: AstExpr): string
+fn json_ast_struct_fields(es: &ast::ExprStore, store: &ast::StmtStore, expr: ast::AstExpr): string
 {
     let mut out = "["
     for (i in 0 .. expr.field_names.length)
@@ -90,7 +91,7 @@ fn json_ast_struct_fields(es: &ExprStore, store: &StmtStore, expr: AstExpr): str
     return out + "]"
 }
 
-fn json_ast_lambda_params(expr: AstExpr): string
+fn json_ast_lambda_params(expr: ast::AstExpr): string
 {
     let mut out = "["
     for (i in 0 .. expr.field_names.length)
@@ -101,16 +102,16 @@ fn json_ast_lambda_params(expr: AstExpr): string
     return out + "]"
 }
 
-pub fn json_ast_expr(es: &ExprStore, store: &StmtStore, idx: i32): string
+pub fn json_ast_expr(es: &ast::ExprStore, store: &ast::StmtStore, idx: i32): string
 {
     if (idx < 0) { return "null" }
-    let expr = expr_store_get(es, idx)
+    let expr = ast::expr_store_get(es, idx)
     let loc = json_ast_loc(expr.line, expr.col)
     return match expr.tag
     {
-        "int" -> "{\"type\":\"IntegerLiteral\",\"value\":" + ast_i32(expr.int_value) + "," + loc + "}"
+        "int" -> "{\"type\":\"IntegerLiteral\",\"value\":" + ast::ast_i32(expr.int_value) + "," + loc + "}"
         "bool" -> "{\"type\":\"BooleanLiteral\",\"value\":" + json_ast_bool(expr.int_value) + "," + loc + "}"
-        "float" -> "{\"type\":\"FloatLiteral\",\"value\":" + ast_f64(expr.float_value) + "," + loc + "}"
+        "float" -> "{\"type\":\"FloatLiteral\",\"value\":" + ast::ast_f64(expr.float_value) + "," + loc + "}"
         "string" -> "{\"type\":\"StringLiteral\",\"value\":" + json_ast_quote(expr.text) + "," + loc + "}"
         "ident" -> "{\"type\":\"Identifier\",\"name\":" + json_ast_quote(expr.text) + "," + loc + "}"
         "binop" -> "{\"type\":\"BinaryExpression\",\"operator\":" + json_ast_quote(expr.text) + ",\"left\":" + json_ast_expr(es, store, expr.left_idx) + ",\"right\":" + json_ast_expr(es, store, expr.right_idx) + "," + loc + "}"
@@ -157,7 +158,7 @@ pub fn json_ast_expr(es: &ExprStore, store: &StmtStore, idx: i32): string
     }
 }
 
-fn json_ast_stmt_indices(es: &ExprStore, store: &StmtStore, indices: [i32]): string
+fn json_ast_stmt_indices(es: &ast::ExprStore, store: &ast::StmtStore, indices: [i32]): string
 {
     let mut out = "["
     for (i in 0 .. indices.length)
@@ -168,7 +169,7 @@ fn json_ast_stmt_indices(es: &ExprStore, store: &StmtStore, indices: [i32]): str
     return out + "]"
 }
 
-fn json_ast_block_body(es: &ExprStore, store: &StmtStore, stmt: AstStmt): string
+fn json_ast_block_body(es: &ast::ExprStore, store: &ast::StmtStore, stmt: ast::AstStmt): string
 {
     if (stmt.stmt_indices.length > 0) { return json_ast_stmt_indices(es, store, stmt.stmt_indices) }
     let mut out = "["
@@ -180,7 +181,7 @@ fn json_ast_block_body(es: &ExprStore, store: &StmtStore, stmt: AstStmt): string
     return out + "]"
 }
 
-fn json_ast_match_arms(es: &ExprStore, store: &StmtStore, stmt: AstStmt): string
+fn json_ast_match_arms(es: &ast::ExprStore, store: &ast::StmtStore, stmt: ast::AstStmt): string
 {
     let mut out = "["
     for (i in 0 .. stmt.match_pattern_indices.length)
@@ -193,14 +194,14 @@ fn json_ast_match_arms(es: &ExprStore, store: &StmtStore, stmt: AstStmt): string
     return out + "]"
 }
 
-pub fn json_ast_stmt(es: &ExprStore, store: &StmtStore, idx: i32): string
+pub fn json_ast_stmt(es: &ast::ExprStore, store: &ast::StmtStore, idx: i32): string
 {
     if (idx < 0) { return "null" }
-    let stmt = stmt_store_get(store, idx)
+    let stmt = ast::stmt_store_get(store, idx)
     let loc = json_ast_loc(stmt.line, stmt.col)
     return match stmt.tag
     {
-        "return" -> "{\"type\":\"ReturnStatement\",\"value\":" + ast_i32(stmt.direct_ret) + "," + loc + "}"
+        "return" -> "{\"type\":\"ReturnStatement\",\"value\":" + ast::ast_i32(stmt.direct_ret) + "," + loc + "}"
         "return_expr" -> "{\"type\":\"ReturnStatement\",\"value\":" + json_ast_expr(es, store, stmt.value_idx) + "," + loc + "}"
         "let" -> "{\"type\":\"LetStatement\",\"name\":" + json_ast_quote(stmt.assign_name) + ",\"mutable\":" + json_ast_bool(stmt.is_mut) + ",\"declaredType\":" + (if (stmt.type_text == "") { "null" } else { json_ast_quote(stmt.type_text) }) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + loc + "}"
         "assign" -> "{\"type\":\"AssignStatement\",\"name\":" + json_ast_quote(stmt.assign_name) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + loc + "}"
@@ -215,14 +216,14 @@ pub fn json_ast_stmt(es: &ExprStore, store: &StmtStore, idx: i32): string
         "break" -> "{\"type\":\"BreakStatement\"," + loc + "}"
         "continue" -> "{\"type\":\"ContinueStatement\"," + loc + "}"
         "if" -> "{\"type\":\"IfStatement\",\"condition\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"then\":" + json_ast_stmt(es, store, stmt.body_idx) + ",\"else\":" + json_ast_stmt(es, store, stmt.assign_idx) + "," + loc + "}"
-        "if_eq_return" -> "{\"type\":\"IfEqReturnStatement\",\"conditionLeft\":" + json_ast_quote(stmt.cond_left) + ",\"conditionRight\":" + json_ast_quote(stmt.cond_right) + ",\"thenReturn\":" + ast_i32(stmt.then_ret) + ",\"elseReturn\":" + ast_i32(stmt.else_ret) + "," + loc + "}"
+        "if_eq_return" -> "{\"type\":\"IfEqReturnStatement\",\"conditionLeft\":" + json_ast_quote(stmt.cond_left) + ",\"conditionRight\":" + json_ast_quote(stmt.cond_right) + ",\"thenReturn\":" + ast::ast_i32(stmt.then_ret) + ",\"elseReturn\":" + ast::ast_i32(stmt.else_ret) + "," + loc + "}"
         "match" -> "{\"type\":\"MatchStatement\",\"subject\":" + json_ast_expr(es, store, stmt.value_idx) + ",\"arms\":" + json_ast_match_arms(es, store, stmt) + "," + loc + "}"
-        "match_option_string" -> "{\"type\":\"MatchOptionStringStatement\",\"bind\":" + json_ast_quote(stmt.match_bind) + ",\"optionValue\":" + json_ast_quote(stmt.match_option_value) + ",\"compareRight\":" + json_ast_quote(stmt.match_compare_right) + ",\"someThenReturn\":" + ast_i32(stmt.match_some_then_ret) + ",\"someElseReturn\":" + ast_i32(stmt.match_some_else_ret) + ",\"noneReturn\":" + ast_i32(stmt.match_none_ret) + "," + loc + "}"
+        "match_option_string" -> "{\"type\":\"MatchOptionStringStatement\",\"bind\":" + json_ast_quote(stmt.match_bind) + ",\"optionValue\":" + json_ast_quote(stmt.match_option_value) + ",\"compareRight\":" + json_ast_quote(stmt.match_compare_right) + ",\"someThenReturn\":" + ast::ast_i32(stmt.match_some_then_ret) + ",\"someElseReturn\":" + ast::ast_i32(stmt.match_some_else_ret) + ",\"noneReturn\":" + ast::ast_i32(stmt.match_none_ret) + "," + loc + "}"
         _ -> "{\"type\":\"UnknownStatement\",\"tag\":" + json_ast_quote(stmt.tag) + "," + loc + "}"
     }
 }
 
-fn json_ast_params(func: AstFunction): string
+fn json_ast_params(func: ast::AstFunction): string
 {
     let mut out = "["
     for (i in 0 .. func.param_names.length)
@@ -234,12 +235,12 @@ fn json_ast_params(func: AstFunction): string
     return out + "]"
 }
 
-fn json_ast_function(func: AstFunction, es: &ExprStore, store: &StmtStore): string
+fn json_ast_function(func: ast::AstFunction, es: &ast::ExprStore, store: &ast::StmtStore): string
 {
     return "{\"type\":\"FunctionDeclaration\",\"name\":" + json_ast_quote(func.name) + ",\"returnType\":" + json_ast_quote(func.ret_ty) + ",\"typeParameters\":" + json_ast_string_array(func.type_params) + ",\"parameters\":" + json_ast_params(func) + ",\"varargs\":" + json_ast_bool(func.is_var_arg) + ",\"body\":" + json_ast_stmt(es, store, func.body_idx) + "," + json_ast_loc(func.line, func.col) + "}"
 }
 
-fn json_ast_struct(decl: AstStructDecl): string
+fn json_ast_struct(decl: ast::AstStructDecl): string
 {
     let mut fields = "["
     for (i in 0 .. decl.field_names.length)
@@ -251,7 +252,7 @@ fn json_ast_struct(decl: AstStructDecl): string
     return "{\"type\":\"StructDeclaration\",\"name\":" + json_ast_quote(decl.name) + ",\"fields\":" + fields + "]," + json_ast_loc(decl.line, decl.col) + "}"
 }
 
-fn json_ast_adt(decl: AstAdtDecl): string
+fn json_ast_adt(decl: ast::AstAdtDecl): string
 {
     let mut variants = "["
     for (i in 0 .. decl.variant_names.length)
@@ -263,12 +264,12 @@ fn json_ast_adt(decl: AstAdtDecl): string
     return "{\"type\":\"AdtDeclaration\",\"name\":" + json_ast_quote(decl.name) + ",\"typeParameters\":" + json_ast_string_array(decl.type_params) + ",\"variants\":" + variants + "]," + json_ast_loc(decl.line, decl.col) + "}"
 }
 
-fn json_ast_global(stmt: AstStmt, es: &ExprStore, store: &StmtStore): string
+fn json_ast_global(stmt: ast::AstStmt, es: &ast::ExprStore, store: &ast::StmtStore): string
 {
     return "{\"type\":\"GlobalDeclaration\",\"name\":" + json_ast_quote(stmt.assign_name) + ",\"mutable\":" + json_ast_bool(stmt.is_mut) + ",\"declaredType\":" + (if (stmt.type_text == "") { "null" } else { json_ast_quote(stmt.type_text) }) + ",\"value\":" + json_ast_expr(es, store, stmt.assign_idx) + "," + json_ast_loc(stmt.line, stmt.col) + "}"
 }
 
-pub fn json_ast(program: AstProgram): string
+pub fn json_ast(program: ast::AstProgram): string
 {
     if (program.ok == 0)
     {

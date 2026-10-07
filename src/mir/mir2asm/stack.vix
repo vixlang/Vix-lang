@@ -2,12 +2,13 @@
 use "types.vix" as machine_types
 use "target.vix" as target
 use "registers.vix" as registers
+use "../../lexer.vix" as lexer
 
-pub fn mir2asm_label(b: &MirAsm, name: string): string => b.fn_name + "__" + mir2asm_clean_name(name)
+pub fn mir2asm_label(b: &machine_types::MirAsm, name: string): string => b.fn_name + "__" + target::mir2asm_clean_name(name)
 
-pub fn mir2asm_find_name(b: &MirAsm, name: string): i32
+pub fn mir2asm_find_name(b: &machine_types::MirAsm, name: string): i32
 {
-    let clean = mir2asm_clean_name(name)
+    let clean = target::mir2asm_clean_name(name)
     for (i in 0 .. b.names.length)
     {
         if (b.names[i] == clean) { return i }
@@ -15,12 +16,12 @@ pub fn mir2asm_find_name(b: &MirAsm, name: string): i32
     return -1
 }
 
-pub fn mir2asm_alloc_slot_typed(b: &MirAsm, name: string, addr: i32, ty: string): i32
+pub fn mir2asm_alloc_slot_typed(b: &machine_types::MirAsm, name: string, addr: i32, ty: string): i32
 {
-    let clean = mir2asm_clean_name(name)
+    let clean = target::mir2asm_clean_name(name)
     let existing = mir2asm_find_name(b, clean)
     if (existing >= 0) { return b.offsets[existing] }
-    b.stack_next += mir2asm_slot_size_for(b, ty)
+    b.stack_next += target::mir2asm_slot_size_for(b, ty)
     b.names.push(clean)
     b.offsets.push(b.stack_next)
     b.is_addr.push(addr)
@@ -28,11 +29,11 @@ pub fn mir2asm_alloc_slot_typed(b: &MirAsm, name: string, addr: i32, ty: string)
     return b.stack_next
 }
 
-pub fn mir2asm_mem(offset: i32): string => "[rbp-" + i32_to_str(offset) + "]"
+pub fn mir2asm_mem(offset: i32): string => "[rbp-" + lexer::i32_to_str(offset) + "]"
 
-pub fn mir2asm_slot_ty(b: &MirAsm, value: string): string
+pub fn mir2asm_slot_ty(b: &machine_types::MirAsm, value: string): string
 {
-    let clean = mir2asm_clean_name(mir2asm_trim(value))
+    let clean = target::mir2asm_clean_name(target::mir2asm_trim(value))
     for (ri in 0 .. b.lir_names.length)
     {
         if (b.lir_names[ri] == clean) { return b.lir_tys[ri] }
@@ -46,12 +47,12 @@ pub fn mir2asm_slot_ty(b: &MirAsm, value: string): string
     return "i32"
 }
 
-pub fn mir2asm_lir_reg(b: &MirAsm, value: string, ty: string): string
+pub fn mir2asm_lir_reg(b: &machine_types::MirAsm, value: string, ty: string): string
 {
-    let clean = mir2asm_clean_name(mir2asm_trim(value))
+    let clean = target::mir2asm_clean_name(target::mir2asm_trim(value))
     for (i in 0 .. b.lir_names.length)
     {
-        if (b.lir_names[i] == clean and b.lir_regs[i] != "") { return mir2asm_callee_reg_typed(b.lir_regs[i], ty) }
+        if (b.lir_names[i] == clean and b.lir_regs[i] != "") { return registers::mir2asm_callee_reg_typed(b.lir_regs[i], ty) }
     }
     return ""
 }
@@ -63,26 +64,26 @@ pub fn mir2asm_type_is_byte(ty: string): i32
     return 0
 }
 
-pub fn mir2asm_operand_typed(b: &MirAsm, value: string, ty: string): string
+pub fn mir2asm_operand_typed(b: &machine_types::MirAsm, value: string, ty: string): string
 {
-    let v = mir2asm_trim(value)
+    let v = target::mir2asm_trim(value)
     if (v == "null" or v == "undef") { return "0" }
     if (v.length == 0) { return "0" }
-    if (mir2asm_starts_with(v, "sizeof(") == 1 and compiler_string_byte(v, v.length - 1) == ')')
+    if (target::mir2asm_starts_with(v, "sizeof(") == 1 and compiler_string_byte(v, v.length - 1) == ')')
     {
-        let size_ty = mir2asm_trim(mir2asm_slice(v, 7, v.length - 1))
-        return i32_to_str(mir2asm_type_size_for(b, size_ty))
+        let size_ty = target::mir2asm_trim(target::mir2asm_slice(v, 7, v.length - 1))
+        return lexer::i32_to_str(target::mir2asm_type_size_for(b, size_ty))
     }
     if (compiler_string_byte(v, 0) >= '0' and compiler_string_byte(v, 0) <= '9') return v
     if (compiler_string_byte(v, 0) == '-' and v.length > 1) return v
     let lir_reg = mir2asm_lir_reg(b, v, ty)
     if (lir_reg != "") { return lir_reg }
-    let clean = mir2asm_clean_name(v)
+    let clean = target::mir2asm_clean_name(v)
     let idx = mir2asm_find_name(b, clean)
-    if (idx >= 0) { return mir2asm_mem_word(ty) + " " + mir2asm_mem(b.offsets[idx]) }
+    if (idx >= 0) { return target::mir2asm_mem_word(ty) + " " + mir2asm_mem(b.offsets[idx]) }
     for (i in 0 .. b.param_names.length)
     {
-        if (b.param_names[i] == clean) { return mir2asm_arg_reg_typed(i, ty) }
+        if (b.param_names[i] == clean) { return registers::mir2asm_arg_reg_typed(i, ty) }
     }
     return "0"
 }
