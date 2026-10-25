@@ -1,6 +1,0 @@
-include "lib.vix"
-
-fn main(): i32
-{
-    return v()
-}

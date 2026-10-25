@@ -38,10 +38,10 @@ runtime-related components, examples, and language documentation.
 ## Hello world
 
 ``` vix
-import "std/io.vix"
+use "core/io.vix" as io
 fn main(): i32
 {
-    puts("Hello,world!")
+    io::puts("Hello,world!")
     return 0
 }
 ```

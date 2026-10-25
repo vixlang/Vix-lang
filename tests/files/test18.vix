@@ -1,8 +1,8 @@
-include "../../core/io.vix"
+use "../../core/io.vix" as io
 
 fn main(): i32
 {
     let msg = "Hello syscall\n"
-    io_stdout(msg, 14)
+    io::io_stdout(msg, 14)
     return 0
 }

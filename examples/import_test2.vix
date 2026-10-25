@@ -1,6 +1,6 @@
-include "std/io.vix"
+use "../core/io.vix" as io
 
 fn main(): i32 {
-    puts("Import test 2 passed!")
+    io::puts("Import test 2 passed!")
     return 0
 }

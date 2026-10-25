@@ -2359,16 +2359,15 @@ fn parse_strip_attr_lines(src: string): string
 
 pub fn parse_program_impl(src: string, filename: string, do_preprocess: i32): ast::AstProgram
 {
-    return parse_program_seeded(src, filename, do_preprocess, [])
+    return parse_program_seeded(src, filename, do_preprocess)
 }
 
-// already_loaded holds files another loader has claimed (the module graph), so
-// a quoted import of one of them is not inlined a second time.
-pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, already_loaded: [string]): ast::AstProgram
+// Parses a source text that has already had its attributes and macros handled
+// by the preprocessor.  Files join the program through the module graph, so
+// there is no include bookkeeping here.
+pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32): ast::AstProgram
 {
-    let mut imports = preprocess::import_set_new()
-    for (pre in 0 .. already_loaded.length) { preprocess::import_set_add(&imports, already_loaded[pre]) }
-    let preprocess = if (do_preprocess == 1) preprocess::preprocess_source_result(src, filename, &imports) else preprocess::preprocess_source_local_result(src, filename)
+    let preprocess = if (do_preprocess == 1) preprocess::preprocess_source_result(src, filename) else preprocess::preprocess_source_local_result(src, filename)
     if (preprocess.ok == 0)
     {
         return ast::ast_program_err_diag(diag::diag_render(preprocess.diagnostic, diag::diag_render_options(src, filename)), preprocess.diagnostic)
@@ -2420,14 +2419,13 @@ pub fn parse_program_seeded(src: string, filename: string, do_preprocess: i32, a
         // already reachable through its qualified name.
         elif (parser_text(&parser) == "import")
         {
-            parser_fail(&parser, "'import' has been removed: use 'include <path>' to splice a file, or 'use <path> as <name>' for a module")
+            parser_fail(&parser, "'import' has been removed: use 'use <path> as <name>' for a module")
             return ast::ast_program_err_diag(parser.error, parser.diagnostic)
         }
-        elif (parser_text(&parser) == "include" and parser.pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_kind_at(parser.stream, parser.pos + 1) == lexer::tk_string())
+        elif (parser_text(&parser) == "include")
         {
-            parser_advance(&parser)
-            parser_advance(&parser)
-            parser_accept_text(&parser, ";")
+            parser_fail(&parser, "'include' has been removed: load the file with 'use <path> as <name>' and qualify its symbols")
+            return ast::ast_program_err_diag(parser.error, parser.diagnostic)
         }
         elif (parser_text(&parser) == "extern")
         {
@@ -2572,14 +2570,13 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
     }
     elif (parser_text(&parser) == "import")
     {
-        parser_fail(&parser, "'import' has been removed: use 'include <path>' to splice a file, or 'use <path> as <name>' for a module")
+        parser_fail(&parser, "'import' has been removed: use 'use <path> as <name>' for a module")
         return ast::ast_program_err_diag(parser.error, parser.diagnostic)
     }
-    elif (parser_text(&parser) == "include" and parser.pos + 1 < lexer::stream_len(parser.stream) and lexer::stream_kind_at(parser.stream, parser.pos + 1) == lexer::tk_string())
+    elif (parser_text(&parser) == "include")
     {
-        parser_advance(&parser)
-        parser_advance(&parser)
-        parser_accept_text(&parser, ";")
+        parser_fail(&parser, "'include' has been removed: load the file with 'use <path> as <name>' and qualify its symbols")
+        return ast::ast_program_err_diag(parser.error, parser.diagnostic)
     }
     elif (parser_text(&parser) == "extern")
     {
@@ -2658,12 +2655,6 @@ pub fn parse_declaration_fragment_stream(src: string, filename: string, stream: 
 
 pub fn parse_program_stats(src: string, filename: string): string
 {
-    let mut imports = preprocess::import_set_new()
-    return parse_program_stats_source(src, filename, &imports)
-}
-
-pub fn parse_program_stats_source(src: string, filename: string, imports: &preprocess::ImportSet): string
-{
     let mut extern_count = 0
     let mut type_count = 0
     let mut fn_count = 0
@@ -2674,29 +2665,6 @@ pub fn parse_program_stats_source(src: string, filename: string, imports: &prepr
         if (compiler_string_byte(src, i) == '#')
         {
             i = preprocess::skip_attr_line(src, i)
-            continue
-        }
-        let import_end = preprocess::scan_import_line(src, i)
-        if (import_end > i)
-        {
-            let path = preprocess::extract_import_path(src, i)
-            if (path != "")
-            {
-                let resolved = preprocess::resolve_import_path(filename, path)
-                let mut actual = resolved
-                let mut content = preprocess::read_file_content(actual)
-                if (content == "" and path != resolved)
-                {
-                    actual = path
-                    content = preprocess::read_file_content(actual)
-                }
-                if (content != "" and preprocess::import_set_contains(imports, actual) == 0)
-                {
-                    preprocess::import_set_add(imports, actual)
-                    let child = parse_program_stats_source(content, actual, imports)
-                }
-            }
-            i = import_end
             continue
         }
         i += 1
@@ -2710,5 +2678,5 @@ pub fn parse_program_stats_source(src: string, filename: string, imports: &prepr
         elif (text == "fn") { fn_count += 1 }
         token_count += 1
     }
-    return "ParseStats(tokens=" + ast::ast_i32(token_count) + ", imports=" + ast::ast_i32(imports.paths.length) + ", externs=" + ast::ast_i32(extern_count) + ", types=" + ast::ast_i32(type_count) + ", functions=" + ast::ast_i32(fn_count) + ")"
+    return "ParseStats(tokens=" + ast::ast_i32(token_count) + ", externs=" + ast::ast_i32(extern_count) + ", types=" + ast::ast_i32(type_count) + ", functions=" + ast::ast_i32(fn_count) + ")"
 }

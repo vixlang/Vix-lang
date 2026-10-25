@@ -1,8 +1,8 @@
-include "../../std/io.vix"
+use "../../core/io.vix" as io
 
 fn main(): i32
 {
     let msg = "Compat io\n"
-    io_stdout(msg, 10)
+    io::io_stdout(msg, 10)
     return 0
 }

@@ -1,27 +1,16 @@
-# 模块与文件包含
+# 模块系统
 
 本文描述当前实现。历史版本里有过另一套规则（`import module::symbol`、
-`mod name`、包名展开），那些语法已删除，见文末的迁移说明。
+`mod name`、`include "path.vix"` 文本拼接、包名展开），那些语法已删除，
+见文末的迁移说明。
 
 ---
 
-## 一、两种机制，两个关键字
+## 一、一个机制，一个关键字
 
 | 写法 | 做什么 | 命名空间 |
 |------|--------|----------|
-| `include "path.vix"` | 把目标文件处理后的源码**拼进当前文件** | 扁平，并入当前编译单元 |
 | `use "path.vix" as name` | 加载模块，符号加前缀 | `name::item` |
-
-### include
-
-```vix
-include "lib/math.vix"
-
-fn main(): i32
-{
-    return add(3, 4)          // 扁平：直接调
-}
-```
 
 ### use
 
@@ -39,6 +28,10 @@ fn main(): i32
 的方案都必然撞。
 
 模块可以自己 `use` 别的模块，引用写成它自己的别名；合并时会被改写指向目标模块的完整命名空间。同一个文件被多处引用（菱形）只加载一次，并统一到它第一次落地的命名空间。
+
+extern 声明不属于任何命名空间：它们按裸名合并、对应 C ABI 符号。所以
+`io::printf` 这类限定写法在确定没有模块函数、类型或 variant 占用该名字时，
+会回落到裸 extern 名 `printf`。
 
 同一文件可以用不同别名引入多次，只加载一次：
 
@@ -74,30 +67,14 @@ error[E1001]: expected token -- expected 'as', got 'fn'
 规范化是纯词法的，不要求路径存在——这正是它能作为导入身份的原因。
 
 `use` 的路径除了 `x.vix` 之外还接受目录模块：`use "utils" as utils` 会依次找
-`utils.vix` 和 `utils/mod.vix`。
+`utils.vix` 和 `utils/mod.vix`。路径相对**声明所在文件**解析。
 
 **没有包管理器**：没有裸名展开、没有 `$VIX_HOME`、没有 `.vix/libs` 搜索。
 这些在历史文档里写过，但从未实现，相关文档已删除。
 
 ---
 
-## 三、一个账本
-
-模块图是**唯一**决定"一个程序包含哪些文件"的地方。它在解析之前构建，并把已
-认领的路径交给预处理器，因此 `include` 不会重复内联模块图已经拥有的文件。
-
-原因：两套机制各自维护去重集合时，一个文件被 `mod` 和 `import` 同时引用就会
-包含两次。函数因为合并时会加前缀而幸免，结构体不会：
-
-```
-error[E2006]: duplicate struct 'Thing'
-```
-
-回归测试：`tests/dual_mechanism/`。
-
----
-
-## 四、接口文件 .vixi
+## 三、接口文件 .vixi
 
 每个被 `use` 加载的模块都会生成一个 JSON 接口文件，记录它的签名和
 三个失效依据。编译成功后自动写出，不需要手工调用。
@@ -150,7 +127,7 @@ vixc src/math.vix --emit-vixi        # 写出 src/math.vixi
 
 另外可见性没有进入接口：`pub` 尚未落到 AST 上，所以接口列出所有顶层
 声明。
-## 五、可见性
+## 四、可见性
 
 `pub` 目前**不强制**：解析器接受并丢弃，合并时不做可见性过滤。所以接口文件
 列出所有顶层声明（诚实的超集）。要真正实现可见性，得先把 `is_pub` 加进
@@ -158,20 +135,21 @@ vixc src/math.vix --emit-vixi        # 写出 src/math.vixi
 
 ---
 
-## 六、迁移
+## 五、迁移
 
 | 旧写法 | 新写法 |
 |--------|--------|
-| `import "x.vix"` | `include "x.vix"` |
 | `mod name` | `use "name.vix" as name` |
 | `mod "x.vix"` | `use "x.vix" as <别名>` |
 | `pub mod name` | `use "name.vix" as name`（pub 尚未强制） |
 | `import module::symbol` | 直接写限定名 `module::symbol` |
+| `include "x.vix"` | `use "x.vix" as x` 并把它的符号写成 `x::符号`；它声明的外部函数（extern）可以直接用裸名或 `x::裸名` 调用 |
 
 旧语法不是静默失效，而是给出迁移提示：
 
 ```
 error[E1000]: 'mod' has been removed: declare the module with 'use <path> as <name>'
-error[E1000]: 'import' has been removed: use 'include <path>' to splice a file,
-              or 'use <path> as <name>' for a module
+error[E1000]: 'import' has been removed: use 'use <path> as <name>' for a module
+error[E1000]: 'include' has been removed: load the file with 'use <path> as <name>'
+              and qualify its symbols
 ```

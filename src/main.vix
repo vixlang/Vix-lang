@@ -410,9 +410,7 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
     // and a quoted import used to be included twice, and every declaration in it
     // collided.
     let early_graph = module::module_graph_build(filename)
-    let mut loaded_paths: [string] = []
-    if (early_graph.ok == 1) { loaded_paths = module::module_graph_loaded_paths(early_graph) }
-    let program = parser::parse_program_seeded(src, filename, 1, loaded_paths)
+    let program = parser::parse_program(src, filename)
 
     match mode
     {

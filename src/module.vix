@@ -1278,8 +1278,80 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: ast::AstProgram): ast
         }
         merged_type_symbols = module_type_symbols_add(merged_type_symbols, prefix, prog.structs, prog.adts)
     }
-    
+
+    // Extern declarations live in the flat C ABI namespace: they merge by bare
+    // name and are never prefixed.  A module that qualified one of them with a
+    // use alias therefore wrote a name nothing declares.  When the qualified
+    // spelling matches no function, struct or variant, fall back to the bare
+    // extern name so `io::printf` reaches the C symbol.
+    let mut extern_names: [string] = []
+    for (i in 0 .. root_program.extern_functions.length) { extern_names.push(root_program.extern_functions[i].name) }
+    for (i in 0 .. merged_externs.length) { extern_names.push(merged_externs[i].name) }
+    if (extern_names.length > 0)
+    {
+        for (e in 0 .. merged_es.exprs.length)
+        {
+            if (module_name_is_bare(merged_es.exprs[e].text) == 1) { continue }
+            let tail = module_qualified_tail(merged_es.exprs[e].text)
+            if (module_string_in(extern_names, tail) == 0) { continue }
+            if (module_qualified_name_taken(merged_es.exprs[e].text, merged_fns, merged_structs, merged_adts) == 1) { continue }
+            merged_es.exprs[e].text = tail
+        }
+    }
+
     let mut merged_program = ast::ast_program_full(merged_fns, merged_externs, merged_globals, merged_structs, merged_adts, [], [], merged_es, merged_store)
     merged_program.type_symbols = merged_type_symbols
     return merged_program
+}
+
+// The member part of a qualified name: the text after the last "::", or the
+// whole text when the name is not qualified.
+fn module_qualified_tail(text: string): string
+{
+    let mut last = -1
+    let mut i = 0
+    while (i + 1 < text.length)
+    {
+        if (compiler_string_byte(text, i) == ':' and compiler_string_byte(text, i + 1) == ':') { last = i }
+        i += 1
+    }
+    if (last < 0) { return text }
+    let mut out = ""
+    for (j in last + 2 .. text.length)
+    {
+        out = out + lexer::char_string(compiler_string_byte(text, j))
+    }
+    return out
+}
+
+fn module_string_in(names: [string], text: string): i32
+{
+    for (i in 0 .. names.length)
+    {
+        if (names[i] == text) { return 1 }
+    }
+    return 0
+}
+
+// Whether the qualified spelling names something the merge actually declared:
+// those keep their namespace, externs are the only global fallback.
+fn module_qualified_name_taken(text: string, fns: [ast::AstFunction], structs: [ast::AstStructDecl], adts: [ast::AstAdtDecl]): i32
+{
+    for (i in 0 .. fns.length)
+    {
+        if (fns[i].name == text) { return 1 }
+    }
+    for (i in 0 .. structs.length)
+    {
+        if (structs[i].name == text) { return 1 }
+    }
+    for (i in 0 .. adts.length)
+    {
+        if (adts[i].name == text) { return 1 }
+        for (v in 0 .. adts[i].variant_names.length)
+        {
+            if (adts[i].variant_names[v] == text) { return 1 }
+        }
+    }
+    return 0
 }

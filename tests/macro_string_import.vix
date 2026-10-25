@@ -1,4 +1,4 @@
-include "../src/lexer.vix"
+use "../src/lexer.vix" as lexer
 
 fn main(): i32 {
     print("$capture(not_a_macro)")

@@ -31,17 +31,18 @@ use "lib/math.vix" as math      // 加载模块，符号加 math:: 前缀
 
 ## 编译器源码的命名空间特点
 
-整个编译单元（`sys.vix` 聚合后的所有文件）**共享一个符号空间**，
-所以文件里可以调用别处定义的函数而不再单独 import；但为了
-`--check` 单文件和 analyzer 聚合能解析，**新文件仍要显式 import 依赖**。
+跨文件引用一律走模块系统：`use "ast.vix" as ast` 声明依赖，引用处写
+`ast::` 限定名。**每个文件显式声明它用到的模块**，没有隐式共享的符号空间
+（extern 声明除外：它们按裸名合并进 C ABI 命名空间）。
 
 路径已做词法规范化（见上），所以 `"ast.vix"` 和 `"../ast.vix"` 不会再被当成
 两份。但**建议全仓库保持同一种拼写**，可读性更好：
 
-- `src/*.vix` 之间用裸名 `import "ast.vix"`；
-- `src/*/**.vix` 引用新方法模块时用 `import "method.vix"`，
-  跨目录用相对路径（如 `src/infer/solver.vix` 里的 `import "../ast.vix"`）。
+- `src/*.vix` 之间用裸名 `use "ast.vix" as ast`；
+- `src/*/**.vix` 引用新方法模块时用 `use "method.vix" as method`，
+  跨目录用相对路径（如 `src/infer/solver.vix` 里的 `use "../ast.vix" as ast`）。
 
+`include "path.vix"` 文本拼接已删除；同一语言里只有模块这一种文件组织方式。
 加新模块时改完全量编译 + analyzer 编译都过一遍。
 
 ## 宏

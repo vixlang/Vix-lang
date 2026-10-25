@@ -1,18 +1,18 @@
-include "imported_adt.vix"
+use "imported_adt.vix" as defs
 
-fn eval(e: ImportedExpr): i32
+fn eval(e: defs::ImportedExpr): i32
 {
     match e
     {
-        ImportedNum(n) -> { return n }
-        ImportedNil -> { return 0 }
+        defs::ImportedNum(n) -> { return n }
+        defs::ImportedNil -> { return 0 }
     }
     return 0
 }
 
 fn main(): i32
 {
-    let x = ImportedNum(42)
-    let y = ImportedNil
+    let x = defs::ImportedNum(42)
+    let y = defs::ImportedNil
     return eval(x) + eval(y)
 }

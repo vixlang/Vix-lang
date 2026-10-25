@@ -268,39 +268,6 @@ pub fn analyzer_collect_references(symbols: &symbol_index::SymbolIndex, program:
     }
 }
 
-// The compiler numbers positions against a combined source in which every
-// legacy quoted-import line has been dropped, so a line is reported one lower
-// for each such import above it. A fragment parsed on its own must reproduce
-// that numbering, otherwise its diagnostics sit one line too low per import.
-pub fn analyzer_dropped_lines_before(text: string, line: i32): i32
-{
-    let mut dropped = 0
-    let mut index = 0
-    let mut start = 0
-    while (start < text.length and index < line)
-    {
-        let mut end = start
-        while (end < text.length and util::analyzer_byte_at(text, end) != '\n')
-        {
-            end += 1
-        }
-        let trimmed = util::analyzer_trim(util::analyzer_copy(text, start, end))
-        if (util::analyzer_starts_with(trimmed, "import ") == 1 and util::analyzer_byte_at(trimmed, 7) == '"')
-        {
-            dropped += 1
-        }
-        index += 1
-        start = end + 1
-    }
-    return dropped
-}
-
-// Combined-source line for a physical 0-based line.
-pub fn analyzer_combined_line(text: string, line: i32): i32
-{
-    return line - analyzer_dropped_lines_before(text, line)
-}
-
 // Parses every top-level declaration on its own. Slice boundaries start at the
 // declaration's first line so token columns line up with the file.
 pub fn analyzer_build_fragments(tree: stub_tree::StubTree, text: string): [ast_fragment::AstFragment]
@@ -312,7 +279,6 @@ pub fn analyzer_build_fragments(tree: stub_tree::StubTree, text: string): [ast_f
     {
         let node = tree.nodes[order[o]]
         let line = position::line_index_position(index, node.range.start).line
-        let combined = analyzer_combined_line(text, line)
         let start = util::analyzer_line_start(text, line)
         let mut end = node.range.end
         if (end > text.length)
@@ -322,7 +288,7 @@ pub fn analyzer_build_fragments(tree: stub_tree::StubTree, text: string): [ast_f
         if (end > start)
         {
             let slice = util::analyzer_copy(text, start, end)
-            fragments.push(ast_fragment::ast_fragment_parse(slice, combined, combined, start, end))
+            fragments.push(ast_fragment::ast_fragment_parse(slice, line, line, start, end))
         }
     }
     return fragments
@@ -341,7 +307,6 @@ pub fn analyzer_reuse_fragments(tree: stub_tree::StubTree, text: string, previou
     {
         let node = tree.nodes[order[o]]
         let line = position::line_index_position(index, node.range.start).line
-        let combined = analyzer_combined_line(text, line)
         let start = util::analyzer_line_start(text, line)
         let mut end = node.range.end
         if (end > text.length)
@@ -375,11 +340,11 @@ pub fn analyzer_reuse_fragments(tree: stub_tree::StubTree, text: string, previou
         if (picked >= 0)
         {
             used.push(picked)
-            fragments.push(ast_fragment::ast_fragment_moved(previous[picked], start, end, combined))
+            fragments.push(ast_fragment::ast_fragment_moved(previous[picked], start, end, line))
         }
         else
         {
-            fragments.push(ast_fragment::ast_fragment_parse(slice, combined, combined, start, end))
+            fragments.push(ast_fragment::ast_fragment_parse(slice, line, line, start, end))
         }
     }
     return fragments
