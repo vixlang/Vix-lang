@@ -81,30 +81,29 @@ int vix_asm_write_line(void *file, const char *text) {
 #define MAX_VARS 4096
 #define MAX_FIELDS 32
 /* Module-qualified symbols are emitted as length-prefixed mangled names, so a
-   name can be far longer than the bare identifier it came from.  These tables
-   truncate to the sizes below, and a truncated key silently loses its
-   signature, which makes callers fall back to i32. */
-#define NAME_SIZE 256
-#define TYPE_SIZE 128
+   name or a type spelling can be far longer than the bare identifier it came
+   from.  Every string in these tables is heap-allocated: a fixed buffer would
+   truncate a deep namespace path, and a truncated type loses its closing
+   parenthesis, which makes signature parsing return no parameters at all. */
 
 typedef struct {
-  char name[NAME_SIZE];
+  char *name;
   LLVMValueRef value;
-  char type[TYPE_SIZE];
+  char *type;
 } VarEntry;
 
 typedef struct {
-  char name[NAME_SIZE];
-  char return_type[TYPE_SIZE];
-  char param_types[16][TYPE_SIZE];
+  char *name;
+  char *return_type;
+  char *param_types[16];
   int param_count;
   int is_var_arg;
 } FunctionEntry;
 
 typedef struct {
-  char name[NAME_SIZE];
-  char field_names[MAX_FIELDS][NAME_SIZE];
-  char field_types[MAX_FIELDS][TYPE_SIZE];
+  char *name;
+  char *field_names[MAX_FIELDS];
+  char *field_types[MAX_FIELDS];
   int field_count;
   LLVMTypeRef llvm_type;
   int body_set;
@@ -700,7 +699,33 @@ char *vix_compiler_runtime_object_path(const char *argv0) {
   return vix_join_object("runtime", "runtime.o");
 }
 
-void vix_reset_vars(void) { var_count = 0; }
+static char *vix_strdup(const char *text) {
+  size_t len = strlen(text);
+  char *out = malloc(len + 1);
+  if (out == NULL)
+    return NULL;
+  memcpy(out, text, len + 1);
+  return out;
+}
+
+static void vix_strset(char **slot, const char *text) {
+  char *copy = vix_strdup(text);
+  if (copy == NULL)
+    return;
+  free(*slot);
+  *slot = copy;
+}
+
+void vix_reset_vars(void) {
+  for (int i = 0; i < var_count; i++) {
+    free(vars[i].name);
+    free(vars[i].type);
+    vars[i].name = NULL;
+    vars[i].type = NULL;
+    vars[i].value = NULL;
+  }
+  var_count = 0;
+}
 
 void vix_set_var(const char *name, LLVMValueRef value) {
   for (int i = var_count - 1; i >= 0; i--) {
@@ -710,10 +735,9 @@ void vix_set_var(const char *name, LLVMValueRef value) {
     }
   }
   if (var_count < MAX_VARS) {
-    strncpy(vars[var_count].name, name, NAME_SIZE - 1);
-    vars[var_count].name[NAME_SIZE - 1] = '\0';
+    vars[var_count].name = vix_strdup(name);
     vars[var_count].value = value;
-    vars[var_count].type[0] = '\0';
+    vars[var_count].type = vix_strdup("");
     var_count++;
   }
 }
@@ -721,17 +745,14 @@ void vix_set_var(const char *name, LLVMValueRef value) {
 void vix_set_var_type(const char *name, const char *type) {
   for (int i = var_count - 1; i >= 0; i--) {
     if (strcmp(vars[i].name, name) == 0) {
-      strncpy(vars[i].type, type, TYPE_SIZE - 1);
-      vars[i].type[TYPE_SIZE - 1] = '\0';
+      vix_strset(&vars[i].type, type);
       return;
     }
   }
   if (var_count < MAX_VARS) {
-    strncpy(vars[var_count].name, name, NAME_SIZE - 1);
-    vars[var_count].name[NAME_SIZE - 1] = '\0';
+    vars[var_count].name = vix_strdup(name);
     vars[var_count].value = NULL;
-    strncpy(vars[var_count].type, type, TYPE_SIZE - 1);
-    vars[var_count].type[TYPE_SIZE - 1] = '\0';
+    vars[var_count].type = vix_strdup(type);
     var_count++;
   }
 }
@@ -756,7 +777,20 @@ LLVMValueRef vix_get_var(const char *name) {
   return NULL;
 }
 
-void vix_reset_function_sigs(void) { func_count = 0; }
+void vix_reset_function_sigs(void) {
+  for (int i = 0; i < func_count; i++) {
+    free(funcs[i].name);
+    free(funcs[i].return_type);
+    for (int p = 0; p < 16; p++) {
+      free(funcs[i].param_types[p]);
+      funcs[i].param_types[p] = NULL;
+    }
+    funcs[i].name = NULL;
+    funcs[i].return_type = NULL;
+    funcs[i].param_count = 0;
+  }
+  func_count = 0;
+}
 
 static int vix_find_struct_index(const char *name) {
   for (int i = struct_count - 1; i >= 0; i--) {
@@ -766,7 +800,20 @@ static int vix_find_struct_index(const char *name) {
   return -1;
 }
 
-void vix_reset_struct_sigs(void) { struct_count = 0; }
+void vix_reset_struct_sigs(void) {
+  for (int i = 0; i < struct_count; i++) {
+    free(structs[i].name);
+    for (int f = 0; f < MAX_FIELDS; f++) {
+      free(structs[i].field_names[f]);
+      free(structs[i].field_types[f]);
+      structs[i].field_names[f] = NULL;
+      structs[i].field_types[f] = NULL;
+    }
+    structs[i].name = NULL;
+    structs[i].field_count = 0;
+  }
+  struct_count = 0;
+}
 
 void vix_declare_struct_sig(const char *name) {
   if (vix_find_struct_index(name) >= 0)
@@ -774,8 +821,7 @@ void vix_declare_struct_sig(const char *name) {
   if (struct_count >= MAX_VARS)
     return;
   int idx = struct_count++;
-  strncpy(structs[idx].name, name, NAME_SIZE - 1);
-  structs[idx].name[NAME_SIZE - 1] = '\0';
+  structs[idx].name = vix_strdup(name);
   structs[idx].field_count = 0;
   structs[idx].llvm_type = LLVMStructCreateNamed(LLVMGetGlobalContext(), name);
   structs[idx].body_set = 0;
@@ -817,14 +863,16 @@ static LLVMTypeRef vix_llvm_type_for_name(const char *type) {
   if (type[0] == '[') {
     const char *star = strchr(type, '*');
     if (star != NULL && star > type + 1) {
-      char elem[TYPE_SIZE];
       size_t len = (size_t)(star - (type + 1));
-      if (len >= sizeof(elem)) len = sizeof(elem) - 1;
-      memcpy(elem, type + 1, len);
-      elem[len] = '\0';
-      unsigned long count = strtoul(star + 1, NULL, 10);
-      if (count > 0 && count <= UINT_MAX && vix_layout_c_abi)
-        return LLVMArrayType(vix_llvm_type_for_name(elem), (unsigned)count);
+      char *elem = malloc(len + 1);
+      if (elem != NULL) {
+        memcpy(elem, type + 1, len);
+        elem[len] = '\0';
+        unsigned long count = strtoul(star + 1, NULL, 10);
+        if (count > 0 && count <= UINT_MAX && vix_layout_c_abi)
+          return LLVMArrayType(vix_llvm_type_for_name(elem), (unsigned)count);
+        free(elem);
+      }
     }
     return LLVMPointerType(LLVMInt8Type(), 0);
   }
@@ -864,10 +912,8 @@ void vix_register_struct_sig_abi(const char *name, const char **field_names,
   int previous_layout = vix_layout_c_abi;
   vix_layout_c_abi = is_c_abi;
   for (int i = 0; i < field_count; i++) {
-    strncpy(structs[idx].field_names[i], field_names[i], NAME_SIZE - 1);
-    structs[idx].field_names[i][NAME_SIZE - 1] = '\0';
-    strncpy(structs[idx].field_types[i], field_types[i], TYPE_SIZE - 1);
-    structs[idx].field_types[i][TYPE_SIZE - 1] = '\0';
+    vix_strset(&structs[idx].field_names[i], field_names[i]);
+    vix_strset(&structs[idx].field_types[i], field_types[i]);
     llvm_fields[i] = vix_llvm_type_for_name(field_types[i]);
   }
   vix_layout_c_abi = previous_layout;
@@ -964,17 +1010,16 @@ void vix_register_function_sig_vararg(const char *name, const char *return_type,
     }
     idx = func_count++;
   }
-  strncpy(funcs[idx].name, name, NAME_SIZE - 1);
-  funcs[idx].name[NAME_SIZE - 1] = '\0';
-  strncpy(funcs[idx].return_type, return_type, TYPE_SIZE - 1);
-  funcs[idx].return_type[TYPE_SIZE - 1] = '\0';
+  vix_strset(&funcs[idx].name, name);
+  vix_strset(&funcs[idx].return_type, return_type);
   if (param_count > 16)
     param_count = 16;
+  for (int i = funcs[idx].param_count; i < param_count; i++)
+    funcs[idx].param_types[i] = NULL;
   funcs[idx].param_count = param_count;
   funcs[idx].is_var_arg = is_var_arg;
   for (int i = 0; i < param_count; i++) {
-    strncpy(funcs[idx].param_types[i], param_types[i], TYPE_SIZE - 1);
-    funcs[idx].param_types[i][TYPE_SIZE - 1] = '\0';
+    vix_strset(&funcs[idx].param_types[i], param_types[i]);
   }
 }
 
