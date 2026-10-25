@@ -61,7 +61,8 @@ pub type JsonCursor = struct
 {
     text: string,
     pos: i32,
-    ok: i32
+    ok: i32,
+    depth: i32
 }
 
 pub fn json_document_new(): JsonDocument
@@ -71,7 +72,7 @@ pub fn json_document_new(): JsonDocument
 
 pub fn json_cursor_new(text: string): JsonCursor
 {
-    return JsonCursor{ text: text, pos: 0, ok: 1 }
+    return JsonCursor{ text: text, pos: 0, ok: 1, depth: 0 }
 }
 
 pub fn json_add_node(doc: &JsonDocument, node: JsonNode): i32
@@ -386,6 +387,22 @@ pub fn json_read_literal(cursor: &JsonCursor, word: string, bool_value: i32, doc
 }
 
 pub fn json_read_value(cursor: &JsonCursor, doc: &JsonDocument): i32
+{
+    // JSON arrives from LSP clients, so untrusted nesting must fail cleanly
+    // instead of exhausting the stack.
+    cursor.depth += 1
+    if (cursor.depth > 200)
+    {
+        cursor.ok = 0
+        cursor.depth -= 1
+        return -1
+    }
+    let result = json_read_value_inner(cursor, doc)
+    cursor.depth -= 1
+    return result
+}
+
+fn json_read_value_inner(cursor: &JsonCursor, doc: &JsonDocument): i32
 {
     json_skip_space(cursor)
     let start = cursor.pos

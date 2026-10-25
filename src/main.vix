@@ -473,6 +473,12 @@ fn run_mode(mode: string, src: string, filename: string, emit: string, output: s
             return mode_failure()
         }
         merged_program = module::module_graph_load_all(g, program)
+        if (merged_program.ok == 0)
+        {
+            diag_print(merged_program.error)
+            diag_protocol_finish(1, 0)
+            return mode_failure()
+        }
     }
 
     // One method table per compilation unit, attached after modules are merged.

@@ -30,6 +30,16 @@ cd "$ROOT"
 CLANG=${CLANG:-/usr/bin/clang}
 CLANGXX=${CLANGXX:-/usr/bin/clang++}
 LLVM_CONFIG=${LLVM_CONFIG:-llvm-config}
+# Default to the first lld development tree found in the usual places; both
+# variables stay overridable for non-standard layouts.
+for candidate in "$HOME/miniconda3" "$HOME/.homebrew/opt/lld" \
+                 "/opt/homebrew/opt/lld" "/usr/local/opt/lld"; do
+  if [ -d "$candidate/include/lld" ]; then
+    LLD_INCLUDE=${LLD_INCLUDE:-"$candidate/include"}
+    LLD_LIBDIR=${LLD_LIBDIR:-"$candidate/lib"}
+    break
+  fi
+done
 LLD_INCLUDE=${LLD_INCLUDE:-/Users/Admin/miniconda3/include}
 LLD_LIBDIR=${LLD_LIBDIR:-/Users/Admin/miniconda3/lib}
 LLVM_LINK_LIB=${LLVM_LINK_LIB:-LLVM-21}

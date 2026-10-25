@@ -8,6 +8,7 @@ use "preprocess.vix" as preprocess
 use "diag.vix" as diag
 use "receiver.vix" as receiver
 
+
 pub type Parser = struct {
     stream: lexer::TokenStream,
     pos: i32,
@@ -20,12 +21,42 @@ pub type Parser = struct {
     filename: string,
     current_function: string,
     lambda_counter: i32,
-    lambda_functions: [ast::AstFunction]
+    lambda_functions: [ast::AstFunction],
+    depth: i32
 }
 
 pub fn parser_new(src: string, filename: string): Parser => parser_new_stream(src, filename, lexer::tokenize(src))
 
-pub fn parser_new_stream(src: string, filename: string, stream: lexer::TokenStream): Parser => Parser{ stream: stream, pos: 0, ok: 1, error: "", diagnostic: diag::diag_new("E0000", diag::DiagError, diag::DiagParser, ""), expr_store: ast::expr_store_new(), store: ast::stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [] }
+// The parser recurses once per nesting level (parentheses, blocks, match arms,
+// call arguments...), so a pathological input can otherwise exhaust the stack
+// and crash the compiler or the language server.  Every recursive entry goes
+// through parse_expression or parse_statement, so counting there bounds the
+// whole descent.  One nesting level costs more than a dozen frames of these
+// (fat) parser functions, so 200 already allows far deeper nesting than
+// anything handwritten while staying well inside the default 8MB stack.
+pub fn parser_depth_enter(parser: &Parser): i32
+{
+    parser.depth += 1
+    if (parser.depth > 200)
+    {
+        // The precedence chain and parse_primary descend without re-checking
+        // ok, so failing alone would still walk every remaining nesting level
+        // and overflow the stack on pathological inputs.  Record the error at
+        // the real position first, then park on the EOF token: every further
+        // match fails, the recursion unwinds at once, and this first error is
+        // the one that gets reported.
+        parser_fail(parser, "nesting is too deep (more than 200 levels)")
+        parser.pos = lexer::stream_len(parser.stream) - 1
+    }
+    return parser.depth
+}
+
+pub fn parser_depth_exit(parser: &Parser)
+{
+    if (parser.depth > 0) { parser.depth -= 1 }
+}
+
+pub fn parser_new_stream(src: string, filename: string, stream: lexer::TokenStream): Parser => Parser{ stream: stream, pos: 0, ok: 1, error: "", diagnostic: diag::diag_new("E0000", diag::DiagError, diag::DiagParser, ""), expr_store: ast::expr_store_new(), store: ast::stmt_store_new(), source: src, filename: filename, current_function: "global", lambda_counter: 0, lambda_functions: [], depth: 0 }
 
 pub fn parser_kind(parser: &Parser): i32 => lexer::stream_kind_at(parser.stream, parser.pos)
 
@@ -138,6 +169,14 @@ pub fn parser_expect_kind(parser: &Parser, kind: i32): i32
 }
 
 pub fn parse_expression(parser: &Parser): i32
+{
+    parser_depth_enter(parser)
+    let result = parse_expression_inner(parser)
+    parser_depth_exit(parser)
+    return result
+}
+
+fn parse_expression_inner(parser: &Parser): i32
 {
     let mut left = parse_logical_or(parser)
     if (parser.ok == 0) { return -1 }
@@ -1586,6 +1625,14 @@ pub fn parse_match_statement(parser: &Parser): i32
 }
 
 pub fn parse_statement(parser: &Parser): i32
+{
+    parser_depth_enter(parser)
+    let result = parse_statement_inner(parser)
+    parser_depth_exit(parser)
+    return result
+}
+
+fn parse_statement_inner(parser: &Parser): i32
 {
     let line = parser_line(parser)
     let col = parser_col(parser)

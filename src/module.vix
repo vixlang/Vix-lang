@@ -2,6 +2,7 @@
 use "ast.vix" as ast
 use "type/typepool.vix" as typepool
 use "lexer.vix" as lexer
+use "diag.vix" as diag
 use "preprocess.vix" as preprocess
 use "parser.vix" as parser
 use "vixi.vix" as vixi
@@ -1042,14 +1043,22 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: ast::AstProgram): ast
     }
     merged_type_symbols = module_type_symbols_add(merged_type_symbols, "", root_program.structs, root_program.adts)
     
+    let mut load_error = ""
     for (mi in 1 .. g.modules.length)
     {
         let mnode = g.modules[mi]
         let src = preprocess::read_file_content(mnode.source_path)
         if (src == "") { continue }
-        
+
         let prog = parser::parse_program_raw(src, mnode.source_path)
-        if (prog.ok == 0) { continue }
+        if (prog.ok == 0)
+        {
+            // A module that fails to parse contributes nothing, so every name
+            // it should provide would surface later as unrelated undefined
+            // symbols.  Fail the merge with the real cause instead.
+            load_error = "module '" + mnode.source_path + "' failed to parse\n" + prog.error
+            continue
+        }
         
         let prefix = module_strip_root_prefix(mnode.id.qualified_name)
         let expr_off = merged_es.exprs.length
@@ -1297,6 +1306,11 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: ast::AstProgram): ast
             if (module_qualified_name_taken(merged_es.exprs[e].text, merged_fns, merged_structs, merged_adts) == 1) { continue }
             merged_es.exprs[e].text = tail
         }
+    }
+
+    if (load_error != "")
+    {
+        return ast::ast_program_err_diag(load_error, diag::diag_new("E1000", diag::DiagError, diag::DiagParser, ""))
     }
 
     let mut merged_program = ast::ast_program_full(merged_fns, merged_externs, merged_globals, merged_structs, merged_adts, [], [], merged_es, merged_store)
