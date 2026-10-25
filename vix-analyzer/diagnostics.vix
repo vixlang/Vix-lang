@@ -1,10 +1,10 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "../src/json.vix"
-include "../src/diag.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "../src/json.vix" as json
+use "../src/diag.vix" as diag
 
 pub type DiagnosticSeverity = SeverityError | SeverityWarning | SeverityInformation | SeverityHint
 
@@ -13,8 +13,8 @@ pub type AnalyzerDiagnostic = struct
     code: string,
     message: string,
     severity: DiagnosticSeverity,
-    file: FileId,
-    range: LspRange
+    file: ids::FileId,
+    range: position::LspRange
 }
 
 pub fn analyzer_severity(level: diag::DiagLevel): DiagnosticSeverity
@@ -47,17 +47,17 @@ pub fn analyzer_severity_code(severity: DiagnosticSeverity): string
     return "4"
 }
 
-pub fn analyzer_span_range(span: diag::DiagSpan): LspRange
+pub fn analyzer_span_range(span: diag::DiagSpan): position::LspRange
 {
     let line = if (span.line < 1) 0 else span.line - 1
     let character = if (span.column < 1) 0 else span.column - 1
-    return LspRange{
-        start: LspPosition{ line: line, character: character },
-        end: LspPosition{ line: line, character: character + 1 }
+    return position::LspRange{
+        start: position::LspPosition{ line: line, character: character },
+        end: position::LspPosition{ line: line, character: character + 1 }
     }
 }
 
-pub fn analyzer_diagnostic(code: string, message: string, severity: DiagnosticSeverity, file: FileId, range: LspRange): AnalyzerDiagnostic
+pub fn analyzer_diagnostic(code: string, message: string, severity: DiagnosticSeverity, file: ids::FileId, range: position::LspRange): AnalyzerDiagnostic
 {
     return AnalyzerDiagnostic{
         code: code,
@@ -68,7 +68,7 @@ pub fn analyzer_diagnostic(code: string, message: string, severity: DiagnosticSe
     }
 }
 
-pub fn analyzer_diagnostic_from_diag(file: FileId, diag: diag::Diagnostic): AnalyzerDiagnostic
+pub fn analyzer_diagnostic_from_diag(file: ids::FileId, diag: diag::Diagnostic): AnalyzerDiagnostic
 {
     let message = if (diag.message != "") diag.message else diag.title
     return AnalyzerDiagnostic{
@@ -80,16 +80,16 @@ pub fn analyzer_diagnostic_from_diag(file: FileId, diag: diag::Diagnostic): Anal
     }
 }
 
-pub fn analyzer_diagnostic_syntax(file: FileId, message: string, line: i32, character: i32): AnalyzerDiagnostic
+pub fn analyzer_diagnostic_syntax(file: ids::FileId, message: string, line: i32, character: i32): AnalyzerDiagnostic
 {
     return AnalyzerDiagnostic{
         code: "E0000",
         message: message,
         severity: SeverityError,
         file: file,
-        range: LspRange{
-            start: LspPosition{ line: line, character: character },
-            end: LspPosition{ line: line, character: character + 1 }
+        range: position::LspRange{
+            start: position::LspPosition{ line: line, character: character },
+            end: position::LspPosition{ line: line, character: character + 1 }
         }
     }
 }
@@ -104,10 +104,10 @@ pub fn diagnostics_to_json(diagnostics: [AnalyzerDiagnostic]): string
             out = out + ","
         }
         let item = diagnostics[i]
-        out = out + "{\"range\":{\"start\":{\"line\":" + analyzer_i32_to_str(item.range.start.line)
-        out = out + ",\"character\":" + analyzer_i32_to_str(item.range.start.character) + "},"
-        out = out + "\"end\":{\"line\":" + analyzer_i32_to_str(item.range.end.line)
-        out = out + ",\"character\":" + analyzer_i32_to_str(item.range.end.character) + "}},"
+        out = out + "{\"range\":{\"start\":{\"line\":" + util::analyzer_i32_to_str(item.range.start.line)
+        out = out + ",\"character\":" + util::analyzer_i32_to_str(item.range.start.character) + "},"
+        out = out + "\"end\":{\"line\":" + util::analyzer_i32_to_str(item.range.end.line)
+        out = out + ",\"character\":" + util::analyzer_i32_to_str(item.range.end.character) + "}},"
         out = out + "\"severity\":" + analyzer_severity_code(item.severity) + ","
         out = out + "\"code\":" + json::json_quote(item.code) + ","
         out = out + "\"source\":\"vix-analyzer\","

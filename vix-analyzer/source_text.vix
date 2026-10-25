@@ -1,23 +1,23 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
+use "ids.vix" as ids
+use "position.vix" as position
 
 pub type TextEdit = struct
 {
-    range: TextRange,
+    range: position::TextRange,
     replacement: string,
 }
 pub type SourceText = struct
 {
-    file: FileId,
+    file: ids::FileId,
     version: i32,
     text: string,
-    index: LineIndex,
+    index: position::LineIndex,
 }
-pub fn source_text_new(file: FileId, version: i32, text: string): SourceText
+pub fn source_text_new(file: ids::FileId, version: i32, text: string): SourceText
 {
-    return SourceText{ file: file, version: version, text: text, index: line_index_new(text) }
+    return SourceText{ file: file, version: version, text: text, index: position::line_index_new(text) }
 }
 pub fn source_text_replace(source: SourceText, text: string, version: i32): SourceText
 {
@@ -33,7 +33,7 @@ pub fn source_text_text(source: SourceText): string
 {
     return source.text
 }
-pub fn source_text_changed_range(old_source: SourceText, new_source: SourceText): TextRange
+pub fn source_text_changed_range(old_source: SourceText, new_source: SourceText): position::TextRange
 {
     let mut start = 0;
     let limit = if (old_source.text.length < new_source.text.length) { old_source.text.length } else { new_source.text.length };
@@ -42,9 +42,9 @@ pub fn source_text_changed_range(old_source: SourceText, new_source: SourceText)
     let mut new_end = new_source.text.length;
     while (old_end > start and new_end > start and old_source.text[old_end - 1] == new_source.text[new_end - 1]) { old_end -= 1;
     new_end -= 1 };
-    return TextRange{ start: start, end: new_end }
+    return position::TextRange{ start: start, end: new_end }
 }
-pub fn source_text_position(source: SourceText, byte: i32): TextPosition
+pub fn source_text_position(source: SourceText, byte: i32): position::TextPosition
 {
-    return line_index_position(source.index, byte)
+    return position::line_index_position(source.index, byte)
 }

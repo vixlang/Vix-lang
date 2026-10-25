@@ -1,28 +1,30 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "stub_tree.vix"
-include "symbol_index.vix"
-include "diagnostics.vix"
-include "incremental.vix"
-include "ast_fragment.vix"
-include "sema_cache.vix"
-include "source_text.vix"
-include "../src/diag.vix"
-include "../src/lexer.vix"
-include "../src/parser.vix"
-include "../src/semantic.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "stub_tree.vix" as stub_tree
+use "symbol_index.vix" as symbol_index
+use "diagnostics.vix" as diagnostics
+use "incremental.vix" as incremental
+use "ast_fragment.vix" as ast_fragment
+use "sema_cache.vix" as sema_cache
+use "source_text.vix" as source_text
+use "../src/diag.vix" as diag
+use "../src/lexer.vix" as lexer
+use "../src/parser.vix" as parser
+use "../src/semantic.vix" as semantic
+use "../src/ast.vix" as ast
+use "../src/receiver.vix" as receiver
 
 pub type DocumentAnalysis = struct
 {
-    file: FileId,
-    tree: StubTree,
-    fragments: [AstFragment],
-    symbols: SymbolIndex,
-    diagnostics: [AnalyzerDiagnostic],
-    sema_cache: SemaCache,
+    file: ids::FileId,
+    tree: stub_tree::StubTree,
+    fragments: [ast_fragment::AstFragment],
+    symbols: symbol_index::SymbolIndex,
+    diagnostics: [diagnostics::AnalyzerDiagnostic],
+    sema_cache: sema_cache::SemaCache,
     ok: i32,
     reused_nodes: i32,
     fresh_nodes: i32,
@@ -61,7 +63,7 @@ pub fn analyzer_receiver_text(kind: receiver::ReceiverKind, receiver_type: strin
     return receiver_type
 }
 
-pub fn analyzer_enrich_types(symbols: &SymbolIndex, program: ast::AstProgram)
+pub fn analyzer_enrich_types(symbols: &symbol_index::SymbolIndex, program: ast::AstProgram)
 {
     for (i in 0 .. program.functions.length)
     {
@@ -69,7 +71,7 @@ pub fn analyzer_enrich_types(symbols: &SymbolIndex, program: ast::AstProgram)
         let signature = analyzer_function_signature(function)
         for (d in 0 .. symbols.declarations.length)
         {
-            if (symbols.declarations[d].kind == FunctionSymbol and symbols.declarations[d].name == function.name)
+            if (symbols.declarations[d].kind == symbol_index::FunctionSymbol and symbols.declarations[d].name == function.name)
             {
                 symbols.declarations[d].type_text = signature
             }
@@ -88,7 +90,7 @@ pub fn analyzer_enrich_types(symbols: &SymbolIndex, program: ast::AstProgram)
     }
 }
 
-pub fn analyzer_push_reference(symbols: &SymbolIndex, file: FileId, symbol: SymbolId, range: LspRange)
+pub fn analyzer_push_reference(symbols: &symbol_index::SymbolIndex, file: ids::FileId, symbol: ids::SymbolId, range: position::LspRange)
 {
     for (i in 0 .. symbols.references.length)
     {
@@ -98,10 +100,10 @@ pub fn analyzer_push_reference(symbols: &SymbolIndex, file: FileId, symbol: Symb
             return
         }
     }
-    symbols.references.push(Reference{ symbol: symbol, file: file, range: range })
+    symbols.references.push(symbol_index::Reference{ symbol: symbol, file: file, range: range })
 }
 
-pub fn analyzer_record_reference(symbols: &SymbolIndex, file: FileId, text: string, index: LineIndex, name: string, line: i32, column: i32)
+pub fn analyzer_record_reference(symbols: &symbol_index::SymbolIndex, file: ids::FileId, text: string, index: position::LineIndex, name: string, line: i32, column: i32)
 {
     if (name == "")
     {
@@ -113,21 +115,21 @@ pub fn analyzer_record_reference(symbols: &SymbolIndex, file: FileId, text: stri
         {
             let start = diag::diag_offset_at(text, line, column)
             let end = start + name.length
-            analyzer_push_reference(symbols, file, symbols.declarations[d].id, text_range_to_lsp(index, text_range(start, end), text))
+            analyzer_push_reference(symbols, file, symbols.declarations[d].id, position::text_range_to_lsp(index, position::text_range(start, end), text))
         }
     }
 }
 
-pub fn analyzer_record_method_reference(symbols: &SymbolIndex, file: FileId, text: string, index: LineIndex, method: string, line: i32, column: i32)
+pub fn analyzer_record_method_reference(symbols: &symbol_index::SymbolIndex, file: ids::FileId, text: string, index: position::LineIndex, method: string, line: i32, column: i32)
 {
-    let symbol = symbol_index_find_method(@symbols, method)
+    let symbol = symbol_index::symbol_index_find_method(@symbols, method)
     if (symbol.index < 0) { return }
     let start = diag::diag_offset_at(text, line, column)
     let end = start + method.length
-    analyzer_push_reference(symbols, file, symbol, text_range_to_lsp(index, text_range(start, end), text))
+    analyzer_push_reference(symbols, file, symbol, position::text_range_to_lsp(index, position::text_range(start, end), text))
 }
 
-pub fn analyzer_walk_expr(symbols: &SymbolIndex, program: ast::AstProgram, file: FileId, text: string, index: LineIndex, expr_idx: i32)
+pub fn analyzer_walk_expr(symbols: &symbol_index::SymbolIndex, program: ast::AstProgram, file: ids::FileId, text: string, index: position::LineIndex, expr_idx: i32)
 {
     if (expr_idx < 0 or expr_idx >= program.expr_store.exprs.length)
     {
@@ -153,7 +155,7 @@ pub fn analyzer_walk_expr(symbols: &SymbolIndex, program: ast::AstProgram, file:
 // Mirrors the per-tag field usage of semantic_check_stmt. Walking every index
 // field regardless of tag would follow statement indices as expressions, and
 // vice versa.
-pub fn analyzer_walk_stmt(symbols: &SymbolIndex, program: ast::AstProgram, file: FileId, text: string, index: LineIndex, stmt_idx: i32)
+pub fn analyzer_walk_stmt(symbols: &symbol_index::SymbolIndex, program: ast::AstProgram, file: ids::FileId, text: string, index: position::LineIndex, stmt_idx: i32)
 {
     if (stmt_idx < 0 or stmt_idx >= program.store.stmts.length)
     {
@@ -244,9 +246,9 @@ pub fn analyzer_walk_stmt(symbols: &SymbolIndex, program: ast::AstProgram, file:
     }
 }
 
-pub fn analyzer_collect_references(symbols: &SymbolIndex, program: ast::AstProgram, file: FileId, text: string)
+pub fn analyzer_collect_references(symbols: &symbol_index::SymbolIndex, program: ast::AstProgram, file: ids::FileId, text: string)
 {
-    let index = line_index_new(text)
+    let index = position::line_index_new(text)
     for (d in 0 .. symbols.declarations.length)
     {
         analyzer_push_reference(symbols, file, symbols.declarations[d].id, symbols.declarations[d].selection_range)
@@ -278,12 +280,12 @@ pub fn analyzer_dropped_lines_before(text: string, line: i32): i32
     while (start < text.length and index < line)
     {
         let mut end = start
-        while (end < text.length and analyzer_byte_at(text, end) != '\n')
+        while (end < text.length and util::analyzer_byte_at(text, end) != '\n')
         {
             end += 1
         }
-        let trimmed = analyzer_trim(analyzer_copy(text, start, end))
-        if (analyzer_starts_with(trimmed, "import ") == 1 and analyzer_byte_at(trimmed, 7) == '"')
+        let trimmed = util::analyzer_trim(util::analyzer_copy(text, start, end))
+        if (util::analyzer_starts_with(trimmed, "import ") == 1 and util::analyzer_byte_at(trimmed, 7) == '"')
         {
             dropped += 1
         }
@@ -301,17 +303,17 @@ pub fn analyzer_combined_line(text: string, line: i32): i32
 
 // Parses every top-level declaration on its own. Slice boundaries start at the
 // declaration's first line so token columns line up with the file.
-pub fn analyzer_build_fragments(tree: StubTree, text: string): [AstFragment]
+pub fn analyzer_build_fragments(tree: stub_tree::StubTree, text: string): [ast_fragment::AstFragment]
 {
-    let index = line_index_new(text)
-    let order = stub_tree_sorted_declarations(tree)
-    let mut fragments: [AstFragment] = []
+    let index = position::line_index_new(text)
+    let order = stub_tree::stub_tree_sorted_declarations(tree)
+    let mut fragments: [ast_fragment::AstFragment] = []
     for (o in 0 .. order.length)
     {
         let node = tree.nodes[order[o]]
-        let line = line_index_position(index, node.range.start).line
+        let line = position::line_index_position(index, node.range.start).line
         let combined = analyzer_combined_line(text, line)
-        let start = analyzer_line_start(text, line)
+        let start = util::analyzer_line_start(text, line)
         let mut end = node.range.end
         if (end > text.length)
         {
@@ -319,8 +321,8 @@ pub fn analyzer_build_fragments(tree: StubTree, text: string): [AstFragment]
         }
         if (end > start)
         {
-            let slice = analyzer_copy(text, start, end)
-            fragments.push(ast_fragment_parse(slice, combined, combined, start, end))
+            let slice = util::analyzer_copy(text, start, end)
+            fragments.push(ast_fragment::ast_fragment_parse(slice, combined, combined, start, end))
         }
     }
     return fragments
@@ -329,18 +331,18 @@ pub fn analyzer_build_fragments(tree: StubTree, text: string): [AstFragment]
 // Rebuilds the fragment list for the current text. A declaration whose slice text
 // is unchanged keeps its previously parsed AST, so reuse depends on content
 // rather than on offset arithmetic.
-pub fn analyzer_reuse_fragments(tree: StubTree, text: string, previous: [AstFragment]): [AstFragment]
+pub fn analyzer_reuse_fragments(tree: stub_tree::StubTree, text: string, previous: [ast_fragment::AstFragment]): [ast_fragment::AstFragment]
 {
-    let index = line_index_new(text)
-    let order = stub_tree_sorted_declarations(tree)
+    let index = position::line_index_new(text)
+    let order = stub_tree::stub_tree_sorted_declarations(tree)
     let mut used: [i32] = []
-    let mut fragments: [AstFragment] = []
+    let mut fragments: [ast_fragment::AstFragment] = []
     for (o in 0 .. order.length)
     {
         let node = tree.nodes[order[o]]
-        let line = line_index_position(index, node.range.start).line
+        let line = position::line_index_position(index, node.range.start).line
         let combined = analyzer_combined_line(text, line)
-        let start = analyzer_line_start(text, line)
+        let start = util::analyzer_line_start(text, line)
         let mut end = node.range.end
         if (end > text.length)
         {
@@ -350,7 +352,7 @@ pub fn analyzer_reuse_fragments(tree: StubTree, text: string, previous: [AstFrag
         {
             continue
         }
-        let slice = analyzer_copy(text, start, end)
+        let slice = util::analyzer_copy(text, start, end)
         let mut picked = -1
         for (p in 0 .. previous.length)
         {
@@ -373,29 +375,29 @@ pub fn analyzer_reuse_fragments(tree: StubTree, text: string, previous: [AstFrag
         if (picked >= 0)
         {
             used.push(picked)
-            fragments.push(ast_fragment_moved(previous[picked], start, end, combined))
+            fragments.push(ast_fragment::ast_fragment_moved(previous[picked], start, end, combined))
         }
         else
         {
-            fragments.push(ast_fragment_parse(slice, combined, combined, start, end))
+            fragments.push(ast_fragment::ast_fragment_parse(slice, combined, combined, start, end))
         }
     }
     return fragments
 }
 
-pub fn analyzer_finish(file: FileId, text: string, tree: StubTree, fragments: [AstFragment], program: ast::AstProgram, previous_cache: SemaCache): DocumentAnalysis
+pub fn analyzer_finish(file: ids::FileId, text: string, tree: stub_tree::StubTree, fragments: [ast_fragment::AstFragment], program: ast::AstProgram, previous_cache: sema_cache::SemaCache): DocumentAnalysis
 {
-    let mut diagnostics: [AnalyzerDiagnostic] = []
+    let mut diagnostics: [diagnostics::AnalyzerDiagnostic] = []
     if (program.ok == 0)
     {
-        diagnostics.push(analyzer_diagnostic("E1000", program.error, SeverityError, file, lsp_range(lsp_position(0, 0), lsp_position(0, 0))))
+        diagnostics.push(diagnostics::analyzer_diagnostic("E1000", program.error, diagnostics::SeverityError, file, position::lsp_range(position::lsp_position(0, 0), position::lsp_position(0, 0))))
         return DocumentAnalysis{
             file: file,
             tree: tree,
             fragments: fragments,
-            symbols: symbol_index_new(),
+            symbols: symbol_index::symbol_index_new(),
             diagnostics: diagnostics,
-            sema_cache: sema_cache_empty(),
+            sema_cache: sema_cache::sema_cache_empty(),
             ok: 0,
             reused_nodes: 0,
             fresh_nodes: tree.nodes.length,
@@ -404,12 +406,12 @@ pub fn analyzer_finish(file: FileId, text: string, tree: StubTree, fragments: [A
             checked_functions: 0
         }
     }
-    let outcome = analyzer_semantic_run(file, text, program, fragments, previous_cache)
+    let outcome = sema_cache::analyzer_semantic_run(file, text, program, fragments, previous_cache)
     for (i in 0 .. outcome.diagnostics.length)
     {
         diagnostics.push(outcome.diagnostics[i])
     }
-    let symbols = symbol_index_build(file, text, tree)
+    let symbols = symbol_index::symbol_index_build(file, text, tree)
     analyzer_enrich_types(&symbols, program)
     analyzer_collect_references(&symbols, program, file, text)
     let ok = if (outcome.error_count > 0) 0 else 1
@@ -431,39 +433,39 @@ pub fn analyzer_finish(file: FileId, text: string, tree: StubTree, fragments: [A
 
 // Default: incremental stub tree, whole-file parse for the AST. Verified by the
 // differential test against analyze_document_legacy.
-pub fn analyze_document(file: FileId, text: string): DocumentAnalysis
+pub fn analyze_document(file: ids::FileId, text: string): DocumentAnalysis
 {
-    let tree = stub_tree_parse(file, text)
-    return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache_empty())
+    let tree = stub_tree::stub_tree_parse(file, text)
+    return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
 }
 
 // Experimental: the AST is assembled from per-declaration fragments. Still fails
 // the differential test, so nothing uses it unless the mode is forced.
-pub fn analyze_document_fragments(file: FileId, text: string): DocumentAnalysis
+pub fn analyze_document_fragments(file: ids::FileId, text: string): DocumentAnalysis
 {
-    let tree = stub_tree_parse(file, text)
+    let tree = stub_tree::stub_tree_parse(file, text)
     let fragments = analyzer_build_fragments(tree, text)
-    let program = ast_assemble(fragments)
+    let program = ast_fragment::ast_assemble(fragments)
     if (program.ok == 0)
     {
-        return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache_empty())
+        return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
     }
     // Safety net: if the assembled program has an out-of-range index, fall back
     // to the whole-file parse rather than running the semantic pass on it.
-    if (ast_program_validate(program) != "")
+    if (ast_fragment::ast_program_validate(program) != "")
     {
-        return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache_empty())
+        return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
     }
-    return analyzer_finish(file, text, tree, fragments, program, sema_cache_empty())
+    return analyzer_finish(file, text, tree, fragments, program, sema_cache::sema_cache_empty())
 }
 
 // Default: the stub tree is spliced, the AST is still parsed whole.
-pub fn analyze_document_incremental(file: FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
+pub fn analyze_document_incremental(file: ids::FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
 {
-    let old_source = source_text_new(file, 0, old_text)
-    let new_source = source_text_new(file, 0, new_text)
-    let repair = incremental_reparse(previous.tree, old_source, new_source)
-    let analysis = analyzer_finish(file, new_text, repair.tree, [], parser::parse_program_raw(new_text, ""), sema_cache_empty())
+    let old_source = source_text::source_text_new(file, 0, old_text)
+    let new_source = source_text::source_text_new(file, 0, new_text)
+    let repair = incremental::incremental_reparse(previous.tree, old_source, new_source)
+    let analysis = analyzer_finish(file, new_text, repair.tree, [], parser::parse_program_raw(new_text, ""), sema_cache::sema_cache_empty())
     analysis.reused_nodes = repair.reused_nodes
     analysis.fresh_nodes = repair.fresh_nodes
     analysis.full_file = repair.full_file
@@ -472,16 +474,16 @@ pub fn analyze_document_incremental(file: FileId, previous: DocumentAnalysis, ol
 
 // Experimental: fragments are rebuilt from the current text, reusing every
 // declaration whose slice text did not change.
-pub fn analyze_document_incremental_fragments(file: FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
+pub fn analyze_document_incremental_fragments(file: ids::FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
 {
-    let old_source = source_text_new(file, 0, old_text)
-    let new_source = source_text_new(file, 0, new_text)
-    let repair = incremental_reparse(previous.tree, old_source, new_source)
+    let old_source = source_text::source_text_new(file, 0, old_text)
+    let new_source = source_text::source_text_new(file, 0, new_text)
+    let repair = incremental::incremental_reparse(previous.tree, old_source, new_source)
     let fragments = analyzer_reuse_fragments(repair.tree, new_text, previous.fragments)
-    let program = ast_assemble(fragments)
+    let program = ast_fragment::ast_assemble(fragments)
     if (program.ok == 0)
     {
-        let fallback = analyzer_finish(file, new_text, repair.tree, [], parser::parse_program_raw(new_text, ""), sema_cache_empty())
+        let fallback = analyzer_finish(file, new_text, repair.tree, [], parser::parse_program_raw(new_text, ""), sema_cache::sema_cache_empty())
         fallback.reused_nodes = repair.reused_nodes
         fallback.fresh_nodes = repair.fresh_nodes
         fallback.full_file = 1
@@ -496,8 +498,8 @@ pub fn analyze_document_incremental_fragments(file: FileId, previous: DocumentAn
 
 // Ground truth for the differential test: a fresh stub tree and a fresh
 // whole-file parse on every change, with no reuse at all.
-pub fn analyze_document_legacy(file: FileId, text: string): DocumentAnalysis
+pub fn analyze_document_legacy(file: ids::FileId, text: string): DocumentAnalysis
 {
-    let tree = stub_tree_parse(file, text)
-    return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache_empty())
+    let tree = stub_tree::stub_tree_parse(file, text)
+    return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
 }

@@ -1,26 +1,26 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "source_text.vix"
-include "../src/lexer.vix"
-include "../src/method.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "source_text.vix" as source_text
+use "../src/lexer.vix" as lexer
+use "../src/method.vix" as method
 
 pub type StubKind = SourceFile | ModuleDecl | ImportDecl | TypeDecl | FieldDecl | AdtDecl | VariantDecl | FunctionDecl | ParameterDecl | Block | Statement | Expression | ErrorStub
 
 pub type StubNode = struct
 {
-    id: StubNodeId,
+    id: ids::StubNodeId,
     kind: StubKind,
-    parent: StubNodeId,
-    children: [StubNodeId],
-    range: TextRange,
+    parent: ids::StubNodeId,
+    children: [ids::StubNodeId],
+    range: position::TextRange,
     // The span of the declared name. LSP separates the full declaration range
     // from the selection range, and cursor lookups must use the name.
-    name_range: TextRange,
-    token_start: TokenId,
-    token_end: TokenId,
+    name_range: position::TextRange,
+    token_start: ids::TokenId,
+    token_end: ids::TokenId,
     name: string,
     flags: i32,
     has_error: i32,
@@ -33,24 +33,24 @@ pub type StubNode = struct
 
 pub type StubTree = struct
 {
-    file: FileId,
+    file: ids::FileId,
     generation: i32,
-    root: StubNodeId,
+    root: ids::StubNodeId,
     nodes: [StubNode],
-    tokens: [TokenId]
+    tokens: [ids::TokenId]
 }
 
-pub fn stub_node_new(id: StubNodeId, kind: StubKind, parent: StubNodeId, name: string, start: i32, end: i32, name_start: i32, name_end: i32, generation: i32): StubNode
+pub fn stub_node_new(id: ids::StubNodeId, kind: StubKind, parent: ids::StubNodeId, name: string, start: i32, end: i32, name_start: i32, name_end: i32, generation: i32): StubNode
 {
     return StubNode{
         id: id,
         kind: kind,
         parent: parent,
         children: [],
-        range: text_range(start, end),
-        name_range: text_range(name_start, name_end),
-        token_start: token_id_invalid(),
-        token_end: token_id_invalid(),
+        range: position::text_range(start, end),
+        name_range: position::text_range(name_start, name_end),
+        token_start: ids::token_id_invalid(),
+        token_end: ids::token_id_invalid(),
         name: name,
         flags: 0,
         has_error: 0,
@@ -59,9 +59,9 @@ pub fn stub_node_new(id: StubNodeId, kind: StubKind, parent: StubNodeId, name: s
     }
 }
 
-pub fn stub_tree_new(file: FileId): StubTree
+pub fn stub_tree_new(file: ids::FileId): StubTree
 {
-    let root = stub_node_new(stub_node_id(0, 1), SourceFile, stub_node_id_invalid(), "", 0, 0, 0, 0, 1)
+    let root = stub_node_new(ids::stub_node_id(0, 1), SourceFile, ids::stub_node_id_invalid(), "", 0, 0, 0, 0, 1)
     return StubTree{
         file: file,
         generation: 1,
@@ -71,9 +71,9 @@ pub fn stub_tree_new(file: FileId): StubTree
     }
 }
 
-pub fn stub_tree_add_node(tree: &StubTree, kind: StubKind, name: string, start: i32, end: i32, name_start: i32, name_end: i32): StubNodeId
+pub fn stub_tree_add_node(tree: &StubTree, kind: StubKind, name: string, start: i32, end: i32, name_start: i32, name_end: i32): ids::StubNodeId
 {
-    let id = stub_node_id(tree.nodes.length, tree.generation)
+    let id = ids::stub_node_id(tree.nodes.length, tree.generation)
     tree.nodes.push(stub_node_new(id, kind, tree.root, name, start, end, name_start, name_end, tree.generation))
     tree.nodes[0].children.push(id)
     return id
@@ -97,7 +97,7 @@ pub fn stub_tree_depths(source: string): [i32]
     for (i in 0 .. source.length)
     {
         depths.push(depth)
-        let byte = analyzer_byte_at(source, i)
+        let byte = util::analyzer_byte_at(source, i)
         if (byte == '{')
         {
             depth += 1
@@ -123,7 +123,7 @@ pub fn stub_tree_depths(source: string): [i32]
 pub fn stub_tree_next_nonspace(source: string, from: i32): i32
 {
     let mut i = from
-    while (i < source.length and analyzer_is_space(analyzer_byte_at(source, i)) == 1)
+    while (i < source.length and util::analyzer_is_space(util::analyzer_byte_at(source, i)) == 1)
     {
         i += 1
     }
@@ -140,7 +140,7 @@ pub fn stub_tree_match_brace(source: string, at: i32): i32
     let mut i = at
     while (i < source.length)
     {
-        let byte = analyzer_byte_at(source, i)
+        let byte = util::analyzer_byte_at(source, i)
         if (byte == '{')
         {
             depth += 1
@@ -161,16 +161,16 @@ pub fn stub_tree_match_brace(source: string, at: i32): i32
 pub fn stub_tree_declaration_end(source: string, from: i32): i32
 {
     let mut i = from
-    while (i < source.length and analyzer_byte_at(source, i) != '{' and analyzer_byte_at(source, i) != ';')
+    while (i < source.length and util::analyzer_byte_at(source, i) != '{' and util::analyzer_byte_at(source, i) != ';')
     {
-        if (analyzer_byte_at(source, i) == '\n')
+        if (util::analyzer_byte_at(source, i) == '\n')
         {
             let next = stub_tree_next_nonspace(source, i + 1)
             if (next < 0)
             {
                 return source.length
             }
-            let byte = analyzer_byte_at(source, next)
+            let byte = util::analyzer_byte_at(source, next)
             // The declaration continues when the next line opens a body or
             // continues a signature, type union, or parameter list.
             if (byte == '{' or byte == '|' or byte == '=' or byte == ',' or byte == ')' or byte == ':')
@@ -187,11 +187,11 @@ pub fn stub_tree_declaration_end(source: string, from: i32): i32
             i += 1
         }
     }
-    if (i < source.length and analyzer_byte_at(source, i) == ';')
+    if (i < source.length and util::analyzer_byte_at(source, i) == ';')
     {
         return i + 1
     }
-    if (i < source.length and analyzer_byte_at(source, i) == '{')
+    if (i < source.length and util::analyzer_byte_at(source, i) == '{')
     {
         return stub_tree_match_brace(source, i)
     }
@@ -213,17 +213,17 @@ pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
             {
                 matched = 0
             }
-            if (cursor > 0 and analyzer_is_ident_byte(analyzer_byte_at(source, cursor - 1)) == 1)
+            if (cursor > 0 and util::analyzer_is_ident_byte(util::analyzer_byte_at(source, cursor - 1)) == 1)
             {
                 matched = 0
             }
-            if (analyzer_is_ident_byte(analyzer_byte_at(source, cursor + keyword.length)) == 1)
+            if (util::analyzer_is_ident_byte(util::analyzer_byte_at(source, cursor + keyword.length)) == 1)
             {
                 matched = 0
             }
             for (j in 0 .. keyword.length)
             {
-                if (analyzer_byte_at(source, cursor + j) != analyzer_byte_at(keyword, j))
+                if (util::analyzer_byte_at(source, cursor + j) != util::analyzer_byte_at(keyword, j))
                 {
                     matched = 0
                 }
@@ -231,12 +231,12 @@ pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
             if (matched == 1)
             {
                 let mut start = cursor + keyword.length
-                while (start < source.length and analyzer_byte_at(source, start) == ' ')
+                while (start < source.length and util::analyzer_byte_at(source, start) == ' ')
                 {
                     start += 1
                 }
                 let mut end = start
-                while (end < source.length and analyzer_byte_at(source, end) != ' ' and analyzer_byte_at(source, end) != '\n' and analyzer_byte_at(source, end) != '{' and analyzer_byte_at(source, end) != ';' and analyzer_byte_at(source, end) != '(' and analyzer_byte_at(source, end) != ':')
+                while (end < source.length and util::analyzer_byte_at(source, end) != ' ' and util::analyzer_byte_at(source, end) != '\n' and util::analyzer_byte_at(source, end) != '{' and util::analyzer_byte_at(source, end) != ';' and util::analyzer_byte_at(source, end) != '(' and util::analyzer_byte_at(source, end) != ':')
                 {
                     end += 1
                 }
@@ -249,20 +249,20 @@ pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
                         cursor = boundary_end
                     }
                 }
-                elif (keyword == "fn" and start < source.length and analyzer_byte_at(source, start) == '(')
+                elif (keyword == "fn" and start < source.length and util::analyzer_byte_at(source, start) == '(')
                 {
                     let mut close = start
-                    while (close < source.length and analyzer_byte_at(source, close) != ')') { close += 1 }
+                    while (close < source.length and util::analyzer_byte_at(source, close) != ')') { close += 1 }
                     let method_start = stub_tree_next_nonspace(source, close + 1)
                     if (method_start >= 0)
                     {
                         let mut method_end = method_start
-                        while (method_end < source.length and analyzer_is_ident_byte(analyzer_byte_at(source, method_end)) == 1) { method_end += 1 }
+                        while (method_end < source.length and util::analyzer_is_ident_byte(util::analyzer_byte_at(source, method_end)) == 1) { method_end += 1 }
                         let declaration_end = stub_tree_declaration_end(source, method_end)
                         let receiver_end = start + 1
-                        while (receiver_end < close and analyzer_byte_at(source, receiver_end) != ')') { receiver_end += 1 }
-                        let receiver_text = analyzer_copy(source, start + 1, receiver_end)
-                        let qualified = method::method_qualify(receiver_text, analyzer_copy(source, method_start, method_end))
+                        while (receiver_end < close and util::analyzer_byte_at(source, receiver_end) != ')') { receiver_end += 1 }
+                        let receiver_text = util::analyzer_copy(source, start + 1, receiver_end)
+                        let qualified = method::method_qualify(receiver_text, util::analyzer_copy(source, method_start, method_end))
                         stub_tree_add_node(tree, FunctionDecl, qualified, base + cursor, base + declaration_end, base + method_start, base + method_end)
                         cursor = declaration_end
                     }
@@ -270,7 +270,7 @@ pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
                 elif (end > start)
                 {
                     let declaration_end = stub_tree_declaration_end(source, end)
-                    stub_tree_add_node(tree, stub_tree_keyword_kind(keyword), analyzer_copy(source, start, end), base + cursor, base + declaration_end, base + start, base + end)
+                    stub_tree_add_node(tree, stub_tree_keyword_kind(keyword), util::analyzer_copy(source, start, end), base + cursor, base + declaration_end, base + start, base + end)
                     cursor = declaration_end
                 }
             }
@@ -279,20 +279,20 @@ pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
     }
 }
 
-pub fn stub_tree_parse(file: FileId, source: string): StubTree
+pub fn stub_tree_parse(file: ids::FileId, source: string): StubTree
 {
     let mut tree = stub_tree_new(file)
-    tree.nodes[0].range = text_range(0, source.length)
+    tree.nodes[0].range = position::text_range(0, source.length)
     let stream = lexer::tokenize(source)
     for (i in 0 .. lexer::stream_len(stream))
     {
-        tree.tokens.push(token_id(i, tree.generation))
+        tree.tokens.push(ids::token_id(i, tree.generation))
     }
     let mut depth = 0
     for (i in 0 .. source.length)
     {
-        if (analyzer_byte_at(source, i) == '{') { depth += 1 }
-        if (analyzer_byte_at(source, i) == '}') { depth -= 1 }
+        if (util::analyzer_byte_at(source, i) == '{') { depth += 1 }
+        if (util::analyzer_byte_at(source, i) == '}') { depth -= 1 }
     }
     if (depth != 0)
     {
@@ -302,12 +302,12 @@ pub fn stub_tree_parse(file: FileId, source: string): StubTree
     return tree
 }
 
-pub fn stub_tree_root(tree: StubTree): StubNodeId
+pub fn stub_tree_root(tree: StubTree): ids::StubNodeId
 {
     return tree.root
 }
 
-pub fn stub_tree_get(tree: StubTree, id: StubNodeId): StubNode
+pub fn stub_tree_get(tree: StubTree, id: ids::StubNodeId): StubNode
 {
     if (id.index < 0 or id.index >= tree.nodes.length)
     {
@@ -316,7 +316,7 @@ pub fn stub_tree_get(tree: StubTree, id: StubNodeId): StubNode
     return tree.nodes[id.index]
 }
 
-pub fn stub_tree_alive(tree: StubTree, id: StubNodeId): i32
+pub fn stub_tree_alive(tree: StubTree, id: ids::StubNodeId): i32
 {
     if (id.index < 0 or id.index >= tree.nodes.length)
     {
@@ -325,7 +325,7 @@ pub fn stub_tree_alive(tree: StubTree, id: StubNodeId): i32
     return tree.nodes[id.index].alive
 }
 
-pub fn stub_tree_find_at(tree: StubTree, byte: i32): StubNodeId
+pub fn stub_tree_find_at(tree: StubTree, byte: i32): ids::StubNodeId
 {
     let mut result = tree.root
     let mut best_size = 0
@@ -349,9 +349,9 @@ pub fn stub_tree_find_at(tree: StubTree, byte: i32): StubNodeId
     return result
 }
 
-pub fn stub_tree_find_named(tree: StubTree, name: string): [StubNodeId]
+pub fn stub_tree_find_named(tree: StubTree, name: string): [ids::StubNodeId]
 {
-    let mut result: [StubNodeId] = []
+    let mut result: [ids::StubNodeId] = []
     for (i in 0 .. tree.nodes.length)
     {
         if (tree.nodes[i].alive == 1 and tree.nodes[i].name == name)
@@ -375,7 +375,7 @@ pub fn stub_tree_alive_count(tree: StubTree): i32
     return count
 }
 
-pub fn stub_tree_contains_range(node: StubNode, range: TextRange): i32
+pub fn stub_tree_contains_range(node: StubNode, range: position::TextRange): i32
 {
     if (node.range.start <= range.start and range.end <= node.range.end)
     {
@@ -417,7 +417,7 @@ pub fn stub_tree_sorted_declarations(tree: StubTree): [i32]
     return indices
 }
 
-pub fn stub_tree_declaration_body_at(tree: StubTree, byte: i32): StubNodeId
+pub fn stub_tree_declaration_body_at(tree: StubTree, byte: i32): ids::StubNodeId
 {
     let root = tree.nodes[0]
     for (i in 0 .. root.children.length)
@@ -433,10 +433,10 @@ pub fn stub_tree_declaration_body_at(tree: StubTree, byte: i32): StubNodeId
             return child
         }
     }
-    return stub_node_id_invalid()
+    return ids::stub_node_id_invalid()
 }
 
-pub fn stub_tree_declaration_at(tree: StubTree, byte: i32): StubNodeId
+pub fn stub_tree_declaration_at(tree: StubTree, byte: i32): ids::StubNodeId
 {
     let root = tree.nodes[0]
     for (i in 0 .. root.children.length)
@@ -452,10 +452,10 @@ pub fn stub_tree_declaration_at(tree: StubTree, byte: i32): StubNodeId
             return child
         }
     }
-    return stub_node_id_invalid()
+    return ids::stub_node_id_invalid()
 }
 
-pub fn stub_tree_kill_subtree(tree: &StubTree, id: StubNodeId)
+pub fn stub_tree_kill_subtree(tree: &StubTree, id: ids::StubNodeId)
 {
     if (id.index < 0 or id.index >= tree.nodes.length)
     {
@@ -473,7 +473,7 @@ pub fn stub_tree_kill_subtree(tree: &StubTree, id: StubNodeId)
 // ranges are relative to a slice starting at offset. The replaced nodes stay in
 // the arena as tombstones, so untouched declarations keep their exact
 // StubNodeId across the edit.
-pub fn stub_tree_splice(tree: StubTree, target: StubNodeId, fresh: StubTree, offset: i32): StubTree
+pub fn stub_tree_splice(tree: StubTree, target: ids::StubNodeId, fresh: StubTree, offset: i32): StubTree
 {
     let mut out = tree
     if (target.index < 0 or target.index >= out.nodes.length)
@@ -484,7 +484,7 @@ pub fn stub_tree_splice(tree: StubTree, target: StubNodeId, fresh: StubTree, off
     let parent_index = if (parent.index < 0) out.root.index else parent.index
     stub_tree_kill_subtree(&out, target)
 
-    let mut inserted: [StubNodeId] = []
+    let mut inserted: [ids::StubNodeId] = []
     let fresh_root = fresh.nodes[0]
     for (i in 0 .. fresh_root.children.length)
     {
@@ -494,13 +494,13 @@ pub fn stub_tree_splice(tree: StubTree, target: StubNodeId, fresh: StubTree, off
             continue
         }
         let source = fresh.nodes[source_index]
-        let id = stub_node_id(out.nodes.length, out.generation)
-        let node = stub_node_new(id, source.kind, stub_node_id(parent_index, out.generation), source.name, source.range.start + offset, source.range.end + offset, source.name_range.start + offset, source.name_range.end + offset, out.generation)
+        let id = ids::stub_node_id(out.nodes.length, out.generation)
+        let node = stub_node_new(id, source.kind, ids::stub_node_id(parent_index, out.generation), source.name, source.range.start + offset, source.range.end + offset, source.name_range.start + offset, source.name_range.end + offset, out.generation)
         out.nodes.push(node)
         inserted.push(id)
     }
 
-    let mut children: [StubNodeId] = []
+    let mut children: [ids::StubNodeId] = []
     for (i in 0 .. out.nodes[parent_index].children.length)
     {
         let child = out.nodes[parent_index].children[i]
@@ -543,7 +543,7 @@ pub fn stub_tree_shift_after(tree: StubTree, threshold: i32, delta: i32): StubTr
     return tree
 }
 
-pub fn stub_tree_rebase_ranges(tree: StubTree, edit: TextEdit): StubTree
+pub fn stub_tree_rebase_ranges(tree: StubTree, edit: source_text::TextEdit): StubTree
 {
     let delta = edit.replacement.length - (edit.range.end - edit.range.start)
     for (i in 0 .. tree.nodes.length)

@@ -1,23 +1,23 @@
 #[no_main]
 
-include "ids.vix"
-include "source_text.vix"
-include "stub_tree.vix"
-include "incremental.vix"
+use "ids.vix" as ids
+use "source_text.vix" as source_text
+use "stub_tree.vix" as stub_tree
+use "incremental.vix" as incremental
 
 pub type DocumentState = struct
 {
-    file: FileId,
+    file: ids::FileId,
     uri: string,
     path: string,
-    source: SourceText,
-    stub: StubTree,
+    source: source_text::SourceText,
+    stub: stub_tree::StubTree,
     open: i32,
 }
-pub fn document_new(file: FileId, uri: string, path: string, version: i32, text: string): DocumentState
+pub fn document_new(file: ids::FileId, uri: string, path: string, version: i32, text: string): DocumentState
 {
-    let source = source_text_new(file, version, text);
-    return DocumentState{ file: file, uri: uri, path: path, source: source, stub: stub_tree_parse(file, text), open: 0 }
+    let source = source_text::source_text_new(file, version, text);
+    return DocumentState{ file: file, uri: uri, path: path, source: source, stub: stub_tree::stub_tree_parse(file, text), open: 0 }
 }
 pub fn document_open(document: DocumentState): DocumentState
 {
@@ -32,20 +32,20 @@ pub fn document_close(document: DocumentState): DocumentState
 pub fn document_replace(document: DocumentState, version: i32, text: string): DocumentState
 {
     let old = document.source;
-    document.source = source_text_replace(old, text, version);
-    document.stub = stub_tree_parse(document.file, text);
+    document.source = source_text::source_text_replace(old, text, version);
+    document.stub = stub_tree::stub_tree_parse(document.file, text);
     return document
 }
-pub fn document_apply_edit(document: DocumentState, version: i32, edit: TextEdit): DocumentState
+pub fn document_apply_edit(document: DocumentState, version: i32, edit: source_text::TextEdit): DocumentState
 {
     let old = document.source;
-    document.source = source_text_apply_edit(old, edit, version);
-    let result = incremental_reparse(document.stub, old, document.source);
+    document.source = source_text::source_text_apply_edit(old, edit, version);
+    let result = incremental::incremental_reparse(document.stub, old, document.source);
     document.stub = result.tree;
     return document
 }
 pub fn document_rebuild_stub(document: DocumentState): DocumentState
 {
-    document.stub = stub_tree_parse(document.file, document.source.text);
+    document.stub = stub_tree::stub_tree_parse(document.file, document.source.text);
     return document
 }

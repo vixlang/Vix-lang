@@ -1,12 +1,12 @@
 #[no_main]
 
-include "ids.vix"
-include "diagnostics.vix"
-include "ast_fragment.vix"
-include "../src/ast.vix"
-include "../src/diag.vix"
-include "../src/semantic.vix"
-include "../src/type/typeck.vix"
+use "ids.vix" as ids
+use "diagnostics.vix" as diagnostics
+use "ast_fragment.vix" as ast_fragment
+use "../src/ast.vix" as ast
+use "../src/diag.vix" as diag
+use "../src/semantic.vix" as semantic
+use "../src/type/typeck.vix" as typeck
 
 // Function-level cache for the semantic pass.
 //
@@ -23,7 +23,7 @@ include "../src/type/typeck.vix"
 pub type CachedFunctionDiagnostics = struct
 {
     key: i32,
-    diagnostics: [AnalyzerDiagnostic]
+    diagnostics: [diagnostics::AnalyzerDiagnostic]
 }
 
 pub type SemaCache = struct
@@ -34,7 +34,7 @@ pub type SemaCache = struct
 
 pub type SemaOutcome = struct
 {
-    diagnostics: [AnalyzerDiagnostic],
+    diagnostics: [diagnostics::AnalyzerDiagnostic],
     cache: SemaCache,
     error_count: i32,
     reused_functions: i32,
@@ -70,7 +70,7 @@ pub fn analyzer_hash_text(hash: i32, text: string): i32
 // One key per entry of program.functions, derived from the fragment texts that
 // produced them. ast_assemble appends each fragment's functions in order, so the
 // two lists line up.
-pub fn analyzer_function_keys(fragments: [AstFragment]): [i32]
+pub fn analyzer_function_keys(fragments: [ast_fragment::AstFragment]): [i32]
 {
     let mut keys: [i32] = []
     for (f in 0 .. fragments.length)
@@ -147,22 +147,22 @@ pub fn analyzer_surface_hash(program: ast::AstProgram): i32
     return h
 }
 
-pub fn analyzer_diagnostics_from_bag(file: FileId, bag: diag::DiagBag): [AnalyzerDiagnostic]
+pub fn analyzer_diagnostics_from_bag(file: ids::FileId, bag: diag::DiagBag): [diagnostics::AnalyzerDiagnostic]
 {
-    let mut out: [AnalyzerDiagnostic] = []
+    let mut out: [diagnostics::AnalyzerDiagnostic] = []
     for (i in 0 .. bag.diagnostics.length)
     {
-        out.push(analyzer_diagnostic_from_diag(file, bag.diagnostics[i]))
+        out.push(diagnostics::analyzer_diagnostic_from_diag(file, bag.diagnostics[i]))
     }
     return out
 }
 
-pub fn analyzer_count_errors(diagnostics: [AnalyzerDiagnostic]): i32
+pub fn analyzer_count_errors(diagnostics: [diagnostics::AnalyzerDiagnostic]): i32
 {
     let mut count = 0
     for (i in 0 .. diagnostics.length)
     {
-        if (diagnostics[i].severity == SeverityError)
+        if (diagnostics[i].severity == diagnostics::SeverityError)
         {
             count += 1
         }
@@ -172,10 +172,10 @@ pub fn analyzer_count_errors(diagnostics: [AnalyzerDiagnostic]): i32
 
 // Runs the semantic pass, reusing cached per-function diagnostics when the
 // surface allows it.
-pub fn analyzer_semantic_run(file: FileId, text: string, program: ast::AstProgram, fragments: [AstFragment], previous: SemaCache): SemaOutcome
+pub fn analyzer_semantic_run(file: ids::FileId, text: string, program: ast::AstProgram, fragments: [ast_fragment::AstFragment], previous: SemaCache): SemaOutcome
 {
     let limit = analyzer_diag_limit()
-    let mut merged: [AnalyzerDiagnostic] = []
+    let mut merged: [diagnostics::AnalyzerDiagnostic] = []
 
     let head = semantic::semantic_result_new_with_warnings(0)
     semantic::semantic_check_duplicate_functions(program.functions, program.extern_functions, &head, text, "")
@@ -247,7 +247,7 @@ pub fn analyzer_semantic_run(file: FileId, text: string, program: ast::AstProgra
     // be truncated the same way.
     if (merged.length > limit)
     {
-        let mut capped: [AnalyzerDiagnostic] = []
+        let mut capped: [diagnostics::AnalyzerDiagnostic] = []
         for (i in 0 .. limit)
         {
             capped.push(merged[i])

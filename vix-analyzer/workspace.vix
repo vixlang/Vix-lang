@@ -1,16 +1,16 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "analysis.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "analysis.vix" as analysis
 
 pub type OpenDocument = struct
 {
-    file: FileId,
+    file: ids::FileId,
     uri: string,
     version: i32,
     text: string,
-    analysis: DocumentAnalysis
+    analysis: analysis::DocumentAnalysis
 }
 
 pub type Workspace = struct
@@ -18,7 +18,7 @@ pub type Workspace = struct
     root_uri: string,
     root_path: string,
     documents: [OpenDocument],
-    revision: Revision,
+    revision: ids::Revision,
     // 0 = assembled fragment path (default, verified against the whole-file
     // parse by the differential test), 1 = stub tree plus whole-file parse,
     // 2 = fresh tree plus whole-file parse (used as the differential baseline).
@@ -31,7 +31,7 @@ pub fn workspace_new(root_uri: string, root_path: string): Workspace
         root_uri: root_uri,
         root_path: root_path,
         documents: [],
-        revision: revision_zero(),
+        revision: ids::revision_zero(),
         analysis_mode: 0
     }
 }
@@ -53,7 +53,7 @@ pub fn workspace_set_text(workspace: &Workspace, uri: string, version: i32, text
     let at = workspace_find(workspace, uri)
     if (at < 0)
     {
-        let file = file_id(workspace.documents.length)
+        let file = ids::file_id(workspace.documents.length)
         workspace.documents.push(OpenDocument{
             file: file,
             uri: uri,
@@ -71,15 +71,15 @@ pub fn workspace_set_text(workspace: &Workspace, uri: string, version: i32, text
     workspace.documents[at].text = text
     if (workspace.analysis_mode == 1)
     {
-        workspace.documents[at].analysis = analyze_document_incremental(file, previous, old_text, text)
+        workspace.documents[at].analysis = analysis::analyze_document_incremental(file, previous, old_text, text)
     }
     elif (workspace.analysis_mode == 2)
     {
-        workspace.documents[at].analysis = analyze_document_legacy(file, text)
+        workspace.documents[at].analysis = analysis::analyze_document_legacy(file, text)
     }
     else
     {
-        workspace.documents[at].analysis = analyze_document_incremental_fragments(file, previous, old_text, text)
+        workspace.documents[at].analysis = analysis::analyze_document_incremental_fragments(file, previous, old_text, text)
     }
     workspace.revision.value += 1
 }
@@ -108,17 +108,17 @@ pub fn workspace_close(workspace: &Workspace, uri: string)
     workspace.revision.value += 1
 }
 
-pub fn workspace_analyze(workspace: &Workspace, file: FileId, text: string): DocumentAnalysis
+pub fn workspace_analyze(workspace: &Workspace, file: ids::FileId, text: string): analysis::DocumentAnalysis
 {
     if (workspace.analysis_mode == 1)
     {
-        return analyze_document(file, text)
+        return analysis::analyze_document(file, text)
     }
     if (workspace.analysis_mode == 2)
     {
-        return analyze_document_legacy(file, text)
+        return analysis::analyze_document_legacy(file, text)
     }
-    return analyze_document_fragments(file, text)
+    return analysis::analyze_document_fragments(file, text)
 }
 
 pub fn workspace_text(workspace: &Workspace, uri: string): string
@@ -133,7 +133,7 @@ pub fn workspace_text(workspace: &Workspace, uri: string): string
     return ""
 }
 
-pub fn workspace_text_by_file(workspace: &Workspace, file: FileId): string
+pub fn workspace_text_by_file(workspace: &Workspace, file: ids::FileId): string
 {
     for (i in 0 .. workspace.documents.length)
     {
@@ -145,7 +145,7 @@ pub fn workspace_text_by_file(workspace: &Workspace, file: FileId): string
     return ""
 }
 
-pub fn workspace_file(workspace: &Workspace, uri: string): FileId
+pub fn workspace_file(workspace: &Workspace, uri: string): ids::FileId
 {
     for (i in 0 .. workspace.documents.length)
     {
@@ -154,10 +154,10 @@ pub fn workspace_file(workspace: &Workspace, uri: string): FileId
             return workspace.documents[i].file
         }
     }
-    return file_id_invalid()
+    return ids::file_id_invalid()
 }
 
-pub fn workspace_analysis(workspace: &Workspace, uri: string): DocumentAnalysis
+pub fn workspace_analysis(workspace: &Workspace, uri: string): analysis::DocumentAnalysis
 {
     for (i in 0 .. workspace.documents.length)
     {
@@ -166,10 +166,10 @@ pub fn workspace_analysis(workspace: &Workspace, uri: string): DocumentAnalysis
             return workspace.documents[i].analysis
         }
     }
-    return analyze_document(file_id_invalid(), "")
+    return analysis::analyze_document(ids::file_id_invalid(), "")
 }
 
-pub fn workspace_analysis_by_file(workspace: &Workspace, file: FileId): DocumentAnalysis
+pub fn workspace_analysis_by_file(workspace: &Workspace, file: ids::FileId): analysis::DocumentAnalysis
 {
     for (i in 0 .. workspace.documents.length)
     {
@@ -178,10 +178,10 @@ pub fn workspace_analysis_by_file(workspace: &Workspace, file: FileId): Document
             return workspace.documents[i].analysis
         }
     }
-    return analyze_document(file, "")
+    return analysis::analyze_document(file, "")
 }
 
-pub fn workspace_revision(workspace: Workspace): Revision
+pub fn workspace_revision(workspace: Workspace): ids::Revision
 {
     return workspace.revision
 }

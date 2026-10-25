@@ -1,25 +1,27 @@
 #[no_main]
 
+use "util.vix" as util
+use "workspace.vix" as workspace
+use "lsp_transport.vix" as lsp_transport
+use "lsp_protocol.vix" as lsp_protocol
+use "lsp_handlers.vix" as lsp_handlers
+use "diagnostics.vix" as diagnostics
+use "../src/json.vix" as json
+
 // Temporary analyzer bridge: the analyzer still uses a flat legacy namespace.
-include "util.vix"
-include "workspace.vix"
-include "lsp_transport.vix"
-include "lsp_protocol.vix"
-include "lsp_handlers.vix"
-include "diagnostics.vix"
 
 pub type LspServer = struct
 {
-    transport: TransportState,
-    workspace: Workspace,
+    transport: lsp_transport::TransportState,
+    workspace: workspace::Workspace,
     initialized: i32
 }
 
 pub fn lsp_server_new(root_uri: string, root_path: string): LspServer
 {
     return LspServer{
-        transport: transport_new(),
-        workspace: workspace_new(root_uri, root_path),
+        transport: lsp_transport::transport_new(),
+        workspace: workspace::workspace_new(root_uri, root_path),
         initialized: 0
     }
 }
@@ -30,13 +32,13 @@ pub fn lsp_server_publish(server: &LspServer, uri: string)
     {
         return
     }
-    let analysis = workspace_analysis(server.workspace, uri)
-    transport_write_frame(lsp_publish_diagnostics(uri, analysis.diagnostics))
+    let analysis = workspace::workspace_analysis(server.workspace, uri)
+    lsp_transport::transport_write_frame(lsp_protocol::lsp_publish_diagnostics(uri, analysis.diagnostics))
 }
 
 pub fn lsp_server_dispatch(server: &LspServer, frame: string)
 {
-    let message = lsp_parse_message(frame)
+    let message = lsp_protocol::lsp_parse_message(frame)
     if (message.method == "")
     {
         return
@@ -45,7 +47,7 @@ pub fn lsp_server_dispatch(server: &LspServer, frame: string)
     if (message.method == "initialize")
     {
         server.initialized = 1
-        transport_write_frame(lsp_response(message.id, lsp_initialize_result()))
+        lsp_transport::transport_write_frame(lsp_protocol::lsp_response(message.id, lsp_protocol::lsp_initialize_result()))
     }
     elif (message.method == "initialized")
     {
@@ -69,7 +71,7 @@ pub fn lsp_server_dispatch(server: &LspServer, frame: string)
     }
     elif (message.method == "shutdown")
     {
-        transport_write_frame(lsp_response(message.id, "null"))
+        lsp_transport::transport_write_frame(lsp_protocol::lsp_response(message.id, "null"))
         server.transport.shutdown = 1
         server.transport.running = 0
     }
@@ -80,57 +82,57 @@ pub fn lsp_server_dispatch(server: &LspServer, frame: string)
     }
     elif (message.method == "textDocument/didOpen")
     {
-        let uri = handle_did_open(&workspace, message.params)
+        let uri = lsp_handlers::handle_did_open(&workspace, message.params)
         server.workspace = workspace
         lsp_server_publish(server, uri)
     }
     elif (message.method == "textDocument/didChange")
     {
-        let uri = handle_did_change(&workspace, message.params)
+        let uri = lsp_handlers::handle_did_change(&workspace, message.params)
         server.workspace = workspace
         if (uri != "")
         {
-            transport_write_frame(lsp_analysis_stats(uri, workspace_analysis(server.workspace, uri)))
+            lsp_transport::transport_write_frame(lsp_protocol::lsp_analysis_stats(uri, workspace::workspace_analysis(server.workspace, uri)))
         }
         lsp_server_publish(server, uri)
     }
     elif (message.method == "textDocument/didClose")
     {
-        let uri = handle_did_close(&workspace, message.params)
+        let uri = lsp_handlers::handle_did_close(&workspace, message.params)
         server.workspace = workspace
         lsp_server_publish(server, uri)
     }
     elif (message.method == "textDocument/hover")
     {
-        transport_write_frame(handle_hover(workspace, message.id, message.params))
+        lsp_transport::transport_write_frame(lsp_handlers::handle_hover(workspace, message.id, message.params))
     }
     elif (message.method == "textDocument/definition")
     {
-        transport_write_frame(handle_definition(workspace, message.id, message.params))
+        lsp_transport::transport_write_frame(lsp_handlers::handle_definition(workspace, message.id, message.params))
     }
     elif (message.method == "textDocument/references")
     {
-        transport_write_frame(handle_references(workspace, message.id, message.params))
+        lsp_transport::transport_write_frame(lsp_handlers::handle_references(workspace, message.id, message.params))
     }
     elif (message.method == "textDocument/documentSymbol")
     {
-        transport_write_frame(handle_document_symbol(workspace, message.id, message.params))
+        lsp_transport::transport_write_frame(lsp_handlers::handle_document_symbol(workspace, message.id, message.params))
     }
     elif (message.method == "textDocument/completion")
     {
-        transport_write_frame(handle_completion(workspace, message.id, message.params))
+        lsp_transport::transport_write_frame(lsp_handlers::handle_completion(workspace, message.id, message.params))
     }
     elif (message.method == "textDocument/formatting")
     {
-        transport_write_frame(handle_formatting(workspace, message.id, message.params))
+        lsp_transport::transport_write_frame(lsp_handlers::handle_formatting(workspace, message.id, message.params))
     }
     elif (message.method == "textDocument/rename")
     {
-        transport_write_frame(handle_rename(workspace, message.id, message.params))
+        lsp_transport::transport_write_frame(lsp_handlers::handle_rename(workspace, message.id, message.params))
     }
     elif (message.has_id == 1)
     {
-        transport_write_frame(lsp_error(message.id, -32601, "method not found: " + message.method))
+        lsp_transport::transport_write_frame(lsp_protocol::lsp_error(message.id, -32601, "method not found: " + message.method))
     }
 }
 
@@ -139,7 +141,7 @@ pub fn lsp_server_run(server: &LspServer)
     server.transport.running = 1
     while (server.transport.shutdown == 0)
     {
-        let frame = transport_read_frame()
+        let frame = lsp_transport::transport_read_frame()
         if (frame == "")
         {
             break

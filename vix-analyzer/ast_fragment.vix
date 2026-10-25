@@ -1,14 +1,14 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "stub_tree.vix"
-include "../src/ast.vix"
-include "../src/method.vix"
-include "../src/parser.vix"
-include "../src/diag.vix"
-include "../src/lexer.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "stub_tree.vix" as stub_tree
+use "../src/ast.vix" as ast
+use "../src/method.vix" as method
+use "../src/parser.vix" as parser
+use "../src/diag.vix" as diag
+use "../src/lexer.vix" as lexer
 
 // One top-level declaration, parsed on its own. Statement and expression indices
 // inside a fragment are local to it; ast_assemble rebases them onto the

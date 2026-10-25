@@ -1,23 +1,23 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "stub_tree.vix"
-include "semantic_adapter.vix"
-include "../src/lexer.vix"
-include "../src/parser.vix"
-include "../src/semantic.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "stub_tree.vix" as stub_tree
+use "semantic_adapter.vix" as semantic_adapter
+use "../src/lexer.vix" as lexer
+use "../src/parser.vix" as parser
+use "../src/semantic.vix" as semantic
 
 pub type CoreTokenSnapshot = struct
 {
-    file: FileId,
+    file: ids::FileId,
     count: i32,
     generation: i32
 }
 
 pub type CoreAstSnapshot = struct
 {
-    file: FileId,
+    file: ids::FileId,
     ok: i32,
     root_index: i32,
     error: string
@@ -25,12 +25,12 @@ pub type CoreAstSnapshot = struct
 
 pub type CoreSemanticSnapshot = struct
 {
-    file: FileId,
+    file: ids::FileId,
     ok: i32,
     error_count: i32
 }
 
-pub fn core_lex(file: FileId, source: string): CoreTokenSnapshot
+pub fn core_lex(file: ids::FileId, source: string): CoreTokenSnapshot
 {
     let stream = lexer::tokenize(source)
     return CoreTokenSnapshot{
@@ -40,7 +40,7 @@ pub fn core_lex(file: FileId, source: string): CoreTokenSnapshot
     }
 }
 
-pub fn core_parse(file: FileId, source: string, tree: StubTree): CoreAstSnapshot
+pub fn core_parse(file: ids::FileId, source: string, tree: stub_tree::StubTree): CoreAstSnapshot
 {
     let program = parser::parse_program_raw(source, "")
     return CoreAstSnapshot{
@@ -51,7 +51,7 @@ pub fn core_parse(file: FileId, source: string, tree: StubTree): CoreAstSnapshot
     }
 }
 
-pub fn core_semantic(input: SemanticInput): CoreSemanticSnapshot
+pub fn core_semantic(input: semantic_adapter::SemanticInput): CoreSemanticSnapshot
 {
     let program = parser::parse_program_raw(input.source, "")
     if (program.ok == 0)
@@ -70,17 +70,17 @@ pub fn core_semantic(input: SemanticInput): CoreSemanticSnapshot
     }
 }
 
-pub fn core_token_snapshot_empty(file: FileId): CoreTokenSnapshot
+pub fn core_token_snapshot_empty(file: ids::FileId): CoreTokenSnapshot
 {
     return CoreTokenSnapshot{ file: file, count: 0, generation: 0 }
 }
 
-pub fn core_ast_snapshot_empty(file: FileId): CoreAstSnapshot
+pub fn core_ast_snapshot_empty(file: ids::FileId): CoreAstSnapshot
 {
     return CoreAstSnapshot{ file: file, ok: 0, root_index: -1, error: "" }
 }
 
-pub fn core_semantic_snapshot_empty(file: FileId): CoreSemanticSnapshot
+pub fn core_semantic_snapshot_empty(file: ids::FileId): CoreSemanticSnapshot
 {
     return CoreSemanticSnapshot{ file: file, ok: 0, error_count: 0 }
 }

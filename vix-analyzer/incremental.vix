@@ -1,25 +1,25 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "source_text.vix"
-include "stub_tree.vix"
-include "../src/lexer.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "source_text.vix" as source_text
+use "stub_tree.vix" as stub_tree
+use "../src/lexer.vix" as lexer
 
 // Which slice of the new text has to be re-lexed and re-scanned. A change inside
 // a top-level declaration reparse just that declaration; anything else falls
 // back to the whole file.
 pub type ReparseTarget = struct
 {
-    node: StubNodeId,
-    range: TextRange,
+    node: ids::StubNodeId,
+    range: position::TextRange,
     full_file: i32
 }
 
 pub type IncrementalResult = struct
 {
-    tree: StubTree,
+    tree: stub_tree::StubTree,
     target: ReparseTarget,
     reused_nodes: i32,
     fresh_nodes: i32,
@@ -27,35 +27,35 @@ pub type IncrementalResult = struct
     full_file: i32
 }
 
-pub fn incremental_find_target(tree: StubTree, changed: TextRange): ReparseTarget
+pub fn incremental_find_target(tree: stub_tree::StubTree, changed: position::TextRange): ReparseTarget
 {
-    let node = stub_tree_declaration_body_at(tree, changed.start)
+    let node = stub_tree::stub_tree_declaration_body_at(tree, changed.start)
     if (node.index < 0)
     {
-        return ReparseTarget{ node: stub_node_id_invalid(), range: changed, full_file: 1 }
+        return ReparseTarget{ node: ids::stub_node_id_invalid(), range: changed, full_file: 1 }
     }
-    let declaration = stub_tree_get(tree, node)
+    let declaration = stub_tree::stub_tree_get(tree, node)
     return ReparseTarget{ node: node, range: declaration.range, full_file: 0 }
 }
 
-pub fn incremental_expand_lex_range(tree: StubTree, changed: TextRange, source: string): TextRange
+pub fn incremental_expand_lex_range(tree: stub_tree::StubTree, changed: position::TextRange, source: string): position::TextRange
 {
     let target = incremental_find_target(tree, changed)
     if (target.full_file == 0)
     {
         return target.range
     }
-    return text_range(0, source.length)
+    return position::text_range(0, source.length)
 }
 
-pub fn incremental_reparse(old_tree: StubTree, old_source: SourceText, new_source: SourceText): IncrementalResult
+pub fn incremental_reparse(old_tree: stub_tree::StubTree, old_source: source_text::SourceText, new_source: source_text::SourceText): IncrementalResult
 {
-    let changed = source_text_changed_range(old_source, new_source)
+    let changed = source_text::source_text_changed_range(old_source, new_source)
     let target = incremental_find_target(old_tree, changed)
 
     if (target.full_file == 1)
     {
-        let tree = stub_tree_parse(new_source.file, new_source.text)
+        let tree = stub_tree::stub_tree_parse(new_source.file, new_source.text)
         let stream = lexer::tokenize(new_source.text)
         return IncrementalResult{
             tree: tree,
@@ -76,11 +76,11 @@ pub fn incremental_reparse(old_tree: StubTree, old_source: SourceText, new_sourc
     {
         end = new_source.text.length
     }
-    let slice = analyzer_copy(new_source.text, start, end)
-    let fresh = stub_tree_parse(new_source.file, slice)
-    let alive_before = stub_tree_alive_count(old_tree)
-    let spliced = stub_tree_splice(old_tree, target.node, fresh, start)
-    let tree = stub_tree_shift_after(spliced, start, delta)
+    let slice = util::analyzer_copy(new_source.text, start, end)
+    let fresh = stub_tree::stub_tree_parse(new_source.file, slice)
+    let alive_before = stub_tree::stub_tree_alive_count(old_tree)
+    let spliced = stub_tree::stub_tree_splice(old_tree, target.node, fresh, start)
+    let tree = stub_tree::stub_tree_shift_after(spliced, start, delta)
     let stream = lexer::tokenize(slice)
     return IncrementalResult{
         tree: tree,
@@ -92,12 +92,12 @@ pub fn incremental_reparse(old_tree: StubTree, old_source: SourceText, new_sourc
     }
 }
 
-pub fn incremental_reparse_target(target: ReparseTarget, source: SourceText): StubTree
+pub fn incremental_reparse_target(target: ReparseTarget, source: source_text::SourceText): stub_tree::StubTree
 {
-    return stub_tree_parse(source.file, source.text)
+    return stub_tree::stub_tree_parse(source.file, source.text)
 }
 
-pub fn incremental_ranges_overlap(left: TextRange, right: TextRange): i32
+pub fn incremental_ranges_overlap(left: position::TextRange, right: position::TextRange): i32
 {
     if (left.start <= right.end and right.start <= left.end)
     {

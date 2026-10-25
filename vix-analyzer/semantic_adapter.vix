@@ -1,29 +1,29 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "stub_tree.vix"
-include "../src/parser.vix"
-include "../src/semantic.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "stub_tree.vix" as stub_tree
+use "../src/parser.vix" as parser
+use "../src/semantic.vix" as semantic
 
 pub type SemanticInput = struct
 {
-    file: FileId,
+    file: ids::FileId,
     source: string,
-    tree: StubTree,
-    module_revision: Revision
+    tree: stub_tree::StubTree,
+    module_revision: ids::Revision
 }
 
 pub type SemanticSnapshot = struct
 {
-    file: FileId,
-    revision: Revision,
+    file: ids::FileId,
+    revision: ids::Revision,
     ok: i32,
     ast_index: i32,
     diagnostics: [i32]
 }
 
-pub fn semantic_input_new(file: FileId, source: string, tree: StubTree, module_revision: Revision): SemanticInput
+pub fn semantic_input_new(file: ids::FileId, source: string, tree: stub_tree::StubTree, module_revision: ids::Revision): SemanticInput
 {
     return SemanticInput{
         file: file,
@@ -56,23 +56,23 @@ pub fn semantic_analyze(input: SemanticInput): SemanticSnapshot
     }
 }
 
-pub fn semantic_snapshot_empty(file: FileId, revision: Revision): SemanticSnapshot
+pub fn semantic_snapshot_empty(file: ids::FileId, revision: ids::Revision): SemanticSnapshot
 {
     return SemanticSnapshot{
         file: file,
-        revision: revision,
+        revision: ids::revision,
         ok: 0,
         ast_index: -1,
         diagnostics: []
     }
 }
 
-pub fn semantic_type_at(snapshot: SemanticSnapshot, position: LspPosition): string
+pub fn semantic_type_at(snapshot: SemanticSnapshot, position: position::LspPosition): string
 {
     return "unknown"
 }
 
-pub fn semantic_definition_at(snapshot: SemanticSnapshot, position: LspPosition): SymbolId
+pub fn semantic_definition_at(snapshot: SemanticSnapshot, position: position::LspPosition): ids::SymbolId
 {
-    return symbol_id_invalid()
+    return ids::symbol_id_invalid()
 }

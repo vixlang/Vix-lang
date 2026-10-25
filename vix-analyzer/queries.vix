@@ -1,16 +1,16 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "workspace.vix"
-include "symbol_index.vix"
-include "analysis.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "workspace.vix" as workspace
+use "symbol_index.vix" as symbol_index
+use "analysis.vix" as analysis
 
 pub type HoverResult = struct
 {
     contents: string,
-    range: LspRange
+    range: position::LspRange
 }
 
 pub type CompletionItem = struct
@@ -29,22 +29,22 @@ pub type QueryResult = struct
 // Resolves the symbol under the cursor. A declaration containing the position
 // wins; otherwise the identifier at the position is resolved by name, which is
 // what makes hover, definition and references work at use sites.
-pub fn query_symbol(workspace: Workspace, file: FileId, position: LspPosition): SymbolId
+pub fn query_symbol(workspace: workspace::Workspace, file: ids::FileId, position: position::LspPosition): ids::SymbolId
 {
-    let analysis = workspace_analysis_by_file(workspace, file)
-    let direct = symbol_index_find_at(analysis.symbols, file, position)
+    let analysis = workspace::workspace_analysis_by_file(workspace, file)
+    let direct = symbol_index::symbol_index_find_at(analysis.symbols, file, position)
     if (direct.index >= 0)
     {
         return direct
     }
-    let text = workspace_text_by_file(workspace, file)
-    let word = analyzer_word_at(text, position)
-    let method_symbol = symbol_index_find_method(analysis.symbols, word)
+    let text = workspace::workspace_text_by_file(workspace, file)
+    let word = util::analyzer_word_at(text, position)
+    let method_symbol = symbol_index::symbol_index_find_method(analysis.symbols, word)
     if (method_symbol.index >= 0) { return method_symbol }
-    return symbol_index_find_by_name(analysis.symbols, word)
+    return symbol_index::symbol_index_find_by_name(analysis.symbols, word)
 }
 
-pub fn hover_contents(declaration: Declaration): string
+pub fn hover_contents(declaration: symbol_index::Declaration): string
 {
     if (declaration.name == "")
     {
@@ -55,49 +55,49 @@ pub fn hover_contents(declaration: Declaration): string
         return declaration.name + ": " + declaration.type_text
     }
     let kind = "symbol"
-    if (declaration.kind == FunctionSymbol)
+    if (declaration.kind == symbol_index::FunctionSymbol)
     {
         kind = "function"
     }
-    elif (declaration.kind == TypeSymbol)
+    elif (declaration.kind == symbol_index::TypeSymbol)
     {
         kind = "type"
     }
-    elif (declaration.kind == ModuleSymbol)
+    elif (declaration.kind == symbol_index::ModuleSymbol)
     {
         kind = "module"
     }
     return declaration.name + ": " + kind
 }
 
-pub fn query_hover(workspace: Workspace, file: FileId, position: LspPosition): HoverResult
+pub fn query_hover(workspace: workspace::Workspace, file: ids::FileId, position: position::LspPosition): HoverResult
 {
-    let analysis = workspace_analysis_by_file(workspace, file)
+    let analysis = workspace::workspace_analysis_by_file(workspace, file)
     let symbol = query_symbol(workspace, file, position)
-    let declaration = symbol_index_find_definition(analysis.symbols, symbol)
+    let declaration = symbol_index::symbol_index_find_definition(analysis.symbols, symbol)
     return HoverResult{
         contents: hover_contents(declaration),
         range: declaration.range
     }
 }
 
-pub fn query_definition(workspace: Workspace, file: FileId, position: LspPosition): Declaration
+pub fn query_definition(workspace: workspace::Workspace, file: ids::FileId, position: position::LspPosition): symbol_index::Declaration
 {
-    let analysis = workspace_analysis_by_file(workspace, file)
+    let analysis = workspace::workspace_analysis_by_file(workspace, file)
     let symbol = query_symbol(workspace, file, position)
-    return symbol_index_find_definition(analysis.symbols, symbol)
+    return symbol_index::symbol_index_find_definition(analysis.symbols, symbol)
 }
 
-pub fn query_references(workspace: Workspace, file: FileId, position: LspPosition): [Reference]
+pub fn query_references(workspace: workspace::Workspace, file: ids::FileId, position: position::LspPosition): [symbol_index::Reference]
 {
-    let analysis = workspace_analysis_by_file(workspace, file)
+    let analysis = workspace::workspace_analysis_by_file(workspace, file)
     let symbol = query_symbol(workspace, file, position)
-    return symbol_index_find_references(analysis.symbols, symbol)
+    return symbol_index::symbol_index_find_references(analysis.symbols, symbol)
 }
 
-pub fn query_completion(workspace: Workspace, file: FileId, position: LspPosition): [CompletionItem]
+pub fn query_completion(workspace: workspace::Workspace, file: ids::FileId, position: position::LspPosition): [CompletionItem]
 {
-    let analysis = workspace_analysis_by_file(workspace, file)
+    let analysis = workspace::workspace_analysis_by_file(workspace, file)
     let mut result: [CompletionItem] = []
     for (i in 0 .. analysis.symbols.declarations.length)
     {
@@ -105,24 +105,24 @@ pub fn query_completion(workspace: Workspace, file: FileId, position: LspPositio
         result.push(CompletionItem{
             label: declaration.name,
             detail: declaration.type_text,
-            kind: symbol_lsp_kind(declaration.kind)
+            kind: symbol_index::symbol_lsp_kind(declaration.kind)
         })
     }
     return result
 }
 
-pub fn query_document_symbols(workspace: Workspace, file: FileId): [Declaration]
+pub fn query_document_symbols(workspace: workspace::Workspace, file: ids::FileId): [symbol_index::Declaration]
 {
-    let analysis = workspace_analysis_by_file(workspace, file)
-    return symbol_index_declarations(analysis.symbols, file)
+    let analysis = workspace::workspace_analysis_by_file(workspace, file)
+    return symbol_index::symbol_index_declarations(analysis.symbols, file)
 }
 
-pub fn query_workspace_symbols(workspace: Workspace, name: string): [Declaration]
+pub fn query_workspace_symbols(workspace: workspace::Workspace, name: string): [symbol_index::Declaration]
 {
-    let mut result: [Declaration] = []
+    let mut result: [symbol_index::Declaration] = []
     for (i in 0 .. workspace.documents.length)
     {
-        let declarations = symbol_index_declarations(workspace.documents[i].analysis.symbols, workspace.documents[i].file)
+        let declarations = symbol_index::symbol_index_declarations(workspace.documents[i].analysis.symbols, workspace.documents[i].file)
         for (j in 0 .. declarations.length)
         {
             if (name == "" or declarations[j].name == name)
@@ -134,7 +134,7 @@ pub fn query_workspace_symbols(workspace: Workspace, name: string): [Declaration
     return result
 }
 
-pub fn query_rename(workspace: Workspace, file: FileId, position: LspPosition, new_name: string): QueryResult
+pub fn query_rename(workspace: workspace::Workspace, file: ids::FileId, position: position::LspPosition, new_name: string): QueryResult
 {
     let references = query_references(workspace, file, position)
     if (references.length == 0)

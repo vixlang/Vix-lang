@@ -1,49 +1,50 @@
 #[no_main]
 
-include "ids.vix"
-include "source_db.vix"
-include "stub_tree.vix"
-include "semantic_adapter.vix"
-include "symbol_index.vix"
-include "module_resolution.vix"
+use "ids.vix" as ids
+use "source_db.vix" as source_db
+use "stub_tree.vix" as stub_tree
+use "semantic_adapter.vix" as semantic_adapter
+use "symbol_index.vix" as symbol_index
+use "module_resolution.vix" as module_resolution
+use "source_text.vix" as source_text
 
 pub type AnalysisDatabase = struct
 {
-    sources: SourceDatabase,
-    modules: ModuleGraph,
-    trees: [StubTree],
-    semantics: [SemanticSnapshot],
-    symbols: SymbolIndex,
+    sources: source_db::SourceDatabase,
+    modules: module_resolution::ModuleGraph,
+    trees: [stub_tree::StubTree],
+    semantics: [semantic_adapter::SemanticSnapshot],
+    symbols: symbol_index::SymbolIndex,
 }
 pub fn analysis_db_new(): AnalysisDatabase
 {
-    return AnalysisDatabase{sources: SourceDatabase{files: [], next_file: 0, revision: Revision{value: 0}}, modules: ModuleGraph{modules: [], revision: Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: SymbolIndex{declarations: [], references: [], generation: 0}}
+    return AnalysisDatabase{sources: source_db::SourceDatabase{files: [], next_file: 0, revision: ids::Revision{value: 0}}, modules: module_resolution::ModuleGraph{modules: [], revision: ids::Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: symbol_index::SymbolIndex{declarations: [], references: [], generation: 0}}
 }
-pub fn analysis_db_source(db: AnalysisDatabase, file: FileId): SourceText
+pub fn analysis_db_source(db: AnalysisDatabase, file: ids::FileId): source_text::SourceText
 {
-    return SourceText{}
+    return source_text::SourceText{}
 }
-pub fn analysis_db_stub_tree(db: AnalysisDatabase, file: FileId): StubTree
+pub fn analysis_db_stub_tree(db: AnalysisDatabase, file: ids::FileId): stub_tree::StubTree
 {
-    return StubTree{}
+    return stub_tree::StubTree{}
 }
-pub fn analysis_db_semantic(db: AnalysisDatabase, file: FileId): SemanticSnapshot
+pub fn analysis_db_semantic(db: AnalysisDatabase, file: ids::FileId): semantic_adapter::SemanticSnapshot
 {
-    return SemanticSnapshot{file: FileId{value: 0}, revision: Revision{value: 0}, ok: 0, ast_index: 0, diagnostics: []}
+    return semantic_adapter::SemanticSnapshot{file: ids::FileId{value: 0}, revision: ids::Revision{value: 0}, ok: 0, ast_index: 0, diagnostics: []}
 }
-pub fn analysis_db_update_file(db: AnalysisDatabase, file: FileId): AnalysisDatabase
+pub fn analysis_db_update_file(db: AnalysisDatabase, file: ids::FileId): AnalysisDatabase
 {
-    return AnalysisDatabase{sources: SourceDatabase{files: [], next_file: 0, revision: Revision{value: 0}}, modules: ModuleGraph{modules: [], revision: Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: SymbolIndex{declarations: [], references: [], generation: 0}}
+    return AnalysisDatabase{sources: source_db::SourceDatabase{files: [], next_file: 0, revision: ids::Revision{value: 0}}, modules: module_resolution::ModuleGraph{modules: [], revision: ids::Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: symbol_index::SymbolIndex{declarations: [], references: [], generation: 0}}
 }
 pub fn analysis_db_update_modules(db: AnalysisDatabase): AnalysisDatabase
 {
-    return AnalysisDatabase{sources: SourceDatabase{files: [], next_file: 0, revision: Revision{value: 0}}, modules: ModuleGraph{modules: [], revision: Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: SymbolIndex{declarations: [], references: [], generation: 0}}
+    return AnalysisDatabase{sources: source_db::SourceDatabase{files: [], next_file: 0, revision: ids::Revision{value: 0}}, modules: module_resolution::ModuleGraph{modules: [], revision: ids::Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: symbol_index::SymbolIndex{declarations: [], references: [], generation: 0}}
 }
-pub fn analysis_db_invalidate_file(db: AnalysisDatabase, file: FileId): AnalysisDatabase
+pub fn analysis_db_invalidate_file(db: AnalysisDatabase, file: ids::FileId): AnalysisDatabase
 {
-    return AnalysisDatabase{sources: SourceDatabase{files: [], next_file: 0, revision: Revision{value: 0}}, modules: ModuleGraph{modules: [], revision: Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: SymbolIndex{declarations: [], references: [], generation: 0}}
+    return AnalysisDatabase{sources: source_db::SourceDatabase{files: [], next_file: 0, revision: ids::Revision{value: 0}}, modules: module_resolution::ModuleGraph{modules: [], revision: ids::Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: symbol_index::SymbolIndex{declarations: [], references: [], generation: 0}}
 }
-pub fn analysis_db_invalidate_dependents(db: AnalysisDatabase, file: FileId): AnalysisDatabase
+pub fn analysis_db_invalidate_dependents(db: AnalysisDatabase, file: ids::FileId): AnalysisDatabase
 {
-    return AnalysisDatabase{sources: SourceDatabase{files: [], next_file: 0, revision: Revision{value: 0}}, modules: ModuleGraph{modules: [], revision: Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: SymbolIndex{declarations: [], references: [], generation: 0}}
+    return AnalysisDatabase{sources: source_db::SourceDatabase{files: [], next_file: 0, revision: ids::Revision{value: 0}}, modules: module_resolution::ModuleGraph{modules: [], revision: ids::Revision{value: 0}, ok: 0}, trees: [], semantics: [], symbols: symbol_index::SymbolIndex{declarations: [], references: [], generation: 0}}
 }

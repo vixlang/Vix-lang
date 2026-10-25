@@ -1,6 +1,6 @@
 #[no_main]
 
-include "util.vix"
+use "util.vix" as util
 
 extern "C"
 {
@@ -29,10 +29,10 @@ pub fn transport_read_header(): string
         {
             return header
         }
-        header = header + analyzer_char_string(byte)
+        header = header + util::analyzer_char_string(byte)
         if (header.length >= 4)
         {
-            if (analyzer_byte_at(header, header.length - 4) == '\r' and analyzer_byte_at(header, header.length - 3) == '\n' and analyzer_byte_at(header, header.length - 2) == '\r' and analyzer_byte_at(header, header.length - 1) == '\n')
+            if (util::analyzer_byte_at(header, header.length - 4) == '\r' and util::analyzer_byte_at(header, header.length - 3) == '\n' and util::analyzer_byte_at(header, header.length - 2) == '\r' and util::analyzer_byte_at(header, header.length - 1) == '\n')
             {
                 return header
             }
@@ -44,13 +44,13 @@ pub fn transport_read_header(): string
 pub fn transport_decode_content_length(headers: string): i32
 {
     let marker = "Content-Length:"
-    let at = analyzer_index_of(headers, marker, 0)
+    let at = util::analyzer_index_of(headers, marker, 0)
     if (at < 0)
     {
         return 0
     }
     let mut pos = at + marker.length
-    while (pos < headers.length and analyzer_byte_at(headers, pos) == ' ')
+    while (pos < headers.length and util::analyzer_byte_at(headers, pos) == ' ')
     {
         pos += 1
     }
@@ -58,7 +58,7 @@ pub fn transport_decode_content_length(headers: string): i32
     let mut digits = 0
     while (pos < headers.length)
     {
-        let byte = analyzer_byte_at(headers, pos)
+        let byte = util::analyzer_byte_at(headers, pos)
         if (byte < '0' or byte > '9')
         {
             break
@@ -95,7 +95,7 @@ pub fn transport_read_frame(): string
         {
             return ""
         }
-        body = body + analyzer_char_string(byte)
+        body = body + util::analyzer_char_string(byte)
         count += 1
     }
     return body
@@ -103,7 +103,7 @@ pub fn transport_read_frame(): string
 
 pub fn transport_write_frame(payload: string)
 {
-    let header = "Content-Length: " + analyzer_i32_to_str(payload.length) + "\r\n\r\n"
+    let header = "Content-Length: " + util::analyzer_i32_to_str(payload.length) + "\r\n\r\n"
     vix_analyzer_write(header + payload, header.length + payload.length)
 }
 

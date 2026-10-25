@@ -1,29 +1,30 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "stub_tree.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "stub_tree.vix" as stub_tree
+use "../src/method.vix" as method
 
 pub type SymbolKind = ModuleSymbol | FunctionSymbol | ParameterSymbol | VariableSymbol | TypeSymbol | FieldSymbol | VariantSymbol | ImportSymbol
 
 pub type Declaration = struct
 {
-    id: SymbolId,
+    id: ids::SymbolId,
     name: string,
     kind: SymbolKind,
-    file: FileId,
-    range: LspRange,
-    selection_range: LspRange,
+    file: ids::FileId,
+    range: position::LspRange,
+    selection_range: position::LspRange,
     type_text: string,
-    parent: SymbolId
+    parent: ids::SymbolId
 }
 
 pub type Reference = struct
 {
-    symbol: SymbolId,
-    file: FileId,
-    range: LspRange
+    symbol: ids::SymbolId,
+    file: ids::FileId,
+    range: position::LspRange
 }
 
 pub type SymbolIndex = struct
@@ -38,29 +39,29 @@ pub fn symbol_index_new(): SymbolIndex
     return SymbolIndex{ declarations: [], references: [], generation: 0 }
 }
 
-pub fn symbol_kind_for_node(kind: StubKind): SymbolKind
+pub fn symbol_kind_for_node(kind: stub_tree::StubKind): SymbolKind
 {
-    if (kind == FunctionDecl)
+    if (kind == stub_tree::FunctionDecl)
     {
         return FunctionSymbol
     }
-    if (kind == TypeDecl or kind == AdtDecl)
+    if (kind == stub_tree::TypeDecl or kind == stub_tree::AdtDecl)
     {
         return TypeSymbol
     }
-    if (kind == FieldDecl)
+    if (kind == stub_tree::FieldDecl)
     {
         return FieldSymbol
     }
-    if (kind == VariantDecl)
+    if (kind == stub_tree::VariantDecl)
     {
         return VariantSymbol
     }
-    if (kind == ModuleDecl)
+    if (kind == stub_tree::ModuleDecl)
     {
         return ModuleSymbol
     }
-    if (kind == ImportDecl)
+    if (kind == stub_tree::ImportDecl)
     {
         return ImportSymbol
     }
@@ -99,7 +100,7 @@ pub fn symbol_lsp_kind(kind: SymbolKind): i32
 // Containment is decided by the selection range (the name), not the whole
 // declaration range, so a cursor inside a body is not captured by the
 // enclosing declaration.
-pub fn declaration_contains(declaration: Declaration, position: LspPosition): i32
+pub fn declaration_contains(declaration: Declaration, position: position::LspPosition): i32
 {
     let range = declaration.selection_range
     if (position.line < range.start.line or position.line > range.end.line)
@@ -117,26 +118,26 @@ pub fn declaration_contains(declaration: Declaration, position: LspPosition): i3
     return 1
 }
 
-pub fn symbol_index_build(file: FileId, source: string, tree: StubTree): SymbolIndex
+pub fn symbol_index_build(file: ids::FileId, source: string, tree: stub_tree::StubTree): SymbolIndex
 {
-    let index = line_index_new(source)
+    let index = position::line_index_new(source)
     let symbols = symbol_index_new()
     for (i in 0 .. tree.nodes.length)
     {
         let node = tree.nodes[i]
         if (node.alive == 1 and node.name != "")
         {
-            let range = text_range_to_lsp(index, node.range, source)
-            let selection = text_range_to_lsp(index, node.name_range, source)
+            let range = position::text_range_to_lsp(index, node.range, source)
+            let selection = position::text_range_to_lsp(index, node.name_range, source)
             symbols.declarations.push(Declaration{
-                id: symbol_id(symbols.declarations.length, tree.generation),
+                id: ids::symbol_id(symbols.declarations.length, tree.generation),
                 name: node.name,
                 kind: symbol_kind_for_node(node.kind),
                 file: file,
                 range: range,
                 selection_range: selection,
                 type_text: "",
-                parent: symbol_id_invalid()
+                parent: ids::symbol_id_invalid()
             })
         }
     }
@@ -144,7 +145,7 @@ pub fn symbol_index_build(file: FileId, source: string, tree: StubTree): SymbolI
     return symbols
 }
 
-pub fn symbol_index_declarations(index: SymbolIndex, file: FileId): [Declaration]
+pub fn symbol_index_declarations(index: SymbolIndex, file: ids::FileId): [Declaration]
 {
     let mut result: [Declaration] = []
     for (i in 0 .. index.declarations.length)
@@ -157,9 +158,9 @@ pub fn symbol_index_declarations(index: SymbolIndex, file: FileId): [Declaration
     return result
 }
 
-pub fn symbol_index_find_at(index: SymbolIndex, file: FileId, position: LspPosition): SymbolId
+pub fn symbol_index_find_at(index: SymbolIndex, file: ids::FileId, position: position::LspPosition): ids::SymbolId
 {
-    let mut best = symbol_id_invalid()
+    let mut best = ids::symbol_id_invalid()
     let mut best_size = 0
     for (i in 0 .. index.declarations.length)
     {
@@ -182,11 +183,11 @@ pub fn symbol_index_find_at(index: SymbolIndex, file: FileId, position: LspPosit
     return best
 }
 
-pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): SymbolId
+pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): ids::SymbolId
 {
     if (name == "")
     {
-        return symbol_id_invalid()
+        return ids::symbol_id_invalid()
     }
     for (i in 0 .. index.declarations.length)
     {
@@ -195,13 +196,13 @@ pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): SymbolId
             return index.declarations[i].id
         }
     }
-    return symbol_id_invalid()
+    return ids::symbol_id_invalid()
 }
 
 // Resolves a method call when the static receiver type is known. The lookup key
 // is built by method_qualify, the same function the compiler uses to name method
 // declarations, so the analyzer cannot drift from the compiler.
-pub fn symbol_index_find_method_on_receiver(index: SymbolIndex, receiver_type: string, method: string): SymbolId
+pub fn symbol_index_find_method_on_receiver(index: SymbolIndex, receiver_type: string, method: string): ids::SymbolId
 {
     return symbol_index_find_by_name(index, method::method_qualify(receiver_type, method))
 }
@@ -209,22 +210,22 @@ pub fn symbol_index_find_method_on_receiver(index: SymbolIndex, receiver_type: s
 // Fallback for call sites whose receiver type the analyzer cannot determine: it
 // scans for any method with this short name. It reports the first match, so a
 // caller that knows the receiver type must use symbol_index_find_method_on_receiver.
-pub fn symbol_index_find_method(index: SymbolIndex, method: string): SymbolId
+pub fn symbol_index_find_method(index: SymbolIndex, method: string): ids::SymbolId
 {
     let suffix = "::" + method
     for (i in 0 .. index.declarations.length)
     {
         let name = index.declarations[i].name
-        let tail = if (name.length >= suffix.length) { analyzer_copy(name, name.length - suffix.length, name.length) } else { "" }
+        let tail = if (name.length >= suffix.length) { util::analyzer_copy(name, name.length - suffix.length, name.length) } else { "" }
         if (tail == suffix)
         {
             return index.declarations[i].id
         }
     }
-    return symbol_id_invalid()
+    return ids::symbol_id_invalid()
 }
 
-pub fn symbol_index_find_definition(index: SymbolIndex, symbol: SymbolId): Declaration
+pub fn symbol_index_find_definition(index: SymbolIndex, symbol: ids::SymbolId): Declaration
 {
     for (i in 0 .. index.declarations.length)
     {
@@ -239,18 +240,18 @@ pub fn symbol_index_find_definition(index: SymbolIndex, symbol: SymbolId): Decla
 pub fn declaration_invalid(): Declaration
 {
     return Declaration{
-        id: symbol_id_invalid(),
+        id: ids::symbol_id_invalid(),
         name: "",
         kind: VariableSymbol,
-        file: file_id_invalid(),
-        range: lsp_range(lsp_position(0, 0), lsp_position(0, 0)),
-        selection_range: lsp_range(lsp_position(0, 0), lsp_position(0, 0)),
+        file: ids::file_id_invalid(),
+        range: position::lsp_range(position::lsp_position(0, 0), position::lsp_position(0, 0)),
+        selection_range: position::lsp_range(position::lsp_position(0, 0), position::lsp_position(0, 0)),
         type_text: "",
-        parent: symbol_id_invalid()
+        parent: ids::symbol_id_invalid()
     }
 }
 
-pub fn symbol_index_find_references(index: SymbolIndex, symbol: SymbolId): [Reference]
+pub fn symbol_index_find_references(index: SymbolIndex, symbol: ids::SymbolId): [Reference]
 {
     let mut result: [Reference] = []
     for (i in 0 .. index.references.length)

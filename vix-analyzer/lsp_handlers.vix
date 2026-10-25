@@ -1,20 +1,20 @@
 #[no_main]
 
-include "ids.vix"
-include "position.vix"
-include "util.vix"
-include "../src/json.vix"
-include "workspace.vix"
-include "queries.vix"
-include "lsp_protocol.vix"
-include "../src/fmt.vix"
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "../src/json.vix" as json
+use "workspace.vix" as workspace
+use "queries.vix" as queries
+use "lsp_protocol.vix" as lsp_protocol
+use "../src/fmt.vix" as fmt
 
 pub type TextDocumentParams = struct
 {
     uri: string,
     version: i32,
     text: string,
-    position: LspPosition
+    position: position::LspPosition
 }
 
 pub fn lsp_params_document(params: string): ?TextDocumentParams
@@ -30,11 +30,11 @@ pub fn lsp_params_document(params: string): ?TextDocumentParams
     {
         return None
     }
-    let mut position = lsp_position(0, 0)
+    let mut position = position::lsp_position(0, 0)
     let position_node = json::json_object_get(doc, root, "position")
     if (position_node >= 0)
     {
-        position = lsp_position(
+        position = position::lsp_position(
             json::json_int_at(doc, json::json_object_get(doc, position_node, "line")),
             json::json_int_at(doc, json::json_object_get(doc, position_node, "character"))
         )
@@ -69,19 +69,19 @@ pub fn lsp_apply_changes(current: string, params: string): string
         }
         else
         {
-            let index = line_index_new(text)
+            let index = position::line_index_new(text)
             let start_node = json::json_object_get(doc, range, "start")
             let end_node = json::json_object_get(doc, range, "end")
-            let start_position = lsp_position(
+            let start_position = position::lsp_position(
                 json::json_int_at(doc, json::json_object_get(doc, start_node, "line")),
                 json::json_int_at(doc, json::json_object_get(doc, start_node, "character"))
             )
-            let end_position = lsp_position(
+            let end_position = position::lsp_position(
                 json::json_int_at(doc, json::json_object_get(doc, end_node, "line")),
                 json::json_int_at(doc, json::json_object_get(doc, end_node, "character"))
             )
-            let mut start_byte = line_index_byte(index, start_position, text)
-            let mut end_byte = line_index_byte(index, end_position, text)
+            let mut start_byte = position::line_index_byte(index, start_position, text)
+            let mut end_byte = position::line_index_byte(index, end_position, text)
             if (start_byte < 0)
             {
                 start_byte = 0
@@ -90,18 +90,18 @@ pub fn lsp_apply_changes(current: string, params: string): string
             {
                 end_byte = start_byte
             }
-            text = analyzer_copy(text, 0, start_byte) + replacement + analyzer_copy(text, end_byte, text.length)
+            text = util::analyzer_copy(text, 0, start_byte) + replacement + util::analyzer_copy(text, end_byte, text.length)
         }
     }
     return text
 }
 
-pub fn handle_did_open(workspace: &Workspace, params: string): string
+pub fn handle_did_open(workspace: &workspace::Workspace, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            workspace_open(workspace, document.uri, document.version, document.text)
+            workspace::workspace_open(workspace, document.uri, document.version, document.text)
             return document.uri
         }
         None -> {}
@@ -109,13 +109,13 @@ pub fn handle_did_open(workspace: &Workspace, params: string): string
     return ""
 }
 
-pub fn handle_did_change(workspace: &Workspace, params: string): string
+pub fn handle_did_change(workspace: &workspace::Workspace, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            let text = lsp_apply_changes(workspace_text(workspace, document.uri), params)
-            workspace_set_text(workspace, document.uri, document.version, text)
+            let text = lsp_apply_changes(workspace::workspace_text(workspace, document.uri), params)
+            workspace::workspace_set_text(workspace, document.uri, document.version, text)
             return document.uri
         }
         None -> {}
@@ -123,12 +123,12 @@ pub fn handle_did_change(workspace: &Workspace, params: string): string
     return ""
 }
 
-pub fn handle_did_close(workspace: &Workspace, params: string): string
+pub fn handle_did_close(workspace: &workspace::Workspace, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            workspace_close(workspace, document.uri)
+            workspace::workspace_close(workspace, document.uri)
             return document.uri
         }
         None -> {}
@@ -136,85 +136,85 @@ pub fn handle_did_close(workspace: &Workspace, params: string): string
     return ""
 }
 
-pub fn handle_hover(workspace: Workspace, id: i32, params: string): string
+pub fn handle_hover(workspace: workspace::Workspace, id: i32, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            let file = workspace_file(workspace, document.uri)
-            let result = query_hover(workspace, file, document.position)
+            let file = workspace::workspace_file(workspace, document.uri)
+            let result = queries::query_hover(workspace, file, document.position)
             if (result.contents == "")
             {
-                return lsp_response(id, "null")
+                return lsp_protocol::lsp_response(id, "null")
             }
-            return lsp_response(id, lsp_encode_hover(result))
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_hover(result))
         }
         None -> {}
     }
-    return lsp_response(id, "null")
+    return lsp_protocol::lsp_response(id, "null")
 }
 
-pub fn handle_definition(workspace: Workspace, id: i32, params: string): string
+pub fn handle_definition(workspace: workspace::Workspace, id: i32, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            let file = workspace_file(workspace, document.uri)
-            let declaration = query_definition(workspace, file, document.position)
+            let file = workspace::workspace_file(workspace, document.uri)
+            let declaration = queries::query_definition(workspace, file, document.position)
             if (declaration.name == "")
             {
-                return lsp_response(id, "null")
+                return lsp_protocol::lsp_response(id, "null")
             }
-            return lsp_response(id, lsp_encode_location(document.uri, declaration.selection_range))
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_location(document.uri, declaration.selection_range))
         }
         None -> {}
     }
-    return lsp_response(id, "null")
+    return lsp_protocol::lsp_response(id, "null")
 }
 
-pub fn handle_references(workspace: Workspace, id: i32, params: string): string
+pub fn handle_references(workspace: workspace::Workspace, id: i32, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            let file = workspace_file(workspace, document.uri)
-            let references = query_references(workspace, file, document.position)
-            return lsp_response(id, lsp_encode_locations(document.uri, references))
+            let file = workspace::workspace_file(workspace, document.uri)
+            let references = queries::query_references(workspace, file, document.position)
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_locations(document.uri, references))
         }
         None -> {}
     }
-    return lsp_response(id, "[]")
+    return lsp_protocol::lsp_response(id, "[]")
 }
 
-pub fn handle_document_symbol(workspace: Workspace, id: i32, params: string): string
+pub fn handle_document_symbol(workspace: workspace::Workspace, id: i32, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            let file = workspace_file(workspace, document.uri)
-            let declarations = query_document_symbols(workspace, file)
-            return lsp_response(id, lsp_encode_symbols(declarations))
+            let file = workspace::workspace_file(workspace, document.uri)
+            let declarations = queries::query_document_symbols(workspace, file)
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_symbols(declarations))
         }
         None -> {}
     }
-    return lsp_response(id, "[]")
+    return lsp_protocol::lsp_response(id, "[]")
 }
 
-pub fn handle_completion(workspace: Workspace, id: i32, params: string): string
+pub fn handle_completion(workspace: workspace::Workspace, id: i32, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            let file = workspace_file(workspace, document.uri)
-            let items = query_completion(workspace, file, document.position)
-            return lsp_response(id, lsp_encode_completion(items))
+            let file = workspace::workspace_file(workspace, document.uri)
+            let items = queries::query_completion(workspace, file, document.position)
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_completion(items))
         }
         None -> {}
     }
-    return lsp_response(id, "[]")
+    return lsp_protocol::lsp_response(id, "[]")
 }
 
-pub fn handle_rename(workspace: Workspace, id: i32, params: string): string
+pub fn handle_rename(workspace: workspace::Workspace, id: i32, params: string): string
 {
     let doc = json::json_parse(params)
     let root = json::json_root(doc)
@@ -224,27 +224,27 @@ pub fn handle_rename(workspace: Workspace, id: i32, params: string): string
         Some(document) -> {
             if (new_name == "")
             {
-                return lsp_response(id, "null")
+                return lsp_protocol::lsp_response(id, "null")
             }
-            let file = workspace_file(workspace, document.uri)
-            let references = query_references(workspace, file, document.position)
+            let file = workspace::workspace_file(workspace, document.uri)
+            let references = queries::query_references(workspace, file, document.position)
             if (references.length == 0)
             {
-                return lsp_response(id, "null")
+                return lsp_protocol::lsp_response(id, "null")
             }
-            return lsp_response(id, lsp_encode_rename(document.uri, references, new_name))
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_rename(document.uri, references, new_name))
         }
         None -> {}
     }
-    return lsp_response(id, "null")
+    return lsp_protocol::lsp_response(id, "null")
 }
 // A "file://" URI as a filesystem path, so a vix-fmt.toml next to the document
 // can be found.
 pub fn lsp_uri_to_path(uri: string): string
 {
-    if (analyzer_starts_with(uri, "file://") == 1)
+    if (util::analyzer_starts_with(uri, "file://") == 1)
     {
-        return analyzer_copy(uri, 7, uri.length)
+        return util::analyzer_copy(uri, 7, uri.length)
     }
     return uri
 }
@@ -275,24 +275,24 @@ pub fn lsp_format_config(document: TextDocumentParams, params: string): fmt::Fmt
     return fmt::fmt_config_normalize(config)
 }
 
-pub fn handle_formatting(workspace: Workspace, id: i32, params: string): string
+pub fn handle_formatting(workspace: workspace::Workspace, id: i32, params: string): string
 {
     match lsp_params_document(params)
     {
         Some(document) -> {
-            let text = workspace_text(workspace, document.uri)
+            let text = workspace::workspace_text(workspace, document.uri)
             if (text == "")
             {
-                return lsp_response(id, "[]")
+                return lsp_protocol::lsp_response(id, "[]")
             }
             let result = fmt::fmt_format(text, lsp_format_config(document, params))
             if (result.ok == 0 or result.text == text)
             {
-                return lsp_response(id, "[]")
+                return lsp_protocol::lsp_response(id, "[]")
             }
-            return lsp_response(id, lsp_encode_format_edits(text, result.text))
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_format_edits(text, result.text))
         }
         None -> {}
     }
-    return lsp_response(id, "[]")
+    return lsp_protocol::lsp_response(id, "[]")
 }

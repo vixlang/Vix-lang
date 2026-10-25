@@ -1,6 +1,6 @@
 #[no_main]
 
-include "position.vix"
+use "position.vix" as position
 
 extern "C"
 {
@@ -159,10 +159,10 @@ pub fn analyzer_is_ident_byte(byte: i32): i32
     return 0
 }
 
-pub fn analyzer_word_at(text: string, position: LspPosition): string
+pub fn analyzer_word_at(text: string, position: position::LspPosition): string
 {
-    let index = line_index_new(text)
-    let offset = line_index_byte(index, position, text)
+    let index = position::line_index_new(text)
+    let offset = position::line_index_byte(index, position, text)
     if (offset < 0 or offset > text.length)
     {
         return ""

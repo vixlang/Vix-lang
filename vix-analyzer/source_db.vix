@@ -1,74 +1,75 @@
 #[no_main]
 
-include "ids.vix"
-include "source_text.vix"
+use "ids.vix" as ids
+use "source_text.vix" as source_text
+use "stub_tree.vix" as stub_tree
 
- pub type SourceFile = struct
+ pub type stub_tree::SourceFile = struct
 {
-    file: FileId,
+    file: ids::FileId,
     uri: string,
     path: string,
-    source: SourceText,
+    source: source_text::SourceText,
     overlay: i32,
 }
 pub type SourceDatabase = struct
 {
-    files: [SourceFile],
+    files: [stub_tree::SourceFile],
     next_file: i32,
-    revision: Revision,
+    revision: ids::Revision,
 }
 pub fn source_db_new(): SourceDatabase
 {
-    return SourceDatabase{ files: [], next_file: 0, revision: revision_zero() }
+    return SourceDatabase{ files: [], next_file: 0, revision: ids::revision_zero() }
 }
-pub fn source_db_intern(db: SourceDatabase, uri: string, path: string): FileId
+pub fn source_db_intern(db: SourceDatabase, uri: string, path: string): ids::FileId
 {
     for (i in 0 .. db.files.length) { if (db.files[i].uri == uri) { return db.files[i].file } };
-    return file_id(db.next_file)
+    return ids::file_id(db.next_file)
 }
 pub fn source_db_open(db: SourceDatabase, uri: string, path: string, version: i32, text: string): SourceDatabase
 {
     let file = source_db_intern(db, uri, path);
-    let source = source_text_new(file, version, text);
+    let source = source_text::source_text_new(file, version, text);
     for (i in 0 .. db.files.length) { if (db.files[i].file.value == file.value) { db.files[i].source = source;
     db.files[i].overlay = 1;
     db.revision.value += 1;
     return db } };
-    db.files.push(SourceFile{ file: file, uri: uri, path: path, source: source, overlay: 1 });
+    db.files.push(stub_tree::SourceFile{ file: file, uri: uri, path: path, source: source, overlay: 1 });
     db.next_file += 1;
     db.revision.value += 1;
     return db
 }
-pub fn source_db_apply_edit(db: SourceDatabase, file: FileId, version: i32, edit: TextEdit): SourceDatabase
+pub fn source_db_apply_edit(db: SourceDatabase, file: ids::FileId, version: i32, edit: source_text::TextEdit): SourceDatabase
 {
-    for (i in 0 .. db.files.length) { if (db.files[i].file.value == file.value) { db.files[i].source = source_text_apply_edit(db.files[i].source, edit, version);
+    for (i in 0 .. db.files.length) { if (db.files[i].file.value == file.value) { db.files[i].source = source_text::source_text_apply_edit(db.files[i].source, edit, version);
     db.files[i].overlay = 1;
     db.revision.value += 1 } };
     return db
 }
-pub fn source_db_replace(db: SourceDatabase, file: FileId, version: i32, text: string): SourceDatabase
+pub fn source_db_replace(db: SourceDatabase, file: ids::FileId, version: i32, text: string): SourceDatabase
 {
-    for (i in 0 .. db.files.length) { if (db.files[i].file.value == file.value) { db.files[i].source = source_text_replace(db.files[i].source, text, version);
+    for (i in 0 .. db.files.length) { if (db.files[i].file.value == file.value) { db.files[i].source = source_text::source_text_replace(db.files[i].source, text, version);
     db.files[i].overlay = 1;
     db.revision.value += 1 } };
     return db
 }
-pub fn source_db_close(db: SourceDatabase, file: FileId): SourceDatabase
+pub fn source_db_close(db: SourceDatabase, file: ids::FileId): SourceDatabase
 {
     for (i in 0 .. db.files.length) { if (db.files[i].file.value == file.value) { db.files[i].overlay = 0;
     db.revision.value += 1 } };
     return db
 }
-pub fn source_db_file(db: SourceDatabase, file: FileId): SourceFile
+pub fn source_db_file(db: SourceDatabase, file: ids::FileId): stub_tree::SourceFile
 {
     for (i in 0 .. db.files.length) { if (db.files[i].file.value == file.value) { return db.files[i] } };
-    return SourceFile{ file: file_id_invalid(), uri: "", path: "", source: source_text_new(file_id_invalid(), 0, ""), overlay: 0 }
+    return stub_tree::SourceFile{ file: ids::file_id_invalid(), uri: "", path: "", source: source_text::source_text_new(ids::file_id_invalid(), 0, ""), overlay: 0 }
 }
-pub fn source_db_revision(db: SourceDatabase): Revision
+pub fn source_db_revision(db: SourceDatabase): ids::Revision
 {
     return db.revision
 }
-pub fn source_db_file_revision(db: SourceDatabase, file: FileId): Revision
+pub fn source_db_file_revision(db: SourceDatabase, file: ids::FileId): ids::Revision
 {
     return db.revision
 }

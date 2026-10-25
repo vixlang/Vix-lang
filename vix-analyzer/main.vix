@@ -1,5 +1,6 @@
 #[no_main]
 
+use "lsp_server.vix" as lsp_server
 use "../src/ast.vix" as ast
 use "../src/diag.vix" as diag
 use "../src/fmt.vix" as fmt
@@ -13,12 +14,11 @@ use "../src/type/typeck.vix" as typeck
 
 extern "C" { fn fputs(s: string, file: ptr): i32 }
 
-include "lsp_server.vix"
 
 pub fn vix_analyzer_main(): i32
 {
-    let server = lsp_server_new("", "")
-    lsp_server_run(&server)
+    let server = lsp_server::lsp_server_new("", "")
+    lsp_server::lsp_server_run(&server)
     return 0
 }
 
