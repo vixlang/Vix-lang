@@ -1,7 +1,12 @@
 LLVM_CFLAGS := $(shell llvm-config --cflags)
 LLVM_CXXFLAGS := $(shell llvm-config --cxxflags)
 LLVM_LDFLAGS := $(shell llvm-config --ldflags --libs all)
+ifeq ($(OS),Windows_NT)
+# Linker.cpp instantiates the COFF driver on Windows, which lives in lldCOFF.
+LLD_LIBS := -llldELF -llldCOFF -llldCommon -lz -lzstd
+else
 LLD_LIBS := -llldELF -llldCommon -lz -lzstd
+endif
 GC_LIBS := $(shell pkg-config --libs bdw-gc 2>/dev/null || echo -lgc)
 HOST_UNAME := $(shell uname -s)
 ifeq ($(OS),Windows_NT)
@@ -41,6 +46,7 @@ SEED_GC_TARGET := $(BUILD_DIR)/vixc-seed-gc$(EXE_EXT)
 BOOTSTRAP_OBJ := $(BUILD_DIR)/vixc-bootstrap.o
 BOOTSTRAP_TARGET := $(BUILD_DIR)/vixc-bootstrap$(EXE_EXT)
 HELPER_OBJ := $(BUILD_DIR)/helper.o
+TYPEPOOL_OBJ := $(BUILD_DIR)/typepool.o
 RUNTIME_OBJ := $(RUNTIME_DIR)/runtime.o
 VIXC_OBJ := $(BUILD_DIR)/vixc.o
 SELF_STAGE_OBJ := $(BUILD_DIR)/vixc-self.o
@@ -53,7 +59,7 @@ LINKER_OBJ := $(BUILD_DIR)/Linker.o
 PASSES_OBJ := $(BUILD_DIR)/Passes.o
 COMPILER_GC_OBJ := $(BUILD_DIR)/compiler_gc.o
 LLVM_API_OBJS := $(API_OBJ) $(LLC_OBJ) $(LINKER_OBJ) $(PASSES_OBJ)
-COMPILER_SUPPORT_OBJS := $(HELPER_OBJ) $(RUNTIME_OBJ) $(LLVM_API_OBJS) $(COMPILER_GC_OBJ)
+COMPILER_SUPPORT_OBJS := $(HELPER_OBJ) $(TYPEPOOL_OBJ) $(RUNTIME_OBJ) $(LLVM_API_OBJS) $(COMPILER_GC_OBJ)
 VIXC ?= $(SEED_GC_TARGET)
 
 VIX_SOURCES := $(shell find $(SRC_DIR) -type f -name '*.vix')
@@ -82,6 +88,9 @@ $(BUILD_DIR) $(RUNTIME_DIR):
 
 $(HELPER_OBJ): $(SRC_DIR)/helper.c | $(BUILD_DIR)
 	$(GCC) -c $< -o $@ $(LLVM_CFLAGS) -Wno-deprecated-declarations
+
+$(TYPEPOOL_OBJ): $(SRC_DIR)/typepool.c | $(BUILD_DIR)
+	$(GCC) -c $< -o $@
 
 $(API_OBJ): lib/api.c | $(BUILD_DIR)
 	$(GCC) -c $< -o $@

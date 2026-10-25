@@ -91,7 +91,7 @@ jobs:
           make -j2 build/vixc-seed-gc.exe \
             GCC=clang CXX="clang++ -Qunused-arguments -Wl,--stack,16777216" CLANG=clang \
             LLVM_CXXFLAGS="$(llvm-config --cxxflags | sed 's/-stdlib=libc++//g')" \
-            GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCommon -lz -lzstd"
+            GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCOFF -llldCommon -lz -lzstd"
           cp build/vixc-seed-gc.exe build/vixc.exe
 
       - name: Package compiler
