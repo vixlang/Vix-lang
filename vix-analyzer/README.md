@@ -130,10 +130,21 @@ vixc 内嵌链接器只有 ELF 和 COFF 驱动，没有 Mach-O 驱动，所以 m
 `vixc prog.vix -o prog` 无法链接（examples/hello.vix 同样失败）。LLVM 后端本身正常，
 能产出合法 Mach-O 目标文件，因此构建方式是「LLVM 后端出目标文件 + 平台工具链接」。
 
-编译器还需要 src/codegen.vix 里的 Option 聚合体修复：原先 `Some(struct)` 会生成
-`%add = add %P %insert, i32 1` 这种非法 IR。修复后聚合载荷改为 alloca + store 传递
-指针，解码侧对应 load。scripts/build-analyzer.sh 会先用现有 build/vixc 编译出带修复的
-build/vixc-patched，再用它构建 analyzer。
+Option 聚合体代码生成修复（原先 `Some(struct)` 会生成
+`%add = add %P %insert, i32 1` 这种非法 IR）已经在 src/codegen.vix 里，任何由当前
+源码构建的 vixc 都能直接编译 analyzer。scripts/build-analyzer.sh 优先用现存的
+build/vixc-patched，否则回退到 build/vixc（make all 的产物）。
+
+## 平台
+
+| 平台 | 状态 | 方式 |
+|------|------|------|
+| macOS | 支持 | 本脚本：LLVM 后端出 Mach-O 目标文件 + 平台 clang 链接（内嵌链接器没有 Mach-O 驱动） |
+| Linux | 支持 | CI 直接 `build/vixc vix-analyzer/main.vix -obj` + clang 链接 |
+| Windows | 支持 | CI 用 build/vixc.exe（seed）出 COFF 目标文件 + clang 链接；冒烟失败则自举一步后重试 |
+
+Windows 的 support.c 会把 stdin/stdout 切到 `_O_BINARY`，否则 CRLF 翻译破坏
+Content-Length 帧。三平台的发布档案都带 vix-analyzer(.exe)，vix-up 会为它创建 shim。
 
 工具链要求（可用环境变量覆盖）：LLVM 21 头文件与 llvm-config、lld 头文件与
 lld/LLVM 库、bdw-gc。
@@ -142,7 +153,9 @@ lld/LLVM 库、bdw-gc。
 
 - textDocumentSync 声明为 Full；range 增量编辑已支持，语法层是增量的，语义层不是
 - references 与 rename 是单文件、基于标识符名的解析，尚未做作用域与遮蔽分析
-- 跨文件 module graph 与依赖失效尚未接入 analyzer
+- 模块系统已接入：文档在磁盘上且带 use 声明时，按模块图合并分析；被用模块的
+  函数体不做重复检查，跨文件 hover 与定义跳转可用（.vixi 缓存尚未接，模块每次
+  重新解析）
 - 局部变量没有进入 symbol index，因此 hover 不覆盖局部变量
 - 格式化只处理缩进与空行，不做折行/对齐/空格归一化
 - 未实现 semanticTokens、codeAction

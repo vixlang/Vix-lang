@@ -75,9 +75,28 @@ pub fn query_hover(workspace: workspace::Workspace, file: ids::FileId, position:
     let analysis = workspace::workspace_analysis_by_file(workspace, file)
     let symbol = query_symbol(workspace, file, position)
     let declaration = symbol_index::symbol_index_find_definition(analysis.symbols, symbol)
+    if (declaration.name != "")
+    {
+        return HoverResult{
+            contents: hover_contents(declaration),
+            range: declaration.range
+        }
+    }
+    // Fall back to the used modules' surface: hovering io::puts in a call
+    // resolves even though the declaration lives in another file.
+    let text = workspace::workspace_text_by_file(workspace, file)
+    let word = util::analyzer_word_at(text, position)
+    let external = analysis::analyzer_external_for_word(analysis, word)
+    if (external.name != "")
+    {
+        return HoverResult{
+            contents: external.namespace + "::" + external.name + ": " + external.signature,
+            range: util::analyzer_word_range_at(text, position)
+        }
+    }
     return HoverResult{
-        contents: hover_contents(declaration),
-        range: declaration.range
+        contents: "",
+        range: position::lsp_range(position, position)
     }
 }
 
@@ -85,7 +104,34 @@ pub fn query_definition(workspace: workspace::Workspace, file: ids::FileId, posi
 {
     let analysis = workspace::workspace_analysis_by_file(workspace, file)
     let symbol = query_symbol(workspace, file, position)
-    return symbol_index::symbol_index_find_definition(analysis.symbols, symbol)
+    let declaration = symbol_index::symbol_index_find_definition(analysis.symbols, symbol)
+    if (declaration.name != "")
+    {
+        return declaration
+    }
+    let text = workspace::workspace_text_by_file(workspace, file)
+    let word = util::analyzer_word_at(text, position)
+    let external = analysis::analyzer_external_for_word(analysis, word)
+    if (external.name == "")
+    {
+        return symbol_index::declaration_invalid()
+    }
+    // The declaration lives in the used module's own file; the merged program
+    // kept its 1-based coordinates, and the graph gave us the file path.
+    let line = if (external.line < 1) 0 else external.line - 1
+    let col = if (external.col < 1) 0 else external.col - 1
+    let module_range = position::lsp_range(position::lsp_position(line, col), position::lsp_position(line, col + 1))
+    return symbol_index::Declaration{
+        id: ids::symbol_id_invalid(),
+        name: external.name,
+        kind: external.kind,
+        file: file,
+        range: module_range,
+        selection_range: module_range,
+        type_text: external.signature,
+        parent: ids::symbol_id_invalid(),
+        uri: util::analyzer_path_to_uri(external.path)
+    }
 }
 
 pub fn query_references(workspace: workspace::Workspace, file: ids::FileId, position: position::LspPosition): [symbol_index::Reference]

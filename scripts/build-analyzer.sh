@@ -71,10 +71,19 @@ $CLANGXX -c lib/llvm/Linker.cpp -o build/Linker.o $LLVM_CXXFLAGS -I"$LLD_INCLUDE
 COMPILER_SUPPORT="build/typepool.o build/helper.o runtime/runtime.o build/api.o build/Llc.o build/Linker.o build/Passes.o build/compiler_gc.o"
 
 echo "== bootstrap compiler through module graph =="
-# The checked-in compiler sources now use the module graph directly.  The
-# patched seed understands those imports; do not rewrite main.vix to legacy
-# include syntax because sys.vix is itself a real module manifest.
-build/vixc-patched src/main.vix -obj -o build/vixc-stage1.o
+# The checked-in compiler sources use the module graph directly, and the
+# Option-aggregate codegen fix lives in HEAD's codegen.vix -- so any compiler
+# built from current sources works.  A previous vixc-patched is still
+# preferred when present; build/vixc (from make all) is the fallback.
+BOOTSTRAP=build/vixc-patched
+if [ ! -x "$BOOTSTRAP" ]; then
+  BOOTSTRAP=build/vixc
+fi
+if [ ! -x "$BOOTSTRAP" ]; then
+  echo "build-analyzer: no build/vixc-patched or build/vixc to bootstrap with" >&2
+  exit 1
+fi
+"$BOOTSTRAP" src/main.vix -obj -o build/vixc-stage1.o
 $CLANGXX -o build/vixc-stage1 build/vixc-stage1.o $COMPILER_SUPPORT \
   -L"$LLD_LIBDIR" -llldELF -llldCommon -l"$LLVM_LINK_LIB" \
   -L"$GC_LIBDIR" -lgc -lz -lzstd -Wl,-rpath,"$LLD_LIBDIR"

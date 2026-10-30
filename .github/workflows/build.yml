@@ -94,6 +94,61 @@ jobs:
             GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCOFF -llldCommon -lz -lzstd"
           cp build/vixc-seed-gc.exe build/vixc.exe
 
+      - name: Build vix-analyzer (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          # The analyzer needs only the front end: vixc emits the object, and
+          # the final link is the four runtime objects with no LLVM at all.
+          set -euo pipefail
+          CC=clang-21
+          if [ "${{ runner.os }}" = "macOS" ]; then CC=clang; fi
+          "$CC" -c vix-analyzer/support.c -o build/vix-analyzer-support.o
+          build/vixc vix-analyzer/main.vix -obj -o build/vix-analyzer.o
+          "$CC" build/vix-analyzer.o build/vix-analyzer-support.o \
+            runtime/runtime.o build/typepool.o -o build/vix-analyzer
+
+      - name: Build vix-analyzer (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          clang -c vix-analyzer/support.c -o build/vix-analyzer-support.o
+          link_analyzer () {
+            clang build/vix-analyzer.o build/vix-analyzer-support.o \
+              runtime/runtime.o build/typepool.o -o build/vix-analyzer.exe
+          }
+          build/vixc.exe vix-analyzer/main.vix -obj -o build/vix-analyzer.o
+          link_analyzer
+          # The seed's codegen must handle the analyzer's Option/aggregate
+          # shapes; the LSP smoke test proves the binary actually works.  If
+          # it does not, self-host one step (the seed compiles the current
+          # compiler, whose codegen certainly does) and rebuild the analyzer.
+          if ! python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe \
+             && ! python vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe; then
+            echo "seed-built analyzer failed the smoke test; self-hosting once"
+            build/vixc.exe src/main.vix -obj -o build/vixc-self.o
+            clang++ -o build/vixc-self.exe build/vixc-self.o build/typepool.o \
+              build/helper.o runtime/runtime.o build/api.o build/Llc.o \
+              build/Linker.o build/Passes.o build/compiler_gc.o \
+              -llldELF -llldCOFF -llldCommon -lz -lzstd
+            build/vixc-self.exe vix-analyzer/main.vix -obj -o build/vix-analyzer.o
+            link_analyzer
+            python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe \
+              || python vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe
+          fi
+
+      - name: Test vix-analyzer (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer
+          python3 vix-analyzer/tests/lsp_modules.py ./build/vix-analyzer
+          python3 vix-analyzer/tests/lsp_differential.py ./build/vix-analyzer 60
+
+      - name: Test vix-analyzer (macOS smoke)
+        if: runner.os == 'macOS'
+        run: |
+          python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer
+
       - name: Package compiler
         shell: bash
         run: |
@@ -103,6 +158,11 @@ jobs:
           compiler_path=build/vixc
           if [ "${{ runner.os }}" = "Windows" ]; then compiler_path=build/vixc.exe; fi
           cp "$compiler_path" "$package_root/"
+          # The language server ships beside the compiler; vix-up already
+          # creates a shim for it in toolchain installs.
+          analyzer_path=build/vix-analyzer
+          if [ "${{ runner.os }}" = "Windows" ]; then analyzer_path=build/vix-analyzer.exe; fi
+          cp "$analyzer_path" "$package_root/"
           # vstd is maintained in its own repository and is shipped beside
           # the compiler. The native runtime sources remain available too.
           # MSYS2 cannot reliably recreate vstd's directory symlinks in the

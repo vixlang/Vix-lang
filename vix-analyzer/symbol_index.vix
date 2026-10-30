@@ -17,7 +17,10 @@ pub type Declaration = struct
     range: position::LspRange,
     selection_range: position::LspRange,
     type_text: string,
-    parent: ids::SymbolId
+    parent: ids::SymbolId,
+    // Non-empty when the declaration lives in another file (a used module);
+    // the definition handler then targets this URI instead of the document's.
+    uri: string
 }
 
 pub type Reference = struct
@@ -137,7 +140,8 @@ pub fn symbol_index_build(file: ids::FileId, source: string, tree: stub_tree::St
                 range: range,
                 selection_range: selection,
                 type_text: "",
-                parent: ids::symbol_id_invalid()
+                parent: ids::symbol_id_invalid(),
+                uri: ""
             })
         }
     }
@@ -247,7 +251,8 @@ pub fn declaration_invalid(): Declaration
         range: position::lsp_range(position::lsp_position(0, 0), position::lsp_position(0, 0)),
         selection_range: position::lsp_range(position::lsp_position(0, 0), position::lsp_position(0, 0)),
         type_text: "",
-        parent: ids::symbol_id_invalid()
+        parent: ids::symbol_id_invalid(),
+        uri: ""
     }
 }
 

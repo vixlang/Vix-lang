@@ -165,7 +165,10 @@ pub fn handle_definition(workspace: workspace::Workspace, id: i32, params: strin
             {
                 return lsp_protocol::lsp_response(id, "null")
             }
-            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_location(document.uri, declaration.selection_range))
+            // A non-empty uri means the declaration lives in a used module's
+            // file and the jump has to target that document.
+            let target_uri = if (declaration.uri != "") declaration.uri else document.uri
+            return lsp_protocol::lsp_response(id, lsp_protocol::lsp_encode_location(target_uri, declaration.selection_range))
         }
         None -> {}
     }
@@ -242,11 +245,7 @@ pub fn handle_rename(workspace: workspace::Workspace, id: i32, params: string): 
 // can be found.
 pub fn lsp_uri_to_path(uri: string): string
 {
-    if (util::analyzer_starts_with(uri, "file://") == 1)
-    {
-        return util::analyzer_copy(uri, 7, uri.length)
-    }
-    return uri
+    return util::analyzer_uri_to_path(uri)
 }
 
 // Indentation comes from the editor's own settings, max width from vix-fmt.toml.

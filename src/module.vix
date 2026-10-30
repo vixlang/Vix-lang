@@ -427,9 +427,18 @@ pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name:
 
 pub fn module_graph_build(entry_src_path: string): ModuleGraph
 {
+    return module_graph_build_with_source(entry_src_path, preprocess::read_file_content(entry_src_path))
+}
+
+// Variant for tools that hold the entry file in memory: the LSP buffer may
+// carry unsaved edits, so the root document's own text is supplied instead of
+// re-reading it from disk.  Used modules are still located and read from disk
+// exactly like module_graph_build does.
+pub fn module_graph_build_with_source(entry_src_path: string, entry_source: string): ModuleGraph
+{
     let mut loader = module_loader_new()
 
-    let root_src = preprocess::read_file_content(entry_src_path)
+    let root_src = entry_source
     if (root_src == "")
     {
         ml_add_error(loader, "error: cannot read entry file: '" + entry_src_path + "'")
@@ -695,6 +704,22 @@ pub fn module_graph_checked_prefixes(g: ModuleGraph): [string]
     for (i in 0 .. g.modules.length)
     {
         if (g.modules[i].vixi_valid == 1 and g.modules[i].id.qualified_name != "root")
+        {
+            out.push(module_strip_root_prefix(g.modules[i].id.qualified_name))
+        }
+    }
+    return out
+}
+
+// Namespace prefixes of every used module, regardless of cache validity.
+// Tools that analyze one document (the language server) check only the root
+// file's own bodies and need every module prefix to skip the rest.
+pub fn module_graph_namespace_prefixes(g: ModuleGraph): [string]
+{
+    let mut out: [string] = []
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].id.qualified_name != "root")
         {
             out.push(module_strip_root_prefix(g.modules[i].id.qualified_name))
         }

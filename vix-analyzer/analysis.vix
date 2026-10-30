@@ -14,8 +14,31 @@ use "../src/diag.vix" as diag
 use "../src/lexer.vix" as lexer
 use "../src/parser.vix" as parser
 use "../src/semantic.vix" as semantic
+use "../src/module.vix" as module
 use "../src/ast.vix" as ast
 use "../src/receiver.vix" as receiver
+
+// One public symbol of a used module, for cross-file hover and definition.
+// Positions are the module file's own 1-based coordinates and path points at
+// the module on disk.
+pub type ExternalSymbol = struct
+{
+    name: string,
+    namespace: string,
+    signature: string,
+    kind: symbol_index::SymbolKind,
+    path: string,
+    line: i32,
+    col: i32
+}
+
+// Result of resolving a document's use declarations: either the standalone
+// program unchanged, or the merged program plus the modules' public surface.
+pub type ModuleResolution = struct
+{
+    program: ast::AstProgram,
+    externals: [ExternalSymbol]
+}
 
 pub type DocumentAnalysis = struct
 {
@@ -31,7 +54,8 @@ pub type DocumentAnalysis = struct
     full_file: i32,
     // Semantic pass accounting: how many function bodies came from the cache.
     reused_functions: i32,
-    checked_functions: i32
+    checked_functions: i32,
+    externals: [ExternalSymbol]
 }
 
 // Renders a declaration the way it was written: receiver methods show their
@@ -68,6 +92,7 @@ pub fn analyzer_enrich_types(symbols: &symbol_index::SymbolIndex, program: ast::
     for (i in 0 .. program.functions.length)
     {
         let function = program.functions[i]
+        if (analyzer_is_qualified(function.name) == 1) { continue }
         let signature = analyzer_function_signature(function)
         for (d in 0 .. symbols.declarations.length)
         {
@@ -255,6 +280,7 @@ pub fn analyzer_collect_references(symbols: &symbol_index::SymbolIndex, program:
     }
     for (i in 0 .. program.functions.length)
     {
+        if (analyzer_is_qualified(program.functions[i].name) == 1) { continue }
         analyzer_walk_stmt(symbols, program, file, text, index, program.functions[i].body_idx)
     }
     for (i in 0 .. program.extern_functions.length)
@@ -266,6 +292,222 @@ pub fn analyzer_collect_references(symbols: &symbol_index::SymbolIndex, program:
         analyzer_walk_expr(symbols, program, file, text, index, program.globals[i].value_idx)
         analyzer_walk_expr(symbols, program, file, text, index, program.globals[i].assign_idx)
     }
+}
+
+
+// A merged name carries "::" exactly when it belongs to a used module: root
+// functions keep their bare names (the root namespace is empty), and module
+// lambdas inherit their namespace just like module functions do.
+pub fn analyzer_is_qualified(name: string): i32
+{
+    if (name.length < 2) { return 0 }
+    for (i in 0 .. name.length - 1)
+    {
+        if (util::analyzer_byte_at(name, i) == ':' and util::analyzer_byte_at(name, i + 1) == ':')
+        {
+            return 1
+        }
+    }
+    return 0
+}
+
+// Root functions lead the merged program under their bare names; used-module
+// functions follow prefixed. The first prefixed name is the boundary.
+pub fn analyzer_root_function_count(program: ast::AstProgram): i32
+{
+    let mut count = 0
+    while (count < program.functions.length and analyzer_is_qualified(program.functions[count].name) == 0)
+    {
+        count += 1
+    }
+    return count
+}
+
+// The namespace of a merged name: everything before the final "::".
+pub fn analyzer_namespace_of(qualified: string): string
+{
+    let mut last = -1
+    for (i in 0 .. qualified.length - 1)
+    {
+        if (util::analyzer_byte_at(qualified, i) == ':' and util::analyzer_byte_at(qualified, i + 1) == ':')
+        {
+            last = i
+        }
+    }
+    if (last < 0) { return "" }
+    return util::analyzer_copy(qualified, 0, last)
+}
+
+// The declaration part of a merged name: everything after the final "::".
+pub fn analyzer_bare_name(qualified: string): string
+{
+    let mut last = -1
+    for (i in 0 .. qualified.length - 1)
+    {
+        if (util::analyzer_byte_at(qualified, i) == ':' and util::analyzer_byte_at(qualified, i + 1) == ':')
+        {
+            last = i
+        }
+    }
+    if (last < 0) { return qualified }
+    return util::analyzer_copy(qualified, last + 2, qualified.length)
+}
+
+pub fn analyzer_string_in(names: [string], text: string): i32
+{
+    for (i in 0 .. names.length)
+    {
+        if (names[i] == text) { return 1 }
+    }
+    return 0
+}
+
+// Namespace prefixes of every used module in the merged program, for the
+// checker-skipping variants of semantic and typeck.
+pub fn analyzer_namespace_prefixes(program: ast::AstProgram): [string]
+{
+    let mut out: [string] = []
+    let root_count = analyzer_root_function_count(program)
+    for (i in root_count .. program.functions.length)
+    {
+        let namespace = analyzer_namespace_of(program.functions[i].name)
+        if (namespace != "" and analyzer_string_in(out, namespace) == 0)
+        {
+            out.push(namespace)
+        }
+    }
+    return out
+}
+
+// Resolves a document's use declarations against the module graph when the
+// document lives on disk. The buffer text stays the root source (unsaved
+// edits are honored), used modules load from disk and end up prefixed in the
+// merged program. Documents without a path (untitled buffers), with parse
+// errors, or without use declarations keep the standalone single-file
+// program, exactly as before.
+// Whether the document joins other files through use declarations. The stub
+// tree records them as import declarations, which is what makes the gate work
+// for the fragment path too: slices never contain the use lines themselves,
+// so the assembled program's import list is empty there.
+pub fn analyzer_tree_has_imports(tree: stub_tree::StubTree): i32
+{
+    for (i in 0 .. tree.nodes.length)
+    {
+        if (tree.nodes[i].kind == stub_tree::ImportDecl)
+        {
+            return 1
+        }
+    }
+    return 0
+}
+
+fn analyzer_resolve_modules(path: string, text: string, tree: stub_tree::StubTree, program: ast::AstProgram): ModuleResolution
+{
+    if (path == "" or program.ok == 0 or analyzer_tree_has_imports(tree) == 0)
+    {
+        return ModuleResolution{ program: program, externals: [] }
+    }
+    let g = module::module_graph_build_with_source(path, text)
+    if (g.ok == 0)
+    {
+        let mut message = ""
+        for (i in 0 .. g.errors.length)
+        {
+            message = message + g.errors[i] + "\n"
+        }
+        let failed = ast::ast_program_err_diag(message, diag::diag_new("E1000", diag::DiagError, diag::DiagParser, ""))
+        return ModuleResolution{ program: failed, externals: [] }
+    }
+    let merged = module::module_graph_load_all(g, program)
+    if (merged.ok == 0)
+    {
+        return ModuleResolution{ program: merged, externals: [] }
+    }
+    return ModuleResolution{ program: merged, externals: analyzer_build_externals(g, merged) }
+}
+
+fn analyzer_module_path(g: module::ModuleGraph, namespace: string): string
+{
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].id.qualified_name != "root" and module::module_strip_root_prefix(g.modules[i].id.qualified_name) == namespace)
+        {
+            return g.modules[i].source_path
+        }
+    }
+    return ""
+}
+
+// Indexes the used modules' surface for cross-file hover and definition.
+// Merged declarations keep their module-file coordinates, and the graph maps
+// each namespace back to the file it came from.
+fn analyzer_build_externals(g: module::ModuleGraph, program: ast::AstProgram): [ExternalSymbol]
+{
+    let mut out: [ExternalSymbol] = []
+    let root_count = analyzer_root_function_count(program)
+    for (i in root_count .. program.functions.length)
+    {
+        let f = program.functions[i]
+        let namespace = analyzer_namespace_of(f.name)
+        let path = analyzer_module_path(g, namespace)
+        if (path == "") { continue }
+        out.push(ExternalSymbol{
+            name: analyzer_bare_name(f.name),
+            namespace: namespace,
+            signature: analyzer_function_signature(f),
+            kind: symbol_index::FunctionSymbol,
+            path: path,
+            line: f.line,
+            col: f.col
+        })
+    }
+    for (i in 0 .. program.structs.length)
+    {
+        if (analyzer_is_qualified(program.structs[i].name) == 0) { continue }
+        let namespace = analyzer_namespace_of(program.structs[i].name)
+        let path = analyzer_module_path(g, namespace)
+        if (path == "") { continue }
+        out.push(ExternalSymbol{
+            name: analyzer_bare_name(program.structs[i].name),
+            namespace: namespace,
+            signature: "struct " + program.structs[i].name,
+            kind: symbol_index::TypeSymbol,
+            path: path,
+            line: program.structs[i].line,
+            col: program.structs[i].col
+        })
+    }
+    for (i in 0 .. program.adts.length)
+    {
+        if (analyzer_is_qualified(program.adts[i].name) == 0) { continue }
+        let namespace = analyzer_namespace_of(program.adts[i].name)
+        let path = analyzer_module_path(g, namespace)
+        if (path == "") { continue }
+        out.push(ExternalSymbol{
+            name: analyzer_bare_name(program.adts[i].name),
+            namespace: namespace,
+            signature: "adt " + program.adts[i].name,
+            kind: symbol_index::TypeSymbol,
+            path: path,
+            line: program.adts[i].line,
+            col: program.adts[i].col
+        })
+    }
+    return out
+}
+
+// Public lookup for the query layer: the first external whose bare name or
+// namespace matches the word under the cursor. Empty name means no match.
+pub fn analyzer_external_for_word(analysis: DocumentAnalysis, word: string): ExternalSymbol
+{
+    for (i in 0 .. analysis.externals.length)
+    {
+        if (analysis.externals[i].name == word or analysis.externals[i].namespace == word)
+        {
+            return analysis.externals[i]
+        }
+    }
+    return ExternalSymbol{ name: "", namespace: "", signature: "", kind: symbol_index::VariableSymbol, path: "", line: 0, col: 0 }
 }
 
 // Parses every top-level declaration on its own. Slice boundaries start at the
@@ -368,7 +610,8 @@ pub fn analyzer_finish(file: ids::FileId, text: string, tree: stub_tree::StubTre
             fresh_nodes: tree.nodes.length,
             full_file: 1,
             reused_functions: 0,
-            checked_functions: 0
+            checked_functions: 0,
+            externals: []
         }
     }
     let outcome = sema_cache::analyzer_semantic_run(file, text, program, fragments, previous_cache)
@@ -392,45 +635,60 @@ pub fn analyzer_finish(file: ids::FileId, text: string, tree: stub_tree::StubTre
         fresh_nodes: tree.nodes.length,
         full_file: 1,
         reused_functions: outcome.reused_functions,
-        checked_functions: outcome.checked_functions
+        checked_functions: outcome.checked_functions,
+        externals: []
     }
 }
 
 // Default: incremental stub tree, whole-file parse for the AST. Verified by the
 // differential test against analyze_document_legacy.
-pub fn analyze_document(file: ids::FileId, text: string): DocumentAnalysis
+pub fn analyze_document(file: ids::FileId, path: string, text: string): DocumentAnalysis
 {
     let tree = stub_tree::stub_tree_parse(file, text)
-    return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
+    let resolution = analyzer_resolve_modules(path, text, tree, parser::parse_program_raw(text, ""))
+    let analysis = analyzer_finish(file, text, tree, [], resolution.program, sema_cache::sema_cache_empty())
+    analysis.externals = resolution.externals
+    return analysis
 }
 
 // Experimental: the AST is assembled from per-declaration fragments. Still fails
 // the differential test, so nothing uses it unless the mode is forced.
-pub fn analyze_document_fragments(file: ids::FileId, text: string): DocumentAnalysis
+pub fn analyze_document_fragments(file: ids::FileId, path: string, text: string): DocumentAnalysis
 {
     let tree = stub_tree::stub_tree_parse(file, text)
     let fragments = analyzer_build_fragments(tree, text)
     let program = ast_fragment::ast_assemble(fragments)
     if (program.ok == 0)
     {
-        return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
+        let resolution = analyzer_resolve_modules(path, text, tree, parser::parse_program_raw(text, ""))
+        let analysis = analyzer_finish(file, text, tree, [], resolution.program, sema_cache::sema_cache_empty())
+        analysis.externals = resolution.externals
+        return analysis
     }
     // Safety net: if the assembled program has an out-of-range index, fall back
     // to the whole-file parse rather than running the semantic pass on it.
     if (ast_fragment::ast_program_validate(program) != "")
     {
-        return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
+        let resolution = analyzer_resolve_modules(path, text, tree, parser::parse_program_raw(text, ""))
+        let analysis = analyzer_finish(file, text, tree, [], resolution.program, sema_cache::sema_cache_empty())
+        analysis.externals = resolution.externals
+        return analysis
     }
-    return analyzer_finish(file, text, tree, fragments, program, sema_cache::sema_cache_empty())
+    let resolution = analyzer_resolve_modules(path, text, tree, program)
+    let analysis = analyzer_finish(file, text, tree, fragments, resolution.program, sema_cache::sema_cache_empty())
+    analysis.externals = resolution.externals
+    return analysis
 }
 
 // Default: the stub tree is spliced, the AST is still parsed whole.
-pub fn analyze_document_incremental(file: ids::FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
+pub fn analyze_document_incremental(file: ids::FileId, path: string, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
 {
     let old_source = source_text::source_text_new(file, 0, old_text)
     let new_source = source_text::source_text_new(file, 0, new_text)
     let repair = incremental::incremental_reparse(previous.tree, old_source, new_source)
-    let analysis = analyzer_finish(file, new_text, repair.tree, [], parser::parse_program_raw(new_text, ""), sema_cache::sema_cache_empty())
+    let resolution = analyzer_resolve_modules(path, new_text, repair.tree, parser::parse_program_raw(new_text, ""))
+    let analysis = analyzer_finish(file, new_text, repair.tree, [], resolution.program, sema_cache::sema_cache_empty())
+    analysis.externals = resolution.externals
     analysis.reused_nodes = repair.reused_nodes
     analysis.fresh_nodes = repair.fresh_nodes
     analysis.full_file = repair.full_file
@@ -439,7 +697,7 @@ pub fn analyze_document_incremental(file: ids::FileId, previous: DocumentAnalysi
 
 // Experimental: fragments are rebuilt from the current text, reusing every
 // declaration whose slice text did not change.
-pub fn analyze_document_incremental_fragments(file: ids::FileId, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
+pub fn analyze_document_incremental_fragments(file: ids::FileId, path: string, previous: DocumentAnalysis, old_text: string, new_text: string): DocumentAnalysis
 {
     let old_source = source_text::source_text_new(file, 0, old_text)
     let new_source = source_text::source_text_new(file, 0, new_text)
@@ -448,13 +706,17 @@ pub fn analyze_document_incremental_fragments(file: ids::FileId, previous: Docum
     let program = ast_fragment::ast_assemble(fragments)
     if (program.ok == 0)
     {
-        let fallback = analyzer_finish(file, new_text, repair.tree, [], parser::parse_program_raw(new_text, ""), sema_cache::sema_cache_empty())
+        let resolution = analyzer_resolve_modules(path, new_text, repair.tree, parser::parse_program_raw(new_text, ""))
+        let fallback = analyzer_finish(file, new_text, repair.tree, [], resolution.program, sema_cache::sema_cache_empty())
+        fallback.externals = resolution.externals
         fallback.reused_nodes = repair.reused_nodes
         fallback.fresh_nodes = repair.fresh_nodes
         fallback.full_file = 1
         return fallback
     }
-    let analysis = analyzer_finish(file, new_text, repair.tree, fragments, program, previous.sema_cache)
+    let resolution = analyzer_resolve_modules(path, new_text, repair.tree, program)
+    let analysis = analyzer_finish(file, new_text, repair.tree, fragments, resolution.program, previous.sema_cache)
+    analysis.externals = resolution.externals
     analysis.reused_nodes = repair.reused_nodes
     analysis.fresh_nodes = repair.fresh_nodes
     analysis.full_file = repair.full_file
@@ -463,8 +725,11 @@ pub fn analyze_document_incremental_fragments(file: ids::FileId, previous: Docum
 
 // Ground truth for the differential test: a fresh stub tree and a fresh
 // whole-file parse on every change, with no reuse at all.
-pub fn analyze_document_legacy(file: ids::FileId, text: string): DocumentAnalysis
+pub fn analyze_document_legacy(file: ids::FileId, path: string, text: string): DocumentAnalysis
 {
     let tree = stub_tree::stub_tree_parse(file, text)
-    return analyzer_finish(file, text, tree, [], parser::parse_program_raw(text, ""), sema_cache::sema_cache_empty())
+    let resolution = analyzer_resolve_modules(path, text, tree, parser::parse_program_raw(text, ""))
+    let analysis = analyzer_finish(file, text, tree, [], resolution.program, sema_cache::sema_cache_empty())
+    analysis.externals = resolution.externals
+    return analysis
 }

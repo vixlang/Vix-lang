@@ -180,6 +180,29 @@ pub fn analyzer_word_at(text: string, position: position::LspPosition): string
     return analyzer_copy(text, start, end)
 }
 
+// The identifier at the cursor as an LSP range, for query results that point
+// at a use site rather than a declaration.
+pub fn analyzer_word_range_at(text: string, position: position::LspPosition): position::LspRange
+{
+    let index = position::line_index_new(text)
+    let offset = position::line_index_byte(index, position, text)
+    let mut start = offset
+    if (start < 0) { start = 0 }
+    if (start > text.length) { start = text.length }
+    let mut end = start
+    while (start > 0 and analyzer_is_ident_byte(analyzer_byte_at(text, start - 1)) == 1)
+    {
+        start -= 1
+    }
+    while (end < text.length and analyzer_is_ident_byte(analyzer_byte_at(text, end)) == 1)
+    {
+        end += 1
+    }
+    let a = position::line_index_position(index, start)
+    let b = position::line_index_position(index, end)
+    return position::lsp_range(position::lsp_position(a.line, a.column), position::lsp_position(b.line, b.column))
+}
+
 pub fn analyzer_is_space(byte: i32): i32
 {
     if (byte == ' ' or byte == '\t' or byte == '\n' or byte == '\r')
@@ -187,4 +210,25 @@ pub fn analyzer_is_space(byte: i32): i32
         return 1
     }
     return 0
+}
+// LSP URIs are used in their plain "file://" + absolute path spelling on both
+// sides (the decoder ignores percent-escapes, the encoder emits none), which
+// round-trips every ordinary path. Keep the two next to each other so the
+// convention stays symmetric.
+pub fn analyzer_uri_to_path(uri: string): string
+{
+    if (analyzer_starts_with(uri, "file://") == 1)
+    {
+        return analyzer_copy(uri, 7, uri.length)
+    }
+    return uri
+}
+
+pub fn analyzer_path_to_uri(path: string): string
+{
+    if (analyzer_starts_with(path, "file://") == 1)
+    {
+        return path
+    }
+    return "file://" + path
 }

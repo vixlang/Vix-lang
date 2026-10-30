@@ -7,6 +7,7 @@ use "../src/ast.vix" as ast
 use "../src/diag.vix" as diag
 use "../src/semantic.vix" as semantic
 use "../src/type/typeck.vix" as typeck
+use "analysis.vix" as analysis
 
 // Function-level cache for the semantic pass.
 //
@@ -177,6 +178,13 @@ pub fn analyzer_semantic_run(file: ids::FileId, text: string, program: ast::AstP
     let limit = analyzer_diag_limit()
     let mut merged: [diagnostics::AnalyzerDiagnostic] = []
 
+    // When the document uses modules, the merged program leads with the root
+    // file's own functions and follows with the modules' prefixed ones. Only
+    // the root's bodies are checked and cached here: the modules belong to
+    // other files, and their diagnostics would carry foreign coordinates.
+    let root_count = analysis::analyzer_root_function_count(program)
+    let prefixes = analysis::analyzer_namespace_prefixes(program)
+
     let head = semantic::semantic_result_new_with_warnings(0)
     semantic::semantic_check_duplicate_functions(program.functions, program.extern_functions, &head, text, "")
     semantic::semantic_check_duplicate_structs(program.structs, &head, text, "")
@@ -198,9 +206,9 @@ pub fn analyzer_semantic_run(file: ids::FileId, text: string, program: ast::AstP
     let surface = analyzer_surface_hash(program)
     let keys = analyzer_function_keys(fragments)
     let mut reusable = 0
-    // Keys must line up one-to-one with functions, otherwise a missing key would
-    // let unrelated functions match the same entry.
-    if (previous.surface != 0 and previous.surface == surface and previous.entries.length == program.functions.length and keys.length == program.functions.length and keys.length > 0)
+    // Keys must line up one-to-one with the root's functions, otherwise a
+    // missing key would let unrelated functions match the same entry.
+    if (previous.surface != 0 and previous.surface == surface and previous.entries.length == root_count and keys.length == root_count and keys.length > 0)
     {
         reusable = 1
     }
@@ -208,7 +216,7 @@ pub fn analyzer_semantic_run(file: ids::FileId, text: string, program: ast::AstP
     let mut entries: [CachedFunctionDiagnostics] = []
     let mut reused = 0
     let mut checked = 0
-    for (i in 0 .. program.functions.length)
+    for (i in 0 .. root_count)
     {
         let key = if (i < keys.length) keys[i] else 0
         let mut done = 0
@@ -257,7 +265,9 @@ pub fn analyzer_semantic_run(file: ids::FileId, text: string, program: ast::AstP
 
     if (analyzer_count_errors(merged) == 0)
     {
-        let type_result = typeck::typeck_check_program(program)
+        // Used-module bodies are skipped by namespace prefix; the modules are
+        // other files, and re-inferring them per keystroke buys nothing.
+        let type_result = if (prefixes.length > 0) typeck::typeck_check_program_skipping(program, prefixes) else typeck::typeck_check_program(program)
         let tail = semantic::semantic_result_new_with_warnings(0)
         semantic::semantic_add_typeck_error(&tail, text, "", type_result)
         let tail_diags = analyzer_diagnostics_from_bag(file, tail.bag)

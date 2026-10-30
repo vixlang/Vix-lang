@@ -85,6 +85,7 @@ pub fn stub_tree_keyword_kind(keyword: string): StubKind
     if (keyword == "type") { return TypeDecl }
     if (keyword == "mod") { return ModuleDecl }
     if (keyword == "import") { return ImportDecl }
+    if (keyword == "use") { return ImportDecl }
     return Statement
 }
 
@@ -200,7 +201,7 @@ pub fn stub_tree_declaration_end(source: string, from: i32): i32
 
 pub fn stub_tree_scan(tree: &StubTree, source: string, base: i32)
 {
-    let keywords = ["fn", "type", "let", "extern", "mod", "import"]
+    let keywords = ["fn", "type", "let", "extern", "mod", "import", "use"]
     let depths = stub_tree_depths(source)
     for (k in 0 .. keywords.length)
     {
