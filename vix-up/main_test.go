@@ -63,7 +63,7 @@ func TestInstallAndSwitch(t *testing.T) {
 	if err != nil || c.DefaultToolchain != "1.0.0" {
 		t.Fatalf("config: %#v %v", c, err)
 	}
-	if _, err := os.Stat(filepath.Join(root, "bin", exe("vixc"))); err != nil {
+	if _, err := os.Stat(filepath.Join(root, "bin", shimName("vixc"))); err != nil {
 		t.Fatal(err)
 	}
 }
