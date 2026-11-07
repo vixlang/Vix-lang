@@ -1,0 +1,79 @@
+#[no_main]
+
+pub type FileId = struct
+{
+    value: i32
+}
+
+pub type Revision = struct
+{
+    value: i32
+}
+
+pub type StubNodeId = struct
+{
+    index: i32,
+    generation: i32
+}
+
+pub type TokenId = struct
+{
+    index: i32,
+    generation: i32
+}
+
+pub type SymbolId = struct
+{
+    index: i32,
+    generation: i32
+}
+
+pub fn file_id(value: i32): FileId
+{
+    return FileId{ value: value }
+}
+
+pub fn revision(value: i32): Revision
+{
+    return Revision{ value: value }
+}
+
+pub fn stub_node_id(index: i32, generation: i32): StubNodeId
+{
+    return StubNodeId{ index: index, generation: generation }
+}
+
+pub fn token_id(index: i32, generation: i32): TokenId
+{
+    return TokenId{ index: index, generation: generation }
+}
+
+pub fn symbol_id(index: i32, generation: i32): SymbolId
+{
+    return SymbolId{ index: index, generation: generation }
+}
+
+pub fn file_id_invalid(): FileId
+{
+    return file_id(-1)
+}
+
+pub fn revision_zero(): Revision
+{
+    return revision(0)
+}
+
+pub fn stub_node_id_invalid(): StubNodeId
+{
+    return stub_node_id(-1, 0)
+}
+
+pub fn token_id_invalid(): TokenId
+{
+    return token_id(-1, 0)
+}
+
+pub fn symbol_id_invalid(): SymbolId
+{
+    return symbol_id(-1, 0)
+}

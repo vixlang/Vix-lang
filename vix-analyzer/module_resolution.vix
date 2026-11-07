@@ -1,0 +1,54 @@
+#[no_main]
+
+use "ids.vix" as ids
+use "source_db.vix" as source_db
+
+ pub type ModuleId = struct
+{
+    value: i32,
+}
+pub type Module = struct
+{
+    id: ModuleId,
+    file: ids::FileId,
+    name: string,
+    parent: ModuleId,
+    imports: [string],
+    exports: [ids::SymbolId],
+}
+pub type ModuleGraph = struct
+{
+    modules: [Module],
+    revision: ids::Revision,
+    ok: i32,
+}
+pub fn module_id(value: i32): ModuleId
+{
+    return ModuleId{value: 0}
+}
+pub fn module_graph_new(): ModuleGraph
+{
+    return ModuleGraph{modules: [], revision: ids::Revision{value: 0}, ok: 0}
+}
+pub fn module_graph_build(db: source_db::SourceDatabase): ModuleGraph
+{
+    return ModuleGraph{modules: [], revision: ids::Revision{value: 0}, ok: 0}
+}
+pub fn module_graph_find_file(graph: ModuleGraph, file: ids::FileId): ModuleId
+{
+    return ModuleId{value: 0}
+}
+pub fn module_graph_find_name(graph: ModuleGraph, name: string): ModuleId
+{
+    return ModuleId{value: 0}
+}
+pub fn module_graph_importers(graph: ModuleGraph, module: ModuleId): [ModuleId]
+{
+}
+pub fn module_graph_exports(graph: ModuleGraph, module: ModuleId): [ids::SymbolId]
+{
+}
+pub fn module_graph_is_stale(graph: ModuleGraph, revision: ids::Revision): i32
+{
+    return 0
+}

@@ -1,0 +1,117 @@
+#[no_main]
+
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "../src/json.vix" as json
+use "../src/diag.vix" as diag
+
+pub type DiagnosticSeverity = SeverityError | SeverityWarning | SeverityInformation | SeverityHint
+
+pub type AnalyzerDiagnostic = struct
+{
+    code: string,
+    message: string,
+    severity: DiagnosticSeverity,
+    file: ids::FileId,
+    range: position::LspRange
+}
+
+pub fn analyzer_severity(level: diag::DiagLevel): DiagnosticSeverity
+{
+    if (level == diag::DiagError)
+    {
+        return SeverityError
+    }
+    if (level == diag::DiagWarning)
+    {
+        return SeverityWarning
+    }
+    return SeverityInformation
+}
+
+pub fn analyzer_severity_code(severity: DiagnosticSeverity): string
+{
+    if (severity == SeverityError)
+    {
+        return "1"
+    }
+    if (severity == SeverityWarning)
+    {
+        return "2"
+    }
+    if (severity == SeverityInformation)
+    {
+        return "3"
+    }
+    return "4"
+}
+
+pub fn analyzer_span_range(span: diag::DiagSpan): position::LspRange
+{
+    let line = if (span.line < 1) 0 else span.line - 1
+    let character = if (span.column < 1) 0 else span.column - 1
+    return position::LspRange{
+        start: position::LspPosition{ line: line, character: character },
+        end: position::LspPosition{ line: line, character: character + 1 }
+    }
+}
+
+pub fn analyzer_diagnostic(code: string, message: string, severity: DiagnosticSeverity, file: ids::FileId, range: position::LspRange): AnalyzerDiagnostic
+{
+    return AnalyzerDiagnostic{
+        code: code,
+        message: message,
+        severity: severity,
+        file: file,
+        range: range
+    }
+}
+
+pub fn analyzer_diagnostic_from_diag(file: ids::FileId, diag: diag::Diagnostic): AnalyzerDiagnostic
+{
+    let message = if (diag.message != "") diag.message else diag.title
+    return AnalyzerDiagnostic{
+        code: diag.code,
+        message: message,
+        severity: analyzer_severity(diag.level),
+        file: file,
+        range: analyzer_span_range(diag::diag_primary_span(diag))
+    }
+}
+
+pub fn analyzer_diagnostic_syntax(file: ids::FileId, message: string, line: i32, character: i32): AnalyzerDiagnostic
+{
+    return AnalyzerDiagnostic{
+        code: "E0000",
+        message: message,
+        severity: SeverityError,
+        file: file,
+        range: position::LspRange{
+            start: position::LspPosition{ line: line, character: character },
+            end: position::LspPosition{ line: line, character: character + 1 }
+        }
+    }
+}
+
+pub fn diagnostics_to_json(diagnostics: [AnalyzerDiagnostic]): string
+{
+    let mut out = "["
+    for (i in 0 .. diagnostics.length)
+    {
+        if (i > 0)
+        {
+            out = out + ","
+        }
+        let item = diagnostics[i]
+        out = out + "{\"range\":{\"start\":{\"line\":" + util::analyzer_i32_to_str(item.range.start.line)
+        out = out + ",\"character\":" + util::analyzer_i32_to_str(item.range.start.character) + "},"
+        out = out + "\"end\":{\"line\":" + util::analyzer_i32_to_str(item.range.end.line)
+        out = out + ",\"character\":" + util::analyzer_i32_to_str(item.range.end.character) + "}},"
+        out = out + "\"severity\":" + analyzer_severity_code(item.severity) + ","
+        out = out + "\"code\":" + json::json_quote(item.code) + ","
+        out = out + "\"source\":\"vix-analyzer\","
+        out = out + "\"message\":" + json::json_quote(item.message) + "}"
+    }
+    return out + "]"
+}

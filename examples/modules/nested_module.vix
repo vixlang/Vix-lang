@@ -10,12 +10,7 @@
 //   vixc examples/modules/nested_module.vix --backend=self -o nested_module
 //   ./nested_module     # exit code: 5
 
-mod utils
-
-import utils::greet
-import utils::string_helpers::length
-import utils::string_helpers::is_empty
-
+use "utils/mod.vix" as utils
 fn main(): i32
 {
     utils::greet("Vix")

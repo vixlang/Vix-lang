@@ -1,5 +1,7 @@
 #[no_main]
 
+use "type/typepool.vix" as typepool
+
 pub fn vararg_promoted_type(ty: string): string
 {
     if (ty == "f32") { return "f64" }
@@ -261,12 +263,27 @@ pub fn register_struct_sig_abi(name: string, field_names: [string], field_types:
 
 pub fn type_text_is_array(ty: string): i32
 {
+    // The parser interns every type it reads; only texts assembled by hand are
+    // absent from the pool and need the textual test below.
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        let k = typepool::kind(node)
+        if (k == typepool::kind_array() or k == typepool::kind_slice()) { return 1 }
+        return 0
+    }
     if (ty.length > 0 and compiler_string_byte(ty, 0) == '[') return 1
     return 0
 }
 
 pub fn type_text_is_function(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        if (typepool::kind(node) == typepool::kind_fn()) { return 1 }
+        return 0
+    }
     if (ty.length >= 4 and compiler_string_byte(ty, 0) == 'f' and compiler_string_byte(ty, 1) == 'n' and compiler_string_byte(ty, 2) == '(') return 1
     return 0
 }
@@ -317,6 +334,12 @@ pub fn type_function_close(ty: string): i32
 pub fn type_function_params(ty: string): [string]
 {
     let mut params: [string] = []
+    let node = typepool::find(ty)
+    if (node >= 0 and typepool::kind(node) == typepool::kind_fn())
+    {
+        for (i in 0 .. typepool::arg_count(node)) { params.push(typepool::text(typepool::arg(node, i))) }
+        return params
+    }
     let close = type_function_close(ty)
     if (close < 0) return params
     let mut start = 3
@@ -338,6 +361,11 @@ pub fn type_function_params(ty: string): [string]
 
 pub fn type_function_return(ty: string): string
 {
+    let node = typepool::find(ty)
+    if (node >= 0 and typepool::kind(node) == typepool::kind_fn())
+    {
+        return typepool::text(typepool::ret(node))
+    }
     let close = type_function_close(ty)
     if (close < 0) return "unknown"
     let mut start = close + 1
@@ -350,6 +378,12 @@ pub fn type_function_return(ty: string): string
 
 pub fn type_array_element(ty: string): string
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        let k = typepool::kind(node)
+        if (k == typepool::kind_array() or k == typepool::kind_slice()) { return typepool::text(typepool::arg(node, 0)) }
+    }
     if (type_text_is_array(ty) == 0 or ty.length <= 2) { return "unknown" }
     let mut result = ""
     let mut end = ty.length - 1
@@ -369,6 +403,12 @@ pub fn type_array_element(ty: string): string
 
 pub fn type_text_is_fixed_array(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        if (typepool::kind(node) == typepool::kind_array()) { return 1 }
+        return 0
+    }
     if (type_text_is_array(ty) == 0) { return 0 }
     for (i in 1 .. ty.length - 1)
     {
@@ -379,6 +419,12 @@ pub fn type_text_is_fixed_array(ty: string): i32
 
 pub fn type_fixed_array_count(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        if (typepool::kind(node) == typepool::kind_array()) { return typepool::array_len(node) }
+        return 0
+    }
     let mut count = 0
     let mut in_count = 0
     for (i in 1 .. ty.length - 1)
@@ -403,6 +449,8 @@ pub fn is_ptr_to_struct(ty: string): i32
 
 pub fn type_text_is_ref_to_ptr(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0) { return typepool::is_ref_to_ptr(node) }
     if (ty.length > 7 and type_text_slice(ty, 0, 7) == "refptr:") return 1
     return 0
 }
@@ -435,6 +483,12 @@ pub fn type_text_is_ptr_to_array(ty: string): i32
 
 pub fn type_text_index_element(ty: string): string
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        let k = typepool::kind(node)
+        if (k == typepool::kind_array() or k == typepool::kind_slice()) { return typepool::text(typepool::arg(node, 0)) }
+    }
     if (type_text_is_ref_to_ptr(ty) == 1) return type_text_index_element(strip_ref_to_ptr_prefix(ty))
     if (type_text_is_array(ty) == 1) { return type_array_element(ty) }
     if (type_text_is_ptr_to_array(ty) == 1) { return type_array_element(strip_ptr_prefix(ty)) }
@@ -445,26 +499,56 @@ pub fn type_text_index_element(ty: string): string
 
 pub fn type_text_is_option(ty: string): i32
 {
+    let node = typepool::find(ty)
+    if (node >= 0)
+    {
+        if (typepool::kind(node) == typepool::kind_option()) { return 1 }
+        return 0
+    }
     if (ty.length > 7 and compiler_string_byte(ty, 0) == 'O' and compiler_string_byte(ty, 1) == 'p' and compiler_string_byte(ty, 2) == 't' and compiler_string_byte(ty, 3) == 'i' and compiler_string_byte(ty, 4) == 'o' and compiler_string_byte(ty, 5) == 'n' and compiler_string_byte(ty, 6) == '[') return 1
     return 0
 }
 
 pub fn type_text_base_name_builder(ty: string): string
 {
+    let node = typepool::find(ty)
+    if (node >= 0 and typepool::kind(node) == typepool::kind_named()) { return typepool::base(node) }
+    // "mod::Name[A]" is the name "mod::Name": a module qualifier belongs to the
+    // name, while a single ':' starts the generic argument list.  Stopping at
+    // the first ':' turned "a::Foo" into "a", so every struct lookup missed
+    // once types became namespaced.
     let mut result = ""
-    for (i in 0 .. ty.length)
+    let mut i = 0
+    while (i < ty.length)
     {
-        if (compiler_string_byte(ty, i) == ':' or compiler_string_byte(ty, i) == '[') return result
+        let c = compiler_string_byte(ty, i)
+        if (c == '[') { return result }
+        if (c == ':')
+        {
+            if (i + 1 < ty.length and compiler_string_byte(ty, i + 1) == ':')
+            {
+                result = result + "::"
+                i += 2
+                continue
+            }
+            return result
+        }
         let s: string = malloc(2)
-        s[0] = compiler_string_byte(ty, i)
+        s[0] = c
         s[1] = 0
         result = result + s
+        i += 1
     }
     return result
 }
 
 pub fn type_text_option_inner(ty: string): string
 {
+    let node = typepool::find(ty)
+    if (node >= 0 and typepool::kind(node) == typepool::kind_option())
+    {
+        return typepool::text(typepool::arg(node, 0))
+    }
     if (type_text_is_option(ty) == 0) { return "unknown" }
     let mut result = ""
     for (i in 7 .. ty.length - 1)

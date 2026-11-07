@@ -1,0 +1,6 @@
+use "dep.vix" as dep
+
+fn main(): i32
+{
+    return dep::value()
+}

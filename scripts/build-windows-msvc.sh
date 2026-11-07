@@ -53,12 +53,13 @@ LLD_LIBS="$LLVM_ROOT\\lib\\lldCommon.lib $LLVM_ROOT\\lib\\lldELF.lib $LLVM_ROOT\
 
 link_vixc() { # link_vixc <output.exe> <compiler .obj>
   "$CLANGXX" -o "$1" \
-    "$2" build/helper.obj runtime/runtime.o build/api.obj \
+    "$2" build/typepool.obj build/helper.obj runtime/runtime.o build/api.obj \
     build/Llc.obj build/Linker.obj build/Passes.obj \
     $ALL_LIBS $LLD_LIBS $SYS_LIBS -Wl,/STACK:16777216
 }
 
 echo '[1/6] C bridge objects'
+"$CLANG" -c src/typepool.c -o build/typepool.obj
 "$CLANG" -c src/helper.c   -o build/helper.obj -I"$LLVM_ROOT\\include"
 "$CLANG" -c src/runtime.c  -o runtime/runtime.o
 "$CLANG" -c lib/api.c      -o build/api.obj -I"$LLVM_ROOT\\include"

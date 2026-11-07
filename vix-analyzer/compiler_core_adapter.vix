@@ -1,0 +1,86 @@
+#[no_main]
+
+use "ids.vix" as ids
+use "position.vix" as position
+use "stub_tree.vix" as stub_tree
+use "semantic_adapter.vix" as semantic_adapter
+use "../src/lexer.vix" as lexer
+use "../src/parser.vix" as parser
+use "../src/semantic.vix" as semantic
+
+pub type CoreTokenSnapshot = struct
+{
+    file: ids::FileId,
+    count: i32,
+    generation: i32
+}
+
+pub type CoreAstSnapshot = struct
+{
+    file: ids::FileId,
+    ok: i32,
+    root_index: i32,
+    error: string
+}
+
+pub type CoreSemanticSnapshot = struct
+{
+    file: ids::FileId,
+    ok: i32,
+    error_count: i32
+}
+
+pub fn core_lex(file: ids::FileId, source: string): CoreTokenSnapshot
+{
+    let stream = lexer::tokenize(source)
+    return CoreTokenSnapshot{
+        file: file,
+        count: lexer::stream_len(stream),
+        generation: 0
+    }
+}
+
+pub fn core_parse(file: ids::FileId, source: string, tree: stub_tree::StubTree): CoreAstSnapshot
+{
+    let program = parser::parse_program_raw(source, "")
+    return CoreAstSnapshot{
+        file: file,
+        ok: program.ok,
+        root_index: 0,
+        error: program.error
+    }
+}
+
+pub fn core_semantic(input: semantic_adapter::SemanticInput): CoreSemanticSnapshot
+{
+    let program = parser::parse_program_raw(input.source, "")
+    if (program.ok == 0)
+    {
+        return CoreSemanticSnapshot{
+            file: input.file,
+            ok: 0,
+            error_count: 1
+        }
+    }
+    let result = semantic::semantic_check_program_with_warnings(program, input.source, "", 0)
+    return CoreSemanticSnapshot{
+        file: input.file,
+        ok: result.ok,
+        error_count: result.error_count
+    }
+}
+
+pub fn core_token_snapshot_empty(file: ids::FileId): CoreTokenSnapshot
+{
+    return CoreTokenSnapshot{ file: file, count: 0, generation: 0 }
+}
+
+pub fn core_ast_snapshot_empty(file: ids::FileId): CoreAstSnapshot
+{
+    return CoreAstSnapshot{ file: file, ok: 0, root_index: -1, error: "" }
+}
+
+pub fn core_semantic_snapshot_empty(file: ids::FileId): CoreSemanticSnapshot
+{
+    return CoreSemanticSnapshot{ file: file, ok: 0, error_count: 0 }
+}

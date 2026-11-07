@@ -189,7 +189,7 @@ Wrap lines 409-772 (the LLVM codegen/linking path) in `#ifndef VIXC_FRONTEND_ONL
 #include <stdio.h>
 
 void test_hello_world() {
-    const char *source = "import \"std/io.vix\"\nfn main(): i32 { puts(\"hello\"); return 0 }";
+    const char *source = "use \"core/io.vix\" as io\nfn main(): i32 { io::puts(\"hello\"); return 0 }";
     CompileResult r = vixc_compile_string(source);
     assert(r.error_count == 0);
     assert(r.root != NULL);
@@ -838,7 +838,7 @@ git commit -m "feat: add Emscripten build for vixc-wasm playground"
 
 ```javascript
 (function() {
-    const DEFAULT_CODE = `import "std/io.vix"
+    const DEFAULT_CODE = `use "core/io.vix" as io
 
 fn main(): i32
 {
@@ -1152,7 +1152,7 @@ Add a dropdown in `playground.html` with preset Vix examples:
 In `playground.js`, store example code presets and switch on selection:
 ```javascript
 const EXAMPLES = {
-    hello: 'import "std/io.vix"\nfn main(): i32 { puts("Hello!"); return 0 }',
+    hello: 'use "core/io.vix" as io\nfn main(): i32 { io::puts("Hello!"); return 0 }',
     fib: 'fn fib(n: i32): i32 { if n <= 1 { return n; } return fib(n-1) + fib(n-2); }',
     // ...
 };

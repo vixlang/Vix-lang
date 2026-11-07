@@ -2,13 +2,13 @@
 
 ## Overview
 
-Vix 0.4.0 introduces significant language improvements including impl blocks for method syntax, fixed ADT payload handling, new generic syntax, and compiler flags for static linking and library paths.
+Vix 0.4.0 introduces significant language improvements including receiver methods for method syntax, fixed ADT payload handling, new generic syntax, and compiler flags for static linking and library paths.
 
 ## New Features
 
-### 1. Impl Blocks (Method Syntax)
+### 1. Receiver Methods (Method Syntax)
 
-Vix now supports `impl` blocks for defining methods on types:
+Vix defines methods directly with a receiver declaration:
 
 ```vix
 type Point = struct {
@@ -16,13 +16,11 @@ type Point = struct {
     y: i32
 }
 
-impl Point {
-    fn new(x: i32, y: i32): Point {
-        return Point{ x: x, y: y }
-    }
-    fn distance(self: &Point): f64 {
-        return 5.0
-    }
+fn (Point) new(x: i32, y: i32): Point {
+    return Point{ x: x, y: y }
+}
+fn (&Point) distance(): f64 {
+    return 5.0
 }
 
 fn main(): i32 {

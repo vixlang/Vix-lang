@@ -1,8 +1,11 @@
 #[no_main]
-import "ast.vix"
-import "lexer.vix"
-import "preprocess.vix"
-import "parser.vix"
+use "ast.vix" as ast
+use "type/typepool.vix" as typepool
+use "lexer.vix" as lexer
+use "diag.vix" as diag
+use "preprocess.vix" as preprocess
+use "parser.vix" as parser
+use "vixi.vix" as vixi
 
 // ---------------------------------------------------------------------------
 // ModuleId
@@ -24,29 +27,37 @@ pub fn module_id_new(id: i32, qualified_name: string, source_path: string): Modu
 // ---------------------------------------------------------------------------
 
 pub type Module = struct {
-    id:              ModuleId,
-    parent_id:       i32,
-    child_ids:       [i32],
-    source_path:     string,
-    public_symbols:  [string],
-    private_symbols: [string],
-    import_paths:    [string],
-    import_aliases:  [string],
-    is_pub:          i32
+    id:          ModuleId,
+    parent_id:   i32,
+    child_ids:   [i32],
+    source_path: string,
+    is_pub:      i32,
+    // 1 when a .vixi for this module exists and matches its source, this
+    // compiler and every dependency's interface.  Such a module was already
+    // checked, so its function bodies do not have to be checked again.
+    vixi_valid:  i32,
+    // Interface hash of this module, used by dependents to detect changes.
+    interface_hash: string,
+    // For each child: the alias it was imported under here.  References inside
+    // this module are written with that alias, while definitions are prefixed
+    // with the child's full namespace path, so the merge has to map one to the
+    // other.  use_targets holds the module each alias resolves to.
+    use_aliases: [string],
+    use_targets: [i32]
 }
 
 pub fn module_new(id: ModuleId, parent_id: i32, source_path: string, is_pub: i32): Module
 {
     return Module{
-        id:              id,
-        parent_id:       parent_id,
-        child_ids:       [],
-        source_path:     source_path,
-        public_symbols:  [],
-        private_symbols: [],
-        import_paths:    [],
-        import_aliases:  [],
-        is_pub:          is_pub
+        id:          id,
+        parent_id:   parent_id,
+        child_ids:   [],
+        source_path: source_path,
+        is_pub:      is_pub,
+        vixi_valid:  0,
+        interface_hash: "",
+        use_aliases: [],
+        use_targets: []
     }
 }
 
@@ -86,17 +97,17 @@ pub fn module_graph_find_by_qname(g: &ModuleGraph, qname: string): i32
 
 pub fn module_graph_debug(g: &ModuleGraph): string
 {
-    let mut out = "ModuleGraph(ok=" + ast_i32(g.ok) + ", modules=" + ast_i32(g.modules.length) + ")\n"
+    let mut out = "ModuleGraph(ok=" + ast::ast_i32(g.ok) + ", modules=" + ast::ast_i32(g.modules.length) + ")\n"
     for (i in 0 .. g.modules.length)
     {
         let m = g.modules[i]
-        out = out + "  [" + ast_i32(m.id.id) + "] " + m.id.qualified_name + " -> " + m.source_path + "\n"
+        out = out + "  [" + ast::ast_i32(m.id.id) + "] " + m.id.qualified_name + " -> " + m.source_path + "\n"
         if (m.child_ids.length > 0)
         {
             out = out + "     children:"
             for (j in 0 .. m.child_ids.length)
             {
-                out = out + " " + ast_i32(m.child_ids[j])
+                out = out + " " + ast::ast_i32(m.child_ids[j])
             }
             out = out + "\n"
         }
@@ -188,7 +199,7 @@ pub fn ml_dirname(path: string): string
     }
     if (last < 0) { return "." }
     let mut out = ""
-    for (i in 0 .. last) { out = out + char_string(compiler_string_byte(path, i)) }
+    for (i in 0 .. last) { out = out + lexer::char_string(compiler_string_byte(path, i)) }
     return out
 }
 
@@ -199,7 +210,7 @@ pub fn ml_locate(base_dir: string, name: string): string
     if (name.length >= 4 and compiler_string_byte(name, name.length - 4) == '.' and compiler_string_byte(name, name.length - 3) == 'v' and compiler_string_byte(name, name.length - 2) == 'i' and compiler_string_byte(name, name.length - 1) == 'x')
     {
         let direct = ml_join_dir(base_dir, name)
-        if (read_file_content(direct) != "") { return direct }
+        if (preprocess::read_file_content(direct) != "") { return direct }
         return ""
     }
     let has_slash = 0
@@ -207,13 +218,13 @@ pub fn ml_locate(base_dir: string, name: string): string
     if (has_slash == 1)
     {
         let direct = ml_join_dir(base_dir, name)
-        if (read_file_content(direct) != "") { return direct }
+        if (preprocess::read_file_content(direct) != "") { return direct }
         return ""
     }
     let file_path = ml_join_dir(base_dir, name + ".vix")
     let dir_path  = ml_join_dir(ml_join_dir(base_dir, name), "mod.vix")
-    let fc = read_file_content(file_path)
-    let dc = read_file_content(dir_path)
+    let fc = preprocess::read_file_content(file_path)
+    let dc = preprocess::read_file_content(dir_path)
     let fe = if (fc != "") { 1 } else { 0 }
     let de = if (dc != "") { 1 } else { 0 }
     if (fe == 1 and de == 1)
@@ -225,40 +236,38 @@ pub fn ml_locate(base_dir: string, name: string): string
     return ""
 }
 
+fn module_source_is_compiler(loader: &ModuleLoader, parent_idx: i32): i32
+{
+    if (parent_idx < 0) { return 0 }
+    let path = loader.graph.modules[parent_idx].source_path
+    if (path.length >= 4 and compiler_string_byte(path, 0) == 's' and compiler_string_byte(path, 1) == 'r' and compiler_string_byte(path, 2) == 'c' and compiler_string_byte(path, 3) == '/') { return 1 }
+    return 0
+}
+
 // ---------------------------------------------------------------------------
-// Scan child mods  (token-level, no full parse)
+// Scan use declarations (token-level, no full parse).
+//
+// The graph is the only thing that loads files now: mod was removed and quoted
+// imports are handled by the preprocessor, which skips whatever this claims.
 // ---------------------------------------------------------------------------
 
 pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, src_path: string)
 {
-    let stream = tokenize(src)
-    let len    = stream_len(stream)
+    let stream = lexer::tokenize(src)
+    let len    = lexer::stream_len(stream)
     let mut i  = 0
     while (i < len)
     {
-        let text = stream_text_at(stream, i)
-        let mut is_pub = 0
-        let mut at     = i
-        if (text == "pub" and i + 1 < len and stream_text_at(stream, i + 1) == "mod")
+        let text = lexer::stream_text_at(stream, i)
+        if (text == "use" and i + 3 < len and lexer::stream_kind_at(stream, i + 1) == lexer::tk_string()
+            and lexer::stream_text_at(stream, i + 2) == "as" and lexer::stream_kind_at(stream, i + 3) == lexer::tk_ident())
         {
-            is_pub = 1
-            at     = i + 1
-        }
-        elif (text != "mod")
-        {
-            i += 1
+            ml_load_module_named(loader, parent_idx, lexer::stream_text_at(stream, i + 1),
+                                 lexer::stream_text_at(stream, i + 3), 0, src_path)
+            i = i + 4
             continue
         }
-        if (at + 1 < len and (stream_kind_at(stream, at + 1) == tk_ident() or stream_kind_at(stream, at + 1) == tk_string()))
-        {
-            let name = stream_text_at(stream, at + 1)
-            ml_load_module(loader, parent_idx, name, is_pub, src_path)
-            i = at + 2
-        }
-        else
-        {
-            i += 1
-        }
+        i += 1
     }
 }
 
@@ -268,6 +277,18 @@ pub fn ml_scan_child_mods(loader: &ModuleLoader, parent_idx: i32, src: string, s
 
 pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_pub: i32, parent_path: string)
 {
+    ml_load_module_named(loader, parent_idx, name, name, is_pub, parent_path)
+}
+
+// Loads a module whose on-disk name and namespace name differ.
+//
+//   mod "utils/string.vix"      -> both are the path, namespace follows it
+//   use "utils/string.vix" as s -> locate is the path, namespace is "s"
+//
+// Separating them is what lets use pick its own namespace instead of inheriting
+// one from the file name (five files in this tree are called mod.vix).
+pub fn ml_load_module_named(loader: &ModuleLoader, parent_idx: i32, locate_name: string, ns_name: string, is_pub: i32, parent_path: string)
+{
     let parent_qname = if (parent_idx < 0)
     {
         "root"
@@ -276,7 +297,7 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
     {
         loader.graph.modules[parent_idx].id.qualified_name
     }
-    let qname    = parent_qname + "::" + name
+    let qname    = parent_qname + "::" + ns_name
     let base_dir = ml_dirname(parent_path)
 
     // cycle check
@@ -293,18 +314,24 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
         if (parent_idx >= 0)
         {
             loader.graph.modules[parent_idx].child_ids.push(existing)
+            loader.graph.modules[parent_idx].use_aliases.push(ns_name)
+            loader.graph.modules[parent_idx].use_targets.push(existing)
         }
         return
     }
 
     // locate file
-    let located = ml_locate(base_dir, name)
+    let mut located = ml_locate(base_dir, locate_name)
+    if (located == "" and parent_idx >= 0 and module_source_is_compiler(loader, parent_idx) == 1)
+    {
+        located = ml_locate("src/main.vix", locate_name)
+    }
     if (located == "")
     {
         ml_add_error(loader,
             "error: module not found: '" + qname + "'\n" +
-            "  tried: " + ml_join_dir(base_dir, name + ".vix") + "\n" +
-            "  tried: " + ml_join_dir(ml_join_dir(base_dir, name), "mod.vix"))
+            "  tried: " + ml_join_dir(base_dir, locate_name + ".vix") + "\n" +
+            "  tried: " + ml_join_dir(ml_join_dir(base_dir, locate_name), "mod.vix"))
         return
     }
     if (located.length >= 9 and compiler_string_byte(located, 0) == 'A' and compiler_string_byte(located, 1) == 'M' and compiler_string_byte(located, 2) == 'B')
@@ -313,13 +340,32 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
             "error: ambiguous module '" + qname + "': " + located)
         return
     }
+    located = preprocess::path_normalize(located)
 
     // read source
-    let src = read_file_content(located)
+    let src = preprocess::read_file_content(located)
     if (src == "")
     {
         ml_add_error(loader, "error: cannot read: '" + located + "'")
         return
+    }
+
+    // A file reached from two different modules is still one module: loading it
+    // twice would duplicate every declaration in it.  The namespace it already
+    // has wins, and the second importer's references are rewritten to it.
+    let normalized = preprocess::path_normalize(located)
+    for (seen in 0 .. loader.graph.modules.length)
+    {
+        if (preprocess::path_normalize(loader.graph.modules[seen].source_path) == normalized)
+        {
+            if (parent_idx >= 0)
+            {
+                loader.graph.modules[parent_idx].child_ids.push(seen)
+                loader.graph.modules[parent_idx].use_aliases.push(ns_name)
+                loader.graph.modules[parent_idx].use_targets.push(seen)
+            }
+            return
+        }
     }
 
     // register node
@@ -331,6 +377,8 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
     if (parent_idx >= 0)
     {
         loader.graph.modules[parent_idx].child_ids.push(mod_idx)
+        loader.graph.modules[parent_idx].use_aliases.push(ns_name)
+        loader.graph.modules[parent_idx].use_targets.push(mod_idx)
     }
 
     // DFS push
@@ -338,6 +386,36 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
 
     // recurse
     ml_scan_child_mods(loader, mod_idx, src, located)
+
+    // Interface cache.
+    //
+    // A .vixi that matches this source, this compiler and every dependency's
+    // interface means the module was already checked, so its bodies can be
+    // skipped later.  Dependents are collected first, which is why this runs
+    // after the children have been loaded: a parent's interface names the
+    // interfaces it was built against, and that is what stops a stale interface
+    // from being accepted when only the dependency changed.
+    let mut dep_paths: [string] = []
+    let mut dep_hashes: [string] = []
+    let mut deps_complete = 1
+    for (c in 0 .. loader.graph.modules[mod_idx].child_ids.length)
+    {
+        let child = loader.graph.modules[mod_idx].child_ids[c]
+        dep_paths.push(preprocess::path_normalize(loader.graph.modules[child].source_path))
+        let child_hash = loader.graph.modules[child].interface_hash
+        dep_hashes.push(child_hash)
+        if (child_hash == "") { deps_complete = 0 }
+    }
+    let cached_text = preprocess::read_file_content(vixi::vixi_path_for(located))
+    if (cached_text != "" and deps_complete == 1)
+    {
+        let cached = vixi::vixi_parse(cached_text)
+        if (vixi::vixi_is_valid(cached, preprocess::path_normalize(located), vixi::vixi_source_hash(src), vixi::vixi_compiler_id(), dep_paths, dep_hashes) == 1)
+        {
+            loader.graph.modules[mod_idx].vixi_valid = 1
+            loader.graph.modules[mod_idx].interface_hash = vixi::vixi_interface_hash(cached)
+        }
+    }
 
     // DFS pop
     ml_pop_stack(loader, qname)
@@ -349,9 +427,18 @@ pub fn ml_load_module(loader: &ModuleLoader, parent_idx: i32, name: string, is_p
 
 pub fn module_graph_build(entry_src_path: string): ModuleGraph
 {
+    return module_graph_build_with_source(entry_src_path, preprocess::read_file_content(entry_src_path))
+}
+
+// Variant for tools that hold the entry file in memory: the LSP buffer may
+// carry unsaved edits, so the root document's own text is supplied instead of
+// re-reading it from disk.  Used modules are still located and read from disk
+// exactly like module_graph_build does.
+pub fn module_graph_build_with_source(entry_src_path: string, entry_source: string): ModuleGraph
+{
     let mut loader = module_loader_new()
 
-    let root_src = read_file_content(entry_src_path)
+    let root_src = entry_source
     if (root_src == "")
     {
         ml_add_error(loader, "error: cannot read entry file: '" + entry_src_path + "'")
@@ -399,18 +486,18 @@ pub fn mangle_name(qualified_module: string, sym: string): string
         {
             if (seg != "")
             {
-                out = out + ast_i32(seg.length) + seg
+                out = out + ast::ast_i32(seg.length) + seg
             }
             seg = ""
             i = if (at_sep == 1) { i + 2 } else { i + 1 }
         }
         else
         {
-            seg = seg + char_string(compiler_string_byte(qualified_module, i))
+            seg = seg + lexer::char_string(compiler_string_byte(qualified_module, i))
             i += 1
         }
     }
-    out = out + ast_i32(sym.length) + sym
+    out = out + ast::ast_i32(sym.length) + sym
     return out
 }
 
@@ -427,54 +514,10 @@ pub fn mangle_flat_name(flat: string): string
     }
     if (last_sep < 0) { return flat }
     let mut mod_path = ""
-    for (j in 0 .. last_sep)               { mod_path = mod_path + char_string(compiler_string_byte(flat, j)) }
+    for (j in 0 .. last_sep)               { mod_path = mod_path + lexer::char_string(compiler_string_byte(flat, j)) }
     let mut sym      = ""
-    for (j in last_sep + 2 .. flat.length) { sym = sym + char_string(compiler_string_byte(flat, j)) }
+    for (j in last_sep + 2 .. flat.length) { sym = sym + lexer::char_string(compiler_string_byte(flat, j)) }
     return mangle_name(mod_path, sym)
-}
-
-// ---------------------------------------------------------------------------
-// Import / symbol resolution helpers
-// ---------------------------------------------------------------------------
-
-// Collect all public function/type names declared in a program.
-pub fn module_collect_public_symbols(m: &Module, prog: AstProgram)
-{
-    for (i in 0 .. prog.functions.length)
-    {
-        m.public_symbols.push(prog.functions[i].name)
-    }
-    for (i in 0 .. prog.structs.length)
-    {
-        m.public_symbols.push(prog.structs[i].name)
-    }
-    for (i in 0 .. prog.adts.length)
-    {
-        m.public_symbols.push(prog.adts[i].name)
-    }
-}
-
-// Resolve an import declaration path to a qualified name string.
-// e.g. ["math", "add"] -> "math::add"
-pub fn import_path_to_qname(path: [string]): string
-{
-    let mut out = ""
-    for (i in 0 .. path.length)
-    {
-        if (i > 0) { out = out + "::" }
-        out = out + path[i]
-    }
-    return out
-}
-
-// Check whether `name` is a duplicate in `names`.
-pub fn symbol_is_duplicate(names: [string], name: string): i32
-{
-    for (i in 0 .. names.length)
-    {
-        if (names[i] == name) { return 1 }
-    }
-    return 0
 }
 
 // ---------------------------------------------------------------------------
@@ -491,24 +534,34 @@ fn module_strip_root_prefix(qname: string): string
         let mut out = ""
         for (i in 6 .. qname.length)
         {
-            out = out + char_string(compiler_string_byte(qname, i))
+            out = out + lexer::char_string(compiler_string_byte(qname, i))
         }
         return out
     }
     return qname
 }
 
-// Compiler sources are aggregated below `sys` so their existing unqualified
-// calls remain valid while user-defined modules retain their namespace.
-fn module_is_sys_member(qname: string): i32
+// True when a reference is a plain identifier: no namespace separator and no
+// literal or operator prefix.
+fn module_name_is_bare(text: string): i32
 {
-    if (qname.length < 11) { return 0 }
-    if (compiler_string_byte(qname, 0) == 'r' and compiler_string_byte(qname, 1) == 'o' and compiler_string_byte(qname, 2) == 'o' and compiler_string_byte(qname, 3) == 't' and compiler_string_byte(qname, 4) == ':' and compiler_string_byte(qname, 5) == ':' and compiler_string_byte(qname, 6) == 's' and compiler_string_byte(qname, 7) == 'y' and compiler_string_byte(qname, 8) == 's' and compiler_string_byte(qname, 9) == ':' and compiler_string_byte(qname, 10) == ':') return 1
+    if (text == "") { return 0 }
+    let first = compiler_string_byte(text, 0)
+    if ((first >= 'a' and first <= 'z') or (first >= 'A' and first <= 'Z') or first == '_')
+    {
+        let mut i = 0
+        while (i + 1 < text.length)
+        {
+            if (compiler_string_byte(text, i) == ':' and compiler_string_byte(text, i + 1) == ':') { return 0 }
+            i += 1
+        }
+        return 1
+    }
     return 0
 }
 
 // Merge all exprs from src into dst, remapping indices by expr_off/stmt_off
-fn module_merge_exprs(src_es: ExprStore, dst_es: &ExprStore, expr_off: i32, stmt_off: i32)
+fn module_merge_exprs(src_es: ast::ExprStore, dst_es: &ast::ExprStore, expr_off: i32, stmt_off: i32)
 {
     for (i in 0 .. src_es.exprs.length)
     {
@@ -545,7 +598,7 @@ fn module_merge_exprs(src_es: ExprStore, dst_es: &ExprStore, expr_off: i32, stmt
 }
 
 // Merge all stmts from src into dst, remapping indices
-fn module_merge_stmts(src_store: StmtStore, dst_store: &StmtStore, expr_off: i32, stmt_off: i32)
+fn module_merge_stmts(src_store: ast::StmtStore, dst_store: &ast::StmtStore, expr_off: i32, stmt_off: i32)
 {
     for (i in 0 .. src_store.stmts.length)
     {
@@ -623,7 +676,299 @@ fn module_merge_stmts(src_store: StmtStore, dst_store: &StmtStore, expr_off: i32
 }
 
 // Load and merge all modules in the graph into a single AstProgram
-pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgram
+// Source paths the graph has claimed.
+//
+// The preprocessor keeps its own set of included files, and the two used to be
+// independent: a file reached through both mod and import was loaded twice and
+// every declaration in it collided.  The graph is the authority, so its paths
+// are handed to the preprocessor and quoted imports of them are skipped.
+pub fn module_graph_loaded_paths(g: ModuleGraph): [string]
+{
+    let mut out: [string] = []
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].id.qualified_name != "root")
+        {
+            out.push(preprocess::path_normalize(g.modules[i].source_path))
+        }
+    }
+    return out
+}
+
+// Namespace prefixes of the modules whose interfaces are already valid, and
+// whose function bodies therefore do not have to be checked again.  A function
+// belongs to a module when its merged name starts with "<prefix>::".
+pub fn module_graph_checked_prefixes(g: ModuleGraph): [string]
+{
+    let mut out: [string] = []
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].vixi_valid == 1 and g.modules[i].id.qualified_name != "root")
+        {
+            out.push(module_strip_root_prefix(g.modules[i].id.qualified_name))
+        }
+    }
+    return out
+}
+
+// Namespace prefixes of every used module, regardless of cache validity.
+// Tools that analyze one document (the language server) check only the root
+// file's own bodies and need every module prefix to skip the rest.
+pub fn module_graph_namespace_prefixes(g: ModuleGraph): [string]
+{
+    let mut out: [string] = []
+    for (i in 0 .. g.modules.length)
+    {
+        if (g.modules[i].id.qualified_name != "root")
+        {
+            out.push(module_strip_root_prefix(g.modules[i].id.qualified_name))
+        }
+    }
+    return out
+}
+
+// Records the interface of every module that does not have a valid one yet.
+//
+// This is the other half of the cache: a .vixi exists only for a module that was
+// actually checked, which is what makes skipping it next time sound.  Modules
+// are visited in reverse because children are appended after their parent, so a
+// dependency is written and hashed before the module that names it.
+// Rewrites a reference written with a local alias into the referenced module's
+// full namespace path.
+//
+// Definitions are prefixed when modules merge, but a reference inside a module
+// is written the way its author sees it: a module that does
+//   use "dep.vix" as dep
+// writes dep::value, while the merged definition is mid::dep::value.  Without
+// this rewrite the call resolves to nothing.
+pub fn module_rewrite_reference(text: string, aliases: [string], prefixes: [string]): string
+{
+    for (i in 0 .. aliases.length)
+    {
+        let alias = aliases[i]
+        let prefix = prefixes[i]
+        if (text.length > alias.length + 2)
+        {
+            let mut same = 1
+            for (k in 0 .. alias.length)
+            {
+                if (compiler_string_byte(text, k) != compiler_string_byte(alias, k)) { same = 0 }
+            }
+            if (same == 1
+                and compiler_string_byte(text, alias.length) == ':'
+                and compiler_string_byte(text, alias.length + 1) == ':')
+            {
+                let mut out = if (prefix == "") { "" } else { prefix + "::" }
+                for (j in alias.length + 2 .. text.length)
+                {
+                    out = out + lexer::char_string(compiler_string_byte(text, j))
+                }
+                return out
+            }
+        }
+    }
+    return text
+}
+
+pub fn module_graph_write_interfaces(g: ModuleGraph)
+{
+    let mut hashes: [string] = []
+    for (i in 0 .. g.modules.length) { hashes.push(g.modules[i].interface_hash) }
+
+    let mut index = g.modules.length
+    while (index > 0)
+    {
+        index -= 1
+        if (g.modules[index].id.qualified_name == "root") { continue }
+        if (g.modules[index].vixi_valid == 1) { continue }
+
+        let path = g.modules[index].source_path
+        let source = preprocess::read_file_content(path)
+        if (source == "") { continue }
+
+        let mut dep_paths: [string] = []
+        let mut dep_hashes: [string] = []
+        for (c in 0 .. g.modules[index].child_ids.length)
+        {
+            let child = g.modules[index].child_ids[c]
+            dep_paths.push(preprocess::path_normalize(g.modules[child].source_path))
+            dep_hashes.push(hashes[child])
+        }
+
+        let parsed = parser::parse_program_raw(source, path)
+        if (parsed.ok == 0) { continue }
+        let m = vixi::vixi_collect(parsed, path, vixi::vixi_compiler_id(), source, dep_paths, dep_hashes)
+        if (vixi::vixi_write_file(vixi::vixi_path_for(path), vixi::vixi_emit(m)) == 0)
+        {
+            hashes[index] = vixi::vixi_interface_hash(m)
+        }
+    }
+}
+
+fn module_qualified_type_name(module_path: string, name: string): string
+{
+    if (module_path == "") { return name }
+    return module_path + "::" + name
+}
+
+// Registers every type a module declares.  Types keep the module they came from
+// so resolution can be by identity instead of by bare name.
+fn module_type_symbols_add(symbols: [ast::AstTypeSymbol], module_path: string, structs: [ast::AstStructDecl], adts: [ast::AstAdtDecl]): [ast::AstTypeSymbol]
+{
+    let mut out = symbols
+    for (i in 0 .. structs.length)
+    {
+        let qualified = module_qualified_type_name(module_path, structs[i].name)
+        let sym_id = out.length
+        out.push(ast::AstTypeSymbol{
+            id: sym_id,
+            module_path: module_path,
+            name: structs[i].name,
+            qualified: qualified,
+            kind: 0,
+            is_pub: structs[i].is_pub,
+            line: structs[i].line,
+            col: structs[i].col
+        })
+        // Stamp the type pool so a type reference can carry the symbol itself
+        // instead of only its spelling.
+        typepool::set_sym(typepool::named(qualified, qualified, []), sym_id)
+    }
+    for (i in 0 .. adts.length)
+    {
+        let qualified = module_qualified_type_name(module_path, adts[i].name)
+        let sym_id = out.length
+        out.push(ast::AstTypeSymbol{
+            id: sym_id,
+            module_path: module_path,
+            name: adts[i].name,
+            qualified: qualified,
+            kind: 1,
+            is_pub: adts[i].is_pub,
+            line: adts[i].line,
+            col: adts[i].col
+        })
+        typepool::set_sym(typepool::named(qualified, qualified, []), sym_id)
+    }
+    return out
+}
+
+// A single-file program never goes through the merge, but its own declarations
+// still need symbols so the rest of the compiler sees one code path.
+pub fn module_program_with_type_symbols(program: ast::AstProgram): ast::AstProgram
+{
+    let mut out = program
+    out.type_symbols = module_type_symbols_add(out.type_symbols, "", program.structs, program.adts)
+    return out
+}
+
+
+// Types are a namespace too.  A declaration inside a module is addressed as
+// mod::Type, exactly like a function; built-ins and the parser-synthesized
+// Option/Result stay global.
+fn module_type_name_is_global(name: string): i32
+{
+    if (name == "i8" or name == "i16" or name == "i32" or name == "i64") { return 1 }
+    if (name == "u8" or name == "u16" or name == "u32" or name == "u64") { return 1 }
+    if (name == "usize" or name == "isize" or name == "f32" or name == "f64") { return 1 }
+    if (name == "bool" or name == "string" or name == "void" or name == "char" or name == "ptr") { return 1 }
+    if (name == "unknown" or name == "Option" or name == "Result") { return 1 }
+    if (name == "Ok" or name == "Err" or name == "Some" or name == "None") { return 1 }
+    return 0
+}
+
+// Rewrites one type spelling: an identifier that names a type of this module
+// gets the module prefix.  Spacing, brackets and generic arguments are copied
+// verbatim so diagnostics and interfaces keep the author's spelling.
+fn module_qualify_type_text(text: string, prefix: string, local_types: [string], aliases: [string], alias_prefixes: [string]): string
+{
+    if (text == "") { return text }
+    let mut out = ""
+    let mut i = 0
+    // Set while the previous token was a "::" qualifier: the word that follows
+    // is the member of an already qualified name and must be copied verbatim.
+    let mut after_qualifier = 0
+    while (i < text.length)
+    {
+        let c = compiler_string_byte(text, i)
+        let is_start = (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or c == '_'
+        if (is_start == 0)
+        {
+            if (c == ':' and i + 1 < text.length and compiler_string_byte(text, i + 1) == ':')
+            {
+                out = out + "::"
+                i += 2
+                after_qualifier = 1
+                continue
+            }
+            out = out + lexer::char_string(c)
+            i += 1
+            after_qualifier = 0
+            continue
+        }
+        let start = i
+        while (i < text.length)
+        {
+            let d = compiler_string_byte(text, i)
+            if ((d >= 'a' and d <= 'z') or (d >= 'A' and d <= 'Z') or (d >= '0' and d <= '9') or d == '_') { i += 1 }
+            else { break }
+        }
+        let mut word = ""
+        for (j in start .. i) { word = word + lexer::char_string(compiler_string_byte(text, j)) }
+        if (after_qualifier == 1)
+        {
+            out = out + word
+            after_qualifier = 0
+            continue
+        }
+        let mut already_qualified = 0
+        if (i + 1 < text.length and compiler_string_byte(text, i) == ':' and compiler_string_byte(text, i + 1) == ':') { already_qualified = 1 }
+        let mut is_local = 0
+        for (k in 0 .. local_types.length)
+        {
+            if (local_types[k] == word) { is_local = 1 }
+        }
+        if (already_qualified == 1)
+        {
+            // "alias::Type" is how a module names another module's type; the
+            // alias has to be pointed at the namespace the target landed in,
+            // exactly like a function reference.
+            let mut alias_idx = -1
+            for (ai in 0 .. aliases.length)
+            {
+                if (aliases[ai] == word) { alias_idx = ai }
+            }
+            if (alias_idx >= 0 and alias_prefixes[alias_idx] != "")
+            {
+                // Emit the target namespace and consume the "::" so the member
+                // that follows is appended verbatim as part of the same name.
+                out = out + alias_prefixes[alias_idx] + "::"
+                i += 2
+                after_qualifier = 1
+                continue
+            }
+            out = out + word
+        }
+        elif (module_type_name_is_global(word) == 1)
+        {
+            out = out + word
+        }
+        elif (is_local == 1 and prefix != "")
+        {
+            out = out + prefix + "::" + word
+        }
+        else
+        {
+            // Phase 7: a type reference must name its module.  Nothing is
+            // guessed here any more; an unqualified cross-module type is left
+            // alone so the checker reports it.
+            out = out + word
+        }
+    }
+    return out
+}
+
+pub fn module_graph_load_all(g: ModuleGraph, root_program: ast::AstProgram): ast::AstProgram
 {
     if (g.ok == 0 or g.modules.length == 0)
     {
@@ -632,23 +977,70 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
     
     if (g.modules.length == 1)
     {
-        return root_program
+        let mut single = root_program
+        single.type_symbols = module_type_symbols_add(single.type_symbols, "", root_program.structs, root_program.adts)
+        return single
     }
     
-    let mut merged_fns: [AstFunction] = []
-    let mut merged_externs: [AstFunction] = []
-    let mut merged_globals: [AstStmt] = []
-    let mut merged_structs: [AstStructDecl] = []
-    let mut merged_adts: [AstAdtDecl] = []
-    let mut merged_es = expr_store_new()
-    let mut merged_store = stmt_store_new()
+    let mut merged_fns: [ast::AstFunction] = []
+    let mut merged_externs: [ast::AstFunction] = []
+    let mut merged_globals: [ast::AstStmt] = []
+    let mut merged_structs: [ast::AstStructDecl] = []
+    let mut merged_adts: [ast::AstAdtDecl] = []
+    let mut merged_type_symbols: [ast::AstTypeSymbol] = []
+    let mut root_local_types: [string] = []
+    for (i in 0 .. root_program.structs.length) { root_local_types.push(root_program.structs[i].name) }
+    for (i in 0 .. root_program.adts.length)
+    {
+        root_local_types.push(root_program.adts[i].name)
+        for (v in 0 .. root_program.adts[i].variant_names.length) { root_local_types.push(root_program.adts[i].variant_names[v]) }
+    }
+    let mut merged_es = ast::expr_store_new()
+    let mut merged_store = ast::stmt_store_new()
     
     module_merge_exprs(root_program.expr_store, merged_es, 0, 0)
     module_merge_stmts(root_program.store, merged_store, 0, 0)
+    let root_expr_end = merged_es.exprs.length
+    let root_stmt_end = merged_store.stmts.length
+
+    // The entry file needs the same alias mapping as any other module: when a
+    // file it uses was already loaded under another namespace (a diamond), the
+    // entry's own reference has to be pointed at where the definition landed.
+    // The entry file needs the same alias mapping as any other module, in its
+    // expressions *and* in the types it declares.
+    let mut root_aliases: [string] = []
+    let mut root_prefixes: [string] = []
+    for (u in 0 .. g.modules[0].use_aliases.length)
+    {
+        let target = g.modules[g.modules[0].use_targets[u]]
+        root_prefixes.push(module_strip_root_prefix(target.id.qualified_name))
+        root_aliases.push(g.modules[0].use_aliases[u])
+    }
+    if (root_aliases.length > 0)
+    {
+        for (re in 0 .. root_expr_end)
+        {
+            merged_es.exprs[re].text = module_rewrite_reference(merged_es.exprs[re].text, root_aliases, root_prefixes)
+        }
+        for (rt in 0 .. root_stmt_end)
+        {
+            merged_store.stmts[rt].assign_name = module_rewrite_reference(merged_store.stmts[rt].assign_name, root_aliases, root_prefixes)
+            merged_store.stmts[rt].type_text = module_rewrite_reference(merged_store.stmts[rt].type_text, root_aliases, root_prefixes)
+            merged_store.stmts[rt].type_text = module_qualify_type_text(merged_store.stmts[rt].type_text, "", root_local_types, root_aliases, root_prefixes)
+        }
+    }
     
+    // The entry file is a module too: its own types stay global, but every
+    // reference it makes to another module's type has to be qualified.
     for (i in 0 .. root_program.functions.length)
     {
-        merged_fns.push(root_program.functions[i])
+        let mut f = root_program.functions[i]
+        let mut q_params: [string] = []
+        for (k in 0 .. f.param_types.length) { q_params.push(module_qualify_type_text(f.param_types[k], "", root_local_types, root_aliases, root_prefixes)) }
+        f.param_types = q_params
+        f.ret_ty = module_qualify_type_text(f.ret_ty, "", root_local_types, root_aliases, root_prefixes)
+        f.receiver_type = module_qualify_type_text(f.receiver_type, "", root_local_types, root_aliases, root_prefixes)
+        merged_fns.push(f)
     }
     for (i in 0 .. root_program.extern_functions.length)
     {
@@ -660,42 +1052,187 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
     }
     for (i in 0 .. root_program.structs.length)
     {
-        merged_structs.push(root_program.structs[i])
+        let mut decl = root_program.structs[i]
+        let mut q_fields: [string] = []
+        for (k in 0 .. decl.field_types.length) { q_fields.push(module_qualify_type_text(decl.field_types[k], "", root_local_types, root_aliases, root_prefixes)) }
+        decl.field_types = q_fields
+        merged_structs.push(decl)
     }
     for (i in 0 .. root_program.adts.length)
     {
-        merged_adts.push(root_program.adts[i])
+        let mut decl = root_program.adts[i]
+        let mut q_payloads: [string] = []
+        for (k in 0 .. decl.variant_payload_types.length) { q_payloads.push(module_qualify_type_text(decl.variant_payload_types[k], "", root_local_types, root_aliases, root_prefixes)) }
+        decl.variant_payload_types = q_payloads
+        merged_adts.push(decl)
     }
+    merged_type_symbols = module_type_symbols_add(merged_type_symbols, "", root_program.structs, root_program.adts)
     
+    let mut load_error = ""
     for (mi in 1 .. g.modules.length)
     {
         let mnode = g.modules[mi]
-        let src = read_file_content(mnode.source_path)
+        let src = preprocess::read_file_content(mnode.source_path)
         if (src == "") { continue }
+
+        let prog = parser::parse_program_raw(src, mnode.source_path)
+        if (prog.ok == 0)
+        {
+            // A module that fails to parse contributes nothing, so every name
+            // it should provide would surface later as unrelated undefined
+            // symbols.  Fail the merge with the real cause instead.
+            load_error = "module '" + mnode.source_path + "' failed to parse\n" + prog.error
+            continue
+        }
         
-        let prog = parse_program_raw(src, mnode.source_path)
-        if (prog.ok == 0) { continue }
-        
-        let prefix = if (module_is_sys_member(mnode.id.qualified_name) == 1) { "" } else { module_strip_root_prefix(mnode.id.qualified_name) }
+        let prefix = module_strip_root_prefix(mnode.id.qualified_name)
         let expr_off = merged_es.exprs.length
         let stmt_off = merged_store.stmts.length
         
         module_merge_exprs(prog.expr_store, merged_es, expr_off, stmt_off)
         module_merge_stmts(prog.store, merged_store, expr_off, stmt_off)
-        
+
+        // References this module wrote with its own aliases have to be pointed
+        // at the namespace the definitions ended up in.
+        let mut alias_names: [string] = []
+        let mut alias_prefixes: [string] = []
+        for (u in 0 .. mnode.use_aliases.length)
+        {
+            let target = g.modules[mnode.use_targets[u]]
+            let target_prefix = module_strip_root_prefix(target.id.qualified_name)
+            alias_names.push(mnode.use_aliases[u])
+            alias_prefixes.push(target_prefix)
+        }
+        if (alias_names.length > 0)
+        {
+            for (e in expr_off .. merged_es.exprs.length)
+            {
+                merged_es.exprs[e].text = module_rewrite_reference(merged_es.exprs[e].text, alias_names, alias_prefixes)
+            }
+            for (t in stmt_off .. merged_store.stmts.length)
+            {
+                merged_store.stmts[t].assign_name = module_rewrite_reference(merged_store.stmts[t].assign_name, alias_names, alias_prefixes)
+                merged_store.stmts[t].type_text = module_rewrite_reference(merged_store.stmts[t].type_text, alias_names, alias_prefixes)
+            }
+        }
+
+        // Merging prefixes every function a module defines, so the bare calls it
+        // wrote in its own body no longer name anything.  Point them at the
+        // prefixed definition, unless a parameter or local binding shadows the
+        // name, which stays an ordinary variable.
+        let mut local_types: [string] = []
+        for (lti in 0 .. prog.structs.length) { local_types.push(prog.structs[lti].name) }
+        for (lti in 0 .. prog.adts.length)
+        {
+            local_types.push(prog.adts[lti].name)
+            for (ltv in 0 .. prog.adts[lti].variant_names.length) { local_types.push(prog.adts[lti].variant_names[ltv]) }
+        }
+        for (qst in stmt_off .. merged_store.stmts.length)
+        {
+            merged_store.stmts[qst].type_text = module_qualify_type_text(merged_store.stmts[qst].type_text, prefix, local_types, alias_names, alias_prefixes)
+        }
+
+        if (prefix != "")
+        {
+            let mut local_names: [string] = []
+            for (p in 0 .. prog.functions.length)
+            {
+                for (k in 0 .. prog.functions[p].param_names.length)
+                {
+                    local_names.push(prog.functions[p].param_names[k])
+                }
+            }
+            for (s in 0 .. prog.store.stmts.length)
+            {
+                if (prog.store.stmts[s].assign_name != "") { local_names.push(prog.store.stmts[s].assign_name) }
+            }
+            for (e in expr_off .. merged_es.exprs.length)
+            {
+                // A lambda carries its own parameter and return types, which are
+                // type positions like any other.
+                if (merged_es.exprs[e].tag == "lambda")
+                {
+                    let mut q_lambda_params: [string] = []
+                    for (lp in 0 .. merged_es.exprs[e].type_args.length)
+                    {
+                        q_lambda_params.push(module_qualify_type_text(merged_es.exprs[e].type_args[lp], prefix, local_types, alias_names, alias_prefixes))
+                    }
+                    merged_es.exprs[e].type_args = q_lambda_params
+                    merged_es.exprs[e].option_value = module_qualify_type_text(merged_es.exprs[e].option_value, prefix, local_types, alias_names, alias_prefixes)
+                }
+                let ex = merged_es.exprs[e]
+                if (ex.tag != "field" and ex.tag != "method_call" and module_name_is_bare(ex.text) == 1)
+                {
+                    let mut is_own = 0
+                    for (p in 0 .. prog.functions.length)
+                    {
+                        if (prog.functions[p].name == ex.text) { is_own = 1 }
+                    }
+                    // Constructors and struct literals are namespaced too.
+                    for (lt in 0 .. local_types.length)
+                    {
+                        if (local_types[lt] == ex.text) { is_own = 1 }
+                    }
+                    if (is_own == 0)
+                    {
+                        for (gg in 0 .. prog.globals.length)
+                        {
+                            if (prog.globals[gg].assign_name == ex.text) { is_own = 1 }
+                        }
+                    }
+                    let mut is_local = 0
+                    for (l in 0 .. local_names.length)
+                    {
+                        if (local_names[l] == ex.text) { is_local = 1 }
+                    }
+                    if (is_own == 1 and is_local == 0 and prefix != "")
+                    {
+                        merged_es.exprs[e].text = prefix + "::" + ex.text
+                    }
+                    elif (is_own == 0 and is_local == 0)
+                    {
+                        // Phase 7: constructors name their module too.  A bare
+                        // one is left alone and the checker reports it.
+                        0
+                    }
+                }
+            }
+        }
+
         for (i in 0 .. prog.functions.length)
         {
             let f = prog.functions[i]
             let new_body_idx = if (f.body_idx >= 0) { f.body_idx + stmt_off } else { f.body_idx }
             let new_name = if (prefix == "") { f.name } else { prefix + "::" + f.name }
-            merged_fns.push(AstFunction{
+            let mut q_param_types: [string] = []
+            for (qp in 0 .. f.param_types.length) { q_param_types.push(module_qualify_type_text(f.param_types[qp], prefix, local_types, alias_names, alias_prefixes)) }
+            let q_ret_ty = module_qualify_type_text(f.ret_ty, prefix, local_types, alias_names, alias_prefixes)
+            // A lambda exists twice: as an expression and as a generated
+            // function.  The expression's own types were written in the source
+            // and must end up qualified exactly like the function's signature,
+            // otherwise the callback type does not match its callee.
+            if (f.name.length >= 9 and compiler_string_byte(f.name, 0) == '_' and compiler_string_byte(f.name, 1) == '_' and compiler_string_byte(f.name, 2) == 'l')
+            {
+                for (le in expr_off .. merged_es.exprs.length)
+                {
+                    if (merged_es.exprs[le].tag == "lambda" and merged_es.exprs[le].text == f.name)
+                    {
+                        merged_es.exprs[le].type_args = q_param_types
+                        merged_es.exprs[le].option_value = q_ret_ty
+                    }
+                }
+            }
+            merged_fns.push(ast::AstFunction{
                 name: new_name,
-                ret_ty: f.ret_ty,
+                ret_ty: q_ret_ty,
                 body_idx: new_body_idx,
                 param_names: f.param_names,
-                param_types: f.param_types,
+                param_types: q_param_types,
                 type_params: f.type_params,
                 is_var_arg: f.is_var_arg,
+                is_pub: f.is_pub,
+                receiver_kind: f.receiver_kind,
+                receiver_type: module_qualify_type_text(f.receiver_type, prefix, local_types, alias_names, alias_prefixes),
                 line: f.line,
                 col: f.col
             })
@@ -724,31 +1261,136 @@ pub fn module_graph_load_all(g: ModuleGraph, root_program: AstProgram): AstProgr
         
         for (i in 0 .. prog.structs.length)
         {
-            // 保持结构体本地名称不变：函数体内仍用 Counter，非 counter::Counter
-            merged_structs.push(prog.structs[i])
+            // A module's struct is addressed as mod::Name, like its functions.
+            let mut decl = prog.structs[i]
+            if (prefix != "" and module_type_name_is_global(decl.name) == 0) { decl.name = prefix + "::" + decl.name }
+            let mut q_fields: [string] = []
+            for (k in 0 .. decl.field_types.length) { q_fields.push(module_qualify_type_text(decl.field_types[k], prefix, local_types, alias_names, alias_prefixes)) }
+            decl.field_types = q_fields
+            merged_structs.push(decl)
         }
         
         for (i in 0 .. prog.adts.length)
         {
+            let mut decl = prog.adts[i]
+            if (prefix != "" and module_type_name_is_global(decl.name) == 0) { decl.name = prefix + "::" + decl.name }
+            let mut q_variants: [string] = []
+            for (k in 0 .. decl.variant_names.length)
+            {
+                let vn = decl.variant_names[k]
+                if (prefix != "" and module_type_name_is_global(vn) == 0) { q_variants.push(prefix + "::" + vn) }
+                else { q_variants.push(vn) }
+            }
+            let mut q_payloads: [string] = []
+            for (k in 0 .. decl.variant_payload_types.length) { q_payloads.push(module_qualify_type_text(decl.variant_payload_types[k], prefix, local_types, alias_names, alias_prefixes)) }
+            decl.variant_names = q_variants
+            decl.variant_payload_types = q_payloads
             let mut existing = -1
             for (j in 0 .. merged_adts.length)
             {
-                if (merged_adts[j].name == prog.adts[i].name) { existing = j }
+                if (merged_adts[j].name == decl.name) { existing = j }
             }
             if (existing < 0)
             {
-                merged_adts.push(prog.adts[i])
+                merged_adts.push(decl)
             }
-            elif (merged_adts[existing].line == 0 and prog.adts[i].line > 0)
+            elif (merged_adts[existing].line == 0 and decl.line > 0)
             {
                 // A module may use Ok/Err before the module graph has seen an
                 // explicit shared Result declaration.  Replace that parser-
                 // injected placeholder with the real declaration so ADT
                 // constructors and payload layout are generated only once.
-                merged_adts[existing] = prog.adts[i]
+                merged_adts[existing] = decl
+            }
+            elif (decl.line > 0)
+            {
+                // Two real declarations with the same name are a conflict, not
+                // something to silently drop: keeping both lets the semantic
+                // pass report it instead of the second module losing its type.
+                merged_adts.push(prog.adts[i])
             }
         }
+        merged_type_symbols = module_type_symbols_add(merged_type_symbols, prefix, prog.structs, prog.adts)
     }
-    
-    return ast_program_full(merged_fns, merged_externs, merged_globals, merged_structs, merged_adts, [], [], merged_es, merged_store)
+
+    // Extern declarations live in the flat C ABI namespace: they merge by bare
+    // name and are never prefixed.  A module that qualified one of them with a
+    // use alias therefore wrote a name nothing declares.  When the qualified
+    // spelling matches no function, struct or variant, fall back to the bare
+    // extern name so `io::printf` reaches the C symbol.
+    let mut extern_names: [string] = []
+    for (i in 0 .. root_program.extern_functions.length) { extern_names.push(root_program.extern_functions[i].name) }
+    for (i in 0 .. merged_externs.length) { extern_names.push(merged_externs[i].name) }
+    if (extern_names.length > 0)
+    {
+        for (e in 0 .. merged_es.exprs.length)
+        {
+            if (module_name_is_bare(merged_es.exprs[e].text) == 1) { continue }
+            let tail = module_qualified_tail(merged_es.exprs[e].text)
+            if (module_string_in(extern_names, tail) == 0) { continue }
+            if (module_qualified_name_taken(merged_es.exprs[e].text, merged_fns, merged_structs, merged_adts) == 1) { continue }
+            merged_es.exprs[e].text = tail
+        }
+    }
+
+    if (load_error != "")
+    {
+        return ast::ast_program_err_diag(load_error, diag::diag_new("E1000", diag::DiagError, diag::DiagParser, ""))
+    }
+
+    let mut merged_program = ast::ast_program_full(merged_fns, merged_externs, merged_globals, merged_structs, merged_adts, [], [], merged_es, merged_store)
+    merged_program.type_symbols = merged_type_symbols
+    return merged_program
+}
+
+// The member part of a qualified name: the text after the last "::", or the
+// whole text when the name is not qualified.
+fn module_qualified_tail(text: string): string
+{
+    let mut last = -1
+    let mut i = 0
+    while (i + 1 < text.length)
+    {
+        if (compiler_string_byte(text, i) == ':' and compiler_string_byte(text, i + 1) == ':') { last = i }
+        i += 1
+    }
+    if (last < 0) { return text }
+    let mut out = ""
+    for (j in last + 2 .. text.length)
+    {
+        out = out + lexer::char_string(compiler_string_byte(text, j))
+    }
+    return out
+}
+
+fn module_string_in(names: [string], text: string): i32
+{
+    for (i in 0 .. names.length)
+    {
+        if (names[i] == text) { return 1 }
+    }
+    return 0
+}
+
+// Whether the qualified spelling names something the merge actually declared:
+// those keep their namespace, externs are the only global fallback.
+fn module_qualified_name_taken(text: string, fns: [ast::AstFunction], structs: [ast::AstStructDecl], adts: [ast::AstAdtDecl]): i32
+{
+    for (i in 0 .. fns.length)
+    {
+        if (fns[i].name == text) { return 1 }
+    }
+    for (i in 0 .. structs.length)
+    {
+        if (structs[i].name == text) { return 1 }
+    }
+    for (i in 0 .. adts.length)
+    {
+        if (adts[i].name == text) { return 1 }
+        for (v in 0 .. adts[i].variant_names.length)
+        {
+            if (adts[i].variant_names[v] == text) { return 1 }
+        }
+    }
+    return 0
 }

@@ -1,0 +1,15 @@
+type Point = struct {
+    x: i32,
+    y: i32
+}
+
+fn (&Point) sum(): i32 {
+    return self.x + self.y
+}
+
+fn main(): i32 {
+    let p = Point{ x: 3, y: 4 }
+    let a = p.sum()
+    let b = p.sum()
+    return a + b
+}

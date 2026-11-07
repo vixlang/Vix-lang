@@ -18,8 +18,11 @@ jobs:
     name: Build vixc 0.5.0-beta.1 (${{ matrix.os }})
     strategy:
       fail-fast: false
+      # macos-14 hosted runners are not served on this organization's plan
+      # ("configuration not supported"); macOS is verified on development
+      # machines instead.  Re-add when billing covers macOS runners.
       matrix:
-        os: [ubuntu-24.04, windows-2022, macos-14]
+        os: [ubuntu-24.04, windows-2022]
 
     runs-on: ${{ matrix.os }}
 
@@ -44,14 +47,6 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-21 100
           sudo ln -sf /usr/bin/llvm-config-21 /usr/bin/llvm-config
 
-      - name: Install macOS dependencies
-        if: runner.os == 'macOS'
-        run: |
-          brew install llvm lld libatomic_ops bdw-gc pkg-config make
-          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
-          echo "$(brew --prefix lld)/bin" >> "$GITHUB_PATH"
-          echo "$(brew --prefix make)/libexec/gnubin" >> "$GITHUB_PATH"
-
       - name: Set up MSYS2
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
@@ -68,19 +63,11 @@ jobs:
             mingw-w64-clang-x86_64-zstd
             mingw-w64-clang-x86_64-pkgconf
 
-      - name: Build vixc (Linux/macOS)
+      - name: Build vixc (Linux)
         if: runner.os != 'Windows'
         run: |
-          if [ "${{ runner.os }}" = "macOS" ]; then
-            make -j2 all VIXC_RUN="" GCC=clang CXX=clang++ CLANG=clang \
-              VIXC="./build/vixc-seed-gc" \
-              LLVM_CXXFLAGS="$(llvm-config --cxxflags) -I$(brew --prefix lld)/include" \
-              LLD_LIBS="-L$(brew --prefix lld)/lib -llldELF -llldCommon" \
-              GC_WRAP_LDFLAGS=""
-          else
-            make -j2 all VIXC_RUN="" VIXC="./build/vixc-seed-gc" \
-              GCC=clang-21 CXX=clang++-21 CLANG=clang-21
-          fi
+          make -j2 all VIXC_RUN="" VIXC="./build/vixc-seed-gc" \
+            GCC=clang-21 CXX=clang++-21 CLANG=clang-21
 
       - name: Build vixc (Windows)
         if: runner.os == 'Windows'
@@ -91,8 +78,58 @@ jobs:
           make -j2 build/vixc-seed-gc.exe \
             GCC=clang CXX="clang++ -Qunused-arguments -Wl,--stack,16777216" CLANG=clang \
             LLVM_CXXFLAGS="$(llvm-config --cxxflags | sed 's/-stdlib=libc++//g')" \
-            GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCommon -lz -lzstd"
+            GC_WRAP_LDFLAGS="" LLD_LIBS="-llldELF -llldCOFF -llldCommon -lz -lzstd"
           cp build/vixc-seed-gc.exe build/vixc.exe
+
+      - name: Build vix-analyzer (Linux)
+        if: runner.os != 'Windows'
+        env:
+          CC: clang-21
+        run: |
+          # The analyzer needs only the front end: vixc emits the object, and
+          # the final link is the four runtime objects with no LLVM at all.
+          set -euo pipefail
+          "$CC" -c vix-analyzer/support.c -o build/vix-analyzer-support.o
+          build/vixc vix-analyzer/main.vix -obj -o build/vix-analyzer.o
+          "$CC" build/vix-analyzer.o build/vix-analyzer-support.o \
+            runtime/runtime.o build/typepool.o -o build/vix-analyzer
+
+      - name: Build vix-analyzer (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: |
+          set -euo pipefail
+          # The analyzer leans on Option/aggregate codegen shapes that the
+          # seed compiler has never proven on this target, so build through a
+          # one-step self-host: the seed compiles the current compiler, and
+          # that fresh compiler (whose codegen certainly matches HEAD) builds
+          # the analyzer.  The msys2 shell has no python, so the smoke test
+          # runs in its own step below.
+          clang -c vix-analyzer/support.c -o build/vix-analyzer-support.o
+          build/vixc.exe src/main.vix -obj -o build/vixc-self.o
+          clang++ -o build/vixc-self.exe build/vixc-self.o build/typepool.o \
+            build/helper.o runtime/runtime.o build/api.o build/Llc.o \
+            build/Linker.o build/Passes.o build/compiler_gc.o \
+            $(llvm-config --ldflags --libs all) \
+            $(pkg-config --libs bdw-gc 2>/dev/null || echo "-lgc -lpthread") \
+            -llldELF -llldCOFF -llldCommon -lz -lzstd
+          build/vixc-self.exe vix-analyzer/main.vix -obj -o build/vix-analyzer.o
+          clang build/vix-analyzer.o build/vix-analyzer-support.o \
+            runtime/runtime.o build/typepool.o -o build/vix-analyzer.exe
+
+      - name: Test vix-analyzer (Windows smoke)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe \
+            || python vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe
+
+      - name: Test vix-analyzer (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer
+          python3 vix-analyzer/tests/lsp_modules.py ./build/vix-analyzer
+          python3 vix-analyzer/tests/lsp_differential.py ./build/vix-analyzer 60
 
       - name: Package compiler
         shell: bash
@@ -103,6 +140,11 @@ jobs:
           compiler_path=build/vixc
           if [ "${{ runner.os }}" = "Windows" ]; then compiler_path=build/vixc.exe; fi
           cp "$compiler_path" "$package_root/"
+          # The language server ships beside the compiler; vix-up already
+          # creates a shim for it in toolchain installs.
+          analyzer_path=build/vix-analyzer
+          if [ "${{ runner.os }}" = "Windows" ]; then analyzer_path=build/vix-analyzer.exe; fi
+          cp "$analyzer_path" "$package_root/"
           # vstd is maintained in its own repository and is shipped beside
           # the compiler. The native runtime sources remain available too.
           # MSYS2 cannot reliably recreate vstd's directory symlinks in the
@@ -127,8 +169,6 @@ jobs:
           EOF
           if [ "${{ runner.os }}" = "Windows" ]; then
             7z a -tzip "vixc-${VIXC_VERSION}-windows-x86_64.zip" "./${package_root}"/*
-          elif [ "${{ runner.os }}" = "macOS" ]; then
-            tar -czf "vixc-${VIXC_VERSION}-macos-arm64.tar.gz" -C package "vixc-${VIXC_VERSION}-macOS"
           else
             tar -czf "vixc-${VIXC_VERSION}-linux-x86_64.tar.gz" -C package "vixc-${VIXC_VERSION}-Linux"
           fi

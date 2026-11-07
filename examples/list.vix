@@ -1,4 +1,4 @@
-type List = struct {
+struct List {
     head: i32,
     tail: ref List
 }

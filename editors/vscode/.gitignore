@@ -1,0 +1,3 @@
+node_modules/
+*.vsix
+server/vix-analyzer

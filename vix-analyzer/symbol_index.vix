@@ -1,0 +1,291 @@
+#[no_main]
+
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "stub_tree.vix" as stub_tree
+use "../src/method.vix" as method
+
+pub type SymbolKind = ModuleSymbol | FunctionSymbol | ParameterSymbol | VariableSymbol | TypeSymbol | FieldSymbol | VariantSymbol | ImportSymbol
+
+pub type Declaration = struct
+{
+    id: ids::SymbolId,
+    name: string,
+    kind: SymbolKind,
+    file: ids::FileId,
+    range: position::LspRange,
+    selection_range: position::LspRange,
+    type_text: string,
+    parent: ids::SymbolId,
+    // Non-empty when the declaration lives in another file (a used module);
+    // the definition handler then targets this URI instead of the document's.
+    uri: string
+}
+
+pub type Reference = struct
+{
+    symbol: ids::SymbolId,
+    file: ids::FileId,
+    range: position::LspRange
+}
+
+pub type SymbolIndex = struct
+{
+    declarations: [Declaration],
+    references: [Reference],
+    generation: i32
+}
+
+pub fn symbol_index_new(): SymbolIndex
+{
+    return SymbolIndex{ declarations: [], references: [], generation: 0 }
+}
+
+pub fn symbol_kind_for_node(kind: stub_tree::StubKind): SymbolKind
+{
+    if (kind == stub_tree::FunctionDecl)
+    {
+        return FunctionSymbol
+    }
+    if (kind == stub_tree::TypeDecl or kind == stub_tree::AdtDecl)
+    {
+        return TypeSymbol
+    }
+    if (kind == stub_tree::FieldDecl)
+    {
+        return FieldSymbol
+    }
+    if (kind == stub_tree::VariantDecl)
+    {
+        return VariantSymbol
+    }
+    if (kind == stub_tree::ModuleDecl)
+    {
+        return ModuleSymbol
+    }
+    if (kind == stub_tree::ImportDecl)
+    {
+        return ImportSymbol
+    }
+    return VariableSymbol
+}
+
+pub fn symbol_lsp_kind(kind: SymbolKind): i32
+{
+    if (kind == FunctionSymbol)
+    {
+        return 12
+    }
+    if (kind == VariableSymbol or kind == ParameterSymbol)
+    {
+        return 13
+    }
+    if (kind == TypeSymbol)
+    {
+        return 5
+    }
+    if (kind == FieldSymbol)
+    {
+        return 8
+    }
+    if (kind == VariantSymbol)
+    {
+        return 22
+    }
+    if (kind == ModuleSymbol or kind == ImportSymbol)
+    {
+        return 2
+    }
+    return 13
+}
+
+// Containment is decided by the selection range (the name), not the whole
+// declaration range, so a cursor inside a body is not captured by the
+// enclosing declaration.
+pub fn declaration_contains(declaration: Declaration, position: position::LspPosition): i32
+{
+    let range = declaration.selection_range
+    if (position.line < range.start.line or position.line > range.end.line)
+    {
+        return 0
+    }
+    if (position.line == range.start.line and position.character < range.start.character)
+    {
+        return 0
+    }
+    if (position.line == range.end.line and position.character > range.end.character)
+    {
+        return 0
+    }
+    return 1
+}
+
+pub fn symbol_index_build(file: ids::FileId, source: string, tree: stub_tree::StubTree): SymbolIndex
+{
+    let index = position::line_index_new(source)
+    let symbols = symbol_index_new()
+    for (i in 0 .. tree.nodes.length)
+    {
+        let node = tree.nodes[i]
+        if (node.alive == 1 and node.name != "")
+        {
+            let range = position::text_range_to_lsp(index, node.range, source)
+            let selection = position::text_range_to_lsp(index, node.name_range, source)
+            symbols.declarations.push(Declaration{
+                id: ids::symbol_id(symbols.declarations.length, tree.generation),
+                name: node.name,
+                kind: symbol_kind_for_node(node.kind),
+                file: file,
+                range: range,
+                selection_range: selection,
+                type_text: "",
+                parent: ids::symbol_id_invalid(),
+                uri: ""
+            })
+        }
+    }
+    symbols.generation = tree.generation
+    return symbols
+}
+
+pub fn symbol_index_declarations(index: SymbolIndex, file: ids::FileId): [Declaration]
+{
+    let mut result: [Declaration] = []
+    for (i in 0 .. index.declarations.length)
+    {
+        if (index.declarations[i].file.value == file.value)
+        {
+            result.push(index.declarations[i])
+        }
+    }
+    return result
+}
+
+pub fn symbol_index_find_at(index: SymbolIndex, file: ids::FileId, position: position::LspPosition): ids::SymbolId
+{
+    let mut best = ids::symbol_id_invalid()
+    let mut best_size = 0
+    for (i in 0 .. index.declarations.length)
+    {
+        let declaration = index.declarations[i]
+        if (declaration.file.value != file.value)
+        {
+            continue
+        }
+        if (declaration_contains(declaration, position) == 0)
+        {
+            continue
+        }
+        let size = (declaration.range.end.line - declaration.range.start.line) * 4096 + declaration.range.end.character - declaration.range.start.character
+        if (best.index < 0 or size < best_size)
+        {
+            best = declaration.id
+            best_size = size
+        }
+    }
+    return best
+}
+
+pub fn symbol_index_find_by_name(index: SymbolIndex, name: string): ids::SymbolId
+{
+    if (name == "")
+    {
+        return ids::symbol_id_invalid()
+    }
+    for (i in 0 .. index.declarations.length)
+    {
+        if (index.declarations[i].name == name)
+        {
+            return index.declarations[i].id
+        }
+    }
+    return ids::symbol_id_invalid()
+}
+
+// Resolves a method call when the static receiver type is known. The lookup key
+// is built by method_qualify, the same function the compiler uses to name method
+// declarations, so the analyzer cannot drift from the compiler.
+pub fn symbol_index_find_method_on_receiver(index: SymbolIndex, receiver_type: string, method: string): ids::SymbolId
+{
+    return symbol_index_find_by_name(index, method::method_qualify(receiver_type, method))
+}
+
+// Fallback for call sites whose receiver type the analyzer cannot determine: it
+// scans for any method with this short name. It reports the first match, so a
+// caller that knows the receiver type must use symbol_index_find_method_on_receiver.
+pub fn symbol_index_find_method(index: SymbolIndex, method: string): ids::SymbolId
+{
+    let suffix = "::" + method
+    for (i in 0 .. index.declarations.length)
+    {
+        let name = index.declarations[i].name
+        let tail = if (name.length >= suffix.length) { util::analyzer_copy(name, name.length - suffix.length, name.length) } else { "" }
+        if (tail == suffix)
+        {
+            return index.declarations[i].id
+        }
+    }
+    return ids::symbol_id_invalid()
+}
+
+pub fn symbol_index_find_definition(index: SymbolIndex, symbol: ids::SymbolId): Declaration
+{
+    for (i in 0 .. index.declarations.length)
+    {
+        if (index.declarations[i].id.index == symbol.index and index.declarations[i].id.generation == symbol.generation)
+        {
+            return index.declarations[i]
+        }
+    }
+    return declaration_invalid()
+}
+
+pub fn declaration_invalid(): Declaration
+{
+    return Declaration{
+        id: ids::symbol_id_invalid(),
+        name: "",
+        kind: VariableSymbol,
+        file: ids::file_id_invalid(),
+        range: position::lsp_range(position::lsp_position(0, 0), position::lsp_position(0, 0)),
+        selection_range: position::lsp_range(position::lsp_position(0, 0), position::lsp_position(0, 0)),
+        type_text: "",
+        parent: ids::symbol_id_invalid(),
+        uri: ""
+    }
+}
+
+pub fn symbol_index_find_references(index: SymbolIndex, symbol: ids::SymbolId): [Reference]
+{
+    let mut result: [Reference] = []
+    for (i in 0 .. index.references.length)
+    {
+        if (index.references[i].symbol.index == symbol.index)
+        {
+            result.push(index.references[i])
+        }
+    }
+    return result
+}
+
+pub fn symbol_index_add_reference(index: &SymbolIndex, reference: Reference)
+{
+    index.references.push(reference)
+}
+
+pub fn symbol_index_merge(index: &SymbolIndex, other: SymbolIndex)
+{
+    for (i in 0 .. other.declarations.length)
+    {
+        index.declarations.push(other.declarations[i])
+    }
+    for (i in 0 .. other.references.length)
+    {
+        index.references.push(other.references[i])
+    }
+    if (other.generation > index.generation)
+    {
+        index.generation = other.generation
+    }
+}

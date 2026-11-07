@@ -1,8 +1,12 @@
 LLVM_CFLAGS := $(shell llvm-config --cflags)
 LLVM_CXXFLAGS := $(shell llvm-config --cxxflags)
 LLVM_LDFLAGS := $(shell llvm-config --ldflags --libs all)
-LLVM_LIBDIR := $(shell llvm-config --libdir)
+ifeq ($(OS),Windows_NT)
+# Linker.cpp instantiates the COFF driver on Windows, which lives in lldCOFF.
+LLD_LIBS := -llldELF -llldCOFF -llldCommon -lz -lzstd
+else
 LLD_LIBS := -llldELF -llldCommon -lz -lzstd
+endif
 GC_LIBS := $(shell pkg-config --libs bdw-gc 2>/dev/null || echo -lgc)
 HOST_UNAME := $(shell uname -s)
 ifeq ($(OS),Windows_NT)
@@ -11,14 +15,6 @@ else ifeq ($(HOST_UNAME),Darwin)
 GC_WRAP_LDFLAGS :=
 else
 GC_WRAP_LDFLAGS := -Wl,--wrap=malloc -Wl,--wrap=realloc -Wl,--wrap=free
-endif
-
-ifeq ($(HOST_UNAME),Darwin)
-LLVM_RPATH := -Wl,-rpath,$(LLVM_LIBDIR)
-else ifeq ($(OS),Windows_NT)
-LLVM_RPATH :=
-else
-LLVM_RPATH := -Wl,-rpath,$(LLVM_LIBDIR)
 endif
 
 GCC ?= clang 
@@ -50,6 +46,7 @@ SEED_GC_TARGET := $(BUILD_DIR)/vixc-seed-gc$(EXE_EXT)
 BOOTSTRAP_OBJ := $(BUILD_DIR)/vixc-bootstrap.o
 BOOTSTRAP_TARGET := $(BUILD_DIR)/vixc-bootstrap$(EXE_EXT)
 HELPER_OBJ := $(BUILD_DIR)/helper.o
+TYPEPOOL_OBJ := $(BUILD_DIR)/typepool.o
 RUNTIME_OBJ := $(RUNTIME_DIR)/runtime.o
 VIXC_OBJ := $(BUILD_DIR)/vixc.o
 SELF_STAGE_OBJ := $(BUILD_DIR)/vixc-self.o
@@ -62,7 +59,7 @@ LINKER_OBJ := $(BUILD_DIR)/Linker.o
 PASSES_OBJ := $(BUILD_DIR)/Passes.o
 COMPILER_GC_OBJ := $(BUILD_DIR)/compiler_gc.o
 LLVM_API_OBJS := $(API_OBJ) $(LLC_OBJ) $(LINKER_OBJ) $(PASSES_OBJ)
-COMPILER_SUPPORT_OBJS := $(HELPER_OBJ) $(RUNTIME_OBJ) $(LLVM_API_OBJS) $(COMPILER_GC_OBJ)
+COMPILER_SUPPORT_OBJS := $(HELPER_OBJ) $(TYPEPOOL_OBJ) $(RUNTIME_OBJ) $(LLVM_API_OBJS) $(COMPILER_GC_OBJ)
 VIXC ?= $(SEED_GC_TARGET)
 
 VIX_SOURCES := $(shell find $(SRC_DIR) -type f -name '*.vix')
@@ -92,6 +89,9 @@ $(BUILD_DIR) $(RUNTIME_DIR):
 $(HELPER_OBJ): $(SRC_DIR)/helper.c | $(BUILD_DIR)
 	$(GCC) -c $< -o $@ $(LLVM_CFLAGS) -Wno-deprecated-declarations
 
+$(TYPEPOOL_OBJ): $(SRC_DIR)/typepool.c | $(BUILD_DIR)
+	$(GCC) -c $< -o $@
+
 $(API_OBJ): lib/api.c | $(BUILD_DIR)
 	$(GCC) -c $< -o $@
 
@@ -113,34 +113,34 @@ $(COMPILER_GC_OBJ): $(SRC_DIR)/compiler_gc.c | $(BUILD_DIR)
 $(SEED_OBJ): seed/vixc.ll | $(BUILD_DIR)
 	$(CLANG) -c $< -o $@
 
-$(SEED_GC_TARGET): $(SEED_OBJ) $(COMPILER_SUPPORT_OBJS) makefile | $(BUILD_DIR)
-	$(CXX) -fuse-ld=lld -o $@ $(filter %.o,$^) $(LLVM_LDFLAGS) $(LLVM_RPATH) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
+$(SEED_GC_TARGET): $(SEED_OBJ) $(COMPILER_SUPPORT_OBJS) | $(BUILD_DIR)
+	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
 
 $(BOOTSTRAP_OBJ): $(VIX_SOURCES) $(VIXC) | $(BUILD_DIR)
 	$(VIXC_RUN) $(VIXC) $(SRC_DIR)/main.vix -obj -o $@
 
-$(BOOTSTRAP_TARGET): $(BOOTSTRAP_OBJ) $(COMPILER_SUPPORT_OBJS) makefile | $(BUILD_DIR)
-	$(CXX) -fuse-ld=lld -o $@ $(filter %.o,$^) $(LLVM_LDFLAGS) $(LLVM_RPATH) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
+$(BOOTSTRAP_TARGET): $(BOOTSTRAP_OBJ) $(COMPILER_SUPPORT_OBJS) | $(BUILD_DIR)
+	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
 
 $(VIXC_OBJ): $(VIX_SOURCES) $(BOOTSTRAP_TARGET) | $(BUILD_DIR)
 	$(VIXC_RUN) $(BOOTSTRAP_TARGET) $(SRC_DIR)/main.vix -obj -o $@
 
-$(TARGET): $(VIXC_OBJ) $(COMPILER_SUPPORT_OBJS) makefile | $(BUILD_DIR)
-	$(CXX) -fuse-ld=lld -o $@ $(filter %.o,$^) $(LLVM_LDFLAGS) $(LLVM_RPATH) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
+$(TARGET): $(VIXC_OBJ) $(COMPILER_SUPPORT_OBJS) | $(BUILD_DIR)
+	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
 
 $(SELF_STAGE_OBJ): $(VIX_SOURCES) $(TARGET) | $(BUILD_DIR)
 	$(VIXC_RUN) $(TARGET) --backend=self $(SRC_DIR)/main.vix -obj -o $@
 
-$(SELF_STAGE_TARGET): $(SELF_STAGE_OBJ) $(COMPILER_SUPPORT_OBJS) makefile | $(BUILD_DIR)
-	$(CXX) -fuse-ld=lld -o $@ $(filter %.o,$^) $(LLVM_LDFLAGS) $(LLVM_RPATH) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
+$(SELF_STAGE_TARGET): $(SELF_STAGE_OBJ) $(COMPILER_SUPPORT_OBJS) | $(BUILD_DIR)
+	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
 
 self-stage: $(SELF_STAGE_TARGET)
 
 $(SELF_LIR_STAGE_OBJ): $(VIX_SOURCES) $(TARGET) | $(BUILD_DIR)
 	$(VIXC_RUN) $(TARGET) --backend=self-lir $(SRC_DIR)/main.vix -obj -o $@
 
-$(SELF_LIR_STAGE_TARGET): $(SELF_LIR_STAGE_OBJ) $(COMPILER_SUPPORT_OBJS) makefile | $(BUILD_DIR)
-	$(CXX) -fuse-ld=lld -o $@ $(filter %.o,$^) $(LLVM_LDFLAGS) $(LLVM_RPATH) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
+$(SELF_LIR_STAGE_TARGET): $(SELF_LIR_STAGE_OBJ) $(COMPILER_SUPPORT_OBJS) | $(BUILD_DIR)
+	$(CXX) -fuse-ld=lld -o $@ $^ $(LLVM_LDFLAGS) $(GC_WRAP_LDFLAGS) $(GC_LIBS) $(LLD_LIBS)
 
 self-lir-stage: $(SELF_LIR_STAGE_TARGET)
 

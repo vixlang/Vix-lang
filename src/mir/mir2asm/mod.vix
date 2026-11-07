@@ -1,8 +1,8 @@
 #[no_main]
-import "types.vix"
-import "target.vix"
-import "registers.vix"
-import "stack.vix"
-import "machine.vix"
-import "x86_64/mod.vix"
-import "emit.vix"
+use "types.vix" as machine_types
+use "target.vix" as target
+use "registers.vix" as registers
+use "stack.vix" as stack
+use "machine.vix" as machine
+use "x86_64/mod.vix" as x86_64
+use "emit.vix" as emit

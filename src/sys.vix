@@ -1,47 +1,54 @@
 // Compiler aggregate. Paths are relative to this file and loaded without PP.
-mod "ast.vix"
-mod "analysis/typed_analysis.vix"
-mod "backend/boot16.vix"
-mod "backend/linker.vix"
-mod "backend/llc.vix"
-mod "backend/passes.vix"
-mod "builder.vix"
-mod "codegen.vix"
-mod "desugar.vix"
-mod "diag.vix"
-mod "error.vix"
-mod "infer/constraint.vix"
-mod "infer/env.vix"
-mod "infer/error.vix"
-mod "infer/gen.vix"
-mod "infer/solver.vix"
-mod "infer/unify.vix"
-mod "json_ast.vix"
-mod "lexer.vix"
-mod "mir/lir/mod.vix"
-mod "mir/lir2asm/mod.vix"
-mod "mir/lir2asm/x86_64/mod.vix"
-mod "mir/mir.vix"
-mod "mir/mir2asm/emit.vix"
-mod "mir/mir2asm/machine.vix"
-mod "mir/mir2asm/mod.vix"
-mod "mir/mir2asm/registers.vix"
-mod "mir/mir2asm/stack.vix"
-mod "mir/mir2asm/target.vix"
-mod "mir/mir2asm/types.vix"
-mod "mir/mir2asm/x86_64/abi.vix"
-mod "mir/mir2asm/x86_64/codegen.vix"
-mod "mir/mir2asm/x86_64/instructions.vix"
-mod "mir/mir2asm/x86_64/mod.vix"
-mod "mir/mir_builder.vix"
-mod "mir/opt.vix"
-mod "module.vix"
-mod "parser.vix"
-mod "preprocess.vix"
-mod "semantic.vix"
-mod "type/scheme.vix"
-mod "type/subst.vix"
-mod "type/typeck.vix"
-mod "type/ty.vix"
-mod "util/fresh.vix"
-mod "util/pos.vix"
+use "ast.vix" as ast
+use "analysis/typed_analysis.vix" as analysis
+use "backend/boot16.vix" as boot16
+use "backend/linker.vix" as linker
+use "backend/llc.vix" as llc
+use "backend/passes.vix" as passes
+use "builder.vix" as builder
+use "codegen.vix" as codegen
+use "desugar.vix" as desugar
+use "diag.vix" as diag
+use "error.vix" as error
+use "fmt.vix" as fmt
+use "infer/constraint.vix" as constraint
+use "intrinsic.vix" as intrinsic
+use "method.vix" as methods
+use "method_decl.vix" as method_decl
+use "infer/env.vix" as env
+use "infer/error.vix" as infer_error
+use "infer/gen.vix" as gen
+use "infer/solver.vix" as solver
+use "infer/unify.vix" as unify
+use "json_ast.vix" as json_ast
+use "json.vix" as json
+use "vixi.vix" as vixi
+use "lexer.vix" as lexer
+use "mir/lir/mod.vix" as lir
+use "mir/lir2asm/mod.vix" as lir2asm
+use "mir/lir2asm/x86_64/mod.vix" as lir2asm_x86
+use "mir/mir.vix" as mir
+use "mir/mir2asm/emit.vix" as mir2asm_emit
+use "mir/mir2asm/machine.vix" as machine
+use "mir/mir2asm/mod.vix" as mir2asm
+use "mir/mir2asm/registers.vix" as registers
+use "mir/mir2asm/stack.vix" as stack
+use "mir/mir2asm/target.vix" as target
+use "mir/mir2asm/types.vix" as machine_types
+use "mir/mir2asm/x86_64/abi.vix" as abi
+use "mir/mir2asm/x86_64/codegen.vix" as x86_codegen
+use "mir/mir2asm/x86_64/instructions.vix" as instructions
+use "mir/mir2asm/x86_64/mod.vix" as x86_64
+use "mir/mir_builder.vix" as mir_builder
+use "mir/opt.vix" as mir_opt
+use "module.vix" as module
+use "parser.vix" as parser
+use "preprocess.vix" as preprocess
+use "receiver.vix" as receiver
+use "semantic.vix" as semantic
+use "type/scheme.vix" as scheme
+use "type/subst.vix" as subst
+use "type/typeck.vix" as typeck
+use "type/ty.vix" as ty
+use "util/fresh.vix" as fresh
+use "util/pos.vix" as pos

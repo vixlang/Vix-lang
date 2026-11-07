@@ -10,16 +10,8 @@
 //   vixc examples/modules/multi_module.vix --backend=self -o multi_module
 //   ./multi_module      # exit code: 0，打印运行结果
 
-mod math
-mod counter
-
-import math::add
-import math::mul
-import math::abs_val
-import counter::counter_new
-import counter::counter_inc
-import counter::counter_get
-
+use "math.vix" as math
+use "counter.vix" as counter
 fn main(): i32
 {
     // 使用 math 模块

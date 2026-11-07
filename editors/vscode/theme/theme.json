@@ -1,0 +1,258 @@
+{
+  "$schema": "vscode://schemas/color-theme",
+  "name": "Vix Aurora Dark",
+  "type": "dark",
+  "semanticHighlighting": true,
+  "colors": {
+    "editor.background": "#1E1F22",
+    "editor.foreground": "#BCBEC4",
+    "editorLineNumber.foreground": "#4B5059",
+    "editorLineNumber.activeForeground": "#BCBEC4",
+    "editorCursor.foreground": "#BCBEC4",
+    "editor.selectionBackground": "#214283",
+    "editor.inactiveSelectionBackground": "#21428366",
+    "editor.lineHighlightBackground": "#26282E",
+    "editorIndentGuide.background1": "#393B40",
+    "editorIndentGuide.activeBackground1": "#4B6EAF",
+    "editorBracketMatch.background": "#21428366",
+    "editorBracketMatch.border": "#4B6EAF",
+    "editorWhitespace.foreground": "#393B40",
+    "editor.findMatchBackground": "#32593D",
+    "editor.findMatchHighlightBackground": "#32593D88",
+    "editor.wordHighlightBackground": "#21428366",
+    "editor.wordHighlightStrongBackground": "#21428399",
+    "editorGutter.background": "#1E1F22",
+    "editorWidget.background": "#2B2D30",
+    "editorWidget.border": "#393B40",
+    "editorHoverWidget.background": "#2B2D30",
+    "editorHoverWidget.border": "#393B40",
+    "panel.background": "#1E1F22",
+    "panel.border": "#393B40",
+    "sideBar.background": "#1E1F22",
+    "sideBar.foreground": "#BCBEC4",
+    "activityBar.background": "#2B2D30",
+    "activityBar.foreground": "#BCBEC4",
+    "statusBar.background": "#2B2D30",
+    "statusBar.foreground": "#BCBEC4",
+    "titleBar.activeBackground": "#2B2D30",
+    "titleBar.activeForeground": "#BCBEC4",
+    "terminal.background": "#1E1F22",
+    "terminal.foreground": "#BCBEC4",
+    "gitDecoration.untrackedResourceForeground": "#DB5860",
+    "gitDecoration.addedResourceForeground": "#73BD79",
+    "gitDecoration.modifiedResourceForeground": "#5394EC",
+    "gitDecoration.deletedResourceForeground": "#8C8C8C",
+    "gitDecoration.renamedResourceForeground": "#5394EC",
+    "gitDecoration.stageModifiedResourceForeground": "#5394EC",
+    "gitDecoration.stageDeletedResourceForeground": "#8C8C8C",
+    "gitDecoration.conflictingResourceForeground": "#E5C07B",
+    "gitDecoration.ignoredResourceForeground": "#6C6C6C",
+    "gitDecoration.submoduleResourceForeground": "#6C6C6C",
+    "list.errorForeground": "#DB5860",
+    "list.warningForeground": "#E5C07B",
+    "editorBracketHighlight.foreground1": "#BCBEC4",
+    "editorBracketHighlight.foreground2": "#CF8E6D",
+    "editorBracketHighlight.foreground3": "#56A8F5",
+    "editorBracketHighlight.foreground4": "#7EA95E",
+    "editorBracketHighlight.foreground5": "#C77DBB",
+    "editorBracketHighlight.foreground6": "#2AACB8",
+    "editorBracketHighlight.unexpectedBracket.foreground": "#DB5860",
+    "editorBracketPairGuide.activeBackground1": "#4B6EAF",
+    "editorBracketPairGuide.background1": "#393B40",
+    "button.background": "#7C5CFF",
+    "button.hoverBackground": "#8F73FF",
+    "button.foreground": "#FFFFFF",
+    "button.secondaryBackground": "#3C3F41",
+    "button.secondaryHoverBackground": "#4B5059",
+    "button.secondaryForeground": "#BCBEC4",
+    "focusBorder": "#7C5CFF",
+    "activityBarBadge.background": "#7C5CFF",
+    "badge.background": "#7C5CFF",
+    "progressBar.background": "#7C5CFF"
+  },
+  "tokenColors": [
+    {
+      "name": "Vix comments",
+      "scope": [
+        "comment.line.double-slash.vix",
+        "comment.block.vix",
+        "comment.block.documentation.vix"
+      ],
+      "settings": {
+        "foreground": "#7A7E85",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "name": "Vix keywords",
+      "scope": [
+        "keyword.control.vix",
+        "keyword.declaration.vix",
+        "keyword.declaration.variable.vix",
+        "storage.type.variable.vix",
+        "storage.type.function.vix",
+        "storage.modifier.vix",
+        "storage.modifier.extern.vix",
+        "storage.modifier.mutable.vix"
+      ],
+      "settings": {
+        "foreground": "#CF8E6D"
+      }
+    },
+    {
+      "name": "Vix builtin types",
+      "scope": [
+        "storage.type.primitive.vix"
+      ],
+      "settings": {
+        "foreground": "#CF8E6D"
+      }
+    },
+    {
+      "name": "Vix functions and calls",
+      "scope": [
+        "entity.name.function.vix",
+        "entity.name.function.call.vix",
+        "support.function.vix"
+      ],
+      "settings": {
+        "foreground": "#56A8F5"
+      }
+    },
+    {
+      "name": "Vix type names",
+      "scope": [
+        "entity.name.type.vix",
+        "storage.type.vix",
+        "entity.name.type.parameter.vix"
+      ],
+      "settings": {
+        "foreground": "#7EA95E"
+      }
+    },
+    {
+      "name": "Vix strings",
+      "scope": [
+        "string.quoted.double.vix",
+        "string.quoted.single.vix",
+        "string.unquoted.import.vix"
+      ],
+      "settings": {
+        "foreground": "#6A8759"
+      }
+    },
+    {
+      "name": "Vix numbers",
+      "scope": [
+        "constant.numeric.integer.vix",
+        "constant.numeric.float.vix",
+        "constant.numeric.hex.vix"
+      ],
+      "settings": {
+        "foreground": "#2AACB8"
+      }
+    },
+    {
+      "name": "Vix escapes and placeholders",
+      "scope": [
+        "constant.character.escape.vix",
+        "constant.other.placeholder.vix"
+      ],
+      "settings": {
+        "foreground": "#CF8E6D"
+      }
+    },
+    {
+      "name": "Vix constants",
+      "scope": [
+        "constant.language.boolean.vix",
+        "constant.language.vix"
+      ],
+      "settings": {
+        "foreground": "#CF8E6D"
+      }
+    },
+    {
+      "name": "Vix fields",
+      "scope": [
+        "variable.other.field.vix",
+        "variable.other.property.vix"
+      ],
+      "settings": {
+        "foreground": "#C77DBB"
+      }
+    },
+    {
+      "name": "Vix declared variables",
+      "scope": "variable.other.readwrite.declaration.vix",
+      "settings": {
+        "foreground": "#BCBEC4"
+      }
+    },
+    {
+      "name": "Vix parameters",
+      "scope": "variable.parameter.vix",
+      "settings": {
+        "foreground": "#BCBEC4"
+      }
+    },
+    {
+      "name": "Vix variables",
+      "scope": [
+        "variable.other.vix",
+        "variable.other.object.vix"
+      ],
+      "settings": {
+        "foreground": "#BCBEC4"
+      }
+    },
+    {
+      "name": "Vix operators",
+      "scope": [
+        "keyword.operator.arithmetic.vix",
+        "keyword.operator.address.vix",
+        "keyword.operator.at.vix",
+        "keyword.operator.multiplication.vix",
+        "keyword.operator.arrow.vix",
+        "keyword.operator.vix"
+      ],
+      "settings": {
+        "foreground": "#BCBEC4"
+      }
+    },
+    {
+      "name": "Vix punctuation",
+      "scope": [
+        "punctuation.separator.vix",
+        "punctuation.separator.type.vix",
+        "punctuation.separator.comma.vix",
+        "punctuation.accessor.dot.vix",
+        "punctuation.definition.parameters.begin.vix",
+        "punctuation.definition.parameters.end.vix"
+      ],
+      "settings": {
+        "foreground": "#BCBEC4"
+      }
+    },
+    {
+      "name": "Vix brackets",
+      "scope": [
+        "meta.brace.curly.vix",
+        "meta.brace.square.vix",
+        "meta.brace.round.vix"
+      ],
+      "settings": {
+        "foreground": "#BCBEC4"
+      }
+    },
+    {
+      "name": "Vix TODO markers",
+      "scope": "markup.todo.vix",
+      "settings": {
+        "foreground": "#1E1F22",
+        "background": "#CF8E6D",
+        "fontStyle": "bold"
+      }
+    }
+  ]
+}

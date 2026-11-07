@@ -1,4 +1,7 @@
 #[no_main]
+use "../mir2asm/machine.vix" as machine
+use "../mir2asm/target.vix" as target
+use "../../lexer.vix" as lexer
 
 pub type MachineLirValue = struct {
     name: string,
@@ -35,7 +38,7 @@ pub type MachineLirFunction = struct {
 }
 
 pub type MachineLirModule = struct {
-    machine: MachineModule,
+    machine: machine::MachineModule,
     functions: [MachineLirFunction],
     error: string,
     error_line: i32,
@@ -47,7 +50,7 @@ pub fn machine_lir_is_register_type(ty: string): i32
     if (ty == "i1" or ty == "i8" or ty == "i16" or ty == "i32" or ty == "i64" or ty == "char") { return 1 }
     if (ty == "u8" or ty == "u16" or ty == "u32" or ty == "u64" or ty == "usize") { return 1 }
     if (ty == "ptr" or ty == "string") { return 1 }
-    if (ty.length > 4) { if (mir2asm_starts_with(ty, "ptr:") == 1) { return 1 } }
+    if (ty.length > 4) { if (target::mir2asm_starts_with(ty, "ptr:") == 1) { return 1 } }
     return 0
 }
 
@@ -58,17 +61,17 @@ pub fn machine_lir_is_known_type(ty: string): i32
     return 0
 }
 
-pub fn machine_lir_branch_target(inst: MachineInst, which: i32): string
+pub fn machine_lir_branch_target(inst: machine::MachineInst, which: i32): string
 {
-    if (inst.opcode == "br") { return mir2asm_trim(mir2asm_after(inst.text, 9)) }
+    if (inst.opcode == "br") { return target::mir2asm_trim(target::mir2asm_after(inst.text, 9)) }
     if (inst.opcode == "br_cond")
     {
-        let c1 = mir2asm_find(inst.text, ',', 0)
+        let c1 = target::mir2asm_find(inst.text, ',', 0)
         if (c1 < 0) { return "" }
-        let c2 = mir2asm_find(inst.text, ',', c1 + 1)
+        let c2 = target::mir2asm_find(inst.text, ',', c1 + 1)
         if (c2 < 0) { return "" }
-        if (which == 0) { return mir2asm_trim(mir2asm_after(mir2asm_trim(mir2asm_slice(inst.text, c1 + 1, c2)), 6)) }
-        return mir2asm_trim(mir2asm_after(mir2asm_trim(mir2asm_after(inst.text, c2 + 1)), 6))
+        if (which == 0) { return target::mir2asm_trim(target::mir2asm_after(target::mir2asm_trim(target::mir2asm_slice(inst.text, c1 + 1, c2)), 6)) }
+        return target::mir2asm_trim(target::mir2asm_after(target::mir2asm_trim(target::mir2asm_after(inst.text, c2 + 1)), 6))
     }
     return ""
 }
@@ -111,7 +114,7 @@ pub fn machine_lir_value_index(lir: MachineLirFunction, name: string): i32
     return -1
 }
 
-pub fn machine_lir_block_index(f: MachineFunction, name: string): i32
+pub fn machine_lir_block_index(f: machine::MachineFunction, name: string): i32
 {
     for (i in 0 .. f.blocks.length) { if (f.blocks[i].name == name) { return i } }
     return -1
@@ -129,20 +132,20 @@ pub fn machine_lir_add_name(lir: &MachineLirFunction, name: string)
     lir.names.push(name)
 }
 
-pub fn machine_lir_collect_params(lir: &MachineLirFunction, f: MachineFunction)
+pub fn machine_lir_collect_params(lir: &MachineLirFunction, f: machine::MachineFunction)
 {
-    let at = mir2asm_find(f.header, '(', 0)
+    let at = target::mir2asm_find(f.header, '(', 0)
     if (at < 0) { return }
-    let rp = mir2asm_find_matching_paren(f.header, at)
+    let rp = target::mir2asm_find_matching_paren(f.header, at)
     if (rp < 0) { return }
     let mut p = at + 1
     while (p < rp)
     {
-        let percent = mir2asm_find(f.header, '%', p)
+        let percent = target::mir2asm_find(f.header, '%', p)
         if (percent < 0 or percent >= rp) { return }
-        let colon = mir2asm_find(f.header, ':', percent)
+        let colon = target::mir2asm_find(f.header, ':', percent)
         if (colon < 0 or colon >= rp) { return }
-        machine_lir_add_name(lir, mir2asm_slice(f.header, percent, colon))
+        machine_lir_add_name(lir, target::mir2asm_slice(f.header, percent, colon))
         p = colon + 1
     }
 }
@@ -168,7 +171,7 @@ pub fn machine_lir_init_temp_ids(lir: &MachineLirFunction)
     }
 }
 
-pub fn machine_lir_build_function(f: MachineFunction, force_spill: i32): MachineLirFunction
+pub fn machine_lir_build_function(f: machine::MachineFunction, force_spill: i32): MachineLirFunction
 {
     let mut lir = MachineLirFunction{ name: f.name, values: [], blocks: [], names: [], temp_name_ids: [], temp_value_ids: [], used_callee_regs: 0, frame_names: [], frame_offsets: [], frame_is_addr: [], frame_tys: [], frame_size: 0, frame_ready: 0 }
     machine_lir_collect_params(&lir, f)
@@ -214,7 +217,7 @@ pub fn machine_lir_build_function(f: MachineFunction, force_spill: i32): Machine
         for (ii2 in 0 .. f.blocks[bi2].insts.length)
         {
             let inst2 = f.blocks[bi2].insts[ii2]
-            let operands = machine_collect_operands(inst2.text, inst2.dest)
+            let operands = machine::machine_collect_operands(inst2.text, inst2.dest)
             for (oi in 0 .. operands.length)
             {
                 let value_id = machine_lir_value_index(lir, operands[oi])
@@ -360,14 +363,14 @@ pub fn machine_lir_linear_scan(lir: &MachineLirFunction)
     lir.used_callee_regs = used12 + used13 * 2 + used14 * 4 + used15 * 8
 }
 
-pub fn machine_lir_error(out: &MachineLirModule, f: MachineFunction, inst: MachineInst, text: string)
+pub fn machine_lir_error(out: &MachineLirModule, f: machine::MachineFunction, inst: machine::MachineInst, text: string)
 {
     out.error = text
     out.error_line = inst.line_no
     out.error_function = f.name
 }
 
-pub fn machine_lir_build(module: MachineModule): MachineLirModule
+pub fn machine_lir_build(module: machine::MachineModule): MachineLirModule
 {
     let mut out = MachineLirModule{ machine: module, functions: [], error: "", error_line: 0, error_function: "" }
     let mut module_candidates = 0
@@ -404,7 +407,7 @@ pub fn machine_lir_build(module: MachineModule): MachineLirModule
             {
                 let inst = f.blocks[bi2].insts[ii]
                 if (inst.opcode == "load" and inst.dest != "" and machine_lir_is_known_type(inst.ty) == 0 and out.error == "") { machine_lir_error(&out, f, inst, "invalid load type " + inst.ty) }
-                let operands2 = machine_collect_operands(inst.text, inst.dest)
+                let operands2 = machine::machine_collect_operands(inst.text, inst.dest)
                 for (oi in 0 .. operands2.length)
                 {
                     let operand = operands2[oi]
@@ -431,7 +434,7 @@ pub fn machine_lir_build(module: MachineModule): MachineLirModule
     return out
 }
 
-pub fn mir2lir(mir: string): MachineLirModule => machine_lir_build(machine_parse(mir))
+pub fn mir2lir(mir: string): MachineLirModule => machine_lir_build(machine::machine_parse(mir))
 
 pub fn machine_lir_finish_frame(lir: &MachineLirFunction, names: [string], offsets: [i32], is_addr: [i32], tys: [string], frame_size: i32)
 {
@@ -449,12 +452,12 @@ pub fn machine_lir_debug(lir: MachineLirModule): string
     for (fi in 0 .. lir.functions.length)
     {
         let f = lir.functions[fi]
-        out = out + "  fn @" + f.name + " frame=" + if (f.frame_ready == 1) { i32_to_str(f.frame_size) } else { "pending" } + " {\n"
+        out = out + "  fn @" + f.name + " frame=" + if (f.frame_ready == 1) { lexer::i32_to_str(f.frame_size) } else { "pending" } + " {\n"
         for (vi in 0 .. f.values.length)
         {
             let v = f.values[vi]
             let location = if (v.spilled == 1 or v.phys_reg == "") { "spill" } else { v.phys_reg }
-            out = out + "    vreg " + v.name + ": " + v.ty + " [" + i32_to_str(v.start) + "," + i32_to_str(v.end) + "] -> " + location + "\n"
+            out = out + "    vreg " + v.name + ": " + v.ty + " [" + lexer::i32_to_str(v.start) + "," + lexer::i32_to_str(v.end) + "] -> " + location + "\n"
         }
         out = out + "  }\n"
     }

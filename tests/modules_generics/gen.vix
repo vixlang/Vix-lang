@@ -1,0 +1,18 @@
+// Cross-module generics: the callee lives in another module and is
+// monomorphised at the call site in main.vix. This is the property that lets
+// the LLVM backend keep working on one merged AST.
+
+pub fn id:[T](value: T): T
+{
+    return value
+}
+
+pub fn add:[T](a: T, b: T): T
+{
+    return a + b
+}
+
+pub fn first:[T](values: [T]): T
+{
+    return values[0]
+}

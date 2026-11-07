@@ -1,3 +1,0 @@
-#[no_main]
-
-import "type/typeck.vix"

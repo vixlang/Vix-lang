@@ -7,21 +7,18 @@ type Point = struct
     x: i32,
     y: i32
 }
-impl Point
+fn (&Point) length(): f64
 {
-    fn length(self: &Point): f64
-    {
-        return sqrt(self.x * self.x + self.y * self.y)
-    }
-    fn move(mut self: &Point, dx: i32, dy: i32)
-    {
-        self.x = self.x + dx
-        self.y = self.y + dy
-    }
-    fn new(x: i32, y: i32): Point 
-    {
-        return Point{ x: x, y: y }
-    }
+    return sqrt(self.x * self.x + self.y * self.y)
+}
+fn (&mut Point) move(dx: i32, dy: i32)
+{
+    self.x = self.x + dx
+    self.y = self.y + dy
+}
+fn make_point(x: i32, y: i32): Point
+{
+    return Point{ x: x, y: y }
 }
 fn main(): i32
 {

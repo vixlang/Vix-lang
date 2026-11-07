@@ -1,0 +1,192 @@
+#[no_main]
+
+use "ids.vix" as ids
+use "position.vix" as position
+use "util.vix" as util
+use "../src/json.vix" as json
+use "queries.vix" as queries
+use "symbol_index.vix" as symbol_index
+use "diagnostics.vix" as diagnostics
+use "analysis.vix" as analysis
+use "stub_tree.vix" as stub_tree
+
+pub type LspMessage = struct
+{
+    id: i32,
+    has_id: i32,
+    method: string,
+    params: string
+}
+
+pub type ServerCapabilities = struct
+{
+    text_document_sync: i32,
+    hover: i32,
+    definition: i32,
+    completion: i32,
+    symbols: i32,
+    references: i32,
+    rename: i32
+}
+
+pub fn lsp_initialize_capabilities(): ServerCapabilities
+{
+    return ServerCapabilities{
+        text_document_sync: 1,
+        hover: 1,
+        definition: 1,
+        completion: 1,
+        symbols: 1,
+        references: 1,
+        rename: 1
+    }
+}
+
+pub fn lsp_parse_message(json_text: string): LspMessage
+{
+    let doc = json::json_parse(json_text)
+    let root = json::json_root(doc)
+    if (root < 0)
+    {
+        return LspMessage{ id: 0, has_id: 0, method: "", params: "" }
+    }
+    let id_node = json::json_object_get(doc, root, "id")
+    let params_node = json::json_object_get(doc, root, "params")
+    return LspMessage{
+        id: json::json_int_at(doc, id_node),
+        has_id: if (id_node >= 0) 1 else 0,
+        method: json::json_string_at(doc, json::json_object_get(doc, root, "method")),
+        params: json::json_raw(doc, json_text, params_node)
+    }
+}
+
+pub fn lsp_response(id: i32, result: string): string
+{
+    return "{\"jsonrpc\":\"2.0\",\"id\":" + util::analyzer_i32_to_str(id) + ",\"result\":" + result + "}"
+}
+
+pub fn lsp_error(id: i32, code: i32, message: string): string
+{
+    return "{\"jsonrpc\":\"2.0\",\"id\":" + util::analyzer_i32_to_str(id) + ",\"error\":{\"code\":" + util::analyzer_i32_to_str(code) + ",\"message\":" + json::json_quote(message) + "}}"
+}
+
+pub fn lsp_notification(method: string, params: string): string
+{
+    return "{\"jsonrpc\":\"2.0\",\"method\":" + json::json_quote(method) + ",\"params\":" + params + "}"
+}
+
+pub fn lsp_initialize_result(): string
+{
+    let capabilities = lsp_initialize_capabilities()
+    // documentFormattingProvider must be advertised, otherwise the editor never
+    // sends textDocument/formatting and "Format Document" silently does nothing.
+    return "{\"capabilities\":{\"textDocumentSync\":" + util::analyzer_i32_to_str(capabilities.text_document_sync) + ",\"hoverProvider\":true,\"definitionProvider\":true,\"completionProvider\":{},\"documentSymbolProvider\":true,\"referencesProvider\":true,\"renameProvider\":true,\"documentFormattingProvider\":true},\"serverInfo\":{\"name\":\"vix-analyzer\",\"version\":\"0.1.0\"}}"
+}
+
+pub fn lsp_publish_diagnostics(uri: string, diagnostics: [diagnostics::AnalyzerDiagnostic]): string
+{
+    let params = "{\"uri\":" + json::json_quote(uri) + ",\"diagnostics\":" + diagnostics::diagnostics_to_json(diagnostics) + "}"
+    return lsp_notification("textDocument/publishDiagnostics", params)
+}
+
+pub fn lsp_encode_range(range: position::LspRange): string
+{
+    return "{\"start\":{\"line\":" + util::analyzer_i32_to_str(range.start.line) + ",\"character\":" + util::analyzer_i32_to_str(range.start.character) + "},\"end\":{\"line\":" + util::analyzer_i32_to_str(range.end.line) + ",\"character\":" + util::analyzer_i32_to_str(range.end.character) + "}}"
+}
+
+pub fn lsp_encode_location(uri: string, range: position::LspRange): string
+{
+    return "{\"uri\":" + json::json_quote(uri) + ",\"range\":" + lsp_encode_range(range) + "}"
+}
+
+pub fn lsp_encode_hover(result: queries::HoverResult): string
+{
+    return "{\"contents\":{\"kind\":\"markdown\",\"value\":" + json::json_quote(result.contents) + "},\"range\":" + lsp_encode_range(result.range) + "}"
+}
+
+pub fn lsp_encode_completion(items: [queries::CompletionItem]): string
+{
+    let mut out = "["
+    for (i in 0 .. items.length)
+    {
+        if (i > 0)
+        {
+            out = out + ","
+        }
+        out = out + "{\"label\":" + json::json_quote(items[i].label) + ",\"detail\":" + json::json_quote(items[i].detail) + ",\"kind\":" + util::analyzer_i32_to_str(items[i].kind) + "}"
+    }
+    return out + "]"
+}
+
+pub fn lsp_encode_symbols(declarations: [symbol_index::Declaration]): string
+{
+    let mut out = "["
+    for (i in 0 .. declarations.length)
+    {
+        if (i > 0)
+        {
+            out = out + ","
+        }
+        out = out + "{\"name\":" + json::json_quote(declarations[i].name)
+        out = out + ",\"kind\":" + util::analyzer_i32_to_str(symbol_index::symbol_lsp_kind(declarations[i].kind))
+        out = out + ",\"range\":" + lsp_encode_range(declarations[i].range)
+        out = out + ",\"selectionRange\":" + lsp_encode_range(declarations[i].selection_range) + "}"
+    }
+    return out + "]"
+}
+
+pub fn lsp_encode_locations(uri: string, references: [symbol_index::Reference]): string
+{
+    let mut out = "["
+    for (i in 0 .. references.length)
+    {
+        if (i > 0)
+        {
+            out = out + ","
+        }
+        out = out + lsp_encode_location(uri, references[i].range)
+    }
+    return out + "]"
+}
+
+pub fn lsp_encode_rename(uri: string, references: [symbol_index::Reference], new_name: string): string
+{
+    let mut edits = "["
+    for (i in 0 .. references.length)
+    {
+        if (i > 0)
+        {
+            edits = edits + ","
+        }
+        edits = edits + "{\"range\":" + lsp_encode_range(references[i].range) + ",\"newText\":" + json::json_quote(new_name) + "}"
+    }
+    edits = edits + "]"
+    return "{\"changes\":{" + json::json_quote(uri) + ":" + edits + "}}"
+}
+// Reports how much of the syntax layer was reused by the last edit. This is the
+// observable proof that a change inside one declaration does not re-scan the
+// others; it is a notification so clients can ignore it.
+pub fn lsp_analysis_stats(uri: string, analysis: analysis::DocumentAnalysis): string
+{
+    let params = "{\"uri\":" + json::json_quote(uri)
+    params = params + ",\"reusedNodes\":" + util::analyzer_i32_to_str(analysis.reused_nodes)
+    params = params + ",\"freshNodes\":" + util::analyzer_i32_to_str(analysis.fresh_nodes)
+    params = params + ",\"aliveNodes\":" + util::analyzer_i32_to_str(stub_tree::stub_tree_alive_count(analysis.tree))
+    params = params + ",\"fullFile\":" + util::analyzer_i32_to_str(analysis.full_file)
+    params = params + ",\"reusedFunctions\":" + util::analyzer_i32_to_str(analysis.reused_functions)
+    params = params + ",\"checkedFunctions\":" + util::analyzer_i32_to_str(analysis.checked_functions) + "}"
+    return lsp_notification("vix/analysisStats", params)
+}
+// A formatting result is returned as one edit that replaces the whole document,
+// which keeps the range arithmetic trivial and the result exact.
+pub fn lsp_full_range(text: string): position::LspRange
+{
+    let index = position::line_index_new(text)
+    let end = position::line_index_position(index, text.length)
+    return position::lsp_range(position::lsp_position(0, 0), position::lsp_position(end.line, end.column))
+}
+
+pub fn lsp_encode_format_edits(text: string, formatted: string): string
+{
+    return "[{\"range\":" + lsp_encode_range(lsp_full_range(text)) + ",\"newText\":" + json::json_quote(formatted) + "}]"
+}

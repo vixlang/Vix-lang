@@ -1,6 +1,7 @@
 #[no_main]
+use "../ast.vix" as ast
 
-pub fn boot16_validate_exprs(program: AstProgram): string
+pub fn boot16_validate_exprs(program: ast::AstProgram): string
 {
     for (i in 0 .. program.expr_store.exprs.length)
     {
@@ -13,7 +14,7 @@ pub fn boot16_validate_exprs(program: AstProgram): string
     return ""
 }
 
-pub fn boot16_validate(program: AstProgram, no_std: i32): string
+pub fn boot16_validate(program: ast::AstProgram, no_std: i32): string
 {
     if (no_std == 0) { return "vixc: error: boot16 requires #[no_std]" }
     if (program.extern_functions.length > 0) { return "vixc: error: boot16 does not support extern functions" }
@@ -32,17 +33,17 @@ pub fn boot16_validate(program: AstProgram, no_std: i32): string
     if (func.param_names.length > 0) { return "vixc: error: boot16 boot_main cannot have parameters" }
     if (func.ret_ty != "i32") { return "vixc: error: boot16 boot_main must return i32" }
 
-    let body = stmt_store_get(program.store, func.body_idx)
+    let body = ast::stmt_store_get(program.store, func.body_idx)
     if (body.tag != "block" or body.stmt_indices.length != 1)
     {
         return "vixc: error: boot16 currently supports only 'return <integer>' in boot_main"
     }
-    let ret = stmt_store_get(program.store, body.stmt_indices[0])
+    let ret = ast::stmt_store_get(program.store, body.stmt_indices[0])
     if (ret.tag != "return_expr")
     {
         return "vixc: error: boot16 currently supports only 'return <integer>' in boot_main"
     }
-    let value = expr_store_get(program.expr_store, ret.value_idx)
+    let value = ast::expr_store_get(program.expr_store, ret.value_idx)
     if (value.tag != "int")
     {
         return "vixc: error: boot16 currently supports only an integer return value"

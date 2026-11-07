@@ -1,0 +1,8 @@
+// Diamond: both mid and this file use dep.vix. It must be one module, not two.
+use "mid.vix" as mid
+use "dep.vix" as dep
+
+fn main(): i32
+{
+    return mid::call() + dep::value()
+}

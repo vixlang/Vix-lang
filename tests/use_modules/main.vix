@@ -1,0 +1,7 @@
+// The alias names the namespace; nothing is derived from the file name.
+use "lib.vix" as util
+
+fn main(): i32
+{
+    return util::add(3, 4)
+}

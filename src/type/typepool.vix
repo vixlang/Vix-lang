@@ -1,0 +1,132 @@
+#[no_main]
+
+// Interned type pool.
+//
+// A type used to be a string: every consumer re-parsed the text and compared
+// strings.  Here a type is an index into one content-addressed pool, so two
+// occurrences of the same type share an index and identity is an integer
+// comparison.  The canonical spelling is still available for diagnostics, the
+// AST JSON dump and the interface files.
+//
+// kinds: 0 named, 1 pointer, 2 array, 3 slice, 4 tuple, 5 function, 6 option,
+//        7 unknown, 8 error
+//
+// Parameter names in this module deliberately avoid the names of its own
+// functions: module merging prefixes a bare call only when the name is not a
+// parameter or local anywhere in the module, so a parameter named like a
+// sibling function would stop that function from being called at all.
+
+extern "C"
+{
+    fn vix_type_intern(t: string, k: i32, b: string, a: ptr, n: i32, r: i32, len: i32, m: i32): i32
+    fn vix_type_unknown(): i32
+    fn vix_type_invalid(): i32
+    fn vix_type_find(text: string): i32
+    fn vix_type_text(idx: i32): string
+    fn vix_type_base(idx: i32): string
+    fn vix_type_kind(idx: i32): i32
+    fn vix_type_arg_count(idx: i32): i32
+    fn vix_type_arg(idx: i32, i: i32): i32
+    fn vix_type_ret(idx: i32): i32
+    fn vix_type_array_len(idx: i32): i32
+    fn vix_type_is_mut(idx: i32): i32
+    fn vix_type_set_ref_info(idx: i32, is_ref: i32, lifetime: string)
+    fn vix_type_set_ref_to_ptr(idx: i32, value: i32)
+    fn vix_type_is_ref_to_ptr(idx: i32): i32
+    fn vix_type_is_ref(idx: i32): i32
+    fn vix_type_lifetime(idx: i32): string
+    fn vix_type_sym(idx: i32): i32
+    fn vix_type_set_sym(idx: i32, s: i32)
+    fn vix_type_count(): i32
+}
+
+pub fn kind_named(): i32 { return 0 }
+pub fn kind_ptr(): i32 { return 1 }
+pub fn kind_array(): i32 { return 2 }
+pub fn kind_slice(): i32 { return 3 }
+pub fn kind_tuple(): i32 { return 4 }
+pub fn kind_fn(): i32 { return 5 }
+pub fn kind_option(): i32 { return 6 }
+pub fn kind_unknown(): i32 { return 7 }
+pub fn kind_error(): i32 { return 8 }
+
+pub fn intern(t: string, k: i32, b: string, a: [i32], r: i32, len: i32, m: i32): i32
+{
+    return vix_type_intern(t, k, b, a, a.length, r, len, m)
+}
+
+// A named type keeps its written base ("Vec", "dep::T", "i32") plus any generic
+// arguments; the base is what resolution turns into a symbol.
+pub fn named(t: string, b: string, a: [i32]): i32
+{
+    return intern(t, kind_named(), b, a, -1, -1, 0)
+}
+
+pub fn primitive(t: string): i32
+{
+    return named(t, t, [])
+}
+
+pub fn pointer(t: string, inner: i32, m: i32): i32
+{
+    return intern(t, kind_ptr(), "", [inner], -1, -1, m)
+}
+
+pub fn array(t: string, inner: i32, len: i32): i32
+{
+    return intern(t, kind_array(), "", [inner], -1, len, 0)
+}
+
+pub fn slice(t: string, inner: i32): i32
+{
+    return intern(t, kind_slice(), "", [inner], -1, -1, 0)
+}
+
+pub fn tuple_type(t: string, elems: [i32]): i32
+{
+    return intern(t, kind_tuple(), "", elems, -1, -1, 0)
+}
+
+pub fn option_type(t: string, inner: i32): i32
+{
+    return intern(t, kind_option(), "", [inner], -1, -1, 0)
+}
+
+pub fn function_type(t: string, params: [i32], result: i32): i32
+{
+    return intern(t, kind_fn(), "", params, result, -1, 0)
+}
+
+pub fn unknown(): i32 { return vix_type_unknown() }
+pub fn invalid(): i32 { return vix_type_invalid() }
+
+pub fn find(text: string): i32 { return vix_type_find(text) }
+pub fn text(idx: i32): string { return vix_type_text(idx) }
+pub fn base(idx: i32): string { return vix_type_base(idx) }
+pub fn kind(idx: i32): i32 { return vix_type_kind(idx) }
+pub fn arg_count(idx: i32): i32 { return vix_type_arg_count(idx) }
+pub fn arg(idx: i32, i: i32): i32 { return vix_type_arg(idx, i) }
+pub fn ret(idx: i32): i32 { return vix_type_ret(idx) }
+pub fn array_len(idx: i32): i32 { return vix_type_array_len(idx) }
+pub fn is_mut(idx: i32): i32 { return vix_type_is_mut(idx) }
+pub fn set_ref_info(idx: i32, is_ref: i32, lifetime: string) { vix_type_set_ref_info(idx, is_ref, lifetime) }
+pub fn is_ref(idx: i32): i32 { return vix_type_is_ref(idx) }
+
+// The analysis layer lowers "&T" to the synthetic spelling "refptr:T"; making
+// that a pool node lets consumers ask structurally instead of scanning text.
+pub fn ref_to_ptr(t0: string, inner: i32): i32
+{
+    let node = intern(t0, kind_ptr(), "", [inner], -1, -1, 0)
+    vix_type_set_ref_to_ptr(node, 1)
+    return node
+}
+
+pub fn is_ref_to_ptr(idx: i32): i32 { return vix_type_is_ref_to_ptr(idx) }
+pub fn lifetime(idx: i32): string { return vix_type_lifetime(idx) }
+pub fn sym(idx: i32): i32 { return vix_type_sym(idx) }
+pub fn set_sym(idx: i32, s: i32) { vix_type_set_sym(idx, s) }
+pub fn pool_size(): i32 { return vix_type_count() }
+
+pub fn is_unknown(idx: i32): i32 { return if (kind(idx) == kind_unknown()) { 1 } else { 0 } }
+pub fn is_error(idx: i32): i32 { return if (kind(idx) == kind_error()) { 1 } else { 0 } }
+pub fn is_named(idx: i32): i32 { return if (kind(idx) == kind_named()) { 1 } else { 0 } }

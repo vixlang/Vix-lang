@@ -1,4 +1,9 @@
 #[no_main]
+
+use "method_decl.vix" as method_decl
+use "receiver.vix" as receiver
+use "diag.vix" as diag
+
 extern "C"
 {
     fn malloc(size: usize): string
@@ -48,10 +53,15 @@ pub type AstExpr = struct {
 }
 
 pub type ExprStore = struct {
-    exprs: [AstExpr]
+    exprs: [AstExpr],
+    // The single method declaration index for this compilation unit. The parser
+    // and every later phase share the expression store, so carrying the table
+    // here keeps one source of truth for method resolution without threading a
+    // new parameter through every expression helper.
+    methods: method_decl::MethodTable
 }
 
-pub fn expr_store_new(): ExprStore => ExprStore{ exprs: [] }
+pub fn expr_store_new(): ExprStore => ExprStore{ exprs: [], methods: method_decl::method_table_empty() }
 
 pub fn expr_store_add(store: &ExprStore, expr: AstExpr): i32
 {
@@ -134,8 +144,11 @@ pub type AstFunction = struct {
     param_types: [string],
     type_params: [string],
     is_var_arg: i32,
+    receiver_kind: receiver::ReceiverKind,
+    receiver_type: string,
     line: i32,
     col: i32
+    is_pub: i32,
 }
 
 pub type AstStructDecl = struct {
@@ -145,6 +158,7 @@ pub type AstStructDecl = struct {
     is_c_abi: i32,
     line: i32,
     col: i32
+    is_pub: i32,
 }
 
 pub type AstAdtDecl = struct {
@@ -154,6 +168,7 @@ pub type AstAdtDecl = struct {
     variant_payload_types: [string],
     line: i32,
     col: i32
+    is_pub: i32,
 }
 
 // Module declaration: `mod math` or `pub mod math`
@@ -174,6 +189,19 @@ pub type AstImportDecl = struct {
     col: i32
 }
 
+// Every struct and ADT declaration gets a symbol.  The id is the identity the
+// type checker compares; the qualified name is what diagnostics print.
+pub type AstTypeSymbol = struct {
+    id: i32,
+    module_path: string,
+    name: string,
+    qualified: string,
+    kind: i32,
+    is_pub: i32,
+    line: i32,
+    col: i32
+}
+
 pub type AstProgram = struct {
     function: AstFunction,
     functions: [AstFunction],
@@ -183,11 +211,12 @@ pub type AstProgram = struct {
     adts: [AstAdtDecl],
     mod_decls: [AstModDecl],
     import_decls: [AstImportDecl],
+    type_symbols: [AstTypeSymbol],
     expr_store: ExprStore,
     store: StmtStore,
     ok: i32,
     error: string,
-    diagnostic: Diagnostic
+    diagnostic: diag::Diagnostic
 }
 
 macro ast_default_loc_fields() {
@@ -463,18 +492,32 @@ pub fn ast_function_full_vararg(name: string, ret_ty: string, body_idx: i32, par
 
 pub fn ast_function_generic_full_vararg(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], is_var_arg: i32): AstFunction
 {
-    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, $ast_default_loc_fields() }
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: is_var_arg, receiver_kind: receiver::ReceiverNone, receiver_type: "", is_pub: 0, $ast_default_loc_fields() }
+}
+
+pub fn ast_function_method(name: string, ret_ty: string, body_idx: i32, param_names: [string], param_types: [string], type_params: [string], receiver_kind: receiver::ReceiverKind, receiver_type: string): AstFunction
+{
+    return AstFunction{ name: name, ret_ty: ret_ty, body_idx: body_idx, param_names: param_names, param_types: param_types, type_params: type_params, is_var_arg: 0, receiver_kind: receiver_kind, receiver_type: receiver_type, is_pub: 0, $ast_default_loc_fields() }
 }
 
 pub fn ast_function_with_loc(func: AstFunction, line: i32, col: i32): AstFunction
 {
-    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, type_params: func.type_params, is_var_arg: func.is_var_arg, line: line, col: col }
+    return AstFunction{ name: func.name, ret_ty: func.ret_ty, body_idx: func.body_idx, param_names: func.param_names, param_types: func.param_types, type_params: func.type_params, is_var_arg: func.is_var_arg, receiver_kind: func.receiver_kind, receiver_type: func.receiver_type, is_pub: func.is_pub, line: line, col: col }
+}
+
+// pub is kept on the declaration rather than dropped, so an interface file can
+// say what a module actually exports and a later pass can enforce it.
+pub fn ast_function_mark_pub(func: AstFunction, is_pub: i32): AstFunction
+{
+    let mut marked = func
+    marked.is_pub = is_pub
+    return marked
 }
 
 pub fn ast_program_ok(function: AstFunction, expr_store: ExprStore, store: StmtStore): AstProgram
 {
     let entry = ast_function_with_loc(function, function.line, function.col)
-    return AstProgram{ function: entry, functions: [function], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store, store: store, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, "") }
+    return AstProgram{ function: entry, functions: [function], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], type_symbols: [], expr_store: expr_store, store: store, ok: 1, error: "", diagnostic: diag::diag_new("E0000", diag::DiagError, diag::DiagParser, "") }
 }
 
 pub fn ast_program_ok_functions(functions: [AstFunction], expr_store: ExprStore, store: StmtStore): AstProgram
@@ -516,19 +559,19 @@ pub fn ast_program_full(functions: [AstFunction], extern_functions: [AstFunction
             }
         }
     }
-    return AstProgram{ function: entry, functions: functions, extern_functions: extern_functions, globals: globals, structs: structs, adts: adts, mod_decls: mod_decls, import_decls: import_decls, expr_store: expr_store, store: store, ok: 1, error: "", diagnostic: diag_new("E0000", DiagError, DiagParser, "") }
+    return AstProgram{ function: entry, functions: functions, extern_functions: extern_functions, globals: globals, structs: structs, adts: adts, mod_decls: mod_decls, import_decls: import_decls, type_symbols: [], expr_store: expr_store, store: store, ok: 1, error: "", diagnostic: diag::diag_new("E0000", diag::DiagError, diag::DiagParser, "") }
 }
 
 pub fn ast_program_err(message: string): AstProgram
 {
-    let diagnostic = diag_new("E1000", DiagError, DiagParser, "parse error")
-        |> diag_message(message)
+    let diagnostic = diag::diag_new("E1000", diag::DiagError, diag::DiagParser, "parse error")
+        |> diag::diag_message(message)
     return ast_program_err_diag(message, diagnostic)
 }
 
-pub fn ast_program_err_diag(message: string, diagnostic: Diagnostic): AstProgram
+pub fn ast_program_err_diag(message: string, diagnostic: diag::Diagnostic): AstProgram
 {
-    return AstProgram{ function: ast_function("main", "i32", -1), functions: [], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], expr_store: expr_store_new(), store: stmt_store_new(), ok: 0, error: message, diagnostic: diagnostic }
+    return AstProgram{ function: ast_function("main", "i32", -1), functions: [], extern_functions: [], globals: [], structs: [], adts: [], mod_decls: [], import_decls: [], type_symbols: [], expr_store: expr_store_new(), store: stmt_store_new(), ok: 0, error: message, diagnostic: diagnostic }
 }
 
 pub fn ast_expr_debug(store: &ExprStore, idx: i32): string
@@ -560,14 +603,31 @@ pub fn ast_expr_debug(store: &ExprStore, idx: i32): string
 
 pub fn ast_type_base_name(ty: string): string
 {
+    // "mod::Name[A]" is the name "mod::Name": a module qualifier belongs to the
+    // name, a single ':' starts the generic argument list.  Stopping at the
+    // first ':' turned "lexer::TokenStream" into "lexer", so every lookup by
+    // type name missed once types became namespaced.
     let mut result = ""
-    for (i in 0 .. ty.length)
+    let mut i = 0
+    while (i < ty.length)
     {
-        if (compiler_string_byte(ty, i) == '[' or compiler_string_byte(ty, i) == ':') return result
+        let c = compiler_string_byte(ty, i)
+        if (c == '[') { return result }
+        if (c == ':')
+        {
+            if (i + 1 < ty.length and compiler_string_byte(ty, i + 1) == ':')
+            {
+                result = result + "::"
+                i += 2
+                continue
+            }
+            return result
+        }
         let s: string = malloc(2)
-        s[0] = compiler_string_byte(ty, i)
+        s[0] = c
         s[1] = 0
         result = result + s
+        i += 1
     }
     return result
 }
@@ -1192,3 +1252,27 @@ pub fn ast(program: AstProgram): string
     }
     return out
 }
+// True when a merged symbol name belongs to one of the checked modules.
+//
+// A module's symbols are prefixed with its namespace when modules merge, so
+// "<prefix>::" is the whole test.  This lives here rather than beside the module
+// graph because the type checker needs it and does not include the graph -- the
+// language server checks programs without ever building one.
+pub fn module_name_is_checked(name: string, prefixes: [string]): i32
+{
+    for (i in 0 .. prefixes.length)
+    {
+        let prefix = prefixes[i] + "::"
+        if (name.length > prefix.length)
+        {
+            let mut same = 1
+            for (k in 0 .. prefix.length)
+            {
+                if (compiler_string_byte(name, k) != compiler_string_byte(prefix, k)) { same = 0 }
+            }
+            if (same == 1) { return 1 }
+        }
+    }
+    return 0
+}
+
