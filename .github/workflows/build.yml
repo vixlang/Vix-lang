@@ -112,30 +112,30 @@ jobs:
         shell: msys2 {0}
         run: |
           set -euo pipefail
+          # The analyzer leans on Option/aggregate codegen shapes that the
+          # seed compiler has never proven on this target, so build through a
+          # one-step self-host: the seed compiles the current compiler, and
+          # that fresh compiler (whose codegen certainly matches HEAD) builds
+          # the analyzer.  The msys2 shell has no python, so the smoke test
+          # runs in its own step below.
           clang -c vix-analyzer/support.c -o build/vix-analyzer-support.o
-          link_analyzer () {
-            clang build/vix-analyzer.o build/vix-analyzer-support.o \
-              runtime/runtime.o build/typepool.o -o build/vix-analyzer.exe
-          }
-          build/vixc.exe vix-analyzer/main.vix -obj -o build/vix-analyzer.o
-          link_analyzer
-          # The seed's codegen must handle the analyzer's Option/aggregate
-          # shapes; the LSP smoke test proves the binary actually works.  If
-          # it does not, self-host one step (the seed compiles the current
-          # compiler, whose codegen certainly does) and rebuild the analyzer.
-          if ! python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe \
-             && ! python vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe; then
-            echo "seed-built analyzer failed the smoke test; self-hosting once"
-            build/vixc.exe src/main.vix -obj -o build/vixc-self.o
-            clang++ -o build/vixc-self.exe build/vixc-self.o build/typepool.o \
-              build/helper.o runtime/runtime.o build/api.o build/Llc.o \
-              build/Linker.o build/Passes.o build/compiler_gc.o \
-              -llldELF -llldCOFF -llldCommon -lz -lzstd
-            build/vixc-self.exe vix-analyzer/main.vix -obj -o build/vix-analyzer.o
-            link_analyzer
-            python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe \
-              || python vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe
-          fi
+          build/vixc.exe src/main.vix -obj -o build/vixc-self.o
+          clang++ -o build/vixc-self.exe build/vixc-self.o build/typepool.o \
+            build/helper.o runtime/runtime.o build/api.o build/Llc.o \
+            build/Linker.o build/Passes.o build/compiler_gc.o \
+            $(llvm-config --ldflags --libs all) \
+            $(pkg-config --libs bdw-gc 2>/dev/null || echo "-lgc -lpthread") \
+            -llldELF -llldCOFF -llldCommon -lz -lzstd
+          build/vixc-self.exe vix-analyzer/main.vix -obj -o build/vix-analyzer.o
+          clang build/vix-analyzer.o build/vix-analyzer-support.o \
+            runtime/runtime.o build/typepool.o -o build/vix-analyzer.exe
+
+      - name: Test vix-analyzer (Windows smoke)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          python3 vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe \
+            || python vix-analyzer/tests/lsp_session.py ./build/vix-analyzer.exe
 
       - name: Test vix-analyzer (Linux)
         if: runner.os == 'Linux'
