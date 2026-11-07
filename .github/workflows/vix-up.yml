@@ -23,9 +23,8 @@ jobs:
           - os: ubuntu-24.04
             goos: linux
             goarch: amd64
-          - os: macos-14
-            goos: darwin
-            goarch: arm64
+          # macos-14 hosted runners are not served on this organization's
+          # plan ("configuration not supported"); same as build.yml.
           - os: windows-2022
             goos: windows
             goarch: amd64
