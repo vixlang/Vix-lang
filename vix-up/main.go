@@ -404,10 +404,27 @@ func defaultCmd(v string) error {
 	return writeShims()
 }
 func toolPath(root, name string) string {
-	if _, err := os.Stat(filepath.Join(root, "bin", exe(name))); err == nil {
-		return filepath.Join(root, "bin", exe(name))
+	// Release archives carry exe(name) on Windows, but accept an
+	// extension-less layout too; on Unix both spellings are the same file.
+	for _, candidate := range []string{
+		filepath.Join(root, "bin", exe(name)),
+		filepath.Join(root, exe(name)),
+		filepath.Join(root, "bin", name),
+		filepath.Join(root, name),
+	} {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
 	}
-	return filepath.Join(root, exe(name))
+	return filepath.Join(root, "bin", exe(name))
+}
+
+// The shim a tool gets in the user's bin directory.
+func shimName(name string) string {
+	if runtime.GOOS == "windows" {
+		return name + ".cmd"
+	}
+	return name
 }
 func writeShims() error {
 	_, bin, _ := dirs()
@@ -421,9 +438,8 @@ func writeShims() error {
 	root := toolchainDir(resolve("", c))
 	for _, name := range []string{"vix", "vixc", "vix-analyzer"} {
 		target := toolPath(root, name)
-		p := filepath.Join(bin, name)
+		p := filepath.Join(bin, shimName(name))
 		if runtime.GOOS == "windows" {
-			p += ".cmd"
 			content := "@echo off\r\n\"" + target + "\" %*\r\n"
 			if err = os.WriteFile(p, []byte(content), 0644); err != nil {
 				return err
