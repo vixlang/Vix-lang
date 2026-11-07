@@ -139,9 +139,12 @@ build/vixc-patched，否则回退到 build/vixc（make all 的产物）。
 
 | 平台 | 状态 | 方式 |
 |------|------|------|
-| macOS | 支持 | 本脚本：LLVM 后端出 Mach-O 目标文件 + 平台 clang 链接（内嵌链接器没有 Mach-O 驱动） |
-| Linux | 支持 | CI 直接 `build/vixc vix-analyzer/main.vix -obj` + clang 链接 |
-| Windows | 支持 | CI 用 build/vixc.exe（seed）出 COFF 目标文件 + clang 链接；冒烟失败则自举一步后重试 |
+| macOS | 支持（本机构建） | 本脚本：LLVM 后端出 Mach-O 目标文件 + 平台 clang 链接（内嵌链接器没有 Mach-O 驱动） |
+| Linux | 支持（CI） | CI 直接 `build/vixc vix-analyzer/main.vix -obj` + clang 链接 |
+| Windows | 支持（CI） | CI 自举一步后出 COFF 目标文件 + clang 链接 |
+
+组织当前的 GitHub 计划不提供 macos-14 托管 runner，CI matrix 只有
+Linux 和 Windows；macOS 靠开发机验证，待计费覆盖后可加回 matrix。
 
 Windows 的 support.c 会把 stdin/stdout 切到 `_O_BINARY`，否则 CRLF 翻译破坏
 Content-Length 帧。三平台的发布档案都带 vix-analyzer(.exe)，vix-up 会为它创建 shim。
