@@ -117,7 +117,8 @@ int vix_diag_color_enabled(void) {
   if (vix_diag_color_mode == 1)
     return 1;
 #ifdef _WIN32
-  return _isatty(_STDERR_FILENO) ? 1 : 0;
+  /* MinGW's io.h has _isatty but not the _STDxxx_FILENO fd constants. */
+  return _isatty(2) ? 1 : 0;
 #else
   return isatty(STDERR_FILENO) ? 1 : 0;
 #endif
