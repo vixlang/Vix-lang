@@ -82,7 +82,7 @@ compiler unchanged, so the problems panel and the language server are unaffected
 
 ## Getting Help
 
-- Open a discussion in [GitHub Issues](https://github.com/Daweidie/vix-lang/issues).
+- Open a discussion in [GitHub Issues](https://github.com/vixlang/vix-lang/issues).
 - Contact: [popolk1871@outlook.com](mailto:popolk1871@outlook.com)
 - QQ Group: 130577506
 
@@ -92,7 +92,7 @@ Contributions are welcome, including language design feedback, bug reports,
 tests, standard library improvements, and documentation updates.
 
 To start contributing, please open or pick an issue:
-[vix-lang issues](https://github.com/Daweidie/vix-lang/issues)
+[vix-lang issues](https://github.com/vixlang/vix-lang/issues)
 
 ## License
 
